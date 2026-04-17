@@ -119,6 +119,8 @@ Per the disclosure on Sheet 2, if both R6X and D30 apply to the same build (an i
 
 One row per published (trim × seat × seat_trim × interior_color_treatment) intersection from Block 1 of either Color and Trim sheet. `3LT, 3LZ` in the source row expands to two rows. `AH2 / AE4` in the source also expands to two rows — one per seat code — because seat codes carry different compatibility downstream.
 
+Footnotes attached to Block 1 cells, column headers, or row labels are carried into every expanded row that row or column produced. When a disclosure is scoped by trim, model family, or body style — e.g. `"Requires N26 on Stingray and Grand Sport models; Requires N2Z on Z06, ZR1 and ZR1X models"` — attempt to parse the scoping into structured columns so downstream consumers don't re-parse the prose. See **Footnote scope parsing** below.
+
 | Column | Meaning |
 |---|---|
 | `combo_id` | Stable key, e.g. `ctc_3lt_ah2_htt` |
@@ -131,6 +133,10 @@ One row per published (trim × seat × seat_trim × interior_color_treatment) in
 | `seat_trim_material` | From the `Seat Trim` column |
 | `interior_color_treatment_name` | The column header as it appears in the source |
 | `interior_color_rpo` | The RPO from the cell |
+| `footnote_scope_trim` | Pipe-delimited trim codes the footnote disclosure applies to, when parseable from prose; blank otherwise |
+| `footnote_scope_model_family` | Pipe-delimited model families the footnote disclosure applies to, when parseable from prose; blank otherwise |
+| `footnote_scope_body_style` | Pipe-delimited body styles the footnote disclosure applies to, when parseable from prose; blank otherwise |
+| `footnote_scope_fragment` | The portion of the disclosure text that applies to this row's scope, when parseable; blank otherwise |
 | `requires_rpos` | `R6X` if combo_source is custom_r6x, else blank |
 | `notes` | |
 
@@ -152,6 +158,37 @@ One row per (exterior_rpo × interior_color_treatment) pairing from Block 2 of e
 | `notes` | |
 
 **Important:** the D30 inference is not read from the source. The Color and Trim sheets show `--` to mean "not a published combination." Per Sean's ordering rules, customers can still order that combination by adding D30. Record the inference explicitly in `availability_label` so downstream consumers don't have to re-derive it. The R6X requirement on all Sheet 2 selections is similarly inferred from the sheet-level disclosure, not from the cells themselves.
+
+### Footnote scope parsing
+
+When a Block 1 footnote disclosure names specific trims, model families, or body styles alongside their applicable RPOs, ingest attempts to split the disclosure by scope and populate the `footnote_scope_*` columns on each expanded row. This gives the build skill structured data without forcing it to re-parse prose.
+
+**The parsing is strictly pattern-matched, not interpretive.** If a disclosure doesn't match the documented patterns, leave all `footnote_scope_*` columns blank — the full disclosure still lands in `compat_note_text` as always, so no information is lost.
+
+**Recognized scope tokens:**
+- Trim codes: `1LT`, `2LT`, `3LT`, `1LZ`, `2LZ`, `3LZ`, and slash-separated or comma-separated groups of the same (`1LT/2LT/3LT`, `LZ trims`, `LT models`)
+- Model families: `Stingray`, `Grand Sport`, `Z06`, `E-Ray`, `ZR1`, `ZR1X`, `Grand Sport X`, in any comma-and-`and` list form (`Stingray and Grand Sport`, `Z06, ZR1 and ZR1X`, `Z06/ZR1/ZR1X`)
+- Body styles: `Coupe`, `Convertible`, `Coupe and Convertible`, `Coupe/Convertible`
+
+**Recognized connectives tying a scope to a fragment:**
+- `Requires X on <scope>` / `Requires X on <scope> models`
+- `<scope> requires X` / `<scope> models require X`
+- `X on <scope>` / `X for <scope>`
+- Semicolon-separated clauses where each clause contains its own scope
+
+**Parsing logic:**
+1. Split the disclosure on `;` first — each clause is a candidate scope fragment.
+2. For each clause, look for any scope token (trim, model family, or body style). If found, record the scope axis and the token values.
+3. The clause itself becomes `footnote_scope_fragment` for rows whose trim/model_family/body_style matches the parsed scope.
+4. When a row matches a clause's scope, populate the corresponding `footnote_scope_*` column(s) on that row with the parsed tokens and copy the clause into `footnote_scope_fragment`.
+5. If a disclosure has no recognizable scope tokens, or has scope tokens but no clean clause boundaries, leave all `footnote_scope_*` columns blank on every row. The full `compat_note_text` still carries the disclosure.
+
+**Ambiguity rule.** If a clause's scope matches the row on one axis (e.g. model family) but conflicts on another (e.g. a trim code that doesn't exist for that model), log an entry in `Ingest Exceptions` with the disclosure text and both scope interpretations, and leave the row's `footnote_scope_*` columns blank. Do not guess.
+
+**What this does NOT do:**
+- Does not infer model family from trim codes, or vice versa. A disclosure saying `"on 3LZ trims"` populates `footnote_scope_trim=3LZ`; it does not populate `footnote_scope_model_family` even though 3LZ only exists on Z06/ZR1/ZR1X.
+- Does not reword or normalize the fragment. If the source says `"Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models"`, that exact string lands in `footnote_scope_fragment` — parentheses, RPO code, and all.
+- Does not parse disclosures on anything other than Block 1 cells, column headers, and row labels. Footnotes on Block 2 (exterior paint × interior color) cells are out of scope for this parsing; they land in `compat_note_text` as full text.
 
 ### Relationship to matrix-sheet exterior colors
 
