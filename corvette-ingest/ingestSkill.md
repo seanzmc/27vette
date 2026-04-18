@@ -1,6 +1,6 @@
 ---
 name: corvette-ingest
-description: Ingest raw Chevrolet Corvette order-guide exports and GM price schedules into a flattened intermediate layer for downstream configurator use. Use this skill whenever Sean shares a new GM export workbook (Standard Equipment 1-4, Interior 1-4, Exterior 1-4, Mechanical 1-4, Equipment Groups 1-4, Options Long, Pricing), a new model-year price schedule document, or asks to refresh, re-ingest, normalize, or flatten raw Corvette source data. Trigger even if Sean does not use the word "ingest" — phrases like "new export", "new model year", "refresh the source data", "update the catalog from GM", "process this price schedule", or "capture what GM sent" all indicate ingest work. Do NOT use this skill when Sean is editing per-variant configurator sheets, building out order-form logic, or working in the Stingray / Grand Sport / Z06 / E-Ray / ZR1 / ZR1X build sheets — that is the corvette-build skill's job.
+description: Ingest raw Chevrolet Corvette order-guide exports and GM price schedules into a flattened intermediate layer for downstream configurator use. Use this skill whenever Sean shares a new GM export workbook (Standard Equipment 1-4, Interior 1-4, Exterior 1-4, Mechanical 1-4, Equipment Groups 1-4, Options Long, Pricing), a new model-year price schedule document, or asks to refresh, re-ingest, normalize, or flatten raw Corvette source data. Trigger even if Sean does not use the word "ingest" — phrases like "new export", "new model year", "refresh the source data", "update the catalog from GM", "process this price schedule", or "capture what GM sent" all indicate ingest work. Do NOT use this skill when Sean is editing per-variant configurator sheets, building out order-form logic, or working in the Stingray / Grand Sport / Z06 / Grand Sport X / ZR1 / ZR1X build sheets — that is the corvette-build skill's job.
 ---
 
 # Corvette Ingest
@@ -19,7 +19,7 @@ The one exception: structural flattening. A 4-way-split matrix sheet (Interior 1
 
 Matrix-style sheets in a GM export follow a consistent header pattern regardless of which sheet they appear in. Always drive scope detection from the header cells, never from the sheet name.
 
-**R1 C1** carries the model family declaration. Observed forms include single families (`Stingray`, `Grand Sport`, `Z06`, `E-Ray`, `ZR1`, `ZR1X`, `Grand Sport X`) and combined families (`ZR1 and ZR1X`). Treat the text as a human label and extract model families from it rather than expecting an exact match — for example `"ZR1 and ZR1X"` yields two model families. A future sheet could declare `"Z06 and Grand Sport X"` or similar; handle it the same way.
+**R1 C1** carries the model family declaration. Observed forms include single families (`Stingray`, `Grand Sport`, `Z06`, `Grand Sport X`, `ZR1`, `ZR1X`) and combined families (`ZR1 and ZR1X`). Treat the text as a human label and extract model families from it rather than expecting an exact match — for example `"ZR1 and ZR1X"` yields two model families. A future sheet could declare `"Z06 and Grand Sport X"` or similar; handle it the same way.
 
 **R2 C3** holds the legend of cell codes (`S`, `A`, `--`, `D`, `■`, `□`, `*`). Its presence is a strong confirmation that the sheet is a matrix sheet. If R2 C3 is blank or carries different text, re-examine the sheet's structure before proceeding.
 
@@ -209,7 +209,7 @@ One row per (variant × option) observation from the raw matrix sheets. This is 
 | `option_id` | FK to Option Catalog |
 | `rpo_code` | Redundant but kept for readability |
 | `variant_id` | `var_<model>_<body>_<trim>` e.g. `var_stingray_coupe_2lt` |
-| `model_family` | Stingray, Grand Sport, Z06, E-Ray, ZR1, ZR1X |
+| `model_family` | Stingray, Grand Sport, Grand Sport X,Z06, ZR1, ZR1X |
 | `body_style` | Coupe / Convertible |
 | `trim` | 1LT, 2LT, 3LT, 1LZ, 2LZ, 3LZ, etc. |
 | `availability_raw` | Exact source cell value: `S`, `A`, `A/D`, `--`, `■`, or similar |
