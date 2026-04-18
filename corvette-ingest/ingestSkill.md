@@ -32,6 +32,8 @@ Parse each variant header into three pieces by splitting on newlines:
 
 When Line 1 has no model-family prefix (as in Stingray's `"Coupe\n1YC07\n1LT"`), derive the model family from R1 C1. When Line 1 is prefixed (as in ZR1X's `"ZR1X Coupe\n1YS07\n1LZ"` on a combined sheet), trust the prefix and validate it against R1 C1's declared families.
 
+Trim codes also narrow model family even when the sheet header is broad. Trims ending in `LT` are always `Stingray` or `Grand Sport`. Trims ending in `LZ` are always `Grand Sport X`, `Z06`, `ZR1`, or `ZR1X`. Use that as a validation rule and as a tie-breaker when a combined-family declaration is broader than a single column's actual scope. Do not assign a model family that conflicts with the trim suffix.
+
 The model code on Line 2 is the authoritative variant identifier in GM's system. Build `variant_id` from the parsed pieces using a stable convention: `var_<model_family_slug>_<body_slug>_<trim>` (e.g. `var_stingray_coupe_2lt`, `var_grand_sport_x_convertible_3lz`). Keep the model code in a separate `model_code` column — do not try to reverse-engineer it from the variant_id.
 
 **Sanity checks to run on every matrix sheet before extraction:**
@@ -52,6 +54,10 @@ GM's source documents use superscripted digit markers to tie cell content to she
 
 Disclosures are always same-sheet — a marker in a Color and Trim 1 cell points at a footnote elsewhere on Color and Trim 1, never another sheet. The ingest skill never needs to resolve a marker across sheets.
 
+Color and Trim sheets are the only sheets where disclosures can be whole-sheet, page-specific disclosures. On every other sheet, disclosures apply only to the row where the marker occurs unless the source explicitly says otherwise.
+
+In-cell disclosures are written into the same cell as the option name. They always begin after a line break with `1. ` following the main option text. If a second disclosure is present, it begins after another line break with `2. `. Preserve those line breaks when reading the cell so the option name and disclosure text stay distinct.
+
 **Apply this cleanup before anything else extracts identity or RPO codes from a cell.** If ingest builds Option Catalog entries or Availability Long rows from un-cleaned cells, it will mint phantom RPOs like `HU76`, `HUA6`, `EL98` that do not exist in GM's system. That is a data integrity bug. Fix it at read time.
 
 **Cleanup logic:**
@@ -60,7 +66,7 @@ Disclosures are always same-sheet — a marker in a Color and Trim 1 cell points
 2. If the cell value is a candidate RPO token (all uppercase letters + digits, typical length 3-5) longer than 3 characters and ends in one or more digits, split at the 3-character boundary. The real RPO is the first three characters; the trailing digits are the footnote marker.
 3. If the cell value is a name, description, or other display string and ends directly in a digit run with no separating whitespace, split at the boundary between the last non-digit character and the digit run. The real name is everything before; the digit run is the footnote marker.
 4. Record the original un-cleaned cell value in a `raw_value` or `name_raw` column for provenance. Record the extracted footnote marker in a separate column or as a pipe-delimited list if multiple markers are present (rare but possible).
-5. When multiple cells on the same sheet carry footnote markers, collect the distinct marker values and attempt to resolve each one to its on-sheet disclosure text. If the disclosure can't be located (some GM sheets have disclosures embedded in a boilerplate block near the top or bottom, others have them in a trailing row), log each unresolved marker in `Ingest Exceptions` — do not silently drop them.
+5. On Color and Trim sheets, collect the distinct marker values and attempt to resolve each one to its whole-sheet disclosure text. On every other sheet, resolve the marker only against the row where it occurs, including disclosures embedded in the same cell after line breaks like `\n1. ` and `\n2. `. If the disclosure can't be located, log each unresolved marker in `Ingest Exceptions` — do not silently drop them.
 
 **Cases to handle carefully:**
 
@@ -119,7 +125,7 @@ Per the disclosure on Sheet 2, if both R6X and D30 apply to the same build (an i
 
 One row per published (trim × seat × seat_trim × interior_color_treatment) intersection from Block 1 of either Color and Trim sheet. `3LT, 3LZ` in the source row expands to two rows. `AH2 / AE4` in the source also expands to two rows — one per seat code — because seat codes carry different compatibility downstream.
 
-Footnotes attached to Block 1 cells, column headers, or row labels are carried into every expanded row that row or column produced. When a disclosure is scoped by trim, model family, or body style — e.g. `"Requires N26 on Stingray and Grand Sport models; Requires N2Z on Z06, ZR1 and ZR1X models"` — attempt to parse the scoping into structured columns so downstream consumers don't re-parse the prose. See **Footnote scope parsing** below.
+Footnotes attached to Block 1 cells, column headers, or row labels are carried into every expanded row that row or column produced. The row already establishes the trim scope, so do not add separate trim/model/body footnote-scope columns here. If the disclosure text itself clearly names a specific model family, keep that disclosure with the rows it unambiguously applies to. If there is no reliable way to tell whether a disclosure in this section is more specific than the row already implies, do the default: keep the full disclosure text with the row and do not try to split or parse extra scope from it.
 
 | Column | Meaning |
 |---|---|
@@ -133,10 +139,6 @@ Footnotes attached to Block 1 cells, column headers, or row labels are carried i
 | `seat_trim_material` | From the `Seat Trim` column |
 | `interior_color_treatment_name` | The column header as it appears in the source |
 | `interior_color_rpo` | The RPO from the cell |
-| `footnote_scope_trim` | Pipe-delimited trim codes the footnote disclosure applies to, when parseable from prose; blank otherwise |
-| `footnote_scope_model_family` | Pipe-delimited model families the footnote disclosure applies to, when parseable from prose; blank otherwise |
-| `footnote_scope_body_style` | Pipe-delimited body styles the footnote disclosure applies to, when parseable from prose; blank otherwise |
-| `footnote_scope_fragment` | The portion of the disclosure text that applies to this row's scope, when parseable; blank otherwise |
 | `requires_rpos` | `R6X` if combo_source is custom_r6x, else blank |
 | `notes` | |
 
@@ -159,40 +161,9 @@ One row per (exterior_rpo × interior_color_treatment) pairing from Block 2 of e
 
 **Important:** the D30 inference is not read from the source. The Color and Trim sheets show `--` to mean "not a published combination." Per Sean's ordering rules, customers can still order that combination by adding D30. Record the inference explicitly in `availability_label` so downstream consumers don't have to re-derive it. The R6X requirement on all Sheet 2 selections is similarly inferred from the sheet-level disclosure, not from the cells themselves.
 
-### Footnote scope parsing
-
-When a Block 1 footnote disclosure names specific trims, model families, or body styles alongside their applicable RPOs, ingest attempts to split the disclosure by scope and populate the `footnote_scope_*` columns on each expanded row. This gives the build skill structured data without forcing it to re-parse prose.
-
-**The parsing is strictly pattern-matched, not interpretive.** If a disclosure doesn't match the documented patterns, leave all `footnote_scope_*` columns blank — the full disclosure still lands in `compat_note_text` as always, so no information is lost.
-
-**Recognized scope tokens:**
-- Trim codes: `1LT`, `2LT`, `3LT`, `1LZ`, `2LZ`, `3LZ`, and slash-separated or comma-separated groups of the same (`1LT/2LT/3LT`, `LZ trims`, `LT models`)
-- Model families: `Stingray`, `Grand Sport`, `Z06`, `E-Ray`, `ZR1`, `ZR1X`, `Grand Sport X`, in any comma-and-`and` list form (`Stingray and Grand Sport`, `Z06, ZR1 and ZR1X`, `Z06/ZR1/ZR1X`)
-- Body styles: `Coupe`, `Convertible`, `Coupe and Convertible`, `Coupe/Convertible`
-
-**Recognized connectives tying a scope to a fragment:**
-- `Requires X on <scope>` / `Requires X on <scope> models`
-- `<scope> requires X` / `<scope> models require X`
-- `X on <scope>` / `X for <scope>`
-- Semicolon-separated clauses where each clause contains its own scope
-
-**Parsing logic:**
-1. Split the disclosure on `;` first — each clause is a candidate scope fragment.
-2. For each clause, look for any scope token (trim, model family, or body style). If found, record the scope axis and the token values.
-3. The clause itself becomes `footnote_scope_fragment` for rows whose trim/model_family/body_style matches the parsed scope.
-4. When a row matches a clause's scope, populate the corresponding `footnote_scope_*` column(s) on that row with the parsed tokens and copy the clause into `footnote_scope_fragment`.
-5. If a disclosure has no recognizable scope tokens, or has scope tokens but no clean clause boundaries, leave all `footnote_scope_*` columns blank on every row. The full `compat_note_text` still carries the disclosure.
-
-**Ambiguity rule.** If a clause's scope matches the row on one axis (e.g. model family) but conflicts on another (e.g. a trim code that doesn't exist for that model), log an entry in `Ingest Exceptions` with the disclosure text and both scope interpretations, and leave the row's `footnote_scope_*` columns blank. Do not guess.
-
-**What this does NOT do:**
-- Does not infer model family from trim codes, or vice versa. A disclosure saying `"on 3LZ trims"` populates `footnote_scope_trim=3LZ`; it does not populate `footnote_scope_model_family` even though 3LZ only exists on Z06/ZR1/ZR1X.
-- Does not reword or normalize the fragment. If the source says `"Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models"`, that exact string lands in `footnote_scope_fragment` — parentheses, RPO code, and all.
-- Does not parse disclosures on anything other than Block 1 cells, column headers, and row labels. Footnotes on Block 2 (exterior paint × interior color) cells are out of scope for this parsing; they land in `compat_note_text` as full text.
-
 ### Relationship to matrix-sheet exterior colors
 
-Exterior color RPOs also appear in the per-variant Exterior matrix sheets (e.g. `Exterior 1`, `Exterior 2`, etc.) where their availability varies by variant. Color and Trim is authoritative for exterior paint identity (name, RPO, touch-up number) and cross-interior compatibility. The Exterior matrix sheets are authoritative for per-variant availability. Both feed the Option Catalog (with Color and Trim winning on identity fields) and both feed Availability Long (Exterior matrix sheets populate the per-variant rows, Color and Trim populates the color-combination cross-reference).
+ Color and Trim is authoritative for exterior paint identity (name, RPO, touch-up number) and cross-interior compatibility. The matrix sheets are authoritative for per-variant availability. Both feed the Option Catalog (with Color and Trim winning on identity fields) and both feed Availability Long (matrix sheets populate the per-variant rows, Color and Trim populates the color-combination cross-reference).
 
 ## Inputs this skill handles
 
@@ -204,7 +175,7 @@ Exterior color RPOs also appear in the per-variant Exterior matrix sheets (e.g. 
 
 ## Outputs this skill produces
 
-Write to a fresh workbook (or a clearly-labeled intermediate area of an existing workbook). Do not edit raw source sheets in place.
+Write to newly created output sheets in the same workbook/document being prepared for ingest. Do not edit raw source sheets in place.
 
 The full output set is seven sheets: `Option Catalog`, `Availability Long`, `Pricing Long`, `Base Prices`, `Interior Trim Combos`, `Color Combination Availability`, and `Ingest Exceptions`. The first four are primary; the next two are Color and Trim extractions documented in the section above; the last logs everything that could not be cleanly placed.
 
@@ -228,6 +199,8 @@ One row per distinct RPO observed across all sources. Identity fields only — n
 | `notes` | Source compatibility prose copied verbatim |
 
 If the same RPO appears with slightly different names across sheets, pick the most specific one for `name` and record the variants in `notes`. Flag ambiguous cases to Sean instead of silently resolving them.
+
+If an option is flagged with no price in the price schedule, compare its RPO against the RPOs found on the Standard Equipment sheets. When the same RPO is present there, treat that as confirmation that the item is standard equipment and reflect that in `Option Catalog` using `section = Standard Equipment` and the most specific standard-equipment identity text available. If a no-price RPO does not appear on Standard Equipment, do not auto-promote it to standard equipment; leave the catalog identity as-is and log the mismatch in `Ingest Exceptions`.
 
 ### 2. `Availability Long` (flattened variant × option matrix)
 
@@ -271,6 +244,8 @@ One row per (RPO × price context) from the price schedule. A single RPO with tw
 | `source_page_or_row` | Location reference |
 
 Token extraction from context notes (`context_note_raw` → `context_trim`, `requires_rpos`, etc.) is pattern-matching, not interpretation. If the note says "2LT/LZ or 3LT/LZ", that tokenizes cleanly to `context_trim=2LT|2LZ|3LT|3LZ`. If a note is ambiguous ("available with performance packages"), leave the tokenized fields blank and keep the raw note — don't guess what counts as a performance package.
+
+When the price schedule flags an RPO with no price, cross-check that RPO against Standard Equipment. If the RPO appears on Standard Equipment, treat the no-price state as standard-equipment evidence rather than a missing paid price. If it does not appear there, keep the no-price record as written and log the unresolved pricing/status mismatch in `Ingest Exceptions`.
 
 ### 4. `Base Prices`
 
@@ -330,7 +305,7 @@ For sheets already in long format (Options Long), just re-key to match the schem
 ### Step 4: Extract Color and Trim
 
 Process both Color and Trim sheets (if present). For each one:
-- Parse Block 1 (Seat/Trim × Interior Color) into `Interior Trim Combos` rows. Expand comma-separated `Decor Level` values into one row per trim. Preserve slash-separated `Seat Code` values as pipe-delimited.
+- Parse Block 1 (Seat/Trim × Interior Color) into `Interior Trim Combos` rows. Expand comma-separated `Decor Level` values into one row per trim.
 - Add one Option Catalog entry per distinct interior color RPO observed in Block 1 cells (`option_kind = interior_color`).
 - Parse Block 2 (Exterior Paint × Interior Color) into `Color Combination Availability` rows. Every cell produces a row, including `--` cells (mapped to the appropriate D30/R6X availability_label).
 - Add one Option Catalog entry per exterior paint row in Block 2 (`option_kind = exterior_color`). Treat Color and Trim as authoritative for exterior paint identity; merge with any entries already in Option Catalog from Exterior matrix sheets, preferring the Color and Trim name and touch-up number.
@@ -339,6 +314,8 @@ Process both Color and Trim sheets (if present). For each one:
 ### Step 5: Flatten pricing
 
 Walk the price schedule. For each priced item, emit one or more `Pricing Long` rows — one per distinct context. Tokenize context notes using documented patterns only; leave ambiguous notes in `context_note_raw` unprocessed.
+
+For items flagged with no price, compare the RPO to `Option Catalog` entries sourced from Standard Equipment / Standard Equipment sheets. If there is a match, update or merge the `Option Catalog` entry so that RPO is explicitly treated as standard equipment. If there is no match, do not guess whether it is standard or optional — preserve the no-price pricing record and log the discrepancy in `Ingest Exceptions` for Sean to review.
 
 ### Step 6: Log exceptions
 
@@ -355,16 +332,16 @@ For any non-trivial ingest:
 - Expected row counts for Availability Long and Pricing Long
 - Any ambiguities flagged for Sean's review
 
-Stop here. Wait for Sean to confirm before writing any output workbook.
+Stop here. Wait for Sean to confirm before creating and populating the new output sheets in the same document.
 
-**Phase 2 — Execute.** Only after Phase 1 is approved. Write the five output sheets. Report the actual row counts back and note any deviation from the Phase 1 estimates.
+**Phase 2 — Execute.** Only after Phase 1 is approved. Write the seven output sheets. Report the actual row counts back and note any deviation from the Phase 1 estimates.
 
 ## What this skill does NOT do
 
 - Does not extract rules from compatibility notes. `"Requires Z51"` stays as a note in `Option Catalog.notes` or `Availability Long.compat_note_text`. The build skill decides if it becomes a structured rule.
 - Does not enumerate legal combinations. No row like "AE4 + suede + red + two-tone = legal". That's the build skill.
 - Does not merge model years. Each model year gets its own ingested workbook.
-- Does not modify the raw source workbook. Always write to a separate output workbook.
+- Does not modify the raw source sheets. Always write to newly created output sheets in the same workbook/document.
 - Does not consult prior-year structured interpretations (Option Rules Clean, Choice Groups Clean, etc.) — those belong to the build skill's migration pass.
 
 ## Failure modes to avoid

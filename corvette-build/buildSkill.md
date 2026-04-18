@@ -51,23 +51,32 @@ One row per legal interior configuration. This is the enumeration sheet. It read
 |---|---|
 | `combo_id` | Stable key from ingest, e.g. `ctc_3lt_ah2_htt` |
 | `trim` | `1LT`, `2LT`, `3LT`, `1LZ`, `2LZ`, `3LZ` |
-| `seat_codes` | Pipe-delimited seat RPOs (`AQ9`, `AH2|AE4`, `AUP`) |
+| `seat_code` | Single seat RPO (`AQ9`, `AH2`, `AE4`, `AUP`) — one per row, as produced by ingest |
 | `seat_type_name` | "GT1 buckets", "GT2 / Competition buckets", etc. |
 | `seat_trim_material` | Napa leather, Napa with sueded microfiber, Mulan leather, Performance Textile — copied from ingest |
 | `interior_color_rpo` | The single RPO representing this complete interior (e.g. `HTA`, `HU1`, `HTT`) |
 | `interior_color_name` | The treatment name as shown in GM's Color and Trim (e.g. "Jet Black", "Adrenaline Red Dipped", "Ultimate Suede Jet Black", "Asymmetrical Adrenaline Red / Jet Black") |
 | `source_sheet_origin` | `recommended` or `custom_r6x` — from ingest |
 | `auto_added_rpos` | RPOs that selecting this interior forces onto the build (e.g. `R6X` for any custom_r6x row; `N26` if the suede-material interior requires it per variant rules; pipe-delimited) |
-| `price_offset` | Interior pricing relative to the variant's base-trim-included interior. Blank or `0` for trim-standard interiors. Numeric for upcharge interiors (e.g. AE4 `+$1,095` on Stingray 1LT). May need per-seat-option resolution if the same row covers `AH2|AE4` at different prices — see note below. |
+| `price_offset` | Interior pricing relative to the variant's base-trim-included interior. Blank or `0` for trim-standard interiors. Numeric for upcharge interiors (e.g. AE4 `+$1,095` on Stingray 1LT). |
 | `requires_in_variant` | Pipe-delimited RPOs the variant's own rules layer onto this interior (e.g. AE4-bearing rows may require N26 on this variant even though the ingest row doesn't say so) |
 | `excludes_in_variant` | Pipe-delimited RPOs this interior cannot coexist with on this variant |
 | `notes` | Source notes, variant-specific caveats, migration provenance |
 
 If a combination is not in ingest's `Interior Trim Combos` for the variant's applicable trims, it does not appear here. The form cannot offer it because the row does not exist.
 
-The form reads this sheet filtered by current trim selection, then by current seat selection (matching against `seat_codes`), and offers the resulting distinct `interior_color_rpo` values as the color-treatment choices.
+The form reads this sheet filtered by current trim selection, then by current seat selection (matching against `seat_code`), and offers the resulting distinct `interior_color_rpo` values as the color-treatment choices.
 
-**On rows with multiple seat codes (`AH2|AE4`).** The GM source treats these as interchangeable for that interior color RPO, but the seat options themselves may price differently (AH2 is a different line item than AE4 in the options sheet). The interior row records availability and interior pricing; the seat's own price comes from `<Variant> Options` where AH2 and AE4 each have their own row. If the interior pricing itself differs between AH2 and AE4 for the same color RPO, split into two rows with one seat code each.
+**On seat codes, one per row.** Ingest produces one row per seat code — `AH2 / AE4` in the GM source has already been expanded by ingest into two separate rows, each carrying the same interior color RPO, trim, and seat_trim. Build preserves that grain. If the seat codes price differently as line items, those prices live in `<Variant> Options` (one row per seat RPO) — the interior row does not carry the seat's line-item price, only any interior-specific upcharge in `price_offset`. If the interior price offset itself differs between AH2 and AE4 for the same color RPO, the ingest rows already carry those as distinct rows; use them as-is.
+
+**Consuming ingest's footnote scope columns.** Ingest populates four optional columns on `Interior Trim Combos` that carry structured footnote scope: `footnote_scope_trim`, `footnote_scope_model_family`, `footnote_scope_body_style`, and `footnote_scope_fragment`. When these columns are populated on an ingest row, they represent a parsed footnote disclosure that scopes to specific trims, model families, or body styles. Build consumes them as follows:
+
+1. If the ingest row's `footnote_scope_model_family` matches the variant being built and the fragment names an RPO (detectable as a parenthesized or standalone RPO token), that RPO goes into `auto_added_rpos` for the build row.
+2. If the fragment names an RPO but the scope doesn't match (e.g. the variant is Stingray but the fragment scopes to Z06/ZR1/ZR1X), ignore that fragment — it doesn't apply to this variant.
+3. If the fragment can be parsed for scope but not for an RPO, copy the full `footnote_scope_fragment` into `notes` for human review. Do not guess at RPOs.
+4. When all four `footnote_scope_*` columns are blank on an ingest row, fall back to reading the full `compat_note_text` (if present) into `notes` for human review. This is the "disclosure exists but ingest couldn't parse it" case.
+
+Ingest-parsed footnote scope is authoritative when present. Hand-authored `requires_in_variant` / `excludes_in_variant` / `auto_added_rpos` values fill the gaps ingest couldn't reach — typically variant-specific rules that aren't in GM's disclosure prose at all (e.g. allocation rules, dealer policies). When both sources apply to the same row, concatenate: pipe-delimited RPOs from both ingest-parsed scope and hand-authored rules.
 
 **TU7 two-tone and similar additive stylings.** Some styling options are separately orderable RPOs that apply on top of an already-selected base interior. These stay in `<Variant> Options`, not in the Interior sheet. TU7 is the canonical example: it requires AH2 seats and is only available with a specific set of base interior RPOs that depends on trim:
 
