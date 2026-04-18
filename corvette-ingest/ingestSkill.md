@@ -89,7 +89,7 @@ Color and Trim sheets are structurally different from matrix sheets. They cover 
 - Columns 5 onward: interior color *treatments* — these are not atomic colors. A column header can be a plain color (`Jet Black`), a dipped or styled color (`Adrenaline Red Dipped`, `Ultimate Suede Jet Black`), or an asymmetric two-tone treatment (`Asymmetrical Adrenaline Red / Jet Black`). Treat the column header as an opaque label that identifies the interior treatment.
 - Data rows: each row is one (decor × seat × seat-trim) combination. Cell values are either an interior color RPO (like `HTA`, `HUU`, `EJH`) — meaning the combination is available and this RPO represents the entire (row × column) intersection — or `--` for not available.
 - The `Decor Level` column may hold comma-separated trim codes like `1LT, 1LZ` or `3LT, 3LZ` — expand these into separate logical trim scopes. A row with `3LT, 3LZ` means the RPO in that row applies to both 3LT and 3LZ trims.
-- The `Seat Code` column may hold a slash-separated pair like `AH2 / AE4`. Expand these into separate rows — one per seat code — carrying the same interior color RPO, trim, and seat_trim. Different seat codes have different downstream compatibility and companion options, so grouping them loses information the build skill needs.
+- The `Seat Code` column may hold a slash-separated pair like `AH2 / AE4`. Expand these into separate rows — one per seat code — carrying the same interior color RPO, trim, and seat_trim. Different seat codes have different downstream compatibility, pricing, and companion options, so grouping them loses information the build skill needs.
 
 **Block 2 (Exterior Paint × Interior Color).** The second data block captures which exterior paints are paired with which interior treatments. The interior color columns match Block 1 exactly.
 
@@ -174,8 +174,6 @@ One row per (exterior_rpo × interior_color_treatment) pairing from Block 2 of e
 3. **Prior-year ingested workbook** — for model-year updates, the previous year's flattened layer is a useful reference for deltas but not a source of truth for the new year.
 
 ## Outputs this skill produces
-
-Write to newly created output sheets in the same workbook/document being prepared for ingest. Do not edit raw source sheets in place.
 
 The full output set is seven sheets: `Option Catalog`, `Availability Long`, `Pricing Long`, `Base Prices`, `Interior Trim Combos`, `Color Combination Availability`, and `Ingest Exceptions`. The first four are primary; the next two are Color and Trim extractions documented in the section above; the last logs everything that could not be cleanly placed.
 
@@ -308,14 +306,12 @@ Process both Color and Trim sheets (if present). For each one:
 - Parse Block 1 (Seat/Trim × Interior Color) into `Interior Trim Combos` rows. Expand comma-separated `Decor Level` values into one row per trim.
 - Add one Option Catalog entry per distinct interior color RPO observed in Block 1 cells (`option_kind = interior_color`).
 - Parse Block 2 (Exterior Paint × Interior Color) into `Color Combination Availability` rows. Every cell produces a row, including `--` cells (mapped to the appropriate D30/R6X availability_label).
-- Add one Option Catalog entry per exterior paint row in Block 2 (`option_kind = exterior_color`). Treat Color and Trim as authoritative for exterior paint identity; merge with any entries already in Option Catalog from Exterior matrix sheets, preferring the Color and Trim name and touch-up number.
+- Add one Option Catalog entry per exterior paint row in Block 2 (`option_kind = exterior_color`).
 - Strip footnote digits from names for canonical fields; preserve raw strings.
 
 ### Step 5: Flatten pricing
 
-Walk the price schedule. For each priced item, emit one or more `Pricing Long` rows — one per distinct context. Tokenize context notes using documented patterns only; leave ambiguous notes in `context_note_raw` unprocessed.
-
-For items flagged with no price, compare the RPO to `Option Catalog` entries sourced from Standard Equipment / Standard Equipment sheets. If there is a match, update or merge the `Option Catalog` entry so that RPO is explicitly treated as standard equipment. If there is no match, do not guess whether it is standard or optional — preserve the no-price pricing record and log the discrepancy in `Ingest Exceptions` for Sean to review.
+Walk the price schedule. For each priced item, emit one or more `Pricing Long` rows — one per distinct context. Tokenize context notes using documented patterns only; leave ambiguous notes in `context_note_raw` unprocessed. Flag any price notes that fail to tokenize or that reference RPOs not found in Option Catalog.
 
 ### Step 6: Log exceptions
 
