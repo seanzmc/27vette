@@ -5,7 +5,7 @@ description: Ingest raw Chevrolet Corvette order-guide exports and GM price sche
 
 # Corvette Ingest
 
-Faithfully capture what GM exported. Produce a clean flattened intermediate layer. Do not invent logic, do not infer rules from prose, do not merge with human interpretation of how the order form should cascade.
+Faithfully capture what GM exported. Produce a clean flattened intermediate layer. Do not invent logic, do not infer rules from prose, do not merge with human interpretation of how the order form should cascade. The goal is to preserve source intent and give the build skill a clean, structured feed of what GM actually published so the build skill can decide how to interpret it for configurator use. The build skill is where all the logic lives — option relationships, compatibility rules, package rules, pricing rules, form behavior rules, etc. Ingest's job is to read the source data as literally as possible and produce a structured feed that preserves all the information and disclosures GM published without trying to guess which pieces are important or how they relate to each other.
 
 The downstream consumer is the `corvette-build` skill, which turns this flattened layer into per-variant configurator data.
 
@@ -167,11 +167,9 @@ One row per (exterior_rpo × interior_color_treatment) pairing from Block 2 of e
 
 ## Inputs this skill handles
 
-1. **GM order-guide export workbook** — a multi-sheet .xlsx with raw matrix tabs grouped by section (Standard Equipment, Equipment Groups, Interior, Exterior, Mechanical, Wheels, Color and Trim, Options Long). Sections are typically split across multiple sheets, one per model family or group of related model families — but the split is not stable across model years. Never assume which model a sheet covers from the sheet name or its trailing number. Always read the sheet's header rows to determine variant scope. See **Determining variant scope from headers** below.
+1. **GM order-guide export workbook** — a multi-sheet .xlsx with raw matrix tabs grouped by section (Standard Equipment, Equipment Groups, Interior, Exterior, Mechanical, Color and Trim). Sections typically contain information for one model family. Never assume which model a sheet covers from the sheet name or its trailing number. Always read the sheet's header rows to determine variant scope. See **Determining variant scope from headers** below.
 
-2. **GM price schedule** — usually a separate document (PDF, Word, or a Pricing tab). Lists base model prices and option prices, often with trim-context notes like "2LT/3LT only" or "LT6 and LT7 Engines only". Prices may vary by trim for the same RPO.
-
-3. **Prior-year ingested workbook** — for model-year updates, the previous year's flattened layer is a useful reference for deltas but not a source of truth for the new year.
+2. **GM price schedule** — usually a sheet named "Price Schedule" or "Pricing". Lists base model prices and option prices, often with trim-context notes like "2LT/3LT only" or "LT6 and LT7 Engines only". Prices may vary by trim for the same RPO.
 
 ## Outputs this skill produces
 
@@ -187,14 +185,23 @@ One row per distinct RPO observed across all sources. Identity fields only — n
 | `rpo_code` | GM RPO code (uppercase, exactly 3 characters after footnote cleanup) |
 | `name` | Short display name (footnote digits stripped) |
 | `name_raw` | Original name as it appeared in the source, including any fused footnote digits |
-| `description` | Longer description when source provides one (footnote digits stripped) |
-| `description_raw` | Original description as it appeared in the source |
+| `description` | Base descriptive text only. On raw matrix sheets, this is the regular-weight text after the first comma in the option cell, with fused footnote digits stripped. Do not include disclosure lines here. |
+| `description_raw` | Original base-description segment as it appeared in the source before cleanup. Do not include the option name or later disclosure lines. |
 | `section` | Top-level bucket (Interior, Exterior, Mechanical, Wheels, Standard Equipment, Equipment Groups, Color and Trim, Accessories) |
 | `option_kind` | One of: `standalone`, `package`, `seat`, `seat_color`, `exterior_color`, `interior_color`, `wheel`, `caliper`, `spoiler`, `stripe`, `trim_material`, `accessory`, `lpo` |
-| `footnote_markers` | Pipe-delimited list of footnote digit markers attached to this RPO or its name across sources |
+| `footnote_markers` | Pipe-delimited list of footnote digit markers attached to this RPO, name, or description across sources |
 | `footnote_texts` | Pipe-delimited resolved disclosure texts for each marker, or `UNRESOLVED` if the marker could not be located on its source sheet |
 | `source_sheets` | Pipe-delimited list of raw sheet names where this RPO appeared |
-| `notes` | Source compatibility prose copied verbatim |
+| `notes` | Verbatim compatibility, availability, and disclosure prose not part of the base description. On raw matrix sheets, capture the follow-on disclosure lines introduced by in-cell line breaks here. |
+
+For raw matrix sheets (`Interior`, `Exterior`, `Mechanical`), treat the option identity cell as structured content, not a single freeform string:
+
+1. The bold text before the first comma is the canonical `name`.
+2. The regular-weight text after that comma on the same line is the canonical `description`.
+3. Any later in-cell line created by a line break and rendered as smaller bold text is disclosure text tied to a superscript notation definition, not part of `description`.
+4. These disclosure lines usually begin with `1. `, `2. `, etc. Preserve them verbatim in `notes`, and resolve the corresponding marker into `footnote_markers` / `footnote_texts` when possible.
+5. If rich-text formatting is unavailable in the export, fall back to structure: split on the first comma for `name` vs. `description`, then treat later in-cell lines that begin with a numbered marker as disclosure lines.
+6. If a cell has no comma-separated base description, leave `description` blank rather than inferring it from disclosure text.
 
 If the same RPO appears with slightly different names across sheets, pick the most specific one for `name` and record the variants in `notes`. Flag ambiguous cases to Sean instead of silently resolving them.
 
