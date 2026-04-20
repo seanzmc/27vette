@@ -5,12 +5,119 @@ description: Build and maintain deterministic per-variant Corvette order-flow sh
 
 # Corvette Build V2
 
-Read these first:
+This skill is self-contained for single-file import environments such as the Excel ChatGPT add-in. It does not require access to any separate contract file at runtime.
 
-1. [sharedContractV2.md](/Users/seandm/Projects/27vette/corvette-contract/sharedContractV2.md:1)
-2. [ingestSkillV2.md](/Users/seandm/Projects/27vette/corvette-ingest/ingestSkillV2.md:1)
+It assumes the V2 ingest outputs exist and are clean enough to pass the build gate.
 
-This build spec assumes the V2 ingest outputs exist and are clean enough to pass the build gate.
+## Embedded shared contract
+
+### Canonical substrate
+
+The canonical working substrate is a single Excel workbook (`.xlsx`) per model year.
+
+- Raw GM export sheets and generated output sheets live in the same workbook.
+- Raw sheets are read-only.
+- Generated sheets may be replaced on rerun.
+
+### Run boundary
+
+One ingest/build run operates on one workbook for one model year.
+
+- The workbook is the isolation boundary.
+- Generated IDs are namespaced by `dataset_id`.
+- Cross-year joins are not allowed inside a single run.
+
+### Model year and dataset ID
+
+Every generated sheet carries these shared fields where relevant:
+
+- `model_year` as a four-digit integer, e.g. `2027`
+- `dataset_id` as `my<yy>`, e.g. `my27`
+
+### Canonical model families
+
+The supported model-family labels are:
+
+- `Stingray`
+- `Grand Sport`
+- `Grand Sport X`
+- `Z06`
+- `ZR1`
+- `ZR1X`
+
+Do not substitute `E-Ray` for any of the six labels above.
+
+### Scope conventions
+
+Shared scope fields use these conventions:
+
+- `model_family_scope`: pipe-delimited model families
+- `body_scope`: pipe-delimited `Coupe|Convertible`
+- `trim_scope`: pipe-delimited trims such as `1LT|2LT|3LT`
+
+Blank scope means "all values valid in the current dataset" only when the source truly has no narrower bound. Blank never means "unknown".
+
+### Shared availability vocabulary
+
+`Availability Long` uses one base availability state plus zero or more co-occurring context labels.
+
+Canonical base availability states:
+
+- `Standard Equipment`
+- `Available`
+- `Not Available`
+- `ADI Available`
+
+Canonical context labels:
+
+- `Included in Equipment Group`
+- `Included in Equipment Group but upgradeable`
+- `Indicates availability of feature on multiple models`
+
+Context labels do not replace or rewrite the base availability state. They travel alongside it as inclusion/reference context.
+
+### Generated sheet replace policy
+
+The default rerun mode is full rebuild of generated sheets.
+
+- Raw sheets are never edited or deleted.
+- Generated sheets are replaced in place by name.
+- Partial patch mode is not part of the default contract.
+
+### Shared input set
+
+This build spec consumes:
+
+1. `Option Catalog`
+2. `Availability Long`
+3. `Pricing Long`
+4. `Base Prices`
+5. `Interior Trim Combos`
+6. `Color Combination Availability`
+7. `Equipment Group Membership`
+8. `Ingest Exceptions`
+
+Color and Trim derived input rules:
+
+- `Interior Trim Combos` does not carry `model_family_scope` or `body_scope`
+- `Color Combination Availability` does not carry `model_family_scope` or `body_scope`
+
+Interior and exterior colors are treated as not model-family-specific and not body-style-specific in this contract. Trim-specific behavior may still be carried where needed.
+
+### Build gate
+
+Before doing any variant work:
+
+- read `Ingest Exceptions`
+- stop on any blocking exception with `blocking_scope = global`
+- stop on any blocking exception that affects the target model family
+- stop on any blocking exception that affects one of the target variants
+
+Warnings do not stop the build, but they must be reported back to Sean.
+
+### Validation floor
+
+Use the later operational validation section in this file as the authoritative validation procedure, and ensure its sample coverage includes the standard seat path, package-dependent pricing, D30-only override, R6X plus D30 collapse, and an additive interior option gated by base interior.
 
 ## Core model
 
@@ -22,30 +129,6 @@ The V2 difference is that row generation is now explicit:
 - scope may collapse only when behavior stays identical
 - rows must split when behavior changes in any load-bearing way
 - blocking ingest exceptions stop the build before any variant sheet is written
-
-## Inputs consumed
-
-Build consumes all V2 ingest outputs:
-
-1. `Option Catalog`
-2. `Availability Long`
-3. `Pricing Long`
-4. `Base Prices`
-5. `Interior Trim Combos`
-6. `Color Combination Availability`
-7. `Equipment Group Membership`
-8. `Ingest Exceptions`
-
-## Build gate
-
-Before doing any variant work:
-
-- read `Ingest Exceptions`
-- stop on any blocking exception with `blocking_scope = global`
-- stop on any blocking exception that affects the target model family
-- stop on any blocking exception that affects one of the target variants
-
-Warnings do not stop the build, but they must be reported back to Sean.
 
 ## Canonical outputs
 
