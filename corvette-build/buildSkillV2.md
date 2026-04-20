@@ -95,7 +95,9 @@ No other sheet is allowed to invent extra variants.
 
 ### Step 2: Build `<Variant> Interior`
 
-Filter `Interior Trim Combos` to rows whose `model_family_scope` contains the target family and whose `trim` exists in target-family `Base Prices`.
+Filter `Interior Trim Combos` to rows whose `trim` exists in target-family `Base Prices`.
+
+`Interior Trim Combos` does not carry `model_family_scope` or `body_scope` in V2. Interior colors are treated as not model-family-specific and not body-style-specific.
 
 Required columns:
 
@@ -122,14 +124,15 @@ Rules:
 
 ### Step 3: Build `<Variant> Exterior` section 3b first
 
-Filter `Color Combination Availability` to rows whose `model_family_scope` contains the target family and whose `interior_color_rpo` exists in `<Variant> Interior`.
+Filter `Color Combination Availability` to rows whose `interior_color_rpo` exists in `<Variant> Interior`.
+
+`Color Combination Availability` does not carry `model_family_scope` or `body_scope` in V2. Exterior/interior color relationships are treated as not model-family-specific and not body-style-specific.
 
 Required columns:
 
 | Column | Meaning |
 |---|---|
 | `pair_id` | From ingest |
-| `body_scope` | Pipe-delimited body scope |
 | `trim_scope` | Pipe-delimited trim scope |
 | `exterior_color_rpo` | Paint code |
 | `interior_color_rpo` | Base interior code |
@@ -140,7 +143,7 @@ Required columns:
 
 Collapse rule:
 
-- rows may merge `trim_scope` or `body_scope` only when `availability_label`, `auto_added_rpos`, and `source_note` stay identical
+- rows may merge `trim_scope` only when `availability_label`, `auto_added_rpos`, and `source_note` stay identical
 
 ### Step 4: Build `<Variant> Exterior` section 3a
 

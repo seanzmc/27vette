@@ -304,6 +304,8 @@ V2 closes the treatment-to-RPO handoff by expanding Block 2 through Block 1.
 
 ### `Interior Trim Combos`
 
+Interior and exterior colors are not model-family-specific or body-style-specific in this contract. Do not add `model_family_scope` or `body_scope` columns to this sheet.
+
 Required columns:
 
 | Column | Meaning |
@@ -313,8 +315,6 @@ Required columns:
 | `combo_id` | Stable key |
 | `source_sheet` | |
 | `source_sheet_origin` | `recommended` or `custom_r6x` |
-| `model_family_scope` | Derived family scope |
-| `body_scope` | Default `Coupe|Convertible` unless narrowed by source |
 | `trim` | Single trim |
 | `seat_codes_raw` | Raw source value |
 | `seat_code` | Single seat code |
@@ -327,15 +327,13 @@ Required columns:
 | `footnote_texts` | |
 | `source_note` | Whole-sheet or row/cell disclosures |
 
-Family-scope rule:
-
-- `LT` trim rows default to `Stingray|Grand Sport`
-- `LZ` trim rows default to `Grand Sport X|Z06|ZR1|ZR1X`
-- if a disclosure explicitly narrows the family scope, use the narrower scope
+Trim remains on this sheet because the same interior RPO may have different legal seat pairings or pricing offsets by trim.
 
 ### `Color Combination Availability`
 
 V2 output is no longer treatment-only. Expand Block 2 by joining each treatment column to the matching `Interior Trim Combos` rows so build receives concrete interior RPO rows.
+
+Because colors are not model-family-specific or body-style-specific, this sheet also does not carry `model_family_scope` or `body_scope`.
 
 Required columns:
 
@@ -346,8 +344,6 @@ Required columns:
 | `pair_id` | Stable key |
 | `source_sheet` | |
 | `source_sheet_origin` | `recommended` or `custom_r6x` |
-| `model_family_scope` | From the joined interior rows |
-| `body_scope` | Default `Coupe|Convertible` unless narrowed |
 | `trim_scope` | Pipe-delimited trim scope for the joined interior rows |
 | `exterior_color_rpo` | Paint code |
 | `exterior_color_name` | Paint name |

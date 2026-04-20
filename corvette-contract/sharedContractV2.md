@@ -121,6 +121,13 @@ The V2 ingest/build contract assumes this ingest output set:
 
 Build consumes all eight sheets.
 
+Color and Trim derived outputs use this additional rule:
+
+- `Interior Trim Combos` does not carry `model_family_scope` or `body_scope`
+- `Color Combination Availability` does not carry `model_family_scope` or `body_scope`
+
+Interior and exterior colors are treated as not model-family-specific and not body-style-specific in the shared contract. Trim-specific behavior may still be carried where needed.
+
 ## 8. Note and Provenance Vocabulary
 
 When a generated field contains carried-through note text, it must also identify the note source type when the schema supports it.
