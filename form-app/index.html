@@ -55,6 +55,31 @@
               <div><dt>Total MSRP</dt><dd id="summaryTotal">$0</dd></div>
             </dl>
           </div>
+          <form id="customerForm" class="summary-card customer-card">
+            <h3>Customer Information</h3>
+            <div class="customer-field-grid">
+              <label>
+                Name
+                <input id="customerName" name="name" type="text" autocomplete="name">
+              </label>
+              <label>
+                Address
+                <input id="customerAddress" name="address" type="text" autocomplete="street-address">
+              </label>
+              <label>
+                Email
+                <input id="customerEmail" name="email" type="email" autocomplete="email">
+              </label>
+              <label>
+                Phone Number
+                <input id="customerPhone" name="phone" type="tel" autocomplete="tel">
+              </label>
+              <label>
+                Comments
+                <textarea id="customerComments" name="comments" rows="4"></textarea>
+              </label>
+            </div>
+          </form>
           <div class="summary-card">
             <h3>Selected RPOs</h3>
             <ul id="selectedList" class="summary-list"></ul>
@@ -76,6 +101,6 @@
     </main>
 
     <script src="./data.js?v=2"></script>
-    <script src="./app.js?v=2"></script>
+    <script src="./app.js?v=3"></script>
   </body>
 </html>

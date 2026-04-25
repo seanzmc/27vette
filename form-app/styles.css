@@ -27,7 +27,9 @@ body {
 }
 
 button,
-select {
+select,
+input,
+textarea {
   font: inherit;
 }
 
@@ -137,7 +139,9 @@ label {
   text-transform: none;
 }
 
-select {
+select,
+input,
+textarea {
   width: 100%;
   min-height: 44px;
   border: 1px solid var(--line);
@@ -146,6 +150,12 @@ select {
   background: var(--panel-strong);
   color: var(--ink);
   font-weight: 700;
+}
+
+textarea {
+  min-height: 108px;
+  padding: 10px 12px;
+  resize: vertical;
 }
 
 .vehicle-price {
@@ -357,6 +367,20 @@ select {
   margin-bottom: 12px;
   padding: 14px;
   background: var(--panel);
+}
+
+.customer-card {
+  display: grid;
+  gap: 12px;
+}
+
+.customer-field-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.customer-field-grid label {
+  text-transform: none;
 }
 
 .total-list {

@@ -6,6 +6,13 @@ const state = {
   selected: new Set(),
   selectedInterior: "",
   activeStep: "body_style",
+  customer: {
+    name: "",
+    address: "",
+    email: "",
+    phone: "",
+    comments: "",
+  },
 };
 
 const els = {
@@ -23,6 +30,7 @@ const els = {
   missingList: document.querySelector("#missingList"),
   standardEquipmentList: document.querySelector("#standardEquipmentList"),
   alertRegion: document.querySelector("#alertRegion"),
+  customerForm: document.querySelector("#customerForm"),
   resetButton: document.querySelector("#resetButton"),
   exportJsonButton: document.querySelector("#exportJsonButton"),
   exportCsvButton: document.querySelector("#exportCsvButton"),
@@ -487,6 +495,23 @@ function renderSummary() {
   els.alertRegion.innerHTML = dataWarnings.map((item) => `<div class="alert">${item.message}</div>`).join("");
 }
 
+function customerInformation() {
+  return {
+    name: state.customer.name.trim(),
+    address: state.customer.address.trim(),
+    email: state.customer.email.trim(),
+    phone: state.customer.phone.trim(),
+    comments: state.customer.comments.trim(),
+  };
+}
+
+function resetCustomerInformation() {
+  for (const key of Object.keys(state.customer)) {
+    state.customer[key] = "";
+  }
+  els.customerForm.reset();
+}
+
 function renderStandardEquipment() {
   const variantId = currentVariantId();
   const rows = data.standardEquipment
@@ -520,6 +545,7 @@ function currentOrder() {
   const optionsTotal = items.reduce((sum, item) => sum + Number(item.price || 0), 0);
   return {
     dataset: data.dataset,
+    customer_information: customerInformation(),
     variant,
     selected_option_ids: [...state.selected],
     selected_interior_id: state.selectedInterior,
@@ -552,10 +578,18 @@ function exportJson() {
 
 function exportCsv() {
   const order = currentOrder();
-  const headers = ["type", "id", "rpo", "label", "price"];
-  const rows = order.line_items.map((item) => headers.map((key) => JSON.stringify(item[key] ?? "")).join(","));
+  const headers = ["type", "id", "rpo", "label", "price", "value"];
+  const customerRows = [
+    ["customer", "name", "", "Customer Name", "", order.customer_information.name],
+    ["customer", "address", "", "Address", "", order.customer_information.address],
+    ["customer", "email", "", "Email", "", order.customer_information.email],
+    ["customer", "phone", "", "Phone Number", "", order.customer_information.phone],
+    ["customer", "comments", "", "Comments", "", order.customer_information.comments],
+  ];
+  const rows = customerRows.map((row) => row.map((value) => JSON.stringify(value)).join(","));
+  rows.push(...order.line_items.map((item) => headers.map((key) => JSON.stringify(item[key] ?? "")).join(",")));
   rows.unshift(headers.join(","));
-  rows.push(["total", "", "", "Total MSRP", order.pricing.total_msrp].map((value) => JSON.stringify(value)).join(","));
+  rows.push(["total", "", "", "Total MSRP", order.pricing.total_msrp, ""].map((value) => JSON.stringify(value)).join(","));
   download("stingray-order.csv", rows.join("\n"), "text/csv");
 }
 
@@ -573,7 +607,15 @@ function init() {
   resetDefaults();
   els.resetButton.addEventListener("click", () => {
     resetDefaults();
+    resetCustomerInformation();
     render();
+  });
+  els.customerForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+  });
+  els.customerForm.addEventListener("input", (event) => {
+    if (!event.target.name || !(event.target.name in state.customer)) return;
+    state.customer[event.target.name] = event.target.value;
   });
   els.exportJsonButton.addEventListener("click", exportJson);
   els.exportCsvButton.addEventListener("click", exportCsv);
