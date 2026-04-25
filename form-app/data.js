@@ -678,20 +678,6 @@ window.STINGRAY_FORM_DATA = {
   ],
   "contextChoices": [
     {
-      "context_choice_id": "body_style__convertible",
-      "context_type": "body_style",
-      "value": "convertible",
-      "label": "Convertible",
-      "description": "3 trims available",
-      "section_id": "sec_context_body_style",
-      "step_key": "body_style",
-      "body_style": "convertible",
-      "trim_level": "",
-      "variant_id": "",
-      "base_price": "",
-      "display_order": 1
-    },
-    {
       "context_choice_id": "body_style__coupe",
       "context_type": "body_style",
       "value": "coupe",
@@ -700,6 +686,20 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_context_body_style",
       "step_key": "body_style",
       "body_style": "coupe",
+      "trim_level": "",
+      "variant_id": "",
+      "base_price": "",
+      "display_order": 1
+    },
+    {
+      "context_choice_id": "body_style__convertible",
+      "context_type": "body_style",
+      "value": "convertible",
+      "label": "Convertible",
+      "description": "3 trims available",
+      "section_id": "sec_context_body_style",
+      "step_key": "body_style",
+      "body_style": "convertible",
       "trim_level": "",
       "variant_id": "",
       "base_price": "",
