@@ -23,7 +23,9 @@ APP_DIR = ROOT / "form-app"
 
 GENERATED_SHEETS = [
     "form_steps",
+    "form_context_choices",
     "form_choices",
+    "form_standard_equipment",
     "form_rules",
     "form_price_rules",
     "form_interiors",
@@ -67,6 +69,35 @@ STEP_LABELS = {
     "summary": "Summary",
     "standard_equipment": "Standard Equipment",
 }
+
+CONTEXT_SECTIONS = [
+    {
+        "section_id": "sec_context_body_style",
+        "section_name": "Body Style",
+        "category_id": "cat_context_001",
+        "category_name": "Vehicle Context",
+        "selection_mode": "single_select_req",
+        "choice_mode": "single",
+        "is_required": "True",
+        "standard_behavior": "user_selected",
+        "section_display_order": 1,
+        "step_key": "body_style",
+        "step_label": "Body Style",
+    },
+    {
+        "section_id": "sec_context_trim_level",
+        "section_name": "Trim Level",
+        "category_id": "cat_context_001",
+        "category_name": "Vehicle Context",
+        "selection_mode": "single_select_req",
+        "choice_mode": "single",
+        "is_required": "True",
+        "standard_behavior": "user_selected",
+        "section_display_order": 2,
+        "step_key": "trim_level",
+        "step_label": "Trim Level",
+    },
+]
 
 SECTION_STEP_OVERRIDES = {
     "sec_pain_001": "paint",
@@ -253,7 +284,7 @@ def main() -> None:
     ]
     variant_by_id = {row["variant_id"]: row for row in active_variants}
 
-    section_rows: list[dict[str, Any]] = []
+    section_rows: list[dict[str, Any]] = [dict(row) for row in CONTEXT_SECTIONS]
     for section_id, section in sections.items():
         category = categories.get(section.get("category_id", ""), {})
         step_key = step_for_section(section_id, section.get("section_name", ""), section.get("category_id", ""))
@@ -288,6 +319,45 @@ def main() -> None:
         section_ids_by_step[row["step_key"]].append(row["section_id"])
     for row in step_rows:
         row["section_ids"] = "|".join(sorted(section_ids_by_step.get(row["step_key"], [])))
+
+    body_context_choices = []
+    for display_order, body_style in enumerate(sorted({row["body_style"] for row in active_variants}), start=1):
+        body_variants = [row for row in active_variants if row["body_style"] == body_style]
+        body_context_choices.append(
+            {
+                "context_choice_id": f"body_style__{body_style}",
+                "context_type": "body_style",
+                "value": body_style,
+                "label": body_style.title(),
+                "description": f"{len(body_variants)} trims available",
+                "section_id": "sec_context_body_style",
+                "step_key": "body_style",
+                "body_style": body_style,
+                "trim_level": "",
+                "variant_id": "",
+                "base_price": "",
+                "display_order": display_order,
+            }
+        )
+    trim_context_choices = []
+    for variant in active_variants:
+        trim_context_choices.append(
+            {
+                "context_choice_id": f"trim_level__{variant['body_style']}__{variant['trim_level'].lower()}",
+                "context_type": "trim_level",
+                "value": variant["trim_level"],
+                "label": variant["trim_level"],
+                "description": variant["display_name"],
+                "section_id": "sec_context_trim_level",
+                "step_key": "trim_level",
+                "body_style": variant["body_style"],
+                "trim_level": variant["trim_level"],
+                "variant_id": variant["variant_id"],
+                "base_price": variant["base_price"],
+                "display_order": variant["display_order"],
+            }
+        )
+    context_choices = body_context_choices + trim_context_choices
 
     options_by_id: dict[str, dict[str, Any]] = {}
     for option in options_raw:
@@ -525,6 +595,25 @@ def main() -> None:
                 )
 
     status_counts = Counter(row["status"] for row in choices)
+    standard_equipment = [
+        {
+            "equipment_id": f"std_{choice['variant_id']}__{choice['option_id']}",
+            "variant_id": choice["variant_id"],
+            "body_style": choice["body_style"],
+            "trim_level": choice["trim_level"],
+            "option_id": choice["option_id"],
+            "rpo": choice["rpo"],
+            "label": choice["label"],
+            "description": choice["description"],
+            "section_id": choice["section_id"],
+            "section_name": choice["section_name"],
+            "category_name": choice["category_name"],
+            "display_order": choice["display_order"],
+            "source_detail_raw": choice["source_detail_raw"],
+        }
+        for choice in choices
+        if choice["status"] == "standard" and (choice["step_key"] == "standard_equipment" or choice["selectable"] != "True")
+    ]
     validation_rows.extend(
         [
             {
@@ -559,6 +648,25 @@ def main() -> None:
     )
     write_sheet(
         wb,
+        "form_context_choices",
+        [
+            "context_choice_id",
+            "context_type",
+            "value",
+            "label",
+            "description",
+            "section_id",
+            "step_key",
+            "body_style",
+            "trim_level",
+            "variant_id",
+            "base_price",
+            "display_order",
+        ],
+        context_choices,
+    )
+    write_sheet(
+        wb,
         "form_choices",
         [
             "choice_id",
@@ -585,6 +693,26 @@ def main() -> None:
             "source_detail_raw",
         ],
         choices,
+    )
+    write_sheet(
+        wb,
+        "form_standard_equipment",
+        [
+            "equipment_id",
+            "variant_id",
+            "body_style",
+            "trim_level",
+            "option_id",
+            "rpo",
+            "label",
+            "description",
+            "section_id",
+            "section_name",
+            "category_name",
+            "display_order",
+            "source_detail_raw",
+        ],
+        standard_equipment,
     )
     write_sheet(
         wb,
@@ -662,7 +790,9 @@ def main() -> None:
         "variants": active_variants,
         "steps": step_rows,
         "sections": section_rows,
+        "contextChoices": context_choices,
         "choices": choices,
+        "standardEquipment": standard_equipment,
         "rules": [row for row in raw_rules if row["active"] == "True"],
         "priceRules": price_rules,
         "interiors": [row for row in interiors if row["active_for_stingray"]],
@@ -706,6 +836,8 @@ def main() -> None:
         "json": str(json_path),
         "csv": str(csv_path),
         "choices": len(choices),
+        "context_choices": len(context_choices),
+        "standard_equipment": len(standard_equipment),
         "rules": len(data["rules"]),
         "price_rules": len(price_rules),
         "interiors": len(data["interiors"]),

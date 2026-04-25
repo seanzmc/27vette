@@ -5,12 +5,12 @@ const state = {
   trimLevel: "",
   selected: new Set(),
   selectedInterior: "",
-  activeStep: "paint",
+  activeStep: "body_style",
 };
 
 const els = {
-  bodySelect: document.querySelector("#bodySelect"),
-  trimSelect: document.querySelector("#trimSelect"),
+  currentBody: document.querySelector("#currentBody"),
+  currentTrim: document.querySelector("#currentTrim"),
   basePrice: document.querySelector("#basePrice"),
   summaryBase: document.querySelector("#summaryBase"),
   summaryOptions: document.querySelector("#summaryOptions"),
@@ -21,13 +21,14 @@ const els = {
   selectedList: document.querySelector("#selectedList"),
   autoList: document.querySelector("#autoList"),
   missingList: document.querySelector("#missingList"),
+  standardEquipmentList: document.querySelector("#standardEquipmentList"),
   alertRegion: document.querySelector("#alertRegion"),
   resetButton: document.querySelector("#resetButton"),
   exportJsonButton: document.querySelector("#exportJsonButton"),
   exportCsvButton: document.querySelector("#exportCsvButton"),
 };
 
-const runtimeSteps = data.steps.filter((step) => !["body_style", "trim_level", "summary"].includes(step.step_key));
+const runtimeSteps = data.steps.filter((step) => step.step_key !== "summary");
 const variants = [...data.variants].sort((a, b) => a.display_order - b.display_order);
 const choicesByOption = new Map();
 const sectionsById = new Map(data.sections.map((section) => [section.section_id, section]));
@@ -259,6 +260,19 @@ function setBodyAndTrim(bodyStyle, trimLevel) {
   render();
 }
 
+function handleContextChoice(choice) {
+  if (choice.context_type === "body_style") {
+    const nextTrim = variants.find((variant) => variant.body_style === choice.value)?.trim_level;
+    state.activeStep = "trim_level";
+    setBodyAndTrim(choice.value, nextTrim);
+    return;
+  }
+  if (choice.context_type === "trim_level") {
+    state.activeStep = "paint";
+    setBodyAndTrim(choice.body_style, choice.trim_level);
+  }
+}
+
 function handleChoice(choice) {
   const reason = disableReasonForChoice(choice);
   if (reason) return;
@@ -283,15 +297,9 @@ function handleInterior(interior) {
   render();
 }
 
-function renderSelectors() {
-  const bodies = [...new Set(variants.map((variant) => variant.body_style))];
-  els.bodySelect.innerHTML = bodies
-    .map((body) => `<option value="${body}" ${body === state.bodyStyle ? "selected" : ""}>${body[0].toUpperCase() + body.slice(1)}</option>`)
-    .join("");
-  const trims = variants
-    .filter((variant) => variant.body_style === state.bodyStyle)
-    .map((variant) => variant.trim_level);
-  els.trimSelect.innerHTML = trims.map((trim) => `<option value="${trim}" ${trim === state.trimLevel ? "selected" : ""}>${trim}</option>`).join("");
+function renderVehicleContext() {
+  els.currentBody.textContent = state.bodyStyle ? state.bodyStyle[0].toUpperCase() + state.bodyStyle.slice(1) : "";
+  els.currentTrim.textContent = state.trimLevel || "";
 }
 
 function renderStepRail() {
@@ -349,12 +357,43 @@ function renderInteriorCard(interior) {
   `;
 }
 
+function renderContextCard(choice) {
+  const selected =
+    (choice.context_type === "body_style" && choice.value === state.bodyStyle) ||
+    (choice.context_type === "trim_level" && choice.body_style === state.bodyStyle && choice.trim_level === state.trimLevel);
+  const disabled = choice.context_type === "trim_level" && choice.body_style !== state.bodyStyle;
+  const classes = ["choice-card", "context-choice-card"];
+  if (selected) classes.push("selected");
+  if (disabled) classes.push("disabled");
+  const price = choice.base_price ? formatMoney(choice.base_price) : "";
+  return `
+    <button class="${classes.join(" ")}" type="button" data-context-choice="${choice.context_choice_id}" ${disabled ? "aria-disabled=\"true\"" : ""}>
+      <span class="topline"><span class="rpo">${choice.label}</span><span class="price">${price}</span></span>
+      <p class="choice-name">${choice.description}</p>
+      <p class="choice-note">${selected ? "Current selection" : "Select to continue"}</p>
+      ${disabled ? `<p class="disabled-reason">Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} body style first.</p>` : ""}
+    </button>
+  `;
+}
+
 function renderStepContent() {
   const step = runtimeSteps.find((item) => item.step_key === state.activeStep);
   const autoAdded = computeAutoAdded();
   let body = "";
 
-  if (state.activeStep === "base_interior") {
+  if (state.activeStep === "body_style" || state.activeStep === "trim_level") {
+    const contextChoices = data.contextChoices
+      .filter((choice) => choice.step_key === state.activeStep)
+      .filter((choice) => choice.context_type !== "trim_level" || choice.body_style === state.bodyStyle)
+      .sort((a, b) => Number(a.display_order || 0) - Number(b.display_order || 0));
+    const section = sectionsById.get(state.activeStep === "body_style" ? "sec_context_body_style" : "sec_context_trim_level");
+    body = `
+      <section class="section-block">
+        <div class="section-title"><h3>${section?.section_name || step?.step_label}</h3><span>${section?.selection_mode || "single_select_req"}</span></div>
+        <div class="choice-grid">${contextChoices.map(renderContextCard).join("")}</div>
+      </section>
+    `;
+  } else if (state.activeStep === "base_interior") {
     const selectedSeat = [...state.selected].map((id) => optionsById.get(id)).find((choice) => choice?.step_key === "seat");
     const interiors = data.interiors.filter((interior) => {
       if (interior.trim_level !== state.trimLevel) return false;
@@ -412,6 +451,12 @@ function renderStepContent() {
       if (interior) handleInterior(interior);
     });
   });
+  els.stepContent.querySelectorAll("[data-context-choice]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const choice = data.contextChoices.find((item) => item.context_choice_id === button.dataset.contextChoice);
+      if (choice && !(choice.context_type === "trim_level" && choice.body_style !== state.bodyStyle)) handleContextChoice(choice);
+    });
+  });
 }
 
 function renderSummary() {
@@ -436,9 +481,36 @@ function renderSummary() {
     "<li class=\"empty\">No auto-added RPOs.</li>";
   const missing = missingRequired();
   els.missingList.innerHTML = missing.map((item) => `<li>${item}</li>`).join("") || "<li class=\"empty\">No open required choices.</li>";
+  renderStandardEquipment();
 
   const dataWarnings = data.validation.filter((item) => item.severity === "error");
   els.alertRegion.innerHTML = dataWarnings.map((item) => `<div class="alert">${item.message}</div>`).join("");
+}
+
+function renderStandardEquipment() {
+  const variantId = currentVariantId();
+  const rows = data.standardEquipment
+    .filter((item) => item.variant_id === variantId)
+    .sort((a, b) => a.section_name.localeCompare(b.section_name) || Number(a.display_order || 0) - Number(b.display_order || 0));
+  const grouped = new Map();
+  for (const item of rows) {
+    const groupName = item.section_name || "Included";
+    if (!grouped.has(groupName)) grouped.set(groupName, []);
+    grouped.get(groupName).push(item);
+  }
+  els.standardEquipmentList.innerHTML =
+    [...grouped.entries()]
+      .map(
+        ([group, items]) => `
+          <details class="standard-group">
+            <summary>${group} <span>${items.length}</span></summary>
+            <ul class="summary-list">
+              ${items.map((item) => `<li><strong>${item.rpo || item.option_id}</strong> ${item.label}</li>`).join("")}
+            </ul>
+          </details>
+        `
+      )
+      .join("") || "<p class=\"empty\">No standard equipment rows for this variant.</p>";
 }
 
 function currentOrder() {
@@ -451,6 +523,7 @@ function currentOrder() {
     variant,
     selected_option_ids: [...state.selected],
     selected_interior_id: state.selectedInterior,
+    standard_equipment: data.standardEquipment.filter((item) => item.variant_id === variant?.variant_id),
     selected_rpos: items.filter((item) => item.type !== "auto_added").map((item) => item.rpo || item.id),
     auto_added_rpos: items.filter((item) => item.type === "auto_added").map((item) => item.rpo || item.id),
     line_items: items,
@@ -487,7 +560,7 @@ function exportCsv() {
 }
 
 function render() {
-  renderSelectors();
+  renderVehicleContext();
   renderStepRail();
   renderStepContent();
   renderSummary();
@@ -498,12 +571,6 @@ function init() {
   state.bodyStyle = first.body_style;
   state.trimLevel = first.trim_level;
   resetDefaults();
-  els.bodySelect.addEventListener("change", () => {
-    const nextBody = els.bodySelect.value;
-    const nextTrim = variants.find((variant) => variant.body_style === nextBody)?.trim_level;
-    setBodyAndTrim(nextBody, nextTrim);
-  });
-  els.trimSelect.addEventListener("change", () => setBodyAndTrim(state.bodyStyle, els.trimSelect.value));
   els.resetButton.addEventListener("click", () => {
     resetDefaults();
     render();

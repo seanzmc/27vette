@@ -121,6 +121,7 @@ button:hover {
   border-top: 0;
 }
 
+.vehicle-context-item,
 label {
   display: grid;
   gap: 6px;
@@ -128,6 +129,12 @@ label {
   font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
+}
+
+.vehicle-context-item strong {
+  color: var(--ink);
+  font-size: 20px;
+  text-transform: none;
 }
 
 select {
@@ -293,6 +300,10 @@ select {
   background: #eff8f2;
 }
 
+.context-choice-card {
+  min-height: 132px;
+}
+
 .choice-card .topline {
   display: flex;
   justify-content: space-between;
@@ -383,6 +394,44 @@ select {
   padding-bottom: 8px;
   color: var(--muted);
   font-size: 13px;
+}
+
+.standard-card {
+  max-height: 360px;
+  overflow: auto;
+}
+
+.standard-equipment-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.standard-group {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel-strong);
+}
+
+.standard-group summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.standard-group summary span {
+  color: var(--muted);
+}
+
+.standard-group .summary-list {
+  margin: 0;
+  padding: 0 10px 10px;
 }
 
 .empty {
