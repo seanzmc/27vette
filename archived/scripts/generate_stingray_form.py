@@ -19,7 +19,7 @@ from openpyxl.utils import get_column_letter
 ROOT = Path(__file__).resolve().parents[1]
 WORKBOOK_PATH = ROOT / "stingray_master.xlsx"
 OUTPUT_DIR = ROOT / "form-output"
-APP_DIR = ROOT / "form-app"
+APP_DIR = ROOT.parent / "form-app"
 
 GENERATED_SHEETS = [
     "form_steps",
@@ -44,10 +44,10 @@ STEP_ORDER = [
     "aero_exhaust_stripes_accessories",
     "seat",
     "base_interior",
-    "interior_style",
     "seat_belt",
     "interior_trim",
     "delivery",
+    "customer_info",
     "summary",
 ]
 
@@ -62,10 +62,10 @@ STEP_LABELS = {
     "aero_exhaust_stripes_accessories": "Aero, Exhaust, Stripes & Accessories",
     "seat": "Seats",
     "base_interior": "Base Interior",
-    "interior_style": "Interior Styling",
     "seat_belt": "Seat Belt",
     "interior_trim": "Interior Trim",
     "delivery": "Custom Delivery",
+    "customer_info": "Customer Information",
     "summary": "Summary",
     "standard_equipment": "Standard Equipment",
 }
@@ -77,6 +77,7 @@ CONTEXT_SECTIONS = [
         "category_id": "cat_context_001",
         "category_name": "Vehicle Context",
         "selection_mode": "single_select_req",
+        "selection_mode_label": "Required single choice",
         "choice_mode": "single",
         "is_required": "True",
         "standard_behavior": "user_selected",
@@ -90,6 +91,7 @@ CONTEXT_SECTIONS = [
         "category_id": "cat_context_001",
         "category_name": "Vehicle Context",
         "selection_mode": "single_select_req",
+        "selection_mode_label": "Required single choice",
         "choice_mode": "single",
         "is_required": "True",
         "standard_behavior": "user_selected",
@@ -114,12 +116,36 @@ SECTION_STEP_OVERRIDES = {
     "sec_intc_002": "base_interior",
     "sec_intc_003": "base_interior",
     "sec_seat_001": "seat_belt",
-    "sec_cust_002": "interior_style",
-    "sec_colo_001": "interior_style",
     "sec_inte_001": "interior_trim",
     "sec_lpoi_001": "interior_trim",
     "sec_onst_001": "interior_trim",
     "sec_cust_001": "delivery",
+}
+
+OPTION_ID_ALIASES = {
+    "opt_bc4_002": "opt_bc4_001",
+    "opt_bcp_002": "opt_bcp_001",
+    "opt_bcs_002": "opt_bcs_001",
+    "opt_bc7_002": "opt_bc7_001",
+}
+
+CONSOLIDATED_ENGINE_COVERS = {"opt_bc4_001", "opt_bcp_001", "opt_bcs_001"}
+
+HIDDEN_OPTION_IDS = {
+    "opt_bc4_002",
+    "opt_bcp_002",
+    "opt_bcs_002",
+    "opt_bc7_002",
+    "opt_n26_001",
+    "opt_tu7_001",
+    "opt_zf1_001",
+}
+
+SELECTION_MODE_LABELS = {
+    "single_select_req": "Required single choice",
+    "single_select_opt": "Optional single choice",
+    "multi_select_opt": "Optional multiple choice",
+    "display_only": "Display only",
 }
 
 STANDARD_SECTIONS = {
@@ -189,7 +215,7 @@ def step_for_section(section_id: str, section_name: str, category_id: str) -> st
     if category_id == "cat_exte_001":
         return "exterior_appearance"
     if category_id == "cat_inte_001":
-        return "interior_style"
+        return "interior_trim"
     if category_id == "cat_mech_001":
         return "packages_performance"
     return "standard_equipment"
@@ -209,6 +235,36 @@ def normalize_mode(selection_mode: str) -> str:
     if selection_mode.startswith("multi"):
         return "multi"
     return "display"
+
+
+def selection_mode_label(selection_mode: str) -> str:
+    if not selection_mode:
+        return ""
+    return SELECTION_MODE_LABELS.get(selection_mode, selection_mode.replace("_", " ").title())
+
+
+def canonical_option_id(option_id: str) -> str:
+    return OPTION_ID_ALIASES.get(option_id, option_id)
+
+
+def status_rank(status: str) -> int:
+    return {"unavailable": 0, "available": 1, "standard": 2}.get(status, 0)
+
+
+def best_status(*statuses: str) -> str:
+    cleaned = [clean(status).lower() for status in statuses if clean(status)]
+    if not cleaned:
+        return "unavailable"
+    return max(cleaned, key=status_rank)
+
+
+def rule_body_style_scope(rule: dict[str, str], source_id: str, target_id: str) -> str:
+    note = clean(rule.get("original_detail_raw", ""))
+    if target_id == "opt_zz3_001" or "Convertible Engine Appearance Package" in note:
+        return "convertible"
+    if target_id == "opt_b6p_001" or "on Coupe" in note or "Coupe Engine Appearance Package" in note:
+        return "coupe"
+    return ""
 
 
 def option_key(option: dict[str, str]) -> str:
@@ -269,6 +325,48 @@ def main() -> None:
     lz_interiors_raw = rows_from_sheet(wb, "LZ_Interiors")
     color_overrides_raw = rows_from_sheet(wb, "color_overrides")
 
+    status_by_option_variant_raw = {(row["option_id"], row["variant_id"]): row["status"].lower() for row in statuses_raw}
+    for option in options_raw:
+        original_option_id = option["option_id"]
+        option["option_id"] = canonical_option_id(original_option_id)
+        if option["option_id"] in CONSOLIDATED_ENGINE_COVERS:
+            option["price"] = "695"
+        if option["option_id"] == "opt_t0a_001":
+            option["section_id"] = "sec_spoi_001"
+            option["selectable"] = "True"
+            option["display_order"] = "25"
+        if original_option_id in HIDDEN_OPTION_IDS:
+            option["active"] = "False"
+
+    for row in statuses_raw:
+        row["option_id"] = canonical_option_id(row["option_id"])
+        if row["option_id"] in CONSOLIDATED_ENGINE_COVERS:
+            alias_status = status_by_option_variant_raw.get((f"{row['option_id'][:-3]}002", row["variant_id"]), row["status"])
+            row["status"] = best_status(row["status"], alias_status)
+        if row["option_id"] == "opt_bc7_001" and row["variant_id"].endswith("c67"):
+            row["status"] = "available"
+
+    for rule in rules_raw:
+        rule["source_id"] = canonical_option_id(rule.get("source_id", ""))
+        rule["target_id"] = canonical_option_id(rule.get("target_id", ""))
+
+    existing_price_rule_ids = {row.get("price_rule_id", "") for row in price_rules_raw}
+    for option_id in sorted(CONSOLIDATED_ENGINE_COVERS):
+        price_rule_id = f"pr_b6p_{option_id}_001"
+        if price_rule_id in existing_price_rule_ids:
+            continue
+        price_rules_raw.append(
+            {
+                "price_rule_id": price_rule_id,
+                "condition_option_id": "opt_b6p_001",
+                "target_option_id": option_id,
+                "price_rule_type": "override",
+                "price_value": "595",
+                "review_flag": "False",
+                "notes": "B6P selected sets LS6 engine cover price to 595",
+            }
+        )
+
     active_variants = [
         {
             "variant_id": row["variant_id"],
@@ -295,6 +393,7 @@ def main() -> None:
                 "category_id": section.get("category_id", ""),
                 "category_name": category.get("category_name", ""),
                 "selection_mode": section.get("selection_mode", ""),
+                "selection_mode_label": selection_mode_label(section.get("selection_mode", "")),
                 "choice_mode": normalize_mode(section.get("selection_mode", "")),
                 "is_required": section.get("is_required", ""),
                 "standard_behavior": section.get("standard_behavior", ""),
@@ -361,9 +460,12 @@ def main() -> None:
 
     options_by_id: dict[str, dict[str, Any]] = {}
     for option in options_raw:
+        if option["option_id"] in options_by_id and option.get("active") != "True":
+            continue
         section = sections.get(option.get("section_id", ""), {})
         category = categories.get(section.get("category_id", ""), {})
         step_key = step_for_section(option.get("section_id", ""), section.get("section_name", ""), section.get("category_id", ""))
+        mode = section.get("selection_mode", "")
         options_by_id[option["option_id"]] = {
             "option_id": option["option_id"],
             "rpo": option.get("rpo", ""),
@@ -375,17 +477,23 @@ def main() -> None:
             "category_id": section.get("category_id", ""),
             "category_name": category.get("category_name", ""),
             "step_key": step_key,
-            "selection_mode": section.get("selection_mode", ""),
-            "choice_mode": normalize_mode(section.get("selection_mode", "")),
+            "selection_mode": mode,
+            "selection_mode_label": selection_mode_label(mode),
+            "choice_mode": normalize_mode(mode),
             "selectable": option.get("selectable", ""),
             "active": option.get("active", ""),
             "base_price": money(option.get("price")),
             "display_order": intish(option.get("display_order")),
         }
 
-    status_by_option_variant = {(row["option_id"], row["variant_id"]): row["status"].lower() for row in statuses_raw}
+    status_by_option_variant: dict[tuple[str, str], str] = {}
+    for row in statuses_raw:
+        key = (row["option_id"], row["variant_id"])
+        status_by_option_variant[key] = best_status(status_by_option_variant.get(key, ""), row["status"])
     choices: list[dict[str, Any]] = []
     for option_id, option in options_by_id.items():
+        if option["active"] != "True":
+            continue
         for variant in active_variants:
             status = status_by_option_variant.get((option_id, variant["variant_id"]), "unavailable")
             choices.append(
@@ -409,6 +517,7 @@ def main() -> None:
                     "active": option["active"],
                     "choice_mode": option["choice_mode"],
                     "selection_mode": option["selection_mode"],
+                    "selection_mode_label": option["selection_mode_label"],
                     "base_price": option["base_price"],
                     "display_order": option["display_order"],
                     "source_detail_raw": option["source_detail_raw"],
@@ -463,20 +572,56 @@ def main() -> None:
 
     raw_rules: list[dict[str, Any]] = []
     validation_rows: list[dict[str, Any]] = []
-    for rule in rules_raw:
+    manual_rules = [
+        {
+            "rule_id": "rule_opt_t0a_001_requires_opt_z51_001",
+            "source_id": "opt_t0a_001",
+            "rule_type": "requires",
+            "target_id": "opt_z51_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_spoi_001",
+            "target_section": "sec_perf_001",
+            "source_selection_mode": "single_select_opt",
+            "target_selection_mode": "multi_select_opt",
+            "original_detail_raw": "T0A is available only when Z51 is selected.",
+            "review_flag": "False",
+        },
+        {
+            "rule_id": "rule_opt_tvs_001_excludes_opt_t0a_001",
+            "source_id": "opt_tvs_001",
+            "rule_type": "excludes",
+            "target_id": "opt_t0a_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_spoi_001",
+            "target_section": "sec_spoi_001",
+            "source_selection_mode": "single_select_opt",
+            "target_selection_mode": "single_select_opt",
+            "original_detail_raw": "TVS replaces the default T0A Z51 spoiler when selected.",
+            "review_flag": "False",
+        },
+    ]
+    for rule in rules_raw + manual_rules:
         rule_type = rule.get("rule_type", "").lower()
         source_id = rule.get("source_id", "")
         target_id = rule.get("target_id", "")
+        if source_id in CONSOLIDATED_ENGINE_COVERS and target_id == "opt_b6p_001" and rule_type in {"excludes", "requires"}:
+            continue
+        if source_id in HIDDEN_OPTION_IDS or target_id in HIDDEN_OPTION_IDS:
+            continue
         source_section = rule.get("source_section", "")
         target_section = rule.get("target_section", "")
         source_mode = rule.get("source_selection_mode", "")
         target_mode = rule.get("target_selection_mode", "")
+        body_style_scope = rule_body_style_scope(rule, source_id, target_id)
         redundant = (
             rule_type == "excludes"
             and source_section
             and source_section == target_section
             and source_mode.startswith("single")
             and target_mode.startswith("single")
+            and target_id != "opt_t0a_001"
         )
         action = "omit_redundant_same_section_exclude" if redundant else "active"
         if redundant:
@@ -512,6 +657,7 @@ def main() -> None:
                 "target_section": target_section,
                 "source_selection_mode": source_mode,
                 "target_selection_mode": target_mode,
+                "body_style_scope": body_style_scope,
                 "disabled_reason": disabled_reason,
                 "auto_add": auto_add,
                 "active": "False" if redundant else "True",
@@ -524,14 +670,15 @@ def main() -> None:
     price_rules = [
         {
             "price_rule_id": row.get("price_rule_id", ""),
-            "condition_option_id": row.get("condition_option_id", ""),
-            "target_option_id": row.get("target_option_id", ""),
+            "condition_option_id": canonical_option_id(row.get("condition_option_id", "")),
+            "target_option_id": canonical_option_id(row.get("target_option_id", "")),
             "price_rule_type": row.get("price_rule_type", "").lower(),
             "price_value": money(row.get("price_value")),
             "review_flag": row.get("review_flag", ""),
             "notes": row.get("notes", ""),
         }
         for row in price_rules_raw
+        if row.get("condition_option_id", "") not in HIDDEN_OPTION_IDS and row.get("target_option_id", "") not in HIDDEN_OPTION_IDS
     ]
 
     color_overrides = [
@@ -558,14 +705,15 @@ def main() -> None:
             }
         )
     expected_status_rows = len(active_variants) * len(options_by_id)
-    if len(statuses_raw) != expected_status_rows:
+    canonical_status_rows = len({(row["option_id"], row["variant_id"]) for row in statuses_raw})
+    if canonical_status_rows != expected_status_rows:
         validation_rows.append(
             {
                 "check_id": "availability_row_count",
                 "severity": "error",
                 "entity_type": "availability",
                 "entity_id": "",
-                "message": f"Expected {expected_status_rows} option_variant_status rows; found {len(statuses_raw)}.",
+                "message": f"Expected {expected_status_rows} canonical option_variant_status rows; found {canonical_status_rows}.",
             }
         )
     valid_ids = set(options_by_id) | set(interiors_by_id)
@@ -688,6 +836,7 @@ def main() -> None:
             "active",
             "choice_mode",
             "selection_mode",
+            "selection_mode_label",
             "base_price",
             "display_order",
             "source_detail_raw",
@@ -728,6 +877,7 @@ def main() -> None:
             "target_section",
             "source_selection_mode",
             "target_selection_mode",
+            "body_style_scope",
             "disabled_reason",
             "auto_add",
             "active",

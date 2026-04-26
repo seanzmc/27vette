@@ -259,6 +259,14 @@ textarea {
   margin-bottom: 22px;
 }
 
+.step-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
 .section-title {
   display: flex;
   align-items: center;
@@ -374,13 +382,25 @@ textarea {
   gap: 12px;
 }
 
+.customer-step-form {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--panel-strong);
+}
+
 .customer-field-grid {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
 .customer-field-grid label {
   text-transform: none;
+}
+
+.full-field {
+  grid-column: 1 / -1;
 }
 
 .total-list {
@@ -458,6 +478,31 @@ textarea {
   padding: 0 10px 10px;
 }
 
+.standard-group .summary-list li {
+  display: grid;
+  gap: 3px;
+}
+
+.standard-group .summary-list small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.compact-standard-equipment {
+  margin-top: 12px;
+}
+
+.nested-standard-equipment {
+  display: grid;
+  gap: 8px;
+  padding: 0 10px 10px;
+}
+
+.trim-standard-equipment {
+  margin-top: 24px;
+}
+
 .empty {
   color: var(--muted);
   font-style: italic;
@@ -511,6 +556,10 @@ textarea {
 
   .choice-panel {
     padding: 16px;
+  }
+
+  .customer-field-grid {
+    grid-template-columns: 1fr;
   }
 
   .toolbar {

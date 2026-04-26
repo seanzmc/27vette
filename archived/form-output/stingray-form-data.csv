@@ -215,18 +215,18 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_j6n_001,opt_j6n_001,J6N,Edge Red-painted calipers,sec_cali_001,calipers,1lt_c67,convertible,1LT,available,True,795
 2lt_c67__opt_j6n_001,opt_j6n_001,J6N,Edge Red-painted calipers,sec_cali_001,calipers,2lt_c67,convertible,2LT,available,True,795
 3lt_c67__opt_j6n_001,opt_j6n_001,J6N,Edge Red-painted calipers,sec_cali_001,calipers,3lt_c67,convertible,3LT,available,True,795
-1lt_c07__opt_d30_001,opt_d30_001,D30,Color Combination Override,sec_colo_001,interior_style,1lt_c07,coupe,1LT,available,True,1495
-2lt_c07__opt_d30_001,opt_d30_001,D30,Color Combination Override,sec_colo_001,interior_style,2lt_c07,coupe,2LT,available,True,1495
-3lt_c07__opt_d30_001,opt_d30_001,D30,Color Combination Override,sec_colo_001,interior_style,3lt_c07,coupe,3LT,available,True,1495
-1lt_c67__opt_d30_001,opt_d30_001,D30,Color Combination Override,sec_colo_001,interior_style,1lt_c67,convertible,1LT,available,True,1495
-2lt_c67__opt_d30_001,opt_d30_001,D30,Color Combination Override,sec_colo_001,interior_style,2lt_c67,convertible,2LT,available,True,1495
-3lt_c67__opt_d30_001,opt_d30_001,D30,Color Combination Override,sec_colo_001,interior_style,3lt_c67,convertible,3LT,available,True,1495
-1lt_c07__opt_r6x_001,opt_r6x_001,R6X,Custom Interior Trim and Seat Combination,sec_colo_001,interior_style,1lt_c07,coupe,1LT,unavailable,True,995
-2lt_c07__opt_r6x_001,opt_r6x_001,R6X,Custom Interior Trim and Seat Combination,sec_colo_001,interior_style,2lt_c07,coupe,2LT,unavailable,True,995
-3lt_c07__opt_r6x_001,opt_r6x_001,R6X,Custom Interior Trim and Seat Combination,sec_colo_001,interior_style,3lt_c07,coupe,3LT,available,True,995
-1lt_c67__opt_r6x_001,opt_r6x_001,R6X,Custom Interior Trim and Seat Combination,sec_colo_001,interior_style,1lt_c67,convertible,1LT,unavailable,True,995
-2lt_c67__opt_r6x_001,opt_r6x_001,R6X,Custom Interior Trim and Seat Combination,sec_colo_001,interior_style,2lt_c67,convertible,2LT,unavailable,True,995
-3lt_c67__opt_r6x_001,opt_r6x_001,R6X,Custom Interior Trim and Seat Combination,sec_colo_001,interior_style,3lt_c67,convertible,3LT,available,True,995
+1lt_c07__opt_d30_001,opt_d30_001,D30,Color Combination Override,sec_colo_001,interior_trim,1lt_c07,coupe,1LT,available,True,1495
+2lt_c07__opt_d30_001,opt_d30_001,D30,Color Combination Override,sec_colo_001,interior_trim,2lt_c07,coupe,2LT,available,True,1495
+3lt_c07__opt_d30_001,opt_d30_001,D30,Color Combination Override,sec_colo_001,interior_trim,3lt_c07,coupe,3LT,available,True,1495
+1lt_c67__opt_d30_001,opt_d30_001,D30,Color Combination Override,sec_colo_001,interior_trim,1lt_c67,convertible,1LT,available,True,1495
+2lt_c67__opt_d30_001,opt_d30_001,D30,Color Combination Override,sec_colo_001,interior_trim,2lt_c67,convertible,2LT,available,True,1495
+3lt_c67__opt_d30_001,opt_d30_001,D30,Color Combination Override,sec_colo_001,interior_trim,3lt_c67,convertible,3LT,available,True,1495
+1lt_c07__opt_r6x_001,opt_r6x_001,R6X,Custom Interior Trim and Seat Combination,sec_colo_001,interior_trim,1lt_c07,coupe,1LT,unavailable,True,995
+2lt_c07__opt_r6x_001,opt_r6x_001,R6X,Custom Interior Trim and Seat Combination,sec_colo_001,interior_trim,2lt_c07,coupe,2LT,unavailable,True,995
+3lt_c07__opt_r6x_001,opt_r6x_001,R6X,Custom Interior Trim and Seat Combination,sec_colo_001,interior_trim,3lt_c07,coupe,3LT,available,True,995
+1lt_c67__opt_r6x_001,opt_r6x_001,R6X,Custom Interior Trim and Seat Combination,sec_colo_001,interior_trim,1lt_c67,convertible,1LT,unavailable,True,995
+2lt_c67__opt_r6x_001,opt_r6x_001,R6X,Custom Interior Trim and Seat Combination,sec_colo_001,interior_trim,2lt_c67,convertible,2LT,unavailable,True,995
+3lt_c67__opt_r6x_001,opt_r6x_001,R6X,Custom Interior Trim and Seat Combination,sec_colo_001,interior_trim,3lt_c67,convertible,3LT,available,True,995
 1lt_c07__opt_pin_001,opt_pin_001,PIN,Customer VIN ending reservation,sec_cust_001,delivery,1lt_c07,coupe,1LT,available,True,5495
 2lt_c07__opt_pin_001,opt_pin_001,PIN,Customer VIN ending reservation,sec_cust_001,delivery,2lt_c07,coupe,2LT,available,True,5495
 3lt_c07__opt_pin_001,opt_pin_001,PIN,Customer VIN ending reservation,sec_cust_001,delivery,3lt_c07,coupe,3LT,available,True,5495
@@ -245,24 +245,24 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_cust_001,delivery,1lt_c67,convertible,1LT,available,True,40
 2lt_c67__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_cust_001,delivery,2lt_c67,convertible,2LT,available,True,40
 3lt_c67__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_cust_001,delivery,3lt_c67,convertible,3LT,available,True,40
-1lt_c07__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_style,1lt_c07,coupe,1LT,unavailable,True,495
-2lt_c07__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_style,2lt_c07,coupe,2LT,available,True,495
-3lt_c07__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_style,3lt_c07,coupe,3LT,available,True,495
-1lt_c67__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_style,1lt_c67,convertible,1LT,unavailable,True,495
-2lt_c67__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_style,2lt_c67,convertible,2LT,available,True,495
-3lt_c67__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_style,3lt_c67,convertible,3LT,available,True,495
-1lt_c07__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_style,1lt_c07,coupe,1LT,unavailable,True,495
-2lt_c07__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_style,2lt_c07,coupe,2LT,available,True,495
-3lt_c07__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_style,3lt_c07,coupe,3LT,available,True,495
-1lt_c67__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_style,1lt_c67,convertible,1LT,unavailable,True,495
-2lt_c67__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_style,2lt_c67,convertible,2LT,available,True,495
-3lt_c67__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_style,3lt_c67,convertible,3LT,available,True,495
-1lt_c07__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_style,1lt_c07,coupe,1LT,unavailable,True,495
-2lt_c07__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_style,2lt_c07,coupe,2LT,available,True,495
-3lt_c07__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_style,3lt_c07,coupe,3LT,available,True,495
-1lt_c67__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_style,1lt_c67,convertible,1LT,unavailable,True,495
-2lt_c67__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_style,2lt_c67,convertible,2LT,available,True,495
-3lt_c67__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_style,3lt_c67,convertible,3LT,available,True,495
+1lt_c07__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_trim,1lt_c07,coupe,1LT,unavailable,True,495
+2lt_c07__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_trim,2lt_c07,coupe,2LT,available,True,495
+3lt_c07__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_trim,3lt_c07,coupe,3LT,available,True,495
+1lt_c67__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_trim,1lt_c67,convertible,1LT,unavailable,True,495
+2lt_c67__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_trim,2lt_c67,convertible,2LT,available,True,495
+3lt_c67__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_trim,3lt_c67,convertible,3LT,available,True,495
+1lt_c07__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_trim,1lt_c07,coupe,1LT,unavailable,True,495
+2lt_c07__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_trim,2lt_c07,coupe,2LT,available,True,495
+3lt_c07__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_trim,3lt_c07,coupe,3LT,available,True,495
+1lt_c67__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_trim,1lt_c67,convertible,1LT,unavailable,True,495
+2lt_c67__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_trim,2lt_c67,convertible,2LT,available,True,495
+3lt_c67__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_trim,3lt_c67,convertible,3LT,available,True,495
+1lt_c07__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_trim,1lt_c07,coupe,1LT,unavailable,True,495
+2lt_c07__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_trim,2lt_c07,coupe,2LT,available,True,495
+3lt_c07__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_trim,3lt_c07,coupe,3LT,available,True,495
+1lt_c67__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_trim,1lt_c67,convertible,1LT,unavailable,True,495
+2lt_c67__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_trim,2lt_c67,convertible,2LT,available,True,495
+3lt_c67__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_trim,3lt_c67,convertible,3LT,available,True,495
 1lt_c07__opt_b6p_001,opt_b6p_001,B6P,Coupe Engine Appearance Package,sec_engi_001,exterior_appearance,1lt_c07,coupe,1LT,available,True,1895
 2lt_c07__opt_b6p_001,opt_b6p_001,B6P,Coupe Engine Appearance Package,sec_engi_001,exterior_appearance,2lt_c07,coupe,2LT,available,True,1895
 3lt_c07__opt_b6p_001,opt_b6p_001,B6P,Coupe Engine Appearance Package,sec_engi_001,exterior_appearance,3lt_c07,coupe,3LT,available,True,1895
@@ -272,51 +272,27 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c07__opt_bc4_001,opt_bc4_001,BC4,NEW! Blue LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c07,coupe,1LT,available,True,695
 2lt_c07__opt_bc4_001,opt_bc4_001,BC4,NEW! Blue LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c07,coupe,2LT,available,True,695
 3lt_c07__opt_bc4_001,opt_bc4_001,BC4,NEW! Blue LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c07,coupe,3LT,available,True,695
-1lt_c67__opt_bc4_001,opt_bc4_001,BC4,NEW! Blue LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c67,convertible,1LT,unavailable,True,695
-2lt_c67__opt_bc4_001,opt_bc4_001,BC4,NEW! Blue LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c67,convertible,2LT,unavailable,True,695
-3lt_c67__opt_bc4_001,opt_bc4_001,BC4,NEW! Blue LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c67,convertible,3LT,unavailable,True,695
-1lt_c07__opt_bc4_002,opt_bc4_002,BC4,NEW! Blue LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c07,coupe,1LT,available,True,595
-2lt_c07__opt_bc4_002,opt_bc4_002,BC4,NEW! Blue LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c07,coupe,2LT,available,True,595
-3lt_c07__opt_bc4_002,opt_bc4_002,BC4,NEW! Blue LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c07,coupe,3LT,available,True,595
-1lt_c67__opt_bc4_002,opt_bc4_002,BC4,NEW! Blue LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c67,convertible,1LT,available,True,595
-2lt_c67__opt_bc4_002,opt_bc4_002,BC4,NEW! Blue LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c67,convertible,2LT,available,True,595
-3lt_c67__opt_bc4_002,opt_bc4_002,BC4,NEW! Blue LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c67,convertible,3LT,available,True,595
+1lt_c67__opt_bc4_001,opt_bc4_001,BC4,NEW! Blue LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c67,convertible,1LT,available,True,695
+2lt_c67__opt_bc4_001,opt_bc4_001,BC4,NEW! Blue LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c67,convertible,2LT,available,True,695
+3lt_c67__opt_bc4_001,opt_bc4_001,BC4,NEW! Blue LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c67,convertible,3LT,available,True,695
 1lt_c07__opt_bc7_001,opt_bc7_001,BC7,Black LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c07,coupe,1LT,standard,True,0
 2lt_c07__opt_bc7_001,opt_bc7_001,BC7,Black LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c07,coupe,2LT,standard,True,0
 3lt_c07__opt_bc7_001,opt_bc7_001,BC7,Black LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c07,coupe,3LT,standard,True,0
-1lt_c67__opt_bc7_001,opt_bc7_001,BC7,Black LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c67,convertible,1LT,unavailable,True,0
-2lt_c67__opt_bc7_001,opt_bc7_001,BC7,Black LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c67,convertible,2LT,unavailable,True,0
-3lt_c67__opt_bc7_001,opt_bc7_001,BC7,Black LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c67,convertible,3LT,unavailable,True,0
-1lt_c07__opt_bc7_002,opt_bc7_002,BC7,Black LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c07,coupe,1LT,unavailable,False,0
-2lt_c07__opt_bc7_002,opt_bc7_002,BC7,Black LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c07,coupe,2LT,unavailable,False,0
-3lt_c07__opt_bc7_002,opt_bc7_002,BC7,Black LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c07,coupe,3LT,unavailable,False,0
-1lt_c67__opt_bc7_002,opt_bc7_002,BC7,Black LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c67,convertible,1LT,available,False,0
-2lt_c67__opt_bc7_002,opt_bc7_002,BC7,Black LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c67,convertible,2LT,available,False,0
-3lt_c67__opt_bc7_002,opt_bc7_002,BC7,Black LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c67,convertible,3LT,available,False,0
+1lt_c67__opt_bc7_001,opt_bc7_001,BC7,Black LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c67,convertible,1LT,available,True,0
+2lt_c67__opt_bc7_001,opt_bc7_001,BC7,Black LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c67,convertible,2LT,available,True,0
+3lt_c67__opt_bc7_001,opt_bc7_001,BC7,Black LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c67,convertible,3LT,available,True,0
 1lt_c07__opt_bcp_001,opt_bcp_001,BCP,Edge Red LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c07,coupe,1LT,available,True,695
 2lt_c07__opt_bcp_001,opt_bcp_001,BCP,Edge Red LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c07,coupe,2LT,available,True,695
 3lt_c07__opt_bcp_001,opt_bcp_001,BCP,Edge Red LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c07,coupe,3LT,available,True,695
-1lt_c67__opt_bcp_001,opt_bcp_001,BCP,Edge Red LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c67,convertible,1LT,unavailable,True,695
-2lt_c67__opt_bcp_001,opt_bcp_001,BCP,Edge Red LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c67,convertible,2LT,unavailable,True,695
-3lt_c67__opt_bcp_001,opt_bcp_001,BCP,Edge Red LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c67,convertible,3LT,unavailable,True,695
-1lt_c07__opt_bcp_002,opt_bcp_002,BCP,Edge Red LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c07,coupe,1LT,available,True,595
-2lt_c07__opt_bcp_002,opt_bcp_002,BCP,Edge Red LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c07,coupe,2LT,available,True,595
-3lt_c07__opt_bcp_002,opt_bcp_002,BCP,Edge Red LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c07,coupe,3LT,available,True,595
-1lt_c67__opt_bcp_002,opt_bcp_002,BCP,Edge Red LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c67,convertible,1LT,available,True,595
-2lt_c67__opt_bcp_002,opt_bcp_002,BCP,Edge Red LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c67,convertible,2LT,available,True,595
-3lt_c67__opt_bcp_002,opt_bcp_002,BCP,Edge Red LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c67,convertible,3LT,available,True,595
+1lt_c67__opt_bcp_001,opt_bcp_001,BCP,Edge Red LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c67,convertible,1LT,available,True,695
+2lt_c67__opt_bcp_001,opt_bcp_001,BCP,Edge Red LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c67,convertible,2LT,available,True,695
+3lt_c67__opt_bcp_001,opt_bcp_001,BCP,Edge Red LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c67,convertible,3LT,available,True,695
 1lt_c07__opt_bcs_001,opt_bcs_001,BCS,Sterling Silver LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c07,coupe,1LT,available,True,695
 2lt_c07__opt_bcs_001,opt_bcs_001,BCS,Sterling Silver LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c07,coupe,2LT,available,True,695
 3lt_c07__opt_bcs_001,opt_bcs_001,BCS,Sterling Silver LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c07,coupe,3LT,available,True,695
-1lt_c67__opt_bcs_001,opt_bcs_001,BCS,Sterling Silver LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c67,convertible,1LT,unavailable,True,695
-2lt_c67__opt_bcs_001,opt_bcs_001,BCS,Sterling Silver LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c67,convertible,2LT,unavailable,True,695
-3lt_c67__opt_bcs_001,opt_bcs_001,BCS,Sterling Silver LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c67,convertible,3LT,unavailable,True,695
-1lt_c07__opt_bcs_002,opt_bcs_002,BCS,Sterling Silver LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c07,coupe,1LT,available,True,595
-2lt_c07__opt_bcs_002,opt_bcs_002,BCS,Sterling Silver LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c07,coupe,2LT,available,True,595
-3lt_c07__opt_bcs_002,opt_bcs_002,BCS,Sterling Silver LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c07,coupe,3LT,available,True,595
-1lt_c67__opt_bcs_002,opt_bcs_002,BCS,Sterling Silver LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c67,convertible,1LT,available,True,595
-2lt_c67__opt_bcs_002,opt_bcs_002,BCS,Sterling Silver LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c67,convertible,2LT,available,True,595
-3lt_c67__opt_bcs_002,opt_bcs_002,BCS,Sterling Silver LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c67,convertible,3LT,available,True,595
+1lt_c67__opt_bcs_001,opt_bcs_001,BCS,Sterling Silver LS6 engine cover,sec_engi_001,exterior_appearance,1lt_c67,convertible,1LT,available,True,695
+2lt_c67__opt_bcs_001,opt_bcs_001,BCS,Sterling Silver LS6 engine cover,sec_engi_001,exterior_appearance,2lt_c67,convertible,2LT,available,True,695
+3lt_c67__opt_bcs_001,opt_bcs_001,BCS,Sterling Silver LS6 engine cover,sec_engi_001,exterior_appearance,3lt_c67,convertible,3LT,available,True,695
 1lt_c07__opt_d3v_001,opt_d3v_001,D3V,Engine lighting,sec_engi_001,exterior_appearance,1lt_c07,coupe,1LT,available,True,195
 2lt_c07__opt_d3v_001,opt_d3v_001,D3V,Engine lighting,sec_engi_001,exterior_appearance,2lt_c07,coupe,2LT,available,True,195
 3lt_c07__opt_d3v_001,opt_d3v_001,D3V,Engine lighting,sec_engi_001,exterior_appearance,3lt_c07,coupe,3LT,available,True,195
@@ -443,12 +419,12 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_qtu_001,opt_qtu_001,QTU,NEW! Tires,sec_incl_001,standard_equipment,1lt_c67,convertible,1LT,available,False,0
 2lt_c67__opt_qtu_001,opt_qtu_001,QTU,NEW! Tires,sec_incl_001,standard_equipment,2lt_c67,convertible,2LT,available,False,0
 3lt_c67__opt_qtu_001,opt_qtu_001,QTU,NEW! Tires,sec_incl_001,standard_equipment,3lt_c67,convertible,3LT,available,False,0
-1lt_c07__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_incl_001,standard_equipment,1lt_c07,coupe,1LT,available,False,0
-2lt_c07__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_incl_001,standard_equipment,2lt_c07,coupe,2LT,available,False,0
-3lt_c07__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_incl_001,standard_equipment,3lt_c07,coupe,3LT,available,False,0
-1lt_c67__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_incl_001,standard_equipment,1lt_c67,convertible,1LT,available,False,0
-2lt_c67__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_incl_001,standard_equipment,2lt_c67,convertible,2LT,available,False,0
-3lt_c67__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_incl_001,standard_equipment,3lt_c67,convertible,3LT,available,False,0
+1lt_c07__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,0
+2lt_c07__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,0
+3lt_c07__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,0
+1lt_c67__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,0
+2lt_c67__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,0
+3lt_c67__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,0
 1lt_c07__opt_tr7_001,opt_tr7_001,TR7,Headlamp control,sec_incl_001,standard_equipment,1lt_c07,coupe,1LT,unavailable,False,0
 2lt_c07__opt_tr7_001,opt_tr7_001,TR7,Headlamp control,sec_incl_001,standard_equipment,2lt_c07,coupe,2LT,available,False,0
 3lt_c07__opt_tr7_001,opt_tr7_001,TR7,Headlamp control,sec_incl_001,standard_equipment,3lt_c07,coupe,3LT,available,False,0
@@ -479,18 +455,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_fa5_001,opt_fa5_001,FA5,Carbon Fiber trim,sec_inte_001,interior_trim,1lt_c67,convertible,1LT,unavailable,True,1795
 2lt_c67__opt_fa5_001,opt_fa5_001,FA5,Carbon Fiber trim,sec_inte_001,interior_trim,2lt_c67,convertible,2LT,available,True,1795
 3lt_c67__opt_fa5_001,opt_fa5_001,FA5,Carbon Fiber trim,sec_inte_001,interior_trim,3lt_c67,convertible,3LT,available,True,1795
-1lt_c07__opt_n26_001,opt_n26_001,N26,Sueded microfiber-wrapped steering wheel,sec_inte_001,interior_trim,1lt_c07,coupe,1LT,available,True,695
-2lt_c07__opt_n26_001,opt_n26_001,N26,Sueded microfiber-wrapped steering wheel,sec_inte_001,interior_trim,2lt_c07,coupe,2LT,available,True,695
-3lt_c07__opt_n26_001,opt_n26_001,N26,Sueded microfiber-wrapped steering wheel,sec_inte_001,interior_trim,3lt_c07,coupe,3LT,available,True,695
-1lt_c67__opt_n26_001,opt_n26_001,N26,Sueded microfiber-wrapped steering wheel,sec_inte_001,interior_trim,1lt_c67,convertible,1LT,available,True,695
-2lt_c67__opt_n26_001,opt_n26_001,N26,Sueded microfiber-wrapped steering wheel,sec_inte_001,interior_trim,2lt_c67,convertible,2LT,available,True,695
-3lt_c67__opt_n26_001,opt_n26_001,N26,Sueded microfiber-wrapped steering wheel,sec_inte_001,interior_trim,3lt_c67,convertible,3LT,available,True,695
-1lt_c07__opt_tu7_001,opt_tu7_001,TU7,Two-tone seats,sec_inte_001,interior_trim,1lt_c07,coupe,1LT,unavailable,True,595
-2lt_c07__opt_tu7_001,opt_tu7_001,TU7,Two-tone seats,sec_inte_001,interior_trim,2lt_c07,coupe,2LT,available,True,595
-3lt_c07__opt_tu7_001,opt_tu7_001,TU7,Two-tone seats,sec_inte_001,interior_trim,3lt_c07,coupe,3LT,available,True,595
-1lt_c67__opt_tu7_001,opt_tu7_001,TU7,Two-tone seats,sec_inte_001,interior_trim,1lt_c67,convertible,1LT,unavailable,True,595
-2lt_c67__opt_tu7_001,opt_tu7_001,TU7,Two-tone seats,sec_inte_001,interior_trim,2lt_c67,convertible,2LT,available,True,595
-3lt_c67__opt_tu7_001,opt_tu7_001,TU7,Two-tone seats,sec_inte_001,interior_trim,3lt_c67,convertible,3LT,available,True,595
 1lt_c07__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,1lt_c07,coupe,1LT,available,True,1495
 2lt_c07__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,2lt_c07,coupe,2LT,standard,True,1495
 3lt_c07__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,3lt_c07,coupe,3LT,standard,True,1495
@@ -509,18 +473,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects. Genuine Corvette Accessory",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,650
 2lt_c67__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects. Genuine Corvette Accessory",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,650
 3lt_c67__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects. Genuine Corvette Accessory",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,650
-1lt_c07__opt_5vm_001,opt_5vm_001,5VM,"LPO, Visible Carbon Fiber Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,unavailable,True,8295
-2lt_c07__opt_5vm_001,opt_5vm_001,5VM,"LPO, Visible Carbon Fiber Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,unavailable,True,8295
-3lt_c07__opt_5vm_001,opt_5vm_001,5VM,"LPO, Visible Carbon Fiber Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,8295
-1lt_c67__opt_5vm_001,opt_5vm_001,5VM,"LPO, Visible Carbon Fiber Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,unavailable,True,8295
-2lt_c67__opt_5vm_001,opt_5vm_001,5VM,"LPO, Visible Carbon Fiber Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,unavailable,True,8295
-3lt_c67__opt_5vm_001,opt_5vm_001,5VM,"LPO, Visible Carbon Fiber Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,8295
-1lt_c07__opt_5w8_001,opt_5w8_001,5W8,"LPO, Carbon Fiber Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,unavailable,True,7295
-2lt_c07__opt_5w8_001,opt_5w8_001,5W8,"LPO, Carbon Fiber Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,unavailable,True,7295
-3lt_c07__opt_5w8_001,opt_5w8_001,5W8,"LPO, Carbon Fiber Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,7295
-1lt_c67__opt_5w8_001,opt_5w8_001,5W8,"LPO, Carbon Fiber Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,unavailable,True,7295
-2lt_c67__opt_5w8_001,opt_5w8_001,5W8,"LPO, Carbon Fiber Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,unavailable,True,7295
-3lt_c67__opt_5w8_001,opt_5w8_001,5W8,"LPO, Carbon Fiber Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,7295
 1lt_c07__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,1575
 2lt_c07__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,1575
 3lt_c07__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,1575
@@ -575,12 +527,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_rwj_001,opt_rwj_001,RWJ,"LPO, Premium outdoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,495
 2lt_c67__opt_rwj_001,opt_rwj_001,RWJ,"LPO, Premium outdoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,495
 3lt_c67__opt_rwj_001,opt_rwj_001,RWJ,"LPO, Premium outdoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,495
-1lt_c07__opt_ryq_001,opt_ryq_001,RYQ,"LPO, Visible Carbon Fiber door intake trim",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,0
-2lt_c07__opt_ryq_001,opt_ryq_001,RYQ,"LPO, Visible Carbon Fiber door intake trim",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,0
-3lt_c07__opt_ryq_001,opt_ryq_001,RYQ,"LPO, Visible Carbon Fiber door intake trim",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,0
-1lt_c67__opt_ryq_001,opt_ryq_001,RYQ,"LPO, Visible Carbon Fiber door intake trim",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,0
-2lt_c67__opt_ryq_001,opt_ryq_001,RYQ,"LPO, Visible Carbon Fiber door intake trim",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,0
-3lt_c67__opt_ryq_001,opt_ryq_001,RYQ,"LPO, Visible Carbon Fiber door intake trim",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,0
 1lt_c07__opt_rz9_001,opt_rz9_001,RZ9,"LPO, Visible Carbon Fiber grille insert",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,2495
 2lt_c07__opt_rz9_001,opt_rz9_001,RZ9,"LPO, Visible Carbon Fiber grille insert",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,2495
 3lt_c07__opt_rz9_001,opt_rz9_001,RZ9,"LPO, Visible Carbon Fiber grille insert",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,2495
@@ -725,12 +671,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_sxt_001,opt_sxt_001,SXT,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,available,True,2695
 2lt_c67__opt_sxt_001,opt_sxt_001,SXT,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,available,True,2695
 3lt_c67__opt_sxt_001,opt_sxt_001,SXT,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,available,True,2695
-1lt_c07__opt_v8x_001,opt_v8x_001,V8X,"LPO, Visible Carbon Fiber sill plates Genuine Corvette Accessory",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,unavailable,True,0
-2lt_c07__opt_v8x_001,opt_v8x_001,V8X,"LPO, Visible Carbon Fiber sill plates Genuine Corvette Accessory",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,unavailable,True,0
-3lt_c07__opt_v8x_001,opt_v8x_001,V8X,"LPO, Visible Carbon Fiber sill plates Genuine Corvette Accessory",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,available,True,0
-1lt_c67__opt_v8x_001,opt_v8x_001,V8X,"LPO, Visible Carbon Fiber sill plates Genuine Corvette Accessory",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,unavailable,True,0
-2lt_c67__opt_v8x_001,opt_v8x_001,V8X,"LPO, Visible Carbon Fiber sill plates Genuine Corvette Accessory",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,unavailable,True,0
-3lt_c67__opt_v8x_001,opt_v8x_001,V8X,"LPO, Visible Carbon Fiber sill plates Genuine Corvette Accessory",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,available,True,0
 1lt_c07__opt_vyw_001,opt_vyw_001,VYW,"LPO, Floor mats",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,available,True,275
 2lt_c07__opt_vyw_001,opt_vyw_001,VYW,"LPO, Floor mats",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,available,True,275
 3lt_c07__opt_vyw_001,opt_vyw_001,VYW,"LPO, Floor mats",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,available,True,275
@@ -887,12 +827,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_cf7_001,opt_cf7_001,CF7,Roof panel,sec_roof_001,exterior_appearance,1lt_c67,convertible,1LT,unavailable,True,0
 2lt_c67__opt_cf7_001,opt_cf7_001,CF7,Roof panel,sec_roof_001,exterior_appearance,2lt_c67,convertible,2LT,unavailable,True,0
 3lt_c67__opt_cf7_001,opt_cf7_001,CF7,Roof panel,sec_roof_001,exterior_appearance,3lt_c67,convertible,3LT,unavailable,True,0
-1lt_c07__opt_cf8_001,opt_cf8_001,CF8,Roof panel,sec_roof_001,exterior_appearance,1lt_c07,coupe,1LT,unavailable,True,3500
-2lt_c07__opt_cf8_001,opt_cf8_001,CF8,Roof panel,sec_roof_001,exterior_appearance,2lt_c07,coupe,2LT,available,True,3500
-3lt_c07__opt_cf8_001,opt_cf8_001,CF8,Roof panel,sec_roof_001,exterior_appearance,3lt_c07,coupe,3LT,available,True,3500
-1lt_c67__opt_cf8_001,opt_cf8_001,CF8,Roof panel,sec_roof_001,exterior_appearance,1lt_c67,convertible,1LT,unavailable,True,3500
-2lt_c67__opt_cf8_001,opt_cf8_001,CF8,Roof panel,sec_roof_001,exterior_appearance,2lt_c67,convertible,2LT,unavailable,True,3500
-3lt_c67__opt_cf8_001,opt_cf8_001,CF8,Roof panel,sec_roof_001,exterior_appearance,3lt_c67,convertible,3LT,unavailable,True,3500
 1lt_c07__opt_cm9_001,opt_cm9_001,CM9,Convertible top,sec_roof_001,exterior_appearance,1lt_c07,coupe,1LT,unavailable,True,0
 2lt_c07__opt_cm9_001,opt_cm9_001,CM9,Convertible top,sec_roof_001,exterior_appearance,2lt_c07,coupe,2LT,unavailable,True,0
 3lt_c07__opt_cm9_001,opt_cm9_001,CM9,Convertible top,sec_roof_001,exterior_appearance,3lt_c07,coupe,3LT,unavailable,True,0
@@ -1079,12 +1013,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_5zu_001,opt_5zu_001,5ZU,"LPO, High wing spoiler, Body color",sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,1395
 2lt_c67__opt_5zu_001,opt_5zu_001,5ZU,"LPO, High wing spoiler, Body color",sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,1395
 3lt_c67__opt_5zu_001,opt_5zu_001,5ZU,"LPO, High wing spoiler, Body color",sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,1395
-1lt_c07__opt_5zw_001,opt_5zw_001,5ZW,"LPO, Two-Stanchion spoiler",sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,0
-2lt_c07__opt_5zw_001,opt_5zw_001,5ZW,"LPO, Two-Stanchion spoiler",sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,0
-3lt_c07__opt_5zw_001,opt_5zw_001,5ZW,"LPO, Two-Stanchion spoiler",sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,0
-1lt_c67__opt_5zw_001,opt_5zw_001,5ZW,"LPO, Two-Stanchion spoiler",sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,0
-2lt_c67__opt_5zw_001,opt_5zw_001,5ZW,"LPO, Two-Stanchion spoiler",sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,0
-3lt_c67__opt_5zw_001,opt_5zw_001,5ZW,"LPO, Two-Stanchion spoiler",sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,0
 1lt_c07__opt_5zz_001,opt_5zz_001,5ZZ,"LPO, High wing spoiler",sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,1550
 2lt_c07__opt_5zz_001,opt_5zz_001,5ZZ,"LPO, High wing spoiler",sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,1550
 3lt_c07__opt_5zz_001,opt_5zz_001,5ZZ,"LPO, High wing spoiler",sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,1550
@@ -1097,12 +1025,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_tvs_001,opt_tvs_001,TVS,Low-profile rear spoiler and front splitter,sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,995
 2lt_c67__opt_tvs_001,opt_tvs_001,TVS,Low-profile rear spoiler and front splitter,sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,995
 3lt_c67__opt_tvs_001,opt_tvs_001,TVS,Low-profile rear spoiler and front splitter,sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,995
-1lt_c07__opt_zf1_001,opt_zf1_001,ZF1,Aero delete,sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,0
-2lt_c07__opt_zf1_001,opt_zf1_001,ZF1,Aero delete,sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,0
-3lt_c07__opt_zf1_001,opt_zf1_001,ZF1,Aero delete,sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,0
-1lt_c67__opt_zf1_001,opt_zf1_001,ZF1,Aero delete,sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,0
-2lt_c67__opt_zf1_001,opt_zf1_001,ZF1,Aero delete,sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,0
-3lt_c67__opt_zf1_001,opt_zf1_001,ZF1,Aero delete,sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,0
 1lt_c07__opt_zyc_001,opt_zyc_001,ZYC,Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped),sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,295
 2lt_c07__opt_zyc_001,opt_zyc_001,ZYC,Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped),sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,295
 3lt_c07__opt_zyc_001,opt_zyc_001,ZYC,Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped),sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,295

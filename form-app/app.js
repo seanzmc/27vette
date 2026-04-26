@@ -26,11 +26,11 @@ const els = {
   stepRail: document.querySelector("#stepRail"),
   stepContent: document.querySelector("#stepContent"),
   selectedList: document.querySelector("#selectedList"),
+  selectedStandardEquipmentList: document.querySelector("#selectedStandardEquipmentList"),
   autoList: document.querySelector("#autoList"),
   missingList: document.querySelector("#missingList"),
   standardEquipmentList: document.querySelector("#standardEquipmentList"),
   alertRegion: document.querySelector("#alertRegion"),
-  customerForm: document.querySelector("#customerForm"),
   resetButton: document.querySelector("#resetButton"),
   exportJsonButton: document.querySelector("#exportJsonButton"),
   exportCsvButton: document.querySelector("#exportCsvButton"),
@@ -72,6 +72,14 @@ function formatMoney(value) {
   }).format(Number(value || 0));
 }
 
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 function currentVariant() {
   return variants.find((variant) => variant.body_style === state.bodyStyle && variant.trim_level === state.trimLevel);
 }
@@ -80,9 +88,50 @@ function currentVariantId() {
   return currentVariant()?.variant_id || "";
 }
 
+function currentStepIndex() {
+  return runtimeSteps.findIndex((step) => step.step_key === state.activeStep);
+}
+
+function nextStep() {
+  const index = currentStepIndex();
+  return index >= 0 ? runtimeSteps[index + 1] : null;
+}
+
+function goToNextStep() {
+  const step = nextStep();
+  if (!step) return;
+  state.activeStep = step.step_key;
+  render();
+}
+
 function activeChoiceRows() {
   const variantId = currentVariantId();
   return data.choices.filter((choice) => choice.variant_id === variantId);
+}
+
+function choiceForCurrentVariant(optionId) {
+  return activeChoiceRows().find((choice) => choice.option_id === optionId);
+}
+
+function ruleAppliesToCurrentVariant(rule) {
+  if (rule.body_style_scope && rule.body_style_scope !== state.bodyStyle) return false;
+  const sourceChoice = choiceForCurrentVariant(rule.source_id);
+  const targetChoice = choiceForCurrentVariant(rule.target_id);
+  if (sourceChoice && (sourceChoice.active !== "True" || sourceChoice.status === "unavailable")) return false;
+  if (targetChoice && (targetChoice.active !== "True" || targetChoice.status === "unavailable")) return false;
+  return true;
+}
+
+function selectedOptionByRpo(rpo) {
+  return [...state.selected].some((id) => optionsById.get(id)?.rpo === rpo);
+}
+
+function shouldHideChoice(choice) {
+  return choice.active !== "True" || choice.status === "unavailable";
+}
+
+function optionIsSelectedOrAuto(choice, autoAdded) {
+  return state.selected.has(choice.option_id) || autoAdded.has(choice.option_id);
 }
 
 function selectedContextIds() {
@@ -105,6 +154,16 @@ function getEntityLabel(id) {
   return id;
 }
 
+function selectedExcludesTarget(targetId, selectedIds) {
+  for (const sourceId of selectedIds) {
+    const rules = ruleTargetsBySource.get(sourceId) || [];
+    if (rules.some((rule) => rule.rule_type === "excludes" && rule.target_id === targetId && ruleAppliesToCurrentVariant(rule))) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function computeAutoAdded() {
   const autoAdded = new Map();
   const selectedIds = new Set(state.selected);
@@ -113,7 +172,7 @@ function computeAutoAdded() {
   for (const sourceId of selectedIds) {
     const rules = ruleTargetsBySource.get(sourceId) || [];
     for (const rule of rules) {
-      if (rule.rule_type === "includes") {
+      if (rule.rule_type === "includes" && ruleAppliesToCurrentVariant(rule) && !selectedExcludesTarget(rule.target_id, selectedIds)) {
         autoAdded.set(rule.target_id, rule.disabled_reason || `Included with ${getEntityLabel(sourceId)}.`);
       }
     }
@@ -136,18 +195,21 @@ function computeAutoAdded() {
 function disableReasonForChoice(choice) {
   if (choice.active !== "True") return "Inactive in the source workbook.";
   if (choice.status === "unavailable") return "Not available for this body and trim.";
+  if (choice.rpo === "FE1" && selectedOptionByRpo("Z51")) return "Replaced by FE3 Z51 performance suspension.";
+  if (choice.rpo === "FE2" && selectedOptionByRpo("Z51")) return "Not available with Z51 Performance Package.";
   if (choice.selectable !== "True" && choice.status !== "standard") return "Display-only source row.";
 
   const selectedIds = selectedContextIds();
   const targetRules = rulesByTarget.get(choice.option_id) || [];
   for (const rule of targetRules) {
-    if (rule.rule_type === "excludes" && selectedIds.has(rule.source_id)) {
+    if (rule.rule_type === "excludes" && selectedIds.has(rule.source_id) && ruleAppliesToCurrentVariant(rule)) {
       return rule.disabled_reason || `Blocked by ${getEntityLabel(rule.source_id)}.`;
     }
   }
 
   const sourceRules = ruleTargetsBySource.get(choice.option_id) || [];
   for (const rule of sourceRules) {
+    if (!ruleAppliesToCurrentVariant(rule)) continue;
     if (rule.rule_type === "requires" && !selectedIds.has(rule.target_id)) {
       return rule.disabled_reason || `Requires ${getEntityLabel(rule.target_id)}.`;
     }
@@ -163,6 +225,7 @@ function disableReasonForInterior(interior) {
   const selectedIds = selectedContextIds();
   const rules = ruleTargetsBySource.get(interior.interior_id) || [];
   for (const rule of rules) {
+    if (!ruleAppliesToCurrentVariant(rule)) continue;
     if (rule.rule_type === "requires" && !selectedIds.has(rule.target_id)) {
       return rule.disabled_reason || `Requires ${getEntityLabel(rule.target_id)}.`;
     }
@@ -232,7 +295,7 @@ function missingRequired() {
     const section = sectionsById.get(choice.section_id);
     if (!section || section.selection_mode !== "single_select_req") continue;
     if (choice.step_key === "base_interior") continue;
-    if (choice.status === "unavailable") continue;
+    if (shouldHideChoice(choice)) continue;
     if (!sections.has(choice.section_id)) sections.set(choice.section_id, section);
   }
   const missing = [];
@@ -258,6 +321,23 @@ function resetDefaults() {
   }
   for (const choices of bySection.values()) {
     if (choices.length === 1) state.selected.add(choices[0].option_id);
+  }
+  for (const defaultRpo of ["FE1", "NGA"]) {
+    const defaultChoice = rows.find((choice) => choice.rpo === defaultRpo && choice.active === "True" && choice.status !== "unavailable");
+    if (defaultChoice) state.selected.add(defaultChoice.option_id);
+  }
+}
+
+function reconcileSelections() {
+  if (selectedOptionByRpo("Z51")) {
+    for (const id of [...state.selected]) {
+      const option = optionsById.get(id);
+      if (option?.rpo === "FE1" || option?.rpo === "FE2") state.selected.delete(id);
+    }
+  }
+  for (const id of [...state.selected]) {
+    const choice = choiceForCurrentVariant(id);
+    if (!choice || shouldHideChoice(choice) || disableReasonForChoice(choice)) state.selected.delete(id);
   }
 }
 
@@ -295,6 +375,7 @@ function handleChoice(choice) {
   } else {
     state.selected.add(choice.option_id);
   }
+  reconcileSelections();
   render();
 }
 
@@ -330,7 +411,7 @@ function renderStepRail() {
 }
 
 function renderChoiceCard(choice, autoAdded) {
-  const selected = state.selected.has(choice.option_id);
+  const selected = optionIsSelectedOrAuto(choice, autoAdded);
   const autoReason = autoAdded.get(choice.option_id);
   const disabledReason = autoReason ? "" : disableReasonForChoice(choice);
   const classes = ["choice-card"];
@@ -346,6 +427,10 @@ function renderChoiceCard(choice, autoAdded) {
       ${autoReason ? `<p class="auto-reason">${autoReason}</p>` : ""}
     </button>
   `;
+}
+
+function renderModeLabel(section) {
+  return section?.selection_mode_label || section?.selection_mode || "";
 }
 
 function renderInteriorCard(interior) {
@@ -384,6 +469,89 @@ function renderContextCard(choice) {
   `;
 }
 
+function renderCustomerForm() {
+  return `
+    <form id="customerForm" class="customer-step-form">
+      <div class="customer-field-grid">
+        <label>
+          Name
+          <input id="customerName" name="name" type="text" autocomplete="name" value="${escapeHtml(state.customer.name)}">
+        </label>
+        <label>
+          Address
+          <input id="customerAddress" name="address" type="text" autocomplete="street-address" value="${escapeHtml(state.customer.address)}">
+        </label>
+        <label>
+          Email
+          <input id="customerEmail" name="email" type="email" autocomplete="email" value="${escapeHtml(state.customer.email)}">
+        </label>
+        <label>
+          Phone Number
+          <input id="customerPhone" name="phone" type="tel" autocomplete="tel" value="${escapeHtml(state.customer.phone)}">
+        </label>
+        <label class="full-field">
+          Comments
+          <textarea id="customerComments" name="comments" rows="5">${escapeHtml(state.customer.comments)}</textarea>
+        </label>
+      </div>
+    </form>
+  `;
+}
+
+function bindCustomerForm() {
+  const form = document.querySelector("#customerForm");
+  if (!form) return;
+  form.addEventListener("submit", (event) => event.preventDefault());
+  form.addEventListener("input", (event) => {
+    if (!event.target.name || !(event.target.name in state.customer)) return;
+    state.customer[event.target.name] = event.target.value;
+  });
+}
+
+function renderStandardEquipmentGroups(rows, initiallyOpen = false) {
+  const grouped = new Map();
+  for (const item of rows) {
+    const groupName = item.section_name || "Included";
+    if (!grouped.has(groupName)) grouped.set(groupName, []);
+    grouped.get(groupName).push(item);
+  }
+  return (
+    [...grouped.entries()]
+      .map(
+        ([group, items]) => `
+          <details class="standard-group" ${initiallyOpen ? "open" : ""}>
+            <summary>${group} <span>${items.length}</span></summary>
+            <ul class="summary-list">
+              ${items
+                .map(
+                  (item) =>
+                    `<li><span>${escapeHtml(item.label)}</span>${item.description ? `<small>${escapeHtml(item.description)}</small>` : ""}</li>`
+                )
+                .join("")}
+            </ul>
+          </details>
+        `
+      )
+      .join("") || "<p class=\"empty\">No standard equipment rows for this variant.</p>"
+  );
+}
+
+function standardEquipmentRows() {
+  const variantId = currentVariantId();
+  return data.standardEquipment
+    .filter((item) => item.variant_id === variantId)
+    .sort((a, b) => a.section_name.localeCompare(b.section_name) || Number(a.display_order || 0) - Number(b.display_order || 0));
+}
+
+function renderTrimStandardEquipment() {
+  return `
+    <section class="section-block trim-standard-equipment">
+      <div class="section-title"><h3>Standard & Included</h3><span>Trim equipment</span></div>
+      <div class="standard-equipment-list">${renderStandardEquipmentGroups(standardEquipmentRows(), true)}</div>
+    </section>
+  `;
+}
+
 function renderStepContent() {
   const step = runtimeSteps.find((item) => item.step_key === state.activeStep);
   const autoAdded = computeAutoAdded();
@@ -397,9 +565,10 @@ function renderStepContent() {
     const section = sectionsById.get(state.activeStep === "body_style" ? "sec_context_body_style" : "sec_context_trim_level");
     body = `
       <section class="section-block">
-        <div class="section-title"><h3>${section?.section_name || step?.step_label}</h3><span>${section?.selection_mode || "single_select_req"}</span></div>
+        <div class="section-title"><h3>${section?.section_name || step?.step_label}</h3><span>${renderModeLabel(section)}</span></div>
         <div class="choice-grid">${contextChoices.map(renderContextCard).join("")}</div>
       </section>
+      ${state.activeStep === "trim_level" ? renderTrimStandardEquipment() : ""}
     `;
   } else if (state.activeStep === "base_interior") {
     const selectedSeat = [...state.selected].map((id) => optionsById.get(id)).find((choice) => choice?.step_key === "seat");
@@ -414,9 +583,17 @@ function renderStepContent() {
         <div class="choice-grid">${interiors.map(renderInteriorCard).join("") || "<p class=\"empty\">Select a seat first.</p>"}</div>
       </section>
     `;
+  } else if (state.activeStep === "customer_info") {
+    body = `
+      <section class="section-block">
+        <div class="section-title"><h3>Customer Information</h3><span>Optional order details</span></div>
+        ${renderCustomerForm()}
+      </section>
+    `;
   } else {
     const rows = activeChoiceRows()
       .filter((choice) => choice.step_key === state.activeStep)
+      .filter((choice) => !shouldHideChoice(choice))
       .sort((a, b) => a.section_name.localeCompare(b.section_name) || a.display_order - b.display_order || a.label.localeCompare(b.label));
     const bySection = new Map();
     for (const choice of rows) {
@@ -428,7 +605,7 @@ function renderStepContent() {
         const section = sectionsById.get(sectionId);
         return `
           <section class="section-block">
-            <div class="section-title"><h3>${section?.section_name || sectionId}</h3><span>${section?.selection_mode || ""}</span></div>
+            <div class="section-title"><h3>${section?.section_name || sectionId}</h3><span>${renderModeLabel(section)}</span></div>
             <div class="choice-grid">${choices.map((choice) => renderChoiceCard(choice, autoAdded)).join("")}</div>
           </section>
         `;
@@ -437,6 +614,7 @@ function renderStepContent() {
     if (!body) body = "<p class=\"empty\">No choices are mapped to this step for the active body and trim.</p>";
   }
 
+  const next = nextStep();
   els.stepContent.innerHTML = `
     <header class="step-header">
       <div>
@@ -446,7 +624,13 @@ function renderStepContent() {
       <span class="step-meta">${currentVariant()?.display_name || ""}</span>
     </header>
     ${body}
+    ${
+      next
+        ? `<footer class="step-footer"><button type="button" data-next-step="${next.step_key}">Next: ${next.step_label}</button></footer>`
+        : ""
+    }
   `;
+  bindCustomerForm();
   els.stepContent.querySelectorAll("[data-option]").forEach((button) => {
     button.addEventListener("click", () => {
       const choice = activeChoiceRows().find((item) => item.option_id === button.dataset.option);
@@ -465,6 +649,7 @@ function renderStepContent() {
       if (choice && !(choice.context_type === "trim_level" && choice.body_style !== state.bodyStyle)) handleContextChoice(choice);
     });
   });
+  els.stepContent.querySelector("[data-next-step]")?.addEventListener("click", goToNextStep);
 }
 
 function renderSummary() {
@@ -509,33 +694,17 @@ function resetCustomerInformation() {
   for (const key of Object.keys(state.customer)) {
     state.customer[key] = "";
   }
-  els.customerForm.reset();
 }
 
 function renderStandardEquipment() {
-  const variantId = currentVariantId();
-  const rows = data.standardEquipment
-    .filter((item) => item.variant_id === variantId)
-    .sort((a, b) => a.section_name.localeCompare(b.section_name) || Number(a.display_order || 0) - Number(b.display_order || 0));
-  const grouped = new Map();
-  for (const item of rows) {
-    const groupName = item.section_name || "Included";
-    if (!grouped.has(groupName)) grouped.set(groupName, []);
-    grouped.get(groupName).push(item);
-  }
-  els.standardEquipmentList.innerHTML =
-    [...grouped.entries()]
-      .map(
-        ([group, items]) => `
-          <details class="standard-group">
-            <summary>${group} <span>${items.length}</span></summary>
-            <ul class="summary-list">
-              ${items.map((item) => `<li><strong>${item.rpo || item.option_id}</strong> ${item.label}</li>`).join("")}
-            </ul>
-          </details>
-        `
-      )
-      .join("") || "<p class=\"empty\">No standard equipment rows for this variant.</p>";
+  const rows = standardEquipmentRows();
+  els.standardEquipmentList.innerHTML = renderStandardEquipmentGroups(rows);
+  els.selectedStandardEquipmentList.innerHTML = `
+    <details class="standard-group">
+      <summary>Standard & Included <span>${rows.length}</span></summary>
+      <div class="nested-standard-equipment">${renderStandardEquipmentGroups(rows)}</div>
+    </details>
+  `;
 }
 
 function currentOrder() {
@@ -609,13 +778,6 @@ function init() {
     resetDefaults();
     resetCustomerInformation();
     render();
-  });
-  els.customerForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-  });
-  els.customerForm.addEventListener("input", (event) => {
-    if (!event.target.name || !(event.target.name in state.customer)) return;
-    state.customer[event.target.name] = event.target.value;
   });
   els.exportJsonButton.addEventListener("click", exportJson);
   els.exportCsvButton.addEventListener("click", exportCsv);

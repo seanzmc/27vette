@@ -57,3 +57,30 @@ Expected: BCP, BCS and BC4 should be priced as 695 standard, available on coupe.
 Issue: Rules should only apply to the current selections. BCP showed "Requires B6P" then when B6P was selected, the label changed to Requires ZZ3 and remained unavailable. This is cross variant rule priority issue that needs to be fixed when the BCP, BCS and BC4 rules are fixed.
 
 Issue: Don't show ZF1 as an option, instead show T0A as an option but it is unavailable unless Z51 is selected, then it is selected by default. TVS, and other spoiler options that say "T0A is removed when Z51 is selected" should still be selecatble but they should just override T0A when selected. This is a case where the same option needs to be available in multiple states and the rules should just override the default selection and availability when the corresponding options are selected.
+
+# QA-1 Output
+
+Implemented the approved QA-1 pass.
+
+**What changed**
+- Updated generated contract and workbook outputs in [generate_stingray_form.py](/Users/seandm/Projects/27vette/archived/scripts/generate_stingray_form.py), [stingray_master.xlsx](/Users/seandm/Projects/27vette/archived/stingray_master.xlsx), [data.js](/Users/seandm/Projects/27vette/form-app/data.js).
+- Moved Customer Information into its own final form step.
+- Added bottom `Next` navigation through the option flow.
+- Added friendly selection-mode labels.
+- Put Standard & Included prominently on Trim Level and collapsed under Selected RPOs, without RPO/id prefixes in the displayed equipment list.
+- Hidden unavailable/inactive rows from option cards.
+- Consolidated BC7 and BC4/BCP/BCS duplicate runtime options, added B6P price overrides, hid ZF1, made T0A visible/auto-added under Z51, and removed N26/TU7 from Interior Trim display.
+- Added focused regression coverage in [stingray-form-regression.test.mjs](/Users/seandm/Projects/27vette/tests/stingray-form-regression.test.mjs).
+
+**What did not change**
+- No new app dependencies or package setup.
+- No broad interior tiered-selection redesign yet; Interior Styling was removed and N26/TU7 are hidden, but the full color/material/two-tone tiering remains follow-up work.
+- No mass copy rewrite for all option names/descriptions beyond the display-rule changes needed for this pass.
+
+**Gate results**
+- Generator: `validation_errors: 0`
+- Workbook reopen check: generated sheets present, `form_validation` has `0` errors, `customer_info` present, `interior_style` absent.
+- Regression tests: `node --test tests/stingray-form-regression.test.mjs` passed `5/5`.
+- Browser smoke via Chromium passed: trim equipment shown, raw mode labels gone, unavailable/inactive rows hidden, ZF1 hidden, Z51 removes FE1 and auto-adds T0A, Customer Information reachable and editable.
+
+Manual verification still pending: a human visual pass on the full interior-selection experience and final copy decisions for duplicate option labels/descriptions.
