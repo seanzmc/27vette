@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "orderform-c-2027",
+  "compatibility_date": "2026-04-27",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "form-app"
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
+}
