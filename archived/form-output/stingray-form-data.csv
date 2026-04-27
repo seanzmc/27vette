@@ -245,24 +245,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_cust_001,delivery,1lt_c67,convertible,1LT,available,True,40
 2lt_c67__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_cust_001,delivery,2lt_c67,convertible,2LT,available,True,40
 3lt_c67__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_cust_001,delivery,3lt_c67,convertible,3LT,available,True,40
-1lt_c07__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_trim,1lt_c07,coupe,1LT,unavailable,True,495
-2lt_c07__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_trim,2lt_c07,coupe,2LT,available,True,495
-3lt_c07__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_trim,3lt_c07,coupe,3LT,available,True,495
-1lt_c67__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_trim,1lt_c67,convertible,1LT,unavailable,True,495
-2lt_c67__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_trim,2lt_c67,convertible,2LT,available,True,495
-3lt_c67__opt_36s_001,opt_36s_001,36S,Competition Yellow custom leather stitch,sec_cust_002,interior_trim,3lt_c67,convertible,3LT,available,True,495
-1lt_c07__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_trim,1lt_c07,coupe,1LT,unavailable,True,495
-2lt_c07__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_trim,2lt_c07,coupe,2LT,available,True,495
-3lt_c07__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_trim,3lt_c07,coupe,3LT,available,True,495
-1lt_c67__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_trim,1lt_c67,convertible,1LT,unavailable,True,495
-2lt_c67__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_trim,2lt_c67,convertible,2LT,available,True,495
-3lt_c67__opt_37s_001,opt_37s_001,37S,Santorini Blue custom leather stitch,sec_cust_002,interior_trim,3lt_c67,convertible,3LT,available,True,495
-1lt_c07__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_trim,1lt_c07,coupe,1LT,unavailable,True,495
-2lt_c07__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_trim,2lt_c07,coupe,2LT,available,True,495
-3lt_c07__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_trim,3lt_c07,coupe,3LT,available,True,495
-1lt_c67__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_trim,1lt_c67,convertible,1LT,unavailable,True,495
-2lt_c67__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_trim,2lt_c67,convertible,2LT,available,True,495
-3lt_c67__opt_38s_001,opt_38s_001,38S,Adrenaline Red custom leather stitch,sec_cust_002,interior_trim,3lt_c67,convertible,3LT,available,True,495
 1lt_c07__opt_b6p_001,opt_b6p_001,B6P,Coupe Engine Appearance Package,sec_engi_001,exterior_appearance,1lt_c07,coupe,1LT,available,True,1895
 2lt_c07__opt_b6p_001,opt_b6p_001,B6P,Coupe Engine Appearance Package,sec_engi_001,exterior_appearance,2lt_c07,coupe,2LT,available,True,1895
 3lt_c07__opt_b6p_001,opt_b6p_001,B6P,Coupe Engine Appearance Package,sec_engi_001,exterior_appearance,3lt_c07,coupe,3LT,available,True,1895
@@ -456,11 +438,11 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 2lt_c67__opt_fa5_001,opt_fa5_001,FA5,Carbon Fiber trim,sec_inte_001,interior_trim,2lt_c67,convertible,2LT,available,True,1795
 3lt_c67__opt_fa5_001,opt_fa5_001,FA5,Carbon Fiber trim,sec_inte_001,interior_trim,3lt_c67,convertible,3LT,available,True,1795
 1lt_c07__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,1lt_c07,coupe,1LT,available,True,1495
-2lt_c07__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,2lt_c07,coupe,2LT,standard,True,1495
-3lt_c07__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,3lt_c07,coupe,3LT,standard,True,1495
+2lt_c07__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,2lt_c07,coupe,2LT,unavailable,False,1495
+3lt_c07__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,3lt_c07,coupe,3LT,unavailable,False,1495
 1lt_c67__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,1lt_c67,convertible,1LT,available,True,1495
-2lt_c67__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,2lt_c67,convertible,2LT,standard,True,1495
-3lt_c67__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,3lt_c67,convertible,3LT,standard,True,1495
+2lt_c67__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,2lt_c67,convertible,2LT,unavailable,False,1495
+3lt_c67__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,3lt_c67,convertible,3LT,unavailable,False,1495
 1lt_c07__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,unavailable,True,1395
 2lt_c07__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,unavailable,True,1395
 3lt_c07__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,1395

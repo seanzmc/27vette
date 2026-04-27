@@ -28,10 +28,10 @@ Then open `http://localhost:8000`.
 
 Use the top-right export buttons:
 
-- `Export JSON` downloads the full order payload, including customer information, selected options, auto-added RPOs, standard equipment, open requirements, and pricing.
+- `Export JSON` downloads the order payload, including customer information, selected options, auto-added RPOs, open requirements, and pricing.
 - `Export CSV` downloads a tabular version of the submission. Customer name, address, email, phone number, and comments are included as customer rows before the selected line items.
 
-The customer information form is part of the right-side summary panel and is included in final submission exports.
+The customer information form is its own final form step and is included in final submission exports.
 
 ## Archived Materials
 

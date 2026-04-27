@@ -197,7 +197,7 @@ function disableReasonForChoice(choice) {
   if (choice.status === "unavailable") return "Not available for this body and trim.";
   if (choice.rpo === "FE1" && selectedOptionByRpo("Z51")) return "Replaced by FE3 Z51 performance suspension.";
   if (choice.rpo === "FE2" && selectedOptionByRpo("Z51")) return "Not available with Z51 Performance Package.";
-  if (choice.selectable !== "True" && choice.status !== "standard") return "Display-only source row.";
+  if (choice.rpo === "NGA" && selectedOptionByRpo("NWI")) return "Replaced by NWI center exhaust.";
 
   const selectedIds = selectedContextIds();
   const targetRules = rulesByTarget.get(choice.option_id) || [];
@@ -217,6 +217,8 @@ function disableReasonForChoice(choice) {
       return `Conflicts with ${getEntityLabel(rule.target_id)}.`;
     }
   }
+
+  if (choice.selectable !== "True" && choice.status !== "standard") return "Display-only source row.";
 
   return "";
 }
@@ -251,6 +253,7 @@ function lineItems() {
   const autoAdded = computeAutoAdded();
   const rows = [];
   for (const id of state.selected) {
+    if (autoAdded.has(id)) continue;
     const option = optionsById.get(id);
     if (option) {
       rows.push({
@@ -335,9 +338,19 @@ function reconcileSelections() {
       if (option?.rpo === "FE1" || option?.rpo === "FE2") state.selected.delete(id);
     }
   }
+  if (selectedOptionByRpo("NWI")) {
+    for (const id of [...state.selected]) {
+      const option = optionsById.get(id);
+      if (option?.rpo === "NGA") state.selected.delete(id);
+    }
+  }
   for (const id of [...state.selected]) {
     const choice = choiceForCurrentVariant(id);
     if (!choice || shouldHideChoice(choice) || disableReasonForChoice(choice)) state.selected.delete(id);
+  }
+  const autoAdded = computeAutoAdded();
+  for (const id of autoAdded.keys()) {
+    state.selected.delete(id);
   }
 }
 
@@ -351,21 +364,27 @@ function setBodyAndTrim(bodyStyle, trimLevel) {
 function handleContextChoice(choice) {
   if (choice.context_type === "body_style") {
     const nextTrim = variants.find((variant) => variant.body_style === choice.value)?.trim_level;
-    state.activeStep = "trim_level";
     setBodyAndTrim(choice.value, nextTrim);
     return;
   }
   if (choice.context_type === "trim_level") {
-    state.activeStep = "paint";
     setBodyAndTrim(choice.body_style, choice.trim_level);
   }
 }
 
 function handleChoice(choice) {
+  const autoAdded = computeAutoAdded();
+  if (autoAdded.has(choice.option_id)) return;
   const reason = disableReasonForChoice(choice);
   if (reason) return;
   const section = sectionsById.get(choice.section_id);
   if (section?.choice_mode === "single") {
+    if (section.selection_mode === "single_select_opt" && state.selected.has(choice.option_id)) {
+      state.selected.delete(choice.option_id);
+      reconcileSelections();
+      render();
+      return;
+    }
     for (const id of [...state.selected]) {
       if (optionsById.get(id)?.section_id === choice.section_id) state.selected.delete(id);
     }
@@ -414,12 +433,13 @@ function renderChoiceCard(choice, autoAdded) {
   const selected = optionIsSelectedOrAuto(choice, autoAdded);
   const autoReason = autoAdded.get(choice.option_id);
   const disabledReason = autoReason ? "" : disableReasonForChoice(choice);
+  const disabled = Boolean(disabledReason || autoReason);
   const classes = ["choice-card"];
   if (selected) classes.push("selected");
   if (disabledReason) classes.push("disabled");
   if (autoReason) classes.push("auto");
   return `
-    <button class="${classes.join(" ")}" type="button" data-option="${choice.option_id}" ${disabledReason ? "aria-disabled=\"true\"" : ""}>
+    <button class="${classes.join(" ")}" type="button" data-option="${choice.option_id}" ${disabled ? "aria-disabled=\"true\" disabled" : ""}>
       <span class="topline"><span class="rpo">${choice.rpo || choice.option_id}</span><span class="price">${formatMoney(optionPrice(choice.option_id))}</span></span>
       <p class="choice-name">${choice.label}</p>
       <p class="choice-note">${choice.description || choice.status_label}</p>
@@ -508,7 +528,7 @@ function bindCustomerForm() {
   });
 }
 
-function renderStandardEquipmentGroups(rows, initiallyOpen = false) {
+function renderStandardEquipmentGroups(rows, initiallyOpen = false, openGroupName = "") {
   const grouped = new Map();
   for (const item of rows) {
     const groupName = item.section_name || "Included";
@@ -519,7 +539,7 @@ function renderStandardEquipmentGroups(rows, initiallyOpen = false) {
     [...grouped.entries()]
       .map(
         ([group, items]) => `
-          <details class="standard-group" ${initiallyOpen ? "open" : ""}>
+          <details class="standard-group" ${initiallyOpen || group === openGroupName ? "open" : ""}>
             <summary>${group} <span>${items.length}</span></summary>
             <ul class="summary-list">
               ${items
@@ -543,11 +563,16 @@ function standardEquipmentRows() {
     .sort((a, b) => a.section_name.localeCompare(b.section_name) || Number(a.display_order || 0) - Number(b.display_order || 0));
 }
 
+function trimEquipmentRows() {
+  return standardEquipmentRows().filter((item) => /LT Equipment$/.test(item.section_name || ""));
+}
+
 function renderTrimStandardEquipment() {
+  const openGroupName = `${state.trimLevel} Equipment`;
   return `
     <section class="section-block trim-standard-equipment">
       <div class="section-title"><h3>Standard & Included</h3><span>Trim equipment</span></div>
-      <div class="standard-equipment-list">${renderStandardEquipmentGroups(standardEquipmentRows(), true)}</div>
+      <div class="standard-equipment-list">${renderStandardEquipmentGroups(trimEquipmentRows(), false, openGroupName)}</div>
     </section>
   `;
 }
@@ -718,7 +743,6 @@ function currentOrder() {
     variant,
     selected_option_ids: [...state.selected],
     selected_interior_id: state.selectedInterior,
-    standard_equipment: data.standardEquipment.filter((item) => item.variant_id === variant?.variant_id),
     selected_rpos: items.filter((item) => item.type !== "auto_added").map((item) => item.rpo || item.id),
     auto_added_rpos: items.filter((item) => item.type === "auto_added").map((item) => item.rpo || item.id),
     line_items: items,

@@ -141,6 +141,13 @@ HIDDEN_OPTION_IDS = {
     "opt_zf1_001",
 }
 
+HIDDEN_SECTION_IDS = {"sec_cust_002"}
+
+BODY_STYLE_DISPLAY_ORDER = {
+    "coupe": 1,
+    "convertible": 2,
+}
+
 SELECTION_MODE_LABELS = {
     "single_select_req": "Required single choice",
     "single_select_opt": "Optional single choice",
@@ -335,7 +342,7 @@ def main() -> None:
             option["section_id"] = "sec_spoi_001"
             option["selectable"] = "True"
             option["display_order"] = "25"
-        if original_option_id in HIDDEN_OPTION_IDS:
+        if original_option_id in HIDDEN_OPTION_IDS or option.get("section_id") in HIDDEN_SECTION_IDS:
             option["active"] = "False"
 
     for row in statuses_raw:
@@ -420,7 +427,11 @@ def main() -> None:
         row["section_ids"] = "|".join(sorted(section_ids_by_step.get(row["step_key"], [])))
 
     body_context_choices = []
-    for display_order, body_style in enumerate(sorted({row["body_style"] for row in active_variants}), start=1):
+    body_styles = sorted(
+        {row["body_style"] for row in active_variants},
+        key=lambda body_style: BODY_STYLE_DISPLAY_ORDER.get(body_style, 99),
+    )
+    for body_style in body_styles:
         body_variants = [row for row in active_variants if row["body_style"] == body_style]
         body_context_choices.append(
             {
@@ -435,7 +446,7 @@ def main() -> None:
                 "trim_level": "",
                 "variant_id": "",
                 "base_price": "",
-                "display_order": display_order,
+                "display_order": BODY_STYLE_DISPLAY_ORDER.get(body_style, 99),
             }
         )
     trim_context_choices = []
@@ -496,6 +507,12 @@ def main() -> None:
             continue
         for variant in active_variants:
             status = status_by_option_variant.get((option_id, variant["variant_id"]), "unavailable")
+            selectable = option["selectable"]
+            active = option["active"]
+            if option_id == "opt_uqt_002" and variant["trim_level"] != "1LT":
+                status = "unavailable"
+                selectable = "False"
+                active = "False"
             choices.append(
                 {
                     "choice_id": f"{variant['variant_id']}__{option_id}",
@@ -513,8 +530,8 @@ def main() -> None:
                     "trim_level": variant["trim_level"],
                     "status": status,
                     "status_label": status_to_label(status),
-                    "selectable": option["selectable"],
-                    "active": option["active"],
+                    "selectable": selectable,
+                    "active": active,
                     "choice_mode": option["choice_mode"],
                     "selection_mode": option["selection_mode"],
                     "selection_mode_label": option["selection_mode_label"],
