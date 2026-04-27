@@ -132,7 +132,7 @@ test("order export omits the full standard equipment dump", () => {
 });
 
 test("replaceable suspension and exhaust defaults are encoded", () => {
-  assert.match(appSource, /for \(const defaultRpo of \["FE1", "NGA"\]\)/);
+  assert.match(appSource, /for \(const defaultRpo of \["FE1", "NGA", "BC7"\]\)/);
   assert.match(appSource, /selectedOptionByRpo\("Z51"\)/);
   assert.match(appSource, /option\?\.rpo === "FE1" \|\| option\?\.rpo === "FE2"/);
   assert.ok(
@@ -142,4 +142,66 @@ test("replaceable suspension and exhaust defaults are encoded", () => {
   assert.ok(data.choices.some((choice) => choice.rpo === "FE4" && choice.status === "available"), "FE4 should be available");
   assert.match(appSource, /selectedOptionByRpo\("NWI"\)/);
   assert.match(appSource, /option\?\.rpo === "NGA"/);
+});
+
+test("coupe defaults include BC7 engine appearance", () => {
+  assert.match(appSource, /defaultRpo of \["FE1", "NGA", "BC7"\]/);
+  assert.match(appSource, /defaultChoice\.body_style === "coupe"/);
+});
+
+test("5V7 can satisfy spoiler requirement with either 5ZU or 5ZZ", () => {
+  const fiveV7Requires = data.rules
+    .filter((rule) => rule.source_id === "opt_5v7_001" && rule.rule_type === "requires")
+    .map((rule) => rule.target_id)
+    .sort();
+
+  assert.deepEqual(JSON.parse(JSON.stringify(fiveV7Requires)), []);
+  assert.match(appSource, /choice\.rpo === "5V7"/);
+  assert.match(appSource, /selectedOptionByRpo\("5ZU"\) \|\| selectedOptionByRpo\("5ZZ"\)/);
+});
+
+test("5ZU body-color spoiler can satisfy its paint requirement with any allowed body color", () => {
+  const fiveZuRequires = data.rules
+    .filter((rule) => rule.source_id === "opt_5zu_001" && rule.rule_type === "requires")
+    .map((rule) => rule.target_id)
+    .sort();
+
+  assert.equal(fiveZuRequires.some((targetId) => ["opt_g8g_001", "opt_gba_001", "opt_gkz_001"].includes(targetId)), false);
+  assert.match(appSource, /choice\.rpo === "5ZU"/);
+  assert.match(appSource, /selectedOptionByRpo\("G8G"\) \|\| selectedOptionByRpo\("GBA"\) \|\| selectedOptionByRpo\("GKZ"\)/);
+});
+
+test("aero exhaust accessories sections use the requested order", () => {
+  const sectionNames = data.sections
+    .filter((section) => section.step_key === "aero_exhaust_stripes_accessories")
+    .sort((a, b) => Number(a.section_display_order) - Number(b.section_display_order))
+    .map((section) => section.section_name);
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(sectionNames)),
+    ["Exhaust", "Spoiler", "Stripes", "LPO Exterior", "LPO Wheels", "Wheel Accessory"]
+  );
+  assert.match(appSource, /section_display_order/);
+});
+
+test("step rendering resets scroll to the top after content replacement", () => {
+  assert.match(appSource, /scrollTo\(\{ top: 0/);
+});
+
+test("interior pricing subtracts the selected seat price", () => {
+  assert.match(appSource, /function selectedSeatChoice/);
+  assert.match(appSource, /function adjustedInteriorPrice/);
+  assert.match(appSource, /Math\.max\(0, Number\(interior\.price \|\| 0\) - Number\(seat\?\.base_price \|\| 0\)\)/);
+  assert.match(appSource, /price: adjustedInteriorPrice\(interior\)/);
+});
+
+test("D30 is auto-added only and not directly selectable", () => {
+  assert.equal(
+    data.choices.some((choice) => choice.rpo === "D30" && choice.active === "True"),
+    false
+  );
+  assert.ok(
+    data.colorOverrides.some((override) => override.adds_rpo === "opt_d30_001"),
+    "D30 should remain available to color override auto-add rules"
+  );
 });

@@ -118,6 +118,7 @@ SECTION_STEP_OVERRIDES = {
     "sec_seat_001": "seat_belt",
     "sec_inte_001": "interior_trim",
     "sec_lpoi_001": "interior_trim",
+    "sec_gsce_001": "exterior_appearance",
     "sec_onst_001": "interior_trim",
     "sec_cust_001": "delivery",
 }
@@ -143,10 +144,24 @@ HIDDEN_OPTION_IDS = {
 
 HIDDEN_SECTION_IDS = {"sec_cust_002"}
 
+AUTO_ONLY_OPTION_IDS = {"opt_d30_001"}
+
 BODY_STYLE_DISPLAY_ORDER = {
     "coupe": 1,
     "convertible": 2,
 }
+
+AERO_EXHAUST_ACCESSORIES_SECTION_ORDER = {
+    "sec_exha_001": 10,
+    "sec_spoi_001": 20,
+    "sec_stri_001": 30,
+    "sec_lpoe_001": 40,
+    "sec_lpow_001": 50,
+    "sec_whee_001": 60,
+}
+
+FIVE_V7_OR_REQUIREMENT_TARGET_IDS = {"opt_5zu_001", "opt_5zz_001", "opt_5zw_001"}
+FIVE_ZU_OR_REQUIREMENT_TARGET_IDS = {"opt_g8g_001", "opt_gba_001", "opt_gkz_001"}
 
 SELECTION_MODE_LABELS = {
     "single_select_req": "Required single choice",
@@ -393,6 +408,7 @@ def main() -> None:
     for section_id, section in sections.items():
         category = categories.get(section.get("category_id", ""), {})
         step_key = step_for_section(section_id, section.get("section_name", ""), section.get("category_id", ""))
+        section_display_order = AERO_EXHAUST_ACCESSORIES_SECTION_ORDER.get(section_id, intish(section.get("display_order")))
         section_rows.append(
             {
                 "section_id": section_id,
@@ -404,7 +420,7 @@ def main() -> None:
                 "choice_mode": normalize_mode(section.get("selection_mode", "")),
                 "is_required": section.get("is_required", ""),
                 "standard_behavior": section.get("standard_behavior", ""),
-                "section_display_order": intish(section.get("display_order")),
+                "section_display_order": section_display_order,
                 "step_key": step_key,
                 "step_label": STEP_LABELS.get(step_key, step_key.replace("_", " ").title()),
             }
@@ -510,6 +526,10 @@ def main() -> None:
             selectable = option["selectable"]
             active = option["active"]
             if option_id == "opt_uqt_002" and variant["trim_level"] != "1LT":
+                status = "unavailable"
+                selectable = "False"
+                active = "False"
+            if option_id in AUTO_ONLY_OPTION_IDS:
                 status = "unavailable"
                 selectable = "False"
                 active = "False"
@@ -624,6 +644,10 @@ def main() -> None:
         source_id = rule.get("source_id", "")
         target_id = rule.get("target_id", "")
         if source_id in CONSOLIDATED_ENGINE_COVERS and target_id == "opt_b6p_001" and rule_type in {"excludes", "requires"}:
+            continue
+        if source_id == "opt_5v7_001" and rule_type == "requires" and target_id in FIVE_V7_OR_REQUIREMENT_TARGET_IDS:
+            continue
+        if source_id == "opt_5zu_001" and rule_type == "requires" and target_id in FIVE_ZU_OR_REQUIREMENT_TARGET_IDS:
             continue
         if source_id in HIDDEN_OPTION_IDS or target_id in HIDDEN_OPTION_IDS:
             continue

@@ -126,6 +126,15 @@ function selectedOptionByRpo(rpo) {
   return [...state.selected].some((id) => optionsById.get(id)?.rpo === rpo);
 }
 
+function selectedSeatChoice() {
+  return [...state.selected].map((id) => optionsById.get(id)).find((choice) => choice?.step_key === "seat");
+}
+
+function adjustedInteriorPrice(interior) {
+  const seat = selectedSeatChoice();
+  return Math.max(0, Number(interior.price || 0) - Number(seat?.base_price || 0));
+}
+
 function shouldHideChoice(choice) {
   return choice.active !== "True" || choice.status === "unavailable";
 }
@@ -198,6 +207,12 @@ function disableReasonForChoice(choice) {
   if (choice.rpo === "FE1" && selectedOptionByRpo("Z51")) return "Replaced by FE3 Z51 performance suspension.";
   if (choice.rpo === "FE2" && selectedOptionByRpo("Z51")) return "Not available with Z51 Performance Package.";
   if (choice.rpo === "NGA" && selectedOptionByRpo("NWI")) return "Replaced by NWI center exhaust.";
+  if (choice.rpo === "5V7" && !(selectedOptionByRpo("5ZU") || selectedOptionByRpo("5ZZ"))) {
+    return "Requires 5ZU Body-Color High Wing Spoiler or 5ZZ Carbon Flash High Wing Spoiler.";
+  }
+  if (choice.rpo === "5ZU" && !(selectedOptionByRpo("G8G") || selectedOptionByRpo("GBA") || selectedOptionByRpo("GKZ"))) {
+    return "Requires Arctic White, Black, or Torch Red exterior paint.";
+  }
 
   const selectedIds = selectedContextIds();
   const targetRules = rulesByTarget.get(choice.option_id) || [];
@@ -272,7 +287,7 @@ function lineItems() {
       rpo: interior.interior_code,
       label: interior.interior_name,
       type: "selected_interior",
-      price: Number(interior.price || 0),
+      price: adjustedInteriorPrice(interior),
     });
   }
   for (const [id, reason] of autoAdded) {
@@ -325,8 +340,12 @@ function resetDefaults() {
   for (const choices of bySection.values()) {
     if (choices.length === 1) state.selected.add(choices[0].option_id);
   }
-  for (const defaultRpo of ["FE1", "NGA"]) {
+  for (const defaultRpo of ["FE1", "NGA", "BC7"]) {
     const defaultChoice = rows.find((choice) => choice.rpo === defaultRpo && choice.active === "True" && choice.status !== "unavailable");
+    if (defaultRpo === "BC7") {
+      if (defaultChoice && defaultChoice.body_style === "coupe") state.selected.add(defaultChoice.option_id);
+      continue;
+    }
     if (defaultChoice) state.selected.add(defaultChoice.option_id);
   }
 }
@@ -462,7 +481,7 @@ function renderInteriorCard(interior) {
   const detail = [interior.material, interior.source_note].filter(Boolean).join(" ");
   return `
     <button class="${classes.join(" ")}" type="button" data-interior="${interior.interior_id}" ${disabledReason ? "aria-disabled=\"true\"" : ""}>
-      <span class="topline"><span class="rpo">${interior.interior_code}</span><span class="price">${formatMoney(interior.price)}</span></span>
+      <span class="topline"><span class="rpo">${interior.interior_code}</span><span class="price">${formatMoney(adjustedInteriorPrice(interior))}</span></span>
       <p class="choice-name">${interior.interior_name}</p>
       <p class="choice-note">${detail || interior.interior_id}</p>
       ${disabledReason ? `<p class="disabled-reason">${disabledReason}</p>` : ""}
@@ -596,7 +615,7 @@ function renderStepContent() {
       ${state.activeStep === "trim_level" ? renderTrimStandardEquipment() : ""}
     `;
   } else if (state.activeStep === "base_interior") {
-    const selectedSeat = [...state.selected].map((id) => optionsById.get(id)).find((choice) => choice?.step_key === "seat");
+    const selectedSeat = selectedSeatChoice();
     const interiors = data.interiors.filter((interior) => {
       if (interior.trim_level !== state.trimLevel) return false;
       if (selectedSeat?.rpo && interior.seat_code !== selectedSeat.rpo) return false;
@@ -619,7 +638,15 @@ function renderStepContent() {
     const rows = activeChoiceRows()
       .filter((choice) => choice.step_key === state.activeStep)
       .filter((choice) => !shouldHideChoice(choice))
-      .sort((a, b) => a.section_name.localeCompare(b.section_name) || a.display_order - b.display_order || a.label.localeCompare(b.label));
+      .sort((a, b) => {
+        const sectionA = sectionsById.get(a.section_id);
+        const sectionB = sectionsById.get(b.section_id);
+        return (
+          Number(sectionA?.section_display_order || 0) - Number(sectionB?.section_display_order || 0) ||
+          a.display_order - b.display_order ||
+          a.label.localeCompare(b.label)
+        );
+      });
     const bySection = new Map();
     for (const choice of rows) {
       if (!bySection.has(choice.section_id)) bySection.set(choice.section_id, []);
@@ -655,6 +682,7 @@ function renderStepContent() {
         : ""
     }
   `;
+  els.stepContent.scrollTo({ top: 0, left: 0 });
   bindCustomerForm();
   els.stepContent.querySelectorAll("[data-option]").forEach((button) => {
     button.addEventListener("click", () => {
