@@ -63,7 +63,7 @@ Issue: Don't show ZF1 as an option, instead show T0A as an option but it is unav
 Implemented the approved QA-1 pass.
 
 **What changed**
-- Updated generated contract and workbook outputs in [generate_stingray_form.py](/Users/seandm/Projects/27vette/archived/scripts/generate_stingray_form.py), [stingray_master.xlsx](/Users/seandm/Projects/27vette/archived/stingray_master.xlsx), [data.js](/Users/seandm/Projects/27vette/form-app/data.js).
+- Updated generated contract and workbook outputs in [generate_stingray_form.py](/Users/seandm/Projects/27vette/scripts/generate_stingray_form.py), [stingray_master.xlsx](/Users/seandm/Projects/27vette/stingray_master.xlsx), [data.js](/Users/seandm/Projects/27vette/form-app/data.js).
 - Moved Customer Information into its own final form step.
 - Added bottom `Next` navigation through the option flow.
 - Added friendly selection-mode labels.

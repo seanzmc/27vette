@@ -33,21 +33,25 @@ Use the top-right export buttons:
 
 The customer information form is its own final form step and is included in final submission exports.
 
+## Active Workflow Materials
+
+The current workbook-to-app workflow lives at the project root:
+
+- `stingray_master.xlsx` - active Stingray source workbook and generated `form_*` sheets
+- `scripts/generate_stingray_form.py` - regenerates workbook form sheets, `form-output/`, and `form-app/data.js`
+- `form-output/` - generated JSON and CSV contract exports used for inspection and handoff
+
 ## Archived Materials
 
-Planning, development, workbook, generated-output, and source-transformation materials were moved into `archived/` so the root stays focused on the deliverable app.
+Deprecated planning, skill, reference, and source-transformation materials live in `archived/`.
 
 Archived contents include:
 
 - `PLAN.md`
 - `Rule_Mapping.csv`
-- `corvette-build/`
+- `$skills/`
 - `corvette-contract/`
-- `corvette-ingest/`
-- `form-output/`
 - `fusion-plan/`
 - `referenceSheets/`
-- `scripts/`
-- `stingray_master.xlsx`
 
 These files are retained for traceability, but they are not required to run the static app.

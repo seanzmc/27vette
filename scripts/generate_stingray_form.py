@@ -19,7 +19,7 @@ from openpyxl.utils import get_column_letter
 ROOT = Path(__file__).resolve().parents[1]
 WORKBOOK_PATH = ROOT / "stingray_master.xlsx"
 OUTPUT_DIR = ROOT / "form-output"
-APP_DIR = ROOT.parent / "form-app"
+APP_DIR = ROOT / "form-app"
 
 GENERATED_SHEETS = [
     "form_steps",
