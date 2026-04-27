@@ -47,3 +47,17 @@ Remaining gap: Color Override stayed in the UI, but it still needs a full rule p
 Original reference: `debug/qa-2.md` lines 48-51
 Current state: The QA-2 pass moved the generic `Display-only source row` fallback after rule-based disabled reasons, so rule-backed rows can show `Requires...` or `Blocked by...` first.
 Remaining gap: This still needs a full UI/data audit for any remaining visible display-only rows that fall back to the generic label.
+
+## New Issues
+
+BC7 should be selected by default when coupe is selected.
+
+5V7 rules need fixed. Should be available when 5ZZ or 5ZU is selected, currently shows only available with 5ZU.
+
+Section 8 should go exhaust, spoiler, then stripes, then lpo exterior, lpo wheels, and then wheel accessories.
+
+going from a long section to a short section should reset the section scroll to the top, currently it stays at the same scroll position which can be confusing.
+
+seat prices need to be subtracted from the base interior color prices that are displayed. Currently double charging for seats.
+
+D30 should not be selectable by the user. It should only be active when a color combination triggers it.
