@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WORKBOOK_PATH = ROOT / "stingray_master.xlsx"
 OUTPUT_DIR = ROOT / "form-output"
 APP_DIR = ROOT / "form-app"
+INTERIOR_REFERENCE_PATH = ROOT / "architectureAudit" / "stingray_interiors_refactor.csv"
 
 GENERATED_SHEETS = [
     "form_steps",
@@ -192,6 +193,7 @@ AERO_EXHAUST_ACCESSORIES_SECTION_ORDER = {
 FIVE_V7_OR_REQUIREMENT_TARGET_IDS = {"opt_5zu_001", "opt_5zz_001", "opt_5zw_001"}
 FIVE_ZU_OR_REQUIREMENT_TARGET_IDS = {"opt_g8g_001", "opt_gba_001", "opt_gkz_001"}
 T0A_REPLACEMENT_OPTION_IDS = {"opt_tvs_001", "opt_5zz_001", "opt_5zu_001"}
+GRAND_SPORT_ONLY_INTERIOR_IDS = {"3LT_AE4_EL9", "3LT_AH2_EL9"}
 
 RULE_GROUPS = [
     {
@@ -371,6 +373,84 @@ def interior_price(row: dict[str, str]) -> int:
     return money(row.get("Price") or row.get("Cost"))
 
 
+def clean_reference_label(value: str) -> str:
+    label = clean(value)
+    if " - " in label:
+        head, tail = label.split(" - ", 1)
+        if re.search(r"\b(option|expandable|choice|card)\b", tail, re.IGNORECASE):
+            label = head
+    label = re.sub(r"\s*\([^)]*(?:expandable|only one option|no need)[^)]*\)\s*$", "", label, flags=re.IGNORECASE)
+    return label.strip()
+
+
+def read_interior_reference() -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
+    reference_by_id: dict[str, dict[str, Any]] = {}
+    reference_rows: list[dict[str, Any]] = []
+    current_levels = [""] * 6
+    with INTERIOR_REFERENCE_PATH.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        for row_number, row in enumerate(reader, start=2):
+            for index in range(6):
+                key = f"level{index}"
+                value = clean_reference_label(row.get(key, ""))
+                if value:
+                    current_levels[index] = value
+                    for deeper in range(index + 1, 6):
+                        current_levels[deeper] = ""
+            interior_id = clean(row.get("interior_id", ""))
+            levels = [level for level in current_levels if level]
+            record = {
+                "row_number": row_number,
+                "interior_id": interior_id,
+                "levels": levels,
+            }
+            reference_rows.append(record)
+            if interior_id:
+                reference_by_id[interior_id] = record
+    return reference_by_id, reference_rows
+
+
+def seat_code_from_label(label: str) -> str:
+    return clean(label).split(" ", 1)[0]
+
+
+def grouping_fields_for_interior(
+    interior: dict[str, Any],
+    reference: dict[str, Any] | None,
+    reference_order: int,
+    fallback: bool = False,
+) -> dict[str, Any]:
+    seat_label = reference["levels"][1] if reference and len(reference["levels"]) > 1 else f"{interior['seat_code']} Seats"
+    levels = reference["levels"] if reference else [
+        interior["trim_level"],
+        seat_label,
+        "Other Interior Choices",
+        interior["interior_name"] or interior["interior_id"],
+    ]
+    leaf_label = levels[-1] if levels else interior["interior_name"] or interior["interior_id"]
+    color_family = levels[2] if len(levels) > 2 else leaf_label
+    material_family = interior.get("material") or "Standard interior"
+    if len(levels) > 3 and levels[-2] != color_family:
+        material_family = levels[-2]
+    parent_group = levels[-2] if len(levels) > 1 else color_family
+    return {
+        "interior_trim_level": levels[0] if levels else interior["trim_level"],
+        "interior_seat_code": seat_code_from_label(seat_label) or interior["seat_code"],
+        "interior_seat_label": seat_label,
+        "interior_color_family": "Other Interior Choices" if fallback else color_family,
+        "interior_material_family": material_family,
+        "interior_variant_label": leaf_label,
+        "interior_group_display_order": reference_order,
+        "interior_material_display_order": reference_order,
+        "interior_choice_display_order": reference_order,
+        "interior_hierarchy_levels": json.dumps(levels, ensure_ascii=False),
+        "interior_hierarchy_path": " > ".join(levels),
+        "interior_parent_group_label": parent_group,
+        "interior_leaf_label": leaf_label,
+        "interior_reference_order": reference_order,
+    }
+
+
 def label_for(entity_id: str, options: dict[str, dict[str, Any]], interiors: dict[str, dict[str, Any]]) -> str:
     if entity_id in options:
         option = options[entity_id]
@@ -420,6 +500,7 @@ def main() -> None:
     lt_interiors_raw = rows_from_sheet(wb, "lt_interiors")
     lz_interiors_raw = rows_from_sheet(wb, "LZ_Interiors")
     color_overrides_raw = rows_from_sheet(wb, "color_overrides")
+    interior_reference_by_id, interior_reference_rows = read_interior_reference()
 
     status_by_option_variant_raw = {(row["option_id"], row["variant_id"]): row["status"].lower() for row in statuses_raw}
     for option in options_raw:
@@ -657,11 +738,12 @@ def main() -> None:
     interiors: list[dict[str, Any]] = []
     for row in lt_interiors_raw:
         trim = row.get("Trim", "")
+        interior_id = row.get("interior_id", "")
         interiors.append(
             {
-                "interior_id": row.get("interior_id", ""),
+                "interior_id": interior_id,
                 "source_sheet": "lt_interiors",
-                "active_for_stingray": trim in {"1LT", "2LT", "3LT", "3LT_R6X"},
+                "active_for_stingray": trim in {"1LT", "2LT", "3LT", "3LT_R6X"} and interior_id not in GRAND_SPORT_ONLY_INTERIOR_IDS,
                 "trim_level": trim.replace("_R6X", ""),
                 "requires_r6x": "True" if "_R6X" in trim or row.get("interior_id", "").endswith("_R6X") else "False",
                 "seat_code": row.get("Seat", ""),
@@ -698,6 +780,61 @@ def main() -> None:
                 "source_note": row.get("Detail from Disclosure", ""),
             }
         )
+    validation_rows: list[dict[str, Any]] = []
+    reference_order_by_id = {
+        row["interior_id"]: index
+        for index, row in enumerate((row for row in interior_reference_rows if row["interior_id"]), start=1)
+    }
+    active_interior_ids = {
+        row["interior_id"]
+        for row in interiors
+        if row["interior_id"] and row["active_for_stingray"]
+    }
+    all_interior_ids = {row["interior_id"] for row in interiors if row["interior_id"]}
+    for interior_id, reference in interior_reference_by_id.items():
+        if interior_id not in all_interior_ids:
+            validation_rows.append(
+                {
+                    "check_id": f"missing_reference_interior_{interior_id}",
+                    "severity": "error",
+                    "entity_type": "interior",
+                    "entity_id": interior_id,
+                    "message": f"Interior reference row {reference['row_number']} does not resolve to generated interior data.",
+                }
+            )
+        elif interior_id not in active_interior_ids:
+            validation_rows.append(
+                {
+                    "check_id": f"inactive_reference_interior_{interior_id}",
+                    "severity": "error",
+                    "entity_type": "interior",
+                    "entity_id": interior_id,
+                    "message": f"Interior reference row {reference['row_number']} resolves to an inactive Stingray interior.",
+                }
+            )
+
+    fallback_order = len(reference_order_by_id) + 1
+    for row in interiors:
+        if not row["interior_id"]:
+            continue
+        reference = interior_reference_by_id.get(row["interior_id"])
+        if row["active_for_stingray"] and reference:
+            row.update(grouping_fields_for_interior(row, reference, reference_order_by_id[row["interior_id"]]))
+        elif row["active_for_stingray"]:
+            row.update(grouping_fields_for_interior(row, None, fallback_order, fallback=True))
+            fallback_order += 1
+            validation_rows.append(
+                {
+                    "check_id": f"unmapped_active_interior_{row['interior_id']}",
+                    "severity": "warning",
+                    "entity_type": "interior",
+                    "entity_id": row["interior_id"],
+                    "message": "Active Stingray interior is not represented in the CSV hierarchy and was placed in Other Interior Choices.",
+                }
+            )
+        else:
+            row.update(grouping_fields_for_interior(row, reference, reference_order_by_id.get(row["interior_id"], fallback_order)))
+
     interiors_by_id = {row["interior_id"]: row for row in interiors if row["interior_id"]}
     r6x_interior_ids = [
         row["interior_id"]
@@ -705,24 +842,20 @@ def main() -> None:
         if row["interior_id"] and row["active_for_stingray"] and row["requires_r6x"] == "True"
     ]
     existing_price_rule_ids = {row.get("price_rule_id", "") for row in price_rules_raw}
-    for interior_id in r6x_interior_ids:
-        price_rule_id = f"pr_{interior_id.lower()}_r6x_001"
-        if price_rule_id in existing_price_rule_ids:
-            continue
+    if "pr_d30_r6x_001" not in existing_price_rule_ids:
         price_rules_raw.append(
             {
-                "price_rule_id": price_rule_id,
-                "condition_option_id": interior_id,
+                "price_rule_id": "pr_d30_r6x_001",
+                "condition_option_id": "opt_d30_001",
                 "target_option_id": "opt_r6x_001",
                 "price_rule_type": "override",
                 "price_value": "0",
                 "review_flag": "False",
-                "notes": "R6X is included in the selected interior price.",
+                "notes": "R6X prices at $0 only when D30 is present in the selected context.",
             }
         )
 
     raw_rules: list[dict[str, Any]] = []
-    validation_rows: list[dict[str, Any]] = []
     manual_rules = [
         {
             "rule_id": "rule_opt_t0a_001_requires_opt_z51_001",
@@ -1139,6 +1272,20 @@ def main() -> None:
             "section_id",
             "color_overrides_raw",
             "source_note",
+            "interior_trim_level",
+            "interior_seat_code",
+            "interior_seat_label",
+            "interior_color_family",
+            "interior_material_family",
+            "interior_variant_label",
+            "interior_group_display_order",
+            "interior_material_display_order",
+            "interior_choice_display_order",
+            "interior_hierarchy_levels",
+            "interior_hierarchy_path",
+            "interior_parent_group_label",
+            "interior_leaf_label",
+            "interior_reference_order",
         ],
         interiors,
     )

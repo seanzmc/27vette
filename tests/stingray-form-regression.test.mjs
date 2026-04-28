@@ -12,6 +12,46 @@ function loadData() {
 const data = loadData();
 const appSource = fs.readFileSync("form-app/app.js", "utf8");
 const htmlSource = fs.readFileSync("form-app/index.html", "utf8");
+const interiorReferenceSource = fs.readFileSync("architectureAudit/stingray_interiors_refactor.csv", "utf8");
+
+function parseCsv(source) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+  for (let index = 0; index < source.length; index++) {
+    const char = source[index];
+    const next = source[index + 1];
+    if (char === '"' && inQuotes && next === '"') {
+      field += '"';
+      index++;
+    } else if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === "," && !inQuotes) {
+      row.push(field);
+      field = "";
+    } else if ((char === "\n" || char === "\r") && !inQuotes) {
+      if (char === "\r" && next === "\n") index++;
+      row.push(field);
+      if (row.some((value) => value !== "")) rows.push(row);
+      row = [];
+      field = "";
+    } else {
+      field += char;
+    }
+  }
+  if (field || row.length) {
+    row.push(field);
+    rows.push(row);
+  }
+  const [headers, ...records] = rows;
+  return records.map((record) => Object.fromEntries(headers.map((header, index) => [header, record[index] || ""])));
+}
+
+const interiorReferenceRows = parseCsv(interiorReferenceSource);
+const interiorReferenceFinalRows = interiorReferenceRows.filter((row) => row.interior_id);
+const interiorReferenceIds = new Set(interiorReferenceFinalRows.map((row) => row.interior_id));
+const activeInteriors = data.interiors.filter((interior) => interior.active_for_stingray === true);
 
 function makeElement() {
   return {
@@ -473,10 +513,113 @@ test("interior pricing subtracts the selected seat price", () => {
   assert.match(appSource, /price: adjustedInteriorPrice\(interior\)/);
 });
 
+test("interior reference maps every final CSV id and active Stingray interior", () => {
+  for (const row of interiorReferenceFinalRows) {
+    assert.ok(data.interiors.some((interior) => interior.interior_id === row.interior_id), `${row.interior_id} should map to generated interiors`);
+  }
+  for (const interior of activeInteriors) {
+    assert.ok(
+      interiorReferenceIds.has(interior.interior_id) || interior.interior_color_family === "Other Interior Choices",
+      `${interior.interior_id} should be represented by the CSV hierarchy or explicit fallback group`
+    );
+  }
+});
+
+test("Grand Sport EL9 interiors are inactive for Stingray and H8T is in the AE4 Santorini hierarchy", () => {
+  for (const interiorId of ["3LT_AE4_EL9", "3LT_AH2_EL9"]) {
+    assert.equal(
+      data.interiors.some((interior) => interior.interior_id === interiorId && interior.active_for_stingray === true),
+      false,
+      `${interiorId} should not be active for Stingray`
+    );
+  }
+
+  const h8tReference = interiorReferenceFinalRows.find((row) => row.interior_id === "3LT_AE4_H8T");
+  assert.ok(h8tReference, "3LT_AE4_H8T should be represented in the reference CSV");
+  const h8tInterior = data.interiors.find((interior) => interior.interior_id === "3LT_AE4_H8T");
+  assert.equal(h8tInterior?.interior_trim_level, "3LT");
+  assert.equal(h8tInterior?.interior_seat_label, "AE4 Competition Seats");
+  assert.equal(h8tInterior?.interior_color_family, "Santorini Blue");
+});
+
+test("active interiors have stable CSV-derived grouping fields", () => {
+  const requiredFields = [
+    "interior_trim_level",
+    "interior_seat_code",
+    "interior_seat_label",
+    "interior_color_family",
+    "interior_material_family",
+    "interior_variant_label",
+    "interior_group_display_order",
+    "interior_material_display_order",
+    "interior_choice_display_order",
+    "interior_hierarchy_levels",
+    "interior_hierarchy_path",
+    "interior_parent_group_label",
+    "interior_leaf_label",
+    "interior_reference_order",
+  ];
+  for (const interior of activeInteriors) {
+    for (const field of requiredFields) {
+      assert.notEqual(interior[field], undefined, `${interior.interior_id} is missing ${field}`);
+      assert.notEqual(interior[field], "", `${interior.interior_id} has blank ${field}`);
+    }
+  }
+});
+
+test("interior grouping preserves required 1LT, 2LT, and 3LT examples", () => {
+  const byId = new Map(activeInteriors.map((interior) => [interior.interior_id, interior]));
+
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(
+        activeInteriors
+          .filter((interior) => interior.trim_level === "1LT" && interior.seat_code === "AQ9")
+          .map((interior) => interior.interior_code)
+          .sort()
+      )
+    ),
+    ["HTA", "HUP", "HUQ"]
+  );
+  assert.equal(byId.get("1LT_AE4_HTJ_N26")?.interior_color_family, "HTJ Jet Black");
+
+  assert.equal(byId.get("2LT_AH2_HTM")?.interior_color_family, "Jet Black");
+  assert.match(byId.get("2LT_AH2_HTM")?.interior_material_family || "", /Napa leather/i);
+  assert.match(byId.get("2LT_AH2_HTP_N26")?.interior_material_family || "", /Sueded microfiber/i);
+  assert.equal(byId.get("2LT_AE4_HTN")?.interior_color_family, "Natural");
+
+  for (const interiorId of [
+    "3LT_AH2_HNK",
+    "3LT_AH2_H8T",
+    "3LT_AH2_HUW",
+    "3LT_AH2_EJH",
+    "3LT_AH2_HUC",
+    "3LT_AH2_HVZ",
+    "3LT_R6X_AH2_HVV",
+  ]) {
+    assert.ok(byId.has(interiorId), `${interiorId} should remain active in the grouped source`);
+  }
+
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(
+        activeInteriors
+          .filter((interior) => interior.trim_level === "3LT" && interior.seat_code === "AUP")
+          .map((interior) => interior.interior_id)
+          .sort()
+      )
+    ),
+    ["3LT_AUP_HAG", "3LT_AUP_HVZ"]
+  );
+});
+
 test("R6X is auto-only and D30 is the only visible disabled color override card", () => {
   assert.equal(data.choices.some((choice) => choice.rpo === "R6X" && choice.active === "True"), false);
   assert.ok(data.rules.some((rule) => rule.target_id === "opt_r6x_001" && rule.rule_type === "includes"), "R6X needs interior include rules");
-  assert.ok(data.priceRules.some((rule) => rule.target_option_id === "opt_r6x_001" && Number(rule.price_value) === 0), "R6X should price at $0 when auto-added");
+  assert.ok(
+    data.priceRules.some((rule) => rule.condition_option_id === "opt_d30_001" && rule.target_option_id === "opt_r6x_001" && Number(rule.price_value) === 0),
+    "R6X should price at $0 only when D30 is present"
+  );
   assert.ok(
     data.choices.some((choice) => choice.rpo === "D30" && choice.active === "True" && choice.selectable === "False"),
     "D30 should be visible but disabled"
@@ -485,6 +628,22 @@ test("R6X is auto-only and D30 is the only visible disabled color override card"
     data.colorOverrides.some((override) => override.adds_rpo === "opt_d30_001"),
     "D30 should remain available to color override auto-add rules"
   );
+});
+
+test("R6X keeps normal price unless D30 is present in the selected context", () => {
+  const runtime = loadRuntime();
+  runtime.state.trimLevel = "3LT";
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.selectedInterior = "3LT_R6X_AH2_HMO_N26";
+  assert.equal(runtime.optionPrice("opt_r6x_001"), 995, "R6X should keep normal price without D30");
+
+  const d30Runtime = loadRuntime();
+  d30Runtime.state.trimLevel = "3LT";
+  d30Runtime.state.bodyStyle = "coupe";
+  d30Runtime.state.selectedInterior = "3LT_R6X_AH2_HZP_N26";
+  d30Runtime.state.selected.add("opt_g26_001");
+  assert.equal(d30Runtime.computeAutoAdded().has("opt_d30_001"), true, "D30 should be auto-added by selected color/interior context");
+  assert.equal(d30Runtime.optionPrice("opt_r6x_001"), 0, "R6X should price at $0 when D30 is present");
 });
 
 test("single interior and included seatbelt defaults are handled in runtime", () => {

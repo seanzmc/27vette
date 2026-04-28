@@ -287,6 +287,68 @@ textarea {
   gap: 10px;
 }
 
+.selected-seat-context {
+  margin: -2px 0 14px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.interior-layout {
+  display: grid;
+  gap: 14px;
+}
+
+.interior-group {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf7;
+  padding: 12px;
+}
+
+.interior-group-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.interior-group-header h4 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.interior-group-header p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.interior-group-header span {
+  flex: 0 0 auto;
+  color: var(--accent-dark);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.interior-material-group + .interior-material-group {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.interior-material-group h5 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.interior-choice-grid {
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+}
+
 .choice-card {
   min-height: 116px;
   border: 1px solid var(--line);

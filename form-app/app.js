@@ -650,14 +650,70 @@ function renderInteriorCard(interior) {
   const classes = ["choice-card"];
   if (selected) classes.push("selected");
   if (disabledReason) classes.push("disabled");
-  const detail = [interior.material, interior.source_note].filter(Boolean).join(" ");
+  const detail = [interior.interior_material_family || interior.material, interior.source_note].filter(Boolean).join(" ");
   return `
     <button class="${classes.join(" ")}" type="button" data-interior="${interior.interior_id}" ${disabledReason ? "aria-disabled=\"true\"" : ""}>
       <span class="topline"><span class="rpo">${interior.interior_code}</span><span class="price">${formatMoney(adjustedInteriorPrice(interior))}</span></span>
-      <p class="choice-name">${interior.interior_name}</p>
-      <p class="choice-note">${detail || interior.interior_id}</p>
+      <p class="choice-name">${escapeHtml(interior.interior_leaf_label || interior.interior_name)}</p>
+      <p class="choice-note">${escapeHtml(detail || interior.interior_id)}</p>
       ${disabledReason ? `<p class="disabled-reason">${disabledReason}</p>` : ""}
     </button>
+  `;
+}
+
+function sortInteriorsByDisplayOrder(a, b) {
+  return (
+    Number(a.interior_group_display_order || 0) - Number(b.interior_group_display_order || 0) ||
+    Number(a.interior_material_display_order || 0) - Number(b.interior_material_display_order || 0) ||
+    Number(a.interior_choice_display_order || 0) - Number(b.interior_choice_display_order || 0) ||
+    a.interior_name.localeCompare(b.interior_name)
+  );
+}
+
+function groupInteriorsBy(interiors, key) {
+  const groups = new Map();
+  for (const interior of interiors) {
+    const label = interior[key] || "Interior Choices";
+    if (!groups.has(label)) groups.set(label, []);
+    groups.get(label).push(interior);
+  }
+  return [...groups.entries()].map(([label, rows]) => ({ label, rows: rows.sort(sortInteriorsByDisplayOrder) }));
+}
+
+function renderInteriorGroups(interiors) {
+  if (!interiors.length) return "<p class=\"empty\">Select a seat first.</p>";
+  return `
+    <div class="interior-layout">
+      ${groupInteriorsBy(interiors.slice().sort(sortInteriorsByDisplayOrder), "interior_color_family")
+        .map((group) => {
+          const materialGroups = groupInteriorsBy(group.rows, "interior_material_family");
+          const materialSummary = [...new Set(group.rows.map((interior) => interior.interior_material_family).filter(Boolean))].join(" / ");
+          return `
+            <section class="interior-group">
+              <div class="interior-group-header">
+                <div>
+                  <h4>${escapeHtml(group.label)}</h4>
+                  ${materialSummary ? `<p>${escapeHtml(materialSummary)}</p>` : ""}
+                </div>
+                <span>${group.rows.length === 1 ? "1 choice" : `${group.rows.length} choices`}</span>
+              </div>
+              ${materialGroups
+                .map(
+                  (materialGroup) => `
+                    <div class="interior-material-group">
+                      ${materialGroups.length > 1 ? `<h5>${escapeHtml(materialGroup.label)}</h5>` : ""}
+                      <div class="choice-grid interior-choice-grid">
+                        ${materialGroup.rows.map(renderInteriorCard).join("")}
+                      </div>
+                    </div>
+                  `
+                )
+                .join("")}
+            </section>
+          `;
+        })
+        .join("")}
+    </div>
   `;
 }
 
@@ -810,10 +866,12 @@ function renderStepContent({ resetScroll = false } = {}) {
     `;
   } else if (state.activeStep === "base_interior") {
     const interiors = validInteriorsForSelectedSeat();
+    const selectedSeat = selectedSeatChoice();
     body = `
       <section class="section-block">
         <div class="section-title"><h3>Base Interior</h3><span>${interiors.length} choices</span></div>
-        <div class="choice-grid">${interiors.map(renderInteriorCard).join("") || "<p class=\"empty\">Select a seat first.</p>"}</div>
+        ${selectedSeat ? `<p class="selected-seat-context">${escapeHtml(selectedSeat.rpo)} ${escapeHtml(selectedSeat.label)}</p>` : ""}
+        ${renderInteriorGroups(interiors)}
       </section>
     `;
   } else if (state.activeStep === "customer_info") {
