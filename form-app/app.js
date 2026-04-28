@@ -220,6 +220,12 @@ function shouldSuppressIncludedDefault(rule) {
   return section?.choice_mode === "single" && userSelectedInSection(sectionId, rule.target_id);
 }
 
+function selectedExclusiveGroupPeer(optionId, selectedIds) {
+  const group = optionExclusiveGroup(optionId);
+  if (!group || group.selection_mode !== "single_within_group") return false;
+  return (group.option_ids || []).some((id) => id !== optionId && selectedIds.has(id));
+}
+
 function requiresAnyReason(choice, selectedIds) {
   const groups = ruleGroupsBySource.get(choice.option_id) || [];
   for (const group of groups) {
@@ -242,7 +248,8 @@ function computeAutoAdded() {
         rule.rule_type === "includes" &&
         ruleAppliesToCurrentVariant(rule) &&
         !selectedExcludesTarget(rule.target_id, selectedIds) &&
-        !shouldSuppressIncludedDefault(rule)
+        !shouldSuppressIncludedDefault(rule) &&
+        !selectedExclusiveGroupPeer(rule.target_id, selectedIds)
       ) {
         autoAdded.set(rule.target_id, rule.disabled_reason || `Included with ${getEntityLabel(sourceId)}.`);
       }

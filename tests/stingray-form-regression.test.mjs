@@ -13,6 +13,74 @@ const data = loadData();
 const appSource = fs.readFileSync("form-app/app.js", "utf8");
 const htmlSource = fs.readFileSync("form-app/index.html", "utf8");
 
+function makeElement() {
+  return {
+    textContent: "",
+    innerHTML: "",
+    dataset: {},
+    addEventListener() {},
+    querySelectorAll() {
+      return [];
+    },
+    querySelector() {
+      return null;
+    },
+    closest() {
+      return makeElement();
+    },
+    scrollTo() {},
+  };
+}
+
+function loadRuntime() {
+  const context = {
+    window: {
+      STINGRAY_FORM_DATA: data,
+      scrollX: 0,
+      scrollY: 0,
+      scrollTo() {},
+    },
+    document: {
+      querySelector() {
+        return makeElement();
+      },
+      createElement() {
+        return makeElement();
+      },
+    },
+    Intl,
+    Number,
+    Set,
+    Map,
+    Boolean,
+    Object,
+    String,
+    URL: {
+      createObjectURL() {
+        return "";
+      },
+      revokeObjectURL() {},
+    },
+    Blob,
+  };
+  const source = appSource.replace(
+    /\ninit\(\);\s*$/,
+    `
+window.__testApi = {
+  state,
+  activeChoiceRows,
+  resetDefaults,
+  reconcileSelections,
+  handleChoice,
+  computeAutoAdded,
+  lineItems,
+};
+`
+  );
+  vm.runInNewContext(source, context);
+  return context.window.__testApi;
+}
+
 function uniqueChoicesByRpo(rpo) {
   return [...new Map(data.choices.filter((choice) => choice.rpo === rpo).map((choice) => [choice.option_id, choice])).values()];
 }
@@ -65,6 +133,34 @@ test("LS6 engine covers are treated as an exclusive selection group", () => {
   assert.match(appSource, /removeOtherExclusiveGroupOptions\(choice\.option_id\)/);
   assert.doesNotMatch(appSource, /LS6_ENGINE_COVER_OPTION_IDS/);
   assert.doesNotMatch(appSource, /removeOtherLs6EngineCovers/);
+});
+
+test("exclusive group selection replaces ZZ3 default BC7 engine cover", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "convertible";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const zz3 = runtime.activeChoiceRows().find((choice) => choice.rpo === "ZZ3");
+  const bcp = runtime.activeChoiceRows().find((choice) => choice.rpo === "BCP");
+  assert.ok(zz3, "ZZ3 should exist for convertible builds");
+  assert.ok(bcp, "BCP should exist for convertible builds");
+
+  runtime.handleChoice(zz3);
+  assert.equal(runtime.computeAutoAdded().has("opt_bc7_001"), true, "ZZ3 should default BC7 before replacement");
+
+  runtime.handleChoice(bcp);
+
+  const selectedIds = [...runtime.state.selected];
+  const userSelectedIds = [...runtime.state.userSelected];
+  const lineItemRpos = runtime.lineItems().map((item) => item.rpo);
+  assert.equal(selectedIds.includes("opt_bcp_001"), true, "new engine cover should remain selected");
+  assert.equal(selectedIds.includes("opt_bc7_001"), false, "default BC7 should be removed from selected state");
+  assert.equal(userSelectedIds.includes("opt_bc7_001"), false, "removed group member should not remain user-selected");
+  assert.equal(runtime.computeAutoAdded().has("opt_bc7_001"), false, "BC7 should not remain auto-added after group replacement");
+  assert.equal(lineItemRpos.includes("BCP"), true, "new engine cover should appear in line items");
+  assert.equal(lineItemRpos.includes("BC7"), false, "replaced default BC7 should not appear in line items");
 });
 
 test("option selections preserve the current viewport instead of resetting to the page top", () => {
