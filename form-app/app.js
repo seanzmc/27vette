@@ -442,6 +442,33 @@ function deleteSelectedRpo(rpo) {
   }
 }
 
+function selectedChoiceRank(choice) {
+  if (choice?.selectable === "True" && choice.step_key !== "standard_equipment") return 0;
+  if (choice?.step_key !== "standard_equipment") return 1;
+  return 2;
+}
+
+function dedupeSelectedRpos() {
+  const byRpo = new Map();
+  for (const id of state.selected) {
+    const choice = optionsById.get(id);
+    if (!choice?.rpo) continue;
+    if (!byRpo.has(choice.rpo)) byRpo.set(choice.rpo, []);
+    byRpo.get(choice.rpo).push(id);
+  }
+  for (const ids of byRpo.values()) {
+    if (ids.length < 2) continue;
+    const keepId = ids.reduce((bestId, currentId) => {
+      const bestChoice = optionsById.get(bestId);
+      const currentChoice = optionsById.get(currentId);
+      return selectedChoiceRank(currentChoice) < selectedChoiceRank(bestChoice) ? currentId : bestId;
+    });
+    for (const id of ids) {
+      if (id !== keepId) deleteSelectedOption(id);
+    }
+  }
+}
+
 function optionExclusiveGroup(optionId) {
   return exclusiveGroupByOption.get(optionId) || null;
 }
@@ -536,6 +563,7 @@ function reconcileSelections() {
   if (!selectedOptionByRpo("Z51") && !selectedOrAutoInSection("sec_susp_001", refreshedAutoAdded)) addDefaultRpo("FE1");
   if (!selectedOptionByRpo("NWI") && !selectedOptionByRpo("NGA")) addDefaultRpo("NGA");
   if (!selectedOrAutoInSection("sec_seat_001", refreshedAutoAdded)) addDefaultRpo("719");
+  dedupeSelectedRpos();
 }
 
 function setBodyAndTrim(bodyStyle, trimLevel) {

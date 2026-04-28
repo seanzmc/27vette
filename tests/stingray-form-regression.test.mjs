@@ -409,6 +409,34 @@ test("FE1 default selection prefers the visible suspension tile", () => {
   assert.match(helper, /choice\.step_key !== "standard_equipment"/);
 });
 
+test("initial selected FE1 state is de-duped to the visible suspension choice", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const selectedFe1Choices = [...runtime.state.selected]
+    .map((id) => data.choices.find((choice) => choice.option_id === id))
+    .filter((choice) => choice?.rpo === "FE1");
+  assert.equal(selectedFe1Choices.length, 1, "initial selected state should contain one FE1 row");
+  assert.equal(selectedFe1Choices[0].option_id, "opt_fe1_001", "FE1 should retain the visible suspension tile");
+  assert.equal(selectedFe1Choices[0].step_key, "packages_performance");
+  assert.equal(selectedFe1Choices[0].selectable, "True");
+
+  const fe1LineItems = runtime.lineItems().filter((item) => item.rpo === "FE1");
+  assert.equal(fe1LineItems.length, 1, "Selected RPOs should render one FE1 line item");
+
+  const z51 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_z51_001");
+  assert.ok(z51, "Z51 should exist for the current variant");
+  runtime.handleChoice(z51);
+
+  const selectedRpos = [...runtime.state.selected].map((id) => data.choices.find((choice) => choice.option_id === id)?.rpo);
+  assert.equal(selectedRpos.includes("FE1"), false, "Z51 should remove FE1");
+  assert.equal(selectedRpos.includes("FE2"), false, "Z51 should remove FE2");
+  assert.equal(runtime.computeAutoAdded().has("opt_fe3_001"), true, "Z51 should still include FE3");
+});
+
 test("coupe defaults include BC7 engine appearance", () => {
   assert.match(appSource, /defaultRpo of \["FE1", "NGA", "BC7"\]/);
   assert.match(appSource, /defaultChoice\.body_style === "coupe"/);
