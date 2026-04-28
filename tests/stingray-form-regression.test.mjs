@@ -51,12 +51,20 @@ test("engine cover variants are consolidated with B6P price overrides", () => {
 });
 
 test("LS6 engine covers are treated as an exclusive selection group", () => {
-  assert.match(appSource, /const LS6_ENGINE_COVER_OPTION_IDS = new Set\(\[/);
-  for (const optionId of ["opt_bc7_001", "opt_bcp_001", "opt_bcs_001", "opt_bc4_001"]) {
-    assert.match(appSource, new RegExp(`"${optionId}"`));
-  }
-  assert.match(appSource, /function removeOtherLs6EngineCovers\(optionId\)/);
-  assert.match(appSource, /removeOtherLs6EngineCovers\(choice\.option_id\)/);
+  assert.ok(Array.isArray(data.exclusiveGroups), "exclusiveGroups should be generated");
+  const group = data.exclusiveGroups.find((item) => item.group_id === "grp_ls6_engine_covers");
+  assert.ok(group, "LS6 engine covers need a generated exclusive group");
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(group.option_ids)),
+    ["opt_bc7_001", "opt_bcp_001", "opt_bcs_001", "opt_bc4_001"]
+  );
+  assert.equal(group.selection_mode, "single_within_group");
+  assert.match(appSource, /const exclusiveGroupByOption = new Map\(\)/);
+  assert.match(appSource, /function optionExclusiveGroup\(optionId\)/);
+  assert.match(appSource, /function removeOtherExclusiveGroupOptions\(optionId\)/);
+  assert.match(appSource, /removeOtherExclusiveGroupOptions\(choice\.option_id\)/);
+  assert.doesNotMatch(appSource, /LS6_ENGINE_COVER_OPTION_IDS/);
+  assert.doesNotMatch(appSource, /removeOtherLs6EngineCovers/);
 });
 
 test("option selections preserve the current viewport instead of resetting to the page top", () => {
@@ -205,10 +213,21 @@ test("5V7 can satisfy spoiler requirement with either 5ZU or 5ZZ", () => {
     .filter((rule) => rule.source_id === "opt_5v7_001" && rule.rule_type === "requires")
     .map((rule) => rule.target_id)
     .sort();
+  assert.ok(Array.isArray(data.ruleGroups), "ruleGroups should be generated");
+  const fiveV7Group = data.ruleGroups.find((group) => group.group_id === "grp_5v7_spoiler_requirement");
 
   assert.deepEqual(JSON.parse(JSON.stringify(fiveV7Requires)), []);
-  assert.match(appSource, /choice\.rpo === "5V7"/);
-  assert.match(appSource, /selectedOptionByRpo\("5ZU"\) \|\| selectedOptionByRpo\("5ZZ"\)/);
+  assert.ok(fiveV7Group, "5V7 should use a generated grouped requirement");
+  assert.equal(fiveV7Group.group_type, "requires_any");
+  assert.deepEqual(JSON.parse(JSON.stringify(fiveV7Group.target_ids)), ["opt_5zu_001", "opt_5zz_001"]);
+  assert.match(fiveV7Group.disabled_reason, /Requires 5ZU Body-Color High Wing Spoiler or 5ZZ Carbon Flash High Wing Spoiler/);
+  assert.match(appSource, /const ruleGroupsBySource = new Map\(\)/);
+  assert.match(appSource, /function ruleGroupAppliesToCurrentVariant\(group\)/);
+  assert.match(appSource, /function requiresAnyReason\(choice, selectedIds\)/);
+  assert.match(appSource, /const selectedIds = selectedContextIds\(\)/);
+  assert.match(appSource, /requiresAnyReason\(choice, selectedIds\)/);
+  assert.doesNotMatch(appSource, /choice\.rpo === "5V7"/);
+  assert.doesNotMatch(appSource, /selectedOptionByRpo\("5ZU"\) \|\| selectedOptionByRpo\("5ZZ"\)/);
 });
 
 test("5ZU body-color spoiler can satisfy its paint requirement with any allowed body color", () => {
@@ -216,10 +235,16 @@ test("5ZU body-color spoiler can satisfy its paint requirement with any allowed 
     .filter((rule) => rule.source_id === "opt_5zu_001" && rule.rule_type === "requires")
     .map((rule) => rule.target_id)
     .sort();
+  assert.ok(Array.isArray(data.ruleGroups), "ruleGroups should be generated");
+  const fiveZuGroup = data.ruleGroups.find((group) => group.group_id === "grp_5zu_paint_requirement");
 
   assert.equal(fiveZuRequires.some((targetId) => ["opt_g8g_001", "opt_gba_001", "opt_gkz_001"].includes(targetId)), false);
-  assert.match(appSource, /choice\.rpo === "5ZU"/);
-  assert.match(appSource, /selectedOptionByRpo\("G8G"\) \|\| selectedOptionByRpo\("GBA"\) \|\| selectedOptionByRpo\("GKZ"\)/);
+  assert.ok(fiveZuGroup, "5ZU should use a generated grouped requirement");
+  assert.equal(fiveZuGroup.group_type, "requires_any");
+  assert.deepEqual(JSON.parse(JSON.stringify(fiveZuGroup.target_ids)), ["opt_g8g_001", "opt_gba_001", "opt_gkz_001"]);
+  assert.match(fiveZuGroup.disabled_reason, /Requires Arctic White, Black, or Torch Red exterior paint/);
+  assert.doesNotMatch(appSource, /choice\.rpo === "5ZU"/);
+  assert.doesNotMatch(appSource, /selectedOptionByRpo\("G8G"\) \|\| selectedOptionByRpo\("GBA"\) \|\| selectedOptionByRpo\("GKZ"\)/);
 });
 
 test("aero exhaust accessories sections use the requested order", () => {

@@ -2,7 +2,7 @@ window.STINGRAY_FORM_DATA = {
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-04-28T06:01:39+00:00"
+    "generated_at": "2026-04-28T14:37:22+00:00"
   },
   "variants": [
     {
@@ -46484,6 +46484,53 @@ window.STINGRAY_FORM_DATA = {
       "category_name": "Standard Equipment",
       "display_order": 7,
       "source_detail_raw": "1. Terms and limitations apply. See onstar.com or dealer for details."
+    }
+  ],
+  "ruleGroups": [
+    {
+      "group_id": "grp_5v7_spoiler_requirement",
+      "group_type": "requires_any",
+      "source_id": "opt_5v7_001",
+      "target_ids": [
+        "opt_5zu_001",
+        "opt_5zz_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "Requires 5ZU Body-Color High Wing Spoiler or 5ZZ Carbon Flash High Wing Spoiler.",
+      "active": "True",
+      "notes": "5V7 is available when either approved high wing spoiler is selected."
+    },
+    {
+      "group_id": "grp_5zu_paint_requirement",
+      "group_type": "requires_any",
+      "source_id": "opt_5zu_001",
+      "target_ids": [
+        "opt_g8g_001",
+        "opt_gba_001",
+        "opt_gkz_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "Requires Arctic White, Black, or Torch Red exterior paint.",
+      "active": "True",
+      "notes": "5ZU body-color spoiler requires one approved body color."
+    }
+  ],
+  "exclusiveGroups": [
+    {
+      "group_id": "grp_ls6_engine_covers",
+      "option_ids": [
+        "opt_bc7_001",
+        "opt_bcp_001",
+        "opt_bcs_001",
+        "opt_bc4_001"
+      ],
+      "selection_mode": "single_within_group",
+      "active": "True",
+      "notes": "LS6 engine cover choices are mutually exclusive within the Engine Appearance section."
     }
   ],
   "rules": [

@@ -26,6 +26,8 @@ GENERATED_SHEETS = [
     "form_context_choices",
     "form_choices",
     "form_standard_equipment",
+    "form_rule_groups",
+    "form_exclusive_groups",
     "form_rules",
     "form_price_rules",
     "form_interiors",
@@ -190,6 +192,43 @@ AERO_EXHAUST_ACCESSORIES_SECTION_ORDER = {
 FIVE_V7_OR_REQUIREMENT_TARGET_IDS = {"opt_5zu_001", "opt_5zz_001", "opt_5zw_001"}
 FIVE_ZU_OR_REQUIREMENT_TARGET_IDS = {"opt_g8g_001", "opt_gba_001", "opt_gkz_001"}
 T0A_REPLACEMENT_OPTION_IDS = {"opt_tvs_001", "opt_5zz_001", "opt_5zu_001"}
+
+RULE_GROUPS = [
+    {
+        "group_id": "grp_5v7_spoiler_requirement",
+        "group_type": "requires_any",
+        "source_id": "opt_5v7_001",
+        "target_ids": ["opt_5zu_001", "opt_5zz_001"],
+        "body_style_scope": "",
+        "trim_level_scope": "",
+        "variant_scope": "",
+        "disabled_reason": "Requires 5ZU Body-Color High Wing Spoiler or 5ZZ Carbon Flash High Wing Spoiler.",
+        "active": "True",
+        "notes": "5V7 is available when either approved high wing spoiler is selected.",
+    },
+    {
+        "group_id": "grp_5zu_paint_requirement",
+        "group_type": "requires_any",
+        "source_id": "opt_5zu_001",
+        "target_ids": ["opt_g8g_001", "opt_gba_001", "opt_gkz_001"],
+        "body_style_scope": "",
+        "trim_level_scope": "",
+        "variant_scope": "",
+        "disabled_reason": "Requires Arctic White, Black, or Torch Red exterior paint.",
+        "active": "True",
+        "notes": "5ZU body-color spoiler requires one approved body color.",
+    },
+]
+
+EXCLUSIVE_GROUPS = [
+    {
+        "group_id": "grp_ls6_engine_covers",
+        "option_ids": ["opt_bc7_001", "opt_bcp_001", "opt_bcs_001", "opt_bc4_001"],
+        "selection_mode": "single_within_group",
+        "active": "True",
+        "notes": "LS6 engine cover choices are mutually exclusive within the Engine Appearance section.",
+    }
+]
 
 SELECTION_MODE_LABELS = {
     "single_select_req": "Required single choice",
@@ -1005,6 +1044,29 @@ def main() -> None:
     )
     write_sheet(
         wb,
+        "form_rule_groups",
+        [
+            "group_id",
+            "group_type",
+            "source_id",
+            "target_ids",
+            "body_style_scope",
+            "trim_level_scope",
+            "variant_scope",
+            "disabled_reason",
+            "active",
+            "notes",
+        ],
+        [{**row, "target_ids": "|".join(row["target_ids"])} for row in RULE_GROUPS],
+    )
+    write_sheet(
+        wb,
+        "form_exclusive_groups",
+        ["group_id", "option_ids", "selection_mode", "active", "notes"],
+        [{**row, "option_ids": "|".join(row["option_ids"])} for row in EXCLUSIVE_GROUPS],
+    )
+    write_sheet(
+        wb,
         "form_rules",
         [
             "rule_id",
@@ -1083,6 +1145,8 @@ def main() -> None:
         "contextChoices": context_choices,
         "choices": choices,
         "standardEquipment": standard_equipment,
+        "ruleGroups": RULE_GROUPS,
+        "exclusiveGroups": EXCLUSIVE_GROUPS,
         "rules": [row for row in raw_rules if row["active"] == "True"],
         "priceRules": price_rules,
         "interiors": [row for row in interiors if row["active_for_stingray"]],

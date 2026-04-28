@@ -45,7 +45,8 @@ const interiorsById = new Map(data.interiors.map((interior) => [interior.interio
 const ruleTargetsBySource = new Map();
 const rulesByTarget = new Map();
 const priceRulesByTarget = new Map();
-const LS6_ENGINE_COVER_OPTION_IDS = new Set(["opt_bc7_001", "opt_bcp_001", "opt_bcs_001", "opt_bc4_001"]);
+const ruleGroupsBySource = new Map();
+const exclusiveGroupByOption = new Map();
 
 for (const choice of data.choices) {
   if (!choicesByOption.has(choice.option_id)) choicesByOption.set(choice.option_id, []);
@@ -63,6 +64,18 @@ for (const rule of data.rules) {
 for (const rule of data.priceRules) {
   if (!priceRulesByTarget.has(rule.target_option_id)) priceRulesByTarget.set(rule.target_option_id, []);
   priceRulesByTarget.get(rule.target_option_id).push(rule);
+}
+
+for (const group of data.ruleGroups || []) {
+  if (!ruleGroupsBySource.has(group.source_id)) ruleGroupsBySource.set(group.source_id, []);
+  ruleGroupsBySource.get(group.source_id).push(group);
+}
+
+for (const group of data.exclusiveGroups || []) {
+  if (group.active && group.active !== "True") continue;
+  for (const optionId of group.option_ids || []) {
+    exclusiveGroupByOption.set(optionId, group);
+  }
 }
 
 function formatMoney(value) {
@@ -120,6 +133,21 @@ function ruleAppliesToCurrentVariant(rule) {
   const targetChoice = choiceForCurrentVariant(rule.target_id);
   if (sourceChoice && (sourceChoice.active !== "True" || sourceChoice.status === "unavailable")) return false;
   if (targetChoice && (targetChoice.active !== "True" || targetChoice.status === "unavailable")) return false;
+  return true;
+}
+
+function scopeMatches(scope, value) {
+  if (!scope) return true;
+  return String(scope).split("|").includes(value);
+}
+
+function ruleGroupAppliesToCurrentVariant(group) {
+  if (group.active && group.active !== "True") return false;
+  if (!scopeMatches(group.body_style_scope, state.bodyStyle)) return false;
+  if (!scopeMatches(group.trim_level_scope, state.trimLevel)) return false;
+  if (!scopeMatches(group.variant_scope, currentVariantId())) return false;
+  const sourceChoice = choiceForCurrentVariant(group.source_id);
+  if (sourceChoice && (sourceChoice.active !== "True" || sourceChoice.status === "unavailable")) return false;
   return true;
 }
 
@@ -192,6 +220,16 @@ function shouldSuppressIncludedDefault(rule) {
   return section?.choice_mode === "single" && userSelectedInSection(sectionId, rule.target_id);
 }
 
+function requiresAnyReason(choice, selectedIds) {
+  const groups = ruleGroupsBySource.get(choice.option_id) || [];
+  for (const group of groups) {
+    if (group.group_type !== "requires_any" || !ruleGroupAppliesToCurrentVariant(group)) continue;
+    if ((group.target_ids || []).some((targetId) => selectedIds.has(targetId))) continue;
+    return group.disabled_reason || `Requires one of ${(group.target_ids || []).map(getEntityLabel).join(", ")}.`;
+  }
+  return "";
+}
+
 function computeAutoAdded() {
   const autoAdded = new Map();
   const selectedIds = new Set(state.selected);
@@ -231,14 +269,10 @@ function disableReasonForChoice(choice) {
   if (choice.rpo === "FE1" && selectedOptionByRpo("Z51")) return "Replaced by FE3 Z51 performance suspension.";
   if (choice.rpo === "FE2" && selectedOptionByRpo("Z51")) return "Not available with Z51 Performance Package.";
   if (choice.rpo === "NGA" && selectedOptionByRpo("NWI")) return "Replaced by NWI center exhaust.";
-  if (choice.rpo === "5V7" && !(selectedOptionByRpo("5ZU") || selectedOptionByRpo("5ZZ"))) {
-    return "Requires 5ZU Body-Color High Wing Spoiler or 5ZZ Carbon Flash High Wing Spoiler.";
-  }
-  if (choice.rpo === "5ZU" && !(selectedOptionByRpo("G8G") || selectedOptionByRpo("GBA") || selectedOptionByRpo("GKZ"))) {
-    return "Requires Arctic White, Black, or Torch Red exterior paint.";
-  }
 
   const selectedIds = selectedContextIds();
+  const groupedReason = requiresAnyReason(choice, selectedIds);
+  if (groupedReason) return groupedReason;
   const targetRules = rulesByTarget.get(choice.option_id) || [];
   for (const rule of targetRules) {
     if (rule.rule_type === "excludes" && selectedIds.has(rule.source_id) && ruleAppliesToCurrentVariant(rule)) {
@@ -390,9 +424,14 @@ function deleteSelectedRpo(rpo) {
   }
 }
 
-function removeOtherLs6EngineCovers(optionId) {
-  if (!LS6_ENGINE_COVER_OPTION_IDS.has(optionId)) return;
-  for (const id of LS6_ENGINE_COVER_OPTION_IDS) {
+function optionExclusiveGroup(optionId) {
+  return exclusiveGroupByOption.get(optionId) || null;
+}
+
+function removeOtherExclusiveGroupOptions(optionId) {
+  const group = optionExclusiveGroup(optionId);
+  if (!group || group.selection_mode !== "single_within_group") return;
+  for (const id of group.option_ids || []) {
     if (id !== optionId) deleteSelectedOption(id);
   }
 }
@@ -521,7 +560,7 @@ function handleChoice(choice) {
   } else if (state.selected.has(choice.option_id)) {
     deleteSelectedOption(choice.option_id);
   } else {
-    removeOtherLs6EngineCovers(choice.option_id);
+    removeOtherExclusiveGroupOptions(choice.option_id);
     state.selected.add(choice.option_id);
     state.userSelected.add(choice.option_id);
   }
