@@ -11,6 +11,7 @@ function loadData() {
 
 const data = loadData();
 const appSource = fs.readFileSync("form-app/app.js", "utf8");
+const htmlSource = fs.readFileSync("form-app/index.html", "utf8");
 
 function uniqueChoicesByRpo(rpo) {
   return [...new Map(data.choices.filter((choice) => choice.rpo === rpo).map((choice) => [choice.option_id, choice])).values()];
@@ -98,7 +99,7 @@ test("optional single-select sections can be unselected", () => {
   const choiceHandler = appSource.match(/function handleChoice\(choice\) \{[\s\S]*?\n\}/)?.[0] || "";
   assert.match(choiceHandler, /selection_mode\s*===\s*"single_select_opt"/);
   assert.match(choiceHandler, /state\.selected\.has\(choice\.option_id\)/);
-  assert.match(choiceHandler, /state\.selected\.delete\(choice\.option_id\)/);
+  assert.match(choiceHandler, /deleteSelectedOption\(choice\.option_id\)/);
 });
 
 test("UQT is selectable only on 1LT and included-only on higher trims", () => {
@@ -134,14 +135,27 @@ test("order export omits the full standard equipment dump", () => {
 test("replaceable suspension and exhaust defaults are encoded", () => {
   assert.match(appSource, /for \(const defaultRpo of \["FE1", "NGA", "BC7"\]\)/);
   assert.match(appSource, /selectedOptionByRpo\("Z51"\)/);
-  assert.match(appSource, /option\?\.rpo === "FE1" \|\| option\?\.rpo === "FE2"/);
+  assert.match(appSource, /deleteSelectedRpo\("FE1"\)/);
+  assert.match(appSource, /deleteSelectedRpo\("FE2"\)/);
   assert.ok(
     data.rules.some((rule) => rule.source_id === "opt_z51_001" && rule.target_id === "opt_fe3_001" && rule.rule_type === "includes"),
     "Z51 should include FE3"
   );
+  assert.ok(
+    data.choices.some(
+      (choice) =>
+        choice.rpo === "FE3" &&
+        choice.section_id === "sec_susp_001" &&
+        choice.step_key === "packages_performance" &&
+        choice.selectable === "True" &&
+        choice.active === "True"
+    ),
+    "FE3 should render as a selectable suspension tile"
+  );
   assert.ok(data.choices.some((choice) => choice.rpo === "FE4" && choice.status === "available"), "FE4 should be available");
   assert.match(appSource, /selectedOptionByRpo\("NWI"\)/);
-  assert.match(appSource, /option\?\.rpo === "NGA"/);
+  assert.match(appSource, /deleteSelectedRpo\("NGA"\)/);
+  assert.match(appSource, /addDefaultRpo\("NGA"\)/);
 });
 
 test("coupe defaults include BC7 engine appearance", () => {
@@ -179,13 +193,60 @@ test("aero exhaust accessories sections use the requested order", () => {
 
   assert.deepEqual(
     JSON.parse(JSON.stringify(sectionNames)),
-    ["Exhaust", "Spoiler", "Stripes", "LPO Exterior", "LPO Wheels", "Wheel Accessory"]
+    ["Exhaust", "Spoiler", "Stripes", "LPO Exterior", "LPO Wheels"]
   );
   assert.match(appSource, /section_display_order/);
 });
 
+test("exterior appearance, engine appearance, and wheel sections use QA-4 ordering", () => {
+  const exteriorSections = data.sections
+    .filter((section) => section.step_key === "exterior_appearance")
+    .sort((a, b) => Number(a.section_display_order) - Number(b.section_display_order))
+    .map((section) => section.section_name)
+    .slice(0, 4);
+  assert.deepEqual(JSON.parse(JSON.stringify(exteriorSections)), ["Roof", "Exterior Accents", "Badges", "Engine Appearance"]);
+
+  const engineOrder = data.choices
+    .filter((choice) => choice.section_id === "sec_engi_001" && choice.variant_id === "1lt_c07" && choice.active === "True")
+    .sort((a, b) => Number(a.display_order) - Number(b.display_order))
+    .map((choice) => choice.rpo);
+  assert.deepEqual(JSON.parse(JSON.stringify(engineOrder)), ["BC7", "BCP", "BCS", "BC4", "B6P", "ZZ3", "D3V", "SL9", "SLK", "SLN", "VUP"]);
+
+  const wheelSections = data.sections
+    .filter((section) => section.step_key === "wheels")
+    .sort((a, b) => Number(a.section_display_order) - Number(b.section_display_order))
+    .map((section) => section.section_name);
+  assert.deepEqual(JSON.parse(JSON.stringify(wheelSections)), ["Wheels", "Caliper Color", "Wheel Accessory"]);
+  assert.equal(data.steps.some((step) => step.step_key === "calipers"), false);
+});
+
+test("BC7 has a convertible-only ZZ3 requirement", () => {
+  const bc7Rule = data.rules.find(
+    (rule) => rule.source_id === "opt_bc7_001" && rule.target_id === "opt_zz3_001" && rule.rule_type === "requires"
+  );
+  assert.ok(bc7Rule, "BC7 should have a ZZ3 requirement rule");
+  assert.equal(bc7Rule.body_style_scope, "convertible");
+  assert.match(bc7Rule.disabled_reason, /Requires ZZ3 Convertible Engine Appearance Package/);
+});
+
+test("spoiler replacement rules preserve ZYC and replace T0A without blocking TVS/5ZZ/5ZU", () => {
+  const spoilerSection = data.sections.find((section) => section.section_id === "sec_spoi_001");
+  assert.equal(spoilerSection.selection_mode, "multi_select_opt");
+  for (const sourceId of ["opt_tvs_001", "opt_5zz_001", "opt_5zu_001"]) {
+    const rule = data.rules.find((item) => item.source_id === sourceId && item.target_id === "opt_t0a_001");
+    assert.ok(rule, `${sourceId} should remove T0A`);
+    assert.equal(rule.runtime_action, "replace");
+    assert.match(rule.disabled_reason, /Removes T0A when Z51 is selected/);
+  }
+  assert.ok(data.rules.some((rule) => rule.source_id === "opt_zyc_001" && rule.target_id === "opt_gba_001"));
+  assert.equal(data.rules.some((rule) => rule.source_id === "opt_zyc_001" && ["opt_tvs_001", "opt_5zz_001", "opt_5zu_001"].includes(rule.target_id)), false);
+  assert.match(appSource, /if \(choice\.rpo === "GBA"\) deleteSelectedRpo\("ZYC"\)/);
+});
+
 test("step rendering resets scroll to the top after content replacement", () => {
-  assert.match(appSource, /scrollTo\(\{ top: 0/);
+  assert.match(appSource, /function resetStepScroll/);
+  assert.match(appSource, /closest\("\.choice-panel"\)\?\.scrollTo\(\{ top: 0, left: 0 \}\)/);
+  assert.match(appSource, /window\.scrollTo\(\{ top: 0, left: 0 \}\)/);
 });
 
 test("interior pricing subtracts the selected seat price", () => {
@@ -195,13 +256,32 @@ test("interior pricing subtracts the selected seat price", () => {
   assert.match(appSource, /price: adjustedInteriorPrice\(interior\)/);
 });
 
-test("D30 is auto-added only and not directly selectable", () => {
-  assert.equal(
-    data.choices.some((choice) => choice.rpo === "D30" && choice.active === "True"),
-    false
+test("R6X is auto-only and D30 is the only visible disabled color override card", () => {
+  assert.equal(data.choices.some((choice) => choice.rpo === "R6X" && choice.active === "True"), false);
+  assert.ok(data.rules.some((rule) => rule.target_id === "opt_r6x_001" && rule.rule_type === "includes"), "R6X needs interior include rules");
+  assert.ok(data.priceRules.some((rule) => rule.target_option_id === "opt_r6x_001" && Number(rule.price_value) === 0), "R6X should price at $0 when auto-added");
+  assert.ok(
+    data.choices.some((choice) => choice.rpo === "D30" && choice.active === "True" && choice.selectable === "False"),
+    "D30 should be visible but disabled"
   );
   assert.ok(
     data.colorOverrides.some((override) => override.adds_rpo === "opt_d30_001"),
     "D30 should remain available to color override auto-add rules"
   );
+});
+
+test("single interior and included seatbelt defaults are handled in runtime", () => {
+  const ae4Interiors = data.interiors.filter((interior) => interior.trim_level === "1LT" && interior.seat_code === "AE4");
+  assert.deepEqual(JSON.parse(JSON.stringify(ae4Interiors.map((interior) => interior.interior_code))), ["HTJ"]);
+  assert.match(appSource, /function reconcileInteriorSelection/);
+  assert.match(appSource, /interiors\.length === 1/);
+  assert.match(appSource, /function shouldSuppressIncludedDefault/);
+  assert.match(appSource, /removeAutoDefaultDuplicates/);
+  assert.match(appSource, /addDefaultRpo\("719"\)/);
+});
+
+test("sidebar keeps one Standard & Included surface inside Selected RPOs", () => {
+  assert.match(htmlSource, /selectedStandardEquipmentList/);
+  assert.doesNotMatch(htmlSource, /standardEquipmentList/);
+  assert.doesNotMatch(htmlSource, /standard-card/);
 });

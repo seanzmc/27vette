@@ -39,7 +39,6 @@ STEP_ORDER = [
     "paint",
     "exterior_appearance",
     "wheels",
-    "calipers",
     "packages_performance",
     "aero_exhaust_stripes_accessories",
     "seat",
@@ -56,8 +55,7 @@ STEP_LABELS = {
     "trim_level": "Trim Level",
     "paint": "Exterior Paint",
     "exterior_appearance": "Exterior Appearance",
-    "wheels": "Wheels",
-    "calipers": "Brake Calipers",
+    "wheels": "Wheels & Brake Calipers",
     "packages_performance": "Packages & Performance",
     "aero_exhaust_stripes_accessories": "Aero, Exhaust, Stripes & Accessories",
     "seat": "Seats",
@@ -104,7 +102,7 @@ CONTEXT_SECTIONS = [
 SECTION_STEP_OVERRIDES = {
     "sec_pain_001": "paint",
     "sec_whee_002": "wheels",
-    "sec_cali_001": "calipers",
+    "sec_cali_001": "wheels",
     "sec_roof_001": "exterior_appearance",
     "sec_exte_001": "exterior_appearance",
     "sec_badg_001": "exterior_appearance",
@@ -118,6 +116,7 @@ SECTION_STEP_OVERRIDES = {
     "sec_seat_001": "seat_belt",
     "sec_inte_001": "interior_trim",
     "sec_lpoi_001": "interior_trim",
+    "sec_whee_001": "wheels",
     "sec_gsce_001": "exterior_appearance",
     "sec_onst_001": "interior_trim",
     "sec_cust_001": "delivery",
@@ -144,7 +143,36 @@ HIDDEN_OPTION_IDS = {
 
 HIDDEN_SECTION_IDS = {"sec_cust_002"}
 
-AUTO_ONLY_OPTION_IDS = {"opt_d30_001"}
+AUTO_ONLY_OPTION_IDS = {"opt_r6x_001"}
+DISPLAY_ONLY_OPTION_IDS = {"opt_d30_001"}
+
+SECTION_MODE_OVERRIDES = {
+    "sec_spoi_001": "multi_select_opt",
+}
+
+SECTION_DISPLAY_ORDER_OVERRIDES = {
+    "sec_roof_001": 10,
+    "sec_exte_001": 20,
+    "sec_badg_001": 30,
+    "sec_engi_001": 40,
+    "sec_whee_002": 10,
+    "sec_cali_001": 20,
+    "sec_whee_001": 30,
+}
+
+ENGINE_APPEARANCE_OPTION_ORDER = {
+    "opt_bc7_001": 10,
+    "opt_bcp_001": 20,
+    "opt_bcs_001": 30,
+    "opt_bc4_001": 40,
+    "opt_b6p_001": 50,
+    "opt_zz3_001": 60,
+    "opt_d3v_001": 70,
+    "opt_sl9_001": 80,
+    "opt_slk_001": 90,
+    "opt_sln_001": 100,
+    "opt_vup_001": 110,
+}
 
 BODY_STYLE_DISPLAY_ORDER = {
     "coupe": 1,
@@ -157,11 +185,11 @@ AERO_EXHAUST_ACCESSORIES_SECTION_ORDER = {
     "sec_stri_001": 30,
     "sec_lpoe_001": 40,
     "sec_lpow_001": 50,
-    "sec_whee_001": 60,
 }
 
 FIVE_V7_OR_REQUIREMENT_TARGET_IDS = {"opt_5zu_001", "opt_5zz_001", "opt_5zw_001"}
 FIVE_ZU_OR_REQUIREMENT_TARGET_IDS = {"opt_g8g_001", "opt_gba_001", "opt_gkz_001"}
+T0A_REPLACEMENT_OPTION_IDS = {"opt_tvs_001", "opt_5zz_001", "opt_5zu_001"}
 
 SELECTION_MODE_LABELS = {
     "single_select_req": "Required single choice",
@@ -357,6 +385,14 @@ def main() -> None:
             option["section_id"] = "sec_spoi_001"
             option["selectable"] = "True"
             option["display_order"] = "25"
+        if option["option_id"] == "opt_fe3_001":
+            option["section_id"] = "sec_susp_001"
+            option["selectable"] = "True"
+            option["display_order"] = "12"
+        if option["option_id"] == "opt_zyc_001":
+            option["display_order"] = "15"
+        if option["option_id"] in ENGINE_APPEARANCE_OPTION_ORDER:
+            option["display_order"] = str(ENGINE_APPEARANCE_OPTION_ORDER[option["option_id"]])
         if original_option_id in HIDDEN_OPTION_IDS or option.get("section_id") in HIDDEN_SECTION_IDS:
             option["active"] = "False"
 
@@ -408,16 +444,20 @@ def main() -> None:
     for section_id, section in sections.items():
         category = categories.get(section.get("category_id", ""), {})
         step_key = step_for_section(section_id, section.get("section_name", ""), section.get("category_id", ""))
-        section_display_order = AERO_EXHAUST_ACCESSORIES_SECTION_ORDER.get(section_id, intish(section.get("display_order")))
+        selection_mode = SECTION_MODE_OVERRIDES.get(section_id, section.get("selection_mode", ""))
+        section_display_order = SECTION_DISPLAY_ORDER_OVERRIDES.get(
+            section_id,
+            AERO_EXHAUST_ACCESSORIES_SECTION_ORDER.get(section_id, intish(section.get("display_order"))),
+        )
         section_rows.append(
             {
                 "section_id": section_id,
                 "section_name": section.get("section_name", ""),
                 "category_id": section.get("category_id", ""),
                 "category_name": category.get("category_name", ""),
-                "selection_mode": section.get("selection_mode", ""),
-                "selection_mode_label": selection_mode_label(section.get("selection_mode", "")),
-                "choice_mode": normalize_mode(section.get("selection_mode", "")),
+                "selection_mode": selection_mode,
+                "selection_mode_label": selection_mode_label(selection_mode),
+                "choice_mode": normalize_mode(selection_mode),
                 "is_required": section.get("is_required", ""),
                 "standard_behavior": section.get("standard_behavior", ""),
                 "section_display_order": section_display_order,
@@ -492,7 +532,7 @@ def main() -> None:
         section = sections.get(option.get("section_id", ""), {})
         category = categories.get(section.get("category_id", ""), {})
         step_key = step_for_section(option.get("section_id", ""), section.get("section_name", ""), section.get("category_id", ""))
-        mode = section.get("selection_mode", "")
+        mode = SECTION_MODE_OVERRIDES.get(option.get("section_id", ""), section.get("selection_mode", ""))
         options_by_id[option["option_id"]] = {
             "option_id": option["option_id"],
             "rpo": option.get("rpo", ""),
@@ -533,6 +573,10 @@ def main() -> None:
                 status = "unavailable"
                 selectable = "False"
                 active = "False"
+            if option_id in DISPLAY_ONLY_OPTION_IDS:
+                status = "available"
+                selectable = "False"
+                active = "True"
             choices.append(
                 {
                     "choice_id": f"{variant['variant_id']}__{option_id}",
@@ -606,6 +650,27 @@ def main() -> None:
             }
         )
     interiors_by_id = {row["interior_id"]: row for row in interiors if row["interior_id"]}
+    r6x_interior_ids = [
+        row["interior_id"]
+        for row in interiors
+        if row["interior_id"] and row["active_for_stingray"] and row["requires_r6x"] == "True"
+    ]
+    existing_price_rule_ids = {row.get("price_rule_id", "") for row in price_rules_raw}
+    for interior_id in r6x_interior_ids:
+        price_rule_id = f"pr_{interior_id.lower()}_r6x_001"
+        if price_rule_id in existing_price_rule_ids:
+            continue
+        price_rules_raw.append(
+            {
+                "price_rule_id": price_rule_id,
+                "condition_option_id": interior_id,
+                "target_option_id": "opt_r6x_001",
+                "price_rule_type": "override",
+                "price_value": "0",
+                "review_flag": "False",
+                "notes": "R6X is included in the selected interior price.",
+            }
+        )
 
     raw_rules: list[dict[str, Any]] = []
     validation_rows: list[dict[str, Any]] = []
@@ -638,7 +703,38 @@ def main() -> None:
             "original_detail_raw": "TVS replaces the default T0A Z51 spoiler when selected.",
             "review_flag": "False",
         },
+        {
+            "rule_id": "rule_opt_bc7_001_requires_opt_zz3_001_convertible",
+            "source_id": "opt_bc7_001",
+            "rule_type": "requires",
+            "target_id": "opt_zz3_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_engi_001",
+            "target_section": "sec_engi_001",
+            "source_selection_mode": "multi_select_opt",
+            "target_selection_mode": "multi_select_opt",
+            "original_detail_raw": "BC7 requires ZZ3 Convertible Engine Appearance Package on Convertible.",
+            "review_flag": "False",
+        },
     ]
+    for interior_id in r6x_interior_ids:
+        manual_rules.append(
+            {
+                "rule_id": f"rule_{interior_id.lower()}_includes_opt_r6x_001",
+                "source_id": interior_id,
+                "rule_type": "includes",
+                "target_id": "opt_r6x_001",
+                "target_type": "option",
+                "source_type": "interior",
+                "source_section": interiors_by_id[interior_id].get("section_id", ""),
+                "target_section": "sec_colo_001",
+                "source_selection_mode": "single_select_req",
+                "target_selection_mode": "multi_select_opt",
+                "original_detail_raw": "R6X is included with this custom interior trim and seat combination.",
+                "review_flag": "False",
+            }
+        )
     for rule in rules_raw + manual_rules:
         rule_type = rule.get("rule_type", "").lower()
         source_id = rule.get("source_id", "")
@@ -653,18 +749,19 @@ def main() -> None:
             continue
         source_section = rule.get("source_section", "")
         target_section = rule.get("target_section", "")
-        source_mode = rule.get("source_selection_mode", "")
-        target_mode = rule.get("target_selection_mode", "")
+        source_mode = SECTION_MODE_OVERRIDES.get(source_section, rule.get("source_selection_mode", ""))
+        target_mode = SECTION_MODE_OVERRIDES.get(target_section, rule.get("target_selection_mode", ""))
         body_style_scope = rule_body_style_scope(rule, source_id, target_id)
+        replaces_t0a = rule_type == "excludes" and target_id == "opt_t0a_001" and source_id in T0A_REPLACEMENT_OPTION_IDS
         redundant = (
             rule_type == "excludes"
             and source_section
             and source_section == target_section
             and source_mode.startswith("single")
             and target_mode.startswith("single")
-            and target_id != "opt_t0a_001"
+            and not replaces_t0a
         )
-        action = "omit_redundant_same_section_exclude" if redundant else "active"
+        action = "replace" if replaces_t0a else "omit_redundant_same_section_exclude" if redundant else "active"
         if redundant:
             validation_rows.append(
                 {
@@ -679,7 +776,9 @@ def main() -> None:
         auto_add = "False"
         source_label = label_for(source_id, options_by_id, interiors_by_id)
         target_label = label_for(target_id, options_by_id, interiors_by_id)
-        if rule_type == "excludes":
+        if replaces_t0a:
+            disabled_reason = "Removes T0A when Z51 is selected."
+        elif rule_type == "excludes":
             disabled_reason = f"Blocked by {source_label}."
         elif rule_type == "requires":
             disabled_reason = f"Requires {target_label}."
@@ -1003,6 +1102,7 @@ def main() -> None:
     with csv_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(
             handle,
+            lineterminator="\n",
             fieldnames=[
                 "choice_id",
                 "option_id",

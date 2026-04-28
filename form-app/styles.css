@@ -440,11 +440,6 @@ textarea {
   font-size: 13px;
 }
 
-.standard-card {
-  max-height: 360px;
-  overflow: auto;
-}
-
 .standard-equipment-list {
   display: grid;
   gap: 8px;

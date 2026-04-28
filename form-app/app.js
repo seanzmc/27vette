@@ -4,6 +4,7 @@ const state = {
   bodyStyle: "",
   trimLevel: "",
   selected: new Set(),
+  userSelected: new Set(),
   selectedInterior: "",
   activeStep: "body_style",
   customer: {
@@ -29,7 +30,6 @@ const els = {
   selectedStandardEquipmentList: document.querySelector("#selectedStandardEquipmentList"),
   autoList: document.querySelector("#autoList"),
   missingList: document.querySelector("#missingList"),
-  standardEquipmentList: document.querySelector("#standardEquipmentList"),
   alertRegion: document.querySelector("#alertRegion"),
   resetButton: document.querySelector("#resetButton"),
   exportJsonButton: document.querySelector("#exportJsonButton"),
@@ -130,6 +130,18 @@ function selectedSeatChoice() {
   return [...state.selected].map((id) => optionsById.get(id)).find((choice) => choice?.step_key === "seat");
 }
 
+function optionSectionId(optionId) {
+  return optionsById.get(optionId)?.section_id || choiceForCurrentVariant(optionId)?.section_id || "";
+}
+
+function selectedOptionIdsInSection(sectionId, ids = state.selected) {
+  return [...ids].filter((id) => optionSectionId(id) === sectionId);
+}
+
+function userSelectedInSection(sectionId, exceptId = "") {
+  return [...state.userSelected].some((id) => id !== exceptId && optionSectionId(id) === sectionId);
+}
+
 function adjustedInteriorPrice(interior) {
   const seat = selectedSeatChoice();
   return Math.max(0, Number(interior.price || 0) - Number(seat?.base_price || 0));
@@ -173,6 +185,12 @@ function selectedExcludesTarget(targetId, selectedIds) {
   return false;
 }
 
+function shouldSuppressIncludedDefault(rule) {
+  const sectionId = optionSectionId(rule.target_id);
+  const section = sectionsById.get(sectionId);
+  return section?.choice_mode === "single" && userSelectedInSection(sectionId, rule.target_id);
+}
+
 function computeAutoAdded() {
   const autoAdded = new Map();
   const selectedIds = new Set(state.selected);
@@ -181,7 +199,12 @@ function computeAutoAdded() {
   for (const sourceId of selectedIds) {
     const rules = ruleTargetsBySource.get(sourceId) || [];
     for (const rule of rules) {
-      if (rule.rule_type === "includes" && ruleAppliesToCurrentVariant(rule) && !selectedExcludesTarget(rule.target_id, selectedIds)) {
+      if (
+        rule.rule_type === "includes" &&
+        ruleAppliesToCurrentVariant(rule) &&
+        !selectedExcludesTarget(rule.target_id, selectedIds) &&
+        !shouldSuppressIncludedDefault(rule)
+      ) {
         autoAdded.set(rule.target_id, rule.disabled_reason || `Included with ${getEntityLabel(sourceId)}.`);
       }
     }
@@ -218,6 +241,8 @@ function disableReasonForChoice(choice) {
   const targetRules = rulesByTarget.get(choice.option_id) || [];
   for (const rule of targetRules) {
     if (rule.rule_type === "excludes" && selectedIds.has(rule.source_id) && ruleAppliesToCurrentVariant(rule)) {
+      if (choice.rpo === "GBA" && rule.source_id === "opt_zyc_001") continue;
+      if (rule.runtime_action === "replace") return rule.disabled_reason || `${getEntityLabel(rule.source_id)} removes this default.`;
       return rule.disabled_reason || `Blocked by ${getEntityLabel(rule.source_id)}.`;
     }
   }
@@ -229,6 +254,7 @@ function disableReasonForChoice(choice) {
       return rule.disabled_reason || `Requires ${getEntityLabel(rule.target_id)}.`;
     }
     if (rule.rule_type === "excludes" && selectedIds.has(rule.target_id)) {
+      if (rule.runtime_action === "replace") continue;
       return `Conflicts with ${getEntityLabel(rule.target_id)}.`;
     }
   }
@@ -309,6 +335,7 @@ function lineItems() {
 function missingRequired() {
   const rows = activeChoiceRows();
   const sections = new Map();
+  const selectedIds = selectedContextIds();
   for (const choice of rows) {
     const section = sectionsById.get(choice.section_id);
     if (!section || section.selection_mode !== "single_select_req") continue;
@@ -318,7 +345,7 @@ function missingRequired() {
   }
   const missing = [];
   for (const [sectionId, section] of sections) {
-    const hasSelection = [...state.selected].some((id) => optionsById.get(id)?.section_id === sectionId);
+    const hasSelection = [...selectedIds].some((id) => optionSectionId(id) === sectionId);
     if (!hasSelection) missing.push(section.section_name);
   }
   if (!state.selectedInterior) missing.push("Base Interior");
@@ -327,6 +354,7 @@ function missingRequired() {
 
 function resetDefaults() {
   state.selected.clear();
+  state.userSelected.clear();
   state.selectedInterior = "";
   const rows = activeChoiceRows();
   const bySection = new Map();
@@ -350,33 +378,105 @@ function resetDefaults() {
   }
 }
 
-function reconcileSelections() {
-  if (selectedOptionByRpo("Z51")) {
-    for (const id of [...state.selected]) {
-      const option = optionsById.get(id);
-      if (option?.rpo === "FE1" || option?.rpo === "FE2") state.selected.delete(id);
+function deleteSelectedOption(optionId) {
+  state.selected.delete(optionId);
+  state.userSelected.delete(optionId);
+}
+
+function deleteSelectedRpo(rpo) {
+  for (const id of [...state.selected]) {
+    if (optionsById.get(id)?.rpo === rpo) deleteSelectedOption(id);
+  }
+}
+
+function defaultChoiceForRpo(rpo) {
+  return activeChoiceRows().find((choice) => choice.rpo === rpo && choice.active === "True" && choice.status !== "unavailable");
+}
+
+function addDefaultRpo(rpo) {
+  const choice = defaultChoiceForRpo(rpo);
+  if (choice && !disableReasonForChoice(choice)) state.selected.add(choice.option_id);
+}
+
+function removeReplaceRuleTargets(sourceId) {
+  const rules = ruleTargetsBySource.get(sourceId) || [];
+  for (const rule of rules) {
+    if (rule.runtime_action === "replace" && ruleAppliesToCurrentVariant(rule)) {
+      deleteSelectedOption(rule.target_id);
     }
   }
-  if (selectedOptionByRpo("NWI")) {
-    for (const id of [...state.selected]) {
-      const option = optionsById.get(id);
-      if (option?.rpo === "NGA") state.selected.delete(id);
+}
+
+function selectedOrAutoInSection(sectionId, autoAdded = computeAutoAdded()) {
+  return (
+    selectedOptionIdsInSection(sectionId).length > 0 ||
+    [...autoAdded.keys()].some((id) => optionSectionId(id) === sectionId)
+  );
+}
+
+function validInteriorsForSelectedSeat() {
+  const selectedSeat = selectedSeatChoice();
+  return data.interiors.filter((interior) => {
+    if (interior.trim_level !== state.trimLevel) return false;
+    if (selectedSeat?.rpo && interior.seat_code !== selectedSeat.rpo) return false;
+    return true;
+  });
+}
+
+function reconcileInteriorSelection() {
+  const interiors = validInteriorsForSelectedSeat();
+  if (state.selectedInterior && !interiors.some((interior) => interior.interior_id === state.selectedInterior)) {
+    state.selectedInterior = "";
+  }
+  if (!state.selectedInterior && interiors.length === 1) {
+    state.selectedInterior = interiors[0].interior_id;
+  }
+}
+
+function removeAutoDefaultDuplicates(autoAdded) {
+  for (const id of autoAdded.keys()) {
+    deleteSelectedOption(id);
+    const sectionId = optionSectionId(id);
+    const section = sectionsById.get(sectionId);
+    if (section?.choice_mode !== "single") continue;
+    for (const selectedId of selectedOptionIdsInSection(sectionId)) {
+      if (!state.userSelected.has(selectedId)) deleteSelectedOption(selectedId);
     }
+  }
+}
+
+function reconcileSelections() {
+  if (selectedOptionByRpo("Z51")) {
+    deleteSelectedRpo("FE1");
+    deleteSelectedRpo("FE2");
+  }
+  if (selectedOptionByRpo("NWI")) {
+    deleteSelectedRpo("NGA");
+  }
+  if (selectedOptionByRpo("GBA")) {
+    deleteSelectedRpo("ZYC");
+  }
+  for (const id of [...state.selected]) {
+    removeReplaceRuleTargets(id);
   }
   for (const id of [...state.selected]) {
     const choice = choiceForCurrentVariant(id);
-    if (!choice || shouldHideChoice(choice) || disableReasonForChoice(choice)) state.selected.delete(id);
+    if (!choice || shouldHideChoice(choice) || disableReasonForChoice(choice)) deleteSelectedOption(id);
   }
+  reconcileInteriorSelection();
   const autoAdded = computeAutoAdded();
-  for (const id of autoAdded.keys()) {
-    state.selected.delete(id);
-  }
+  removeAutoDefaultDuplicates(autoAdded);
+  const refreshedAutoAdded = computeAutoAdded();
+  if (!selectedOptionByRpo("Z51") && !selectedOrAutoInSection("sec_susp_001", refreshedAutoAdded)) addDefaultRpo("FE1");
+  if (!selectedOptionByRpo("NWI") && !selectedOptionByRpo("NGA")) addDefaultRpo("NGA");
+  if (!selectedOrAutoInSection("sec_seat_001", refreshedAutoAdded)) addDefaultRpo("719");
 }
 
 function setBodyAndTrim(bodyStyle, trimLevel) {
   state.bodyStyle = bodyStyle;
   state.trimLevel = trimLevel;
   resetDefaults();
+  reconcileSelections();
   render();
 }
 
@@ -399,20 +499,24 @@ function handleChoice(choice) {
   const section = sectionsById.get(choice.section_id);
   if (section?.choice_mode === "single") {
     if (section.selection_mode === "single_select_opt" && state.selected.has(choice.option_id)) {
-      state.selected.delete(choice.option_id);
+      deleteSelectedOption(choice.option_id);
       reconcileSelections();
       render();
       return;
     }
     for (const id of [...state.selected]) {
-      if (optionsById.get(id)?.section_id === choice.section_id) state.selected.delete(id);
+      if (optionSectionId(id) === choice.section_id) deleteSelectedOption(id);
     }
     state.selected.add(choice.option_id);
+    state.userSelected.add(choice.option_id);
   } else if (state.selected.has(choice.option_id)) {
-    state.selected.delete(choice.option_id);
+    deleteSelectedOption(choice.option_id);
   } else {
     state.selected.add(choice.option_id);
+    state.userSelected.add(choice.option_id);
   }
+  removeReplaceRuleTargets(choice.option_id);
+  if (choice.rpo === "GBA") deleteSelectedRpo("ZYC");
   reconcileSelections();
   render();
 }
@@ -421,6 +525,7 @@ function handleInterior(interior) {
   const reason = disableReasonForInterior(interior);
   if (reason) return;
   state.selectedInterior = state.selectedInterior === interior.interior_id ? "" : interior.interior_id;
+  reconcileSelections();
   render();
 }
 
@@ -596,6 +701,12 @@ function renderTrimStandardEquipment() {
   `;
 }
 
+function resetStepScroll() {
+  els.stepContent.scrollTo({ top: 0, left: 0 });
+  els.stepContent.closest(".choice-panel")?.scrollTo({ top: 0, left: 0 });
+  window.scrollTo({ top: 0, left: 0 });
+}
+
 function renderStepContent() {
   const step = runtimeSteps.find((item) => item.step_key === state.activeStep);
   const autoAdded = computeAutoAdded();
@@ -615,12 +726,7 @@ function renderStepContent() {
       ${state.activeStep === "trim_level" ? renderTrimStandardEquipment() : ""}
     `;
   } else if (state.activeStep === "base_interior") {
-    const selectedSeat = selectedSeatChoice();
-    const interiors = data.interiors.filter((interior) => {
-      if (interior.trim_level !== state.trimLevel) return false;
-      if (selectedSeat?.rpo && interior.seat_code !== selectedSeat.rpo) return false;
-      return true;
-    });
+    const interiors = validInteriorsForSelectedSeat();
     body = `
       <section class="section-block">
         <div class="section-title"><h3>Base Interior</h3><span>${interiors.length} choices</span></div>
@@ -682,7 +788,7 @@ function renderStepContent() {
         : ""
     }
   `;
-  els.stepContent.scrollTo({ top: 0, left: 0 });
+  resetStepScroll();
   bindCustomerForm();
   els.stepContent.querySelectorAll("[data-option]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -751,7 +857,6 @@ function resetCustomerInformation() {
 
 function renderStandardEquipment() {
   const rows = standardEquipmentRows();
-  els.standardEquipmentList.innerHTML = renderStandardEquipmentGroups(rows);
   els.selectedStandardEquipmentList.innerHTML = `
     <details class="standard-group">
       <summary>Standard & Included <span>${rows.length}</span></summary>
@@ -826,9 +931,11 @@ function init() {
   state.bodyStyle = first.body_style;
   state.trimLevel = first.trim_level;
   resetDefaults();
+  reconcileSelections();
   els.resetButton.addEventListener("click", () => {
     resetDefaults();
     resetCustomerInformation();
+    reconcileSelections();
     render();
   });
   els.exportJsonButton.addEventListener("click", exportJson);
