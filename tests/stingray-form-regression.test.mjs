@@ -50,6 +50,22 @@ test("engine cover variants are consolidated with B6P price overrides", () => {
   }
 });
 
+test("LS6 engine covers are treated as an exclusive selection group", () => {
+  assert.match(appSource, /const LS6_ENGINE_COVER_OPTION_IDS = new Set\(\[/);
+  for (const optionId of ["opt_bc7_001", "opt_bcp_001", "opt_bcs_001", "opt_bc4_001"]) {
+    assert.match(appSource, new RegExp(`"${optionId}"`));
+  }
+  assert.match(appSource, /function removeOtherLs6EngineCovers\(optionId\)/);
+  assert.match(appSource, /removeOtherLs6EngineCovers\(choice\.option_id\)/);
+});
+
+test("option selections preserve the current viewport instead of resetting to the page top", () => {
+  assert.match(appSource, /function captureScrollPosition\(\)/);
+  assert.match(appSource, /function restoreScrollPosition\(position\)/);
+  assert.match(appSource, /render\(\{ preserveScroll: true \}\)/);
+  assert.match(appSource, /renderStepContent\(\{ resetScroll = false \} = \{\}\)/);
+});
+
 test("BC7, N26/TU7, and ZF1/T0A visibility follow the QA contract", () => {
   assert.equal(uniqueChoicesByRpo("BC7").length, 1, "BC7 should be one body-style-neutral option id");
 

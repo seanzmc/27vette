@@ -45,6 +45,7 @@ const interiorsById = new Map(data.interiors.map((interior) => [interior.interio
 const ruleTargetsBySource = new Map();
 const rulesByTarget = new Map();
 const priceRulesByTarget = new Map();
+const LS6_ENGINE_COVER_OPTION_IDS = new Set(["opt_bc7_001", "opt_bcp_001", "opt_bcs_001", "opt_bc4_001"]);
 
 for (const choice of data.choices) {
   if (!choicesByOption.has(choice.option_id)) choicesByOption.set(choice.option_id, []);
@@ -101,7 +102,7 @@ function goToNextStep() {
   const step = nextStep();
   if (!step) return;
   state.activeStep = step.step_key;
-  render();
+  render({ resetScroll: true });
 }
 
 function activeChoiceRows() {
@@ -389,6 +390,13 @@ function deleteSelectedRpo(rpo) {
   }
 }
 
+function removeOtherLs6EngineCovers(optionId) {
+  if (!LS6_ENGINE_COVER_OPTION_IDS.has(optionId)) return;
+  for (const id of LS6_ENGINE_COVER_OPTION_IDS) {
+    if (id !== optionId) deleteSelectedOption(id);
+  }
+}
+
 function defaultChoiceForRpo(rpo) {
   const choices = activeChoiceRows().filter((choice) => choice.rpo === rpo && choice.active === "True" && choice.status !== "unavailable");
   return choices.find((choice) => choice.selectable === "True" && choice.step_key !== "standard_equipment") || choices[0];
@@ -513,13 +521,14 @@ function handleChoice(choice) {
   } else if (state.selected.has(choice.option_id)) {
     deleteSelectedOption(choice.option_id);
   } else {
+    removeOtherLs6EngineCovers(choice.option_id);
     state.selected.add(choice.option_id);
     state.userSelected.add(choice.option_id);
   }
   removeReplaceRuleTargets(choice.option_id);
   if (choice.rpo === "GBA") deleteSelectedRpo("ZYC");
   reconcileSelections();
-  render();
+  render({ preserveScroll: true });
 }
 
 function handleInterior(interior) {
@@ -527,7 +536,7 @@ function handleInterior(interior) {
   if (reason) return;
   state.selectedInterior = state.selectedInterior === interior.interior_id ? "" : interior.interior_id;
   reconcileSelections();
-  render();
+  render({ preserveScroll: true });
 }
 
 function renderVehicleContext() {
@@ -549,7 +558,7 @@ function renderStepRail() {
   els.stepRail.querySelectorAll(".step-link").forEach((button) => {
     button.addEventListener("click", () => {
       state.activeStep = button.dataset.step;
-      render();
+      render({ resetScroll: true });
     });
   });
 }
@@ -708,7 +717,23 @@ function resetStepScroll() {
   window.scrollTo({ top: 0, left: 0 });
 }
 
-function renderStepContent() {
+function captureScrollPosition() {
+  return {
+    stepTop: els.stepContent.scrollTop,
+    panelTop: els.stepContent.closest(".choice-panel")?.scrollTop || 0,
+    windowX: window.scrollX,
+    windowY: window.scrollY,
+  };
+}
+
+function restoreScrollPosition(position) {
+  if (!position) return;
+  els.stepContent.scrollTo({ top: position.stepTop, left: 0 });
+  els.stepContent.closest(".choice-panel")?.scrollTo({ top: position.panelTop, left: 0 });
+  window.scrollTo({ top: position.windowY, left: position.windowX });
+}
+
+function renderStepContent({ resetScroll = false } = {}) {
   const step = runtimeSteps.find((item) => item.step_key === state.activeStep);
   const autoAdded = computeAutoAdded();
   let body = "";
@@ -789,7 +814,7 @@ function renderStepContent() {
         : ""
     }
   `;
-  resetStepScroll();
+  if (resetScroll) resetStepScroll();
   bindCustomerForm();
   els.stepContent.querySelectorAll("[data-option]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -920,11 +945,13 @@ function exportCsv() {
   download("stingray-order.csv", rows.join("\n"), "text/csv");
 }
 
-function render() {
+function render({ resetScroll = false, preserveScroll = false } = {}) {
+  const scrollPosition = preserveScroll ? captureScrollPosition() : null;
   renderVehicleContext();
   renderStepRail();
-  renderStepContent();
+  renderStepContent({ resetScroll });
   renderSummary();
+  restoreScrollPosition(scrollPosition);
 }
 
 function init() {
@@ -937,7 +964,7 @@ function init() {
     resetDefaults();
     resetCustomerInformation();
     reconcileSelections();
-    render();
+    render({ resetScroll: true });
   });
   els.exportJsonButton.addEventListener("click", exportJson);
   els.exportCsvButton.addEventListener("click", exportCsv);
