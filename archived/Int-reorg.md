@@ -1,245 +1,245 @@
 **-Interior color reorganization**
-  - 1LT
-    - AQ9 GT1 Bucket Seats
-      - HTA Jet Black
-      - HUP Sky Cool Gray
-      - HUQ Adrenaline Red
-    - AE4 Competition Seats
-      - HTJ Jet Black
-  - 2LT
-    - AQ9 GT1 Bucket Seats
-      - Jet Black - This option should have an indicator showing that it has additional options available within it.
+- 1LT
+  - AQ9 GT1 Bucket Seats
+    - HTA Jet Black
+    - HUP Sky Cool Gray
+    - HUQ Adrenaline Red
+  - AE4 Competition Seats
+    - HTJ Jet Black
+- 2LT
+  - AQ9 GT1 Bucket Seats
+    - Jet Black - This option should have an indicator showing that it has additional options available within it.
+      - Jet Black
+      - Jet Black with Yellow Stitching
+      - Jet Black with Blue Stitching
+      - Jet Black with Red Stitching
+    - Sky Cool Gray - No expandable options, so standard option card with just the one choice.
+    - Adrenaline Red - No expandable options
+    - Natural - No expandable options
+  - AH2 GT2 Bucket Seats
+    - Jet Black - This option (and the others in this section) should have an indicator showing that it has additional options available within it.
+      - Napa leather seating surfaces with perforated inserts.
         - Jet Black
         - Jet Black with Yellow Stitching
         - Jet Black with Blue Stitching
         - Jet Black with Red Stitching
-      - Sky Cool Gray - No expandable options, so standard option card with just the one choice.
-      - Adrenaline Red - No expandable options
-      - Natural - No expandable options
-    - AH2 GT2 Bucket Seats
-      - Jet Black - This option (and the others in this section) should have an indicator showing that it has additional options available within it.
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Jet Black Suede
+        - Jet Black Suede with Yellow Stitching
+        - Jet Black Suede with Blue Stitching
+        - Jet Black Suede with Red Stitching
+    - Sky Cool Gray
+      - Napa leather seating surfaces with perforated inserts.
+        - Sky Cool Gray
+        - Sky Cool Gray Two Tone
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Sky Cool Gray Suede
+        - Sky Cool Gray Suede Two Tone
+    - Adrenaline Red
+      - Napa leather seating surfaces with perforated inserts.
+        - Adrenaline Red
+        - Adrenaline Red Two Tone
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Adrenaline Red Suede Two Tone
+    - Natural
+      - Napa leather seating surfaces with perforated inserts.
+        - Natural
+        - Natural Two Tone
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Natural Suede
+        - Natural Suede Two Tone
+  - AE4 Competition Seats
+    - Jet Black - This option should have an indicator that it has additional options available within it.
+      - Napa leather seating surfaces with perforated inserts.
+        - Jet Black
+        - Jet Black with Yellow Stitching
+        - Jet Black with Blue Stitching
+        - Jet Black with Red Stitching
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Jet Black Suede
+        - Jet Black Suede with Yellow Stitching
+        - Jet Black Suede with Blue Stitching
+        - Jet Black Suede with Red Stitching
+    - Sky Cool Gray
+      - Napa leather seating surfaces with perforated inserts.
+        - Sky Cool Gray
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Sky Cool Gray Suede
+    - Adrenaline Red
+      - Napa leather seating surfaces with perforated inserts.
+        - Adrenaline Red
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Adrenaline Red Suede
+    - Natural
+      - Napa leather seating surfaces with perforated inserts.
+        - Natural
+        - Natural Two Tone
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Natural Suede
+        - Natural Suede Two Tone
+- 3LT
+  - AH2 GT2 Bucket Seats
+    - Jet Black
+      - Napa leather seating surfaces with perforated inserts.
+        - Jet Black
+        - Jet Black with Yellow Stitching
+        - Jet Black with Blue Stitching
+        - Jet Black with Red Stitching
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Jet Black Suede
+        - Jet Black Suede with Yellow Stitching
+        - Jet Black Suede with Blue Stitching
+        - Jet Black Suede with Red Stitching
+    - Sky Cool Gray
+      - Napa leather seating surfaces with perforated inserts.
+        - Sky Cool Gray
+        - Sky Cool Gray Two Tone
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Sky Cool Gray Suede
+        - Sky Cool Gray Suede Two Tone
+    - Adrenaline Red
+      - Napa leather seating surfaces with perforated inserts.
+        - Adrenaline Red
+        - Adrenaline Red Two Tone
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Adrenaline Red Suede Two Tone
+    - Adrenaline Red Dipped (only one option, so no need for an expandable card)
+        - Adrenaline Red Dipped
+    - Natural
+      - Napa leather seating surfaces with perforated inserts.
+        - Natural
+        - Natural Two Tone
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Natural Suede
+        - Natural Suede Two Tone
+    - Natural Dipped
+      - Napa leather seating surfaces with perforated inserts.
+        - Natural Dipped
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Natural Dipped Suede
+    - Santorini Blue (only one option, so no need for an expandable card)
+        - Santorini Blue
+    - Habanero
+      - Napa leather seating surfaces with perforated inserts.
+        - Habanero
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Habanero Suede
+    - Very Dark Atmosphere
+      - Napa leather seating surfaces with perforated inserts.
+        - Very Dark Atmosphere
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Very Dark Atmosphere Suede
+    - Ultimate Suede Jet Black
+      - Napa leather seating surfaces with perforated inserts.
+        - Ultimate Suede Jet Black
+        - Ultimate Suede Jet Black with Yellow Stitching
+        - Ultimate Suede Jet Black with Blue Stitching
+        - Ultimate Suede Jet Black with Red Stitching
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Ultimate Suede Jet Black suede
+        - Ultimate Suede Jet Black suede with Yellow Stitching
+        - Ultimate Suede Jet Black suede with Blue Stitching
+        - Ultimate Suede Jet Black suede with Red Stitching
+    - Asymmetrical Adrenaline Red / Jet Black (only one option, so no need for an expandable card)
+        - Asymmetrical Adrenaline Red / Jet Black
+    - Asymmetrical Santorini Blue / Jet Black (only one option, so no need for an expandable card)
+        - Asymmetrical Santorini Blue / Jet Black
+    - Custom Interior trim and seat combinations
+      - Sky Cool Gray interior / Jet Black seats
         - Napa leather seating surfaces with perforated inserts.
-          - Jet Black
-          - Jet Black with Yellow Stitching
-          - Jet Black with Blue Stitching
-          - Jet Black with Red Stitching
+          - Sky Cool Gray interior / Jet Black seats (HZB)
         - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Jet Black Suede
-          - Jet Black Suede with Yellow Stitching
-          - Jet Black Suede with Blue Stitching
-          - Jet Black Suede with Red Stitching
-      - Sky Cool Gray
+          - Sky Cool Gray interior / Jet Black seats Suede (HVT)
+      - Jet Black interior / Sky Cool Gray seats
         - Napa leather seating surfaces with perforated inserts.
-          - Sky Cool Gray
-          - Sky Cool Gray Two Tone
+          - Jet Black interior / Sky Cool Gray seats (HVV)
+          - Jet Black interior / Sky Cool Gray seats Two Tone (3LT_R6X_AH2_HVV_TU7)
         - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Sky Cool Gray Suede
-          - Sky Cool Gray Suede Two Tone
-      - Adrenaline Red
+          - Jet Black interior / Sky Cool Gray seats Suede (3LT_R6X_AH2_HMO_N26)
+          - Jet Black interior / Sky Cool Gray seats Suede Two Tone (3LT_R6X_AH2_HMO_N26_TU7)
+      - Adrenaline Red interior / Jet Black seats
         - Napa leather seating surfaces with perforated inserts.
-          - Adrenaline Red
-          - Adrenaline Red Two Tone
+          - Adrenaline Red interior / Jet Black seats (HUU)
         - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Adrenaline Red Suede Two Tone
-      - Natural
+          - Adrenaline Red interior / Jet Black seats Suede (HZP)
+      - Jet Black interior / Adrenaline Red seats
         - Napa leather seating surfaces with perforated inserts.
-          - Natural
-          - Natural Two Tone
+          - Jet Black interior / Adrenaline Red seats (HXO)
+          - Jet Black interior / Adrenaline Red seats Two Tone (3LT_R6X_AH2_HXO_TU7)
         - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Natural Suede
-          - Natural Suede Two Tone
-    - AE4 Competition Seats
-      - Jet Black - This option should have an indicator that it has additional options available within it.
+          - Jet Black interior / Adrenaline Red seats Suede HXO (3LT_R6X_AH2_HXO_N26_TU7)
+  - AE4 Competition Seats
+    - Jet Black
+      - Napa leather seating surfaces with perforated inserts.
+        - Jet Black
+        - Jet Black with Yellow Stitching
+        - Jet Black with Blue Stitching
+        - Jet Black with Red Stitching
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Jet Black Suede
+        - Jet Black Suede with Yellow Stitching
+        - Jet Black Suede with Blue Stitching
+        - Jet Black Suede with Red Stitching
+    - Sky Cool Gray
+      - Napa leather seating surfaces with perforated inserts.
+        - Sky Cool Gray
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Sky Cool Gray Suede
+    - Adrenaline Red
+      - Napa leather seating surfaces with perforated inserts.
+        - Adrenaline Red
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Adrenaline Red Suede
+    - Adrenaline Red Dipped (only one option, so no need for an expandable card)
+        - Adrenaline Red Dipped
+    - Natural
+      - Napa leather seating surfaces with perforated inserts.
+        - Natural
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Natural Suede
+    - Natural Dipped
+      - Napa leather seating surfaces with perforated inserts.
+        - Natural Dipped
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Natural Dipped Suede
+    - Santorini Blue (only one option, so no need for an expandable card)
+        - Santorini Blue
+    - Habanero
+      - Napa leather seating surfaces with perforated inserts.
+        - Habanero
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Habanero Suede
+    - Very Dark Atmosphere
+      - Napa leather seating surfaces with perforated inserts.
+        - Very Dark Atmosphere
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Very Dark Atmosphere Suede
+    - Ultimate Suede Jet Black
+      - Napa leather seating surfaces with perforated inserts.
+        - Ultimate Suede Jet Black
+        - Ultimate Suede Jet Black with Yellow Stitching
+        - Ultimate Suede Jet Black with Blue Stitching
+        - Ultimate Suede Jet Black with Red Stitching
+      - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
+        - Ultimate Suede Jet Black
+        - Ultimate Suede Jet Black with Yellow Stitching
+        - Ultimate Suede Jet Black with Blue Stitching
+        - Ultimate Suede Jet Black with Red Stitching
+    - Asymmetrical Adrenaline Red / Jet Black (only one option, so no need for an expandable card)
+        - Asymmetrical Adrenaline Red / Jet Black
+    - Asymmetrical Santorini Blue / Jet Black (only one option, so no need for an expandable card)
+        - Asymmetrical Santorini Blue / Jet Black
+    - Custom Interior trim and seat combinations
+      - Adrenaline Red interior / Jet Black seats
         - Napa leather seating surfaces with perforated inserts.
-          - Jet Black
-          - Jet Black with Yellow Stitching
-          - Jet Black with Blue Stitching
-          - Jet Black with Red Stitching
+          - Adrenaline Red interior / Jet Black seats (HUU)
         - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Jet Black Suede
-          - Jet Black Suede with Yellow Stitching
-          - Jet Black Suede with Blue Stitching
-          - Jet Black Suede with Red Stitching
-      - Sky Cool Gray
+          - Adrenaline Red interior / Jet Black seats Suede (HZP)
+      - Jet Black interior / Adrenaline Red seats
         - Napa leather seating surfaces with perforated inserts.
-          - Sky Cool Gray
+          - Jet Black interior / Adrenaline Red seats (HXO)
         - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Sky Cool Gray Suede
-      - Adrenaline Red
-        - Napa leather seating surfaces with perforated inserts.
-          - Adrenaline Red
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Adrenaline Red Suede
-      - Natural
-        - Napa leather seating surfaces with perforated inserts.
-          - Natural
-          - Natural Two Tone
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Natural Suede
-          - Natural Suede Two Tone
-  - 3LT
-    - AH2 GT2 Bucket Seats
-      - Jet Black
-        - Napa leather seating surfaces with perforated inserts.
-          - Jet Black
-          - Jet Black with Yellow Stitching
-          - Jet Black with Blue Stitching
-          - Jet Black with Red Stitching
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Jet Black Suede
-          - Jet Black Suede with Yellow Stitching
-          - Jet Black Suede with Blue Stitching
-          - Jet Black Suede with Red Stitching
-      - Sky Cool Gray
-        - Napa leather seating surfaces with perforated inserts.
-          - Sky Cool Gray
-          - Sky Cool Gray Two Tone
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Sky Cool Gray Suede
-          - Sky Cool Gray Suede Two Tone
-      - Adrenaline Red
-        - Napa leather seating surfaces with perforated inserts.
-          - Adrenaline Red
-          - Adrenaline Red Two Tone
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Adrenaline Red Suede Two Tone
-      - Adrenaline Red Dipped (only one option, so no need for an expandable card)
-          - Adrenaline Red Dipped
-      - Natural
-        - Napa leather seating surfaces with perforated inserts.
-          - Natural
-          - Natural Two Tone
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Natural Suede
-          - Natural Suede Two Tone
-      - Natural Dipped
-        - Napa leather seating surfaces with perforated inserts.
-          - Natural Dipped
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Natural Dipped Suede
-      - Santorini Blue (only one option, so no need for an expandable card)
-          - Santorini Blue
-      - Habanero
-        - Napa leather seating surfaces with perforated inserts.
-          - Habanero
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Habanero Suede
-      - Very Dark Atmosphere
-        - Napa leather seating surfaces with perforated inserts.
-          - Very Dark Atmosphere
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Very Dark Atmosphere Suede
-      - Ultimate Suede Jet Black
-        - Napa leather seating surfaces with perforated inserts.
-          - Ultimate Suede Jet Black
-          - Ultimate Suede Jet Black with Yellow Stitching
-          - Ultimate Suede Jet Black with Blue Stitching
-          - Ultimate Suede Jet Black with Red Stitching
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Ultimate Suede Jet Black suede
-          - Ultimate Suede Jet Black suede with Yellow Stitching
-          - Ultimate Suede Jet Black suede with Blue Stitching
-          - Ultimate Suede Jet Black suede with Red Stitching
-      - Asymmetrical Adrenaline Red / Jet Black (only one option, so no need for an expandable card)
-          - Asymmetrical Adrenaline Red / Jet Black
-      - Asymmetrical Santorini Blue / Jet Black (only one option, so no need for an expandable card)
-          - Asymmetrical Santorini Blue / Jet Black
-      - Custom Interior trim and seat combinations
-        - Sky Cool Gray interior / Jet Black seats
-          - Napa leather seating surfaces with perforated inserts.
-            - Sky Cool Gray interior / Jet Black seats (HZB)
-          - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-            - Sky Cool Gray interior / Jet Black seats Suede (HVT)
-        - Jet Black interior / Sky Cool Gray seats
-          - Napa leather seating surfaces with perforated inserts.
-            - Jet Black interior / Sky Cool Gray seats (HVV)
-            - Jet Black interior / Sky Cool Gray seats Two Tone (3LT_R6X_AH2_HVV_TU7)
-          - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-            - Jet Black interior / Sky Cool Gray seats Suede (3LT_R6X_AH2_HMO_N26)
-            - Jet Black interior / Sky Cool Gray seats Suede Two Tone (3LT_R6X_AH2_HMO_N26_TU7)
-        - Adrenaline Red interior / Jet Black seats
-          - Napa leather seating surfaces with perforated inserts.
-            - Adrenaline Red interior / Jet Black seats (HUU)
-          - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-            - Adrenaline Red interior / Jet Black seats Suede (HZP)
-        - Jet Black interior / Adrenaline Red seats
-          - Napa leather seating surfaces with perforated inserts.
-            - Jet Black interior / Adrenaline Red seats (HXO)
-            - Jet Black interior / Adrenaline Red seats Two Tone (3LT_R6X_AH2_HXO_TU7)
-          - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-            - Jet Black interior / Adrenaline Red seats Suede HXO (3LT_R6X_AH2_HXO_N26_TU7)
-    - AE4 Competition Seats
-      - Jet Black
-        - Napa leather seating surfaces with perforated inserts.
-          - Jet Black
-          - Jet Black with Yellow Stitching
-          - Jet Black with Blue Stitching
-          - Jet Black with Red Stitching
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Jet Black Suede
-          - Jet Black Suede with Yellow Stitching
-          - Jet Black Suede with Blue Stitching
-          - Jet Black Suede with Red Stitching
-      - Sky Cool Gray
-        - Napa leather seating surfaces with perforated inserts.
-          - Sky Cool Gray
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Sky Cool Gray Suede
-      - Adrenaline Red
-        - Napa leather seating surfaces with perforated inserts.
-          - Adrenaline Red
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Adrenaline Red Suede
-      - Adrenaline Red Dipped (only one option, so no need for an expandable card)
-          - Adrenaline Red Dipped
-      - Natural
-        - Napa leather seating surfaces with perforated inserts.
-          - Natural
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Natural Suede
-      - Natural Dipped
-        - Napa leather seating surfaces with perforated inserts.
-          - Natural Dipped
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Natural Dipped Suede
-      - Santorini Blue (only one option, so no need for an expandable card)
-          - Santorini Blue
-      - Habanero
-        - Napa leather seating surfaces with perforated inserts.
-          - Habanero
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Habanero Suede
-      - Very Dark Atmosphere
-        - Napa leather seating surfaces with perforated inserts.
-          - Very Dark Atmosphere
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Very Dark Atmosphere Suede
-      - Ultimate Suede Jet Black
-        - Napa leather seating surfaces with perforated inserts.
-          - Ultimate Suede Jet Black
-          - Ultimate Suede Jet Black with Yellow Stitching
-          - Ultimate Suede Jet Black with Blue Stitching
-          - Ultimate Suede Jet Black with Red Stitching
-        - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-          - Ultimate Suede Jet Black
-          - Ultimate Suede Jet Black with Yellow Stitching
-          - Ultimate Suede Jet Black with Blue Stitching
-          - Ultimate Suede Jet Black with Red Stitching
-      - Asymmetrical Adrenaline Red / Jet Black (only one option, so no need for an expandable card)
-          - Asymmetrical Adrenaline Red / Jet Black
-      - Asymmetrical Santorini Blue / Jet Black (only one option, so no need for an expandable card)
-          - Asymmetrical Santorini Blue / Jet Black
-      - Custom Interior trim and seat combinations
-        - Adrenaline Red interior / Jet Black seats
-          - Napa leather seating surfaces with perforated inserts.
-            - Adrenaline Red interior / Jet Black seats (HUU)
-          - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-            - Adrenaline Red interior / Jet Black seats Suede (HZP)
-        - Jet Black interior / Adrenaline Red seats
-          - Napa leather seating surfaces with perforated inserts.
-            - Jet Black interior / Adrenaline Red seats (HXO)
-          - Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.
-            - Jet Black interior / Adrenaline Red seats Suede HXO
-    - AUP Assymetrical seats
-      - Asymmetrical Santorini Blue / Jet Black
-      - Asymmetrical Adrenaline Red / Jet Black
+          - Jet Black interior / Adrenaline Red seats Suede HXO
+  - AUP Assymetrical seats
+    - Asymmetrical Santorini Blue / Jet Black
+    - Asymmetrical Adrenaline Red / Jet Black
