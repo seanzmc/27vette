@@ -2,7 +2,9 @@
 
 ## Scope
 
-This pass should resolve the QA-4 "New Issues" list and implement the full tiered interior display model from Issue 13. It is a mixed data-contract, runtime-behavior, and styling task. The riskiest area is interior selection because it changes the user-facing mental model from a flat `base_interior` card grid into a grouped trim/seat/color/material/final-choice flow while preserving the existing single selected interior contract.
+This pass should resolve the QA-4 "New Issues" list except for Issue 13, the full tiered interior display redesign. Issue 13 is intentionally split into `debug/QA-4 Interior Layout Redesign Spec.md` so it can be implemented as a single focused follow-up task.
+
+This QA-4 pass is a mixed data-contract and runtime-behavior task. It should fix the non-layout selection rules, display order issues, sidebar duplication, and scroll behavior while preserving the current flat interior display until the focused interior redesign follows.
 
 ## Diagnosis
 
@@ -14,13 +16,11 @@ Root cause by area:
 - Exhaust defaults: `form-app/app.js` removes NGA when NWI is selected, but does not restore NGA when NWI is later unselected.
 - Scroll reset: `renderStepContent()` calls `els.stepContent.scrollTo(...)`, but the reported behavior means the actual scrolling container may be the page, `.choice-panel`, or another ancestor, so this needs browser verification rather than another blind `scrollTo` tweak.
 - Standard/Included duplication: `form-app/index.html` has both `#selectedStandardEquipmentList` inside the Selected RPOs summary card and a standalone `#standardEquipmentList` card; `form-app/app.js` renders both.
-- Interior selection: generated `form_interiors` rows already contain useful fields (`trim_level`, `seat_code`, `interior_code`, `interior_name`, `material`, `suede`, `stitch`, `two_tone`, `requires_r6x`), but runtime renders them as one flat grid filtered only by trim and selected seat. Issue 13 requires a tiered presentation and a consistent display-field model for one-choice and multi-choice groups.
 - R6X/D30 color override: `AUTO_ONLY_OPTION_IDS` currently hides D30, but R6X still appears as a selectable `interior_trim` option. Color override auto-add and pricing must be reconciled so R6X is auto-only and $0 when added with interiors that already include its price, while D30 remains charge-bearing when triggered.
 - Seatbelt defaults: auto-added included seatbelts currently appear as auto-added rows but do not become the active replaceable default in the seatbelt selection group. The runtime needs a default-selection layer that can be overridden without treating the default as a final manual selection.
 
 Risk level:
 
-- High: Issue 13 interior tiering, because it touches the generated data shape, runtime rendering, selection semantics, summary/export rows, and mobile layout.
 - Medium: FE3/FE4, spoiler replacement, seatbelt defaults, R6X/D30 pricing/default behavior, because they affect pricing and selected/exported RPOs.
 - Low to medium: display order, sidebar duplication, and scroll reset, because they are UI/routing fixes but still need browser checks.
 
@@ -30,7 +30,7 @@ Risk level:
 - `scripts/generate_stingray_form.py`: owns generated steps, section mapping, display order, hidden/auto-only IDs, manual rules, generated interiors, generated rules, generated price rules, `form_*` sheet writes, `form-output/stingray-form-data.json`, and `form-app/data.js`.
 - `form-app/app.js`: owns defaults, reconciliation, auto-add behavior, disabled reasons, line items, interior rendering, summary rendering, exports, and scroll behavior.
 - `form-app/index.html`: owns sidebar structure and static script cache-busting.
-- `form-app/styles.css`: owns the tiered interior layout, card states, responsive behavior, and sidebar standard-equipment presentation.
+- `form-app/styles.css`: owns card states, responsive behavior, and sidebar standard-equipment presentation.
 - `tests/stingray-form-regression.test.mjs`: existing contract regression suite; extend rather than replacing.
 - `debug/qa-1.md`, `debug/qa-2.md`, `debug/qa-3.md`: inspect only for prior intent and issue continuity, not as a source of current truth.
 
@@ -61,9 +61,8 @@ Do not hand-edit generated JSON/CSV/`data.js` except as a temporary diagnostic. 
 - Do not reintroduce the removed `interior_style` step.
 - Do not make R6X or D30 manually selectable unless the issue text is explicitly revised.
 - Do not add new dependencies.
-- Do not redesign the whole app shell while implementing interior tiering. Keep visual changes scoped to the affected option groups, sidebar duplication, and scroll behavior.
-- Keep all interior display fields consistent across one-choice and expandable groups.
-- Reduce nested accordion levels where possible; use progressive grouped sections/cards, not a deeply nested disclosure tree.
+- Do not implement the tiered interior layout redesign in this pass. Keep any interior rendering changes limited to behavior/default correctness needed by Issues 7, 11, and 12.
+- Keep visual changes scoped to affected option groups, sidebar duplication, and scroll behavior.
 - Do not hide customer-relevant availability or pricing changes in summary/export. If an option is selected, defaulted, auto-added, or priced, it must be auditable.
 
 ## Issue Plan
@@ -114,60 +113,24 @@ Preferred implementation shape:
 - Use `index.html` plus `renderStandardEquipment()` cleanup for sidebar duplication.
 - For scroll reset, detect whether `window`, `.choice-panel`, or `#stepContent` is the actual scrolled element before changing code.
 
-### Group C - Tiered interior display model
+### Group C - Deferred interior layout redesign
 
-Issue covered: 13.
+Issue deferred: 13.
 
-Target model:
+Do not implement the tiered interior display model in this QA-4 pass. The separate follow-up spec is `debug/QA-4 Interior Layout Redesign Spec.md`.
 
-- The user should select interiors through a hierarchy that reads as:
-  1. active trim level
-  2. selected seat family (`AQ9`, `AH2`, `AE4`, `AUP`)
-  3. color family (`Jet Black`, `Sky Cool Gray`, `Adrenaline Red`, `Natural`, dipped colors, asymmetrical/custom groups, etc.)
-  4. material family when applicable (`Napa leather seating surfaces with perforated inserts`, `Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel`, or the current workbook material equivalent)
-  5. final interior choice, including stitch/two-tone/suede variants
-- One-choice groups should render with the same fields and visual structure as expandable groups, but should not add unnecessary extra disclosure levels.
-- Groups with additional choices need an obvious indicator that more options are available.
-- Selecting the final option must still set exactly one `state.selectedInterior` value.
-- Pricing shown on grouped cards must reflect the current selected seat price subtraction.
-- Disabled/requirement states must still use `disableReasonForInterior()` and rule-derived reasons.
-- Summary/export should continue to report the final selected interior ID/code/name/price, not just the group label.
+QA-4 may still change interior-adjacent behavior for Issues 7, 11, and 12:
 
-Data-model requirements:
+- 1LT AE4/HTJ automatic selection.
+- 3LT included seatbelt default behavior.
+- R6X auto-only behavior and D30/R6X pricing behavior.
 
-- Generate enough grouping fields for deterministic rendering. At minimum, derive and export:
-  - `interior_trim_level`
-  - `interior_seat_code`
-  - `interior_color_family`
-  - `interior_material_family`
-  - `interior_variant_label`
-  - `interior_group_display_order`
-  - `interior_choice_display_order`
-  - `interior_group_has_children` or equivalent computed runtime signal
-- Prefer deriving these from existing `lt_interiors` columns first (`Trim`, `Seat`, `Interior Code`, `Interior Name`, `Material`, `Suede`, `Stitch`, `Two Tone`, `interior_id`). Add explicit mapping tables only where the workbook text is not enough to produce the Issue 13 grouping.
-- Keep R6X-specific custom interior combinations grouped under the Issue 13 custom interior trim/seat combination buckets and tied to auto-add R6X behavior.
-
-Runtime/UI requirements:
-
-- Replace the flat `base_interior` grid path with a tiered interior renderer.
-- Keep the selected seat prerequisite: if no seat is selected, show the existing empty state.
-- Avoid nested cards. Use section bands or compact grouped rows for seat/color/material/final choices.
-- Keep card radius at or below the current 8px pattern.
-- Ensure mobile layout does not overflow or overlap long interior names.
-- Do not use viewport-scaled font sizes.
-
-Acceptance examples:
-
-- 1LT + AE4 should lead to one HTJ Jet Black final choice that auto-selects or clearly becomes the only current interior without an unnecessary expansion.
-- 2LT + AH2 + Jet Black should expose the Napa/perforated and sueded microfiber families and their stitch variants.
-- 3LT + AH2 should expose dipped, Santorini Blue, Habanero, Very Dark Atmosphere, Ultimate Suede Jet Black, asymmetrical, and custom interior combinations according to the Issue 13 outline.
-- 3LT + AUP should expose only the two asymmetrical seat choices listed in Issue 13.
+Those fixes should preserve the current flat `base_interior` rendering so the follow-up layout task can focus on presentation and grouping instead of rule correctness.
 
 ## Risks And Non-Goals
 
 Risks:
 
-- Some Issue 13 display labels may not map cleanly from current workbook fields. If the source workbook cannot distinguish a requested grouping reliably, log the ambiguous rows and use an explicit mapping table instead of guessing.
 - Changing selection defaults can alter export totals and selected RPO lists. Tests must cover both visual selection state and exported order rows.
 - R6X/D30 pricing can double-count if R6X is treated like a normal option instead of an auto-only zero-dollar add.
 - Removing same-section spoiler blocks can accidentally allow invalid combinations if replacement behavior is not modeled separately from availability blocking.
@@ -177,6 +140,7 @@ Non-goals:
 - Do not solve the older copy/display-field cleanup from Still Existing Issue 1 except where labels are directly named in the new issues.
 - Do not implement the future workbook-driven summary/export inclusion flag from Still Existing Issue 3.
 - Do not complete the full inactive-label audit from Still Existing Issue 4 outside rows touched by QA-4.
+- Do not implement Issue 13's tiered interior display model.
 - Do not add generalized package/rule engines beyond what is needed for these named issues.
 - Do not redesign standard equipment beyond removing the duplicate sidebar surface.
 
@@ -197,16 +161,14 @@ Automated checks:
   - Exterior Appearance and Engine Appearance display order.
   - Wheels/Calipers/Wheel Accessories section order in the combined step.
   - Only one Standard & Included sidebar surface remains.
-  - Tiered interior grouping fields exist and key acceptance examples map to the expected groups.
+  - No tiered interior layout fields or UI are required in this QA-4 pass.
 
 Manual/browser checks:
 
 - Serve `form-app/` locally and cache-bust `data.js`/`app.js` if needed.
-- Verify the main path: Coupe -> 1LT -> AE4 -> Base Interior shows HTJ as the single current interior path.
-- Verify 2LT AH2 Jet Black exposes material/stitch options without nested-card clutter.
-- Verify 3LT AH2 and AE4 expose the full Issue 13 grouped sets.
+- Verify the main path: Coupe -> 1LT -> AE4 -> Base Interior preserves the current flat interior display while HTJ behaves as the only/default path.
 - Verify a 3LT interior that includes a colored seatbelt replaces 719 in the visible selected list and export.
 - Verify selecting and unselecting NWI restores NGA.
 - Verify long-to-short Next Step navigation scrolls to the top of the new step.
 - Verify sidebar has one Standard & Included surface, inside Selected RPOs.
-- Verify desktop and mobile widths for no text overlap, no horizontal overflow, and readable long interior labels.
+- Verify desktop and mobile widths for no text overlap or horizontal overflow on the changed surfaces.
