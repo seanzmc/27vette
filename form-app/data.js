@@ -2,7 +2,7 @@ window.STINGRAY_FORM_DATA = {
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-04-28T19:06:59+00:00"
+    "generated_at": "2026-04-28T19:22:53+00:00"
   },
   "variants": [
     {
@@ -46531,6 +46531,18 @@ window.STINGRAY_FORM_DATA = {
       "selection_mode": "single_within_group",
       "active": "True",
       "notes": "LS6 engine cover choices are mutually exclusive within the Engine Appearance section."
+    },
+    {
+      "group_id": "grp_spoiler_high_wing",
+      "option_ids": [
+        "opt_t0a_001",
+        "opt_tvs_001",
+        "opt_5zz_001",
+        "opt_5zu_001"
+      ],
+      "selection_mode": "single_within_group",
+      "active": "True",
+      "notes": "Spoiler choices are mutually exclusive within the Spoiler section."
     }
   ],
   "rules": [

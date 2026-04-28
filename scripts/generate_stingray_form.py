@@ -227,6 +227,13 @@ EXCLUSIVE_GROUPS = [
         "selection_mode": "single_within_group",
         "active": "True",
         "notes": "LS6 engine cover choices are mutually exclusive within the Engine Appearance section.",
+    },
+    {
+        "group_id": "grp_spoiler_high_wing",
+        "option_ids": ["opt_t0a_001", "opt_tvs_001", "opt_5zz_001", "opt_5zu_001"],
+        "selection_mode": "single_within_group",
+        "active": "True",
+        "notes": "Spoiler choices are mutually exclusive within the Spoiler section.",
     }
 ]
 

@@ -226,6 +226,12 @@ function selectedExclusiveGroupPeer(optionId, selectedIds) {
   return (group.option_ids || []).some((id) => id !== optionId && selectedIds.has(id));
 }
 
+function sameExclusiveGroupPeer(optionId, peerId) {
+  const group = optionExclusiveGroup(optionId);
+  if (!group || group.selection_mode !== "single_within_group") return false;
+  return (group.option_ids || []).includes(peerId);
+}
+
 function requiresAnyReason(choice, selectedIds) {
   const groups = ruleGroupsBySource.get(choice.option_id) || [];
   for (const group of groups) {
@@ -247,6 +253,7 @@ function computeAutoAdded() {
       if (
         rule.rule_type === "includes" &&
         ruleAppliesToCurrentVariant(rule) &&
+        !state.userSelected.has(rule.target_id) &&
         !selectedExcludesTarget(rule.target_id, selectedIds) &&
         !shouldSuppressIncludedDefault(rule) &&
         !selectedExclusiveGroupPeer(rule.target_id, selectedIds)
@@ -283,6 +290,7 @@ function disableReasonForChoice(choice) {
   const targetRules = rulesByTarget.get(choice.option_id) || [];
   for (const rule of targetRules) {
     if (rule.rule_type === "excludes" && selectedIds.has(rule.source_id) && ruleAppliesToCurrentVariant(rule)) {
+      if (sameExclusiveGroupPeer(choice.option_id, rule.source_id)) continue;
       if (choice.rpo === "GBA" && rule.source_id === "opt_zyc_001") continue;
       if (rule.runtime_action === "replace") return rule.disabled_reason || `${getEntityLabel(rule.source_id)} removes this default.`;
       return rule.disabled_reason || `Blocked by ${getEntityLabel(rule.source_id)}.`;

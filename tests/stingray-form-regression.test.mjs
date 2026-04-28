@@ -155,6 +155,45 @@ test("LS6 engine covers are treated as an exclusive selection group", () => {
   assert.doesNotMatch(appSource, /removeOtherLs6EngineCovers/);
 });
 
+test("spoilers are treated as an exclusive selection group", () => {
+  assert.ok(Array.isArray(data.exclusiveGroups), "exclusiveGroups should be generated");
+  const group = data.exclusiveGroups.find((item) => item.group_id === "grp_spoiler_high_wing");
+  assert.ok(group, "spoilers need a generated exclusive group");
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(group.option_ids)),
+    ["opt_t0a_001", "opt_tvs_001", "opt_5zz_001", "opt_5zu_001"]
+  );
+  assert.equal(group.selection_mode, "single_within_group");
+});
+
+test("spoiler exclusive group removes other selected spoiler options", () => {
+  const spoilerIds = ["opt_t0a_001", "opt_tvs_001", "opt_5zz_001", "opt_5zu_001"];
+  for (const targetId of spoilerIds) {
+    const runtime = loadRuntime();
+    runtime.state.bodyStyle = "coupe";
+    runtime.state.trimLevel = "1LT";
+    runtime.state.selected.add("opt_z51_001");
+    runtime.state.userSelected.add("opt_z51_001");
+    runtime.state.selected.add("opt_gba_001");
+    runtime.state.userSelected.add("opt_gba_001");
+    for (const id of spoilerIds.filter((item) => item !== targetId)) {
+      runtime.state.selected.add(id);
+      runtime.state.userSelected.add(id);
+    }
+
+    const targetChoice = runtime.activeChoiceRows().find((choice) => choice.option_id === targetId);
+    assert.ok(targetChoice, `${targetId} should exist for the current variant`);
+    runtime.handleChoice(targetChoice);
+
+    assert.equal(runtime.state.selected.has(targetId), true, `${targetId} should be selected`);
+    assert.equal(runtime.state.userSelected.has(targetId), true, `${targetId} should be user-selected`);
+    for (const peerId of spoilerIds.filter((item) => item !== targetId)) {
+      assert.equal(runtime.state.selected.has(peerId), false, `${peerId} should be removed from selected`);
+      assert.equal(runtime.state.userSelected.has(peerId), false, `${peerId} should be removed from userSelected`);
+    }
+  }
+});
+
 test("exclusive group selection replaces ZZ3 default BC7 engine cover", () => {
   const runtime = loadRuntime();
   runtime.state.bodyStyle = "convertible";
