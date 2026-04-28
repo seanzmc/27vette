@@ -158,6 +158,22 @@ test("replaceable suspension and exhaust defaults are encoded", () => {
   assert.match(appSource, /addDefaultRpo\("NGA"\)/);
 });
 
+test("FE1 default selection prefers the visible suspension tile", () => {
+  const fe1Rows = data.choices.filter((choice) => choice.variant_id === "1lt_c07" && choice.rpo === "FE1");
+  assert.ok(
+    fe1Rows.some((choice) => choice.option_id === "opt_fe1_001" && choice.section_id === "sec_susp_001" && choice.selectable === "True"),
+    "FE1 should have a visible selectable suspension choice"
+  );
+  assert.ok(
+    fe1Rows.some((choice) => choice.option_id === "opt_fe1_002" && choice.step_key === "standard_equipment"),
+    "FE1 also has a standard-equipment duplicate, which must not win default lookup"
+  );
+
+  const helper = appSource.match(/function defaultChoiceForRpo\(rpo\) \{[\s\S]*?\n\}/)?.[0] || "";
+  assert.match(helper, /choice\.selectable === "True"/);
+  assert.match(helper, /choice\.step_key !== "standard_equipment"/);
+});
+
 test("coupe defaults include BC7 engine appearance", () => {
   assert.match(appSource, /defaultRpo of \["FE1", "NGA", "BC7"\]/);
   assert.match(appSource, /defaultChoice\.body_style === "coupe"/);

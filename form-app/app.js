@@ -390,7 +390,8 @@ function deleteSelectedRpo(rpo) {
 }
 
 function defaultChoiceForRpo(rpo) {
-  return activeChoiceRows().find((choice) => choice.rpo === rpo && choice.active === "True" && choice.status !== "unavailable");
+  const choices = activeChoiceRows().filter((choice) => choice.rpo === rpo && choice.active === "True" && choice.status !== "unavailable");
+  return choices.find((choice) => choice.selectable === "True" && choice.step_key !== "standard_equipment") || choices[0];
 }
 
 function addDefaultRpo(rpo) {
