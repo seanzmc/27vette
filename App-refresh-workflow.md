@@ -1,43 +1,159 @@
-# App refresh workflow:
+# App Refresh Workflow
 
-1. Regenerate the app data from the updated workbook:
+Use this checklist whenever `stingray_master.xlsx` changes and the static app needs the updated workbook content.
+
+## Scope
+
+Source of truth:
+
+- `stingray_master.xlsx`
+
+Generated app artifacts:
+
+- `form-app/data.js`
+- `form-output/stingray-form-data.json`
+- `form-output/stingray-form-data.csv`
+- Generated `form_*` sheets inside `stingray_master.xlsx`
+
+Frontend runtime files that usually should not change during a data refresh:
+
+- `form-app/index.html`
+- `form-app/app.js`
+- `form-app/styles.css`
+
+## 1. Confirm the Workbook Edit
+
+Before regenerating app data, confirm the workbook change is actually saved on disk.
+
+For text/table edits, reopen `stingray_master.xlsx` and spot-check the edited sheet and cells. Do not rely only on a script saying it saved successfully.
+
+Also check the working tree so generated changes do not get mixed with unrelated files:
+
+```sh
+cd /Users/seandm/Projects/27vette
+git status --short
+```
+
+If temporary backups exist, keep them out of the final commit unless they are intentionally part of the handoff.
+
+## 2. Regenerate App Data
+
+Run the generator from the project root:
 
 ```sh
 cd /Users/seandm/Projects/27vette
 python3 scripts/generate_stingray_form.py
 ```
 
-That script reads `stingray_master.xlsx`, rewrites the generated `form_*` sheets in the workbook, refreshes `form-output/stingray-form-data.json`, refreshes `form-output/stingray-form-data.csv`, and updates `form-app/data.js`, which is what the frontend actually loads.
+Expected behavior:
 
-2. Validate generated output:
+- Reads `stingray_master.xlsx`
+- Rebuilds generated `form_*` sheets in the workbook
+- Writes `form-output/stingray-form-data.json`
+- Writes `form-output/stingray-form-data.csv`
+- Writes `form-app/data.js`
+- Prints counts for choices, context choices, standard equipment, rules, price rules, interiors, and validation errors
+
+If `validation_errors` is greater than `0`, stop and inspect the generator output before pushing.
+
+## 3. Verify Generated Data
+
+Run the regression suite:
 
 ```sh
+cd /Users/seandm/Projects/27vette
 node --test tests/stingray-form-regression.test.mjs
 ```
 
-Also spot-check that `form-app/data.js` has a new `dataset.generated_at` timestamp and that corrected copy appears in `choices` / `standardEquipment`.
+Then spot-check the generated timestamp:
 
-3. Manually verify the static app:
+```sh
+rg -n '"generated_at"' form-app/data.js form-output/stingray-form-data.json
+```
+
+For copy-only workbook updates, also search for representative changed labels or descriptions:
+
+```sh
+rg -n "Exact changed text here" form-app/data.js form-output/stingray-form-data.json
+```
+
+## 4. Manually Verify the Static App
+
+Serve the static app:
 
 ```sh
 cd /Users/seandm/Projects/27vette/form-app
 python3 -m http.server 8000
 ```
 
-Open `http://localhost:8000`, hard refresh/cache bust if needed, then spot-check the edited labels/descriptions in the relevant option cards and standard/included equipment surfaces.
+Open `http://localhost:8000`.
 
-4. Commit/push the intended files.
+Manual checks:
 
-Likely files to include:
+- Hard refresh or cache-bust if the UI appears stale.
+- Confirm the edited workbook text appears in the relevant option cards or standard/included equipment surfaces.
+- Walk through body style and trim selection if the changed rows vary by variant.
+- Confirm no unrelated app layout or behavior changed.
+
+Stop the local server after verification.
+
+## 5. Review the Diff
+
+Return to the project root:
+
+```sh
+cd /Users/seandm/Projects/27vette
+git status --short
+git diff --stat
+```
+
+Expected files for a normal workbook-to-app refresh:
+
 - `stingray_master.xlsx`
 - `form-app/data.js`
 - `form-output/stingray-form-data.json`
 - `form-output/stingray-form-data.csv`
 
-Do not include unless you intentionally want it tracked:
-- `stingray_master.backup-before-de-copy-cleanup-20260428.xlsx`
+Possible but not automatically expected:
 
-Current unrelated untracked file also exists:
-- `archived/Int-reorg.md`
+- `README.md` or workflow docs, only when process documentation changed
+- `tests/stingray-form-regression.test.mjs`, only when the app contract changed
 
-The frontend has no build step; pushing the regenerated static data is the handoff to the app.
+Do not stage temporary workbook backups, lock files, or unrelated untracked files.
+
+## 6. Commit and Push
+
+Stage only the intended files:
+
+```sh
+git add stingray_master.xlsx form-app/data.js form-output/stingray-form-data.json form-output/stingray-form-data.csv
+```
+
+If this workflow doc changed, include it explicitly:
+
+```sh
+git add App-refresh-workflow.md
+```
+
+Commit with a data-refresh message:
+
+```sh
+git commit -m "Refresh Stingray app data"
+```
+
+Push the branch:
+
+```sh
+git push
+```
+
+## Handoff Checklist
+
+Report these items after each refresh:
+
+- Workbook change verified on disk: yes/no
+- Generator completed: yes/no, include `validation_errors`
+- Regression test result: pass/fail
+- Manual app check: pass/fail or pending
+- Files staged/committed/pushed
+- Any excluded files, such as backups or unrelated untracked files

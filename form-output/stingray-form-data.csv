@@ -449,12 +449,12 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,unavailable,True,1395
 2lt_c67__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,unavailable,True,1395
 3lt_c67__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,1395
-1lt_c07__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects. Genuine Corvette Accessory",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,650
-2lt_c07__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects. Genuine Corvette Accessory",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,650
-3lt_c07__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects. Genuine Corvette Accessory",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,650
-1lt_c67__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects. Genuine Corvette Accessory",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,650
-2lt_c67__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects. Genuine Corvette Accessory",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,650
-3lt_c67__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects. Genuine Corvette Accessory",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,650
+1lt_c07__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,650
+2lt_c07__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,650
+3lt_c07__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,650
+1lt_c67__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,650
+2lt_c67__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,650
+3lt_c67__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,650
 1lt_c07__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,1575
 2lt_c07__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,1575
 3lt_c07__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,1575
@@ -665,24 +665,24 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_w2d_001,opt_w2d_001,W2D,"LPO, Cargo net set",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,available,True,125
 2lt_c67__opt_w2d_001,opt_w2d_001,W2D,"LPO, Cargo net set",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,unavailable,True,125
 3lt_c67__opt_w2d_001,opt_w2d_001,W2D,"LPO, Cargo net set",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,unavailable,True,125
-1lt_c07__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels.",sec_lpow_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,4395
-2lt_c07__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels.",sec_lpow_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,4395
-3lt_c07__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels.",sec_lpow_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,4395
-1lt_c67__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels.",sec_lpow_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,4395
-2lt_c67__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels.",sec_lpow_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,4395
-3lt_c67__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels.",sec_lpow_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,4395
-1lt_c07__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels.",sec_lpow_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,4395
-2lt_c07__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels.",sec_lpow_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,4395
-3lt_c07__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels.",sec_lpow_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,4395
-1lt_c67__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels.",sec_lpow_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,4395
-2lt_c67__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels.",sec_lpow_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,4395
-3lt_c67__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels.",sec_lpow_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,4395
-1lt_c07__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone) Elevate your everyday drives with OnStar One. Have peace of mind with 24/7 access to Emergency Advisors and Stolen Vehicle Assistance. Plus,sec_onst_001,interior_trim,1lt_c07,coupe,1LT,available,True,800
-2lt_c07__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone) Elevate your everyday drives with OnStar One. Have peace of mind with 24/7 access to Emergency Advisors and Stolen Vehicle Assistance. Plus,sec_onst_001,interior_trim,2lt_c07,coupe,2LT,available,True,800
-3lt_c07__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone) Elevate your everyday drives with OnStar One. Have peace of mind with 24/7 access to Emergency Advisors and Stolen Vehicle Assistance. Plus,sec_onst_001,interior_trim,3lt_c07,coupe,3LT,available,True,800
-1lt_c67__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone) Elevate your everyday drives with OnStar One. Have peace of mind with 24/7 access to Emergency Advisors and Stolen Vehicle Assistance. Plus,sec_onst_001,interior_trim,1lt_c67,convertible,1LT,available,True,800
-2lt_c67__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone) Elevate your everyday drives with OnStar One. Have peace of mind with 24/7 access to Emergency Advisors and Stolen Vehicle Assistance. Plus,sec_onst_001,interior_trim,2lt_c67,convertible,2LT,available,True,800
-3lt_c67__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone) Elevate your everyday drives with OnStar One. Have peace of mind with 24/7 access to Emergency Advisors and Stolen Vehicle Assistance. Plus,sec_onst_001,interior_trim,3lt_c67,convertible,3LT,available,True,800
+1lt_c07__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,4395
+2lt_c07__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,4395
+3lt_c07__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,4395
+1lt_c67__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,4395
+2lt_c67__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,4395
+3lt_c67__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,4395
+1lt_c07__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,4395
+2lt_c07__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,4395
+3lt_c07__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,4395
+1lt_c67__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,4395
+2lt_c67__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,4395
+3lt_c67__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,4395
+1lt_c07__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone),sec_onst_001,interior_trim,1lt_c07,coupe,1LT,available,True,800
+2lt_c07__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone),sec_onst_001,interior_trim,2lt_c07,coupe,2LT,available,True,800
+3lt_c07__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone),sec_onst_001,interior_trim,3lt_c07,coupe,3LT,available,True,800
+1lt_c67__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone),sec_onst_001,interior_trim,1lt_c67,convertible,1LT,available,True,800
+2lt_c67__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone),sec_onst_001,interior_trim,2lt_c67,convertible,2LT,available,True,800
+3lt_c67__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone),sec_onst_001,interior_trim,3lt_c67,convertible,3LT,available,True,800
 1lt_c07__opt_r6p_001,opt_r6p_001,R6P,3 Years SiriusXM,sec_onst_001,interior_trim,1lt_c07,coupe,1LT,available,True,299
 2lt_c07__opt_r6p_001,opt_r6p_001,R6P,3 Years SiriusXM,sec_onst_001,interior_trim,2lt_c07,coupe,2LT,available,True,299
 3lt_c07__opt_r6p_001,opt_r6p_001,R6P,3 Years SiriusXM,sec_onst_001,interior_trim,3lt_c07,coupe,3LT,available,True,299
@@ -695,24 +695,24 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_r9l_001,opt_r9l_001,R9L,Removes OnStar Basics (OnStar Fleet Basics for Fleet),sec_onst_001,interior_trim,1lt_c67,convertible,1LT,available,True,0
 2lt_c67__opt_r9l_001,opt_r9l_001,R9L,Removes OnStar Basics (OnStar Fleet Basics for Fleet),sec_onst_001,interior_trim,2lt_c67,convertible,2LT,available,True,0
 3lt_c67__opt_r9l_001,opt_r9l_001,R9L,Removes OnStar Basics (OnStar Fleet Basics for Fleet),sec_onst_001,interior_trim,3lt_c67,convertible,3LT,available,True,0
-1lt_c07__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus. MobileService+ is a suite of service conveniences for 3 years - Mobile Service,sec_onst_001,interior_trim,1lt_c07,coupe,1LT,available,True,599
-2lt_c07__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus. MobileService+ is a suite of service conveniences for 3 years - Mobile Service,sec_onst_001,interior_trim,2lt_c07,coupe,2LT,available,True,599
-3lt_c07__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus. MobileService+ is a suite of service conveniences for 3 years - Mobile Service,sec_onst_001,interior_trim,3lt_c07,coupe,3LT,available,True,599
-1lt_c67__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus. MobileService+ is a suite of service conveniences for 3 years - Mobile Service,sec_onst_001,interior_trim,1lt_c67,convertible,1LT,available,True,599
-2lt_c67__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus. MobileService+ is a suite of service conveniences for 3 years - Mobile Service,sec_onst_001,interior_trim,2lt_c67,convertible,2LT,available,True,599
-3lt_c67__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus. MobileService+ is a suite of service conveniences for 3 years - Mobile Service,sec_onst_001,interior_trim,3lt_c67,convertible,3LT,available,True,599
-1lt_c07__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus. Delete MobileService+ service conveniences - Mobile Service,sec_onst_001,interior_trim,1lt_c07,coupe,1LT,available,True,0
-2lt_c07__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus. Delete MobileService+ service conveniences - Mobile Service,sec_onst_001,interior_trim,2lt_c07,coupe,2LT,available,True,0
-3lt_c07__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus. Delete MobileService+ service conveniences - Mobile Service,sec_onst_001,interior_trim,3lt_c07,coupe,3LT,available,True,0
-1lt_c67__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus. Delete MobileService+ service conveniences - Mobile Service,sec_onst_001,interior_trim,1lt_c67,convertible,1LT,available,True,0
-2lt_c67__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus. Delete MobileService+ service conveniences - Mobile Service,sec_onst_001,interior_trim,2lt_c67,convertible,2LT,available,True,0
-3lt_c67__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus. Delete MobileService+ service conveniences - Mobile Service,sec_onst_001,interior_trim,3lt_c67,convertible,3LT,available,True,0
-1lt_c07__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus. MobileService+ is a suite of service conveniences for 1 year - Mobile Service,sec_onst_001,interior_trim,1lt_c07,coupe,1LT,available,True,199
-2lt_c07__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus. MobileService+ is a suite of service conveniences for 1 year - Mobile Service,sec_onst_001,interior_trim,2lt_c07,coupe,2LT,available,True,199
-3lt_c07__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus. MobileService+ is a suite of service conveniences for 1 year - Mobile Service,sec_onst_001,interior_trim,3lt_c07,coupe,3LT,available,True,199
-1lt_c67__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus. MobileService+ is a suite of service conveniences for 1 year - Mobile Service,sec_onst_001,interior_trim,1lt_c67,convertible,1LT,available,True,199
-2lt_c67__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus. MobileService+ is a suite of service conveniences for 1 year - Mobile Service,sec_onst_001,interior_trim,2lt_c67,convertible,2LT,available,True,199
-3lt_c67__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus. MobileService+ is a suite of service conveniences for 1 year - Mobile Service,sec_onst_001,interior_trim,3lt_c67,convertible,3LT,available,True,199
+1lt_c07__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus,sec_onst_001,interior_trim,1lt_c07,coupe,1LT,available,True,599
+2lt_c07__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus,sec_onst_001,interior_trim,2lt_c07,coupe,2LT,available,True,599
+3lt_c07__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus,sec_onst_001,interior_trim,3lt_c07,coupe,3LT,available,True,599
+1lt_c67__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus,sec_onst_001,interior_trim,1lt_c67,convertible,1LT,available,True,599
+2lt_c67__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus,sec_onst_001,interior_trim,2lt_c67,convertible,2LT,available,True,599
+3lt_c67__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus,sec_onst_001,interior_trim,3lt_c67,convertible,3LT,available,True,599
+1lt_c07__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus,sec_onst_001,interior_trim,1lt_c07,coupe,1LT,available,True,0
+2lt_c07__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus,sec_onst_001,interior_trim,2lt_c07,coupe,2LT,available,True,0
+3lt_c07__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus,sec_onst_001,interior_trim,3lt_c07,coupe,3LT,available,True,0
+1lt_c67__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus,sec_onst_001,interior_trim,1lt_c67,convertible,1LT,available,True,0
+2lt_c67__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus,sec_onst_001,interior_trim,2lt_c67,convertible,2LT,available,True,0
+3lt_c67__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus,sec_onst_001,interior_trim,3lt_c67,convertible,3LT,available,True,0
+1lt_c07__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus,sec_onst_001,interior_trim,1lt_c07,coupe,1LT,available,True,199
+2lt_c07__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus,sec_onst_001,interior_trim,2lt_c07,coupe,2LT,available,True,199
+3lt_c07__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus,sec_onst_001,interior_trim,3lt_c07,coupe,3LT,available,True,199
+1lt_c67__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus,sec_onst_001,interior_trim,1lt_c67,convertible,1LT,available,True,199
+2lt_c67__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus,sec_onst_001,interior_trim,2lt_c67,convertible,2LT,available,True,199
+3lt_c67__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus,sec_onst_001,interior_trim,3lt_c67,convertible,3LT,available,True,199
 1lt_c07__opt_g26_001,opt_g26_001,G26,Sebring Orange Tintcoat,sec_pain_001,paint,1lt_c07,coupe,1LT,available,True,995
 2lt_c07__opt_g26_001,opt_g26_001,G26,Sebring Orange Tintcoat,sec_pain_001,paint,2lt_c07,coupe,2LT,available,True,995
 3lt_c07__opt_g26_001,opt_g26_001,G26,Sebring Orange Tintcoat,sec_pain_001,paint,3lt_c07,coupe,3LT,available,True,995
@@ -1415,12 +1415,12 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_004,opt_004,,Antenna,sec_tech_001,standard_equipment,1lt_c67,convertible,1LT,standard,False,0
 2lt_c67__opt_004,opt_004,,Antenna,sec_tech_001,standard_equipment,2lt_c67,convertible,2LT,standard,False,0
 3lt_c67__opt_004,opt_004,,Antenna,sec_tech_001,standard_equipment,3lt_c67,convertible,3LT,standard,False,0
-1lt_c07__opt_008,opt_008,,OnStar Basics (OnStar Fleet Basics for Fleet) Drive with confidence and convenience using core OnStar services,sec_tech_001,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
-2lt_c07__opt_008,opt_008,,OnStar Basics (OnStar Fleet Basics for Fleet) Drive with confidence and convenience using core OnStar services,sec_tech_001,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
-3lt_c07__opt_008,opt_008,,OnStar Basics (OnStar Fleet Basics for Fleet) Drive with confidence and convenience using core OnStar services,sec_tech_001,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
-1lt_c67__opt_008,opt_008,,OnStar Basics (OnStar Fleet Basics for Fleet) Drive with confidence and convenience using core OnStar services,sec_tech_001,standard_equipment,1lt_c67,convertible,1LT,standard,False,0
-2lt_c67__opt_008,opt_008,,OnStar Basics (OnStar Fleet Basics for Fleet) Drive with confidence and convenience using core OnStar services,sec_tech_001,standard_equipment,2lt_c67,convertible,2LT,standard,False,0
-3lt_c67__opt_008,opt_008,,OnStar Basics (OnStar Fleet Basics for Fleet) Drive with confidence and convenience using core OnStar services,sec_tech_001,standard_equipment,3lt_c67,convertible,3LT,standard,False,0
+1lt_c07__opt_008,opt_008,,OnStar Basics (OnStar Fleet Basics for Fleet),sec_tech_001,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
+2lt_c07__opt_008,opt_008,,OnStar Basics (OnStar Fleet Basics for Fleet),sec_tech_001,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
+3lt_c07__opt_008,opt_008,,OnStar Basics (OnStar Fleet Basics for Fleet),sec_tech_001,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
+1lt_c67__opt_008,opt_008,,OnStar Basics (OnStar Fleet Basics for Fleet),sec_tech_001,standard_equipment,1lt_c67,convertible,1LT,standard,False,0
+2lt_c67__opt_008,opt_008,,OnStar Basics (OnStar Fleet Basics for Fleet),sec_tech_001,standard_equipment,2lt_c67,convertible,2LT,standard,False,0
+3lt_c67__opt_008,opt_008,,OnStar Basics (OnStar Fleet Basics for Fleet),sec_tech_001,standard_equipment,3lt_c67,convertible,3LT,standard,False,0
 1lt_c07__opt_ive_001,opt_ive_001,IVE,Infotainment system with Google Built-In,sec_tech_001,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
 2lt_c07__opt_ive_001,opt_ive_001,IVE,Infotainment system with Google Built-In,sec_tech_001,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
 3lt_c07__opt_ive_001,opt_ive_001,IVE,Infotainment system with Google Built-In,sec_tech_001,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
@@ -1433,12 +1433,12 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_ppw_001,opt_ppw_001,PPW,Wireless Apple CarPlay/Wireless Android Auto,sec_tech_001,standard_equipment,1lt_c67,convertible,1LT,standard,False,0
 2lt_c67__opt_ppw_001,opt_ppw_001,PPW,Wireless Apple CarPlay/Wireless Android Auto,sec_tech_001,standard_equipment,2lt_c67,convertible,2LT,standard,False,0
 3lt_c67__opt_ppw_001,opt_ppw_001,PPW,Wireless Apple CarPlay/Wireless Android Auto,sec_tech_001,standard_equipment,3lt_c67,convertible,3LT,standard,False,0
-1lt_c07__opt_u2k_001,opt_u2k_001,U2K,SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road.,sec_tech_001,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
-2lt_c07__opt_u2k_001,opt_u2k_001,U2K,SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road.,sec_tech_001,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
-3lt_c07__opt_u2k_001,opt_u2k_001,U2K,SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road.,sec_tech_001,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
-1lt_c67__opt_u2k_001,opt_u2k_001,U2K,SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road.,sec_tech_001,standard_equipment,1lt_c67,convertible,1LT,standard,False,0
-2lt_c67__opt_u2k_001,opt_u2k_001,U2K,SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road.,sec_tech_001,standard_equipment,2lt_c67,convertible,2LT,standard,False,0
-3lt_c67__opt_u2k_001,opt_u2k_001,U2K,SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road.,sec_tech_001,standard_equipment,3lt_c67,convertible,3LT,standard,False,0
+1lt_c07__opt_u2k_001,opt_u2k_001,U2K,SiriusXM with 360L Trial Subscription,sec_tech_001,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
+2lt_c07__opt_u2k_001,opt_u2k_001,U2K,SiriusXM with 360L Trial Subscription,sec_tech_001,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
+3lt_c07__opt_u2k_001,opt_u2k_001,U2K,SiriusXM with 360L Trial Subscription,sec_tech_001,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
+1lt_c67__opt_u2k_001,opt_u2k_001,U2K,SiriusXM with 360L Trial Subscription,sec_tech_001,standard_equipment,1lt_c67,convertible,1LT,standard,False,0
+2lt_c67__opt_u2k_001,opt_u2k_001,U2K,SiriusXM with 360L Trial Subscription,sec_tech_001,standard_equipment,2lt_c67,convertible,2LT,standard,False,0
+3lt_c67__opt_u2k_001,opt_u2k_001,U2K,SiriusXM with 360L Trial Subscription,sec_tech_001,standard_equipment,3lt_c67,convertible,3LT,standard,False,0
 1lt_c07__opt_u5g_001,opt_u5g_001,U5G,5G vehicle connectivity,sec_tech_001,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
 2lt_c07__opt_u5g_001,opt_u5g_001,U5G,5G vehicle connectivity,sec_tech_001,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
 3lt_c07__opt_u5g_001,opt_u5g_001,U5G,5G vehicle connectivity,sec_tech_001,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
@@ -1457,12 +1457,12 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_vv4_001,opt_vv4_001,VV4,Wi-Fi Hotspot capable,sec_tech_001,standard_equipment,1lt_c67,convertible,1LT,standard,False,0
 2lt_c67__opt_vv4_001,opt_vv4_001,VV4,Wi-Fi Hotspot capable,sec_tech_001,standard_equipment,2lt_c67,convertible,2LT,standard,False,0
 3lt_c67__opt_vv4_001,opt_vv4_001,VV4,Wi-Fi Hotspot capable,sec_tech_001,standard_equipment,3lt_c67,convertible,3LT,standard,False,0
-1lt_c07__opt_5zc_001,opt_5zc_001,5ZC,"LPO, Jake logo wheel center caps. Genuine Corvette Accessory",sec_whee_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,250
-2lt_c07__opt_5zc_001,opt_5zc_001,5ZC,"LPO, Jake logo wheel center caps. Genuine Corvette Accessory",sec_whee_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,250
-3lt_c07__opt_5zc_001,opt_5zc_001,5ZC,"LPO, Jake logo wheel center caps. Genuine Corvette Accessory",sec_whee_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,250
-1lt_c67__opt_5zc_001,opt_5zc_001,5ZC,"LPO, Jake logo wheel center caps. Genuine Corvette Accessory",sec_whee_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,250
-2lt_c67__opt_5zc_001,opt_5zc_001,5ZC,"LPO, Jake logo wheel center caps. Genuine Corvette Accessory",sec_whee_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,250
-3lt_c67__opt_5zc_001,opt_5zc_001,5ZC,"LPO, Jake logo wheel center caps. Genuine Corvette Accessory",sec_whee_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,250
+1lt_c07__opt_5zc_001,opt_5zc_001,5ZC,"LPO, Jake logo wheel center caps",sec_whee_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,250
+2lt_c07__opt_5zc_001,opt_5zc_001,5ZC,"LPO, Jake logo wheel center caps",sec_whee_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,250
+3lt_c07__opt_5zc_001,opt_5zc_001,5ZC,"LPO, Jake logo wheel center caps",sec_whee_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,250
+1lt_c67__opt_5zc_001,opt_5zc_001,5ZC,"LPO, Jake logo wheel center caps",sec_whee_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,250
+2lt_c67__opt_5zc_001,opt_5zc_001,5ZC,"LPO, Jake logo wheel center caps",sec_whee_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,250
+3lt_c67__opt_5zc_001,opt_5zc_001,5ZC,"LPO, Jake logo wheel center caps",sec_whee_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,250
 1lt_c07__opt_5zd_001,opt_5zd_001,5ZD,"LPO, Carbon Flash wheel center caps with crossed flags logo",sec_whee_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,250
 2lt_c07__opt_5zd_001,opt_5zd_001,5ZD,"LPO, Carbon Flash wheel center caps with crossed flags logo",sec_whee_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,250
 3lt_c07__opt_5zd_001,opt_5zd_001,5ZD,"LPO, Carbon Flash wheel center caps with crossed flags logo",sec_whee_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,250
@@ -1505,12 +1505,12 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_spz_001,opt_spz_001,SPZ,"LPO, Black wheel locks",sec_whee_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,105
 2lt_c67__opt_spz_001,opt_spz_001,SPZ,"LPO, Black wheel locks",sec_whee_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,105
 3lt_c67__opt_spz_001,opt_spz_001,SPZ,"LPO, Black wheel locks",sec_whee_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,105
-1lt_c07__opt_vwd_001,opt_vwd_001,VWD,"LPO, Stingray R logo wheel center caps.",sec_whee_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,250
-2lt_c07__opt_vwd_001,opt_vwd_001,VWD,"LPO, Stingray R logo wheel center caps.",sec_whee_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,250
-3lt_c07__opt_vwd_001,opt_vwd_001,VWD,"LPO, Stingray R logo wheel center caps.",sec_whee_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,250
-1lt_c67__opt_vwd_001,opt_vwd_001,VWD,"LPO, Stingray R logo wheel center caps.",sec_whee_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,250
-2lt_c67__opt_vwd_001,opt_vwd_001,VWD,"LPO, Stingray R logo wheel center caps.",sec_whee_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,250
-3lt_c67__opt_vwd_001,opt_vwd_001,VWD,"LPO, Stingray R logo wheel center caps.",sec_whee_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,250
+1lt_c07__opt_vwd_001,opt_vwd_001,VWD,"LPO, Stingray R logo wheel center caps",sec_whee_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,250
+2lt_c07__opt_vwd_001,opt_vwd_001,VWD,"LPO, Stingray R logo wheel center caps",sec_whee_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,250
+3lt_c07__opt_vwd_001,opt_vwd_001,VWD,"LPO, Stingray R logo wheel center caps",sec_whee_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,250
+1lt_c67__opt_vwd_001,opt_vwd_001,VWD,"LPO, Stingray R logo wheel center caps",sec_whee_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,250
+2lt_c67__opt_vwd_001,opt_vwd_001,VWD,"LPO, Stingray R logo wheel center caps",sec_whee_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,250
+3lt_c67__opt_vwd_001,opt_vwd_001,VWD,"LPO, Stingray R logo wheel center caps",sec_whee_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,250
 1lt_c07__opt_q99_001,opt_q99_001,Q99,20-spoke bright machined-face forged aluminum wheels,sec_whee_002,wheels,1lt_c07,coupe,1LT,available,True,1995
 2lt_c07__opt_q99_001,opt_q99_001,Q99,20-spoke bright machined-face forged aluminum wheels,sec_whee_002,wheels,2lt_c07,coupe,2LT,available,True,1995
 3lt_c07__opt_q99_001,opt_q99_001,Q99,20-spoke bright machined-face forged aluminum wheels,sec_whee_002,wheels,3lt_c07,coupe,3LT,available,True,1995
