@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-04-28T04:36:51+00:00"
+    "generated_at": "2026-04-28T06:01:39+00:00"
   },
   "variants": [
     {
@@ -9989,7 +9989,7 @@
       "trim_level": "1LT",
       "status": "available",
       "status_label": "Available",
-      "selectable": "True",
+      "selectable": "False",
       "active": "True",
       "choice_mode": "single",
       "selection_mode": "single_select_opt",
@@ -10014,7 +10014,7 @@
       "trim_level": "2LT",
       "status": "available",
       "status_label": "Available",
-      "selectable": "True",
+      "selectable": "False",
       "active": "True",
       "choice_mode": "single",
       "selection_mode": "single_select_opt",
@@ -10039,7 +10039,7 @@
       "trim_level": "3LT",
       "status": "available",
       "status_label": "Available",
-      "selectable": "True",
+      "selectable": "False",
       "active": "True",
       "choice_mode": "single",
       "selection_mode": "single_select_opt",
@@ -10064,7 +10064,7 @@
       "trim_level": "1LT",
       "status": "available",
       "status_label": "Available",
-      "selectable": "True",
+      "selectable": "False",
       "active": "True",
       "choice_mode": "single",
       "selection_mode": "single_select_opt",
@@ -10089,7 +10089,7 @@
       "trim_level": "2LT",
       "status": "available",
       "status_label": "Available",
-      "selectable": "True",
+      "selectable": "False",
       "active": "True",
       "choice_mode": "single",
       "selection_mode": "single_select_opt",
@@ -10114,7 +10114,7 @@
       "trim_level": "3LT",
       "status": "available",
       "status_label": "Available",
-      "selectable": "True",
+      "selectable": "False",
       "active": "True",
       "choice_mode": "single",
       "selection_mode": "single_select_opt",

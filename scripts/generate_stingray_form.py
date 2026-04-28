@@ -387,7 +387,7 @@ def main() -> None:
             option["display_order"] = "25"
         if option["option_id"] == "opt_fe3_001":
             option["section_id"] = "sec_susp_001"
-            option["selectable"] = "True"
+            option["selectable"] = "False"
             option["display_order"] = "12"
         if option["option_id"] == "opt_zyc_001":
             option["display_order"] = "15"

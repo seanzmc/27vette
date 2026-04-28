@@ -163,12 +163,17 @@ test("replaceable suspension and exhaust defaults are encoded", () => {
         choice.rpo === "FE3" &&
         choice.section_id === "sec_susp_001" &&
         choice.step_key === "packages_performance" &&
-        choice.selectable === "True" &&
+        choice.selectable === "False" &&
         choice.active === "True"
     ),
-    "FE3 should render as a selectable suspension tile"
+    "FE3 should render as an auto-only suspension tile"
   );
+  assert.equal(data.choices.some((choice) => choice.rpo === "FE3" && choice.selectable === "True"), false, "FE3 should not be manually selectable");
   assert.ok(data.choices.some((choice) => choice.rpo === "FE4" && choice.status === "available"), "FE4 should be available");
+  assert.ok(
+    data.rules.some((rule) => rule.source_id === "opt_fe4_001" && rule.target_id === "opt_z51_001" && rule.rule_type === "requires"),
+    "FE4 should require Z51"
+  );
   assert.match(appSource, /selectedOptionByRpo\("NWI"\)/);
   assert.match(appSource, /deleteSelectedRpo\("NGA"\)/);
   assert.match(appSource, /addDefaultRpo\("NGA"\)/);
