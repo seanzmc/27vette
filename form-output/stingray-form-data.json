@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-04-28T14:37:22+00:00"
+    "generated_at": "2026-04-28T16:58:39+00:00"
   },
   "variants": [
     {
@@ -51064,6 +51064,9 @@
       "target_option_id": "opt_tvs_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Z51 selected sets TVS price to 0"
     },
@@ -51073,6 +51076,9 @@
       "target_option_id": "opt_3a9_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Santorini Blue interior includes blue seatbelt"
     },
@@ -51082,6 +51088,9 @@
       "target_option_id": "opt_3a9_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Santorini Blue interior includes blue seatbelt"
     },
@@ -51091,6 +51100,9 @@
       "target_option_id": "opt_3f9_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Adrenaline Red dipped includes red seatbelt"
     },
@@ -51100,6 +51112,9 @@
       "target_option_id": "opt_3n9_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Natural dipped includes natural seatbelt"
     },
@@ -51109,6 +51124,9 @@
       "target_option_id": "opt_379_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Habanero includes orange seatbelt"
     },
@@ -51118,6 +51136,9 @@
       "target_option_id": "opt_379_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Habanero includes orange seatbelt"
     },
@@ -51127,6 +51148,9 @@
       "target_option_id": "opt_3n9_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Natural dipped includes natural seatbelt"
     },
@@ -51136,6 +51160,9 @@
       "target_option_id": "opt_3a9_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Santorini Blue interior includes blue seatbelt"
     },
@@ -51145,6 +51172,9 @@
       "target_option_id": "opt_3a9_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Santorini Blue interior includes blue seatbelt"
     },
@@ -51154,6 +51184,9 @@
       "target_option_id": "opt_3f9_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Adrenaline Red dipped includes red seatbelt"
     },
@@ -51163,6 +51196,9 @@
       "target_option_id": "opt_3n9_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Natural dipped includes natural seatbelt"
     },
@@ -51172,6 +51208,9 @@
       "target_option_id": "opt_379_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Habanero includes orange seatbelt"
     },
@@ -51181,6 +51220,9 @@
       "target_option_id": "opt_379_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Habanero includes orange seatbelt"
     },
@@ -51190,6 +51232,9 @@
       "target_option_id": "opt_3n9_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Natural dipped includes natural seatbelt"
     },
@@ -51199,6 +51244,9 @@
       "target_option_id": "opt_3a9_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Santorini Blue interior includes blue seatbelt"
     },
@@ -51208,6 +51256,9 @@
       "target_option_id": "opt_d3v_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Engine appearance includes engine lighting"
     },
@@ -51217,6 +51268,9 @@
       "target_option_id": "opt_sl9_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Engine appearance includes engine plaque"
     },
@@ -51226,6 +51280,9 @@
       "target_option_id": "opt_d3v_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Engine appearance includes engine lighting"
     },
@@ -51235,6 +51292,9 @@
       "target_option_id": "opt_d3v_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Engine appearance includes engine lighting"
     },
@@ -51244,6 +51304,9 @@
       "target_option_id": "opt_d3v_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Engine appearance includes engine lighting"
     },
@@ -51253,6 +51316,9 @@
       "target_option_id": "opt_sti_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Stingray protection package includes composite rocker extentions"
     },
@@ -51262,6 +51328,9 @@
       "target_option_id": "opt_vqk_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Stingray protection includes splash guards"
     },
@@ -51271,6 +51340,9 @@
       "target_option_id": "opt_vwe_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Stingray protection includes grille screens"
     },
@@ -51280,6 +51352,9 @@
       "target_option_id": "opt_5dg_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Tech bronze package includes 5DG"
     },
@@ -51289,6 +51364,9 @@
       "target_option_id": "opt_sfz_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Tech bronze package includes SFZ"
     },
@@ -51298,6 +51376,9 @@
       "target_option_id": "opt_sht_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Tech bronze package includes SHT"
     },
@@ -51307,6 +51388,9 @@
       "target_option_id": "opt_sng_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Tech bronze package includes SNG"
     },
@@ -51316,6 +51400,9 @@
       "target_option_id": "opt_sb7_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Stingray R package includes stingray R graphics"
     },
@@ -51325,6 +51412,9 @@
       "target_option_id": "opt_vwd_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "Stingray R package includes Stingray R center caps"
     },
@@ -51334,6 +51424,9 @@
       "target_option_id": "opt_ryt_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "includes (RYT) First Aid Kit, LPO and (S08) Highway Safety Kit, LPO, Genuine Corvette Accessory"
     },
@@ -51343,6 +51436,9 @@
       "target_option_id": "opt_s08_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "includes (RYT) First Aid Kit, LPO and (S08) Highway Safety Kit, LPO, Genuine Corvette Accessory"
     },
@@ -51352,6 +51448,9 @@
       "target_option_id": "opt_cav_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "includes (CAV) contoured cargo area liners with Jake logo and (RIA) all-weather floor liners with Jake logo, Genuine Corvette Accessory"
     },
@@ -51361,6 +51460,9 @@
       "target_option_id": "opt_ria_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "includes (CAV) contoured cargo area liners with Jake logo and (RIA) all-weather floor liners with Jake logo, Genuine Corvette Accessory"
     },
@@ -51370,6 +51472,9 @@
       "target_option_id": "opt_sc7_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "1. Included with (SBT) dual roof, LPO."
     },
@@ -51379,35 +51484,47 @@
       "target_option_id": "opt_sl9_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "1. Included with (B6P/ZZ3) Engine Appearance Package."
     },
     {
-      "price_rule_id": "pr_b6p_opt_bc4_001_001",
-      "condition_option_id": "opt_b6p_001",
+      "price_rule_id": "pr_zz3_convertible_opt_bc4_001_001",
+      "condition_option_id": "opt_zz3_001",
       "target_option_id": "opt_bc4_001",
       "price_rule_type": "override",
       "price_value": 595,
+      "body_style_scope": "convertible",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
-      "notes": "B6P selected sets LS6 engine cover price to 595"
+      "notes": "ZZ3 selected sets convertible LS6 engine cover price to 595"
     },
     {
-      "price_rule_id": "pr_b6p_opt_bcp_001_001",
-      "condition_option_id": "opt_b6p_001",
+      "price_rule_id": "pr_zz3_convertible_opt_bcp_001_001",
+      "condition_option_id": "opt_zz3_001",
       "target_option_id": "opt_bcp_001",
       "price_rule_type": "override",
       "price_value": 595,
+      "body_style_scope": "convertible",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
-      "notes": "B6P selected sets LS6 engine cover price to 595"
+      "notes": "ZZ3 selected sets convertible LS6 engine cover price to 595"
     },
     {
-      "price_rule_id": "pr_b6p_opt_bcs_001_001",
-      "condition_option_id": "opt_b6p_001",
+      "price_rule_id": "pr_zz3_convertible_opt_bcs_001_001",
+      "condition_option_id": "opt_zz3_001",
       "target_option_id": "opt_bcs_001",
       "price_rule_type": "override",
       "price_value": 595,
+      "body_style_scope": "convertible",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
-      "notes": "B6P selected sets LS6 engine cover price to 595"
+      "notes": "ZZ3 selected sets convertible LS6 engine cover price to 595"
     },
     {
       "price_rule_id": "pr_3lt_r6x_ae4_hu0_38s_r6x_001",
@@ -51415,6 +51532,9 @@
       "target_option_id": "opt_r6x_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "R6X is included in the selected interior price."
     },
@@ -51424,6 +51544,9 @@
       "target_option_id": "opt_r6x_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "R6X is included in the selected interior price."
     },
@@ -51433,6 +51556,9 @@
       "target_option_id": "opt_r6x_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "R6X is included in the selected interior price."
     },
@@ -51442,6 +51568,9 @@
       "target_option_id": "opt_r6x_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "R6X is included in the selected interior price."
     },
@@ -51451,6 +51580,9 @@
       "target_option_id": "opt_r6x_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "R6X is included in the selected interior price."
     },
@@ -51460,6 +51592,9 @@
       "target_option_id": "opt_r6x_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "R6X is included in the selected interior price."
     },
@@ -51469,6 +51604,9 @@
       "target_option_id": "opt_r6x_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "R6X is included in the selected interior price."
     },
@@ -51478,6 +51616,9 @@
       "target_option_id": "opt_r6x_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "R6X is included in the selected interior price."
     },
@@ -51487,6 +51628,9 @@
       "target_option_id": "opt_r6x_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "R6X is included in the selected interior price."
     },
@@ -51496,6 +51640,9 @@
       "target_option_id": "opt_r6x_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "R6X is included in the selected interior price."
     },
@@ -51505,6 +51652,9 @@
       "target_option_id": "opt_r6x_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "R6X is included in the selected interior price."
     },
@@ -51514,6 +51664,9 @@
       "target_option_id": "opt_r6x_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "R6X is included in the selected interior price."
     },
@@ -51523,6 +51676,9 @@
       "target_option_id": "opt_r6x_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "R6X is included in the selected interior price."
     },
@@ -51532,6 +51688,9 @@
       "target_option_id": "opt_r6x_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "R6X is included in the selected interior price."
     },
@@ -51541,6 +51700,9 @@
       "target_option_id": "opt_r6x_001",
       "price_rule_type": "override",
       "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
       "review_flag": "False",
       "notes": "R6X is included in the selected interior price."
     }

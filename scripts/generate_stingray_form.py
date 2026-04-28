@@ -449,18 +449,21 @@ def main() -> None:
 
     existing_price_rule_ids = {row.get("price_rule_id", "") for row in price_rules_raw}
     for option_id in sorted(CONSOLIDATED_ENGINE_COVERS):
-        price_rule_id = f"pr_b6p_{option_id}_001"
+        price_rule_id = f"pr_zz3_convertible_{option_id}_001"
         if price_rule_id in existing_price_rule_ids:
             continue
         price_rules_raw.append(
             {
                 "price_rule_id": price_rule_id,
-                "condition_option_id": "opt_b6p_001",
+                "condition_option_id": "opt_zz3_001",
                 "target_option_id": option_id,
                 "price_rule_type": "override",
                 "price_value": "595",
+                "body_style_scope": "convertible",
+                "trim_level_scope": "",
+                "variant_scope": "",
                 "review_flag": "False",
-                "notes": "B6P selected sets LS6 engine cover price to 595",
+                "notes": "ZZ3 selected sets convertible LS6 engine cover price to 595",
             }
         )
 
@@ -853,6 +856,9 @@ def main() -> None:
             "target_option_id": canonical_option_id(row.get("target_option_id", "")),
             "price_rule_type": row.get("price_rule_type", "").lower(),
             "price_value": money(row.get("price_value")),
+            "body_style_scope": row.get("body_style_scope", ""),
+            "trim_level_scope": row.get("trim_level_scope", ""),
+            "variant_scope": row.get("variant_scope", ""),
             "review_flag": row.get("review_flag", ""),
             "notes": row.get("notes", ""),
         }
@@ -1092,7 +1098,18 @@ def main() -> None:
     write_sheet(
         wb,
         "form_price_rules",
-        ["price_rule_id", "condition_option_id", "target_option_id", "price_rule_type", "price_value", "review_flag", "notes"],
+        [
+            "price_rule_id",
+            "condition_option_id",
+            "target_option_id",
+            "price_rule_type",
+            "price_value",
+            "body_style_scope",
+            "trim_level_scope",
+            "variant_scope",
+            "review_flag",
+            "notes",
+        ],
         price_rules,
     )
     write_sheet(

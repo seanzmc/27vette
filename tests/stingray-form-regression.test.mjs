@@ -74,6 +74,7 @@ window.__testApi = {
   handleChoice,
   computeAutoAdded,
   lineItems,
+  optionPrice,
 };
 `
   );
@@ -105,16 +106,35 @@ test("selection modes have friendly display labels", () => {
   }
 });
 
-test("engine cover variants are consolidated with B6P price overrides", () => {
+test("engine cover variants are consolidated with convertible ZZ3 price overrides", () => {
   for (const rpo of ["BC4", "BCP", "BCS"]) {
     const choices = uniqueChoicesByRpo(rpo);
     assert.equal(choices.length, 1, `${rpo} should be one option id`);
     assert.equal(Number(choices[0].base_price), 695, `${rpo} base price`);
     const override = data.priceRules.find(
-      (rule) => rule.condition_option_id === "opt_b6p_001" && rule.target_option_id === choices[0].option_id
+      (rule) => rule.condition_option_id === "opt_zz3_001" && rule.target_option_id === choices[0].option_id
     );
-    assert.ok(override, `${rpo} needs a B6P price override`);
-    assert.equal(Number(override.price_value), 595, `${rpo} B6P override price`);
+    assert.ok(override, `${rpo} needs a convertible ZZ3 price override`);
+    assert.equal(override.body_style_scope, "convertible", `${rpo} override body scope`);
+    assert.equal(Number(override.price_value), 595, `${rpo} convertible ZZ3 override price`);
+  }
+});
+
+test("engine cover pricing stays coupe 695 and convertible ZZ3 595", () => {
+  for (const rpo of ["BC4", "BCP", "BCS"]) {
+    const optionId = uniqueChoicesByRpo(rpo)[0].option_id;
+
+    const coupeRuntime = loadRuntime();
+    coupeRuntime.state.bodyStyle = "coupe";
+    coupeRuntime.state.trimLevel = "1LT";
+    coupeRuntime.state.selected.add("opt_b6p_001");
+    assert.equal(coupeRuntime.optionPrice(optionId), 695, `${rpo} coupe price`);
+
+    const convertibleRuntime = loadRuntime();
+    convertibleRuntime.state.bodyStyle = "convertible";
+    convertibleRuntime.state.trimLevel = "1LT";
+    convertibleRuntime.state.selected.add("opt_zz3_001");
+    assert.equal(convertibleRuntime.optionPrice(optionId), 595, `${rpo} convertible ZZ3 price`);
   }
 });
 

@@ -325,6 +325,9 @@ function optionPrice(optionId) {
   const selectedIds = selectedContextIds();
   const priceRules = priceRulesByTarget.get(optionId) || [];
   for (const rule of priceRules) {
+    if (!scopeMatches(rule.body_style_scope, state.bodyStyle)) continue;
+    if (!scopeMatches(rule.trim_level_scope, state.trimLevel)) continue;
+    if (!scopeMatches(rule.variant_scope, currentVariantId())) continue;
     if (rule.price_rule_type === "override" && selectedIds.has(rule.condition_option_id)) {
       return Number(rule.price_value || 0);
     }

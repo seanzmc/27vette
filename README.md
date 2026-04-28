@@ -41,6 +41,19 @@ The current workbook-to-app workflow lives at the project root:
 - `scripts/generate_stingray_form.py` - regenerates workbook form sheets, `form-output/`, and `form-app/data.js`
 - `form-output/` - generated JSON and CSV contract exports used for inspection and handoff
 
+### Workbook Generator Setup
+
+Use a project-local Python environment before running the workbook generator:
+
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python scripts/generate_stingray_form.py
+node --test tests/stingray-form-regression.test.mjs
+```
+
 ## Archived Materials
 
 Deprecated planning, skill, reference, and source-transformation materials live in `archived/`.
