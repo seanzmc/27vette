@@ -146,29 +146,40 @@ test("selection modes have friendly display labels", () => {
   }
 });
 
-test("engine cover variants are consolidated with convertible ZZ3 price overrides", () => {
+test("engine cover variants are consolidated with scoped B6P and ZZ3 price overrides", () => {
   for (const rpo of ["BC4", "BCP", "BCS"]) {
     const choices = uniqueChoicesByRpo(rpo);
     assert.equal(choices.length, 1, `${rpo} should be one option id`);
     assert.equal(Number(choices[0].base_price), 695, `${rpo} base price`);
-    const override = data.priceRules.find(
+    const b6pOverride = data.priceRules.find(
+      (rule) => rule.condition_option_id === "opt_b6p_001" && rule.target_option_id === choices[0].option_id
+    );
+    const zz3Override = data.priceRules.find(
       (rule) => rule.condition_option_id === "opt_zz3_001" && rule.target_option_id === choices[0].option_id
     );
-    assert.ok(override, `${rpo} needs a convertible ZZ3 price override`);
-    assert.equal(override.body_style_scope, "convertible", `${rpo} override body scope`);
-    assert.equal(Number(override.price_value), 595, `${rpo} convertible ZZ3 override price`);
+    assert.ok(b6pOverride, `${rpo} needs a coupe B6P price override`);
+    assert.equal(b6pOverride.body_style_scope, "coupe", `${rpo} B6P override body scope`);
+    assert.equal(Number(b6pOverride.price_value), 595, `${rpo} coupe B6P override price`);
+    assert.ok(zz3Override, `${rpo} needs a convertible ZZ3 price override`);
+    assert.equal(zz3Override.body_style_scope, "convertible", `${rpo} ZZ3 override body scope`);
+    assert.equal(Number(zz3Override.price_value), 595, `${rpo} convertible ZZ3 override price`);
   }
 });
 
-test("engine cover pricing stays coupe 695 and convertible ZZ3 595", () => {
+test("engine cover pricing stays base 695 with scoped coupe B6P and convertible ZZ3 595", () => {
   for (const rpo of ["BC4", "BCP", "BCS"]) {
     const optionId = uniqueChoicesByRpo(rpo)[0].option_id;
 
-    const coupeRuntime = loadRuntime();
-    coupeRuntime.state.bodyStyle = "coupe";
-    coupeRuntime.state.trimLevel = "1LT";
-    coupeRuntime.state.selected.add("opt_b6p_001");
-    assert.equal(coupeRuntime.optionPrice(optionId), 695, `${rpo} coupe price`);
+    const baseCoupeRuntime = loadRuntime();
+    baseCoupeRuntime.state.bodyStyle = "coupe";
+    baseCoupeRuntime.state.trimLevel = "1LT";
+    assert.equal(baseCoupeRuntime.optionPrice(optionId), 695, `${rpo} base coupe price`);
+
+    const b6pCoupeRuntime = loadRuntime();
+    b6pCoupeRuntime.state.bodyStyle = "coupe";
+    b6pCoupeRuntime.state.trimLevel = "1LT";
+    b6pCoupeRuntime.state.selected.add("opt_b6p_001");
+    assert.equal(b6pCoupeRuntime.optionPrice(optionId), 595, `${rpo} coupe B6P price`);
 
     const convertibleRuntime = loadRuntime();
     convertibleRuntime.state.bodyStyle = "convertible";

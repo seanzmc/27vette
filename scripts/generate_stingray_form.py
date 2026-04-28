@@ -537,23 +537,37 @@ def main() -> None:
 
     existing_price_rule_ids = {row.get("price_rule_id", "") for row in price_rules_raw}
     for option_id in sorted(CONSOLIDATED_ENGINE_COVERS):
-        price_rule_id = f"pr_zz3_convertible_{option_id}_001"
-        if price_rule_id in existing_price_rule_ids:
-            continue
-        price_rules_raw.append(
+        engine_cover_price_rules = [
             {
-                "price_rule_id": price_rule_id,
+                "price_rule_id": f"pr_b6p_coupe_{option_id}_001",
+                "condition_option_id": "opt_b6p_001",
+                "body_style_scope": "coupe",
+                "notes": "B6P selected sets coupe LS6 engine cover price to 595",
+            },
+            {
+                "price_rule_id": f"pr_zz3_convertible_{option_id}_001",
                 "condition_option_id": "opt_zz3_001",
-                "target_option_id": option_id,
-                "price_rule_type": "override",
-                "price_value": "595",
                 "body_style_scope": "convertible",
-                "trim_level_scope": "",
-                "variant_scope": "",
-                "review_flag": "False",
                 "notes": "ZZ3 selected sets convertible LS6 engine cover price to 595",
-            }
-        )
+            },
+        ]
+        for price_rule in engine_cover_price_rules:
+            if price_rule["price_rule_id"] in existing_price_rule_ids:
+                continue
+            price_rules_raw.append(
+                {
+                    "price_rule_id": price_rule["price_rule_id"],
+                    "condition_option_id": price_rule["condition_option_id"],
+                    "target_option_id": option_id,
+                    "price_rule_type": "override",
+                    "price_value": "595",
+                    "body_style_scope": price_rule["body_style_scope"],
+                    "trim_level_scope": "",
+                    "variant_scope": "",
+                    "review_flag": "False",
+                    "notes": price_rule["notes"],
+                }
+            )
 
     active_variants = [
         {

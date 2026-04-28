@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-04-28T21:26:38+00:00"
+    "generated_at": "2026-04-28T21:44:07+00:00"
   },
   "variants": [
     {
@@ -51503,6 +51503,18 @@
       "notes": "1. Included with (B6P/ZZ3) Engine Appearance Package."
     },
     {
+      "price_rule_id": "pr_b6p_coupe_opt_bc4_001_001",
+      "condition_option_id": "opt_b6p_001",
+      "target_option_id": "opt_bc4_001",
+      "price_rule_type": "override",
+      "price_value": 595,
+      "body_style_scope": "coupe",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "review_flag": "False",
+      "notes": "B6P selected sets coupe LS6 engine cover price to 595"
+    },
+    {
       "price_rule_id": "pr_zz3_convertible_opt_bc4_001_001",
       "condition_option_id": "opt_zz3_001",
       "target_option_id": "opt_bc4_001",
@@ -51515,6 +51527,18 @@
       "notes": "ZZ3 selected sets convertible LS6 engine cover price to 595"
     },
     {
+      "price_rule_id": "pr_b6p_coupe_opt_bcp_001_001",
+      "condition_option_id": "opt_b6p_001",
+      "target_option_id": "opt_bcp_001",
+      "price_rule_type": "override",
+      "price_value": 595,
+      "body_style_scope": "coupe",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "review_flag": "False",
+      "notes": "B6P selected sets coupe LS6 engine cover price to 595"
+    },
+    {
       "price_rule_id": "pr_zz3_convertible_opt_bcp_001_001",
       "condition_option_id": "opt_zz3_001",
       "target_option_id": "opt_bcp_001",
@@ -51525,6 +51549,18 @@
       "variant_scope": "",
       "review_flag": "False",
       "notes": "ZZ3 selected sets convertible LS6 engine cover price to 595"
+    },
+    {
+      "price_rule_id": "pr_b6p_coupe_opt_bcs_001_001",
+      "condition_option_id": "opt_b6p_001",
+      "target_option_id": "opt_bcs_001",
+      "price_rule_type": "override",
+      "price_value": 595,
+      "body_style_scope": "coupe",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "review_flag": "False",
+      "notes": "B6P selected sets coupe LS6 engine cover price to 595"
     },
     {
       "price_rule_id": "pr_zz3_convertible_opt_bcs_001_001",
