@@ -669,6 +669,21 @@ test("R6X is auto-only and D30 is the only visible disabled color override card"
   );
 });
 
+test("generated R6X interiors include the PriceRef R6X price component", () => {
+  const byId = new Map(activeInteriors.map((interior) => [interior.interior_id, interior]));
+  const r6xInteriors = activeInteriors.filter((interior) => interior.interior_id.includes("R6X"));
+  assert.ok(r6xInteriors.length > 0, "active R6X interiors should exist");
+  assert.equal(r6xInteriors.every((interior) => Number(interior.price) >= 995), true, "R6X interiors should include the $995 R6X component");
+
+  assert.equal(Number(byId.get("3LT_R6X_AH2_HVV")?.price), 995);
+  assert.equal(Number(byId.get("3LT_R6X_AH2_HVV_TU7")?.price), 1590);
+  assert.equal(Number(byId.get("3LT_R6X_AH2_HMO_N26")?.price), 1690);
+  assert.equal(Number(byId.get("3LT_R6X_AE4_HUU")?.price), 995);
+
+  assert.equal(Number(byId.get("3LT_AH2_HUW")?.price), 0, "non-R6X interiors should not receive the R6X component");
+  assert.equal(Number(byId.get("3LT_AE4_HUW")?.price), 595, "non-R6X AE4 interiors should keep their existing seat component only");
+});
+
 test("R6X keeps normal price unless D30 is present in the selected context", () => {
   const runtime = loadRuntime();
   runtime.state.trimLevel = "3LT";

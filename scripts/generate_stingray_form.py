@@ -373,6 +373,41 @@ def interior_price(row: dict[str, str]) -> int:
     return money(row.get("Price") or row.get("Cost"))
 
 
+def price_ref_key(trim: str, code: str) -> tuple[str, str]:
+    return (clean(trim).replace("_", " "), clean(code))
+
+
+def price_ref_prices(rows: list[dict[str, str]]) -> dict[tuple[str, str], int]:
+    prices: dict[tuple[str, str], int] = {}
+    for row in rows:
+        if clean(row.get("OptionType", "")).lower() != "seat":
+            continue
+        trim = clean(row.get("Trim", ""))
+        code = clean(row.get("Code", ""))
+        if trim and code:
+            prices[price_ref_key(trim, code)] = money(row.get("Price"))
+    return prices
+
+
+def r6x_price_component(row: dict[str, str], price_ref: dict[tuple[str, str], int]) -> int:
+    trim = clean(row.get("Trim", ""))
+    interior_id = clean(row.get("interior_id", "") or row.get("ID", ""))
+    if "R6X" not in trim and "R6X" not in interior_id:
+        return 0
+
+    seat = clean(row.get("Seat", ""))
+    r6x_trim = trim if "R6X" in trim else f"{trim}_R6X"
+    base_trim = r6x_trim.replace("_R6X", "")
+    r6x_price = price_ref.get(price_ref_key(r6x_trim, seat))
+    if r6x_price is None:
+        return 0
+    return max(0, r6x_price - price_ref.get(price_ref_key(base_trim, seat), 0))
+
+
+def generated_interior_price(row: dict[str, str], price_ref: dict[tuple[str, str], int]) -> int:
+    return interior_price(row) + r6x_price_component(row, price_ref)
+
+
 def clean_reference_label(value: str) -> str:
     label = clean(value)
     if " - " in label:
@@ -499,6 +534,7 @@ def main() -> None:
     price_rules_raw = rows_from_sheet(wb, "price_rules")
     lt_interiors_raw = rows_from_sheet(wb, "lt_interiors")
     lz_interiors_raw = rows_from_sheet(wb, "LZ_Interiors")
+    price_ref = price_ref_prices(rows_from_sheet(wb, "PriceRef"))
     color_overrides_raw = rows_from_sheet(wb, "color_overrides")
     interior_reference_by_id, interior_reference_rows = read_interior_reference()
 
@@ -764,7 +800,7 @@ def main() -> None:
                 "interior_code": row.get("Interior Code", ""),
                 "interior_name": row.get("Interior Name", ""),
                 "material": row.get("Material", ""),
-                "price": interior_price(row),
+                "price": generated_interior_price(row, price_ref),
                 "suede": row.get("Suede", ""),
                 "stitch": row.get("Stitch", ""),
                 "two_tone": row.get("Two Tone", ""),
@@ -785,7 +821,7 @@ def main() -> None:
                 "interior_code": row.get("Interior Code", ""),
                 "interior_name": row.get("Interior Name", ""),
                 "material": row.get("Material", ""),
-                "price": interior_price(row),
+                "price": generated_interior_price(row, price_ref),
                 "suede": row.get("Suede", ""),
                 "stitch": row.get("Stitch", ""),
                 "two_tone": row.get("Two Tone", ""),
