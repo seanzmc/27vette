@@ -236,7 +236,35 @@ EXCLUSIVE_GROUPS = [
         "selection_mode": "single_within_group",
         "active": "True",
         "notes": "Spoiler choices are mutually exclusive within the Spoiler section.",
-    }
+    },
+    {
+        "group_id": "excl_center_caps",
+        "option_ids": ["opt_rxj_001", "opt_vwd_001", "opt_5zd_001", "opt_5zc_001", "opt_rxh_001"],
+        "selection_mode": "single_within_group",
+        "active": "True",
+        "notes": "Center cap choices are mutually exclusive within the Wheels section.",
+    },
+    {
+        "group_id": "excl_indoor_car_covers",
+        "option_ids": ["opt_rwh_001", "opt_sl1_001", "opt_wkr_001", "opt_wkq_001"],
+        "selection_mode": "single_within_group",
+        "active": "True",
+        "notes": "Indoor car cover choices are mutually exclusive within the Aero, Exhaust, Stripes & Accessories section.",
+    },
+    {
+        "group_id": "excl_outdoor_car_covers",
+        "option_ids": ["opt_rnx_001", "opt_rwj_001"],
+        "selection_mode": "single_within_group",
+        "active": "True",
+        "notes": "Outdoor car cover choices are mutually exclusive within the Aero, Exhaust, Stripes & Accessories section.",
+    },
+    {
+        "group_id": "excl_suede_trunk_liner",
+        "option_ids": ["opt_sxb_001", "opt_sxr_001", "opt_sxt_001"],
+        "selection_mode": "single_within_group",
+        "active": "True",
+        "notes": "Suede trunk liner choices are mutually exclusive within the Interior Trim section.",
+    },
 ]
 
 SELECTION_MODE_LABELS = {

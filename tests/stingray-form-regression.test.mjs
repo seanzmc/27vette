@@ -149,6 +149,45 @@ function uniqueChoicesByRpo(rpo) {
   return [...new Map(data.choices.filter((choice) => choice.rpo === rpo).map((choice) => [choice.option_id, choice])).values()];
 }
 
+const expectedAccessoryExclusiveGroups = [
+  {
+    groupId: "excl_center_caps",
+    rpos: ["RXJ", "VWD", "5ZD", "5ZC", "RXH"],
+    optionIds: ["opt_rxj_001", "opt_vwd_001", "opt_5zd_001", "opt_5zc_001", "opt_rxh_001"],
+  },
+  {
+    groupId: "excl_indoor_car_covers",
+    rpos: ["RWH", "SL1", "WKR", "WKQ"],
+    optionIds: ["opt_rwh_001", "opt_sl1_001", "opt_wkr_001", "opt_wkq_001"],
+  },
+  {
+    groupId: "excl_outdoor_car_covers",
+    rpos: ["RNX", "RWJ"],
+    optionIds: ["opt_rnx_001", "opt_rwj_001"],
+  },
+  {
+    groupId: "excl_suede_trunk_liner",
+    rpos: ["SXB", "SXR", "SXT"],
+    optionIds: ["opt_sxb_001", "opt_sxr_001", "opt_sxt_001"],
+  },
+];
+
+function activeSelectableOptionIdsForRpo(rpo) {
+  return [
+    ...new Set(
+      data.choices
+        .filter(
+          (choice) =>
+            choice.rpo === rpo &&
+            choice.active === "True" &&
+            choice.selectable === "True" &&
+            choice.step_key !== "standard_equipment"
+        )
+        .map((choice) => choice.option_id)
+    ),
+  ];
+}
+
 function activeChoiceFor(runtime, rpo) {
   return runtime.activeChoiceRows().find((choice) => choice.rpo === rpo && choice.step_key === "seat");
 }
@@ -293,6 +332,53 @@ test("spoiler exclusive group removes other selected spoiler options", () => {
     for (const peerId of spoilerIds.filter((item) => item !== targetId)) {
       assert.equal(runtime.state.selected.has(peerId), false, `${peerId} should be removed from selected`);
       assert.equal(runtime.state.userSelected.has(peerId), false, `${peerId} should be removed from userSelected`);
+    }
+  }
+});
+
+test("accessory exclusive groups are generated from the expected active RPOs", () => {
+  assert.ok(Array.isArray(data.exclusiveGroups), "exclusiveGroups should be generated");
+  for (const expectedGroup of expectedAccessoryExclusiveGroups) {
+    const group = data.exclusiveGroups.find((item) => item.group_id === expectedGroup.groupId);
+    assert.ok(group, `${expectedGroup.groupId} should be generated`);
+    assert.equal(group.selection_mode, "single_within_group", `${expectedGroup.groupId} should use generic single-choice behavior`);
+    assert.deepEqual(JSON.parse(JSON.stringify(group.option_ids)), expectedGroup.optionIds);
+
+    const resolvedIdsByRpo = expectedGroup.rpos.map((rpo) => activeSelectableOptionIdsForRpo(rpo));
+    assert.deepEqual(
+      resolvedIdsByRpo,
+      expectedGroup.optionIds.map((optionId) => [optionId]),
+      `${expectedGroup.groupId} should resolve every listed RPO to one active selectable option`
+    );
+    assert.deepEqual(
+      expectedGroup.rpos.filter((rpo) => activeSelectableOptionIdsForRpo(rpo).length === 0),
+      [],
+      `${expectedGroup.groupId} should not silently miss listed RPOs`
+    );
+  }
+});
+
+test("accessory exclusive groups remove other selected options in the same group", () => {
+  for (const expectedGroup of expectedAccessoryExclusiveGroups) {
+    for (const targetId of expectedGroup.optionIds) {
+      const runtime = loadRuntime();
+      runtime.state.bodyStyle = "coupe";
+      runtime.state.trimLevel = "1LT";
+      for (const id of expectedGroup.optionIds.filter((item) => item !== targetId)) {
+        runtime.state.selected.add(id);
+        runtime.state.userSelected.add(id);
+      }
+
+      const targetChoice = runtime.activeChoiceRows().find((choice) => choice.option_id === targetId);
+      assert.ok(targetChoice, `${targetId} should exist for the current variant`);
+      runtime.handleChoice(targetChoice);
+
+      assert.equal(runtime.state.selected.has(targetId), true, `${targetId} should be selected`);
+      assert.equal(runtime.state.userSelected.has(targetId), true, `${targetId} should be user-selected`);
+      for (const peerId of expectedGroup.optionIds.filter((item) => item !== targetId)) {
+        assert.equal(runtime.state.selected.has(peerId), false, `${peerId} should be removed from selected`);
+        assert.equal(runtime.state.userSelected.has(peerId), false, `${peerId} should be removed from userSelected`);
+      }
     }
   }
 });
