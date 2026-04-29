@@ -389,6 +389,31 @@ def price_ref_prices(rows: list[dict[str, str]]) -> dict[tuple[str, str], int]:
     return prices
 
 
+def price_ref_component_prices(rows: list[dict[str, str]]) -> dict[tuple[str, str, str], int]:
+    prices: dict[tuple[str, str, str], int] = {}
+    for row in rows:
+        option_type = clean(row.get("OptionType", "")).lower()
+        code = clean(row.get("Code", ""))
+        if not option_type or not code:
+            continue
+        prices[(option_type, clean(row.get("Trim", "")).replace("_", " "), code)] = money(row.get("Price"))
+    return prices
+
+
+def price_ref_component_price(
+    price_ref: dict[tuple[str, str, str], int],
+    option_type: str,
+    code: str,
+    trim: str = "",
+) -> int:
+    normalized_type = clean(option_type).lower()
+    normalized_trim = clean(trim).replace("_", " ")
+    normalized_code = clean(code)
+    if (normalized_type, normalized_trim, normalized_code) in price_ref:
+        return price_ref[(normalized_type, normalized_trim, normalized_code)]
+    return price_ref.get((normalized_type, "", normalized_code), 0)
+
+
 def r6x_price_component(row: dict[str, str], price_ref: dict[tuple[str, str], int]) -> int:
     trim = clean(row.get("Trim", ""))
     interior_id = clean(row.get("interior_id", "") or row.get("ID", ""))
@@ -406,6 +431,84 @@ def r6x_price_component(row: dict[str, str], price_ref: dict[tuple[str, str], in
 
 def generated_interior_price(row: dict[str, str], price_ref: dict[tuple[str, str], int]) -> int:
     return interior_price(row) + r6x_price_component(row, price_ref)
+
+
+INTERIOR_COMPONENT_LABELS = {
+    "36S": "Yellow Stitching",
+    "37S": "Blue Stitching",
+    "38S": "Red Stitching",
+    "N26": "Sueded Microfiber",
+    "N2Z": "Sueded Microfiber",
+    "TU7": "Two-Tone",
+    "R6X": "Custom Interior Trim and Seat Combination",
+}
+
+
+def interior_component_metadata(
+    row: dict[str, str],
+    price_ref: dict[tuple[str, str, str], int],
+) -> list[dict[str, Any]]:
+    trim = clean(row.get("Trim", ""))
+    interior_id = clean(row.get("interior_id", "") or row.get("ID", ""))
+    seat = clean(row.get("Seat", ""))
+    tokens = set(interior_id.split("_"))
+    components: list[dict[str, Any]] = []
+
+    if "R6X" in trim or "R6X" in tokens:
+        r6x_trim = trim if "R6X" in trim else f"{trim}_R6X"
+        components.append(
+            {
+                "rpo": "R6X",
+                "label": INTERIOR_COMPONENT_LABELS["R6X"],
+                "price": price_ref_component_price(price_ref, "seat", seat, r6x_trim),
+                "component_type": "r6x",
+            }
+        )
+    else:
+        seat_price = price_ref_component_price(price_ref, "seat", seat, trim)
+        if seat_price:
+            components.append(
+                {
+                    "rpo": seat,
+                    "label": f"{seat} Seat Upgrade",
+                    "price": seat_price,
+                    "component_type": "seat",
+                }
+            )
+
+    for rpo in ("36S", "37S", "38S"):
+        if rpo in tokens:
+            components.append(
+                {
+                    "rpo": rpo,
+                    "label": INTERIOR_COMPONENT_LABELS[rpo],
+                    "price": price_ref_component_price(price_ref, "stitching", rpo),
+                    "component_type": "stitching",
+                }
+            )
+
+    for rpo in ("N26", "N2Z"):
+        if rpo in tokens:
+            components.append(
+                {
+                    "rpo": rpo,
+                    "label": INTERIOR_COMPONENT_LABELS[rpo],
+                    "price": price_ref_component_price(price_ref, "suede", rpo),
+                    "component_type": "suede",
+                }
+            )
+
+    if "TU7" in tokens:
+        components.append(
+            {
+                "rpo": "TU7",
+                "label": INTERIOR_COMPONENT_LABELS["TU7"],
+                "price": price_ref_component_price(price_ref, "twotone", "TU7"),
+                "component_type": "two_tone",
+            }
+        )
+
+    return [component for component in components if component["price"] or component["rpo"] == "R6X"]
 
 
 def clean_reference_label(value: str) -> str:
@@ -534,7 +637,9 @@ def main() -> None:
     price_rules_raw = rows_from_sheet(wb, "price_rules")
     lt_interiors_raw = rows_from_sheet(wb, "lt_interiors")
     lz_interiors_raw = rows_from_sheet(wb, "LZ_Interiors")
-    price_ref = price_ref_prices(rows_from_sheet(wb, "PriceRef"))
+    price_ref_rows = rows_from_sheet(wb, "PriceRef")
+    price_ref = price_ref_prices(price_ref_rows)
+    interior_component_price_ref = price_ref_component_prices(price_ref_rows)
     color_overrides_raw = rows_from_sheet(wb, "color_overrides")
     interior_reference_by_id, interior_reference_rows = read_interior_reference()
 
@@ -789,6 +894,7 @@ def main() -> None:
     for row in lt_interiors_raw:
         trim = row.get("Trim", "")
         interior_id = row.get("interior_id", "")
+        components = interior_component_metadata(row, interior_component_price_ref)
         interiors.append(
             {
                 "interior_id": interior_id,
@@ -807,9 +913,12 @@ def main() -> None:
                 "section_id": row.get("section_id", ""),
                 "color_overrides_raw": row.get("Color Overrides", ""),
                 "source_note": row.get("Detail from Disclosure", ""),
+                "interior_components": components,
+                "interior_components_json": json.dumps(components, separators=(",", ":")),
             }
         )
     for row in lz_interiors_raw:
+        components = interior_component_metadata(row, interior_component_price_ref)
         interiors.append(
             {
                 "interior_id": row.get("ID", ""),
@@ -828,6 +937,8 @@ def main() -> None:
                 "section_id": "",
                 "color_overrides_raw": row.get("Color Overrides", ""),
                 "source_note": row.get("Detail from Disclosure", ""),
+                "interior_components": components,
+                "interior_components_json": json.dumps(components, separators=(",", ":")),
             }
         )
     validation_rows: list[dict[str, Any]] = []
@@ -1322,6 +1433,7 @@ def main() -> None:
             "section_id",
             "color_overrides_raw",
             "source_note",
+            "interior_components_json",
             "interior_trim_level",
             "interior_seat_code",
             "interior_seat_label",

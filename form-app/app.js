@@ -413,19 +413,64 @@ function lineItemFromInterior(interior) {
   };
 }
 
+function interiorComponents(interior) {
+  return Array.isArray(interior?.interior_components) ? interior.interior_components : [];
+}
+
+function selectedInteriorReplacesSeat(interior) {
+  return interiorComponents(interior).some((component) => ["seat", "r6x"].includes(component.component_type));
+}
+
+function interiorComponentPrice(component, autoAdded) {
+  if (component.rpo === "R6X" && autoAdded.has("opt_d30_001")) return 0;
+  return Number(component.price || 0);
+}
+
+function lineItemFromInteriorComponent(interior, component, autoAdded) {
+  return {
+    id: `${interior.interior_id}__${component.rpo}`,
+    rpo: component.rpo || "",
+    label: component.label || "",
+    description: interior.interior_name || "",
+    price: interiorComponentPrice(component, autoAdded),
+    type: "interior_component",
+    section_key: "seats_interior",
+    section_label: sectionLabelForKey("seats_interior"),
+    category_name: interior.interior_seat_label || "Base Interior",
+    step_key: "base_interior",
+    component_type: component.component_type || "",
+  };
+}
+
+function lineItemsFromInterior(interior, autoAdded) {
+  const components = interiorComponents(interior);
+  if (!components.length) return [lineItemFromInterior(interior)];
+
+  const seat = selectedSeatChoice();
+  const replacedSeatPrice = selectedInteriorReplacesSeat(interior) ? Number(seat?.base_price || 0) : 0;
+  const componentBaseTotal = components.reduce((sum, component) => sum + Number(component.price || 0), 0);
+  const identityPrice = Math.max(0, replacedSeatPrice + adjustedInteriorPrice(interior) - componentBaseTotal);
+  return [
+    { ...lineItemFromInterior(interior), price: identityPrice },
+    ...components.map((component) => lineItemFromInteriorComponent(interior, component, autoAdded)),
+  ];
+}
+
 function lineItems() {
   const autoAdded = computeAutoAdded();
   const rows = [];
+  const interior = state.selectedInterior ? interiorsById.get(state.selectedInterior) : null;
+  const skipSelectedSeat = interior ? selectedInteriorReplacesSeat(interior) : false;
   for (const id of state.selected) {
     if (autoAdded.has(id)) continue;
     const option = optionsById.get(id);
     if (option) {
+      if (skipSelectedSeat && option.step_key === "seat") continue;
       rows.push(lineItemFromOption(option, "selected", optionPrice(id)));
     }
   }
-  if (state.selectedInterior) {
-    const interior = interiorsById.get(state.selectedInterior);
-    if (interior) rows.push(lineItemFromInterior(interior));
+  if (interior) {
+    rows.push(...lineItemsFromInterior(interior, autoAdded));
   }
   for (const [id, reason] of autoAdded) {
     const option = optionsById.get(id);
@@ -1160,6 +1205,7 @@ function currentOrder() {
   };
   const selectedOptions = items.filter((item) => item.type === "selected");
   const autoAddedOptions = items.filter((item) => item.type === "auto_added");
+  const interiorComponents = items.filter((item) => item.type === "interior_component");
   const selectedInterior = items.find((item) => item.type === "selected_interior") || {};
   return {
     customer: customerInformation(),
@@ -1168,6 +1214,7 @@ function currentOrder() {
     sections: sectionedOrderRecap(items, pricing),
     selected_options: selectedOptions,
     auto_added_options: autoAddedOptions,
+    interior_components: interiorComponents,
     selected_interior: selectedInterior,
     standard_equipment_summary: standardEquipmentSummary(variant),
     metadata: {

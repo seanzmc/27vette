@@ -149,6 +149,35 @@ function uniqueChoicesByRpo(rpo) {
   return [...new Map(data.choices.filter((choice) => choice.rpo === rpo).map((choice) => [choice.option_id, choice])).values()];
 }
 
+function activeChoiceFor(runtime, rpo) {
+  return runtime.activeChoiceRows().find((choice) => choice.rpo === rpo && choice.step_key === "seat");
+}
+
+function configureInteriorOrder({ trimLevel, interiorId, seatRpo, bodyStyle = "coupe", selectedOptionIds = [] }) {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = bodyStyle;
+  runtime.state.trimLevel = trimLevel;
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  if (seatRpo) {
+    const seat = activeChoiceFor(runtime, seatRpo);
+    assert.ok(seat, `${seatRpo} seat should exist for ${trimLevel}`);
+    runtime.handleChoice(seat);
+  }
+  for (const optionId of selectedOptionIds) {
+    runtime.state.selected.add(optionId);
+    runtime.state.userSelected.add(optionId);
+  }
+  runtime.state.selectedInterior = interiorId;
+  return runtime;
+}
+
+function compactSeatInteriorItems(runtime) {
+  const section = runtime.compactOrder().sections.find((item) => item.section === "Seats & Interior");
+  assert.ok(section, "compact order should include Seats & Interior");
+  return section.items;
+}
+
 test("runtime steps include customer info and omit interior styling", () => {
   const keys = data.steps.map((step) => step.step_key);
   assert.ok(keys.includes("customer_info"));
@@ -672,6 +701,116 @@ test("plain text order summary omits empty comments and internal debug fields", 
   ]) {
     assert.equal(summary.includes(forbidden), false, `summary should omit ${forbidden}`);
   }
+});
+
+test("generated interiors expose priced component metadata from PriceRef", () => {
+  const byId = new Map(activeInteriors.map((interior) => [interior.interior_id, interior]));
+  const expectations = [
+    ["2LT_AQ9_H1Y_36S", [{ rpo: "36S", label: "Yellow Stitching", price: 495, component_type: "stitching" }]],
+    ["2LT_AQ9_H1Y_37S", [{ rpo: "37S", label: "Blue Stitching", price: 495, component_type: "stitching" }]],
+    ["2LT_AQ9_H1Y_38S", [{ rpo: "38S", label: "Red Stitching", price: 495, component_type: "stitching" }]],
+    ["2LT_AH2_HTP_N26", [{ rpo: "N26", label: "Sueded Microfiber", price: 695, component_type: "suede" }]],
+    ["2LT_AH2_HTN_TU7", [{ rpo: "TU7", label: "Two-Tone", price: 595, component_type: "two_tone" }]],
+    ["3LT_R6X_AH2_HUU", [{ rpo: "R6X", label: "Custom Interior Trim and Seat Combination", price: 995, component_type: "r6x" }]],
+    ["3LT_R6X_AE4_HUU", [{ rpo: "R6X", label: "Custom Interior Trim and Seat Combination", price: 1590, component_type: "r6x" }]],
+  ];
+
+  for (const [interiorId, expectedComponents] of expectations) {
+    const interior = byId.get(interiorId);
+    assert.ok(interior, `${interiorId} should be active`);
+    assert.ok(Array.isArray(interior.interior_components), `${interiorId} should expose interior_components`);
+    for (const expected of expectedComponents) {
+      assert.deepEqual(
+        JSON.parse(JSON.stringify(interior.interior_components.find((component) => component.rpo === expected.rpo))),
+        expected,
+        `${interiorId} should include ${expected.rpo}`
+      );
+    }
+  }
+});
+
+test("compact and plain text order output break selected interior into priced component RPO lines", () => {
+  const cases = [
+    {
+      trimLevel: "2LT",
+      interiorId: "2LT_AQ9_H1Y_36S",
+      expected: { rpo: "36S", label: "Yellow Stitching", price: 495 },
+    },
+    {
+      trimLevel: "2LT",
+      interiorId: "2LT_AQ9_H1Y_37S",
+      expected: { rpo: "37S", label: "Blue Stitching", price: 495 },
+    },
+    {
+      trimLevel: "2LT",
+      interiorId: "2LT_AQ9_H1Y_38S",
+      expected: { rpo: "38S", label: "Red Stitching", price: 495 },
+    },
+    {
+      trimLevel: "2LT",
+      interiorId: "2LT_AH2_HTP_N26",
+      seatRpo: "AH2",
+      expected: { rpo: "N26", label: "Sueded Microfiber", price: 695 },
+    },
+    {
+      trimLevel: "2LT",
+      interiorId: "2LT_AH2_HTN_TU7",
+      seatRpo: "AH2",
+      expected: { rpo: "TU7", label: "Two-Tone", price: 595 },
+    },
+  ];
+
+  for (const item of cases) {
+    const runtime = configureInteriorOrder(item);
+    const compactItems = compactSeatInteriorItems(runtime);
+    assert.ok(
+      compactItems.some(
+        (compactItem) =>
+          compactItem.rpo === item.expected.rpo &&
+          compactItem.label === item.expected.label &&
+          compactItem.price === item.expected.price
+      ),
+      `${item.interiorId} should show ${item.expected.rpo} as a compact component line`
+    );
+    assert.equal(
+      compactItems.filter((compactItem) => compactItem.rpo === data.interiors.find((interior) => interior.interior_id === item.interiorId)?.interior_code).length,
+      1,
+      `${item.interiorId} selected interior identity should appear once`
+    );
+
+    const summary = runtime.plainTextOrderSummary();
+    assert.match(
+      summary,
+      new RegExp(`${item.expected.rpo} ${item.expected.label} \\$${item.expected.price.toLocaleString("en-US")}`),
+      `${item.interiorId} should show ${item.expected.rpo} in plain text`
+    );
+  }
+});
+
+test("R6X component order output uses PriceRef pricing and D30 only zeroes the R6X component", () => {
+  const ah2Runtime = configureInteriorOrder({ trimLevel: "3LT", interiorId: "3LT_R6X_AH2_HUU", seatRpo: "AH2" });
+  assert.ok(
+    compactSeatInteriorItems(ah2Runtime).some((item) => item.rpo === "R6X" && item.label === "Custom Interior Trim and Seat Combination" && item.price === 995),
+    "3LT R6X AH2 should show R6X at $995"
+  );
+
+  const ae4Runtime = configureInteriorOrder({ trimLevel: "3LT", interiorId: "3LT_R6X_AE4_HUU", seatRpo: "AE4" });
+  assert.ok(
+    compactSeatInteriorItems(ae4Runtime).some((item) => item.rpo === "R6X" && item.label === "Custom Interior Trim and Seat Combination" && item.price === 1590),
+    "3LT R6X AE4 should show R6X at $1,590"
+  );
+
+  const d30Runtime = configureInteriorOrder({
+    trimLevel: "3LT",
+    interiorId: "3LT_R6X_AH2_HZP_N26",
+    seatRpo: "AH2",
+    selectedOptionIds: ["opt_g26_001"],
+  });
+  assert.equal(d30Runtime.computeAutoAdded().has("opt_d30_001"), true, "D30 should be triggered by selected color/interior context");
+  assert.ok(
+    compactSeatInteriorItems(d30Runtime).some((item) => item.rpo === "R6X" && item.label === "Custom Interior Trim and Seat Combination" && item.price === 0),
+    "D30-triggered R6X should remain visible at $0"
+  );
 });
 
 test("order summary helpers are exposed for browser debug inspection", () => {

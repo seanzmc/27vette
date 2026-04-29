@@ -2,7 +2,7 @@ window.STINGRAY_FORM_DATA = {
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-04-29T03:44:44+00:00"
+    "generated_at": "2026-04-29T17:46:05+00:00"
   },
   "variants": [
     {
@@ -51605,6 +51605,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_001",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 1095,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":1095,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "1LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -51637,6 +51652,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_001",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "1LT",
       "interior_seat_code": "AQ9",
       "interior_seat_label": "AQ9 GT1 Bucket Seats",
@@ -51669,6 +51686,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_001",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "1LT",
       "interior_seat_code": "AQ9",
       "interior_seat_label": "AQ9 GT1 Bucket Seats",
@@ -51701,6 +51720,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_001",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "1LT",
       "interior_seat_code": "AQ9",
       "interior_seat_label": "AQ9 GT1 Bucket Seats",
@@ -51733,6 +51754,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 2095,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":2095,\"component_type\":\"seat\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -51765,6 +51795,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 2095,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "36S",
+          "label": "Yellow Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":2095,\"component_type\":\"seat\"},{\"rpo\":\"36S\",\"label\":\"Yellow Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -51797,6 +51842,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 2095,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "37S",
+          "label": "Blue Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":2095,\"component_type\":\"seat\"},{\"rpo\":\"37S\",\"label\":\"Blue Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -51829,6 +51889,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 2095,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":2095,\"component_type\":\"seat\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -51861,6 +51936,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 2095,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":2095,\"component_type\":\"seat\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -51893,6 +51977,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 2095,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":2095,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -51925,6 +52024,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 2095,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "36S",
+          "label": "Yellow Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":2095,\"component_type\":\"seat\"},{\"rpo\":\"36S\",\"label\":\"Yellow Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -51957,6 +52077,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 2095,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "37S",
+          "label": "Blue Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":2095,\"component_type\":\"seat\"},{\"rpo\":\"37S\",\"label\":\"Blue Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -51989,6 +52130,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 2095,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":2095,\"component_type\":\"seat\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -52021,6 +52183,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 2095,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":2095,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -52053,6 +52230,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.  Seats are Jet Black when (AE4) Competition seats are ordered.\nRequires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 2095,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":2095,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -52085,6 +52277,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "Suede insert is black\nRequires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 2095,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":2095,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -52117,6 +52324,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "Seats are Jet Black when (AE4) Competition seats are ordered.",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 2095,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":2095,\"component_type\":\"seat\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -52149,6 +52365,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 2095,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":2095,\"component_type\":\"seat\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -52181,6 +52406,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52213,6 +52447,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "36S",
+          "label": "Yellow Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"},{\"rpo\":\"36S\",\"label\":\"Yellow Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52245,6 +52494,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "37S",
+          "label": "Blue Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"},{\"rpo\":\"37S\",\"label\":\"Blue Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52277,6 +52541,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52309,6 +52588,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52341,6 +52629,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52373,6 +52676,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52405,6 +52723,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "36S",
+          "label": "Yellow Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"},{\"rpo\":\"36S\",\"label\":\"Yellow Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52437,6 +52776,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "37S",
+          "label": "Blue Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"},{\"rpo\":\"37S\",\"label\":\"Blue Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52469,6 +52829,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52501,6 +52882,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.\nRequires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52533,6 +52929,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.\nRequires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        },
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52565,6 +52982,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.\nRequires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52597,6 +53029,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.\nRequires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        },
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52629,6 +53082,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "(AH2) GT2 bucket seats require (TU7) two-tone seats.\nSuede insert is black\nRequires (N26) sueded microfiber-wrapped steering wheel.",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        },
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52661,6 +53135,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.  Seats are Jet Black when (AE4) Competition seats are ordered.",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52693,6 +53176,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.  Seats are Jet Black when (AE4) Competition seats are ordered.",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52725,6 +53223,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52757,6 +53264,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.",
+      "interior_components": [
+        {
+          "rpo": "AH2",
+          "label": "AH2 Seat Upgrade",
+          "price": 1695,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AH2\",\"label\":\"AH2 Seat Upgrade\",\"price\":1695,\"component_type\":\"seat\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -52789,6 +53311,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AQ9",
       "interior_seat_label": "AQ9 GT1 Bucket Seats",
@@ -52821,6 +53345,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "36S",
+          "label": "Yellow Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"36S\",\"label\":\"Yellow Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AQ9",
       "interior_seat_label": "AQ9 GT1 Bucket Seats",
@@ -52853,6 +53386,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "37S",
+          "label": "Blue Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"37S\",\"label\":\"Blue Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AQ9",
       "interior_seat_label": "AQ9 GT1 Bucket Seats",
@@ -52885,6 +53427,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AQ9",
       "interior_seat_label": "AQ9 GT1 Bucket Seats",
@@ -52917,6 +53468,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AQ9",
       "interior_seat_label": "AQ9 GT1 Bucket Seats",
@@ -52949,6 +53502,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AQ9",
       "interior_seat_label": "AQ9 GT1 Bucket Seats",
@@ -52981,6 +53536,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_002",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "2LT",
       "interior_seat_code": "AQ9",
       "interior_seat_label": "AQ9 GT1 Bucket Seats",
@@ -53013,6 +53570,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G4Z, GKZ",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53045,6 +53611,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G4Z, GKZ",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53077,6 +53658,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GKZ, GPH",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53109,6 +53699,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GKZ, GPH",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53141,6 +53740,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "Full color interior (instrument panel, doors and carpet). comes with (3F9) Torch Red seat belt color",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53173,6 +53781,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53205,6 +53822,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "36S",
+          "label": "Yellow Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"36S\",\"label\":\"Yellow Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53237,6 +53869,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "37S",
+          "label": "Blue Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"37S\",\"label\":\"Blue Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53269,6 +53916,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53301,6 +53963,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.\nRequires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53333,6 +54010,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53365,6 +54057,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "36S",
+          "label": "Yellow Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"36S\",\"label\":\"Yellow Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53397,6 +54110,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "37S",
+          "label": "Blue Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"37S\",\"label\":\"Blue Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53429,6 +54163,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53461,6 +54216,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.  Seats are Jet Black when (AE4) Competition seats are ordered.",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53493,6 +54257,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53525,6 +54298,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Seats are Jet Black when (AE4) Competition seats are ordered.\nRequires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53557,6 +54345,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "(AH2) GT2 bucket seats require (TU7) two-tone seats.\n(AH2) GT2 seats are available with (TU7) two-tone seats option.\nRequires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53589,6 +54392,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53621,6 +54439,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "36S",
+          "label": "Yellow Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"36S\",\"label\":\"Yellow Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53653,6 +54492,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "37S",
+          "label": "Blue Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"37S\",\"label\":\"Blue Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53685,6 +54545,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53717,6 +54598,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53749,6 +54639,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "36S",
+          "label": "Yellow Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"36S\",\"label\":\"Yellow Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53781,6 +54686,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "37S",
+          "label": "Blue Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"37S\",\"label\":\"Blue Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53813,6 +54733,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53845,6 +54780,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53877,6 +54821,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Full color interior (instrument panel, doors and carpet). This interior features light color throughout and may require extra care to avoid soiling. Certain lighting conditions may cause a noticeable reflection on the inside of the windshield.\nRequires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53909,6 +54868,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G4Z, GBK, GKZ, GPH, GTR",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53941,6 +54909,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G4Z, GBK, GKZ, GPH, GTR",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -53973,6 +54956,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -54005,6 +54997,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Comes with (3N9) Natural seat belt color. Full color interior (instrument panel, doors and carpet). This interior features light color throughout and may require extra care to avoid soiling. Certain lighting conditions may cause a noticeable reflection on the inside of the windshield.",
+      "interior_components": [
+        {
+          "rpo": "AE4",
+          "label": "AE4 Seat Upgrade",
+          "price": 595,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -54037,6 +55038,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G4Z, GKZ",
       "source_note": "",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54069,6 +55072,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G4Z, GKZ",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54101,6 +55113,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GKZ, GPH",
       "source_note": "",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54133,6 +55147,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GKZ, GPH",
       "source_note": "",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54165,6 +55181,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "Full color interior (instrument panel, doors and carpet). comes with (3F9) Torch Red seat belt color",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54197,6 +55215,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54229,6 +55249,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "36S",
+          "label": "Yellow Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"36S\",\"label\":\"Yellow Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54261,6 +55290,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "37S",
+          "label": "Blue Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"37S\",\"label\":\"Blue Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54293,6 +55331,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54325,6 +55372,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.\nRequires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54357,6 +55413,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.\nRequires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        },
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54389,6 +55460,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54421,6 +55501,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "36S",
+          "label": "Yellow Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"36S\",\"label\":\"Yellow Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54453,6 +55548,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "37S",
+          "label": "Blue Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"37S\",\"label\":\"Blue Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54485,6 +55595,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54517,6 +55642,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.  Seats are Jet Black when (AE4) Competition seats are ordered.",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54549,6 +55676,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.  Seats are Jet Black when (AE4) Competition seats are ordered.",
+      "interior_components": [
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54581,6 +55717,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54613,6 +55751,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.",
+      "interior_components": [
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54645,6 +55792,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.  Seats are Jet Black when (AE4) Competition seats are ordered.\nRequires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54677,6 +55833,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.  Seats are Jet Black when (AE4) Competition seats are ordered.\nRequires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        },
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54709,6 +55880,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "(AH2) GT2 bucket seats require (TU7) two-tone seats.\n(AH2) GT2 seats are available with (TU7) two-tone seats option.\nRequires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        },
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54741,6 +55927,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54773,6 +55968,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "36S",
+          "label": "Yellow Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"36S\",\"label\":\"Yellow Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54805,6 +56015,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "37S",
+          "label": "Blue Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"37S\",\"label\":\"Blue Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54837,6 +56062,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54869,6 +56109,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54901,6 +56143,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "36S",
+          "label": "Yellow Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"36S\",\"label\":\"Yellow Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54933,6 +56184,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "37S",
+          "label": "Blue Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"37S\",\"label\":\"Blue Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54965,6 +56225,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -54997,6 +56266,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55029,6 +56300,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "(AH2) GT2 seats are available with (TU7) two-tone seats option.",
+      "interior_components": [
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55061,6 +56341,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Full color interior (instrument panel, doors and carpet). This interior features light color throughout and may require extra care to avoid soiling. Certain lighting conditions may cause a noticeable reflection on the inside of the windshield.\nRequires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55093,6 +56382,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G4Z, GBK, GKZ, GPH, GTR",
       "source_note": "",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55125,6 +56416,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G4Z, GBK, GKZ, GPH, GTR",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55157,6 +56457,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55189,6 +56491,8 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Comes with (3N9) Natural seat belt color. Full color interior (instrument panel, doors and carpet). This interior features light color throughout and may require extra care to avoid soiling. Certain lighting conditions may cause a noticeable reflection on the inside of the windshield.",
+      "interior_components": [],
+      "interior_components_json": "[]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55221,6 +56525,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GKZ, GPH",
       "source_note": "Driver's seat Santorini Blue Competition, passenger jet black with blue stitching GT2",
+      "interior_components": [
+        {
+          "rpo": "AUP",
+          "label": "AUP Seat Upgrade",
+          "price": 350,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AUP\",\"label\":\"AUP Seat Upgrade\",\"price\":350,\"component_type\":\"seat\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AUP",
       "interior_seat_label": "AUP Assymetrical seats",
@@ -55253,6 +56566,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "Driver's seat adrenaline red Competition, passenger jet black with red stitching GT2",
+      "interior_components": [
+        {
+          "rpo": "AUP",
+          "label": "AUP Seat Upgrade",
+          "price": 350,
+          "component_type": "seat"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"AUP\",\"label\":\"AUP Seat Upgrade\",\"price\":350,\"component_type\":\"seat\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AUP",
       "interior_seat_label": "AUP Assymetrical seats",
@@ -55285,6 +56607,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (38S) Adrenaline Red custom leather stitch.",
+      "interior_components": [
+        {
+          "rpo": "R6X",
+          "label": "Custom Interior Trim and Seat Combination",
+          "price": 1590,
+          "component_type": "r6x"
+        },
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -55317,6 +56654,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "R6X",
+          "label": "Custom Interior Trim and Seat Combination",
+          "price": 1590,
+          "component_type": "r6x"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -55349,6 +56695,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (38S) Adrenaline Red custom leather stitch. (AH2) GT2 bucket seats require (TU7) two-tone seats.\nRequires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "R6X",
+          "label": "Custom Interior Trim and Seat Combination",
+          "price": 1590,
+          "component_type": "r6x"
+        },
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -55381,6 +56748,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "R6X",
+          "label": "Custom Interior Trim and Seat Combination",
+          "price": 1590,
+          "component_type": "r6x"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -55413,6 +56795,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "R6X",
+          "label": "Custom Interior Trim and Seat Combination",
+          "price": 995,
+          "component_type": "r6x"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55445,6 +56842,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "R6X",
+          "label": "Custom Interior Trim and Seat Combination",
+          "price": 995,
+          "component_type": "r6x"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        },
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55477,6 +56895,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (38S) Adrenaline Red custom leather stitch.",
+      "interior_components": [
+        {
+          "rpo": "R6X",
+          "label": "Custom Interior Trim and Seat Combination",
+          "price": 995,
+          "component_type": "r6x"
+        },
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55509,6 +56942,27 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (38S) Adrenaline Red custom leather stitch.",
+      "interior_components": [
+        {
+          "rpo": "R6X",
+          "label": "Custom Interior Trim and Seat Combination",
+          "price": 995,
+          "component_type": "r6x"
+        },
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55541,6 +56995,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "R6X",
+          "label": "Custom Interior Trim and Seat Combination",
+          "price": 995,
+          "component_type": "r6x"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55573,6 +57036,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "R6X",
+          "label": "Custom Interior Trim and Seat Combination",
+          "price": 995,
+          "component_type": "r6x"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55605,6 +57083,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "R6X",
+          "label": "Custom Interior Trim and Seat Combination",
+          "price": 995,
+          "component_type": "r6x"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55637,6 +57124,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "R6X",
+          "label": "Custom Interior Trim and Seat Combination",
+          "price": 995,
+          "component_type": "r6x"
+        },
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55669,6 +57171,33 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "Requires (38S) Adrenaline Red custom leather stitch. (AH2) GT2 bucket seats require (TU7) two-tone seats.\nRequires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "R6X",
+          "label": "Custom Interior Trim and Seat Combination",
+          "price": 995,
+          "component_type": "r6x"
+        },
+        {
+          "rpo": "38S",
+          "label": "Red Stitching",
+          "price": 495,
+          "component_type": "stitching"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        },
+        {
+          "rpo": "TU7",
+          "label": "Two-Tone",
+          "price": 595,
+          "component_type": "two_tone"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55701,6 +57230,15 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "",
       "source_note": "",
+      "interior_components": [
+        {
+          "rpo": "R6X",
+          "label": "Custom Interior Trim and Seat Combination",
+          "price": 995,
+          "component_type": "r6x"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
@@ -55733,6 +57271,21 @@ window.STINGRAY_FORM_DATA = {
       "section_id": "sec_intc_003",
       "color_overrides_raw": "G26, G4Z, GBK, GPH",
       "source_note": "Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models;",
+      "interior_components": [
+        {
+          "rpo": "R6X",
+          "label": "Custom Interior Trim and Seat Combination",
+          "price": 995,
+          "component_type": "r6x"
+        },
+        {
+          "rpo": "N26",
+          "label": "Sueded Microfiber",
+          "price": 695,
+          "component_type": "suede"
+        }
+      ],
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AH2",
       "interior_seat_label": "AH2 GT2 Bucket Seats",
