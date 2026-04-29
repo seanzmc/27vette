@@ -1260,6 +1260,12 @@ function plainTextOrderSummary(order = compactOrder()) {
   return lines.join("\n").replace(/\n{3,}/g, "\n\n");
 }
 
+window.__orderDebug = {
+  currentOrder,
+  compactOrder,
+  plainTextOrderSummary,
+};
+
 function download(filename, content, type) {
   const blob = new Blob([content], { type });
   const url = URL.createObjectURL(blob);

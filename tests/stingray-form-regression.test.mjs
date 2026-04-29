@@ -674,6 +674,10 @@ test("plain text order summary omits empty comments and internal debug fields", 
   }
 });
 
+test("order summary helpers are exposed for browser debug inspection", () => {
+  assert.match(appSource, /window\.__orderDebug\s*=\s*\{\s*currentOrder,\s*compactOrder,\s*plainTextOrderSummary,\s*\}/);
+});
+
 test("replaceable suspension and exhaust defaults are encoded", () => {
   assert.match(appSource, /for \(const defaultRpo of \["FE1", "NGA", "BC7"\]\)/);
   assert.match(appSource, /selectedOptionByRpo\("Z51"\)/);
