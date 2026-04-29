@@ -73,9 +73,13 @@ function makeElement() {
 }
 
 function loadRuntime() {
+  const downloads = [];
   const context = {
     window: {
       STINGRAY_FORM_DATA: data,
+      __downloads: downloads,
+      __lastBlobContent: "",
+      __lastBlobType: "",
       scrollX: 0,
       scrollY: 0,
       scrollTo() {},
@@ -85,7 +89,15 @@ function loadRuntime() {
         return makeElement();
       },
       createElement() {
-        return makeElement();
+        const element = makeElement();
+        element.click = function () {
+          downloads.push({
+            filename: this.download,
+            content: context.window.__lastBlobContent,
+            type: context.window.__lastBlobType,
+          });
+        };
+        return element;
       },
     },
     Intl,
@@ -101,7 +113,12 @@ function loadRuntime() {
       },
       revokeObjectURL() {},
     },
-    Blob,
+    Blob: class TestBlob {
+      constructor(parts, options = {}) {
+        context.window.__lastBlobContent = parts.join("");
+        context.window.__lastBlobType = options.type || "";
+      }
+    },
   };
   const source = appSource.replace(
     /\ninit\(\);\s*$/,
@@ -115,6 +132,10 @@ window.__testApi = {
   computeAutoAdded,
   lineItems,
   currentOrder,
+  compactOrder: typeof compactOrder === "function" ? compactOrder : undefined,
+  exportJson: typeof exportJson === "function" ? exportJson : undefined,
+  exportCsv: typeof exportCsv === "function" ? exportCsv : undefined,
+  downloads: window.__downloads,
   optionPrice,
 };
 `
@@ -468,6 +489,124 @@ test("current order section recap has predictable labels, one interior, and corr
   const interiorTotal = Number(order.selected_interior?.price || 0);
   assert.equal(order.pricing.selected_options_total, selectedTotal + autoTotal + interiorTotal);
   assert.equal(order.pricing.total_msrp, order.pricing.base_price + order.pricing.selected_options_total);
+});
+
+test("compact order output keeps customer-facing fields and omits rich internals", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.state.customer.name = "Ada Buyer";
+  runtime.state.customer.email = "ada@example.com";
+  runtime.state.customer.phone = "555-0100";
+  runtime.state.customer.address = "1 Corvette Way";
+  runtime.state.customer.comments = "Dealer follow-up requested.";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const z51 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_z51_001");
+  const paint = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001");
+  assert.ok(z51, "Z51 should exist for the current variant");
+  assert.ok(paint, "Black paint should exist for the current variant");
+  runtime.handleChoice(paint);
+  runtime.handleChoice(z51);
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+
+  assert.equal(typeof runtime.compactOrder, "function", "compactOrder should be exposed");
+  const rich = runtime.currentOrder();
+  const compact = runtime.compactOrder();
+
+  assert.deepEqual(Object.keys(compact), ["title", "submitted_at", "customer", "vehicle", "sections", "standard_equipment", "msrp"]);
+  assert.equal(compact.title, "2027 Corvette Stingray");
+  assert.equal(Date.parse(compact.submitted_at) > 0, true, "submitted_at should be an ISO timestamp");
+  assert.deepEqual(JSON.parse(JSON.stringify(compact.customer)), {
+    name: "Ada Buyer",
+    email: "ada@example.com",
+    phone: "555-0100",
+    address: "1 Corvette Way",
+    comments: "Dealer follow-up requested.",
+  });
+  assert.deepEqual(Object.keys(compact.vehicle), ["body_style", "trim_level", "display_name", "base_price"]);
+  assert.equal(compact.standard_equipment.count, rich.standard_equipment_summary.count);
+  assert.equal(compact.msrp, rich.pricing.total_msrp);
+
+  const compactText = JSON.stringify(compact);
+  for (const forbidden of [
+    "metadata",
+    "dataset",
+    "variant",
+    "selected_option_ids",
+    "selected_interior_id",
+    "selected_rpos",
+    "auto_added_rpos",
+    "option_id",
+    "section_key",
+    "description",
+    "groups",
+  ]) {
+    assert.equal(compactText.includes(forbidden), false, `compact order should omit ${forbidden}`);
+  }
+});
+
+test("compact order sections omit empty/admin sections and use minimal item rows", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const z51 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_z51_001");
+  const paint = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001");
+  assert.ok(z51, "Z51 should exist for the current variant");
+  assert.ok(paint, "Black paint should exist for the current variant");
+  runtime.handleChoice(paint);
+  runtime.handleChoice(z51);
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+
+  const compact = runtime.compactOrder();
+  const labels = compact.sections.map((section) => section.section);
+  assert.equal(labels.includes("Pricing Summary"), false);
+  assert.equal(labels.includes("Customer Information"), false);
+  assert.equal(labels.includes("Vehicle"), false);
+  assert.equal(labels.includes("Auto-Added / Required"), true);
+  assert.equal(labels.includes("Seats & Interior"), true);
+
+  const allItems = compact.sections.flatMap((section) => section.items);
+  assert.ok(allItems.length > 0, "compact order should include selected item rows");
+  for (const item of allItems) {
+    assert.deepEqual(Object.keys(item), ["rpo", "label", "price"]);
+  }
+
+  const interiorRows = allItems.filter((item) => item.rpo === "HTA");
+  assert.equal(interiorRows.length, 1, "selected interior should appear once");
+  const autoSection = compact.sections.find((section) => section.section === "Auto-Added / Required");
+  assert.ok(autoSection.items.some((item) => item.rpo === "FE3"), "auto-added FE3 should be grouped as required");
+});
+
+test("JSON and CSV exports use compact customer-facing output", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const paint = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001");
+  assert.ok(paint, "Black paint should exist for the current variant");
+  runtime.handleChoice(paint);
+
+  runtime.exportJson();
+  const jsonDownload = runtime.downloads.at(-1);
+  assert.equal(jsonDownload.filename, "stingray-order-summary.json");
+  const json = JSON.parse(jsonDownload.content);
+  assert.equal(json.title, "2027 Corvette Stingray");
+  assert.equal(Object.hasOwn(json, "metadata"), false);
+  assert.equal(json.sections.every((section) => section.items.every((item) => Object.keys(item).join(",") === "rpo,label,price")), true);
+
+  runtime.exportCsv();
+  const csvDownload = runtime.downloads.at(-1);
+  assert.equal(csvDownload.filename, "stingray-order-summary.csv");
+  assert.equal(csvDownload.content.split("\n")[0], "section,rpo,label,price");
+  assert.equal(csvDownload.content.includes("description"), false);
+  assert.equal(csvDownload.content.includes("option_id"), false);
 });
 
 test("replaceable suspension and exhaust defaults are encoded", () => {

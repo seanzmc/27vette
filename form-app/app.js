@@ -1182,6 +1182,48 @@ function currentOrder() {
   };
 }
 
+function compactOrderItem(item) {
+  return {
+    rpo: item.rpo || "",
+    label: item.label || item.description || "",
+    price: Number(item.price || 0),
+  };
+}
+
+function compactOrder() {
+  const order = currentOrder();
+  const customer = {
+    name: order.customer.name,
+    email: order.customer.email,
+    phone: order.customer.phone,
+    address: order.customer.address,
+  };
+  if (order.customer.comments) customer.comments = order.customer.comments;
+
+  return {
+    title: `${order.vehicle.model_year} ${order.vehicle.model}`,
+    submitted_at: new Date().toISOString(),
+    customer,
+    vehicle: {
+      body_style: order.vehicle.body_style,
+      trim_level: order.vehicle.trim_level,
+      display_name: order.vehicle.display_name,
+      base_price: order.vehicle.base_price,
+    },
+    sections: order.sections
+      .filter((section) => !["vehicle", "pricing_summary", "customer_information"].includes(section.section_key))
+      .filter((section) => section.items.length)
+      .map((section) => ({
+        section: section.section_label,
+        items: section.items.map(compactOrderItem),
+      })),
+    standard_equipment: {
+      count: order.standard_equipment_summary.count,
+    },
+    msrp: order.pricing.total_msrp,
+  };
+}
+
 function download(filename, content, type) {
   const blob = new Blob([content], { type });
   const url = URL.createObjectURL(blob);
@@ -1193,49 +1235,19 @@ function download(filename, content, type) {
 }
 
 function exportJson() {
-  download("stingray-order.json", JSON.stringify(currentOrder(), null, 2), "application/json");
+  download("stingray-order-summary.json", JSON.stringify(compactOrder(), null, 2), "application/json");
 }
 
 function exportCsv() {
-  const order = currentOrder();
-  const headers = ["section_label", "type", "rpo", "label", "description", "price"];
-  const customerRows = [
-    ["Customer Information", "customer", "", "Customer Name", order.customer.name, ""],
-    ["Customer Information", "customer", "", "Address", order.customer.address, ""],
-    ["Customer Information", "customer", "", "Email", order.customer.email, ""],
-    ["Customer Information", "customer", "", "Phone Number", order.customer.phone, ""],
-    ["Customer Information", "customer", "", "Comments", order.customer.comments, ""],
-  ];
-  const vehicleRows = [
-    ["Vehicle", "vehicle", "", "Model Year", order.vehicle.model_year, ""],
-    ["Vehicle", "vehicle", "", "Model", order.vehicle.model, ""],
-    ["Vehicle", "vehicle", "", "Body Style", order.vehicle.body_style, ""],
-    ["Vehicle", "vehicle", "", "Trim Level", order.vehicle.trim_level, ""],
-    ["Vehicle", "vehicle", "", "Variant ID", order.vehicle.variant_id, ""],
-    ["Vehicle", "vehicle", "", "Display Name", order.vehicle.display_name, ""],
-    ["Vehicle", "vehicle", "", "Base Price", "", order.vehicle.base_price],
-  ];
-  const lineRows = order.sections.flatMap((section) =>
-    section.items.map((item) => [
-      item.section_label,
-      item.type,
-      item.rpo,
-      item.label,
-      item.description,
-      item.price,
-    ])
-  );
-  const pricingRows = [
-    ["Pricing Summary", "pricing", "", "Base Price", "", order.pricing.base_price],
-    ["Pricing Summary", "pricing", "", "Selected Options Total", "", order.pricing.selected_options_total],
-    ["Pricing Summary", "pricing", "", "Total MSRP", "", order.pricing.total_msrp],
-  ];
-  const rows = customerRows.map((row) => row.map((value) => JSON.stringify(value)).join(","));
-  rows.unshift(...vehicleRows.map((row) => row.map((value) => JSON.stringify(value)).join(",")));
-  rows.push(...lineRows.map((row) => row.map((value) => JSON.stringify(value ?? "")).join(",")));
-  rows.unshift(headers.join(","));
-  rows.push(...pricingRows.map((row) => row.map((value) => JSON.stringify(value)).join(",")));
-  download("stingray-order.csv", rows.join("\n"), "text/csv");
+  const order = compactOrder();
+  const rows = ["section,rpo,label,price"];
+  for (const section of order.sections) {
+    for (const item of section.items) {
+      rows.push([section.section, item.rpo, item.label, item.price].map((value) => JSON.stringify(value ?? "")).join(","));
+    }
+  }
+  rows.push(["MSRP", "", "", order.msrp].map((value) => JSON.stringify(value)).join(","));
+  download("stingray-order-summary.csv", rows.join("\n"), "text/csv");
 }
 
 function render({ resetScroll = false, preserveScroll = false } = {}) {
