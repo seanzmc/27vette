@@ -1224,6 +1224,42 @@ function compactOrder() {
   };
 }
 
+function plainTextOrderSummary(order = compactOrder()) {
+  const lines = [
+    order.title,
+    "",
+    `Name: ${order.customer.name || ""}`,
+    `Email: ${order.customer.email || ""}`,
+    `Phone: ${order.customer.phone || ""}`,
+    `Address: ${order.customer.address || ""}`,
+  ];
+  if (order.customer.comments) lines.push(`Comments: ${order.customer.comments}`);
+  lines.push(
+    `Submitted: ${order.submitted_at}`,
+    "",
+    "Vehicle",
+    order.vehicle.body_style || "",
+    order.vehicle.trim_level || "",
+    order.vehicle.display_name || "",
+    `Base MSRP: ${formatMoney(order.vehicle.base_price)}`,
+    ""
+  );
+
+  for (const section of order.sections) {
+    lines.push(section.section);
+    for (const item of section.items) {
+      lines.push(`${item.rpo} ${item.label} ${formatMoney(item.price)}`.trim());
+    }
+    lines.push("");
+  }
+
+  if (Number.isFinite(Number(order.standard_equipment?.count))) {
+    lines.push(`Standard & Included: ${Number(order.standard_equipment.count)} items`, "");
+  }
+  lines.push(`MSRP: ${formatMoney(order.msrp)}`);
+  return lines.join("\n").replace(/\n{3,}/g, "\n\n");
+}
+
 function download(filename, content, type) {
   const blob = new Blob([content], { type });
   const url = URL.createObjectURL(blob);

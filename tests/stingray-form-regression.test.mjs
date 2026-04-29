@@ -133,6 +133,7 @@ window.__testApi = {
   lineItems,
   currentOrder,
   compactOrder: typeof compactOrder === "function" ? compactOrder : undefined,
+  plainTextOrderSummary: typeof plainTextOrderSummary === "function" ? plainTextOrderSummary : undefined,
   exportJson: typeof exportJson === "function" ? exportJson : undefined,
   exportCsv: typeof exportCsv === "function" ? exportCsv : undefined,
   downloads: window.__downloads,
@@ -607,6 +608,70 @@ test("JSON and CSV exports use compact customer-facing output", () => {
   assert.equal(csvDownload.content.split("\n")[0], "section,rpo,label,price");
   assert.equal(csvDownload.content.includes("description"), false);
   assert.equal(csvDownload.content.includes("option_id"), false);
+});
+
+test("plain text order summary renders compact order data for emails and review", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.state.customer.name = "Ada Buyer";
+  runtime.state.customer.email = "ada@example.com";
+  runtime.state.customer.phone = "555-0100";
+  runtime.state.customer.address = "1 Corvette Way";
+  runtime.state.customer.comments = "Dealer follow-up requested.";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const z51 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_z51_001");
+  const paint = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001");
+  assert.ok(z51, "Z51 should exist for the current variant");
+  assert.ok(paint, "Black paint should exist for the current variant");
+  runtime.handleChoice(paint);
+  runtime.handleChoice(z51);
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+
+  assert.equal(typeof runtime.plainTextOrderSummary, "function", "plainTextOrderSummary should be exposed");
+  const summary = runtime.plainTextOrderSummary();
+
+  assert.match(summary, /^2027 Corvette Stingray\n\n/);
+  assert.match(summary, /Name: Ada Buyer/);
+  assert.match(summary, /Email: ada@example\.com/);
+  assert.match(summary, /Phone: 555-0100/);
+  assert.match(summary, /Address: 1 Corvette Way/);
+  assert.match(summary, /Comments: Dealer follow-up requested\./);
+  assert.match(summary, /Submitted: .+/);
+  assert.match(summary, /Vehicle\ncoupe\n1LT\nCorvette Stingray Coupe 1LT\nBase MSRP: \$73,495/);
+  assert.match(summary, /Exterior Paint\nGBA Black \$0/);
+  assert.match(summary, /Seats & Interior[\s\S]*AQ9 GT1 Bucket Seats \$0[\s\S]*HTA Jet Black \$0/);
+  assert.match(summary, /Auto-Added \/ Required[\s\S]*FE3 Z51 performance suspension \$0/);
+  assert.match(summary, /Standard & Included: \d+ items/);
+  assert.match(summary, /MSRP: \$\d/);
+});
+
+test("plain text order summary omits empty comments and internal debug fields", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+
+  const summary = runtime.plainTextOrderSummary();
+  assert.equal(summary.includes("Comments:"), false);
+  assert.equal((summary.match(/HTA Jet Black/g) || []).length, 1, "selected interior should appear once");
+  for (const forbidden of [
+    "metadata",
+    "dataset",
+    "option_id",
+    "selected_option_ids",
+    "selected_interior_id",
+    "description",
+    "section_key",
+    "Pricing Summary",
+    "Customer Information",
+  ]) {
+    assert.equal(summary.includes(forbidden), false, `summary should omit ${forbidden}`);
+  }
 });
 
 test("replaceable suspension and exhaust defaults are encoded", () => {
