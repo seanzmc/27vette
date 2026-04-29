@@ -47,6 +47,35 @@ const rulesByTarget = new Map();
 const priceRulesByTarget = new Map();
 const ruleGroupsBySource = new Map();
 const exclusiveGroupByOption = new Map();
+const orderSectionDefinitions = [
+  ["vehicle", "Vehicle"],
+  ["exterior_paint", "Exterior Paint"],
+  ["exterior_appearance", "Exterior Appearance"],
+  ["wheels_brakes", "Wheels & Brakes"],
+  ["performance_mechanical", "Performance & Mechanical"],
+  ["aero_exhaust_stripes_accessories", "Aero, Exhaust, Stripes & Accessories"],
+  ["seats_interior", "Seats & Interior"],
+  ["delivery", "Delivery"],
+  ["auto_added_required", "Auto-Added / Required"],
+  ["pricing_summary", "Pricing Summary"],
+  ["customer_information", "Customer Information"],
+];
+const orderSectionLabels = new Map(orderSectionDefinitions);
+const orderSectionOrder = new Map(orderSectionDefinitions.map(([key], index) => [key, index]));
+const stepOrderSectionKeys = new Map([
+  ["body_style", "vehicle"],
+  ["trim_level", "vehicle"],
+  ["paint", "exterior_paint"],
+  ["exterior_appearance", "exterior_appearance"],
+  ["wheels", "wheels_brakes"],
+  ["packages_performance", "performance_mechanical"],
+  ["aero_exhaust_stripes_accessories", "aero_exhaust_stripes_accessories"],
+  ["seat", "seats_interior"],
+  ["base_interior", "seats_interior"],
+  ["seat_belt", "seats_interior"],
+  ["interior_trim", "seats_interior"],
+  ["delivery", "delivery"],
+]);
 
 for (const choice of data.choices) {
   if (!choicesByOption.has(choice.option_id)) choicesByOption.set(choice.option_id, []);
@@ -343,6 +372,47 @@ function optionPrice(optionId) {
   return Number(optionsById.get(optionId)?.base_price || 0);
 }
 
+function sectionKeyForStep(stepKey, type = "") {
+  if (type === "auto_added") return "auto_added_required";
+  return stepOrderSectionKeys.get(stepKey) || stepKey || "vehicle";
+}
+
+function sectionLabelForKey(sectionKey) {
+  return orderSectionLabels.get(sectionKey) || sectionKey;
+}
+
+function lineItemFromOption(option, type, price, extra = {}) {
+  const sectionKey = sectionKeyForStep(option.step_key, type);
+  return {
+    id: option.option_id,
+    rpo: option.rpo || "",
+    label: option.label || "",
+    description: option.description || "",
+    price,
+    type,
+    section_key: sectionKey,
+    section_label: sectionLabelForKey(sectionKey),
+    category_name: option.category_name || "",
+    step_key: option.step_key || "",
+    ...extra,
+  };
+}
+
+function lineItemFromInterior(interior) {
+  return {
+    id: interior.interior_id,
+    rpo: interior.interior_code || "",
+    label: interior.interior_name || "",
+    description: interior.interior_hierarchy_path || interior.interior_variant_label || interior.material || "",
+    price: adjustedInteriorPrice(interior),
+    type: "selected_interior",
+    section_key: "seats_interior",
+    section_label: sectionLabelForKey("seats_interior"),
+    category_name: interior.interior_seat_label || "Base Interior",
+    step_key: "base_interior",
+  };
+}
+
 function lineItems() {
   const autoAdded = computeAutoAdded();
   const rows = [];
@@ -350,36 +420,17 @@ function lineItems() {
     if (autoAdded.has(id)) continue;
     const option = optionsById.get(id);
     if (option) {
-      rows.push({
-        id,
-        rpo: option.rpo,
-        label: option.label,
-        type: "selected",
-        price: optionPrice(id),
-      });
+      rows.push(lineItemFromOption(option, "selected", optionPrice(id)));
     }
   }
   if (state.selectedInterior) {
     const interior = interiorsById.get(state.selectedInterior);
-    rows.push({
-      id: state.selectedInterior,
-      rpo: interior.interior_code,
-      label: interior.interior_name,
-      type: "selected_interior",
-      price: adjustedInteriorPrice(interior),
-    });
+    if (interior) rows.push(lineItemFromInterior(interior));
   }
   for (const [id, reason] of autoAdded) {
     const option = optionsById.get(id);
     if (option) {
-      rows.push({
-        id,
-        rpo: option.rpo,
-        label: option.label,
-        type: "auto_added",
-        price: optionPrice(id),
-        reason,
-      });
+      rows.push(lineItemFromOption(option, "auto_added", optionPrice(id), { reason }));
     }
   }
   return rows;
@@ -1034,25 +1085,99 @@ function renderStandardEquipment() {
   `;
 }
 
+function vehicleInformation(variant) {
+  return {
+    model_year: variant?.model_year || "",
+    model: "Corvette Stingray",
+    body_style: variant?.body_style || state.bodyStyle,
+    trim_level: variant?.trim_level || state.trimLevel,
+    variant_id: variant?.variant_id || currentVariantId(),
+    display_name: variant?.display_name || "",
+    base_price: Number(variant?.base_price || 0),
+  };
+}
+
+function standardEquipmentSummary(variant) {
+  const rows = standardEquipmentRows();
+  const groups = new Map();
+  for (const row of rows) {
+    const label = row.section_name || "Standard Equipment";
+    groups.set(label, (groups.get(label) || 0) + 1);
+  }
+  return {
+    variant_id: variant?.variant_id || currentVariantId(),
+    count: rows.length,
+    groups: [...groups.entries()].map(([section_label, count]) => ({ section_label, count })),
+  };
+}
+
+function sectionedOrderRecap(items, pricing) {
+  const sections = new Map(
+    orderSectionDefinitions.map(([section_key, section_label]) => [
+      section_key,
+      {
+        section_key,
+        section_label,
+        items: [],
+        section_total: 0,
+      },
+    ])
+  );
+  for (const item of items) {
+    const sectionKey = item.section_key || sectionKeyForStep(item.step_key, item.type);
+    const section =
+      sections.get(sectionKey) ||
+      {
+        section_key: sectionKey,
+        section_label: item.section_label || sectionLabelForKey(sectionKey),
+        items: [],
+        section_total: 0,
+      };
+    section.items.push(item);
+    section.section_total += Number(item.price || 0);
+    sections.set(sectionKey, section);
+  }
+  sections.get("vehicle").section_total = pricing.base_price;
+  sections.get("pricing_summary").section_total = pricing.total_msrp;
+  return [...sections.values()]
+    .filter(
+      (section) =>
+        section.items.length ||
+        ["vehicle", "pricing_summary", "customer_information"].includes(section.section_key)
+    )
+    .sort((a, b) => (orderSectionOrder.get(a.section_key) ?? 999) - (orderSectionOrder.get(b.section_key) ?? 999));
+}
+
 function currentOrder() {
   const variant = currentVariant();
   const items = lineItems();
   const base = Number(variant?.base_price || 0);
   const optionsTotal = items.reduce((sum, item) => sum + Number(item.price || 0), 0);
+  const pricing = {
+    base_price: base,
+    selected_options_total: optionsTotal,
+    total_msrp: base + optionsTotal,
+  };
+  const selectedOptions = items.filter((item) => item.type === "selected");
+  const autoAddedOptions = items.filter((item) => item.type === "auto_added");
+  const selectedInterior = items.find((item) => item.type === "selected_interior") || {};
   return {
-    dataset: data.dataset,
-    customer_information: customerInformation(),
-    variant,
-    selected_option_ids: [...state.selected],
-    selected_interior_id: state.selectedInterior,
-    selected_rpos: items.filter((item) => item.type !== "auto_added").map((item) => item.rpo || item.id),
-    auto_added_rpos: items.filter((item) => item.type === "auto_added").map((item) => item.rpo || item.id),
-    line_items: items,
-    missing_required: missingRequired(),
-    pricing: {
-      base_msrp: base,
-      options_total: optionsTotal,
-      total_msrp: base + optionsTotal,
+    customer: customerInformation(),
+    vehicle: vehicleInformation(variant),
+    pricing,
+    sections: sectionedOrderRecap(items, pricing),
+    selected_options: selectedOptions,
+    auto_added_options: autoAddedOptions,
+    selected_interior: selectedInterior,
+    standard_equipment_summary: standardEquipmentSummary(variant),
+    metadata: {
+      dataset: data.dataset,
+      export_schema_version: 1,
+      selected_option_ids: [...state.selected],
+      selected_interior_id: state.selectedInterior,
+      selected_rpos: items.filter((item) => item.type !== "auto_added").map((item) => item.rpo || item.id),
+      auto_added_rpos: autoAddedOptions.map((item) => item.rpo || item.id),
+      missing_required: missingRequired(),
     },
   };
 }
@@ -1073,18 +1198,43 @@ function exportJson() {
 
 function exportCsv() {
   const order = currentOrder();
-  const headers = ["type", "id", "rpo", "label", "price", "value"];
+  const headers = ["section_label", "type", "rpo", "label", "description", "price"];
   const customerRows = [
-    ["customer", "name", "", "Customer Name", "", order.customer_information.name],
-    ["customer", "address", "", "Address", "", order.customer_information.address],
-    ["customer", "email", "", "Email", "", order.customer_information.email],
-    ["customer", "phone", "", "Phone Number", "", order.customer_information.phone],
-    ["customer", "comments", "", "Comments", "", order.customer_information.comments],
+    ["Customer Information", "customer", "", "Customer Name", order.customer.name, ""],
+    ["Customer Information", "customer", "", "Address", order.customer.address, ""],
+    ["Customer Information", "customer", "", "Email", order.customer.email, ""],
+    ["Customer Information", "customer", "", "Phone Number", order.customer.phone, ""],
+    ["Customer Information", "customer", "", "Comments", order.customer.comments, ""],
+  ];
+  const vehicleRows = [
+    ["Vehicle", "vehicle", "", "Model Year", order.vehicle.model_year, ""],
+    ["Vehicle", "vehicle", "", "Model", order.vehicle.model, ""],
+    ["Vehicle", "vehicle", "", "Body Style", order.vehicle.body_style, ""],
+    ["Vehicle", "vehicle", "", "Trim Level", order.vehicle.trim_level, ""],
+    ["Vehicle", "vehicle", "", "Variant ID", order.vehicle.variant_id, ""],
+    ["Vehicle", "vehicle", "", "Display Name", order.vehicle.display_name, ""],
+    ["Vehicle", "vehicle", "", "Base Price", "", order.vehicle.base_price],
+  ];
+  const lineRows = order.sections.flatMap((section) =>
+    section.items.map((item) => [
+      item.section_label,
+      item.type,
+      item.rpo,
+      item.label,
+      item.description,
+      item.price,
+    ])
+  );
+  const pricingRows = [
+    ["Pricing Summary", "pricing", "", "Base Price", "", order.pricing.base_price],
+    ["Pricing Summary", "pricing", "", "Selected Options Total", "", order.pricing.selected_options_total],
+    ["Pricing Summary", "pricing", "", "Total MSRP", "", order.pricing.total_msrp],
   ];
   const rows = customerRows.map((row) => row.map((value) => JSON.stringify(value)).join(","));
-  rows.push(...order.line_items.map((item) => headers.map((key) => JSON.stringify(item[key] ?? "")).join(",")));
+  rows.unshift(...vehicleRows.map((row) => row.map((value) => JSON.stringify(value)).join(",")));
+  rows.push(...lineRows.map((row) => row.map((value) => JSON.stringify(value ?? "")).join(",")));
   rows.unshift(headers.join(","));
-  rows.push(["total", "", "", "Total MSRP", order.pricing.total_msrp, ""].map((value) => JSON.stringify(value)).join(","));
+  rows.push(...pricingRows.map((row) => row.map((value) => JSON.stringify(value)).join(",")));
   download("stingray-order.csv", rows.join("\n"), "text/csv");
 }
 

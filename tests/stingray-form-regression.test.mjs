@@ -114,6 +114,7 @@ window.__testApi = {
   handleChoice,
   computeAutoAdded,
   lineItems,
+  currentOrder,
   optionPrice,
 };
 `
@@ -358,8 +359,115 @@ test("auto-added included options render as locked selections without duplicate 
 test("order export omits the full standard equipment dump", () => {
   const currentOrder = appSource.match(/function currentOrder\(\) \{[\s\S]*?\n\}/)?.[0] || "";
   assert.doesNotMatch(currentOrder, /standard_equipment\s*:/);
-  assert.match(currentOrder, /line_items\s*:/);
-  assert.match(currentOrder, /auto_added_rpos\s*:/);
+  assert.match(currentOrder, /selected_options\s*:/);
+  assert.match(currentOrder, /auto_added_options\s*:/);
+});
+
+test("current order exposes the stable Formidable-ready top-level contract", () => {
+  const runtime = loadRuntime();
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const order = runtime.currentOrder();
+  for (const key of [
+    "customer",
+    "vehicle",
+    "pricing",
+    "sections",
+    "selected_options",
+    "auto_added_options",
+    "selected_interior",
+    "standard_equipment_summary",
+    "metadata",
+  ]) {
+    assert.ok(Object.hasOwn(order, key), `currentOrder should include ${key}`);
+  }
+
+  assert.deepEqual(Object.keys(order.customer), ["name", "address", "email", "phone", "comments"]);
+  assert.deepEqual(Object.keys(order.vehicle), [
+    "model_year",
+    "model",
+    "body_style",
+    "trim_level",
+    "variant_id",
+    "display_name",
+    "base_price",
+  ]);
+  assert.deepEqual(Object.keys(order.pricing), ["base_price", "selected_options_total", "total_msrp"]);
+  assert.equal(order.metadata.dataset.name, data.dataset.name);
+});
+
+test("current order option lines are complete, separated, and omit standard equipment", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const z51 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_z51_001");
+  const paint = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001");
+  assert.ok(z51, "Z51 should exist for the current variant");
+  assert.ok(paint, "Black paint should exist for the current variant");
+  runtime.handleChoice(paint);
+  runtime.handleChoice(z51);
+
+  const order = runtime.currentOrder();
+  const allLines = [
+    ...order.selected_options,
+    ...order.auto_added_options,
+    ...(order.selected_interior?.rpo ? [order.selected_interior] : []),
+  ];
+  assert.ok(allLines.length > 0, "order should include option lines");
+  for (const line of allLines) {
+    for (const key of ["rpo", "label", "description", "price", "type", "section_key", "section_label", "category_name", "step_key"]) {
+      assert.ok(Object.hasOwn(line, key), `${line.rpo || line.label} should include ${key}`);
+    }
+  }
+
+  assert.equal(order.selected_options.some((item) => item.type === "auto_added"), false);
+  assert.equal(order.auto_added_options.every((item) => item.type === "auto_added"), true);
+  assert.equal(order.auto_added_options.some((item) => item.rpo === "FE3"), true, "Z51 should keep FE3 clearly auto-added");
+  assert.equal(order.selected_options.some((item) => item.step_key === "standard_equipment"), false);
+  assert.equal(order.standard_equipment_summary.count > 0, true);
+  assert.equal(Array.isArray(order.standard_equipment_summary.items), false, "summary should not dump standard equipment rows");
+});
+
+test("current order section recap has predictable labels, one interior, and correct totals", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const paint = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001");
+  assert.ok(paint, "Black paint should exist for the current variant");
+  runtime.handleChoice(paint);
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+
+  const order = runtime.currentOrder();
+  const sectionLabels = order.sections.map((section) => section.section_label);
+  assert.deepEqual(JSON.parse(JSON.stringify(sectionLabels)), [
+    "Vehicle",
+    "Exterior Paint",
+    "Exterior Appearance",
+    "Wheels & Brakes",
+    "Performance & Mechanical",
+    "Aero, Exhaust, Stripes & Accessories",
+    "Seats & Interior",
+    "Pricing Summary",
+    "Customer Information",
+  ]);
+
+  const recapInteriorLines = order.sections.flatMap((section) => section.items).filter((item) => item.type === "selected_interior");
+  assert.equal(recapInteriorLines.length, 1, "selected interior should appear once in section recap");
+  assert.equal(order.selected_interior.type, "selected_interior");
+  assert.equal(order.selected_interior.section_label, "Seats & Interior");
+
+  const selectedTotal = order.selected_options.reduce((sum, item) => sum + Number(item.price || 0), 0);
+  const autoTotal = order.auto_added_options.reduce((sum, item) => sum + Number(item.price || 0), 0);
+  const interiorTotal = Number(order.selected_interior?.price || 0);
+  assert.equal(order.pricing.selected_options_total, selectedTotal + autoTotal + interiorTotal);
+  assert.equal(order.pricing.total_msrp, order.pricing.base_price + order.pricing.selected_options_total);
 });
 
 test("replaceable suspension and exhaust defaults are encoded", () => {
