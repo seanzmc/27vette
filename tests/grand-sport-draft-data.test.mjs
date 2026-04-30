@@ -22,6 +22,29 @@ function generateDraftWithoutAppMutation() {
 
 const draft = generateDraftWithoutAppMutation();
 
+const expectedGrandSportExclusiveGroups = [
+  {
+    group_id: "gs_excl_ls6_engine_covers",
+    option_ids: ["opt_bc7_001", "opt_bc4_001", "opt_bc4_002", "opt_bcp_001", "opt_bcp_002", "opt_bcs_001", "opt_bcs_002"],
+  },
+  {
+    group_id: "gs_excl_center_caps",
+    option_ids: ["opt_5zb_001", "opt_5zc_001", "opt_5zd_001"],
+  },
+  {
+    group_id: "gs_excl_indoor_car_covers",
+    option_ids: ["opt_rwh_001", "opt_wkr_001"],
+  },
+  {
+    group_id: "gs_excl_rear_script_badges",
+    option_ids: ["opt_rik_001", "opt_rin_001", "opt_sl8_001"],
+  },
+  {
+    group_id: "gs_excl_suede_compartment_liners",
+    option_ids: ["opt_sxb_001", "opt_sxr_001", "opt_sxt_001"],
+  },
+];
+
 test("Grand Sport draft preserves the live generated-data top-level contract", () => {
   for (const key of [
     "dataset",
@@ -62,7 +85,6 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
 
 test("Grand Sport draft defers non-normalized surfaces with explicit validation warnings", () => {
   assert.deepEqual(draft.ruleGroups, []);
-  assert.deepEqual(draft.exclusiveGroups, []);
   assert.deepEqual(draft.rules, []);
   assert.deepEqual(draft.priceRules, []);
   assert.deepEqual(draft.colorOverrides, []);
@@ -70,6 +92,23 @@ test("Grand Sport draft defers non-normalized surfaces with explicit validation 
   assert.ok(warnings.has("grand_sport_draft_status"));
   assert.ok(warnings.has("rules_deferred"));
   assert.ok(warnings.has("pricing_deferred"));
+});
+
+test("Grand Sport draft emits the approved model-scoped exclusive groups", () => {
+  assert.equal(draft.exclusiveGroups.length, expectedGrandSportExclusiveGroups.length);
+  const byId = new Map(draft.exclusiveGroups.map((group) => [group.group_id, group]));
+  const choiceOptionIds = new Set(draft.choices.map((choice) => choice.option_id));
+
+  for (const expected of expectedGrandSportExclusiveGroups) {
+    const group = byId.get(expected.group_id);
+    assert.ok(group, `${expected.group_id} should be generated`);
+    assert.equal(group.selection_mode, "single_within_group");
+    assert.equal(group.active, "True");
+    assert.deepEqual(JSON.parse(JSON.stringify(group.option_ids)), expected.option_ids);
+    for (const optionId of expected.option_ids) {
+      assert.equal(choiceOptionIds.has(optionId), true, `${optionId} should exist in Grand Sport choices`);
+    }
+  }
 });
 
 test("Grand Sport draft includes model-scoped LT interiors with EL9 launch edition metadata", () => {
@@ -116,7 +155,6 @@ test("Grand Sport draft preserves rule hot spots and normalization metadata for 
   assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);
   assert.deepEqual(draft.draftMetadata.deferredSurfaces, [
     "ruleGroups",
-    "exclusiveGroups",
     "rules",
     "priceRules",
     "colorOverrides",

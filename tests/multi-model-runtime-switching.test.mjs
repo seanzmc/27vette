@@ -121,6 +121,56 @@ init();
   return context.window.__testApi;
 }
 
+const expectedGrandSportExclusiveGroups = [
+  {
+    groupId: "gs_excl_ls6_engine_covers",
+    optionIds: ["opt_bc7_001", "opt_bc4_001", "opt_bc4_002", "opt_bcp_001", "opt_bcp_002", "opt_bcs_001", "opt_bcs_002"],
+  },
+  {
+    groupId: "gs_excl_center_caps",
+    optionIds: ["opt_5zb_001", "opt_5zc_001", "opt_5zd_001"],
+  },
+  {
+    groupId: "gs_excl_indoor_car_covers",
+    optionIds: ["opt_rwh_001", "opt_wkr_001"],
+  },
+  {
+    groupId: "gs_excl_rear_script_badges",
+    optionIds: ["opt_rik_001", "opt_rin_001", "opt_sl8_001"],
+  },
+  {
+    groupId: "gs_excl_suede_compartment_liners",
+    optionIds: ["opt_sxb_001", "opt_sxr_001", "opt_sxt_001"],
+  },
+];
+
+const expectedStingrayExclusiveGroups = [
+  {
+    groupId: "grp_ls6_engine_covers",
+    optionIds: ["opt_bc7_001", "opt_bcp_001", "opt_bcs_001", "opt_bc4_001"],
+  },
+  {
+    groupId: "grp_spoiler_high_wing",
+    optionIds: ["opt_t0a_001", "opt_tvs_001", "opt_5zz_001", "opt_5zu_001"],
+  },
+  {
+    groupId: "excl_center_caps",
+    optionIds: ["opt_rxj_001", "opt_vwd_001", "opt_5zd_001", "opt_5zc_001", "opt_rxh_001"],
+  },
+  {
+    groupId: "excl_indoor_car_covers",
+    optionIds: ["opt_rwh_001", "opt_sl1_001", "opt_wkr_001", "opt_wkq_001"],
+  },
+  {
+    groupId: "excl_outdoor_car_covers",
+    optionIds: ["opt_rnx_001", "opt_rwj_001"],
+  },
+  {
+    groupId: "excl_suede_trunk_liner",
+    optionIds: ["opt_sxb_001", "opt_sxr_001", "opt_sxt_001"],
+  },
+];
+
 test("generated app data exposes a multi-model registry with Stingray compatibility alias", () => {
   const dataWindow = loadDataWindow();
   const registry = dataWindow.CORVETTE_FORM_DATA;
@@ -137,6 +187,54 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
     JSON.parse(JSON.stringify(registry.models.grandSport.data.variants.map((variant) => variant.variant_id))),
     ["1lt_e07", "2lt_e07", "3lt_e07", "1lt_e67", "2lt_e67", "3lt_e67"]
   );
+});
+
+test("Grand Sport exclusive groups are model-scoped and Stingray groups are unchanged", () => {
+  const dataWindow = loadDataWindow();
+  const registry = dataWindow.CORVETTE_FORM_DATA;
+  const grandSportGroups = registry.models.grandSport.data.exclusiveGroups;
+  const stingrayGroups = registry.models.stingray.data.exclusiveGroups;
+
+  assert.equal(grandSportGroups.length, expectedGrandSportExclusiveGroups.length);
+  for (const expected of expectedGrandSportExclusiveGroups) {
+    const group = grandSportGroups.find((item) => item.group_id === expected.groupId);
+    assert.ok(group, `${expected.groupId} should be generated for Grand Sport`);
+    assert.equal(group.selection_mode, "single_within_group");
+    assert.deepEqual(JSON.parse(JSON.stringify(group.option_ids)), expected.optionIds);
+  }
+
+  assert.equal(stingrayGroups.length, expectedStingrayExclusiveGroups.length);
+  for (const expected of expectedStingrayExclusiveGroups) {
+    const group = stingrayGroups.find((item) => item.group_id === expected.groupId);
+    assert.ok(group, `${expected.groupId} should remain generated for Stingray`);
+    assert.equal(group.selection_mode, "single_within_group");
+    assert.deepEqual(JSON.parse(JSON.stringify(group.option_ids)), expected.optionIds);
+  }
+});
+
+test("Grand Sport exclusive group selections remove peer options without runtime branches", () => {
+  for (const expected of expectedGrandSportExclusiveGroups) {
+    const runtime = loadRuntime();
+    runtime.activateModel("grandSport");
+    runtime.state.bodyStyle = "coupe";
+    runtime.state.trimLevel = "1LT";
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+
+    const [firstId, secondId] = expected.optionIds;
+    const firstChoice = runtime.activeChoiceRows().find((choice) => choice.option_id === firstId);
+    const secondChoice = runtime.activeChoiceRows().find((choice) => choice.option_id === secondId);
+    assert.ok(firstChoice, `${firstId} should be active for Grand Sport`);
+    assert.ok(secondChoice, `${secondId} should be active for Grand Sport`);
+
+    runtime.handleChoice(firstChoice);
+    runtime.handleChoice(secondChoice);
+
+    assert.equal(runtime.state.selected.has(secondId), true, `${secondId} should remain selected`);
+    assert.equal(runtime.state.userSelected.has(secondId), true, `${secondId} should remain user-selected`);
+    assert.equal(runtime.state.selected.has(firstId), false, `${firstId} should be removed from selected`);
+    assert.equal(runtime.state.userSelected.has(firstId), false, `${firstId} should be removed from userSelected`);
+  }
 });
 
 test("runtime defaults to Stingray and switches models with a clean build reset", () => {

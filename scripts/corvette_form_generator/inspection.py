@@ -983,6 +983,16 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
     variants_by_id = {row["variant_id"]: row for row in preview["variants"]}
     sections_by_id = {row["section_id"]: row for row in preview["sections"]}
     interiors = build_grand_sport_interiors(config)
+    exclusive_groups = [
+        {
+            **group,
+            "option_ids": list(group["option_ids"]),
+        }
+        for group in config.exclusive_groups
+    ]
+    deferred_surfaces = ["ruleGroups", "rules", "priceRules", "colorOverrides"]
+    if not exclusive_groups:
+        deferred_surfaces.insert(1, "exclusiveGroups")
     option_rows: dict[str, dict[str, Any]] = {}
     statuses_by_option: defaultdict[str, dict[str, str]] = defaultdict(dict)
     order_by_option: dict[str, int] = {}
@@ -1135,7 +1145,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
         "choices": draft_choices,
         "standardEquipment": standard_equipment,
         "ruleGroups": [],
-        "exclusiveGroups": [],
+        "exclusiveGroups": exclusive_groups,
         "rules": [],
         "priceRules": [],
         "interiors": interiors,
@@ -1147,7 +1157,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
             "fullVariantMatrixChoices": len(draft_choices),
             "ruleDetailHotSpots": preview["ruleDetailHotSpots"],
             "normalization": preview["normalization"],
-            "deferredSurfaces": ["ruleGroups", "exclusiveGroups", "rules", "priceRules", "colorOverrides"],
+            "deferredSurfaces": deferred_surfaces,
         },
     }
 
@@ -1355,7 +1365,7 @@ def render_form_data_draft_markdown(draft: dict[str, Any]) -> str:
         f"- Choices: {len(draft['choices'])}",
         f"- Standard equipment rows: {len(draft['standardEquipment'])}",
         f"- Rule groups: {len(draft['ruleGroups'])} (deferred)",
-        f"- Exclusive groups: {len(draft['exclusiveGroups'])} (deferred)",
+        f"- Exclusive groups: {len(draft['exclusiveGroups'])} ({'model-scoped' if draft['exclusiveGroups'] else 'deferred'})",
         f"- Rules: {len(draft['rules'])} (deferred)",
         f"- Price rules: {len(draft['priceRules'])} (deferred)",
         f"- Interiors: {len(draft['interiors'])} (model-scoped)",

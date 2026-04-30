@@ -11,6 +11,14 @@ from datetime import datetime, timezone
 from typing import Any
 
 from openpyxl import load_workbook
+from corvette_form_generator.inspection import (
+    build_contract_preview,
+    build_form_data_draft,
+    inspect_model_sources,
+    write_contract_preview_artifacts,
+    write_form_data_draft_artifacts,
+    write_inspection_artifacts,
+)
 from corvette_form_generator.mapping import (
     best_status,
     normalize_mode,
@@ -111,6 +119,16 @@ def load_grand_sport_registry_data() -> dict[str, Any] | None:
     if not draft_path.exists():
         return None
     return json.loads(draft_path.read_text(encoding="utf-8"))
+
+
+def refresh_grand_sport_registry_source() -> None:
+    inspection_dir = OUTPUT_DIR / "inspection"
+    report = inspect_model_sources(GRAND_SPORT_MODEL)
+    write_inspection_artifacts(report, inspection_dir)
+    preview = build_contract_preview(GRAND_SPORT_MODEL)
+    write_contract_preview_artifacts(preview, inspection_dir, GRAND_SPORT_MODEL.preview_artifact_prefix)
+    draft = build_form_data_draft(GRAND_SPORT_MODEL)
+    write_form_data_draft_artifacts(draft, inspection_dir, GRAND_SPORT_MODEL.draft_artifact_prefix)
 
 
 def build_app_data_registry(stingray_data: dict[str, Any]) -> dict[str, Any]:
@@ -1349,6 +1367,7 @@ def main() -> None:
     APP_DIR.mkdir(exist_ok=True)
     json_path = OUTPUT_DIR / "stingray-form-data.json"
     write_json_output(json_path, data)
+    refresh_grand_sport_registry_source()
     write_app_data_registry(
         APP_DIR / "data.js",
         build_app_data_registry(data),

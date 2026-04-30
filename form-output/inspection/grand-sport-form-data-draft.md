@@ -1,6 +1,6 @@
 # Grand Sport Form Data Draft
 
-Generated: `2026-04-30T19:09:25+00:00`
+Generated: `2026-04-30T19:37:21+00:00`
 Status: `draft_not_runtime_active`
 Source sheet: `grandSport`
 
@@ -13,7 +13,7 @@ Source sheet: `grandSport`
 - Choices: 1614
 - Standard equipment rows: 545
 - Rule groups: 0 (deferred)
-- Exclusive groups: 0 (deferred)
+- Exclusive groups: 5 (model-scoped)
 - Rules: 0 (deferred)
 - Price rules: 0 (deferred)
 - Interiors: 132 (model-scoped)
