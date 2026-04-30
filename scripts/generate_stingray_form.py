@@ -8,122 +8,36 @@ import json
 import re
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any
 
 from openpyxl import load_workbook
-from openpyxl.styles import Font, PatternFill
-from openpyxl.utils import get_column_letter
+from corvette_form_generator.mapping import (
+    best_status,
+    normalize_mode,
+    selection_mode_label as shared_selection_mode_label,
+    status_to_label,
+    step_for_section as shared_step_for_section,
+)
+from corvette_form_generator.model_configs import STINGRAY_MODEL
+from corvette_form_generator.output import write_app_data, write_json_output
+from corvette_form_generator.validation import validation_error_count
+from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet, write_sheet
 
 
-ROOT = Path(__file__).resolve().parents[1]
-WORKBOOK_PATH = ROOT / "stingray_master.xlsx"
-OUTPUT_DIR = ROOT / "form-output"
-APP_DIR = ROOT / "form-app"
-INTERIOR_REFERENCE_PATH = ROOT / "architectureAudit" / "stingray_interiors_refactor.csv"
-
-GENERATED_SHEETS = [
-    "form_steps",
-    "form_context_choices",
-    "form_choices",
-    "form_standard_equipment",
-    "form_rule_groups",
-    "form_exclusive_groups",
-    "form_rules",
-    "form_price_rules",
-    "form_interiors",
-    "form_color_overrides",
-    "form_validation",
-]
-
-STEP_ORDER = [
-    "body_style",
-    "trim_level",
-    "paint",
-    "exterior_appearance",
-    "wheels",
-    "packages_performance",
-    "aero_exhaust_stripes_accessories",
-    "seat",
-    "base_interior",
-    "seat_belt",
-    "interior_trim",
-    "delivery",
-    "customer_info",
-    "summary",
-]
-
-STEP_LABELS = {
-    "body_style": "Body Style",
-    "trim_level": "Trim Level",
-    "paint": "Exterior Paint",
-    "exterior_appearance": "Exterior Appearance",
-    "wheels": "Wheels & Brake Calipers",
-    "packages_performance": "Packages & Performance",
-    "aero_exhaust_stripes_accessories": "Aero, Exhaust, Stripes & Accessories",
-    "seat": "Seats",
-    "base_interior": "Base Interior",
-    "seat_belt": "Seat Belt",
-    "interior_trim": "Interior Trim",
-    "delivery": "Custom Delivery",
-    "customer_info": "Customer Information",
-    "summary": "Summary",
-    "standard_equipment": "Standard Equipment",
-}
-
-CONTEXT_SECTIONS = [
-    {
-        "section_id": "sec_context_body_style",
-        "section_name": "Body Style",
-        "category_id": "cat_context_001",
-        "category_name": "Vehicle Context",
-        "selection_mode": "single_select_req",
-        "selection_mode_label": "Required single choice",
-        "choice_mode": "single",
-        "is_required": "True",
-        "standard_behavior": "user_selected",
-        "section_display_order": 1,
-        "step_key": "body_style",
-        "step_label": "Body Style",
-    },
-    {
-        "section_id": "sec_context_trim_level",
-        "section_name": "Trim Level",
-        "category_id": "cat_context_001",
-        "category_name": "Vehicle Context",
-        "selection_mode": "single_select_req",
-        "selection_mode_label": "Required single choice",
-        "choice_mode": "single",
-        "is_required": "True",
-        "standard_behavior": "user_selected",
-        "section_display_order": 2,
-        "step_key": "trim_level",
-        "step_label": "Trim Level",
-    },
-]
-
-SECTION_STEP_OVERRIDES = {
-    "sec_pain_001": "paint",
-    "sec_whee_002": "wheels",
-    "sec_cali_001": "wheels",
-    "sec_roof_001": "exterior_appearance",
-    "sec_exte_001": "exterior_appearance",
-    "sec_badg_001": "exterior_appearance",
-    "sec_engi_001": "exterior_appearance",
-    "sec_perf_001": "packages_performance",
-    "sec_susp_001": "packages_performance",
-    "sec_seat_002": "seat",
-    "sec_intc_001": "base_interior",
-    "sec_intc_002": "base_interior",
-    "sec_intc_003": "base_interior",
-    "sec_seat_001": "seat_belt",
-    "sec_inte_001": "interior_trim",
-    "sec_lpoi_001": "interior_trim",
-    "sec_whee_001": "wheels",
-    "sec_gsce_001": "exterior_appearance",
-    "sec_onst_001": "interior_trim",
-    "sec_cust_001": "delivery",
-}
+MODEL_CONFIG = STINGRAY_MODEL
+ROOT = MODEL_CONFIG.root
+WORKBOOK_PATH = MODEL_CONFIG.workbook_path
+OUTPUT_DIR = MODEL_CONFIG.output_dir
+APP_DIR = MODEL_CONFIG.app_dir
+INTERIOR_REFERENCE_PATH = MODEL_CONFIG.interior_reference_path
+GENERATED_SHEETS = list(MODEL_CONFIG.generated_sheets)
+STEP_ORDER = list(MODEL_CONFIG.step_order)
+STEP_LABELS = dict(MODEL_CONFIG.step_labels)
+CONTEXT_SECTIONS = [dict(section) for section in MODEL_CONFIG.context_sections]
+SECTION_STEP_OVERRIDES = dict(MODEL_CONFIG.section_step_overrides)
+BODY_STYLE_DISPLAY_ORDER = dict(MODEL_CONFIG.body_style_display_order)
+SELECTION_MODE_LABELS = dict(MODEL_CONFIG.selection_mode_labels)
+STANDARD_SECTIONS = set(MODEL_CONFIG.standard_sections)
 
 OPTION_ID_ALIASES = {
     "opt_bc4_002": "opt_bc4_001",
@@ -175,11 +89,6 @@ ENGINE_APPEARANCE_OPTION_ORDER = {
     "opt_slk_001": 90,
     "opt_sln_001": 100,
     "opt_vup_001": 110,
-}
-
-BODY_STYLE_DISPLAY_ORDER = {
-    "coupe": 1,
-    "convertible": 2,
 }
 
 AERO_EXHAUST_ACCESSORIES_SECTION_ORDER = {
@@ -267,121 +176,22 @@ EXCLUSIVE_GROUPS = [
     },
 ]
 
-SELECTION_MODE_LABELS = {
-    "single_select_req": "Required single choice",
-    "single_select_opt": "Optional single choice",
-    "multi_select_opt": "Optional multiple choice",
-    "display_only": "Display only",
-}
-
-STANDARD_SECTIONS = {
-    "sec_1lte_001",
-    "sec_2lte_001",
-    "sec_3lte_001",
-    "sec_incl_001",
-    "sec_stan_001",
-    "sec_stan_002",
-    "sec_safe_001",
-    "sec_tech_001",
-}
-
-
-def clean(value: Any) -> str:
-    if value is None:
-        return ""
-    if isinstance(value, bool):
-        return "True" if value else "False"
-    if isinstance(value, float) and value.is_integer():
-        return str(int(value))
-    return str(value).strip()
-
-
-def money(value: Any) -> int:
-    text = clean(value).replace("$", "").replace(",", "")
-    if not text:
-        return 0
-    try:
-        return int(round(float(text)))
-    except ValueError:
-        return 0
-
-
-def intish(value: Any, default: int = 0) -> int:
-    text = clean(value)
-    if not text:
-        return default
-    try:
-        return int(float(text))
-    except ValueError:
-        return default
-
-
-def rows_from_sheet(wb, sheet_name: str) -> list[dict[str, str]]:
-    ws = wb[sheet_name]
-    headers = [clean(ws.cell(1, col).value) for col in range(1, ws.max_column + 1)]
-    rows: list[dict[str, str]] = []
-    for row in ws.iter_rows(min_row=2, values_only=True):
-        record: dict[str, str] = {}
-        for header, value in zip(headers, row):
-            if header:
-                record[header] = clean(value)
-        if any(record.values()):
-            rows.append(record)
-    return rows
-
-
 def step_for_section(section_id: str, section_name: str, category_id: str) -> str:
-    if section_id in STANDARD_SECTIONS:
-        return "standard_equipment"
-    if section_id in SECTION_STEP_OVERRIDES:
-        return SECTION_STEP_OVERRIDES[section_id]
-    name = section_name.lower()
-    if "stripe" in name or "spoiler" in name or "lpo" in name or "exhaust" in name or "wheel accessory" in name:
-        return "aero_exhaust_stripes_accessories"
-    if category_id == "cat_exte_001":
-        return "exterior_appearance"
-    if category_id == "cat_inte_001":
-        return "interior_trim"
-    if category_id == "cat_mech_001":
-        return "packages_performance"
-    return "standard_equipment"
-
-
-def status_to_label(status: str) -> str:
-    return {
-        "available": "Available",
-        "standard": "Standard",
-        "unavailable": "Not Available",
-    }.get(status.lower(), status or "Unknown")
-
-
-def normalize_mode(selection_mode: str) -> str:
-    if selection_mode.startswith("single"):
-        return "single"
-    if selection_mode.startswith("multi"):
-        return "multi"
-    return "display"
+    return shared_step_for_section(
+        section_id,
+        section_name,
+        category_id,
+        standard_sections=STANDARD_SECTIONS,
+        section_step_overrides=SECTION_STEP_OVERRIDES,
+    )
 
 
 def selection_mode_label(selection_mode: str) -> str:
-    if not selection_mode:
-        return ""
-    return SELECTION_MODE_LABELS.get(selection_mode, selection_mode.replace("_", " ").title())
+    return shared_selection_mode_label(selection_mode, SELECTION_MODE_LABELS)
 
 
 def canonical_option_id(option_id: str) -> str:
     return OPTION_ID_ALIASES.get(option_id, option_id)
-
-
-def status_rank(status: str) -> int:
-    return {"unavailable": 0, "available": 1, "standard": 2}.get(status, 0)
-
-
-def best_status(*statuses: str) -> str:
-    cleaned = [clean(status).lower() for status in statuses if clean(status)]
-    if not cleaned:
-        return "unavailable"
-    return max(cleaned, key=status_rank)
 
 
 def rule_body_style_scope(rule: dict[str, str], source_id: str, target_id: str) -> str:
@@ -635,31 +445,13 @@ def truncate_reason(text: str, limit: int = 180) -> str:
     return text[: limit - 1].rstrip() + "..."
 
 
-def write_sheet(wb, name: str, headers: list[str], rows: list[dict[str, Any]]) -> None:
-    if name in wb.sheetnames:
-        del wb[name]
-    ws = wb.create_sheet(name)
-    ws.append(headers)
-    for row in rows:
-        ws.append([row.get(header, "") for header in headers])
-    header_fill = PatternFill("solid", fgColor="1F2937")
-    for cell in ws[1]:
-        cell.font = Font(color="FFFFFF", bold=True)
-        cell.fill = header_fill
-    ws.freeze_panes = "A2"
-    ws.auto_filter.ref = ws.dimensions
-    for idx, header in enumerate(headers, start=1):
-        width = min(max(len(header) + 2, 12), 42)
-        ws.column_dimensions[get_column_letter(idx)].width = width
-
-
 def main() -> None:
     wb = load_workbook(WORKBOOK_PATH)
 
     variants_raw = rows_from_sheet(wb, "variant_master")
     categories = {row["category_id"]: row for row in rows_from_sheet(wb, "category_master")}
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
-    options_raw = rows_from_sheet(wb, "stingray_master")
+    options_raw = rows_from_sheet(wb, MODEL_CONFIG.source_option_sheet)
     statuses_raw = rows_from_sheet(wb, "option_variant_status")
     rules_raw = rows_from_sheet(wb, "rule_mapping")
     price_rules_raw = rows_from_sheet(wb, "price_rules")
@@ -749,7 +541,7 @@ def main() -> None:
             "display_order": intish(row.get("display_order")),
         }
         for row in variants_raw
-        if row.get("active") == "True" and row.get("variant_id", "").endswith(("c07", "c67"))
+        if row.get("active") == "True" and row.get("variant_id", "") in MODEL_CONFIG.variant_ids
     ]
     variant_by_id = {row["variant_id"]: row for row in active_variants}
 
@@ -1496,7 +1288,7 @@ def main() -> None:
     generated_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     data = {
         "dataset": {
-            "name": "2027 Corvette Stingray operational form",
+            "name": MODEL_CONFIG.dataset_name,
             "source_workbook": WORKBOOK_PATH.name,
             "generated_at": generated_at,
         },
@@ -1518,11 +1310,8 @@ def main() -> None:
     OUTPUT_DIR.mkdir(exist_ok=True)
     APP_DIR.mkdir(exist_ok=True)
     json_path = OUTPUT_DIR / "stingray-form-data.json"
-    json_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
-    (APP_DIR / "data.js").write_text(
-        "window.STINGRAY_FORM_DATA = " + json.dumps(data, indent=2) + ";\n",
-        encoding="utf-8",
-    )
+    write_json_output(json_path, data)
+    write_app_data(APP_DIR / "data.js", "STINGRAY_FORM_DATA", data)
     csv_path = OUTPUT_DIR / "stingray-form-data.csv"
     with csv_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(
@@ -1557,7 +1346,7 @@ def main() -> None:
         "rules": len(data["rules"]),
         "price_rules": len(price_rules),
         "interiors": len(data["interiors"]),
-        "validation_errors": sum(1 for row in validation_rows if row["severity"] == "error"),
+        "validation_errors": validation_error_count(validation_rows),
     }, indent=2))
 
 
