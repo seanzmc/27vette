@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport",
-    "generated_at": "2026-04-30T15:36:29+00:00",
+    "generated_at": "2026-04-30T17:59:06+00:00",
     "status": "draft_not_runtime_active"
   },
   "variants": [
@@ -212,15 +212,15 @@
       "step_label": "Trim Level"
     },
     {
-      "section_id": "sec_stan_002",
-      "section_name": "Standard Options",
-      "source_section_name": "Standard Options",
-      "category_id": "cat_stan_001",
-      "category_name": "Standard Equipment",
+      "section_id": "sec_1lte_001",
+      "section_name": "1LT Equipment",
+      "source_section_name": "1LT Equipment",
+      "category_id": "cat_equi_001",
+      "category_name": "Equipment Groups",
       "source_category_ids": [
-        "cat_stan_001"
+        "cat_equi_001"
       ],
-      "section_category_id": "cat_stan_001",
+      "section_category_id": "cat_equi_001",
       "selection_mode": "display_only",
       "selection_mode_label": "Display only",
       "choice_mode": "display",
@@ -229,26 +229,6 @@
       "section_display_order": 10,
       "step_key": "standard_equipment",
       "step_label": "Standard Equipment"
-    },
-    {
-      "section_id": "sec_perf_001",
-      "section_name": "Performance",
-      "source_section_name": "Performance",
-      "category_id": "cat_mech_001",
-      "category_name": "Mechanical",
-      "source_category_ids": [
-        "cat_exte_001",
-        "cat_mech_001"
-      ],
-      "section_category_id": "cat_mech_001",
-      "selection_mode": "multi_select_opt",
-      "selection_mode_label": "Optional multiple choice",
-      "choice_mode": "multi",
-      "is_required": "False",
-      "standard_behavior": "locked_included",
-      "section_display_order": 10,
-      "step_key": "packages_performance",
-      "step_label": "Packages & Performance"
     },
     {
       "section_id": "sec_incl_001",
@@ -310,28 +290,9 @@
       "step_label": "Seats"
     },
     {
-      "section_id": "sec_1lte_001",
-      "section_name": "1LT Equipment",
-      "source_section_name": "1LT Equipment",
-      "category_id": "cat_equi_001",
-      "category_name": "Equipment Groups",
-      "source_category_ids": [
-        "cat_equi_001"
-      ],
-      "section_category_id": "cat_equi_001",
-      "selection_mode": "display_only",
-      "selection_mode_label": "Display only",
-      "choice_mode": "display",
-      "is_required": "False",
-      "standard_behavior": "locked_included",
-      "section_display_order": 10,
-      "step_key": "standard_equipment",
-      "step_label": "Standard Equipment"
-    },
-    {
-      "section_id": "sec_stan_001",
-      "section_name": "Standard Equipment",
-      "source_section_name": "Standard Equipment",
+      "section_id": "sec_stan_002",
+      "section_name": "Standard Options",
+      "source_section_name": "Standard Options",
       "category_id": "cat_stan_001",
       "category_name": "Standard Equipment",
       "source_category_ids": [
@@ -343,28 +304,29 @@
       "choice_mode": "display",
       "is_required": "False",
       "standard_behavior": "locked_included",
-      "section_display_order": 20,
+      "section_display_order": 10,
       "step_key": "standard_equipment",
       "step_label": "Standard Equipment"
     },
     {
-      "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "source_section_name": "2LT Equipment",
-      "category_id": "cat_equi_001",
-      "category_name": "Equipment Groups",
+      "section_id": "sec_perf_001",
+      "section_name": "Performance",
+      "source_section_name": "Performance",
+      "category_id": "cat_mech_001",
+      "category_name": "Mechanical",
       "source_category_ids": [
-        "cat_equi_001"
+        "cat_exte_001",
+        "cat_mech_001"
       ],
-      "section_category_id": "cat_equi_001",
-      "selection_mode": "display_only",
-      "selection_mode_label": "Display only",
-      "choice_mode": "display",
+      "section_category_id": "cat_mech_001",
+      "selection_mode": "multi_select_opt",
+      "selection_mode_label": "Optional multiple choice",
+      "choice_mode": "multi",
       "is_required": "False",
       "standard_behavior": "locked_included",
-      "section_display_order": 20,
-      "step_key": "standard_equipment",
-      "step_label": "Standard Equipment"
+      "section_display_order": 10,
+      "step_key": "packages_performance",
+      "step_label": "Packages & Performance"
     },
     {
       "section_id": "sec_whee_002",
@@ -386,6 +348,25 @@
       "step_label": "Wheels & Brake Calipers"
     },
     {
+      "section_id": "sec_2lte_001",
+      "section_name": "2LT Equipment",
+      "source_section_name": "2LT Equipment",
+      "category_id": "cat_equi_001",
+      "category_name": "Equipment Groups",
+      "source_category_ids": [
+        "cat_equi_001"
+      ],
+      "section_category_id": "cat_equi_001",
+      "selection_mode": "display_only",
+      "selection_mode_label": "Display only",
+      "choice_mode": "display",
+      "is_required": "False",
+      "standard_behavior": "locked_included",
+      "section_display_order": 20,
+      "step_key": "standard_equipment",
+      "step_label": "Standard Equipment"
+    },
+    {
       "section_id": "sec_seat_001",
       "section_name": "Seat Belt",
       "source_section_name": "Seat Belt",
@@ -403,6 +384,44 @@
       "section_display_order": 20,
       "step_key": "seat_belt",
       "step_label": "Seat Belt"
+    },
+    {
+      "section_id": "sec_stan_001",
+      "section_name": "Standard Equipment",
+      "source_section_name": "Standard Equipment",
+      "category_id": "cat_stan_001",
+      "category_name": "Standard Equipment",
+      "source_category_ids": [
+        "cat_stan_001"
+      ],
+      "section_category_id": "cat_stan_001",
+      "selection_mode": "display_only",
+      "selection_mode_label": "Display only",
+      "choice_mode": "display",
+      "is_required": "False",
+      "standard_behavior": "locked_included",
+      "section_display_order": 20,
+      "step_key": "standard_equipment",
+      "step_label": "Standard Equipment"
+    },
+    {
+      "section_id": "sec_safe_001",
+      "section_name": "Safety Features",
+      "source_section_name": "Safety Features",
+      "category_id": "cat_stan_001",
+      "category_name": "Standard Equipment",
+      "source_category_ids": [
+        "cat_stan_001"
+      ],
+      "section_category_id": "cat_stan_001",
+      "selection_mode": "display_only",
+      "selection_mode_label": "Display only",
+      "choice_mode": "display",
+      "is_required": "False",
+      "standard_behavior": "locked_included",
+      "section_display_order": 30,
+      "step_key": "standard_equipment",
+      "step_label": "Standard Equipment"
     },
     {
       "section_id": "sec_exha_001",
@@ -424,15 +443,15 @@
       "step_label": "Aero, Exhaust, Stripes & Accessories"
     },
     {
-      "section_id": "sec_safe_001",
-      "section_name": "Safety Features",
-      "source_section_name": "Safety Features",
-      "category_id": "cat_stan_001",
-      "category_name": "Standard Equipment",
+      "section_id": "sec_3lte_001",
+      "section_name": "3LT Equipment",
+      "source_section_name": "3LT Equipment",
+      "category_id": "cat_equi_001",
+      "category_name": "Equipment Groups",
       "source_category_ids": [
-        "cat_stan_001"
+        "cat_equi_001"
       ],
-      "section_category_id": "cat_stan_001",
+      "section_category_id": "cat_equi_001",
       "selection_mode": "display_only",
       "selection_mode_label": "Display only",
       "choice_mode": "display",
@@ -460,44 +479,6 @@
       "section_display_order": 30,
       "step_key": "wheels",
       "step_label": "Wheels & Brake Calipers"
-    },
-    {
-      "section_id": "sec_3lte_001",
-      "section_name": "3LT Equipment",
-      "source_section_name": "3LT Equipment",
-      "category_id": "cat_equi_001",
-      "category_name": "Equipment Groups",
-      "source_category_ids": [
-        "cat_equi_001"
-      ],
-      "section_category_id": "cat_equi_001",
-      "selection_mode": "display_only",
-      "selection_mode_label": "Display only",
-      "choice_mode": "display",
-      "is_required": "False",
-      "standard_behavior": "locked_included",
-      "section_display_order": 30,
-      "step_key": "standard_equipment",
-      "step_label": "Standard Equipment"
-    },
-    {
-      "section_id": "sec_tech_001",
-      "section_name": "Technology",
-      "source_section_name": "Technology",
-      "category_id": "cat_stan_001",
-      "category_name": "Standard Equipment",
-      "source_category_ids": [
-        "cat_stan_001"
-      ],
-      "section_category_id": "cat_stan_001",
-      "selection_mode": "display_only",
-      "selection_mode_label": "Display only",
-      "choice_mode": "display",
-      "is_required": "False",
-      "standard_behavior": "locked_included",
-      "section_display_order": 40,
-      "step_key": "standard_equipment",
-      "step_label": "Standard Equipment"
     },
     {
       "section_id": "sec_roof_001",
@@ -538,6 +519,25 @@
       "step_label": "Exterior Appearance"
     },
     {
+      "section_id": "sec_tech_001",
+      "section_name": "Technology",
+      "source_section_name": "Technology",
+      "category_id": "cat_stan_001",
+      "category_name": "Standard Equipment",
+      "source_category_ids": [
+        "cat_stan_001"
+      ],
+      "section_category_id": "cat_stan_001",
+      "selection_mode": "display_only",
+      "selection_mode_label": "Display only",
+      "choice_mode": "display",
+      "is_required": "False",
+      "standard_behavior": "locked_included",
+      "section_display_order": 40,
+      "step_key": "standard_equipment",
+      "step_label": "Standard Equipment"
+    },
+    {
       "section_id": "sec_inte_001",
       "section_name": "Interior Trim",
       "source_section_name": "Interior Trim",
@@ -576,25 +576,6 @@
       "step_label": "Interior Trim"
     },
     {
-      "section_id": "sec_colo_001",
-      "section_name": "Color Combination Override",
-      "source_section_name": "Color Override",
-      "category_id": "cat_inte_001",
-      "category_name": "Interior",
-      "source_category_ids": [
-        "cat_inte_001"
-      ],
-      "section_category_id": "cat_inte_001",
-      "selection_mode": "multi_select_opt",
-      "selection_mode_label": "Optional multiple choice",
-      "choice_mode": "multi",
-      "is_required": "False",
-      "standard_behavior": "locked_included",
-      "section_display_order": 50,
-      "step_key": "interior_trim",
-      "step_label": "Interior Trim"
-    },
-    {
       "section_id": "sec_stri_001",
       "section_name": "Stripes",
       "source_section_name": "Stripes",
@@ -612,6 +593,25 @@
       "section_display_order": 50,
       "step_key": "aero_exhaust_stripes_accessories",
       "step_label": "Aero, Exhaust, Stripes & Accessories"
+    },
+    {
+      "section_id": "sec_colo_001",
+      "section_name": "Color Combination Override",
+      "source_section_name": "Color Override",
+      "category_id": "cat_inte_001",
+      "category_name": "Interior",
+      "source_category_ids": [
+        "cat_inte_001"
+      ],
+      "section_category_id": "cat_inte_001",
+      "selection_mode": "multi_select_opt",
+      "selection_mode_label": "Optional multiple choice",
+      "choice_mode": "multi",
+      "is_required": "False",
+      "standard_behavior": "locked_included",
+      "section_display_order": 50,
+      "step_key": "interior_trim",
+      "step_label": "Interior Trim"
     },
     {
       "section_id": "sec_gsce_001",
@@ -690,6 +690,25 @@
       "step_label": "Exterior Appearance"
     },
     {
+      "section_id": "sec_badg_001",
+      "section_name": "Badges",
+      "source_section_name": "Badges",
+      "category_id": "cat_exte_001",
+      "category_name": "Exterior",
+      "source_category_ids": [
+        "cat_exte_001"
+      ],
+      "section_category_id": "cat_exte_001",
+      "selection_mode": "single_select_req",
+      "selection_mode_label": "Required single choice",
+      "choice_mode": "single",
+      "is_required": "True",
+      "standard_behavior": "replaceable_default",
+      "section_display_order": 70,
+      "step_key": "exterior_appearance",
+      "step_label": "Exterior Appearance"
+    },
+    {
       "section_id": "sec_onst_001",
       "section_name": "OnStar",
       "source_section_name": "OnStar",
@@ -708,25 +727,6 @@
       "section_display_order": 70,
       "step_key": "interior_trim",
       "step_label": "Interior Trim"
-    },
-    {
-      "section_id": "sec_badg_001",
-      "section_name": "Badges",
-      "source_section_name": "Badges",
-      "category_id": "cat_exte_001",
-      "category_name": "Exterior",
-      "source_category_ids": [
-        "cat_exte_001"
-      ],
-      "section_category_id": "cat_exte_001",
-      "selection_mode": "single_select_req",
-      "selection_mode_label": "Required single choice",
-      "choice_mode": "single",
-      "is_required": "True",
-      "standard_behavior": "replaceable_default",
-      "section_display_order": 70,
-      "step_key": "exterior_appearance",
-      "step_label": "Exterior Appearance"
     },
     {
       "section_id": "sec_spoi_001",
