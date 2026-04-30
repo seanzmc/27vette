@@ -1,6 +1,6 @@
 # Grand Sport Form Data Draft
 
-Generated: `2026-04-30T17:59:06+00:00`
+Generated: `2026-04-30T19:09:25+00:00`
 Status: `draft_not_runtime_active`
 Source sheet: `grandSport`
 
@@ -16,7 +16,7 @@ Source sheet: `grandSport`
 - Exclusive groups: 0 (deferred)
 - Rules: 0 (deferred)
 - Price rules: 0 (deferred)
-- Interiors: 0 (deferred)
+- Interiors: 132 (model-scoped)
 - Color overrides: 0 (deferred)
 
 ## Draft Notes
@@ -30,7 +30,6 @@ Source sheet: `grandSport`
 
 - `grand_sport_draft_status`: Grand Sport form data is a draft inspection artifact and is not runtime active.
 - `rules_deferred`: Final Grand Sport compatibility rules are deferred; rule/detail evidence is preserved in draftMetadata.ruleDetailHotSpots.
-- `interiors_deferred`: Final Grand Sport interior hierarchy and component pricing are deferred to a later phase.
 - `pricing_deferred`: Final Grand Sport price rules are deferred unless directly represented in normalized option prices.
 
 ## Live Output Safety

@@ -223,3 +223,49 @@ test("model-specific exports keep the compact schema and Stingray filenames", ()
   assert.equal(csvDownload.filename, "grand-sport-order-summary.csv");
   assert.equal(csvDownload.content.split("\n")[0], "section,rpo,label,price");
 });
+
+test("Grand Sport interiors are model-scoped and export selected interior identity", () => {
+  const dataWindow = loadDataWindow();
+  const registry = dataWindow.CORVETTE_FORM_DATA;
+  const grandSportData = registry.models.grandSport.data;
+  const stingrayData = registry.models.stingray.data;
+
+  assert.equal(grandSportData.interiors.length, 132);
+  assert.equal(
+    grandSportData.interiors.some((interior) => interior.interior_id === "3LT_AH2_EL9" && interior.requires_z25 === "True"),
+    true
+  );
+  assert.equal(
+    stingrayData.interiors.some((interior) => interior.interior_id === "3LT_AH2_EL9"),
+    false,
+    "Stingray data must not reactivate Grand Sport-only EL9"
+  );
+
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "3LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const ah2Seat = runtime.activeChoiceRows().find((choice) => choice.rpo === "AH2" && choice.step_key === "seat");
+  assert.ok(ah2Seat, "Grand Sport AH2 seat should exist for 3LT");
+  runtime.handleChoice(ah2Seat);
+  assert.ok(runtime.currentOrder().metadata.missing_required.includes("Base Interior"));
+
+  runtime.state.selectedInterior = "3LT_AH2_EL9";
+  const order = runtime.currentOrder();
+  assert.equal(order.metadata.selected_interior_id, "3LT_AH2_EL9");
+  assert.equal(order.selected_interior.rpo, "EL9");
+  assert.equal(order.selected_interior.label, "Santorini Blue Dipped with Torch Red accents");
+  assert.equal(order.metadata.missing_required.includes("Base Interior"), false);
+
+  const compact = runtime.compactOrder();
+  const seatsInterior = compact.sections.find((section) => section.section === "Seats & Interior");
+  assert.ok(seatsInterior, "compact Grand Sport order should include Seats & Interior");
+  assert.ok(
+    seatsInterior.items.some((item) => item.rpo === "EL9" && item.label === "Santorini Blue Dipped with Torch Red accents"),
+    "compact order should include selected Grand Sport interior"
+  );
+  assert.match(runtime.plainTextOrderSummary(compact), /EL9 Santorini Blue Dipped with Torch Red accents/);
+});

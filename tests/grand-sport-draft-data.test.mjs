@@ -65,13 +65,36 @@ test("Grand Sport draft defers non-normalized surfaces with explicit validation 
   assert.deepEqual(draft.exclusiveGroups, []);
   assert.deepEqual(draft.rules, []);
   assert.deepEqual(draft.priceRules, []);
-  assert.deepEqual(draft.interiors, []);
   assert.deepEqual(draft.colorOverrides, []);
   const warnings = new Set(draft.validation.filter((row) => row.severity === "warning").map((row) => row.check_id));
   assert.ok(warnings.has("grand_sport_draft_status"));
   assert.ok(warnings.has("rules_deferred"));
-  assert.ok(warnings.has("interiors_deferred"));
   assert.ok(warnings.has("pricing_deferred"));
+});
+
+test("Grand Sport draft includes model-scoped LT interiors with EL9 launch edition metadata", () => {
+  assert.equal(draft.interiors.length, 132);
+  assert.equal(draft.interiors.every((interior) => interior.active_for_grand_sport === true), true);
+  assert.equal(draft.interiors.every((interior) => interior.active_for_stingray === false), true);
+
+  const byId = new Map(draft.interiors.map((interior) => [interior.interior_id, interior]));
+  for (const interiorId of ["3LT_AE4_EL9", "3LT_AH2_EL9"]) {
+    const interior = byId.get(interiorId);
+    assert.ok(interior, `${interiorId} should be available for Grand Sport`);
+    assert.equal(interior.interior_code, "EL9");
+    assert.equal(interior.requires_z25, "True");
+    assert.match(interior.source_note, /Z25/);
+    assert.equal(interior.interior_color_family, "Santorini Blue Dipped with Torch Red accents");
+  }
+
+  const ae4El9 = byId.get("3LT_AE4_EL9");
+  const ah2El9 = byId.get("3LT_AH2_EL9");
+  assert.equal(Number(ae4El9.price), 595);
+  assert.equal(Number(ah2El9.price), 0);
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(ae4El9.interior_components)),
+    [{ rpo: "AE4", label: "AE4 Seat Upgrade", price: 595, component_type: "seat" }]
+  );
 });
 
 test("Grand Sport draft keeps normalized display fields and raw rule evidence", () => {
@@ -96,8 +119,6 @@ test("Grand Sport draft preserves rule hot spots and normalization metadata for 
     "exclusiveGroups",
     "rules",
     "priceRules",
-    "interiors",
     "colorOverrides",
   ]);
 });
-

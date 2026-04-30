@@ -34,6 +34,16 @@ RULE_HOT_SPOT_PATTERNS = {
     "except": re.compile(r"\bexcept\b", re.IGNORECASE),
 }
 SPECIAL_REVIEW_RPOS = {"EL9", "Z25", "FEY", "Z15"}
+GRAND_SPORT_ONLY_INTERIOR_IDS = {"3LT_AE4_EL9", "3LT_AH2_EL9"}
+INTERIOR_COMPONENT_LABELS = {
+    "36S": "Yellow Stitching",
+    "37S": "Blue Stitching",
+    "38S": "Red Stitching",
+    "N26": "Sueded Microfiber",
+    "N2Z": "Sueded Microfiber",
+    "TU7": "Two-Tone",
+    "R6X": "Custom Interior Trim and Seat Combination",
+}
 
 
 def normalize_status(value: Any) -> str:
@@ -109,6 +119,269 @@ def cleanup_display_text(value: str, config: ModelConfig) -> tuple[str, list[str
             text = deduped
 
     return text, notes
+
+
+def price_ref_key(trim: str, code: str) -> tuple[str, str]:
+    return (clean(trim).replace("_", " "), clean(code))
+
+
+def price_ref_prices(rows: list[dict[str, str]]) -> dict[tuple[str, str], int]:
+    prices: dict[tuple[str, str], int] = {}
+    for row in rows:
+        if clean(row.get("OptionType", "")).lower() != "seat":
+            continue
+        trim = clean(row.get("Trim", ""))
+        code = clean(row.get("Code", ""))
+        if trim and code:
+            prices[price_ref_key(trim, code)] = money(row.get("Price"))
+    return prices
+
+
+def price_ref_component_prices(rows: list[dict[str, str]]) -> dict[tuple[str, str, str], int]:
+    prices: dict[tuple[str, str, str], int] = {}
+    for row in rows:
+        option_type = clean(row.get("OptionType", "")).lower()
+        code = clean(row.get("Code", ""))
+        if not option_type or not code:
+            continue
+        prices[(option_type, clean(row.get("Trim", "")).replace("_", " "), code)] = money(row.get("Price"))
+    return prices
+
+
+def price_ref_component_price(
+    price_ref: dict[tuple[str, str, str], int],
+    option_type: str,
+    code: str,
+    trim: str = "",
+) -> int:
+    normalized_type = clean(option_type).lower()
+    normalized_trim = clean(trim).replace("_", " ")
+    normalized_code = clean(code)
+    if (normalized_type, normalized_trim, normalized_code) in price_ref:
+        return price_ref[(normalized_type, normalized_trim, normalized_code)]
+    return price_ref.get((normalized_type, "", normalized_code), 0)
+
+
+def r6x_price_component(row: dict[str, str], price_ref: dict[tuple[str, str], int]) -> int:
+    trim = clean(row.get("Trim", ""))
+    interior_id = clean(row.get("interior_id", "") or row.get("ID", ""))
+    if "R6X" not in trim and "R6X" not in interior_id:
+        return 0
+
+    seat = clean(row.get("Seat", ""))
+    r6x_trim = trim if "R6X" in trim else f"{trim}_R6X"
+    base_trim = r6x_trim.replace("_R6X", "")
+    r6x_price = price_ref.get(price_ref_key(r6x_trim, seat))
+    if r6x_price is None:
+        return 0
+    return max(0, r6x_price - price_ref.get(price_ref_key(base_trim, seat), 0))
+
+
+def generated_interior_price(row: dict[str, str], price_ref: dict[tuple[str, str], int]) -> int:
+    return money(row.get("Price") or row.get("Cost")) + r6x_price_component(row, price_ref)
+
+
+def interior_component_metadata(
+    row: dict[str, str],
+    price_ref: dict[tuple[str, str, str], int],
+) -> list[dict[str, Any]]:
+    trim = clean(row.get("Trim", ""))
+    interior_id = clean(row.get("interior_id", "") or row.get("ID", ""))
+    seat = clean(row.get("Seat", ""))
+    tokens = set(interior_id.split("_"))
+    components: list[dict[str, Any]] = []
+
+    if "R6X" in trim or "R6X" in tokens:
+        r6x_trim = trim if "R6X" in trim else f"{trim}_R6X"
+        components.append(
+            {
+                "rpo": "R6X",
+                "label": INTERIOR_COMPONENT_LABELS["R6X"],
+                "price": price_ref_component_price(price_ref, "seat", seat, r6x_trim),
+                "component_type": "r6x",
+            }
+        )
+    else:
+        seat_price = price_ref_component_price(price_ref, "seat", seat, trim)
+        if seat_price:
+            components.append(
+                {
+                    "rpo": seat,
+                    "label": f"{seat} Seat Upgrade",
+                    "price": seat_price,
+                    "component_type": "seat",
+                }
+            )
+
+    for rpo in ("36S", "37S", "38S"):
+        if rpo in tokens:
+            components.append(
+                {
+                    "rpo": rpo,
+                    "label": INTERIOR_COMPONENT_LABELS[rpo],
+                    "price": price_ref_component_price(price_ref, "stitching", rpo),
+                    "component_type": "stitching",
+                }
+            )
+
+    for rpo in ("N26", "N2Z"):
+        if rpo in tokens:
+            components.append(
+                {
+                    "rpo": rpo,
+                    "label": INTERIOR_COMPONENT_LABELS[rpo],
+                    "price": price_ref_component_price(price_ref, "suede", rpo),
+                    "component_type": "suede",
+                }
+            )
+
+    if "TU7" in tokens:
+        components.append(
+            {
+                "rpo": "TU7",
+                "label": INTERIOR_COMPONENT_LABELS["TU7"],
+                "price": price_ref_component_price(price_ref, "twotone", "TU7"),
+                "component_type": "two_tone",
+            }
+        )
+
+    return [component for component in components if component["price"] or component["rpo"] == "R6X"]
+
+
+def clean_reference_label(value: str) -> str:
+    label = clean(value)
+    if " - " in label:
+        head, tail = label.split(" - ", 1)
+        if re.search(r"\b(option|expandable|choice|card)\b", tail, re.IGNORECASE):
+            label = head
+    label = re.sub(r"\s*\([^)]*(?:expandable|only one option|no need)[^)]*\)\s*$", "", label, flags=re.IGNORECASE)
+    return label.strip()
+
+
+def read_interior_reference(config: ModelConfig) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
+    reference_by_id: dict[str, dict[str, Any]] = {}
+    reference_rows: list[dict[str, Any]] = []
+    current_levels = [""] * 6
+    if not config.interior_reference_path.exists():
+        return reference_by_id, reference_rows
+    with config.interior_reference_path.open(newline="", encoding="utf-8") as handle:
+        import csv
+
+        reader = csv.DictReader(handle)
+        for row_number, row in enumerate(reader, start=2):
+            for index in range(6):
+                key = f"level{index}"
+                value = clean_reference_label(row.get(key, ""))
+                if value:
+                    current_levels[index] = value
+                    for deeper in range(index + 1, 6):
+                        current_levels[deeper] = ""
+            interior_id = clean(row.get("interior_id", ""))
+            levels = [level for level in current_levels if level]
+            record = {
+                "row_number": row_number,
+                "interior_id": interior_id,
+                "levels": levels,
+            }
+            reference_rows.append(record)
+            if interior_id:
+                reference_by_id[interior_id] = record
+    return reference_by_id, reference_rows
+
+
+def seat_code_from_label(label: str) -> str:
+    return clean(label).split(" ", 1)[0]
+
+
+def grouping_fields_for_interior(
+    interior: dict[str, Any],
+    reference: dict[str, Any] | None,
+    reference_order: int,
+    fallback: bool = False,
+) -> dict[str, Any]:
+    seat_label = reference["levels"][1] if reference and len(reference["levels"]) > 1 else f"{interior['seat_code']} Seats"
+    levels = reference["levels"] if reference else [
+        interior["trim_level"],
+        seat_label,
+        interior["interior_name"] or "Other Interior Choices",
+        interior["material"] or "Standard interior",
+        interior["interior_name"] or interior["interior_id"],
+    ]
+    leaf_label = levels[-1] if levels else interior["interior_name"] or interior["interior_id"]
+    color_family = levels[2] if len(levels) > 2 else leaf_label
+    material_family = interior.get("material") or "Standard interior"
+    if len(levels) > 3 and levels[-2] != color_family:
+        material_family = levels[-2]
+    parent_group = levels[-2] if len(levels) > 1 else color_family
+    return {
+        "interior_trim_level": levels[0] if levels else interior["trim_level"],
+        "interior_seat_code": seat_code_from_label(seat_label) or interior["seat_code"],
+        "interior_seat_label": seat_label,
+        "interior_color_family": "Other Interior Choices" if fallback else color_family,
+        "interior_material_family": material_family,
+        "interior_variant_label": leaf_label,
+        "interior_group_display_order": reference_order,
+        "interior_material_display_order": reference_order,
+        "interior_choice_display_order": reference_order,
+        "interior_hierarchy_levels": json.dumps(levels, ensure_ascii=False),
+        "interior_hierarchy_path": " > ".join(levels),
+        "interior_parent_group_label": parent_group,
+        "interior_leaf_label": leaf_label,
+        "interior_reference_order": reference_order,
+    }
+
+
+def build_grand_sport_interiors(config: ModelConfig) -> list[dict[str, Any]]:
+    wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
+    lt_interiors_raw = rows_from_sheet(wb, "lt_interiors")
+    price_ref_rows = rows_from_sheet(wb, "PriceRef")
+    interior_price_ref = price_ref_prices(price_ref_rows)
+    interior_component_price_ref = price_ref_component_prices(price_ref_rows)
+    reference_by_id, reference_rows = read_interior_reference(config)
+    reference_order_by_id = {
+        row["interior_id"]: index
+        for index, row in enumerate((row for row in reference_rows if row["interior_id"]), start=1)
+    }
+    fallback_order = len(reference_order_by_id) + 1
+    interiors: list[dict[str, Any]] = []
+
+    for row in lt_interiors_raw:
+        trim = clean(row.get("Trim", ""))
+        if trim not in {"1LT", "2LT", "3LT", "3LT_R6X"}:
+            continue
+        interior_id = clean(row.get("interior_id", ""))
+        components = interior_component_metadata(row, interior_component_price_ref)
+        interior = {
+            "interior_id": interior_id,
+            "source_sheet": "lt_interiors",
+            "active_for_stingray": False,
+            "active_for_grand_sport": True,
+            "requires_z25": "True" if interior_id in GRAND_SPORT_ONLY_INTERIOR_IDS else "False",
+            "trim_level": trim.replace("_R6X", ""),
+            "requires_r6x": "True" if "_R6X" in trim or interior_id.endswith("_R6X") else "False",
+            "seat_code": clean(row.get("Seat", "")),
+            "interior_code": clean(row.get("Interior Code", "")),
+            "interior_name": clean(row.get("Interior Name", "")),
+            "material": clean(row.get("Material", "")),
+            "price": generated_interior_price(row, interior_price_ref),
+            "suede": clean(row.get("Suede", "")),
+            "stitch": clean(row.get("Stitch", "")),
+            "two_tone": clean(row.get("Two Tone", "")),
+            "section_id": clean(row.get("section_id", "")),
+            "color_overrides_raw": clean(row.get("Color Overrides", "")),
+            "source_note": clean(row.get("Detail from Disclosure", "")),
+            "interior_components": components,
+            "interior_components_json": json.dumps(components, separators=(",", ":")),
+        }
+        reference = reference_by_id.get(interior_id)
+        if reference:
+            interior.update(grouping_fields_for_interior(interior, reference, reference_order_by_id[interior_id]))
+        else:
+            interior.update(grouping_fields_for_interior(interior, None, fallback_order, fallback=False))
+            fallback_order += 1
+        interiors.append(interior)
+
+    return interiors
 
 
 def resolve_category(
@@ -709,6 +982,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
     preview = build_contract_preview(config)
     variants_by_id = {row["variant_id"]: row for row in preview["variants"]}
     sections_by_id = {row["section_id"]: row for row in preview["sections"]}
+    interiors = build_grand_sport_interiors(config)
     option_rows: dict[str, dict[str, Any]] = {}
     statuses_by_option: defaultdict[str, dict[str, str]] = defaultdict(dict)
     order_by_option: dict[str, int] = {}
@@ -829,11 +1103,11 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
             "message": "Final Grand Sport compatibility rules are deferred; rule/detail evidence is preserved in draftMetadata.ruleDetailHotSpots.",
         },
         {
-            "check_id": "interiors_deferred",
-            "severity": "warning",
+            "check_id": "interior_contract",
+            "severity": "pass",
             "entity_type": "interior",
             "entity_id": "",
-            "message": "Final Grand Sport interior hierarchy and component pricing are deferred to a later phase.",
+            "message": f"{len(interiors)} model-scoped Grand Sport LT interiors exported.",
         },
         {
             "check_id": "pricing_deferred",
@@ -864,7 +1138,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
         "exclusiveGroups": [],
         "rules": [],
         "priceRules": [],
-        "interiors": [],
+        "interiors": interiors,
         "colorOverrides": [],
         "validation": validation,
         "draftMetadata": {
@@ -873,7 +1147,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
             "fullVariantMatrixChoices": len(draft_choices),
             "ruleDetailHotSpots": preview["ruleDetailHotSpots"],
             "normalization": preview["normalization"],
-            "deferredSurfaces": ["ruleGroups", "exclusiveGroups", "rules", "priceRules", "interiors", "colorOverrides"],
+            "deferredSurfaces": ["ruleGroups", "exclusiveGroups", "rules", "priceRules", "colorOverrides"],
         },
     }
 
@@ -1084,7 +1358,7 @@ def render_form_data_draft_markdown(draft: dict[str, Any]) -> str:
         f"- Exclusive groups: {len(draft['exclusiveGroups'])} (deferred)",
         f"- Rules: {len(draft['rules'])} (deferred)",
         f"- Price rules: {len(draft['priceRules'])} (deferred)",
-        f"- Interiors: {len(draft['interiors'])} (deferred)",
+        f"- Interiors: {len(draft['interiors'])} (model-scoped)",
         f"- Color overrides: {len(draft['colorOverrides'])} (deferred)",
         "",
         "## Draft Notes",
