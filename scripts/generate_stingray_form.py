@@ -18,8 +18,8 @@ from corvette_form_generator.mapping import (
     status_to_label,
     step_for_section as shared_step_for_section,
 )
-from corvette_form_generator.model_configs import STINGRAY_MODEL
-from corvette_form_generator.output import write_app_data, write_json_output
+from corvette_form_generator.model_configs import GRAND_SPORT_MODEL, STINGRAY_MODEL
+from corvette_form_generator.output import write_app_data_registry, write_json_output
 from corvette_form_generator.validation import validation_error_count
 from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet, write_sheet
 
@@ -90,6 +90,44 @@ ENGINE_APPEARANCE_OPTION_ORDER = {
     "opt_sln_001": 100,
     "opt_vup_001": 110,
 }
+
+
+def export_slug(model_key: str) -> str:
+    return model_key.replace("_", "-")
+
+
+def model_registry_entry(model_key: str, model_label: str, data: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "key": "grandSport" if model_key == "grand_sport" else model_key,
+        "label": model_label,
+        "modelName": f"Corvette {model_label}",
+        "exportSlug": export_slug(model_key),
+        "data": data,
+    }
+
+
+def load_grand_sport_registry_data() -> dict[str, Any] | None:
+    draft_path = OUTPUT_DIR / "inspection" / f"{GRAND_SPORT_MODEL.draft_artifact_prefix}.json"
+    if not draft_path.exists():
+        return None
+    return json.loads(draft_path.read_text(encoding="utf-8"))
+
+
+def build_app_data_registry(stingray_data: dict[str, Any]) -> dict[str, Any]:
+    models = {
+        "stingray": model_registry_entry(MODEL_CONFIG.model_key, MODEL_CONFIG.model_label, stingray_data),
+    }
+    grand_sport_data = load_grand_sport_registry_data()
+    if grand_sport_data is not None:
+        models["grandSport"] = model_registry_entry(
+            GRAND_SPORT_MODEL.model_key,
+            GRAND_SPORT_MODEL.model_label,
+            grand_sport_data,
+        )
+    return {
+        "defaultModelKey": "stingray",
+        "models": models,
+    }
 
 AERO_EXHAUST_ACCESSORIES_SECTION_ORDER = {
     "sec_exha_001": 10,
@@ -1311,7 +1349,11 @@ def main() -> None:
     APP_DIR.mkdir(exist_ok=True)
     json_path = OUTPUT_DIR / "stingray-form-data.json"
     write_json_output(json_path, data)
-    write_app_data(APP_DIR / "data.js", "STINGRAY_FORM_DATA", data)
+    write_app_data_registry(
+        APP_DIR / "data.js",
+        build_app_data_registry(data),
+        legacy_aliases={"STINGRAY_FORM_DATA": "stingray"},
+    )
     csv_path = OUTPUT_DIR / "stingray-form-data.csv"
     with csv_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(

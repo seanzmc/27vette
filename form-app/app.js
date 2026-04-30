@@ -1,4 +1,24 @@
-const data = window.STINGRAY_FORM_DATA;
+function formDataRegistry() {
+  return (
+    window.CORVETTE_FORM_DATA || {
+      defaultModelKey: "stingray",
+      models: {
+        stingray: {
+          key: "stingray",
+          label: "Stingray",
+          modelName: "Corvette Stingray",
+          exportSlug: "stingray",
+          data: window.STINGRAY_FORM_DATA,
+        },
+      },
+    }
+  );
+}
+
+const registry = formDataRegistry();
+let activeModelKey = registry.defaultModelKey || "stingray";
+let activeModel = registry.models[activeModelKey] || registry.models.stingray;
+let data = activeModel.data;
 
 const state = {
   bodyStyle: "",
@@ -34,14 +54,16 @@ const els = {
   resetButton: document.querySelector("#resetButton"),
   exportJsonButton: document.querySelector("#exportJsonButton"),
   exportCsvButton: document.querySelector("#exportCsvButton"),
+  modelSelect: document.querySelector("#modelSelect"),
+  appTitle: document.querySelector("#appTitle"),
 };
 
-const runtimeSteps = data.steps.filter((step) => step.step_key !== "summary");
-const variants = [...data.variants].sort((a, b) => a.display_order - b.display_order);
+let runtimeSteps = [];
+let variants = [];
 const choicesByOption = new Map();
-const sectionsById = new Map(data.sections.map((section) => [section.section_id, section]));
+const sectionsById = new Map();
 const optionsById = new Map();
-const interiorsById = new Map(data.interiors.map((interior) => [interior.interior_id, interior]));
+const interiorsById = new Map();
 const ruleTargetsBySource = new Map();
 const rulesByTarget = new Map();
 const priceRulesByTarget = new Map();
@@ -77,35 +99,59 @@ const stepOrderSectionKeys = new Map([
   ["delivery", "delivery"],
 ]);
 
-for (const choice of data.choices) {
-  if (!choicesByOption.has(choice.option_id)) choicesByOption.set(choice.option_id, []);
-  choicesByOption.get(choice.option_id).push(choice);
-  if (!optionsById.has(choice.option_id)) optionsById.set(choice.option_id, choice);
-}
+function rebuildDataIndexes() {
+  runtimeSteps = (data.steps || []).filter((step) => step.step_key !== "summary");
+  variants = [...(data.variants || [])].sort((a, b) => a.display_order - b.display_order);
+  choicesByOption.clear();
+  sectionsById.clear();
+  optionsById.clear();
+  interiorsById.clear();
+  ruleTargetsBySource.clear();
+  rulesByTarget.clear();
+  priceRulesByTarget.clear();
+  ruleGroupsBySource.clear();
+  exclusiveGroupByOption.clear();
 
-for (const rule of data.rules) {
-  if (!ruleTargetsBySource.has(rule.source_id)) ruleTargetsBySource.set(rule.source_id, []);
-  ruleTargetsBySource.get(rule.source_id).push(rule);
-  if (!rulesByTarget.has(rule.target_id)) rulesByTarget.set(rule.target_id, []);
-  rulesByTarget.get(rule.target_id).push(rule);
-}
+  for (const section of data.sections || []) {
+    sectionsById.set(section.section_id, section);
+  }
 
-for (const rule of data.priceRules) {
-  if (!priceRulesByTarget.has(rule.target_option_id)) priceRulesByTarget.set(rule.target_option_id, []);
-  priceRulesByTarget.get(rule.target_option_id).push(rule);
-}
+  for (const interior of data.interiors || []) {
+    interiorsById.set(interior.interior_id, interior);
+  }
 
-for (const group of data.ruleGroups || []) {
-  if (!ruleGroupsBySource.has(group.source_id)) ruleGroupsBySource.set(group.source_id, []);
-  ruleGroupsBySource.get(group.source_id).push(group);
-}
+  for (const choice of data.choices || []) {
+    if (!choicesByOption.has(choice.option_id)) choicesByOption.set(choice.option_id, []);
+    choicesByOption.get(choice.option_id).push(choice);
+    if (!optionsById.has(choice.option_id)) optionsById.set(choice.option_id, choice);
+  }
 
-for (const group of data.exclusiveGroups || []) {
-  if (group.active && group.active !== "True") continue;
-  for (const optionId of group.option_ids || []) {
-    exclusiveGroupByOption.set(optionId, group);
+  for (const rule of data.rules || []) {
+    if (!ruleTargetsBySource.has(rule.source_id)) ruleTargetsBySource.set(rule.source_id, []);
+    ruleTargetsBySource.get(rule.source_id).push(rule);
+    if (!rulesByTarget.has(rule.target_id)) rulesByTarget.set(rule.target_id, []);
+    rulesByTarget.get(rule.target_id).push(rule);
+  }
+
+  for (const rule of data.priceRules || []) {
+    if (!priceRulesByTarget.has(rule.target_option_id)) priceRulesByTarget.set(rule.target_option_id, []);
+    priceRulesByTarget.get(rule.target_option_id).push(rule);
+  }
+
+  for (const group of data.ruleGroups || []) {
+    if (!ruleGroupsBySource.has(group.source_id)) ruleGroupsBySource.set(group.source_id, []);
+    ruleGroupsBySource.get(group.source_id).push(group);
+  }
+
+  for (const group of data.exclusiveGroups || []) {
+    if (group.active && group.active !== "True") continue;
+    for (const optionId of group.option_ids || []) {
+      exclusiveGroupByOption.set(optionId, group);
+    }
   }
 }
+
+rebuildDataIndexes();
 
 function formatMoney(value) {
   return new Intl.NumberFormat("en-US", {
@@ -1086,7 +1132,7 @@ function renderSummary() {
   els.summaryBase.textContent = formatMoney(base);
   els.summaryOptions.textContent = formatMoney(optionsTotal);
   els.summaryTotal.textContent = formatMoney(total);
-  els.variantName.textContent = variant?.display_name || "Stingray";
+  els.variantName.textContent = variant?.display_name || activeModel.label || "Stingray";
 
   const selectedItems = items.filter((item) => item.type !== "auto_added");
   const autoItems = items.filter((item) => item.type === "auto_added");
@@ -1100,7 +1146,7 @@ function renderSummary() {
   els.missingList.innerHTML = missing.map((item) => `<li>${item}</li>`).join("") || "<li class=\"empty\">No open required choices.</li>";
   renderStandardEquipment();
 
-  const dataWarnings = data.validation.filter((item) => item.severity === "error");
+  const dataWarnings = (data.validation || []).filter((item) => item.severity === "error");
   els.alertRegion.innerHTML = dataWarnings.map((item) => `<div class="alert">${item.message}</div>`).join("");
 }
 
@@ -1133,7 +1179,7 @@ function renderStandardEquipment() {
 function vehicleInformation(variant) {
   return {
     model_year: variant?.model_year || "",
-    model: "Corvette Stingray",
+    model: activeModel.modelName || "Corvette Stingray",
     body_style: variant?.body_style || state.bodyStyle,
     trim_level: variant?.trim_level || state.trimLevel,
     variant_id: variant?.variant_id || currentVariantId(),
@@ -1324,7 +1370,7 @@ function download(filename, content, type) {
 }
 
 function exportJson() {
-  download("stingray-order-summary.json", JSON.stringify(compactOrder(), null, 2), "application/json");
+  download(`${activeModel.exportSlug || "stingray"}-order-summary.json`, JSON.stringify(compactOrder(), null, 2), "application/json");
 }
 
 function exportCsv() {
@@ -1336,11 +1382,44 @@ function exportCsv() {
     }
   }
   rows.push(["MSRP", "", "", order.msrp].map((value) => JSON.stringify(value)).join(","));
-  download("stingray-order-summary.csv", rows.join("\n"), "text/csv");
+  download(`${activeModel.exportSlug || "stingray"}-order-summary.csv`, rows.join("\n"), "text/csv");
+}
+
+function resetModelScopedState() {
+  const first = variants[0] || {};
+  state.bodyStyle = first.body_style || "";
+  state.trimLevel = first.trim_level || "";
+  state.selected.clear();
+  state.userSelected.clear();
+  state.selectedInterior = "";
+  state.activeStep = "body_style";
+}
+
+function renderModelChrome() {
+  const title = `${activeModel.label || "Stingray"} Order Form`;
+  if (els.appTitle) els.appTitle.textContent = title;
+  document.title = title;
+  if (els.modelSelect && els.modelSelect.value !== activeModelKey) els.modelSelect.value = activeModelKey;
+}
+
+function activateModel(modelKey, { preserveCustomer = true, shouldRender = true } = {}) {
+  const nextModel = registry.models[modelKey];
+  if (!nextModel) return;
+  activeModelKey = modelKey;
+  activeModel = nextModel;
+  data = activeModel.data;
+  rebuildDataIndexes();
+  resetModelScopedState();
+  if (!preserveCustomer) resetCustomerInformation();
+  resetDefaults();
+  reconcileSelections();
+  renderModelChrome();
+  if (shouldRender) render({ resetScroll: true });
 }
 
 function render({ resetScroll = false, preserveScroll = false } = {}) {
   const scrollPosition = preserveScroll ? captureScrollPosition() : null;
+  renderModelChrome();
   renderVehicleContext();
   renderStepRail();
   renderStepContent({ resetScroll });
@@ -1349,11 +1428,13 @@ function render({ resetScroll = false, preserveScroll = false } = {}) {
 }
 
 function init() {
-  const first = variants[0];
-  state.bodyStyle = first.body_style;
-  state.trimLevel = first.trim_level;
-  resetDefaults();
-  reconcileSelections();
+  activateModel(activeModelKey, { shouldRender: false });
+  if (els.modelSelect) {
+    els.modelSelect.value = activeModelKey;
+    els.modelSelect.addEventListener("change", () => {
+      activateModel(els.modelSelect.value);
+    });
+  }
   els.resetButton.addEventListener("click", () => {
     resetDefaults();
     resetCustomerInformation();

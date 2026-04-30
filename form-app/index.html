@@ -12,9 +12,16 @@
       <header class="topbar">
         <div>
           <p class="eyebrow">2027 Corvette</p>
-          <h1>Stingray Order Form</h1>
+          <h1 id="appTitle">Stingray Order Form</h1>
         </div>
         <div class="toolbar">
+          <label class="model-picker">
+            <span>Model</span>
+            <select id="modelSelect">
+              <option value="stingray">Stingray</option>
+              <option value="grandSport">Grand Sport</option>
+            </select>
+          </label>
           <button id="resetButton" type="button" class="ghost-button">Reset</button>
           <button id="exportJsonButton" type="button">Export JSON</button>
           <button id="exportCsvButton" type="button">Export CSV</button>
@@ -72,7 +79,7 @@
       </div>
     </main>
 
-    <script src="./data.js?v=5"></script>
-    <script src="./app.js?v=5"></script>
+    <script src="./data.js?v=6"></script>
+    <script src="./app.js?v=6"></script>
   </body>
 </html>
