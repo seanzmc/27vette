@@ -30,5 +30,11 @@ class ModelConfig:
     standard_sections: frozenset[str]
     section_step_overrides: Mapping[str, str]
     blank_section_overrides: Mapping[str, str] = field(default_factory=dict)
+    section_category_overrides: Mapping[str, str] = field(default_factory=dict)
+    option_category_overrides: Mapping[str, str] = field(default_factory=dict)
+    section_label_overrides: Mapping[str, str] = field(default_factory=dict)
+    preview_artifact_prefix: str = ""
+    draft_artifact_prefix: str = ""
+    text_cleanup: Mapping[str, Any] = field(default_factory=dict)
+    special_rule_review_rpos: tuple[str, ...] = ()
     notes: tuple[str, ...] = ()
-

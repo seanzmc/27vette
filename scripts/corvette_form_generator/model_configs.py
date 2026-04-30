@@ -140,6 +140,30 @@ STANDARD_SECTIONS = frozenset(
     }
 )
 
+GRAND_SPORT_SECTION_CATEGORY_OVERRIDES = {
+    "sec_lpoe_001": "cat_exte_001",
+    "sec_whee_001": "cat_exte_001",
+    "sec_spoi_001": "cat_exte_001",
+    "sec_perf_001": "cat_mech_001",
+    "sec_incl_001": "cat_stan_001",
+    "sec_cali_001": "cat_exte_001",
+    "sec_onst_001": "cat_stan_001",
+    "sec_spec_001": "cat_mech_001",
+}
+
+GRAND_SPORT_OPTION_CATEGORY_OVERRIDES = {
+    "opt_bv4_001": "cat_inte_001",
+    "opt_pin_001": "cat_exte_001",
+    "opt_r8c_001": "cat_exte_001",
+}
+
+GRAND_SPORT_SECTION_LABEL_OVERRIDES = {
+    "sec_gsce_001": "Grand Sport Center Stripes",
+    "sec_gsha_001": "Grand Sport Heritage Hash Marks",
+    "sec_spec_001": "Special Edition",
+    "sec_colo_001": "Color Combination Override",
+}
+
 STINGRAY_MODEL = ModelConfig(
     model_key="stingray",
     model_label="Stingray",
@@ -194,6 +218,19 @@ GRAND_SPORT_MODEL = ModelConfig(
         "opt_pdy_001": "sec_lpoi_001",
         "opt_pef_001": "sec_lpoi_001",
     },
+    section_category_overrides=GRAND_SPORT_SECTION_CATEGORY_OVERRIDES,
+    option_category_overrides=GRAND_SPORT_OPTION_CATEGORY_OVERRIDES,
+    section_label_overrides=GRAND_SPORT_SECTION_LABEL_OVERRIDES,
+    preview_artifact_prefix="grand-sport-contract-preview",
+    draft_artifact_prefix="grand-sport-form-data-draft",
+    text_cleanup={
+        "enabled": True,
+        "normalize_new_prefix": True,
+        "collapse_whitespace": True,
+        "collapse_repeated_punctuation": True,
+        "remove_adjacent_duplicate_phrases": True,
+    },
+    special_rule_review_rpos=("EL9", "Z25", "FEY", "Z15"),
     notes=(
         "Read-only inspection only: Grand Sport generation is not activated by the Stingray entrypoint.",
         "PCQ, PDY, and PEF blank-section normalization must remain explicit config or validation output.",

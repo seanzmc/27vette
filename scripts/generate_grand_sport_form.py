@@ -5,7 +5,14 @@ from __future__ import annotations
 
 import json
 
-from corvette_form_generator.inspection import inspect_model_sources, write_inspection_artifacts
+from corvette_form_generator.inspection import (
+    build_contract_preview,
+    build_form_data_draft,
+    inspect_model_sources,
+    write_contract_preview_artifacts,
+    write_form_data_draft_artifacts,
+    write_inspection_artifacts,
+)
 from corvette_form_generator.model_configs import GRAND_SPORT_MODEL
 
 
@@ -13,6 +20,18 @@ def main() -> None:
     config = GRAND_SPORT_MODEL
     report = inspect_model_sources(config)
     artifact_paths = write_inspection_artifacts(report, config.output_dir / "inspection")
+    preview = build_contract_preview(config)
+    preview_artifact_paths = write_contract_preview_artifacts(
+        preview,
+        config.output_dir / "inspection",
+        config.preview_artifact_prefix,
+    )
+    draft = build_form_data_draft(config)
+    draft_artifact_paths = write_form_data_draft_artifacts(
+        draft,
+        config.output_dir / "inspection",
+        config.draft_artifact_prefix,
+    )
     print(
         json.dumps(
             {
@@ -26,7 +45,25 @@ def main() -> None:
                 "counts": report["counts"],
                 "blank_section_overrides": dict(config.blank_section_overrides),
                 "warnings": report["warnings"],
-                "artifacts": artifact_paths,
+                "inspection_artifacts": artifact_paths,
+                "preview": {
+                    "status": preview["dataset"]["status"],
+                    "variants": len(preview["variants"]),
+                    "choices": len(preview["choices"]),
+                    "candidate_standard_equipment": len(preview["candidateStandardEquipment"]),
+                    "unresolved_issues": len(preview["normalization"]["unresolvedIssues"]),
+                },
+                "preview_artifacts": preview_artifact_paths,
+                "draft": {
+                    "status": draft["dataset"]["status"],
+                    "variants": len(draft["variants"]),
+                    "choices": len(draft["choices"]),
+                    "standard_equipment": len(draft["standardEquipment"]),
+                    "rules": len(draft["rules"]),
+                    "interiors": len(draft["interiors"]),
+                    "validation_warnings": sum(1 for row in draft["validation"] if row["severity"] == "warning"),
+                },
+                "draft_artifacts": draft_artifact_paths,
                 "notes": list(config.notes),
             },
             indent=2,

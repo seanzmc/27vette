@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-30T01:50:03+00:00",
+  "generated_at": "2026-04-30T04:21:30+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -11839,8 +11839,8 @@
           "not_recommended"
         ],
         "special_mentions": [
-          "Z25",
-          "EL9"
+          "EL9",
+          "Z25"
         ],
         "detail_raw": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition."
       },

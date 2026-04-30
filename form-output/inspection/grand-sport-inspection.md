@@ -1,6 +1,6 @@
 # Grand Sport Inspection
 
-Generated: `2026-04-30T01:50:03+00:00`
+Generated: `2026-04-30T04:21:30+00:00`
 Source sheet: `grandSport`
 Status: `inspection_generated`
 
@@ -55,7 +55,7 @@ Status: `inspection_generated`
 | `37S` | Santorini Blue custom leather stitch | `sec_cust_002` | requires, includes |  |
 | `38S` | Adrenaline Red custom leather stitch | `sec_cust_002` | requires, includes |  |
 | `3A9` | Seat belt color | `sec_seat_001` | included_with, not_recommended |  |
-| `3F9` | Seat belt color | `sec_seat_001` | included_with, not_recommended | Z25, EL9 |
+| `3F9` | Seat belt color | `sec_seat_001` | included_with, not_recommended | EL9, Z25 |
 | `3M9` | Seat belt color | `sec_seat_001` | not_recommended | EL9 |
 | `3N9` | Seat belt color | `sec_seat_001` | included_with |  |
 | `55A` | Competition Yellow Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |

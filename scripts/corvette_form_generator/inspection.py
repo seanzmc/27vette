@@ -11,9 +11,9 @@ from typing import Any
 
 from openpyxl import load_workbook
 
-from corvette_form_generator.mapping import best_status, status_to_label, step_for_section
+from corvette_form_generator.mapping import best_status, normalize_mode, selection_mode_label, status_to_label, step_for_section
 from corvette_form_generator.model_config import ModelConfig
-from corvette_form_generator.workbook import clean, money, rows_from_sheet
+from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet
 
 
 ALLOWED_STATUSES = {"available", "standard", "unavailable"}
@@ -67,6 +67,126 @@ def normalized_option_row(row: dict[str, str], config: ModelConfig) -> dict[str,
         "section_id": resolved_section_id,
         "section_override_applied": bool(not original_section_id and resolved_section_id),
         "statuses": {variant_id: normalize_status(row.get(variant_id, "")) for variant_id in config.variant_ids},
+    }
+
+
+def cleanup_display_text(value: str, config: ModelConfig) -> tuple[str, list[str]]:
+    notes: list[str] = []
+    original = clean(value)
+    text = original
+    if not text or not config.text_cleanup.get("enabled"):
+        return text, notes
+
+    collapsed = re.sub(r"\s+", " ", text).strip()
+    if collapsed != text:
+        notes.append("collapsed_whitespace")
+        text = collapsed
+
+    punctuation = re.sub(r"([!?.,])\1+", r"\1", text)
+    punctuation = re.sub(r"\s+([,.;:!?])", r"\1", punctuation)
+    if punctuation != text:
+        notes.append("collapsed_repeated_punctuation")
+        text = punctuation
+
+    if config.text_cleanup.get("normalize_new_prefix"):
+        normalized_new = re.sub(r"^NEW!\s*", "New ", text, flags=re.IGNORECASE)
+        if normalized_new != text:
+            notes.append("normalized_new_prefix")
+            text = normalized_new
+
+    exact_replacements = {
+        "New Ground effects": "New Ground Effects",
+    }
+    replacement = exact_replacements.get(text)
+    if replacement:
+        notes.append("normalized_capitalization")
+        text = replacement
+
+    if config.text_cleanup.get("remove_adjacent_duplicate_phrases"):
+        deduped = re.sub(r"\b(\w+)(\s+\1\b)+", r"\1", text, flags=re.IGNORECASE)
+        if deduped != text:
+            notes.append("removed_adjacent_duplicate_word")
+            text = deduped
+
+    return text, notes
+
+
+def resolve_category(
+    row: dict[str, Any],
+    sections: dict[str, dict[str, str]],
+    config: ModelConfig,
+) -> tuple[str, str]:
+    option_id = row["option_id"]
+    section_id = row["section_id"]
+    source_category_id = row["category_id"]
+    section_category_id = sections.get(section_id, {}).get("category_id", "")
+
+    if option_id in config.option_category_overrides:
+        return config.option_category_overrides[option_id], "option_override"
+    if section_id in config.section_category_overrides:
+        return config.section_category_overrides[section_id], "section_override"
+    if source_category_id:
+        return source_category_id, "source"
+    return section_category_id, "section_master"
+
+
+def resolved_step_key(
+    section_id: str,
+    sections: dict[str, dict[str, str]],
+    resolved_category_id: str,
+    config: ModelConfig,
+) -> str:
+    section = sections.get(section_id, {})
+    return step_for_section(
+        section_id,
+        section.get("section_name", ""),
+        section.get("category_id", resolved_category_id),
+        standard_sections=config.standard_sections,
+        section_step_overrides=config.section_step_overrides,
+    )
+
+
+def classify_rule_hot_spots(
+    rows: list[dict[str, Any]],
+    config: ModelConfig,
+    include_special_bucket: bool = False,
+) -> dict[str, Any]:
+    rule_hot_spots = []
+    hot_spot_counts: Counter[str] = Counter()
+    special_mentions: defaultdict[str, list[dict[str, str]]] = defaultdict(list)
+    special_rpos = set(config.special_rule_review_rpos or tuple(SPECIAL_REVIEW_RPOS))
+    for row in rows:
+        text = "\n".join(part for part in (row["detail_raw"], row["description"], row["option_name"]) if part)
+        matched_terms = [name for name, pattern in RULE_HOT_SPOT_PATTERNS.items() if pattern.search(text)]
+        mentioned_specials = [rpo for rpo in sorted(special_rpos) if re.search(rf"\b{re.escape(rpo)}\b", text)]
+        if include_special_bucket and (row["rpo"] in special_rpos or mentioned_specials):
+            matched_terms.append("special_package_review")
+        matched_terms = sorted(set(matched_terms), key=matched_terms.index)
+        for term in matched_terms:
+            hot_spot_counts[term] += 1
+        if matched_terms or row["rpo"] in special_rpos or mentioned_specials:
+            record = {
+                "option_id": row["option_id"],
+                "rpo": row["rpo"],
+                "option_name": row["option_name"],
+                "section_id": row["section_id"],
+                "matched_terms": matched_terms,
+                "special_mentions": mentioned_specials,
+                "detail_raw": row["detail_raw"],
+            }
+            rule_hot_spots.append(record)
+            for rpo in mentioned_specials:
+                special_mentions[rpo].append(
+                    {
+                        "option_id": row["option_id"],
+                        "rpo": row["rpo"],
+                        "option_name": row["option_name"],
+                    }
+                )
+    return {
+        "counts": dict(sorted(hot_spot_counts.items())),
+        "rows": rule_hot_spots,
+        "special_mentions": {rpo: rows for rpo, rows in sorted(special_mentions.items())},
     }
 
 
@@ -203,34 +323,7 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
             }
         )
 
-    rule_hot_spots = []
-    hot_spot_counts: Counter[str] = Counter()
-    special_mentions: defaultdict[str, list[dict[str, str]]] = defaultdict(list)
-    for row in rows:
-        text = "\n".join(part for part in (row["detail_raw"], row["description"], row["option_name"]) if part)
-        matched_terms = [name for name, pattern in RULE_HOT_SPOT_PATTERNS.items() if pattern.search(text)]
-        for term in matched_terms:
-            hot_spot_counts[term] += 1
-        mentioned_specials = [rpo for rpo in SPECIAL_REVIEW_RPOS if re.search(rf"\b{re.escape(rpo)}\b", text)]
-        if matched_terms or row["rpo"] in SPECIAL_REVIEW_RPOS or mentioned_specials:
-            record = {
-                "option_id": row["option_id"],
-                "rpo": row["rpo"],
-                "option_name": row["option_name"],
-                "section_id": row["section_id"],
-                "matched_terms": matched_terms,
-                "special_mentions": mentioned_specials,
-                "detail_raw": row["detail_raw"],
-            }
-            rule_hot_spots.append(record)
-            for rpo in mentioned_specials:
-                special_mentions[rpo].append(
-                    {
-                        "option_id": row["option_id"],
-                        "rpo": row["rpo"],
-                        "option_name": row["option_name"],
-                    }
-                )
+    rule_hot_spots = classify_rule_hot_spots(rows, config)
 
     warnings = []
     if len(variant_rows) != config.expected_variant_count:
@@ -306,14 +399,492 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
         "candidate_standard_equipment": candidate_standard_equipment,
         "candidate_choices_sample": candidate_choices[:100],
         "rule_detail_hot_spots": {
-            "counts": dict(sorted(hot_spot_counts.items())),
-            "rows": rule_hot_spots,
-            "special_mentions": {rpo: rows for rpo, rows in sorted(special_mentions.items())},
+            "counts": rule_hot_spots["counts"],
+            "rows": rule_hot_spots["rows"],
+            "special_mentions": rule_hot_spots["special_mentions"],
         },
         "missing_status_cells": missing_status_cells,
         "unknown_status_cells": unknown_status_cells,
         "warnings": warnings,
     }
+
+
+def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
+    wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
+    raw_rows = rows_from_sheet(wb, config.source_option_sheet)
+    variants_raw = rows_from_sheet(wb, "variant_master")
+    categories = {row["category_id"]: row for row in rows_from_sheet(wb, "category_master")}
+    sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
+    rows = [normalized_option_row(row, config) for row in raw_rows]
+
+    variant_source_rows = {row["variant_id"]: row for row in variants_raw if row.get("variant_id", "") in config.variant_ids}
+    variants: list[dict[str, Any]] = []
+    for variant_id in config.variant_ids:
+        source = variant_source_rows.get(variant_id, {})
+        variants.append(
+            {
+                "variant_id": variant_id,
+                "model_year": intish(source.get("model_year"), intish(config.model_year)),
+                "model": config.model_label,
+                "trim_level": clean(source.get("trim_level", variant_id.split("_", 1)[0])).upper(),
+                "body_style": clean(source.get("body_style", "convertible" if variant_id.endswith("e67") else "coupe")).lower(),
+                "display_name": clean(source.get("display_name", variant_id)),
+                "base_price": money(source.get("base_price")),
+                "display_order": intish(source.get("display_order")),
+                "source_active": clean(source.get("active", "")),
+                "preview_included": True,
+            }
+        )
+
+    body_context_choices = []
+    body_styles = sorted(
+        {row["body_style"] for row in variants},
+        key=lambda body_style: config.body_style_display_order.get(body_style, 99),
+    )
+    for body_style in body_styles:
+        body_variants = [row for row in variants if row["body_style"] == body_style]
+        body_context_choices.append(
+            {
+                "context_choice_id": f"body_style__{body_style}",
+                "context_type": "body_style",
+                "value": body_style,
+                "label": body_style.title(),
+                "description": f"{len(body_variants)} trims available",
+                "section_id": "sec_context_body_style",
+                "step_key": "body_style",
+                "body_style": body_style,
+                "trim_level": "",
+                "variant_id": "",
+                "base_price": "",
+                "display_order": config.body_style_display_order.get(body_style, 99),
+            }
+        )
+    trim_context_choices = [
+        {
+            "context_choice_id": f"trim_level__{variant['body_style']}__{variant['trim_level'].lower()}",
+            "context_type": "trim_level",
+            "value": variant["trim_level"],
+            "label": variant["trim_level"],
+            "description": variant["display_name"],
+            "section_id": "sec_context_trim_level",
+            "step_key": "trim_level",
+            "body_style": variant["body_style"],
+            "trim_level": variant["trim_level"],
+            "variant_id": variant["variant_id"],
+            "base_price": variant["base_price"],
+            "display_order": variant["display_order"],
+        }
+        for variant in variants
+    ]
+    context_choices = body_context_choices + trim_context_choices
+    variants_by_id = {row["variant_id"]: row for row in variants}
+
+    choices: list[dict[str, Any]] = []
+    candidate_standard_equipment: list[dict[str, Any]] = []
+    section_category_resolutions: list[dict[str, Any]] = []
+    unresolved_issues: list[dict[str, Any]] = []
+    validation_rows: list[dict[str, Any]] = []
+    text_cleanup_counter: Counter[str] = Counter()
+    section_source_categories: defaultdict[str, set[str]] = defaultdict(set)
+    section_ids_with_choices: set[str] = set()
+
+    for row in rows:
+        section_id = row["section_id"]
+        source_category_id = row["category_id"]
+        section_category_id = sections.get(section_id, {}).get("category_id", "")
+        resolved_category_id, category_resolution_source = resolve_category(row, sections, config)
+        step_key = resolved_step_key(section_id, sections, resolved_category_id, config)
+        section_source_categories[section_id].add(source_category_id or "")
+        if not section_id:
+            issue = {
+                "issue_type": "unresolved_section",
+                "option_id": row["option_id"],
+                "rpo": row["rpo"],
+                "message": "Grand Sport row has no resolved section.",
+            }
+            unresolved_issues.append(issue)
+            validation_rows.append({**issue, "severity": "error"})
+            continue
+        if section_id not in sections:
+            issue = {
+                "issue_type": "unknown_section",
+                "option_id": row["option_id"],
+                "rpo": row["rpo"],
+                "section_id": section_id,
+                "message": "Grand Sport row resolves to a section id missing from section_master.",
+            }
+            unresolved_issues.append(issue)
+            validation_rows.append({**issue, "severity": "error"})
+            continue
+        if not resolved_category_id or resolved_category_id not in categories:
+            issue = {
+                "issue_type": "unknown_category",
+                "option_id": row["option_id"],
+                "rpo": row["rpo"],
+                "resolved_category_id": resolved_category_id,
+                "message": "Grand Sport row resolves to a category id missing from category_master.",
+            }
+            unresolved_issues.append(issue)
+            validation_rows.append({**issue, "severity": "error"})
+            continue
+        if source_category_id and section_category_id and source_category_id != section_category_id:
+            resolution = {
+                "option_id": row["option_id"],
+                "rpo": row["rpo"],
+                "source_category_id": source_category_id,
+                "section_category_id": section_category_id,
+                "resolved_category_id": resolved_category_id,
+                "resolved_section_id": section_id,
+                "category_resolution_source": category_resolution_source,
+            }
+            section_category_resolutions.append(resolution)
+            if category_resolution_source not in {"section_override", "option_override"}:
+                issue = {
+                    "issue_type": "unresolved_section_category_mismatch",
+                    "option_id": row["option_id"],
+                    "rpo": row["rpo"],
+                    "source_category_id": source_category_id,
+                    "section_category_id": section_category_id,
+                    "message": "Section/category mismatch does not have an explicit config resolution.",
+                }
+                unresolved_issues.append(issue)
+                validation_rows.append({**issue, "severity": "warning"})
+
+        label, label_notes = cleanup_display_text(row["option_name"], config)
+        description, description_notes = cleanup_display_text(row["description"], config)
+        text_cleanup_notes = [f"label:{note}" for note in label_notes] + [f"description:{note}" for note in description_notes]
+        for note in text_cleanup_notes:
+            text_cleanup_counter[note] += 1
+
+        category = categories.get(resolved_category_id, {})
+        section = sections.get(section_id, {})
+        section_name = config.section_label_overrides.get(section_id, section.get("section_name", ""))
+        option_base = {
+            "option_id": row["option_id"],
+            "rpo": row["rpo"],
+            "label": label,
+            "description": description,
+            "source_option_name": row["option_name"],
+            "source_description": row["description"],
+            "source_detail_raw": row["detail_raw"],
+            "source_category_id": source_category_id,
+            "source_section_id": row["original_section_id"],
+            "section_id": section_id,
+            "resolved_section_id": section_id,
+            "section_category_id": section_category_id,
+            "resolved_category_id": resolved_category_id,
+            "category_resolution_source": category_resolution_source,
+            "section_name": section_name,
+            "category_name": category.get("category_name", ""),
+            "step_key": step_key,
+            "selectable": row["selectable"],
+            "base_price": row["price"],
+            "text_cleanup_notes": text_cleanup_notes,
+        }
+        section_ids_with_choices.add(section_id)
+
+        for variant_id, status in row["statuses"].items():
+            if status not in {"available", "standard"}:
+                continue
+            variant = variants_by_id[variant_id]
+            choice = {
+                **option_base,
+                "choice_id": f"{variant_id}__{row['option_id']}",
+                "variant_id": variant_id,
+                "body_style": variant["body_style"],
+                "trim_level": variant["trim_level"],
+                "status": status,
+                "status_label": status_to_label(status),
+                "active": "True",
+            }
+            choices.append(choice)
+            if status == "standard":
+                candidate_standard_equipment.append(choice)
+
+    section_rows: list[dict[str, Any]] = [dict(section) for section in config.context_sections]
+    for section_id in sorted(section_ids_with_choices, key=lambda value: intish(sections.get(value, {}).get("display_order"), 9999)):
+        section = sections.get(section_id, {})
+        resolved_categories = sorted(
+            {
+                choice["resolved_category_id"]
+                for choice in choices
+                if choice["resolved_section_id"] == section_id
+            }
+        )
+        resolved_category_id = resolved_categories[0] if resolved_categories else section.get("category_id", "")
+        category = categories.get(resolved_category_id, {})
+        step_key = resolved_step_key(section_id, sections, resolved_category_id, config)
+        selection_mode = section.get("selection_mode", "")
+        section_rows.append(
+            {
+                "section_id": section_id,
+                "section_name": config.section_label_overrides.get(section_id, section.get("section_name", "")),
+                "source_section_name": section.get("section_name", ""),
+                "category_id": resolved_category_id,
+                "category_name": category.get("category_name", ""),
+                "source_category_ids": sorted(value for value in section_source_categories.get(section_id, set()) if value),
+                "section_category_id": section.get("category_id", ""),
+                "selection_mode": selection_mode,
+                "selection_mode_label": selection_mode_label(selection_mode, config.selection_mode_labels),
+                "choice_mode": normalize_mode(selection_mode),
+                "is_required": section.get("is_required", ""),
+                "standard_behavior": section.get("standard_behavior", ""),
+                "section_display_order": intish(section.get("display_order")),
+                "step_key": step_key,
+                "step_label": config.step_labels.get(step_key, step_key.replace("_", " ").title()),
+            }
+        )
+
+    section_ids_by_step: dict[str, list[str]] = defaultdict(list)
+    for row in section_rows:
+        section_ids_by_step[row["step_key"]].append(row["section_id"])
+    step_rows = [
+        {
+            "step_key": step_key,
+            "step_label": config.step_labels[step_key],
+            "runtime_order": index + 1,
+            "source": "runtime",
+            "section_ids": "|".join(sorted(section_ids_by_step.get(step_key, []))),
+        }
+        for index, step_key in enumerate(config.step_order)
+    ]
+
+    blank_overrides = []
+    for option_id, configured_section_id in config.blank_section_overrides.items():
+        row = next((candidate for candidate in rows if candidate["option_id"] == option_id), None)
+        blank_overrides.append(
+            {
+                "option_id": option_id,
+                "rpo": row["rpo"] if row else "",
+                "source_section_blank": bool(row and not row["original_section_id"]),
+                "configured_section_id": configured_section_id,
+                "resolved_section_id": row["section_id"] if row else "",
+                "handled_by_explicit_config": bool(row and row["section_override_applied"] and row["section_id"] == configured_section_id),
+            }
+        )
+
+    rule_hot_spots = classify_rule_hot_spots(rows, config, include_special_bucket=True)
+    text_cleanup_summary = {
+        "changed_fields": sum(text_cleanup_counter.values()),
+        "notes": dict(sorted(text_cleanup_counter.items())),
+    }
+
+    return {
+        "dataset": {
+            "name": "2027 Corvette Grand Sport contract preview",
+            "model": config.model_label,
+            "model_year": config.model_year,
+            "source_workbook": config.workbook_path.name,
+            "source_sheet": config.source_option_sheet,
+            "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+            "status": "read_only_preview",
+        },
+        "variants": variants,
+        "steps": step_rows,
+        "sections": section_rows,
+        "contextChoices": context_choices,
+        "choices": choices,
+        "candidateStandardEquipment": candidate_standard_equipment,
+        "ruleDetailHotSpots": rule_hot_spots,
+        "normalization": {
+            "blankSectionOverrides": blank_overrides,
+            "sectionCategoryResolutions": section_category_resolutions,
+            "textCleanupSummary": text_cleanup_summary,
+            "unresolvedIssues": unresolved_issues,
+        },
+        "validation": validation_rows,
+    }
+
+
+def write_contract_preview_artifacts(preview: dict[str, Any], output_dir: Path, artifact_prefix: str) -> dict[str, str]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    json_path = output_dir / f"{artifact_prefix}.json"
+    md_path = output_dir / f"{artifact_prefix}.md"
+    json_path.write_text(json.dumps(preview, indent=2), encoding="utf-8")
+    md_path.write_text(render_contract_preview_markdown(preview), encoding="utf-8")
+    return {"json": str(json_path), "markdown": str(md_path)}
+
+
+def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
+    preview = build_contract_preview(config)
+    variants_by_id = {row["variant_id"]: row for row in preview["variants"]}
+    sections_by_id = {row["section_id"]: row for row in preview["sections"]}
+    option_rows: dict[str, dict[str, Any]] = {}
+    statuses_by_option: defaultdict[str, dict[str, str]] = defaultdict(dict)
+    order_by_option: dict[str, int] = {}
+
+    for index, choice in enumerate(preview["choices"], start=1):
+        option_id = choice["option_id"]
+        statuses_by_option[option_id][choice["variant_id"]] = choice["status"]
+        if option_id not in order_by_option:
+            order_by_option[option_id] = index
+        if option_id not in option_rows:
+            option_rows[option_id] = {
+                key: choice.get(key, "")
+                for key in (
+                    "option_id",
+                    "rpo",
+                    "label",
+                    "description",
+                    "source_detail_raw",
+                    "source_option_name",
+                    "source_description",
+                    "section_id",
+                    "section_name",
+                    "resolved_section_id",
+                    "resolved_category_id",
+                    "category_name",
+                    "step_key",
+                    "selectable",
+                    "base_price",
+                    "text_cleanup_notes",
+                )
+            }
+
+    draft_choices: list[dict[str, Any]] = []
+    for option_id, option in sorted(option_rows.items(), key=lambda item: order_by_option[item[0]]):
+        section = sections_by_id.get(option["section_id"], {})
+        for variant_id in config.variant_ids:
+            variant = variants_by_id[variant_id]
+            status = statuses_by_option[option_id].get(variant_id, "unavailable")
+            active = "True" if status in {"available", "standard"} else "False"
+            draft_choices.append(
+                {
+                    "choice_id": f"{variant_id}__{option_id}",
+                    "option_id": option_id,
+                    "rpo": option["rpo"],
+                    "label": option["label"],
+                    "description": option["description"],
+                    "section_id": option["section_id"],
+                    "section_name": option["section_name"],
+                    "category_id": option["resolved_category_id"],
+                    "category_name": option["category_name"],
+                    "step_key": option["step_key"],
+                    "variant_id": variant_id,
+                    "body_style": variant["body_style"],
+                    "trim_level": variant["trim_level"],
+                    "status": status,
+                    "status_label": status_to_label(status),
+                    "selectable": option["selectable"],
+                    "active": active,
+                    "choice_mode": section.get("choice_mode", ""),
+                    "selection_mode": section.get("selection_mode", ""),
+                    "selection_mode_label": section.get("selection_mode_label", ""),
+                    "base_price": option["base_price"],
+                    "display_order": order_by_option[option_id],
+                    "source_detail_raw": option["source_detail_raw"],
+                    "source_option_name": option["source_option_name"],
+                    "source_description": option["source_description"],
+                    "text_cleanup_notes": option["text_cleanup_notes"],
+                }
+            )
+
+    standard_equipment = [
+        {
+            "equipment_id": f"std_{choice['choice_id']}",
+            "variant_id": choice["variant_id"],
+            "body_style": choice["body_style"],
+            "trim_level": choice["trim_level"],
+            "option_id": choice["option_id"],
+            "rpo": choice["rpo"],
+            "label": choice["label"],
+            "description": choice["description"],
+            "section_id": choice["section_id"],
+            "section_name": choice["section_name"],
+            "category_name": choice["category_name"],
+            "display_order": choice["display_order"],
+            "source_detail_raw": choice["source_detail_raw"],
+        }
+        for choice in draft_choices
+        if choice["status"] == "standard"
+    ]
+
+    validation = [
+        {
+            "check_id": "grand_sport_draft_status",
+            "severity": "warning",
+            "entity_type": "dataset",
+            "entity_id": "",
+            "message": "Grand Sport form data is a draft inspection artifact and is not runtime active.",
+        },
+        {
+            "check_id": "active_variants",
+            "severity": "pass",
+            "entity_type": "variant",
+            "entity_id": "",
+            "message": f"{len(preview['variants'])} configured Grand Sport variants included by model config; workbook active flags are unchanged.",
+        },
+        {
+            "check_id": "availability_rows",
+            "severity": "pass",
+            "entity_type": "availability",
+            "entity_id": "",
+            "message": f"{len(draft_choices)} draft choice rows exported from the Grand Sport variant matrix.",
+        },
+        {
+            "check_id": "rules_deferred",
+            "severity": "warning",
+            "entity_type": "rule",
+            "entity_id": "",
+            "message": "Final Grand Sport compatibility rules are deferred; rule/detail evidence is preserved in draftMetadata.ruleDetailHotSpots.",
+        },
+        {
+            "check_id": "interiors_deferred",
+            "severity": "warning",
+            "entity_type": "interior",
+            "entity_id": "",
+            "message": "Final Grand Sport interior hierarchy and component pricing are deferred to a later phase.",
+        },
+        {
+            "check_id": "pricing_deferred",
+            "severity": "warning",
+            "entity_type": "price_rule",
+            "entity_id": "",
+            "message": "Final Grand Sport price rules are deferred unless directly represented in normalized option prices.",
+        },
+    ]
+
+    return {
+        "dataset": {
+            "name": "2027 Corvette Grand Sport form data draft",
+            "model": config.model_label,
+            "model_year": config.model_year,
+            "source_workbook": config.workbook_path.name,
+            "source_sheet": config.source_option_sheet,
+            "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+            "status": "draft_not_runtime_active",
+        },
+        "variants": preview["variants"],
+        "steps": preview["steps"],
+        "sections": preview["sections"],
+        "contextChoices": preview["contextChoices"],
+        "choices": draft_choices,
+        "standardEquipment": standard_equipment,
+        "ruleGroups": [],
+        "exclusiveGroups": [],
+        "rules": [],
+        "priceRules": [],
+        "interiors": [],
+        "colorOverrides": [],
+        "validation": validation,
+        "draftMetadata": {
+            "sourcePreviewStatus": preview["dataset"]["status"],
+            "candidateAvailableOrStandardChoices": len(preview["choices"]),
+            "fullVariantMatrixChoices": len(draft_choices),
+            "ruleDetailHotSpots": preview["ruleDetailHotSpots"],
+            "normalization": preview["normalization"],
+            "deferredSurfaces": ["ruleGroups", "exclusiveGroups", "rules", "priceRules", "interiors", "colorOverrides"],
+        },
+    }
+
+
+def write_form_data_draft_artifacts(draft: dict[str, Any], output_dir: Path, artifact_prefix: str) -> dict[str, str]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    json_path = output_dir / f"{artifact_prefix}.json"
+    md_path = output_dir / f"{artifact_prefix}.md"
+    json_path.write_text(json.dumps(draft, indent=2), encoding="utf-8")
+    md_path.write_text(render_form_data_draft_markdown(draft), encoding="utf-8")
+    return {"json": str(json_path), "markdown": str(md_path)}
 
 
 def write_inspection_artifacts(report: dict[str, Any], output_dir: Path) -> dict[str, str]:
@@ -409,4 +980,135 @@ def render_markdown_report(report: dict[str, Any]) -> str:
     else:
         lines.append("- none")
     lines.append("")
+    return "\n".join(lines)
+
+
+def render_contract_preview_markdown(preview: dict[str, Any]) -> str:
+    normalization = preview["normalization"]
+    hot_spots = preview["ruleDetailHotSpots"]
+    unresolved = normalization["unresolvedIssues"]
+    text_cleanup = normalization["textCleanupSummary"]
+    lines = [
+        "# Grand Sport Contract Preview",
+        "",
+        f"Generated: `{preview['dataset']['generated_at']}`",
+        f"Status: `{preview['dataset']['status']}`",
+        f"Source sheet: `{preview['dataset']['source_sheet']}`",
+        "",
+        "## Summary",
+        "",
+        f"- Variants: {len(preview['variants'])}",
+        f"- Context choices: {len(preview['contextChoices'])}",
+        f"- Steps: {len(preview['steps'])}",
+        f"- Sections: {len(preview['sections'])}",
+        f"- Choices: {len(preview['choices'])}",
+        f"- Candidate standard equipment cells: {len(preview['candidateStandardEquipment'])}",
+        f"- Rule/detail hot spot rows: {len(hot_spots['rows'])}",
+        f"- Unresolved normalization issues: {len(unresolved)}",
+        "",
+        "## Variants",
+        "",
+        "| Variant | Display Name | Source Active | Preview Included |",
+        "| --- | --- | --- | --- |",
+    ]
+    for variant in preview["variants"]:
+        lines.append(
+            f"| `{variant['variant_id']}` | {variant['display_name']} | `{variant['source_active']}` | `{variant['preview_included']}` |"
+        )
+    lines.extend(["", "## Blank-Section Overrides", ""])
+    for row in normalization["blankSectionOverrides"]:
+        handled = "yes" if row["handled_by_explicit_config"] else "no"
+        lines.append(
+            f"- `{row['rpo']}` / `{row['option_id']}`: `{row['configured_section_id']}` "
+            f"(handled by explicit config: {handled})"
+        )
+    lines.extend(
+        [
+            "",
+            "## Section/Category Resolution",
+            "",
+            f"- Resolved mismatch rows: {len(normalization['sectionCategoryResolutions'])}",
+            f"- Unresolved issues: {len(unresolved)}",
+            "",
+            "## Text Cleanup",
+            "",
+            f"- Changed display fields: {text_cleanup['changed_fields']}",
+            f"- Notes: `{json.dumps(text_cleanup['notes'], sort_keys=True)}`",
+            "",
+            "## Rule/Detail Hot Spots",
+            "",
+            f"- Counts: `{json.dumps(hot_spots['counts'], sort_keys=True)}`",
+            f"- Rows: {len(hot_spots['rows'])}",
+            "",
+            "## Unresolved Normalization Issues",
+            "",
+        ]
+    )
+    if unresolved:
+        for issue in unresolved:
+            lines.append(f"- `{issue['issue_type']}`: {issue.get('option_id', '')} {issue.get('message', '')}")
+    else:
+        lines.append("- none")
+    lines.extend(
+        [
+            "",
+            "## Live Output Safety",
+            "",
+            "- Grand Sport preview generation writes only inspection artifacts under `form-output/inspection/`.",
+            "- It does not write `form-app/data.js` or final Grand Sport app data.",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def render_form_data_draft_markdown(draft: dict[str, Any]) -> str:
+    metadata = draft["draftMetadata"]
+    warning_rows = [row for row in draft["validation"] if row["severity"] == "warning"]
+    lines = [
+        "# Grand Sport Form Data Draft",
+        "",
+        f"Generated: `{draft['dataset']['generated_at']}`",
+        f"Status: `{draft['dataset']['status']}`",
+        f"Source sheet: `{draft['dataset']['source_sheet']}`",
+        "",
+        "## Contract Surface",
+        "",
+        f"- Variants: {len(draft['variants'])}",
+        f"- Context choices: {len(draft['contextChoices'])}",
+        f"- Steps: {len(draft['steps'])}",
+        f"- Sections: {len(draft['sections'])}",
+        f"- Choices: {len(draft['choices'])}",
+        f"- Standard equipment rows: {len(draft['standardEquipment'])}",
+        f"- Rule groups: {len(draft['ruleGroups'])} (deferred)",
+        f"- Exclusive groups: {len(draft['exclusiveGroups'])} (deferred)",
+        f"- Rules: {len(draft['rules'])} (deferred)",
+        f"- Price rules: {len(draft['priceRules'])} (deferred)",
+        f"- Interiors: {len(draft['interiors'])} (deferred)",
+        f"- Color overrides: {len(draft['colorOverrides'])} (deferred)",
+        "",
+        "## Draft Notes",
+        "",
+        f"- Candidate available/standard choices from preview: {metadata['candidateAvailableOrStandardChoices']}",
+        f"- Full variant-matrix draft choices: {metadata['fullVariantMatrixChoices']}",
+        f"- Rule/detail hot spot rows preserved: {len(metadata['ruleDetailHotSpots']['rows'])}",
+        f"- Unresolved normalization issues: {len(metadata['normalization']['unresolvedIssues'])}",
+        "",
+        "## Validation Warnings",
+        "",
+    ]
+    if warning_rows:
+        lines.extend(f"- `{row['check_id']}`: {row['message']}" for row in warning_rows)
+    else:
+        lines.append("- none")
+    lines.extend(
+        [
+            "",
+            "## Live Output Safety",
+            "",
+            "- This draft writes only inspection artifacts under `form-output/inspection/`.",
+            "- It does not write `form-app/data.js` or activate Grand Sport in the app.",
+            "",
+        ]
+    )
     return "\n".join(lines)
