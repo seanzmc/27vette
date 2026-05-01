@@ -1,0 +1,2 @@
+test_id,required_condition_set_id,message
+gb_convertible_bcp_missing_zz3,cs_selected_zz3,Requires ZZ3 Convertible Engine Appearance Package.

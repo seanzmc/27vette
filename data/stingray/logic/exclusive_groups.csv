@@ -1,2 +1,2 @@
-exclusive_group_id,label,scope_condition_set_id,max_selected,conflict_policy,message,priority,active
-excl_ls6_engine_covers,LS6 engine covers,,1,block_new_selection,Choose only one LS6 engine cover.,10,true
+exclusive_group_id,label,scope_condition_set_id,max_selected,conflict_policy,message,priority,active,legacy_group_id,legacy_notes
+excl_ls6_engine_covers,LS6 engine covers,,1,block_new_selection,Choose only one LS6 engine cover.,10,true,grp_ls6_engine_covers,LS6 engine cover choices are mutually exclusive within the Engine Appearance section.

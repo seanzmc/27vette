@@ -1,0 +1,2 @@
+test_id,exclusive_group_id,member_selectable_ids,message
+gb_exclusive_engine_covers,excl_ls6_engine_covers,opt_bcp_001|opt_bc4_001,Choose only one LS6 engine cover.

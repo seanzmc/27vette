@@ -1,0 +1,9 @@
+test_id,variant_id,description
+gb_coupe_b6p,1lt_c07,Coupe with B6P
+gb_coupe_bcp,1lt_c07,Coupe with BCP
+gb_coupe_bcp_b6p,1lt_c07,Coupe with BCP and B6P
+gb_convertible_bcp_missing_zz3,1lt_c67,Convertible BCP without ZZ3
+gb_convertible_bcp_with_zz3,1lt_c67,Convertible BCP with ZZ3
+gb_exclusive_engine_covers,1lt_c07,Coupe with BCP and BC4
+gb_explicit_d3v_b6p,1lt_c07,Explicit D3V with B6P
+gb_explicit_sl9_b6p,1lt_c07,Explicit SL9 with B6P
