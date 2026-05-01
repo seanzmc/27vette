@@ -11,14 +11,6 @@ from datetime import datetime, timezone
 from typing import Any
 
 from openpyxl import load_workbook
-from corvette_form_generator.inspection import (
-    build_contract_preview,
-    build_form_data_draft,
-    inspect_model_sources,
-    write_contract_preview_artifacts,
-    write_form_data_draft_artifacts,
-    write_inspection_artifacts,
-)
 from corvette_form_generator.mapping import (
     best_status,
     normalize_mode,
@@ -69,35 +61,6 @@ HIDDEN_OPTION_IDS = {
 HIDDEN_SECTION_IDS = {"sec_cust_002"}
 
 AUTO_ONLY_OPTION_IDS = {"opt_r6x_001"}
-DISPLAY_ONLY_OPTION_IDS = {"opt_d30_001"}
-
-SECTION_MODE_OVERRIDES = {
-    "sec_spoi_001": "multi_select_opt",
-}
-
-SECTION_DISPLAY_ORDER_OVERRIDES = {
-    "sec_roof_001": 10,
-    "sec_exte_001": 20,
-    "sec_badg_001": 30,
-    "sec_engi_001": 40,
-    "sec_whee_002": 10,
-    "sec_cali_001": 20,
-    "sec_whee_001": 30,
-}
-
-ENGINE_APPEARANCE_OPTION_ORDER = {
-    "opt_bc7_001": 10,
-    "opt_bcp_001": 20,
-    "opt_bcs_001": 30,
-    "opt_bc4_001": 40,
-    "opt_b6p_001": 50,
-    "opt_zz3_001": 60,
-    "opt_d3v_001": 70,
-    "opt_sl9_001": 80,
-    "opt_slk_001": 90,
-    "opt_sln_001": 100,
-    "opt_vup_001": 110,
-}
 
 
 def export_slug(model_key: str) -> str:
@@ -115,6 +78,17 @@ def model_registry_entry(model_key: str, model_label: str, data: dict[str, Any])
 
 
 def load_grand_sport_registry_data() -> dict[str, Any] | None:
+    app_data_path = APP_DIR / "data.js"
+    if app_data_path.exists():
+        app_data = app_data_path.read_text(encoding="utf-8")
+        try:
+            registry_json = app_data.split("window.CORVETTE_FORM_DATA = ", 1)[1].split(
+                ";\nwindow.STINGRAY_FORM_DATA",
+                1,
+            )[0]
+            return json.loads(registry_json).get("models", {}).get("grandSport", {}).get("data")
+        except (IndexError, json.JSONDecodeError):
+            pass
     draft_path = OUTPUT_DIR / "inspection" / f"{GRAND_SPORT_MODEL.draft_artifact_prefix}.json"
     if not draft_path.exists():
         return None
@@ -122,13 +96,7 @@ def load_grand_sport_registry_data() -> dict[str, Any] | None:
 
 
 def refresh_grand_sport_registry_source() -> None:
-    inspection_dir = OUTPUT_DIR / "inspection"
-    report = inspect_model_sources(GRAND_SPORT_MODEL)
-    write_inspection_artifacts(report, inspection_dir)
-    preview = build_contract_preview(GRAND_SPORT_MODEL)
-    write_contract_preview_artifacts(preview, inspection_dir, GRAND_SPORT_MODEL.preview_artifact_prefix)
-    draft = build_form_data_draft(GRAND_SPORT_MODEL)
-    write_form_data_draft_artifacts(draft, inspection_dir, GRAND_SPORT_MODEL.draft_artifact_prefix)
+    return
 
 
 def build_app_data_registry(stingray_data: dict[str, Any]) -> dict[str, Any]:
@@ -511,6 +479,8 @@ def main() -> None:
     statuses_raw = rows_from_sheet(wb, "option_variant_status")
     rules_raw = rows_from_sheet(wb, "rule_mapping")
     price_rules_raw = rows_from_sheet(wb, "price_rules")
+    d30_r6x_price_rules_raw = [row for row in price_rules_raw if row.get("price_rule_id") == "pr_d30_r6x_001"]
+    price_rules_raw = [row for row in price_rules_raw if row.get("price_rule_id") != "pr_d30_r6x_001"]
     lt_interiors_raw = rows_from_sheet(wb, "lt_interiors")
     lz_interiors_raw = rows_from_sheet(wb, "LZ_Interiors")
     price_ref_rows = rows_from_sheet(wb, "PriceRef")
@@ -525,19 +495,7 @@ def main() -> None:
         option["option_id"] = canonical_option_id(original_option_id)
         if option["option_id"] in CONSOLIDATED_ENGINE_COVERS:
             option["price"] = "695"
-        if option["option_id"] == "opt_t0a_001":
-            option["section_id"] = "sec_spoi_001"
-            option["selectable"] = "True"
-            option["display_order"] = "25"
-        if option["option_id"] == "opt_fe3_001":
-            option["section_id"] = "sec_susp_001"
-            option["selectable"] = "False"
-            option["display_order"] = "12"
-        if option["option_id"] == "opt_zyc_001":
-            option["display_order"] = "15"
-        if option["option_id"] in ENGINE_APPEARANCE_OPTION_ORDER:
-            option["display_order"] = str(ENGINE_APPEARANCE_OPTION_ORDER[option["option_id"]])
-        if original_option_id in HIDDEN_OPTION_IDS or option.get("section_id") in HIDDEN_SECTION_IDS:
+        if option.get("section_id") in HIDDEN_SECTION_IDS:
             option["active"] = "False"
 
     for row in statuses_raw:
@@ -585,6 +543,7 @@ def main() -> None:
                     "notes": price_rule["notes"],
                 }
             )
+    price_rules_raw.extend(d30_r6x_price_rules_raw)
 
     active_variants = [
         {
@@ -605,11 +564,8 @@ def main() -> None:
     for section_id, section in sections.items():
         category = categories.get(section.get("category_id", ""), {})
         step_key = step_for_section(section_id, section.get("section_name", ""), section.get("category_id", ""))
-        selection_mode = SECTION_MODE_OVERRIDES.get(section_id, section.get("selection_mode", ""))
-        section_display_order = SECTION_DISPLAY_ORDER_OVERRIDES.get(
-            section_id,
-            AERO_EXHAUST_ACCESSORIES_SECTION_ORDER.get(section_id, intish(section.get("display_order"))),
-        )
+        selection_mode = section.get("selection_mode", "")
+        section_display_order = AERO_EXHAUST_ACCESSORIES_SECTION_ORDER.get(section_id, intish(section.get("display_order")))
         section_rows.append(
             {
                 "section_id": section_id,
@@ -693,7 +649,7 @@ def main() -> None:
         section = sections.get(option.get("section_id", ""), {})
         category = categories.get(section.get("category_id", ""), {})
         step_key = step_for_section(option.get("section_id", ""), section.get("section_name", ""), section.get("category_id", ""))
-        mode = SECTION_MODE_OVERRIDES.get(option.get("section_id", ""), section.get("selection_mode", ""))
+        mode = section.get("selection_mode", "")
         options_by_id[option["option_id"]] = {
             "option_id": option["option_id"],
             "rpo": option.get("rpo", ""),
@@ -734,10 +690,6 @@ def main() -> None:
                 status = "unavailable"
                 selectable = "False"
                 active = "False"
-            if option_id in DISPLAY_ONLY_OPTION_IDS:
-                status = "available"
-                selectable = "False"
-                active = "True"
             choices.append(
                 {
                     "choice_id": f"{variant['variant_id']}__{option_id}",
@@ -878,65 +830,9 @@ def main() -> None:
         for row in interiors
         if row["interior_id"] and row["active_for_stingray"] and row["requires_r6x"] == "True"
     ]
-    existing_price_rule_ids = {row.get("price_rule_id", "") for row in price_rules_raw}
-    if "pr_d30_r6x_001" not in existing_price_rule_ids:
-        price_rules_raw.append(
-            {
-                "price_rule_id": "pr_d30_r6x_001",
-                "condition_option_id": "opt_d30_001",
-                "target_option_id": "opt_r6x_001",
-                "price_rule_type": "override",
-                "price_value": "0",
-                "review_flag": "False",
-                "notes": "R6X prices at $0 only when D30 is present in the selected context.",
-            }
-        )
 
     raw_rules: list[dict[str, Any]] = []
-    manual_rules = [
-        {
-            "rule_id": "rule_opt_t0a_001_requires_opt_z51_001",
-            "source_id": "opt_t0a_001",
-            "rule_type": "requires",
-            "target_id": "opt_z51_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_spoi_001",
-            "target_section": "sec_perf_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "multi_select_opt",
-            "original_detail_raw": "T0A is available only when Z51 is selected.",
-            "review_flag": "False",
-        },
-        {
-            "rule_id": "rule_opt_tvs_001_excludes_opt_t0a_001",
-            "source_id": "opt_tvs_001",
-            "rule_type": "excludes",
-            "target_id": "opt_t0a_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_spoi_001",
-            "target_section": "sec_spoi_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "single_select_opt",
-            "original_detail_raw": "TVS replaces the default T0A Z51 spoiler when selected.",
-            "review_flag": "False",
-        },
-        {
-            "rule_id": "rule_opt_bc7_001_requires_opt_zz3_001_convertible",
-            "source_id": "opt_bc7_001",
-            "rule_type": "requires",
-            "target_id": "opt_zz3_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_engi_001",
-            "target_section": "sec_engi_001",
-            "source_selection_mode": "multi_select_opt",
-            "target_selection_mode": "multi_select_opt",
-            "original_detail_raw": "BC7 requires ZZ3 Convertible Engine Appearance Package on Convertible.",
-            "review_flag": "False",
-        },
-    ]
+    manual_rules = []
     for interior_id in r6x_interior_ids:
         manual_rules.append(
             {
@@ -968,8 +864,8 @@ def main() -> None:
             continue
         source_section = rule.get("source_section", "")
         target_section = rule.get("target_section", "")
-        source_mode = SECTION_MODE_OVERRIDES.get(source_section, rule.get("source_selection_mode", ""))
-        target_mode = SECTION_MODE_OVERRIDES.get(target_section, rule.get("target_selection_mode", ""))
+        source_mode = sections.get(source_section, {}).get("selection_mode") or rule.get("source_selection_mode", "")
+        target_mode = sections.get(target_section, {}).get("selection_mode") or rule.get("target_selection_mode", "")
         body_style_scope = rule_body_style_scope(rule, source_id, target_id)
         replaces_t0a = rule_type == "excludes" and target_id == "opt_t0a_001" and source_id in T0A_REPLACEMENT_OPTION_IDS
         redundant = (
