@@ -1,0 +1,2 @@
+price_book_id,model_key,model_year,currency,effective_start,effective_end,source_ref_id,active,notes
+pb_2027_stingray,stingray,2027,USD,2026-01-01,,stingray_master_xlsx,true,First-slice Stingray price book.

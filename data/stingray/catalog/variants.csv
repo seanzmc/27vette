@@ -1,0 +1,7 @@
+variant_id,model_key,model_year,body_style,body_code,trim_level,label,base_price_usd,active
+1lt_c07,stingray,2027,coupe,C07,1LT,1LT Coupe,73495,true
+2lt_c07,stingray,2027,coupe,C07,2LT,2LT Coupe,80595,true
+3lt_c07,stingray,2027,coupe,C07,3LT,3LT Coupe,85145,true
+1lt_c67,stingray,2027,convertible,C67,1LT,1LT Convertible,80995,true
+2lt_c67,stingray,2027,convertible,C67,2LT,2LT Convertible,88095,true
+3lt_c67,stingray,2027,convertible,C67,3LT,3LT Convertible,92245,true

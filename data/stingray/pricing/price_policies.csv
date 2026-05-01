@@ -1,0 +1,3 @@
+price_policy_id,policy_type,amount_usd,display_label,notes
+normal,normal,,,Default pricing.
+included_zero,force_amount,0,Included,Auto-added or included at no charge.

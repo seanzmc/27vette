@@ -1,0 +1,9 @@
+selectable_id,selectable_type,rpo,label,description,active,availability_condition_set_id,notes
+opt_b6p_001,option,B6P,Coupe Engine Appearance Package,"Includes carbon fiber trim, D3V engine lighting and SL9 engine specification plaque.",true,cs_coupe,Current generated data makes B6P coupe-only.
+opt_d3v_001,option,D3V,Engine lighting,,true,cs_coupe,Current generated data makes D3V coupe-only and included by B6P or colored LS6 covers on coupe.
+opt_sl9_001,option,SL9,Engine specification plaque,LPO,true,,Current generated data includes SL9 with B6P and ZZ3.
+opt_zz3_001,option,ZZ3,Convertible Engine Appearance Package,"Includes window under tonneau cover, BC7 Black LS6 engine cover and SL9 engine specification plaque.",true,cs_convertible,Current generated data makes ZZ3 convertible-only.
+opt_bcp_001,option,BCP,Edge Red LS6 engine cover,,true,,Colored LS6 engine cover.
+opt_bcs_001,option,BCS,Sterling Silver LS6 engine cover,,true,,Colored LS6 engine cover.
+opt_bc4_001,option,BC4,NEW! Blue LS6 engine cover,,true,,Colored LS6 engine cover.
+opt_bc7_001,option,BC7,Black LS6 engine cover,,true,,Included for LS6 engine-cover exclusivity parity.

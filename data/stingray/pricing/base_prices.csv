@@ -1,0 +1,7 @@
+base_price_id,price_book_id,target_selector_type,target_selector_id,scope_condition_set_id,amount_usd,priority,active,notes
+bp_b6p,pb_2027_stingray,selectable,opt_b6p_001,cs_coupe,1895,10,true,Current B6P base price.
+bp_d3v,pb_2027_stingray,selectable,opt_d3v_001,cs_coupe,195,10,true,Current D3V standalone price.
+bp_sl9,pb_2027_stingray,selectable,opt_sl9_001,,0,10,true,Current SL9 standalone price.
+bp_zz3,pb_2027_stingray,selectable,opt_zz3_001,cs_convertible,1195,10,true,Current ZZ3 base price.
+bp_colored_engine_covers,pb_2027_stingray,selectable_set,set_ls6_engine_covers_colored,,695,10,true,Current BCP BCS BC4 base price.
+bp_bc7,pb_2027_stingray,selectable,opt_bc7_001,,0,10,true,Current BC7 base price.

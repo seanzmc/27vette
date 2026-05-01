@@ -1,0 +1,3 @@
+price_rule_id,price_book_id,target_selector_type,target_selector_id,applies_when_condition_set_id,price_action,amount_usd,lookup_table_id,lookup_key_template,stack_mode,priority,active,explanation
+pr_engine_cover_b6p_static,pb_2027_stingray,selectable_set,set_ls6_engine_covers_colored,cs_coupe_with_b6p,set_static,595,,,exclusive,100,true,Colored LS6 engine covers are 595 on coupe when B6P is selected.
+pr_engine_cover_zz3_static,pb_2027_stingray,selectable_set,set_ls6_engine_covers_colored,cs_convertible_with_zz3,set_static,595,,,exclusive,100,true,Colored LS6 engine covers are 595 on convertible when ZZ3 is selected.

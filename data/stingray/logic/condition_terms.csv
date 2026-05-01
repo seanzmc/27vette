@@ -1,0 +1,10 @@
+condition_set_id,or_group,term_order,term_type,left_ref,operator,right_value,negate
+cs_coupe,g1,1,context,body_style,eq,coupe,false
+cs_convertible,g1,1,context,body_style,eq,convertible,false
+cs_selected_b6p,g1,1,selected,opt_b6p_001,is_true,,false
+cs_coupe_with_b6p,g1,1,context,body_style,eq,coupe,false
+cs_coupe_with_b6p,g1,2,selected,opt_b6p_001,is_true,,false
+cs_selected_zz3,g1,1,selected,opt_zz3_001,is_true,,false
+cs_convertible_with_zz3,g1,1,context,body_style,eq,convertible,false
+cs_convertible_with_zz3,g1,2,selected,opt_zz3_001,is_true,,false
+cs_selected_colored_engine_cover,g1,1,selected_any_in_set,set_ls6_engine_covers_colored,is_true,,false
