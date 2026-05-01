@@ -39,15 +39,6 @@ BODY_STYLE_DISPLAY_ORDER = dict(MODEL_CONFIG.body_style_display_order)
 SELECTION_MODE_LABELS = dict(MODEL_CONFIG.selection_mode_labels)
 STANDARD_SECTIONS = set(MODEL_CONFIG.standard_sections)
 
-OPTION_ID_ALIASES = {
-    "opt_bc4_002": "opt_bc4_001",
-    "opt_bcp_002": "opt_bcp_001",
-    "opt_bcs_002": "opt_bcs_001",
-    "opt_bc7_002": "opt_bc7_001",
-}
-
-CONSOLIDATED_ENGINE_COVERS = {"opt_bc4_001", "opt_bcp_001", "opt_bcs_001"}
-
 HIDDEN_SECTION_IDS = {"sec_cust_002"}
 
 
@@ -199,10 +190,6 @@ def step_for_section(section_id: str, section_name: str, category_id: str) -> st
 
 def selection_mode_label(selection_mode: str) -> str:
     return shared_selection_mode_label(selection_mode, SELECTION_MODE_LABELS)
-
-
-def canonical_option_id(option_id: str) -> str:
-    return OPTION_ID_ALIASES.get(option_id, option_id)
 
 
 def workbook_bool(row: dict[str, str], field: str, fallback: bool) -> bool:
@@ -483,7 +470,6 @@ def main() -> None:
     color_overrides_raw = rows_from_sheet(wb, "color_overrides")
     interior_reference_by_id, interior_reference_rows = read_interior_reference()
 
-    status_by_option_variant_raw = {(row["option_id"], row["variant_id"]): row["status"].lower() for row in statuses_raw}
     display_behavior_by_option_id = {
         row["option_id"]: clean(row.get("display_behavior", "")).lower()
         for row in options_raw
@@ -495,26 +481,10 @@ def main() -> None:
         if display_behavior == "hidden"
     }
     for option in options_raw:
-        original_option_id = option["option_id"]
-        display_behavior = display_behavior_by_option_id.get(original_option_id, "")
-        option["option_id"] = canonical_option_id(original_option_id)
+        display_behavior = display_behavior_by_option_id.get(option["option_id"], "")
         option["_display_behavior"] = display_behavior
-        if option["option_id"] in CONSOLIDATED_ENGINE_COVERS:
-            option["price"] = "695"
         if display_behavior == "hidden" or option.get("section_id") in HIDDEN_SECTION_IDS:
             option["active"] = "False"
-
-    for row in statuses_raw:
-        row["option_id"] = canonical_option_id(row["option_id"])
-        if row["option_id"] in CONSOLIDATED_ENGINE_COVERS:
-            alias_status = status_by_option_variant_raw.get((f"{row['option_id'][:-3]}002", row["variant_id"]), row["status"])
-            row["status"] = best_status(row["status"], alias_status)
-        if row["option_id"] == "opt_bc7_001" and row["variant_id"].endswith("c67"):
-            row["status"] = "available"
-
-    for rule in rules_raw:
-        rule["source_id"] = canonical_option_id(rule.get("source_id", ""))
-        rule["target_id"] = canonical_option_id(rule.get("target_id", ""))
 
     price_rules_raw.extend(d30_r6x_price_rules_raw)
 
@@ -847,8 +817,6 @@ def main() -> None:
         rule_type = rule.get("rule_type", "").lower()
         source_id = rule.get("source_id", "")
         target_id = rule.get("target_id", "")
-        if source_id in CONSOLIDATED_ENGINE_COVERS and target_id == "opt_b6p_001" and rule_type in {"excludes", "requires"}:
-            continue
         if source_id == "opt_5v7_001" and rule_type == "requires" and target_id in FIVE_V7_OR_REQUIREMENT_TARGET_IDS:
             continue
         if source_id == "opt_5zu_001" and rule_type == "requires" and target_id in FIVE_ZU_OR_REQUIREMENT_TARGET_IDS:
@@ -918,8 +886,8 @@ def main() -> None:
     price_rules = [
         {
             "price_rule_id": row.get("price_rule_id", ""),
-            "condition_option_id": canonical_option_id(row.get("condition_option_id", "")),
-            "target_option_id": canonical_option_id(row.get("target_option_id", "")),
+            "condition_option_id": row.get("condition_option_id", ""),
+            "target_option_id": row.get("target_option_id", ""),
             "price_rule_type": row.get("price_rule_type", "").lower(),
             "price_value": money(row.get("price_value")),
             "body_style_scope": row.get("body_style_scope", ""),
