@@ -38,10 +38,9 @@ If `.venv` does not exist, create it from the repo root:
 
 Do not commit `.venv/`.
 
-## Refactor priority
+## Behavioral Guidelines
 
-Preserve current Stingray configurator behavior unless the task explicitly says otherwise.
-
-Avoid broad rewrites. Prefer small, tested changes.
-
-Do not change UI layout, copy, pricing, export shape, line item ordering, step flow, or unrelated compatibility behavior unless specifically requested.
+- Don't assume. Don't hide confusion. Surface tradeoffs.
+- Minimum code that solves the problem. Nothing speculative.
+- Touch only what you must. Clean up only your own mess.
+- Define success criteria. Loop until verified.
