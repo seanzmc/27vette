@@ -48,19 +48,7 @@ OPTION_ID_ALIASES = {
 
 CONSOLIDATED_ENGINE_COVERS = {"opt_bc4_001", "opt_bcp_001", "opt_bcs_001"}
 
-HIDDEN_OPTION_IDS = {
-    "opt_bc4_002",
-    "opt_bcp_002",
-    "opt_bcs_002",
-    "opt_bc7_002",
-    "opt_n26_001",
-    "opt_tu7_001",
-    "opt_zf1_001",
-}
-
 HIDDEN_SECTION_IDS = {"sec_cust_002"}
-
-AUTO_ONLY_OPTION_IDS = {"opt_r6x_001"}
 
 
 def export_slug(model_key: str) -> str:
@@ -126,7 +114,6 @@ AERO_EXHAUST_ACCESSORIES_SECTION_ORDER = {
 FIVE_V7_OR_REQUIREMENT_TARGET_IDS = {"opt_5zu_001", "opt_5zz_001", "opt_5zw_001"}
 FIVE_ZU_OR_REQUIREMENT_TARGET_IDS = {"opt_g8g_001", "opt_gba_001", "opt_gkz_001"}
 T0A_REPLACEMENT_OPTION_IDS = {"opt_tvs_001", "opt_5zz_001", "opt_5zu_001"}
-GRAND_SPORT_ONLY_INTERIOR_IDS = {"3LT_AE4_EL9", "3LT_AH2_EL9"}
 
 RULE_GROUPS = [
     {
@@ -216,6 +203,13 @@ def selection_mode_label(selection_mode: str) -> str:
 
 def canonical_option_id(option_id: str) -> str:
     return OPTION_ID_ALIASES.get(option_id, option_id)
+
+
+def workbook_bool(row: dict[str, str], field: str, fallback: bool) -> bool:
+    value = clean(row.get(field, ""))
+    if value in {"True", "False"}:
+        return value == "True"
+    return fallback
 
 
 def rule_body_style_scope(rule: dict[str, str], source_id: str, target_id: str) -> str:
@@ -490,12 +484,24 @@ def main() -> None:
     interior_reference_by_id, interior_reference_rows = read_interior_reference()
 
     status_by_option_variant_raw = {(row["option_id"], row["variant_id"]): row["status"].lower() for row in statuses_raw}
+    display_behavior_by_option_id = {
+        row["option_id"]: clean(row.get("display_behavior", "")).lower()
+        for row in options_raw
+        if clean(row.get("display_behavior", ""))
+    }
+    hidden_option_ids = {
+        option_id
+        for option_id, display_behavior in display_behavior_by_option_id.items()
+        if display_behavior == "hidden"
+    }
     for option in options_raw:
         original_option_id = option["option_id"]
+        display_behavior = display_behavior_by_option_id.get(original_option_id, "")
         option["option_id"] = canonical_option_id(original_option_id)
+        option["_display_behavior"] = display_behavior
         if option["option_id"] in CONSOLIDATED_ENGINE_COVERS:
             option["price"] = "695"
-        if option.get("section_id") in HIDDEN_SECTION_IDS:
+        if display_behavior == "hidden" or option.get("section_id") in HIDDEN_SECTION_IDS:
             option["active"] = "False"
 
     for row in statuses_raw:
@@ -510,39 +516,6 @@ def main() -> None:
         rule["source_id"] = canonical_option_id(rule.get("source_id", ""))
         rule["target_id"] = canonical_option_id(rule.get("target_id", ""))
 
-    existing_price_rule_ids = {row.get("price_rule_id", "") for row in price_rules_raw}
-    for option_id in sorted(CONSOLIDATED_ENGINE_COVERS):
-        engine_cover_price_rules = [
-            {
-                "price_rule_id": f"pr_b6p_coupe_{option_id}_001",
-                "condition_option_id": "opt_b6p_001",
-                "body_style_scope": "coupe",
-                "notes": "B6P selected sets coupe LS6 engine cover price to 595",
-            },
-            {
-                "price_rule_id": f"pr_zz3_convertible_{option_id}_001",
-                "condition_option_id": "opt_zz3_001",
-                "body_style_scope": "convertible",
-                "notes": "ZZ3 selected sets convertible LS6 engine cover price to 595",
-            },
-        ]
-        for price_rule in engine_cover_price_rules:
-            if price_rule["price_rule_id"] in existing_price_rule_ids:
-                continue
-            price_rules_raw.append(
-                {
-                    "price_rule_id": price_rule["price_rule_id"],
-                    "condition_option_id": price_rule["condition_option_id"],
-                    "target_option_id": option_id,
-                    "price_rule_type": "override",
-                    "price_value": "595",
-                    "body_style_scope": price_rule["body_style_scope"],
-                    "trim_level_scope": "",
-                    "variant_scope": "",
-                    "review_flag": "False",
-                    "notes": price_rule["notes"],
-                }
-            )
     price_rules_raw.extend(d30_r6x_price_rules_raw)
 
     active_variants = [
@@ -666,6 +639,7 @@ def main() -> None:
             "choice_mode": normalize_mode(mode),
             "selectable": option.get("selectable", ""),
             "active": option.get("active", ""),
+            "display_behavior": option.get("_display_behavior", ""),
             "base_price": money(option.get("price")),
             "display_order": intish(option.get("display_order")),
         }
@@ -682,14 +656,19 @@ def main() -> None:
             status = status_by_option_variant.get((option_id, variant["variant_id"]), "unavailable")
             selectable = option["selectable"]
             active = option["active"]
+            display_behavior = option.get("display_behavior", "")
             if option_id == "opt_uqt_002" and variant["trim_level"] != "1LT":
                 status = "unavailable"
                 selectable = "False"
                 active = "False"
-            if option_id in AUTO_ONLY_OPTION_IDS:
+            if display_behavior == "auto_only":
                 status = "unavailable"
                 selectable = "False"
                 active = "False"
+            elif display_behavior == "display_only":
+                status = "available"
+                selectable = "False"
+                active = "True"
             choices.append(
                 {
                     "choice_id": f"{variant['variant_id']}__{option_id}",
@@ -722,14 +701,26 @@ def main() -> None:
     for row in lt_interiors_raw:
         trim = row.get("Trim", "")
         interior_id = row.get("interior_id", "")
+        active_for_stingray = workbook_bool(
+            row,
+            "active_for_stingray",
+            False,
+        )
+        requires_r6x = workbook_bool(
+            row,
+            "requires_r6x",
+            False,
+        )
+        included_option_id = row.get("included_option_id", "") or ("opt_r6x_001" if active_for_stingray and requires_r6x else "")
         components = interior_component_metadata(row, interior_component_price_ref)
         interiors.append(
             {
                 "interior_id": interior_id,
                 "source_sheet": "lt_interiors",
-                "active_for_stingray": trim in {"1LT", "2LT", "3LT", "3LT_R6X"} and interior_id not in GRAND_SPORT_ONLY_INTERIOR_IDS,
+                "active_for_stingray": active_for_stingray,
                 "trim_level": trim.replace("_R6X", ""),
-                "requires_r6x": "True" if "_R6X" in trim or row.get("interior_id", "").endswith("_R6X") else "False",
+                "requires_r6x": "True" if requires_r6x else "False",
+                "_included_option_id": included_option_id,
                 "seat_code": row.get("Seat", ""),
                 "interior_code": row.get("Interior Code", ""),
                 "interior_name": row.get("Interior Name", ""),
@@ -826,27 +817,29 @@ def main() -> None:
 
     interiors_by_id = {row["interior_id"]: row for row in interiors if row["interior_id"]}
     r6x_interior_ids = [
-        row["interior_id"]
+        (row["interior_id"], row.get("_included_option_id", ""))
         for row in interiors
-        if row["interior_id"] and row["active_for_stingray"] and row["requires_r6x"] == "True"
+        if row["interior_id"] and row["active_for_stingray"] and row.get("_included_option_id", "")
     ]
 
     raw_rules: list[dict[str, Any]] = []
     manual_rules = []
-    for interior_id in r6x_interior_ids:
+    for interior_id, included_option_id in r6x_interior_ids:
         manual_rules.append(
             {
-                "rule_id": f"rule_{interior_id.lower()}_includes_opt_r6x_001",
+                "rule_id": f"rule_{interior_id.lower()}_includes_{included_option_id}",
                 "source_id": interior_id,
                 "rule_type": "includes",
-                "target_id": "opt_r6x_001",
+                "target_id": included_option_id,
                 "target_type": "option",
                 "source_type": "interior",
                 "source_section": interiors_by_id[interior_id].get("section_id", ""),
                 "target_section": "sec_colo_001",
                 "source_selection_mode": "single_select_req",
                 "target_selection_mode": "multi_select_opt",
-                "original_detail_raw": "R6X is included with this custom interior trim and seat combination.",
+                "original_detail_raw": "R6X is included with this custom interior trim and seat combination."
+                if included_option_id == "opt_r6x_001"
+                else f"{included_option_id} is included with this custom interior trim and seat combination.",
                 "review_flag": "False",
             }
         )
@@ -860,7 +853,7 @@ def main() -> None:
             continue
         if source_id == "opt_5zu_001" and rule_type == "requires" and target_id in FIVE_ZU_OR_REQUIREMENT_TARGET_IDS:
             continue
-        if source_id in HIDDEN_OPTION_IDS or target_id in HIDDEN_OPTION_IDS:
+        if source_id in hidden_option_ids or target_id in hidden_option_ids:
             continue
         source_section = rule.get("source_section", "")
         target_section = rule.get("target_section", "")
@@ -936,7 +929,7 @@ def main() -> None:
             "notes": row.get("notes", ""),
         }
         for row in price_rules_raw
-        if row.get("condition_option_id", "") not in HIDDEN_OPTION_IDS and row.get("target_option_id", "") not in HIDDEN_OPTION_IDS
+        if row.get("condition_option_id", "") not in hidden_option_ids and row.get("target_option_id", "") not in hidden_option_ids
     ]
 
     color_overrides = [
@@ -950,6 +943,8 @@ def main() -> None:
         }
         for idx, row in enumerate(color_overrides_raw, start=1)
     ]
+    for row in interiors:
+        row.pop("_included_option_id", None)
 
     # Validation floor
     if len(active_variants) != 6:
