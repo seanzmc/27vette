@@ -9,7 +9,7 @@ const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const T0A_RPOS = new Set(["T0A"]);
-const NON_T0A_SPOILER_RPOS = new Set(["Z51", "5V7", "ZYC", "GBA", "5ZW"]);
+const NON_T0A_SPOILER_RPOS = new Set(["Z51", "ZYC", "GBA", "5ZW"]);
 const Z51_INCLUDE_TARGETS = new Set(["FE3", "G0K", "G96", "J55", "M1N", "QTU", "V08"]);
 
 function parseCsv(source) {
@@ -201,7 +201,7 @@ test("CSV T0A legacy fragment matches generated T0A choices and projected spoile
   assert.deepEqual([...t0aOptionIds(projected)].sort(), ["opt_t0a_001"]);
   assert.deepEqual(normalizeChoices(projected.choices), normalizeChoices(production.choices));
   assert.deepEqual(plain(projectedGroup), plain(productionGroup));
-  assert.equal(projected.ruleGroups.length, 0);
+  assert.deepEqual(projected.ruleGroups.map((group) => group.group_id), ["grp_5v7_spoiler_requirement"]);
   for (const rpo of NON_T0A_SPOILER_RPOS) {
     assert.equal(projected.choices.some((choice) => choice.rpo === rpo || choice.option_id === `opt_${rpo.toLowerCase()}_001`), false);
   }

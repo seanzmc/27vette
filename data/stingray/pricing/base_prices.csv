@@ -20,3 +20,4 @@ bp_tvs,pb_2027_stingray,selectable,opt_tvs_001,,995,10,true,Current TVS base pri
 bp_t0a,pb_2027_stingray,selectable,opt_t0a_001,,0,10,true,Current T0A base price.
 bp_5zz,pb_2027_stingray,selectable,opt_5zz_001,,1550,10,true,Current 5ZZ base price.
 bp_5zu,pb_2027_stingray,selectable,opt_5zu_001,,1395,10,true,Current 5ZU base price.
+bp_5v7,pb_2027_stingray,selectable,opt_5v7_001,,650,10,true,Current 5V7 base price.

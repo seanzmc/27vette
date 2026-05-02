@@ -66,14 +66,27 @@ function fixturePackage() {
   return packageDir;
 }
 
-test("production ruleGroup CSV schema exists but emits no projected ruleGroups yet", () => {
+test("production ruleGroup CSV schema emits the projected 5V7 requires_any ruleGroup", () => {
   assert.equal(fs.existsSync(path.join(PACKAGE, RULE_GROUPS)), true);
   assert.equal(fs.existsSync(path.join(PACKAGE, RULE_GROUP_MEMBERS)), true);
 
   const fragment = emitFragment();
 
   assert.deepEqual(fragment.validation_errors, []);
-  assert.deepEqual(fragment.ruleGroups, []);
+  assert.deepEqual(fragment.ruleGroups, [
+    {
+      group_id: "grp_5v7_spoiler_requirement",
+      group_type: "requires_any",
+      source_id: "opt_5v7_001",
+      target_ids: ["opt_5zu_001", "opt_5zz_001"],
+      body_style_scope: "",
+      trim_level_scope: "",
+      variant_scope: "",
+      disabled_reason: "Requires 5ZU Body-Color High Wing Spoiler or 5ZZ Carbon Flash High Wing Spoiler.",
+      active: "True",
+      notes: "5V7 is available when either approved high wing spoiler is selected.",
+    },
+  ]);
 });
 
 test("CSV ruleGroups emit the exact legacy requires_any runtime shape with deterministic member order", () => {

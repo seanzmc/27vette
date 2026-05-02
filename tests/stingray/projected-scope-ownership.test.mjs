@@ -12,6 +12,7 @@ const OVERLAY_SCRIPT = "scripts/stingray_csv_shadow_overlay.py";
 const FRAGMENT_SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const EXPECTED_OWNED_RPOS = [
+  "5V7",
   "5ZC",
   "5ZD",
   "5ZU",
@@ -213,7 +214,7 @@ test("projected ownership manifest declares the current multi-slice control scop
       target_option_id: "opt_5zw_001",
       ownership: "production_guarded",
     },
-    ...["5V7", "GBA", "Z51", "ZYC"].map((rpo) => ({
+    ...["GBA", "Z51", "ZYC"].map((rpo) => ({
       record_type: "guardedOption",
       rpo,
       target_option_id: "",
@@ -229,7 +230,7 @@ test("projected ownership manifest declares the current multi-slice control scop
     {
       record_type: "ruleGroup",
       group_id: "grp_5v7_spoiler_requirement",
-      ownership: "production_guarded",
+      ownership: "projected_owned",
     },
     {
       record_type: "ruleGroup",
@@ -255,7 +256,6 @@ test("projected ownership manifest declares the current multi-slice control scop
     { record_type: "rule", group_id: "", source_rpo: "5ZU", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_5zw_001", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "priceRule", group_id: "", source_rpo: "Z51", source_option_id: "", target_rpo: "TVS", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "ruleGroup", group_id: "", source_rpo: "5V7", source_option_id: "", target_rpo: "5ZZ", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "ruleGroup", group_id: "", source_rpo: "5ZU", source_option_id: "", target_rpo: "GBA", target_option_id: "", ownership: "preserved_cross_boundary" },
   ]) {
     assert.equal(hasPreservedRow(preserved, expected), true, `missing preserved row ${JSON.stringify(expected)}`);
@@ -401,7 +401,7 @@ const validationCases = [
     "guarded group_id missing from production",
     (rows) =>
       rows.map((row) =>
-        row.record_type === "ruleGroup" && row.group_id === "grp_5v7_spoiler_requirement"
+        row.record_type === "ruleGroup" && row.group_id === "grp_5zu_paint_requirement"
           ? { ...row, group_id: "grp_missing_spoiler" }
           : row
       ),

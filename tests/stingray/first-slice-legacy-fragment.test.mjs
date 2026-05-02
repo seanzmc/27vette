@@ -133,6 +133,9 @@ test("CSV first-slice legacy fragment matches generated first-slice contract rec
   assert.deepEqual(normalizeRules(projected.rules, productionOptionIds), normalizeRules(production.rules, productionOptionIds));
   assert.deepEqual(normalizePriceRules(projected.priceRules, productionOptionIds), normalizePriceRules(production.priceRules, productionOptionIds));
   assert.deepEqual(normalizeExclusiveGroups(projected.exclusiveGroups, productionOptionIds), normalizeExclusiveGroups(production.exclusiveGroups, productionOptionIds));
-  assert.deepEqual(projected.ruleGroups, []);
+  assert.equal(
+    projected.ruleGroups.some((group) => group.source_id && productionOptionIds.has(group.source_id)),
+    false
+  );
   assert.deepEqual(projected.documented_mismatches, []);
 });

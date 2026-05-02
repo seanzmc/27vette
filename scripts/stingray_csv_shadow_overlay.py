@@ -456,6 +456,28 @@ def assert_projected_groups_exist(fragment: dict[str, Any], ownership: Ownership
         raise OverlayError(f"{surface_label} projected group is missing from fragment: {missing[:5]}.")
 
 
+def assert_projected_rule_group_ownership(fragment: dict[str, Any], ownership: OwnershipScope, projected_ids: set[str]) -> None:
+    # Default Pass 35 policy: a projected-owned ruleGroup may only be emitted
+    # when its source and all emitted target members are projected-owned.
+    projected_group_ids = ownership.projected_group_ids["ruleGroups"]
+    unowned_sources = []
+    unowned_targets = []
+    for row in fragment.get("ruleGroups", []):
+        group_id = row.get("group_id", "")
+        if group_id not in projected_group_ids:
+            continue
+        source_id = row.get("source_id", "")
+        if source_id not in projected_ids:
+            unowned_sources.append({"group_id": group_id, "source_id": source_id})
+        missing_target_ids = [target_id for target_id in row.get("target_ids", []) if target_id not in projected_ids]
+        if missing_target_ids:
+            unowned_targets.append({"group_id": group_id, "target_ids": missing_target_ids})
+    if unowned_sources:
+        raise OverlayError(f"projected ruleGroup source is not projected-owned: {unowned_sources[:5]}.")
+    if unowned_targets:
+        raise OverlayError(f"projected ruleGroup targets are not projected-owned: {unowned_targets[:5]}.")
+
+
 def assert_same_normalized(surface: str, left: list[dict[str, Any]], right: list[dict[str, Any]]) -> None:
     left_rows = [normalized_json(row) for row in left]
     right_rows = [normalized_json(row) for row in right]
@@ -647,6 +669,7 @@ def overlay_shadow_data(production: dict[str, Any], fragment: dict[str, Any], ow
     guarded_ids = guarded_option_ids(production, ownership)
     assert_preserved_records_exist(production, ownership, preserved_keys_by_surface)
     assert_projected_groups_exist(fragment, ownership)
+    assert_projected_rule_group_ownership(fragment, ownership, fragment_ids)
 
     removed_choices = [row for row in production.get("choices", []) if row.get("rpo") in rpos]
     fragment_rule_keys = {

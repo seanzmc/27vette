@@ -1,1 +1,3 @@
 rule_group_id,target_selectable_id,member_order,active
+grp_5v7_spoiler_requirement,opt_5zu_001,10,true
+grp_5v7_spoiler_requirement,opt_5zz_001,20,true

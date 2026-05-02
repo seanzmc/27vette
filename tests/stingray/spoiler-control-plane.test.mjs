@@ -11,7 +11,7 @@ const PYTHON = ".venv/bin/python";
 const OVERLAY_SCRIPT = "scripts/stingray_csv_shadow_overlay.py";
 const FRAGMENT_SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
-const SPOILER_GUARDED_RPOS = ["5V7", "Z51", "ZYC", "GBA"];
+const SPOILER_GUARDED_RPOS = ["Z51", "ZYC", "GBA"];
 const SPOILER_NOT_PROJECTED_RPOS = new Set([...SPOILER_GUARDED_RPOS, "5ZW"]);
 
 function parseCsv(source) {
@@ -157,6 +157,7 @@ test("Pass 29 projects TVS T0A 5ZZ and 5ZU while other spoiler-adjacent options 
   assert.equal(projectedRpos.includes("T0A"), true);
   assert.equal(projectedRpos.includes("5ZZ"), true);
   assert.equal(projectedRpos.includes("5ZU"), true);
+  assert.equal(projectedRpos.includes("5V7"), true);
   for (const rpo of SPOILER_NOT_PROJECTED_RPOS) {
     assert.equal(projectedRpos.includes(rpo), false, `${rpo} should not be projected-owned in Pass 29`);
   }
@@ -164,7 +165,7 @@ test("Pass 29 projects TVS T0A 5ZZ and 5ZU while other spoiler-adjacent options 
   assert.equal(production.choices.some((choice) => choice.rpo === "5ZW" || choice.option_id === "opt_5zw_001"), false);
 });
 
-test("Pass 31 projects spoiler exclusive group while ruleGroups stay guarded", () => {
+test("Pass 37 projects 5V7 ruleGroup while paint ruleGroup stays guarded", () => {
   assert.deepEqual(groupRows(), [
     {
       record_type: "exclusiveGroup",
@@ -174,7 +175,7 @@ test("Pass 31 projects spoiler exclusive group while ruleGroups stay guarded", (
     {
       record_type: "ruleGroup",
       group_id: "grp_5v7_spoiler_requirement",
-      ownership: "production_guarded",
+      ownership: "projected_owned",
     },
     {
       record_type: "ruleGroup",
@@ -184,7 +185,7 @@ test("Pass 31 projects spoiler exclusive group while ruleGroups stay guarded", (
   ]);
 });
 
-test("spoiler requires_any ruleGroups are production-owned and preserved in shadow data", () => {
+test("spoiler requires_any ruleGroups match production with only 5ZU paint group guarded", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
   const rows = activeManifestRows();
@@ -200,8 +201,8 @@ test("spoiler requires_any ruleGroups are production-owned and preserved in shad
   assert.equal(fiveV7Group.source_id, fiveV7);
   assert.deepEqual([...fiveV7Group.target_ids].sort(), [fiveZU, fiveZZ].sort());
   assert.equal(fiveV7Group.target_ids.includes("opt_5zw_001"), false);
-  assert.equal(preservedRowExists(rows, { record_type: "ruleGroup", source_rpo: "5V7", target_rpo: "5ZU" }), true);
-  assert.equal(preservedRowExists(rows, { record_type: "ruleGroup", source_rpo: "5V7", target_rpo: "5ZZ" }), true);
+  assert.equal(preservedRowExists(rows, { record_type: "ruleGroup", source_rpo: "5V7", target_rpo: "5ZU" }), false);
+  assert.equal(preservedRowExists(rows, { record_type: "ruleGroup", source_rpo: "5V7", target_rpo: "5ZZ" }), false);
 
   const fiveZuGroup = shadow.ruleGroups.find((group) => group.group_id === "grp_5zu_paint_requirement");
   assert.equal(fiveZuGroup.group_type, "requires_any");
@@ -307,13 +308,13 @@ test("overlay rejects missing preserved 5ZW rule-only asymmetry record", () => {
 test("overlay rejects missing preserved spoiler ruleGroup classifications", () => {
   const rows = loadManifest().filter(
     (row) =>
-      !(row.record_type === "ruleGroup" && row.source_rpo === "5V7" && row.target_rpo === "5ZZ")
+      !(row.record_type === "ruleGroup" && row.source_rpo === "5ZU" && row.target_rpo === "GBA")
   );
   const result = runOverlay(["--ownership-manifest", writeTempManifest(rows)]);
 
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /unclassified guarded production records/);
-  assert.match(result.stderr, /opt_5v7_001/);
+  assert.match(result.stderr, /opt_gba_001/);
 });
 
 test("overlay rejects missing projected spoiler exclusiveGroup fragment", () => {
@@ -337,34 +338,23 @@ test("overlay validates projected exclusiveGroup replacement from CSV fragment",
 });
 
 test("overlay rejects projected ruleGroup ownership when the fragment does not provide it", () => {
-  const rows = loadManifest()
-    .filter((row) => row.group_id !== "grp_5v7_spoiler_requirement")
-    .concat({
-      record_type: "ruleGroup",
-      group_id: "grp_5v7_spoiler_requirement",
-      source_rpo: "",
-      source_option_id: "",
-      target_rpo: "",
-      target_option_id: "",
-      rpo: "",
-      ownership: "projected_owned",
-      reason: "Controlled test expects projected ruleGroup replacement",
-      active: "true",
-    });
-  const result = runOverlay(["--ownership-manifest", writeTempManifest(rows)]);
+  const fragment = emitFragment();
+  fragment.ruleGroups = fragment.ruleGroups.filter((item) => item.group_id !== "grp_5v7_spoiler_requirement");
+  const result = runOverlay(["--fragment-json", writeTempJson(fragment)]);
 
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /ruleGroups projected group is missing from fragment/);
   assert.match(result.stderr, /grp_5v7_spoiler_requirement/);
 });
 
-test("overlay validates projected ruleGroup replacement from controlled fragments", () => {
+test("overlay rejects projected 5V7 ruleGroup while source remains production-owned", () => {
   const production = loadGeneratedData();
   const fragment = emitFragment();
   const group = production.ruleGroups.find((item) => item.group_id === "grp_5v7_spoiler_requirement");
-  fragment.ruleGroups = [...fragment.ruleGroups, group];
+  fragment.choices = fragment.choices.filter((choice) => choice.rpo !== "5V7");
+  fragment.ruleGroups = [group];
   const rows = loadManifest()
-    .filter((row) => row.group_id !== "grp_5v7_spoiler_requirement")
+    .filter((row) => row.group_id !== "grp_5v7_spoiler_requirement" && !(row.record_type === "selectable" && row.rpo === "5V7"))
     .concat({
       record_type: "ruleGroup",
       group_id: "grp_5v7_spoiler_requirement",
@@ -379,9 +369,39 @@ test("overlay validates projected ruleGroup replacement from controlled fragment
     });
   const result = runOverlay(["--ownership-manifest", writeTempManifest(rows), "--fragment-json", writeTempJson(fragment)]);
 
-  assert.equal(result.status, 0, result.stderr);
-  const shadow = JSON.parse(result.stdout);
-  assert.deepEqual(plain(shadow.ruleGroups.find((item) => item.group_id === "grp_5v7_spoiler_requirement")), plain(group));
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /projected ruleGroup source is not projected-owned/);
+  assert.match(result.stderr, /grp_5v7_spoiler_requirement/);
+  assert.match(result.stderr, /opt_5v7_001/);
+});
+
+test("overlay rejects projected 5ZU paint ruleGroup while paint targets remain production-owned", () => {
+  const production = loadGeneratedData();
+  const fragment = emitFragment();
+  const group = production.ruleGroups.find((item) => item.group_id === "grp_5zu_paint_requirement");
+  fragment.ruleGroups = [...fragment.ruleGroups, group];
+  const rows = loadManifest()
+    .filter((row) => row.group_id !== "grp_5zu_paint_requirement")
+    .concat({
+      record_type: "ruleGroup",
+      group_id: "grp_5zu_paint_requirement",
+      source_rpo: "",
+      source_option_id: "",
+      target_rpo: "",
+      target_option_id: "",
+      rpo: "",
+      ownership: "projected_owned",
+      reason: "Controlled test fragment projects paint ruleGroup identity",
+      active: "true",
+    });
+  const result = runOverlay(["--ownership-manifest", writeTempManifest(rows), "--fragment-json", writeTempJson(fragment)]);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /projected ruleGroup targets are not projected-owned/);
+  assert.match(result.stderr, /grp_5zu_paint_requirement/);
+  assert.match(result.stderr, /opt_g8g_001/);
+  assert.match(result.stderr, /opt_gba_001/);
+  assert.match(result.stderr, /opt_gkz_001/);
 });
 
 test("overlay rejects missing preserved spoiler priceRule classifications", () => {

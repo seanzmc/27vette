@@ -8,8 +8,8 @@ import { createRuntime, loadGeneratedData, loadShadowData } from "./runtime-harn
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
-const FIVE_ZU_RPOS = new Set(["5ZU"]);
-const NON_5ZU_RPOS = new Set(["Z51", "ZYC", "GBA", "G8G", "GKZ", "5ZW", "5VM", "5W8"]);
+const FIVE_V7_RPOS = new Set(["5V7"]);
+const EXTERNAL_RPOS = new Set(["Z51", "STI", "PCU", "5VM", "5W8", "5ZW"]);
 
 function parseCsv(source) {
   const rows = [];
@@ -85,13 +85,13 @@ function optionIdsByRpo(data) {
   return byRpo;
 }
 
-function fiveZuOptionIds(data) {
-  return new Set(data.choices.filter((choice) => FIVE_ZU_RPOS.has(choice.rpo)).map((choice) => choice.option_id));
+function fiveV7OptionIds(data) {
+  return new Set(data.choices.filter((choice) => FIVE_V7_RPOS.has(choice.rpo)).map((choice) => choice.option_id));
 }
 
 function normalizeChoices(rows) {
   return Array.from(rows)
-    .filter((choice) => FIVE_ZU_RPOS.has(choice.rpo))
+    .filter((choice) => FIVE_V7_RPOS.has(choice.rpo))
     .map((choice) => ({
       choice_id: choice.choice_id,
       option_id: choice.option_id,
@@ -168,13 +168,6 @@ function selectedRpos(runtime, rpos) {
     .sort();
 }
 
-function autoAddedRpos(runtime, rpos) {
-  return [...runtime.computeAutoAdded().keys()]
-    .map((optionId) => runtime.activeChoiceRows().find((choice) => choice.option_id === optionId)?.rpo)
-    .filter((rpo) => rpos.has(rpo))
-    .sort();
-}
-
 function manifestHas(expected) {
   return activeManifestRows().some((row) => Object.entries(expected).every(([key, value]) => row[key] === value));
 }
@@ -193,137 +186,132 @@ function ruleGroupIdsTouchingOption(groups, optionId) {
     .sort();
 }
 
-test("CSV evaluator prices direct 5ZU selection", () => {
-  const result = evaluate("1lt_c07", ["opt_5zu_001"]);
-  const line = result.selected_lines.find((item) => item.selectable_id === "opt_5zu_001");
+test("CSV evaluator prices direct 5V7 selection", () => {
+  const result = evaluate("1lt_c07", ["opt_5zz_001", "opt_5v7_001"]);
+  const line = result.selected_lines.find((item) => item.selectable_id === "opt_5v7_001");
 
-  assert.equal(line?.rpo, "5ZU");
-  assert.equal(line?.label, "LPO, High wing spoiler, Body color");
-  assert.equal(line?.final_price_usd, 1395);
+  assert.equal(line?.rpo, "5V7");
+  assert.equal(line?.label, "LPO, Black Ground Effects");
+  assert.equal(line?.final_price_usd, 650);
   assert.deepEqual(result.validation_errors, []);
 });
 
-test("CSV 5ZU legacy fragment matches generated 5ZU choices and projected spoiler group without ruleGroups", () => {
+test("CSV 5V7 legacy fragment matches generated 5V7 choices and projected generated ruleGroup", () => {
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
-  const projectedGroup = projected.exclusiveGroups.find((group) => group.group_id === "grp_spoiler_high_wing");
-  const productionGroup = production.exclusiveGroups.find((group) => group.group_id === "grp_spoiler_high_wing");
+  const projectedGroup = projected.ruleGroups.find((group) => group.group_id === "grp_5v7_spoiler_requirement");
+  const productionGroup = production.ruleGroups.find((group) => group.group_id === "grp_5v7_spoiler_requirement");
+  const targetRpos = projectedGroup.target_ids.map((optionId) => production.choices.find((choice) => choice.option_id === optionId)?.rpo || optionId);
 
   assert.deepEqual(projected.validation_errors, []);
-  assert.deepEqual([...fiveZuOptionIds(projected)].sort(), ["opt_5zu_001"]);
+  assert.deepEqual([...fiveV7OptionIds(projected)].sort(), ["opt_5v7_001"]);
   assert.deepEqual(normalizeChoices(projected.choices), normalizeChoices(production.choices));
   assert.deepEqual(plain(projectedGroup), plain(productionGroup));
-  assert.deepEqual(projected.ruleGroups.map((group) => group.group_id), ["grp_5v7_spoiler_requirement"]);
-  for (const rpo of NON_5ZU_RPOS) {
+  assert.deepEqual(targetRpos, ["5ZU", "5ZZ"]);
+  assert.equal(projectedGroup.target_ids.includes("opt_5zw_001"), false);
+  for (const rpo of EXTERNAL_RPOS) {
     assert.equal(projected.choices.some((choice) => choice.rpo === rpo || choice.option_id === `opt_${rpo.toLowerCase()}_001`), false);
   }
 });
 
-test("ownership manifest projects 5ZU and preserves every 5ZU-touching production boundary", () => {
+test("ownership manifest projects 5V7 and preserves every 5V7-touching production boundary", () => {
   const production = loadGeneratedData();
   const byRpo = optionIdsByRpo(production);
-  const fiveZU = byRpo.get("5ZU");
-  const t0a = byRpo.get("T0A");
+  const fiveV7 = byRpo.get("5V7");
   const productionRules = production.rules
-    .filter((rule) => rule.source_id === fiveZU || rule.target_id === fiveZU)
+    .filter((rule) => rule.source_id === fiveV7 || rule.target_id === fiveV7)
     .map((rule) => [rule.source_id, rule.target_id, rule.rule_type, rule.auto_add, rule.runtime_action])
     .sort();
   const productionPriceRules = production.priceRules
-    .filter((rule) => rule.condition_option_id === fiveZU || rule.target_option_id === fiveZU)
+    .filter((rule) => rule.condition_option_id === fiveV7 || rule.target_option_id === fiveV7)
     .map((rule) => [rule.condition_option_id, rule.target_option_id, rule.price_rule_type, Number(rule.price_value || 0)])
     .sort();
 
   assert.deepEqual(plain(productionRules), plain([
-    [byRpo.get("WKQ"), fiveZU, "excludes", "False", "active"],
-    [byRpo.get("RNX"), fiveZU, "excludes", "False", "active"],
-    ["opt_5vm_001", fiveZU, "requires", "False", "active"],
-    ["opt_5w8_001", fiveZU, "requires", "False", "active"],
-    [fiveZU, t0a, "excludes", "False", "replace"],
+    [fiveV7, "opt_5vm_001", "excludes", "False", "active"],
+    [fiveV7, "opt_5w8_001", "excludes", "False", "active"],
+    [fiveV7, byRpo.get("STI"), "excludes", "False", "active"],
+    [fiveV7, byRpo.get("TVS"), "excludes", "False", "active"],
+    [fiveV7, byRpo.get("Z51"), "excludes", "False", "active"],
+    ["opt_5vm_001", fiveV7, "excludes", "False", "active"],
+    ["opt_5w8_001", fiveV7, "excludes", "False", "active"],
+    [byRpo.get("PCU"), fiveV7, "excludes", "False", "active"],
+    [byRpo.get("STI"), fiveV7, "excludes", "False", "active"],
   ].sort()));
   assert.deepEqual(plain(productionPriceRules), []);
-  assert.deepEqual(plain(groupIdsTouchingOption(production.exclusiveGroups, fiveZU)), ["grp_spoiler_high_wing"]);
-  assert.deepEqual(plain(ruleGroupIdsTouchingOption(production.ruleGroups, fiveZU)), [
-    "grp_5v7_spoiler_requirement",
-    "grp_5zu_paint_requirement",
-  ]);
+  assert.deepEqual(plain(groupIdsTouchingOption(production.exclusiveGroups, fiveV7)), []);
+  assert.deepEqual(plain(ruleGroupIdsTouchingOption(production.ruleGroups, fiveV7)), ["grp_5v7_spoiler_requirement"]);
 
-  assert.equal(manifestHas({ record_type: "selectable", rpo: "5ZU", ownership: "projected_owned" }), true);
-  assert.equal(manifestHas({ record_type: "exclusiveGroup", group_id: "grp_spoiler_high_wing", ownership: "projected_owned" }), true);
+  assert.equal(manifestHas({ record_type: "selectable", rpo: "5V7", ownership: "projected_owned" }), true);
   assert.equal(manifestHas({ record_type: "ruleGroup", group_id: "grp_5v7_spoiler_requirement", ownership: "projected_owned" }), true);
-  assert.equal(manifestHas({ record_type: "ruleGroup", group_id: "grp_5zu_paint_requirement", ownership: "production_guarded" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5ZU", target_rpo: "T0A", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "WKQ", target_rpo: "5ZU", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "RNX", target_rpo: "5ZU", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5vm_001", target_rpo: "5ZU", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5w8_001", target_rpo: "5ZU", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_rpo: "TVS", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_rpo: "Z51", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_rpo: "STI", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_option_id: "opt_5w8_001", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5vm_001", target_rpo: "5V7", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5w8_001", target_rpo: "5V7", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCU", target_rpo: "5V7", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "STI", target_rpo: "5V7", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5V7", target_rpo: "5ZU", ownership: "preserved_cross_boundary" }), false);
-  for (const paintRpo of ["G8G", "GBA", "GKZ"]) {
-    assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5ZU", target_rpo: paintRpo, ownership: "preserved_cross_boundary" }), true);
-    assert.equal(manifestHas({ record_type: "selectable", rpo: paintRpo, ownership: "projected_owned" }), false);
-  }
+  assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5V7", target_rpo: "5ZZ", ownership: "preserved_cross_boundary" }), false);
 
-  for (const rpo of NON_5ZU_RPOS) {
+  for (const rpo of EXTERNAL_RPOS) {
     assert.equal(manifestHas({ record_type: "selectable", rpo, ownership: "projected_owned" }), false);
   }
-  assert.equal(manifestHas({ record_type: "guardedOption", rpo: "5ZU", ownership: "production_guarded" }), false);
+  assert.equal(manifestHas({ record_type: "guardedOption", rpo: "5V7", ownership: "production_guarded" }), false);
 });
 
-test("shadow overlay preserves 5ZU production-owned rules and groups", () => {
+test("shadow overlay preserves 5V7 production-owned rules and projects the generated ruleGroup", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
-  const fiveZU = optionIdByRpo(production, "5ZU");
+  const fiveV7 = optionIdByRpo(production, "5V7");
 
-  assert.deepEqual(plain(normalizeRules(shadow.rules, fiveZU)), plain(normalizeRules(production.rules, fiveZU)));
-  assert.deepEqual(plain(groupIdsTouchingOption(shadow.exclusiveGroups, fiveZU)), ["grp_spoiler_high_wing"]);
-  assert.deepEqual(plain(ruleGroupIdsTouchingOption(shadow.ruleGroups, fiveZU)), [
-    "grp_5v7_spoiler_requirement",
-    "grp_5zu_paint_requirement",
-  ]);
+  assert.deepEqual(plain(normalizeRules(shadow.rules, fiveV7)), plain(normalizeRules(production.rules, fiveV7)));
+  assert.deepEqual(plain(groupIdsTouchingOption(shadow.exclusiveGroups, fiveV7)), []);
+  assert.deepEqual(plain(ruleGroupIdsTouchingOption(shadow.ruleGroups, fiveV7)), ["grp_5v7_spoiler_requirement"]);
   assert.deepEqual(
-    plain(shadow.exclusiveGroups.find((group) => group.group_id === "grp_spoiler_high_wing")),
-    plain(production.exclusiveGroups.find((group) => group.group_id === "grp_spoiler_high_wing"))
+    plain(shadow.ruleGroups.find((group) => group.group_id === "grp_5v7_spoiler_requirement")),
+    plain(production.ruleGroups.find((group) => group.group_id === "grp_5v7_spoiler_requirement"))
   );
-  for (const groupId of ["grp_5v7_spoiler_requirement", "grp_5zu_paint_requirement"]) {
-    assert.deepEqual(
-      plain(shadow.ruleGroups.find((group) => group.group_id === groupId)),
-      plain(production.ruleGroups.find((group) => group.group_id === groupId))
-    );
-  }
 });
 
-test("shadow 5ZU runtime paint requirement replacement cleanup and 5V7 behavior match production", () => {
+test("shadow 5V7 runtime requirements and external conflicts match production", () => {
   for (const data of [loadGeneratedData(), loadShadowData()]) {
     const directRuntime = runtimeFor(data, "1lt_c07");
-    assert.match(directRuntime.disableReasonForChoice(activeChoiceByRpo(directRuntime, "5ZU")), /Requires Arctic White|Requires Black|Requires Torch Red/);
+    assert.match(directRuntime.disableReasonForChoice(activeChoiceByRpo(directRuntime, "5V7")), /Requires 5ZU|Requires 5ZZ/);
 
-    for (const paintRpo of ["G8G", "GBA", "GKZ"]) {
-      const paintRuntime = runtimeFor(data, "1lt_c07");
-      handleRpo(paintRuntime, paintRpo);
-      assert.equal(paintRuntime.disableReasonForChoice(activeChoiceByRpo(paintRuntime, "5ZU")), "");
-      handleRpo(paintRuntime, "5ZU");
-      assert.equal(paintRuntime.optionPrice(activeChoiceByRpo(paintRuntime, "5ZU").option_id), 1395);
-      assert.deepEqual(selectedRpos(paintRuntime, new Set([paintRpo, "5ZU"])), ["5ZU", paintRpo].sort());
-    }
+    const fiveZzRuntime = runtimeFor(data, "1lt_c07");
+    handleRpo(fiveZzRuntime, "5ZZ");
+    assert.equal(fiveZzRuntime.disableReasonForChoice(activeChoiceByRpo(fiveZzRuntime, "5V7")), "");
+    handleRpo(fiveZzRuntime, "5V7");
+    assert.deepEqual(selectedRpos(fiveZzRuntime, new Set(["5V7", "5ZZ"])), ["5V7", "5ZZ"]);
 
-    const zycRuntime = runtimeFor(data, "1lt_c07");
-    handleRpo(zycRuntime, "ZYC");
-    handleRpo(zycRuntime, "GBA");
-    assert.deepEqual(selectedRpos(zycRuntime, new Set(["GBA", "ZYC"])), ["GBA"]);
+    const fiveZuRuntime = runtimeFor(data, "1lt_c07");
+    handleRpo(fiveZuRuntime, "GBA");
+    handleRpo(fiveZuRuntime, "5ZU");
+    assert.equal(fiveZuRuntime.disableReasonForChoice(activeChoiceByRpo(fiveZuRuntime, "5V7")), "");
+    handleRpo(fiveZuRuntime, "5V7");
+    assert.deepEqual(selectedRpos(fiveZuRuntime, new Set(["5V7", "5ZU"])), ["5V7", "5ZU"]);
+
+    const tvsRuntime = runtimeFor(data, "1lt_c07");
+    handleRpo(tvsRuntime, "5ZZ");
+    handleRpo(tvsRuntime, "5V7");
+    assert.match(tvsRuntime.disableReasonForChoice(activeChoiceByRpo(tvsRuntime, "TVS")), /Blocked by 5V7/);
 
     const z51Runtime = runtimeFor(data, "1lt_c07");
-    handleRpo(z51Runtime, "GBA");
-    handleRpo(z51Runtime, "Z51");
-    assert.deepEqual(autoAddedRpos(z51Runtime, new Set(["T0A"])), ["T0A"]);
-    handleRpo(z51Runtime, "5ZU");
-    assert.deepEqual(selectedRpos(z51Runtime, new Set(["T0A", "TVS", "5ZZ", "5ZU", "Z51"])), ["5ZU", "Z51"]);
-    assert.deepEqual(autoAddedRpos(z51Runtime, new Set(["T0A"])), []);
+    handleRpo(z51Runtime, "5ZZ");
+    handleRpo(z51Runtime, "5V7");
+    assert.match(z51Runtime.disableReasonForChoice(activeChoiceByRpo(z51Runtime, "Z51")), /Blocked by 5V7/);
 
-    const fiveV7Runtime = runtimeFor(data, "1lt_c07");
-    assert.match(fiveV7Runtime.disableReasonForChoice(activeChoiceByRpo(fiveV7Runtime, "5V7")), /Requires 5ZU|Requires 5ZZ/);
-    handleRpo(fiveV7Runtime, "GBA");
-    handleRpo(fiveV7Runtime, "5ZU");
-    assert.equal(fiveV7Runtime.disableReasonForChoice(activeChoiceByRpo(fiveV7Runtime, "5V7")), "");
-    handleRpo(fiveV7Runtime, "5V7");
-    assert.deepEqual(selectedRpos(fiveV7Runtime, new Set(["5V7", "5ZU"])), ["5V7", "5ZU"]);
+    const pcuRuntime = runtimeFor(data, "1lt_c07");
+    handleRpo(pcuRuntime, "5ZZ");
+    handleRpo(pcuRuntime, "PCU");
+    assert.match(pcuRuntime.disableReasonForChoice(activeChoiceByRpo(pcuRuntime, "5V7")), /Blocked by PCU/);
+
+    const stiRuntime = runtimeFor(data, "1lt_c07");
+    handleRpo(stiRuntime, "5ZZ");
+    handleRpo(stiRuntime, "STI");
+    assert.match(stiRuntime.disableReasonForChoice(activeChoiceByRpo(stiRuntime, "5V7")), /Blocked by STI/);
   }
 });

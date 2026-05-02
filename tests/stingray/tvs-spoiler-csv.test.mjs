@@ -9,7 +9,7 @@ const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const TVS_RPOS = new Set(["TVS"]);
-const NON_TVS_SPOILER_RPOS = new Set(["Z51", "5V7", "ZYC", "GBA", "5ZW"]);
+const NON_TVS_SPOILER_RPOS = new Set(["Z51", "ZYC", "GBA", "5ZW"]);
 
 function parseCsv(source) {
   const rows = [];
@@ -207,7 +207,7 @@ test("CSV TVS legacy fragment matches generated TVS choices and projected spoile
   assert.deepEqual([...tvsOptionIds(projected)].sort(), ["opt_tvs_001"]);
   assert.deepEqual(normalizeChoices(projected.choices), normalizeChoices(production.choices));
   assert.deepEqual(plain(projectedGroup), plain(productionGroup));
-  assert.equal(projected.ruleGroups.length, 0);
+  assert.deepEqual(projected.ruleGroups.map((group) => group.group_id), ["grp_5v7_spoiler_requirement"]);
   for (const rpo of NON_TVS_SPOILER_RPOS) {
     assert.equal(projected.choices.some((choice) => choice.rpo === rpo || choice.option_id === `opt_${rpo.toLowerCase()}_001`), false);
   }

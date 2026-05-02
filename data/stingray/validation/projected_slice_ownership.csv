@@ -25,6 +25,7 @@ selectable,,,,,,TVS,projected_owned,TVS low-profile spoiler projected slice,true
 selectable,,,,,,T0A,projected_owned,T0A spoiler choice projected slice,true
 selectable,,,,,,5ZZ,projected_owned,5ZZ high-wing spoiler projected slice,true
 selectable,,,,,,5ZU,projected_owned,5ZU body-color high-wing spoiler projected slice,true
+selectable,,,,,,5V7,projected_owned,5V7 ground effects projected slice,true
 rule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
 priceRule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
 rule,,WKQ,,5ZU,,,preserved_cross_boundary,Car-cover spoiler exclude remains production-owned in Pass 15,true
@@ -35,13 +36,13 @@ rule,,RNX,,,opt_5zw_001,,preserved_cross_boundary,Car-cover 5ZW rule-only exclud
 rule,,RNX,,5ZZ,,,preserved_cross_boundary,Car-cover spoiler exclude remains production-owned in Pass 15,true
 rule,,RNX,,Z51,,,preserved_cross_boundary,Car-cover Z51 exclude remains production-owned in Pass 15,true
 rule,,RWJ,,Z51,,,preserved_cross_boundary,Car-cover Z51 exclude remains production-owned in Pass 15,true
-guardedOption,,,,,,5V7,production_guarded,Spoiler-adjacent ground-effects guarded production option in Pass 17,true
+guardedOption,,,,,,5V7,production_guarded,Spoiler-adjacent ground-effects guarded production option in Pass 17,false
 guardedOption,,,,,,Z51,production_guarded,Spoiler-adjacent package guarded production option in Pass 17,true
 guardedOption,,,,,,ZYC,production_guarded,Spoiler-adjacent appearance guarded production option in Pass 17,true
 guardedOption,,,,,,GBA,production_guarded,Spoiler-adjacent paint guarded production option in Pass 17,true
 guardedOption,,,,,opt_5zw_001,,production_guarded,Spoiler rule-only legacy option id guarded in Pass 17,true
 exclusiveGroup,grp_spoiler_high_wing,,,,,,projected_owned,Spoiler exclusive group projected after all members became projected-owned,true
-ruleGroup,grp_5v7_spoiler_requirement,,,,,,production_guarded,5V7 spoiler requires-any group remains production-owned in Pass 19,true
+ruleGroup,grp_5v7_spoiler_requirement,,,,,,projected_owned,5V7 spoiler requires-any group projected after source and targets became projected-owned,true
 ruleGroup,grp_5zu_paint_requirement,,,,,,production_guarded,5ZU paint requires-any group remains production-owned in Pass 19,true
 rule,,5V7,,,opt_5vm_001,,preserved_cross_boundary,Spoiler control-plane adjacent legacy-ID exclude remains production-owned in Pass 17,true
 rule,,5V7,,,opt_5w8_001,,preserved_cross_boundary,Spoiler control-plane adjacent legacy-ID exclude remains production-owned in Pass 17,true
@@ -83,8 +84,8 @@ rule,,ZYC,,DRG,,,preserved_cross_boundary,ZYC mirror include remains production-
 rule,,T0A,,Z51,,,preserved_cross_boundary,T0A package requirement remains production-owned in Pass 17,true
 rule,,TVS,,T0A,,,preserved_cross_boundary,Spoiler replace rule remains production-owned in Pass 17,true
 priceRule,,Z51,,TVS,,,preserved_cross_boundary,Z51 to TVS price override remains production-owned in Pass 17,true
-ruleGroup,,5V7,,5ZU,,,preserved_cross_boundary,5V7 spoiler requires-any group member remains production-owned in Pass 17,true
-ruleGroup,,5V7,,5ZZ,,,preserved_cross_boundary,5V7 spoiler requires-any group member remains production-owned in Pass 17,true
+ruleGroup,,5V7,,5ZU,,,preserved_cross_boundary,5V7 spoiler requires-any group member remains production-owned in Pass 17,false
+ruleGroup,,5V7,,5ZZ,,,preserved_cross_boundary,5V7 spoiler requires-any group member remains production-owned in Pass 17,false
 ruleGroup,,5ZU,,G8G,,,preserved_cross_boundary,5ZU paint requires-any group member remains production-owned in Pass 17,true
 ruleGroup,,5ZU,,GBA,,,preserved_cross_boundary,5ZU paint requires-any group member remains production-owned in Pass 17,true
 ruleGroup,,5ZU,,GKZ,,,preserved_cross_boundary,5ZU paint requires-any group member remains production-owned in Pass 17,true
