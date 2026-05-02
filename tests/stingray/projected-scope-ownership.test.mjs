@@ -112,6 +112,7 @@ function preservedRows(rows = activeManifestRows()) {
     .filter((row) => row.ownership === "preserved_cross_boundary")
     .map((row) => ({
       record_type: row.record_type,
+      group_id: row.group_id || "",
       source_rpo: row.source_rpo,
       source_option_id: row.source_option_id || "",
       target_rpo: row.target_rpo,
@@ -172,11 +173,22 @@ function hasPreservedRow(rows, expected) {
   return rows.some((row) => Object.entries(expected).every(([key, value]) => row[key] === value));
 }
 
+function groupOwnershipRows(rows = activeManifestRows()) {
+  return rows
+    .filter((row) => (row.record_type === "exclusiveGroup" || row.record_type === "ruleGroup") && row.group_id)
+    .map((row) => ({
+      record_type: row.record_type,
+      group_id: row.group_id || "",
+      ownership: row.ownership,
+    }))
+    .sort((a, b) => `${a.record_type}:${a.group_id}:${a.ownership}`.localeCompare(`${b.record_type}:${b.group_id}:${b.ownership}`));
+}
+
 test("projected ownership manifest declares the current multi-slice control scope", () => {
   const rows = activeManifestRows();
   const preserved = preservedRows(rows);
   const guardedRows = rows
-    .filter((row) => row.ownership === "production_guarded")
+    .filter((row) => row.ownership === "production_guarded" && row.record_type === "guardedOption")
     .map((row) => ({
       record_type: row.record_type,
       rpo: row.rpo,
@@ -204,25 +216,43 @@ test("projected ownership manifest declares the current multi-slice control scop
       ownership: "production_guarded",
     })),
   ]);
+  assert.deepEqual(groupOwnershipRows(rows), [
+    {
+      record_type: "exclusiveGroup",
+      group_id: "grp_spoiler_high_wing",
+      ownership: "production_guarded",
+    },
+    {
+      record_type: "ruleGroup",
+      group_id: "grp_5v7_spoiler_requirement",
+      ownership: "production_guarded",
+    },
+    {
+      record_type: "ruleGroup",
+      group_id: "grp_5zu_paint_requirement",
+      ownership: "production_guarded",
+    },
+  ]);
   for (const expected of [
     {
       record_type: "priceRule",
+      group_id: "",
       source_rpo: "PDV",
       source_option_id: "",
       target_rpo: "VWD",
       target_option_id: "",
       ownership: "preserved_cross_boundary",
     },
-    { record_type: "rule", source_rpo: "PDV", source_option_id: "", target_rpo: "VWD", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", source_rpo: "WKQ", source_option_id: "", target_rpo: "", target_option_id: "opt_5zw_001", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", source_rpo: "RNX", source_option_id: "", target_rpo: "", target_option_id: "opt_5zw_001", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", source_rpo: "TVS", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", source_rpo: "5ZZ", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", source_rpo: "5ZU", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", source_rpo: "", source_option_id: "opt_5zw_001", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "priceRule", source_rpo: "Z51", source_option_id: "", target_rpo: "TVS", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "ruleGroup", source_rpo: "5V7", source_option_id: "", target_rpo: "5ZZ", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "ruleGroup", source_rpo: "5ZU", source_option_id: "", target_rpo: "GBA", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "PDV", source_option_id: "", target_rpo: "VWD", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "WKQ", source_option_id: "", target_rpo: "", target_option_id: "opt_5zw_001", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "RNX", source_option_id: "", target_rpo: "", target_option_id: "opt_5zw_001", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "TVS", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "5ZZ", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "5ZU", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_5zw_001", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "priceRule", group_id: "", source_rpo: "Z51", source_option_id: "", target_rpo: "TVS", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "ruleGroup", group_id: "", source_rpo: "5V7", source_option_id: "", target_rpo: "5ZZ", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "ruleGroup", group_id: "", source_rpo: "5ZU", source_option_id: "", target_rpo: "GBA", target_option_id: "", ownership: "preserved_cross_boundary" },
   ]) {
     assert.equal(hasPreservedRow(preserved, expected), true, `missing preserved row ${JSON.stringify(expected)}`);
   }
@@ -347,6 +377,26 @@ const validationCases = [
     "preserved cross-boundary row missing source",
     (rows) => rows.map((row) => (row.record_type === "rule" && row.source_rpo === "PDV" && row.target_rpo === "VWD" ? { ...row, source_rpo: "" } : row)),
     /preserved_cross_boundary row is missing source_rpo\/source_option_id or target_rpo\/target_option_id/,
+  ],
+  [
+    "group record missing group_id",
+    (rows) => rows.map((row) => (row.record_type === "exclusiveGroup" && row.group_id === "grp_spoiler_high_wing" ? { ...row, group_id: "" } : row)),
+    /group ownership row is missing group_id/,
+  ],
+  [
+    "group record mixed with RPO refs",
+    (rows) => rows.map((row) => (row.record_type === "exclusiveGroup" && row.group_id === "grp_spoiler_high_wing" ? { ...row, source_rpo: "TVS" } : row)),
+    /group ownership row should not set rpo or source\/target refs/,
+  ],
+  [
+    "duplicate active group ownership row",
+    (rows) => [...rows, { ...rows.find((row) => row.record_type === "exclusiveGroup" && row.group_id === "grp_spoiler_high_wing") }],
+    /duplicate active group ownership row/,
+  ],
+  [
+    "preserved group_id missing from production",
+    (rows) => rows.map((row) => (row.record_type === "exclusiveGroup" && row.group_id === "grp_spoiler_high_wing" ? { ...row, group_id: "grp_missing_spoiler" } : row)),
+    /Preserved or guarded production groups do not exist/,
   ],
 ];
 

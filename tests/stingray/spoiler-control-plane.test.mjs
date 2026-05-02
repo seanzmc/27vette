@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -9,6 +9,7 @@ import { createRuntime, loadGeneratedData, loadShadowData } from "./runtime-harn
 
 const PYTHON = ".venv/bin/python";
 const OVERLAY_SCRIPT = "scripts/stingray_csv_shadow_overlay.py";
+const FRAGMENT_SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const SPOILER_GUARDED_RPOS = ["T0A", "TVS", "5ZZ", "5ZU", "5V7", "Z51", "ZYC", "GBA"];
 const SPOILER_PROJECTED_RPOS = new Set([...SPOILER_GUARDED_RPOS, "5ZW"]);
@@ -57,6 +58,13 @@ function writeTempManifest(rows) {
   const headers = Object.keys(rows[0]);
   fs.writeFileSync(tempManifest, `${headers.join(",")}\n${rows.map((row) => headers.map((header) => row[header]).join(",")).join("\n")}\n`);
   return tempManifest;
+}
+
+function writeTempJson(value) {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "stingray-spoiler-fragment-"));
+  const tempJson = path.join(tempDir, "fragment.json");
+  fs.writeFileSync(tempJson, `${JSON.stringify(value)}\n`);
+  return tempJson;
 }
 
 function runOverlay(args = []) {
@@ -119,6 +127,25 @@ function preservedRowExists(rows, expected) {
   );
 }
 
+function groupRows(rows = activeManifestRows()) {
+  return rows
+    .filter((row) => (row.record_type === "exclusiveGroup" || row.record_type === "ruleGroup") && row.group_id)
+    .map((row) => ({
+      record_type: row.record_type,
+      group_id: row.group_id,
+      ownership: row.ownership,
+    }))
+    .sort((a, b) => `${a.record_type}:${a.group_id}:${a.ownership}`.localeCompare(`${b.record_type}:${b.group_id}:${b.ownership}`));
+}
+
+function emitFragment() {
+  return JSON.parse(execFileSync(PYTHON, [FRAGMENT_SCRIPT, "--emit-legacy-fragment"], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+    maxBuffer: 8 * 1024 * 1024,
+  }));
+}
+
 test("Pass 17 guards spoiler-adjacent production options without projecting spoiler ownership", () => {
   const production = loadGeneratedData();
   const rows = activeManifestRows();
@@ -131,6 +158,26 @@ test("Pass 17 guards spoiler-adjacent production options without projecting spoi
   }
   assert.equal(rows.some((row) => row.ownership === "production_guarded" && row.target_option_id === "opt_5zw_001"), true);
   assert.equal(production.choices.some((choice) => choice.rpo === "5ZW" || choice.option_id === "opt_5zw_001"), false);
+});
+
+test("Pass 19 classifies spoiler-adjacent group identities without projecting spoiler choices", () => {
+  assert.deepEqual(groupRows(), [
+    {
+      record_type: "exclusiveGroup",
+      group_id: "grp_spoiler_high_wing",
+      ownership: "production_guarded",
+    },
+    {
+      record_type: "ruleGroup",
+      group_id: "grp_5v7_spoiler_requirement",
+      ownership: "production_guarded",
+    },
+    {
+      record_type: "ruleGroup",
+      group_id: "grp_5zu_paint_requirement",
+      ownership: "production_guarded",
+    },
+  ]);
 });
 
 test("spoiler requires_any ruleGroups are production-owned and preserved in shadow data", () => {
@@ -156,6 +203,17 @@ test("spoiler requires_any ruleGroups are production-owned and preserved in shad
   assert.equal(fiveZuGroup.group_type, "requires_any");
   assert.equal(fiveZuGroup.source_id, fiveZU);
   assert.deepEqual([...fiveZuGroup.target_ids].sort(), fiveZuPaintTargets);
+});
+
+test("spoiler exclusive group is production-owned and preserved in shadow data", () => {
+  const production = loadGeneratedData();
+  const shadow = loadShadowData();
+  const group = shadow.exclusiveGroups.find((item) => item.group_id === "grp_spoiler_high_wing");
+  const productionGroup = production.exclusiveGroups.find((item) => item.group_id === "grp_spoiler_high_wing");
+  const expectedMembers = ["T0A", "TVS", "5ZZ", "5ZU"].map((rpo) => optionIdByRpo(production, rpo)).sort();
+
+  assert.deepEqual(plain(group), plain(productionGroup));
+  assert.deepEqual([...group.option_ids].sort(), expectedMembers);
 });
 
 test("spoiler replace rules and 5ZW asymmetry remain production-owned", () => {
@@ -239,6 +297,89 @@ test("overlay rejects missing preserved spoiler ruleGroup classifications", () =
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /unclassified guarded production records/);
   assert.match(result.stderr, /opt_5v7_001/);
+});
+
+test("overlay rejects missing guarded spoiler exclusiveGroup classification", () => {
+  const rows = loadManifest().filter((row) => row.group_id !== "grp_spoiler_high_wing");
+  const result = runOverlay(["--ownership-manifest", writeTempManifest(rows)]);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /unclassified guarded production groups/);
+  assert.match(result.stderr, /grp_spoiler_high_wing/);
+});
+
+test("overlay validates projected exclusiveGroup replacement from controlled fragments", () => {
+  const production = loadGeneratedData();
+  const fragment = emitFragment();
+  const group = production.exclusiveGroups.find((item) => item.group_id === "grp_spoiler_high_wing");
+  fragment.exclusiveGroups = [...fragment.exclusiveGroups, group];
+  const rows = loadManifest()
+    .filter((row) => row.group_id !== "grp_spoiler_high_wing")
+    .concat({
+      record_type: "exclusiveGroup",
+      group_id: "grp_spoiler_high_wing",
+      source_rpo: "",
+      source_option_id: "",
+      target_rpo: "",
+      target_option_id: "",
+      rpo: "",
+      ownership: "projected_owned",
+      reason: "Controlled test fragment projects spoiler exclusive group identity",
+      active: "true",
+    });
+  const result = runOverlay(["--ownership-manifest", writeTempManifest(rows), "--fragment-json", writeTempJson(fragment)]);
+
+  assert.equal(result.status, 0, result.stderr);
+  const shadow = JSON.parse(result.stdout);
+  assert.deepEqual(plain(shadow.exclusiveGroups.find((item) => item.group_id === "grp_spoiler_high_wing")), plain(group));
+});
+
+test("overlay rejects projected ruleGroup ownership when the fragment does not provide it", () => {
+  const rows = loadManifest()
+    .filter((row) => row.group_id !== "grp_5v7_spoiler_requirement")
+    .concat({
+      record_type: "ruleGroup",
+      group_id: "grp_5v7_spoiler_requirement",
+      source_rpo: "",
+      source_option_id: "",
+      target_rpo: "",
+      target_option_id: "",
+      rpo: "",
+      ownership: "projected_owned",
+      reason: "Controlled test expects projected ruleGroup replacement",
+      active: "true",
+    });
+  const result = runOverlay(["--ownership-manifest", writeTempManifest(rows)]);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /ruleGroups projected group is missing from fragment/);
+  assert.match(result.stderr, /grp_5v7_spoiler_requirement/);
+});
+
+test("overlay validates projected ruleGroup replacement from controlled fragments", () => {
+  const production = loadGeneratedData();
+  const fragment = emitFragment();
+  const group = production.ruleGroups.find((item) => item.group_id === "grp_5v7_spoiler_requirement");
+  fragment.ruleGroups = [...fragment.ruleGroups, group];
+  const rows = loadManifest()
+    .filter((row) => row.group_id !== "grp_5v7_spoiler_requirement")
+    .concat({
+      record_type: "ruleGroup",
+      group_id: "grp_5v7_spoiler_requirement",
+      source_rpo: "",
+      source_option_id: "",
+      target_rpo: "",
+      target_option_id: "",
+      rpo: "",
+      ownership: "projected_owned",
+      reason: "Controlled test fragment projects spoiler ruleGroup identity",
+      active: "true",
+    });
+  const result = runOverlay(["--ownership-manifest", writeTempManifest(rows), "--fragment-json", writeTempJson(fragment)]);
+
+  assert.equal(result.status, 0, result.stderr);
+  const shadow = JSON.parse(result.stdout);
+  assert.deepEqual(plain(shadow.ruleGroups.find((item) => item.group_id === "grp_5v7_spoiler_requirement")), plain(group));
 });
 
 test("overlay rejects missing preserved spoiler priceRule classifications", () => {
