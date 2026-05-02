@@ -203,14 +203,16 @@ test("CSV evaluator prices direct 5ZZ selection", () => {
   assert.deepEqual(result.validation_errors, []);
 });
 
-test("CSV 5ZZ legacy fragment matches generated 5ZZ choices without projecting spoiler groups", () => {
+test("CSV 5ZZ legacy fragment matches generated 5ZZ choices and projected spoiler group", () => {
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
+  const projectedGroup = projected.exclusiveGroups.find((group) => group.group_id === "grp_spoiler_high_wing");
+  const productionGroup = production.exclusiveGroups.find((group) => group.group_id === "grp_spoiler_high_wing");
 
   assert.deepEqual(projected.validation_errors, []);
   assert.deepEqual([...fiveZzOptionIds(projected)].sort(), ["opt_5zz_001"]);
   assert.deepEqual(normalizeChoices(projected.choices), normalizeChoices(production.choices));
-  assert.equal(projected.exclusiveGroups.some((group) => group.group_id === "grp_spoiler_high_wing"), false);
+  assert.deepEqual(plain(projectedGroup), plain(productionGroup));
   assert.equal(projected.ruleGroups.length, 0);
   for (const rpo of NON_5ZZ_SPOILER_RPOS) {
     assert.equal(projected.choices.some((choice) => choice.rpo === rpo || choice.option_id === `opt_${rpo.toLowerCase()}_001`), false);
@@ -243,7 +245,7 @@ test("ownership manifest projects 5ZZ and preserves every 5ZZ-touching productio
   assert.deepEqual(plain(ruleGroupIdsTouchingOption(production.ruleGroups, fiveZZ)), ["grp_5v7_spoiler_requirement"]);
 
   assert.equal(manifestHas({ record_type: "selectable", rpo: "5ZZ", ownership: "projected_owned" }), true);
-  assert.equal(manifestHas({ record_type: "exclusiveGroup", group_id: "grp_spoiler_high_wing", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "exclusiveGroup", group_id: "grp_spoiler_high_wing", ownership: "projected_owned" }), true);
   assert.equal(manifestHas({ record_type: "ruleGroup", group_id: "grp_5v7_spoiler_requirement", ownership: "production_guarded" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "5ZZ", target_rpo: "T0A", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "WKQ", target_rpo: "5ZZ", ownership: "preserved_cross_boundary" }), true);

@@ -108,7 +108,7 @@ function activeManifestRows() {
 }
 
 function projectedOwnedRpos(rows = activeManifestRows()) {
-  return rows.filter((row) => row.ownership === "projected_owned").map((row) => row.rpo).sort();
+  return rows.filter((row) => row.record_type === "selectable" && row.ownership === "projected_owned").map((row) => row.rpo).sort();
 }
 
 function preservedRows(rows = activeManifestRows()) {
@@ -224,7 +224,7 @@ test("projected ownership manifest declares the current multi-slice control scop
     {
       record_type: "exclusiveGroup",
       group_id: "grp_spoiler_high_wing",
-      ownership: "preserved_cross_boundary",
+      ownership: "projected_owned",
     },
     {
       record_type: "ruleGroup",
@@ -398,8 +398,13 @@ const validationCases = [
     /duplicate active group ownership row/,
   ],
   [
-    "preserved group_id missing from production",
-    (rows) => rows.map((row) => (row.record_type === "exclusiveGroup" && row.group_id === "grp_spoiler_high_wing" ? { ...row, group_id: "grp_missing_spoiler" } : row)),
+    "guarded group_id missing from production",
+    (rows) =>
+      rows.map((row) =>
+        row.record_type === "ruleGroup" && row.group_id === "grp_5v7_spoiler_requirement"
+          ? { ...row, group_id: "grp_missing_spoiler" }
+          : row
+      ),
     /Preserved or guarded production groups do not exist/,
   ],
 ];

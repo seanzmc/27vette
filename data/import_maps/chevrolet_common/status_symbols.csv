@@ -1,6 +1,7 @@
 raw_symbol,canonical_status,meaning,notes
 S,standard,Standard Equipment,May include footnote suffixes such as S1.
 A,available,Available,May include footnote suffixes such as A1.
+A/D,available,Available to customer; dealer distinction ignored,May include footnote suffixes such as A/D1. Preserve raw_status.
 D,adi_available,ADI Available,May include footnote suffixes.
 --,not_available,Not Available,Dashes indicate unavailable.
 ■,included_equipment_group,Included in Equipment Group,Derived equipment group evidence only in this scaffold.

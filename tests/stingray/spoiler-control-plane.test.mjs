@@ -164,12 +164,12 @@ test("Pass 29 projects TVS T0A 5ZZ and 5ZU while other spoiler-adjacent options 
   assert.equal(production.choices.some((choice) => choice.rpo === "5ZW" || choice.option_id === "opt_5zw_001"), false);
 });
 
-test("Pass 29 preserves mixed-boundary spoiler group identities without projecting them", () => {
+test("Pass 31 projects spoiler exclusive group while ruleGroups stay guarded", () => {
   assert.deepEqual(groupRows(), [
     {
       record_type: "exclusiveGroup",
       group_id: "grp_spoiler_high_wing",
-      ownership: "preserved_cross_boundary",
+      ownership: "projected_owned",
     },
     {
       record_type: "ruleGroup",
@@ -209,15 +209,18 @@ test("spoiler requires_any ruleGroups are production-owned and preserved in shad
   assert.deepEqual([...fiveZuGroup.target_ids].sort(), fiveZuPaintTargets);
 });
 
-test("spoiler exclusive group is production-owned and preserved in shadow data", () => {
+test("spoiler exclusive group is CSV-projected with production-equivalent member order", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
+  const fragment = emitFragment();
   const group = shadow.exclusiveGroups.find((item) => item.group_id === "grp_spoiler_high_wing");
+  const fragmentGroup = fragment.exclusiveGroups.find((item) => item.group_id === "grp_spoiler_high_wing");
   const productionGroup = production.exclusiveGroups.find((item) => item.group_id === "grp_spoiler_high_wing");
-  const expectedMembers = ["T0A", "TVS", "5ZZ", "5ZU"].map((rpo) => optionIdByRpo(production, rpo)).sort();
+  const expectedMembers = ["T0A", "TVS", "5ZZ", "5ZU"].map((rpo) => optionIdByRpo(production, rpo));
 
+  assert.deepEqual(plain(fragmentGroup), plain(productionGroup));
   assert.deepEqual(plain(group), plain(productionGroup));
-  assert.deepEqual([...group.option_ids].sort(), expectedMembers);
+  assert.deepEqual(group.option_ids, expectedMembers);
 });
 
 test("spoiler replace rules and 5ZW asymmetry remain production-owned", () => {
@@ -313,35 +316,20 @@ test("overlay rejects missing preserved spoiler ruleGroup classifications", () =
   assert.match(result.stderr, /opt_5v7_001/);
 });
 
-test("overlay rejects missing preserved spoiler exclusiveGroup classification", () => {
-  const rows = loadManifest().filter((row) => row.group_id !== "grp_spoiler_high_wing");
-  const result = runOverlay(["--ownership-manifest", writeTempManifest(rows)]);
+test("overlay rejects missing projected spoiler exclusiveGroup fragment", () => {
+  const fragment = emitFragment();
+  fragment.exclusiveGroups = fragment.exclusiveGroups.filter((item) => item.group_id !== "grp_spoiler_high_wing");
+  const result = runOverlay(["--fragment-json", writeTempJson(fragment)]);
 
   assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /unclassified cross-boundary groups/);
+  assert.match(result.stderr, /exclusiveGroups projected group is missing from fragment/);
   assert.match(result.stderr, /grp_spoiler_high_wing/);
 });
 
-test("overlay validates projected exclusiveGroup replacement from controlled fragments", () => {
+test("overlay validates projected exclusiveGroup replacement from CSV fragment", () => {
   const production = loadGeneratedData();
-  const fragment = emitFragment();
   const group = production.exclusiveGroups.find((item) => item.group_id === "grp_spoiler_high_wing");
-  fragment.exclusiveGroups = [...fragment.exclusiveGroups, group];
-  const rows = loadManifest()
-    .filter((row) => row.group_id !== "grp_spoiler_high_wing")
-    .concat({
-      record_type: "exclusiveGroup",
-      group_id: "grp_spoiler_high_wing",
-      source_rpo: "",
-      source_option_id: "",
-      target_rpo: "",
-      target_option_id: "",
-      rpo: "",
-      ownership: "projected_owned",
-      reason: "Controlled test fragment projects spoiler exclusive group identity",
-      active: "true",
-    });
-  const result = runOverlay(["--ownership-manifest", writeTempManifest(rows), "--fragment-json", writeTempJson(fragment)]);
+  const result = runOverlay();
 
   assert.equal(result.status, 0, result.stderr);
   const shadow = JSON.parse(result.stdout);

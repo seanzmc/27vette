@@ -17,3 +17,7 @@ excl_indoor_car_covers,opt_wkr_001,true
 excl_indoor_car_covers,opt_wkq_001,true
 excl_outdoor_car_covers,opt_rnx_001,true
 excl_outdoor_car_covers,opt_rwj_001,true
+excl_spoiler_high_wing,opt_t0a_001,true
+excl_spoiler_high_wing,opt_tvs_001,true
+excl_spoiler_high_wing,opt_5zz_001,true
+excl_spoiler_high_wing,opt_5zu_001,true

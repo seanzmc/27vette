@@ -191,14 +191,16 @@ test("CSV evaluator prices direct T0A selection without projecting Z51 behavior"
   assert.equal(result.selected_lines.some((item) => Z51_INCLUDE_TARGETS.has(item.rpo)), false);
 });
 
-test("CSV T0A legacy fragment matches generated T0A choices without projecting spoiler group or Z51 includes", () => {
+test("CSV T0A legacy fragment matches generated T0A choices and projected spoiler group without Z51 includes", () => {
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
+  const projectedGroup = projected.exclusiveGroups.find((group) => group.group_id === "grp_spoiler_high_wing");
+  const productionGroup = production.exclusiveGroups.find((group) => group.group_id === "grp_spoiler_high_wing");
 
   assert.deepEqual(projected.validation_errors, []);
   assert.deepEqual([...t0aOptionIds(projected)].sort(), ["opt_t0a_001"]);
   assert.deepEqual(normalizeChoices(projected.choices), normalizeChoices(production.choices));
-  assert.equal(projected.exclusiveGroups.some((group) => group.group_id === "grp_spoiler_high_wing"), false);
+  assert.deepEqual(plain(projectedGroup), plain(productionGroup));
   assert.equal(projected.ruleGroups.length, 0);
   for (const rpo of NON_T0A_SPOILER_RPOS) {
     assert.equal(projected.choices.some((choice) => choice.rpo === rpo || choice.option_id === `opt_${rpo.toLowerCase()}_001`), false);
@@ -243,7 +245,7 @@ test("ownership manifest projects T0A and preserves every T0A-touching productio
   assert.deepEqual(plain(productionRuleGroups), []);
 
   assert.equal(manifestHas({ record_type: "selectable", rpo: "T0A", ownership: "projected_owned" }), true);
-  assert.equal(manifestHas({ record_type: "exclusiveGroup", group_id: "grp_spoiler_high_wing", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "exclusiveGroup", group_id: "grp_spoiler_high_wing", ownership: "projected_owned" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "Z51", target_rpo: "T0A", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "T0A", target_rpo: "Z51", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "TVS", target_rpo: "T0A", ownership: "preserved_cross_boundary" }), true);

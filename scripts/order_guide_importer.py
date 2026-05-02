@@ -24,7 +24,8 @@ STATUS_CONTEXTS = {"variant_availability", "color_trim_compatibility", "availabi
 VARIANT_HEADER_RE = re.compile(r"(?P<body_style>[A-Za-z ]+?)\s+(?P<body_code>\d?[A-Z]{2}\d{2})\s+(?P<trim>[0-9A-Z]{2,3})")
 RPO_RE = re.compile(r"\b[A-Z0-9]{3}\b")
 TRAILING_FOOTNOTE_RE = re.compile(r"^(?P<base>.*?)(?P<footnotes>\d+)$")
-STATUS_RE = re.compile(r"^(?P<symbol>A|S|D|--|■|□|\*)(?P<footnotes>\d*)$")
+STATUS_RE = re.compile(r"^(?P<symbol>A/D|A|S|D|--|■|□|\*)(?P<footnotes>\d*)$")
+LOCALE_SUFFIX_RE = re.compile(r"(?:\s*/\s*|\s+)[a-z]{2}(?:-[a-z]{2})$", re.IGNORECASE)
 
 MODEL_HEADER_ALIASES = {
     "stingray": ("stingray",),
@@ -124,6 +125,7 @@ STAGING_OUTPUTS = {
         "source_cell_range",
         "guide_family",
         "model_key",
+        "model_key_confidence",
         "scope_type",
         "trim_level",
         "seat_type",
@@ -144,6 +146,7 @@ STAGING_OUTPUTS = {
         "source_cell_range",
         "guide_family",
         "model_key",
+        "model_key_confidence",
         "scope_type",
         "exterior_color_name_raw",
         "exterior_color_name",
@@ -152,6 +155,8 @@ STAGING_OUTPUTS = {
         "touch_up_paint_code",
         "interior_rpo_raw",
         "interior_rpo",
+        "interior_footnote_refs",
+        "interior_footnote_scope",
         "raw_status",
         "status_symbol",
         "footnote_refs",
@@ -165,6 +170,7 @@ STAGING_OUTPUTS = {
         "source_cell_range",
         "guide_family",
         "model_key",
+        "model_key_confidence",
         "raw_text",
         "extracted_rpos",
         "phrase_type",
@@ -177,6 +183,7 @@ STAGING_OUTPUTS = {
         "source_row",
         "guide_family",
         "model_key",
+        "model_key_confidence",
         "equipment_group_rpo",
         "orderable_rpo",
         "ref_rpo",
@@ -191,6 +198,7 @@ STAGING_OUTPUTS = {
         "source_row",
         "guide_family",
         "model_key",
+        "model_key_confidence",
         "price_block_label",
         "raw_values",
         "notes",
@@ -206,7 +214,9 @@ STAGING_OUTPUTS = {
     "rule_phrase_candidates": [
         "source_sheet",
         "source_row",
+        "guide_family",
         "model_key",
+        "model_key_confidence",
         "source_field",
         "raw_text",
         "phrase_type",
@@ -218,6 +228,9 @@ STAGING_OUTPUTS = {
     "unresolved_rows": [
         "source_sheet",
         "source_row",
+        "guide_family",
+        "model_key",
+        "model_key_confidence",
         "raw_values",
         "reason",
         "review_status",
@@ -225,6 +238,9 @@ STAGING_OUTPUTS = {
     "ignored_rows": [
         "source_sheet",
         "source_row",
+        "guide_family",
+        "model_key",
+        "model_key_confidence",
         "raw_values",
         "reason",
     ],
@@ -662,11 +678,88 @@ def split_footnote(raw_value: str, field_context: str) -> dict[str, str]:
     return {"raw_value": raw, "parsed_value": raw, "footnote_refs": "", "footnote_scope": "", "confidence": "high"}
 
 
+def model_context_from_classification(classification: dict[str, str]) -> dict[str, str]:
+    model_key = clean(classification.get("model_key", ""))
+    return {
+        "model_key": model_key,
+        "model_key_confidence": "high" if model_key else "needs_review",
+    }
+
+
+def model_context_from_variants(variants: list[dict[str, str]]) -> dict[str, str]:
+    model_keys = sorted({variant["model_key"] for variant in variants if variant.get("model_key")})
+    has_unresolved = any(variant.get("model_key_confidence") == "needs_review" for variant in variants)
+    if len(model_keys) == 1:
+        return {
+            "model_key": model_keys[0],
+            "model_key_confidence": "needs_review" if has_unresolved else "high",
+        }
+    return {"model_key": "", "model_key_confidence": "needs_review"}
+
+
+def model_context_from_values(values: list[str], model_codes: dict[str, dict[str, str]]) -> dict[str, str]:
+    model_keys = sorted({model_codes[value]["model_key"] for value in values if value in model_codes and model_codes[value].get("model_key")})
+    if len(model_keys) == 1:
+        return {"model_key": model_keys[0], "model_key_confidence": "high"}
+    if model_keys:
+        return {"model_key": "", "model_key_confidence": "needs_review"}
+    return {"model_key": "", "model_key_confidence": ""}
+
+
+def normalize_color_trim_compatibility_header(raw_header: str) -> dict[str, str]:
+    raw = clean(raw_header)
+    normalized = re.sub(r"\s+", " ", raw.replace("\n", " ")).strip()
+    parse_value = LOCALE_SUFFIX_RE.sub("", normalized).strip()
+    split = split_footnote(parse_value, "interior_color_header")
+    return {
+        "raw_value": raw,
+        "normalized_value": parse_value,
+        "parsed_value": split["parsed_value"],
+        "footnote_refs": split["footnote_refs"],
+        "footnote_scope": split["footnote_scope"],
+        "confidence": split["confidence"],
+        "locale_suffix_removed": "true" if parse_value != normalized else "false",
+    }
+
+
+def ignored_row(
+    classification: dict[str, str],
+    row_index: int,
+    values: list[str],
+    reason: str,
+    model_context: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    context = model_context or model_context_from_classification(classification)
+    return {
+        "source_sheet": classification["sheet_name"],
+        "source_row": row_index,
+        "guide_family": classification["guide_family"],
+        "model_key": context.get("model_key", ""),
+        "model_key_confidence": context.get("model_key_confidence", ""),
+        "raw_values": raw_row_values(values),
+        "reason": reason,
+    }
+
+
+def unresolved_row(
+    classification: dict[str, str],
+    row_index: int,
+    values: list[str],
+    reason: str,
+    model_context: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    row = ignored_row(classification, row_index, values, reason, model_context)
+    row["review_status"] = "needs_review"
+    return row
+
+
 def rule_phrase_candidates(
     *,
     source_sheet: str,
     source_row: int,
     model_key: str,
+    guide_family: str = "",
+    model_key_confidence: str = "",
     source_field: str,
     raw_text: str,
     patterns: list[dict[str, Any]],
@@ -682,7 +775,9 @@ def rule_phrase_candidates(
                 {
                     "source_sheet": source_sheet,
                     "source_row": str(source_row),
+                    "guide_family": guide_family,
                     "model_key": model_key,
+                    "model_key_confidence": model_key_confidence,
                     "source_field": source_field,
                     "raw_text": text,
                     "phrase_type": pattern["phrase_type"],
@@ -811,6 +906,7 @@ def extract_staging(source: Path) -> dict[str, list[dict[str, Any]] | dict[str, 
     footnote_scope_counts: Counter[str] = Counter()
     model_confidence_counts: Counter[str] = Counter()
     unresolved_reasons: Counter[str] = Counter()
+    metrics: Counter[str] = Counter()
     primary_keys: set[str] = set()
 
     for sheet_name in wb.sheetnames:
@@ -837,7 +933,7 @@ def extract_staging(source: Path) -> dict[str, list[dict[str, Any]] | dict[str, 
                 }
             )
             if variant["model_key_confidence"] == "needs_review":
-                unresolved_reasons["model_key_needs_review"] += 1
+                unresolved_reasons["unresolved_model_key"] += 1
 
         row_lookup = row_map(rows)
         handled_rows: set[int] = set()
@@ -846,28 +942,28 @@ def extract_staging(source: Path) -> dict[str, list[dict[str, Any]] | dict[str, 
                 extract_variant_matrix_section(rows_by_name, status_examples, status_rejections, primary_keys, classification, section, row_lookup, variants, status_map, patterns)
                 handled_rows.update(range(section.start_row, section.end_row + 1))
             elif section.section_role == "derived_equipment_summary":
-                extract_equipment_group_section(rows_by_name, primary_keys, classification, section, row_lookup, patterns)
+                extract_equipment_group_section(rows_by_name, primary_keys, classification, section, row_lookup, variants, patterns)
                 handled_rows.update(range(section.start_row, section.end_row + 1))
             elif section.section_role == "color_trim_interior_matrix":
                 extract_color_trim_interior_section(rows_by_name, status_rejections, footnote_scope_counts, classification, section, row_lookup)
                 handled_rows.update(range(section.start_row, section.end_row + 1))
             elif section.section_role == "color_trim_compatibility_matrix":
-                extract_color_trim_compatibility_section(rows_by_name, status_examples, status_rejections, footnote_scope_counts, classification, section, row_lookup, status_map)
+                extract_color_trim_compatibility_section(rows_by_name, status_examples, status_rejections, footnote_scope_counts, metrics, classification, section, row_lookup, status_map)
                 handled_rows.update(range(section.start_row, section.end_row + 1))
             elif section.section_role == "color_trim_disclosure":
                 extract_color_trim_disclosure(rows_by_name, classification, section, row_lookup, patterns)
                 handled_rows.update(range(section.start_row, section.end_row + 1))
             elif section.section_role == "price_block":
-                extract_price_section(rows_by_name, classification, section, row_lookup)
+                extract_price_section(rows_by_name, classification, section, row_lookup, model_codes)
                 handled_rows.update(range(section.start_row, section.end_row + 1))
 
         for row_index, values in rows:
             if row_index in handled_rows:
                 continue
             if is_blank(values):
-                rows_by_name["ignored_rows"].append({"source_sheet": sheet_name, "source_row": row_index, "raw_values": raw_row_values(values), "reason": "blank_row"})
+                rows_by_name["ignored_rows"].append(ignored_row(classification, row_index, values, "blank_row"))
             elif row_index <= header_row_index and header:
-                rows_by_name["ignored_rows"].append({"source_sheet": sheet_name, "source_row": row_index, "raw_values": raw_row_values(values), "reason": "header_or_legend_row"})
+                rows_by_name["ignored_rows"].append(ignored_row(classification, row_index, values, "header_or_legend_row"))
             elif classification["sheet_role"] == "ignored_or_unknown":
                 reason = "ignored_or_unknown_sheet_with_content"
                 unresolved_reasons[reason] += 1
@@ -875,13 +971,15 @@ def extract_staging(source: Path) -> dict[str, list[dict[str, Any]] | dict[str, 
                     rule_phrase_candidates(
                         source_sheet=sheet_name,
                         source_row=row_index,
+                        guide_family=classification["guide_family"],
                         model_key="",
+                        model_key_confidence="needs_review",
                         source_field="row",
                         raw_text=" ".join(value for value in values if value),
                         patterns=patterns,
                     )
                 )
-                rows_by_name["unresolved_rows"].append({"source_sheet": sheet_name, "source_row": row_index, "raw_values": raw_row_values(values), "reason": reason, "review_status": "needs_review"})
+                rows_by_name["unresolved_rows"].append(unresolved_row(classification, row_index, values, reason, {"model_key": "", "model_key_confidence": "needs_review"}))
 
     for (sheet_name, context, symbol, canonical_status), examples in sorted(status_examples.items()):
         rows_by_name["status_symbols"].append(
@@ -895,19 +993,37 @@ def extract_staging(source: Path) -> dict[str, list[dict[str, Any]] | dict[str, 
             }
         )
 
+    ignored_reasons = Counter(row["reason"] for row in rows_by_name["ignored_rows"])
+    model_key_counts_by_file: dict[str, dict[str, int]] = {}
+    model_key_confidence_counts_by_file: dict[str, dict[str, int]] = {}
+    for name, rows in rows_by_name.items():
+        if name == "report":
+            continue
+        if isinstance(rows, list) and rows and "model_key" in STAGING_OUTPUTS.get(name, []):
+            model_key_counts_by_file[name] = dict(sorted(Counter(clean(row.get("model_key", "")) or "<blank>" for row in rows).items()))
+        if isinstance(rows, list) and rows and "model_key_confidence" in STAGING_OUTPUTS.get(name, []):
+            model_key_confidence_counts_by_file[name] = dict(sorted(Counter(clean(row.get("model_key_confidence", "")) or "<blank>" for row in rows).items()))
+    ad_statuses_parsed = sum(sum(examples.values()) for (_, _, symbol, _), examples in status_examples.items() if symbol == "A/D")
+
     report = {
         "source_path": str(source),
         "row_counts": {name: len(rows) for name, rows in rows_by_name.items()},
         "section_role_counts": dict(sorted(Counter(row["section_role"] for row in rows_by_name["sheet_sections"]).items())),
         "model_key_confidence_counts": dict(sorted(model_confidence_counts.items())),
+        "model_key_counts_by_staging_file": model_key_counts_by_file,
+        "model_key_confidence_counts_by_staging_file": model_key_confidence_counts_by_file,
         "unresolved_model_key_count": model_confidence_counts.get("needs_review", 0),
         "color_trim_interior_rows": len(rows_by_name["color_trim_interior_rows"]),
         "color_trim_compatibility_rows": len(rows_by_name["color_trim_compatibility_rows"]),
         "color_trim_disclosure_rows": len(rows_by_name["color_trim_disclosures"]),
         "status_parse_context_counts": dict(sorted(Counter(row["status_context"] for row in rows_by_name["status_symbols"]).items())),
         "status_parse_rejections": dict(sorted(status_rejections.items())),
+        "ad_statuses_parsed": ad_statuses_parsed,
+        "color_trim_locale_suffix_cleanups": metrics["color_trim_locale_suffix_cleanups"],
+        "color_trim_header_footnotes_after_locale_cleanup": metrics["color_trim_header_footnotes_after_locale_cleanup"],
         "footnote_scope_counts": dict(sorted(footnote_scope_counts.items())),
         "unresolved_rows_by_reason": dict(sorted(unresolved_reasons.items())),
+        "ignored_rows_by_reason": dict(sorted(ignored_reasons.items())),
         "notes": [
             "Staging output is structured raw evidence, not canonical truth.",
             "No canonical proposal rows are generated by this scaffold.",
@@ -942,22 +1058,25 @@ def extract_variant_matrix_section(
     status_map: dict[str, dict[str, str]],
     patterns: list[dict[str, Any]],
 ) -> None:
+    section_model_context = model_context_from_variants(variants)
     for row_index in range(section.data_start_row, section.data_end_row + 1):
         values = row_lookup.get(row_index, [])
         if is_blank(values):
-            rows_by_name["ignored_rows"].append({"source_sheet": section.source_sheet, "source_row": row_index, "raw_values": raw_row_values(values), "reason": "blank_row"})
+            rows_by_name["ignored_rows"].append(ignored_row(classification, row_index, values, "blank_row", section_model_context))
             continue
         orderable_rpo = value_at(values, 0)
         ref_rpo = value_at(values, 1)
         description = value_at(values, 2)
         if not (orderable_rpo or ref_rpo or description):
-            rows_by_name["ignored_rows"].append({"source_sheet": section.source_sheet, "source_row": row_index, "raw_values": raw_row_values(values), "reason": "matrix_row_without_rpo_or_description"})
+            rows_by_name["ignored_rows"].append(ignored_row(classification, row_index, values, "matrix_row_without_rpo_or_description", section_model_context))
             continue
         rows_by_name["rule_phrase_candidates"].extend(
             rule_phrase_candidates(
                 source_sheet=section.source_sheet,
                 source_row=row_index,
-                model_key="",
+                guide_family=classification["guide_family"],
+                model_key=section_model_context["model_key"],
+                model_key_confidence=section_model_context["model_key_confidence"],
                 source_field="description",
                 raw_text=description,
                 patterns=patterns,
@@ -1000,25 +1119,29 @@ def extract_equipment_group_section(
     classification: dict[str, str],
     section: Section,
     row_lookup: dict[int, list[str]],
+    variants: list[dict[str, str]],
     patterns: list[dict[str, Any]],
 ) -> None:
+    section_model_context = model_context_from_variants(variants)
     for row_index in range(section.data_start_row, section.data_end_row + 1):
         values = row_lookup.get(row_index, [])
         if is_blank(values):
-            rows_by_name["ignored_rows"].append({"source_sheet": section.source_sheet, "source_row": row_index, "raw_values": raw_row_values(values), "reason": "blank_row"})
+            rows_by_name["ignored_rows"].append(ignored_row(classification, row_index, values, "blank_row", section_model_context))
             continue
         orderable_rpo = value_at(values, 0)
         ref_rpo = value_at(values, 1)
         description = value_at(values, 2)
         if not (orderable_rpo or ref_rpo or description) or orderable_rpo == "Equipment Groups":
             reason = "equipment_group_label_row" if orderable_rpo == "Equipment Groups" else "equipment_group_row_without_rpo_or_description"
-            rows_by_name["ignored_rows"].append({"source_sheet": section.source_sheet, "source_row": row_index, "raw_values": raw_row_values(values), "reason": reason})
+            rows_by_name["ignored_rows"].append(ignored_row(classification, row_index, values, reason, section_model_context))
             continue
         rows_by_name["rule_phrase_candidates"].extend(
             rule_phrase_candidates(
                 source_sheet=section.source_sheet,
                 source_row=row_index,
-                model_key="",
+                guide_family=classification["guide_family"],
+                model_key=section_model_context["model_key"],
+                model_key_confidence=section_model_context["model_key_confidence"],
                 source_field="description",
                 raw_text=description,
                 patterns=patterns,
@@ -1031,7 +1154,8 @@ def extract_equipment_group_section(
                 "source_sheet": section.source_sheet,
                 "source_row": row_index,
                 "guide_family": classification["guide_family"],
-                "model_key": "",
+                "model_key": section_model_context["model_key"],
+                "model_key_confidence": section_model_context["model_key_confidence"],
                 "equipment_group_rpo": orderable_rpo,
                 "orderable_rpo": orderable_rpo,
                 "ref_rpo": ref_rpo,
@@ -1052,6 +1176,7 @@ def extract_color_trim_interior_section(
     section: Section,
     row_lookup: dict[int, list[str]],
 ) -> None:
+    section_model_context = model_context_from_classification(classification)
     header_values = row_lookup.get(section.header_row, [])
     interior_headers: list[dict[str, str]] = []
     for column_index, header in enumerate(header_values[4:], start=5):
@@ -1091,7 +1216,8 @@ def extract_color_trim_interior_section(
                     "source_row": row_index,
                     "source_cell_range": cell_ref(row_index, column_index),
                     "guide_family": classification["guide_family"],
-                    "model_key": "",
+                    "model_key": section_model_context["model_key"],
+                    "model_key_confidence": section_model_context["model_key_confidence"],
                     "scope_type": "model_global",
                     "trim_level": value_at(values, 0),
                     "seat_type": value_at(values, 1),
@@ -1134,20 +1260,34 @@ def extract_color_trim_compatibility_section(
     status_examples: dict[tuple[str, str, str, str], Counter[str]],
     status_rejections: Counter[str],
     footnote_scope_counts: Counter[str],
+    metrics: Counter[str],
     classification: dict[str, str],
     section: Section,
     row_lookup: dict[int, list[str]],
     status_map: dict[str, dict[str, str]],
 ) -> None:
+    section_model_context = model_context_from_classification(classification)
     header_values = row_lookup.get(section.header_row, [])
     interior_headers = []
     for column_index, header in enumerate(header_values[4:], start=5):
         if not header:
             continue
-        split = split_footnote(header.replace(" / en-us", ""), "interior_color_header")
-        if split["footnote_scope"]:
-            footnote_scope_counts[split["footnote_scope"]] += 1
-        interior_headers.append({"column_index": str(column_index), "raw": header, "parsed": split["parsed_value"], "footnote_refs": split["footnote_refs"]})
+        parsed_header = normalize_color_trim_compatibility_header(header)
+        if parsed_header["locale_suffix_removed"] == "true":
+            metrics["color_trim_locale_suffix_cleanups"] += 1
+        if parsed_header["footnote_scope"]:
+            footnote_scope_counts[parsed_header["footnote_scope"]] += 1
+            if parsed_header["locale_suffix_removed"] == "true":
+                metrics["color_trim_header_footnotes_after_locale_cleanup"] += 1
+        interior_headers.append(
+            {
+                "column_index": str(column_index),
+                "raw": parsed_header["raw_value"],
+                "parsed": parsed_header["parsed_value"],
+                "footnote_refs": parsed_header["footnote_refs"],
+                "footnote_scope": parsed_header["footnote_scope"],
+            }
+        )
     for row_index in range(section.data_start_row, section.data_end_row + 1):
         values = row_lookup.get(row_index, [])
         if is_blank(values):
@@ -1171,7 +1311,8 @@ def extract_color_trim_compatibility_section(
                     "source_row": row_index,
                     "source_cell_range": cell_ref(row_index, column_index),
                     "guide_family": classification["guide_family"],
-                    "model_key": "",
+                    "model_key": section_model_context["model_key"],
+                    "model_key_confidence": section_model_context["model_key_confidence"],
                     "scope_type": "model_global",
                     "exterior_color_name_raw": exterior_name_split["raw_value"],
                     "exterior_color_name": exterior_name_split["parsed_value"],
@@ -1180,6 +1321,8 @@ def extract_color_trim_compatibility_section(
                     "touch_up_paint_code": value_at(values, 3),
                     "interior_rpo_raw": header["raw"],
                     "interior_rpo": header["parsed"],
+                    "interior_footnote_refs": header["footnote_refs"],
+                    "interior_footnote_scope": header["footnote_scope"],
                     "raw_status": parsed["raw_status"],
                     "status_symbol": parsed["status_symbol"],
                     "footnote_refs": parsed["footnote_refs"],
@@ -1197,12 +1340,15 @@ def extract_color_trim_disclosure(
     row_lookup: dict[int, list[str]],
     patterns: list[dict[str, Any]],
 ) -> None:
+    section_model_context = model_context_from_classification(classification)
     values = row_lookup.get(section.data_start_row, [])
     raw_text = " ".join(value for value in values if value)
     candidates = rule_phrase_candidates(
         source_sheet=section.source_sheet,
         source_row=section.data_start_row,
-        model_key="",
+        guide_family=classification["guide_family"],
+        model_key=section_model_context["model_key"],
+        model_key_confidence=section_model_context["model_key_confidence"],
         source_field="color_trim_disclosure",
         raw_text=raw_text,
         patterns=patterns,
@@ -1215,7 +1361,8 @@ def extract_color_trim_disclosure(
                     "source_row": section.data_start_row,
                     "source_cell_range": f"A{section.data_start_row}",
                     "guide_family": classification["guide_family"],
-                    "model_key": "",
+                    "model_key": section_model_context["model_key"],
+                    "model_key_confidence": section_model_context["model_key_confidence"],
                     "raw_text": raw_text,
                     "extracted_rpos": candidate["extracted_rpos"],
                     "phrase_type": candidate["phrase_type"],
@@ -1231,7 +1378,8 @@ def extract_color_trim_disclosure(
                 "source_row": section.data_start_row,
                 "source_cell_range": f"A{section.data_start_row}",
                 "guide_family": classification["guide_family"],
-                "model_key": "",
+                "model_key": section_model_context["model_key"],
+                "model_key_confidence": section_model_context["model_key_confidence"],
                 "raw_text": raw_text,
                 "extracted_rpos": "|".join(sorted(set(RPO_RE.findall(raw_text)))),
                 "phrase_type": "",
@@ -1247,18 +1395,21 @@ def extract_price_section(
     classification: dict[str, str],
     section: Section,
     row_lookup: dict[int, list[str]],
+    model_codes: dict[str, dict[str, str]],
 ) -> None:
     for row_index in range(section.data_start_row, section.data_end_row + 1):
         values = row_lookup.get(row_index, [])
         if is_blank(values):
-            rows_by_name["ignored_rows"].append({"source_sheet": section.source_sheet, "source_row": row_index, "raw_values": raw_row_values(values), "reason": "blank_row"})
+            rows_by_name["ignored_rows"].append(ignored_row(classification, row_index, values, "blank_row"))
             continue
+        model_context = model_context_from_values(values, model_codes)
         rows_by_name["price_rows"].append(
             {
                 "source_sheet": section.source_sheet,
                 "source_row": row_index,
                 "guide_family": classification["guide_family"],
-                "model_key": "",
+                "model_key": model_context["model_key"],
+                "model_key_confidence": model_context["model_key_confidence"],
                 "price_block_label": infer_price_block(values),
                 "raw_values": raw_row_values(values),
                 "notes": "Price Schedule extraction in this pass is staging evidence only. Do not classify final canonical price rules, price books, package pricing, or included-zero pricing yet.",
