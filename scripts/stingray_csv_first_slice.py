@@ -26,6 +26,8 @@ TABLES = {
     "condition_terms": "logic/condition_terms.csv",
     "auto_adds": "logic/auto_adds.csv",
     "dependency_rules": "logic/dependency_rules.csv",
+    "rule_groups": "logic/rule_groups.csv",
+    "rule_group_members": "logic/rule_group_members.csv",
     "exclusive_groups": "logic/exclusive_groups.csv",
     "exclusive_group_members": "logic/exclusive_group_members.csv",
     "price_books": "pricing/price_books.csv",
@@ -43,6 +45,7 @@ ID_FIELDS = {
     "condition_sets": "condition_set_id",
     "auto_adds": "auto_add_id",
     "dependency_rules": "rule_id",
+    "rule_groups": "rule_group_id",
     "exclusive_groups": "exclusive_group_id",
     "price_books": "price_book_id",
     "base_prices": "base_price_id",
@@ -83,6 +86,7 @@ class CsvSlice:
         self.auto_adds = {row["auto_add_id"]: row for row in self.tables["auto_adds"] if is_active(row)}
         self.item_set_members = self._build_item_set_members()
         self.condition_terms = self._build_condition_terms()
+        self.rule_group_members = self._build_rule_group_members()
         self.exclusive_members = self._build_exclusive_members()
         self.exclusive_groups_by_member = self._build_exclusive_groups_by_member()
 
@@ -106,6 +110,15 @@ class CsvSlice:
         for row in self.tables["exclusive_group_members"]:
             if is_active(row):
                 members[row["exclusive_group_id"]].append(row["member_selectable_id"])
+        return dict(members)
+
+    def _build_rule_group_members(self) -> dict[str, list[dict[str, str]]]:
+        members: dict[str, list[dict[str, str]]] = defaultdict(list)
+        for row in self.tables["rule_group_members"]:
+            if is_active(row):
+                members[row["rule_group_id"]].append(row)
+        for rows in members.values():
+            rows.sort(key=lambda item: (as_int(item.get("member_order", "")), item["target_selectable_id"]))
         return dict(members)
 
     def _build_exclusive_groups_by_member(self) -> dict[str, list[str]]:
@@ -170,6 +183,36 @@ class CsvSlice:
             self._validate_selector(errors, "dependency_rules", row["subject_selector_type"], row["subject_selector_id"])
             self._validate_condition_ref(errors, "dependency_rules", row.get("applies_when_condition_set_id", ""))
             self._validate_condition_ref(errors, "dependency_rules", row.get("target_condition_set_id", ""))
+
+        for row in self.tables["rule_groups"]:
+            if not is_active(row):
+                continue
+            group_id = row["rule_group_id"]
+            if row["group_type"] != "requires_any":
+                errors.append(f"rule_groups uses unsupported group_type: {row['group_type']}.")
+            if not row["source_selectable_id"]:
+                errors.append("rule_groups has a row missing source_selectable_id.")
+            self._validate_selectable_ref(errors, "rule_groups", row["source_selectable_id"])
+            for scope_field in ("body_style_scope", "trim_level_scope", "variant_scope"):
+                if row.get(scope_field, ""):
+                    errors.append(f"rule_groups uses unsupported {scope_field}: {row[scope_field]}.")
+            if row["group_type"] == "requires_any" and not row.get("disabled_reason", ""):
+                errors.append(f"requires_any rule group is missing disabled_reason: {group_id}.")
+            if not self.rule_group_members.get(group_id):
+                errors.append(f"rule group has no active members: {group_id}.")
+
+        active_rule_group_ids = {row["rule_group_id"] for row in self.tables["rule_groups"] if is_active(row)}
+        for row in self.tables["rule_group_members"]:
+            if not is_active(row):
+                continue
+            group_id = row["rule_group_id"]
+            if group_id not in active_rule_group_ids:
+                errors.append(f"rule_group_members references inactive group: {group_id}.")
+            self._validate_selectable_ref(errors, "rule_group_members", row["target_selectable_id"])
+            try:
+                as_int(row.get("member_order", ""))
+            except ValueError:
+                errors.append(f"rule_group_members has unsupported member_order: {row.get('member_order', '')}.")
 
         for row in self.tables["exclusive_group_members"]:
             if not is_active(row):
@@ -493,7 +536,7 @@ class CsvSlice:
         fragment = {
             "variants": self.legacy_variants(),
             "choices": self.legacy_choices(),
-            "ruleGroups": [],
+            "ruleGroups": self.legacy_rule_groups(),
             "exclusiveGroups": self.legacy_exclusive_groups(),
             "rules": self.legacy_rules(),
             "priceRules": self.legacy_price_rules(),
@@ -668,6 +711,29 @@ class CsvSlice:
                     }
                 )
         rows.sort(key=lambda item: (item["condition_option_id"], item["target_option_id"], item["body_style_scope"], item["price_value"]))
+        return rows
+
+    def legacy_rule_groups(self) -> list[dict[str, Any]]:
+        rows = []
+        for row in sorted((item for item in self.tables["rule_groups"] if is_active(item)), key=lambda item: item["rule_group_id"]):
+            target_ids = [
+                self.legacy_option_id(member["target_selectable_id"])
+                for member in self.rule_group_members.get(row["rule_group_id"], [])
+            ]
+            rows.append(
+                {
+                    "group_id": row.get("legacy_group_id") or row["rule_group_id"],
+                    "group_type": row["group_type"],
+                    "source_id": self.legacy_option_id(row["source_selectable_id"]),
+                    "target_ids": target_ids,
+                    "body_style_scope": row.get("body_style_scope", ""),
+                    "trim_level_scope": row.get("trim_level_scope", ""),
+                    "variant_scope": row.get("variant_scope", ""),
+                    "disabled_reason": row["disabled_reason"],
+                    "active": "True",
+                    "notes": row.get("legacy_notes", ""),
+                }
+            )
         return rows
 
     def legacy_exclusive_groups(self) -> list[dict[str, Any]]:
