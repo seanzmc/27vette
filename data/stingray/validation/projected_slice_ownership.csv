@@ -1,0 +1,16 @@
+record_type,source_rpo,target_rpo,rpo,ownership,reason,active
+selectable,,,B6P,projected_owned,Engine Appearance projected slice,true
+selectable,,,D3V,projected_owned,Engine Appearance projected slice,true
+selectable,,,SL9,projected_owned,Engine Appearance projected slice,true
+selectable,,,ZZ3,projected_owned,Engine Appearance projected slice,true
+selectable,,,BCP,projected_owned,Engine Appearance projected slice,true
+selectable,,,BCS,projected_owned,Engine Appearance projected slice,true
+selectable,,,BC4,projected_owned,Engine Appearance projected slice,true
+selectable,,,BC7,projected_owned,Engine Appearance projected slice,true
+selectable,,,RXJ,projected_owned,Center Cap projected slice,true
+selectable,,,VWD,projected_owned,Center Cap projected slice,true
+selectable,,,5ZD,projected_owned,Center Cap projected slice,true
+selectable,,,5ZC,projected_owned,Center Cap projected slice,true
+selectable,,,RXH,projected_owned,Center Cap projected slice,true
+rule,PDV,VWD,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
+priceRule,PDV,VWD,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true

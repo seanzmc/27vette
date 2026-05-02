@@ -5,3 +5,5 @@ bp_sl9,pb_2027_stingray,selectable,opt_sl9_001,,125,10,true,Current SL9 standalo
 bp_zz3,pb_2027_stingray,selectable,opt_zz3_001,cs_convertible,1195,10,true,Current ZZ3 base price.
 bp_colored_engine_covers,pb_2027_stingray,selectable_set,set_ls6_engine_covers_colored,,695,10,true,Current BCP BCS BC4 base price.
 bp_bc7,pb_2027_stingray,selectable,opt_bc7_001,,0,10,true,Current BC7 base price.
+bp_rxj,pb_2027_stingray,selectable,opt_rxj_001,,275,10,true,Current RXJ base price.
+bp_center_caps_250,pb_2027_stingray,selectable_set,set_center_caps_250,,250,10,true,Current VWD 5ZD 5ZC RXH base price.

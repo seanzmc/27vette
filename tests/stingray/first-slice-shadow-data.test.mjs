@@ -295,7 +295,10 @@ test("shadow assembly preserves all non-first-slice legacy records", () => {
 
 test("shadow assembly substitutes first-slice records from CSV fragment", () => {
   const shadowIds = firstSliceOptionIds(shadowData);
-  assert.deepEqual(normalizeChoices(shadowData.choices.filter((choice) => FIRST_SLICE_RPOS.has(choice.rpo))), normalizeChoices(csvFragment.choices));
+  assert.deepEqual(
+    normalizeChoices(shadowData.choices.filter((choice) => FIRST_SLICE_RPOS.has(choice.rpo))),
+    normalizeChoices(csvFragment.choices.filter((choice) => FIRST_SLICE_RPOS.has(choice.rpo)))
+  );
   assert.deepEqual(
     normalizeRules(shadowData.rules.filter((rule) => shadowIds.has(rule.source_id) || shadowIds.has(rule.target_id))),
     normalizeRules(csvFragment.rules)
@@ -308,7 +311,7 @@ test("shadow assembly substitutes first-slice records from CSV fragment", () => 
   );
   assert.deepEqual(
     normalizeExclusiveGroups(shadowData.exclusiveGroups.filter((group) => (group.option_ids || []).some((optionId) => shadowIds.has(optionId)))),
-    normalizeExclusiveGroups(csvFragment.exclusiveGroups)
+    normalizeExclusiveGroups(csvFragment.exclusiveGroups.filter((group) => (group.option_ids || []).some((optionId) => shadowIds.has(optionId))))
   );
 });
 

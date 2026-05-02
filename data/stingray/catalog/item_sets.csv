@@ -1,3 +1,5 @@
 set_id,label,set_type,active,notes
 set_ls6_engine_covers_colored,Colored LS6 engine covers,selectable_set,true,BCP BCS and BC4.
 set_ls6_engine_covers,LS6 engine covers,selectable_set,true,BC7 plus colored LS6 engine covers.
+set_center_caps,Center cap choices,selectable_set,true,RXJ VWD 5ZD 5ZC and RXH.
+set_center_caps_250,Center cap choices priced at 250,selectable_set,true,VWD 5ZD 5ZC and RXH.

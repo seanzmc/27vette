@@ -6,3 +6,12 @@ set_ls6_engine_covers,opt_bc7_001,true
 set_ls6_engine_covers,opt_bcp_001,true
 set_ls6_engine_covers,opt_bcs_001,true
 set_ls6_engine_covers,opt_bc4_001,true
+set_center_caps,opt_rxj_001,true
+set_center_caps,opt_vwd_001,true
+set_center_caps,opt_5zd_001,true
+set_center_caps,opt_5zc_001,true
+set_center_caps,opt_rxh_001,true
+set_center_caps_250,opt_vwd_001,true
+set_center_caps_250,opt_5zd_001,true
+set_center_caps_250,opt_5zc_001,true
+set_center_caps_250,opt_rxh_001,true

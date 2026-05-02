@@ -179,6 +179,6 @@ test("golden first-slice scenarios are production-derived CSV fixtures", () => {
 
 test("first-slice compiler does not hard-code RPO-specific control flow", () => {
   const source = fs.readFileSync(SCRIPT, "utf8");
-  const forbiddenBranch = /\b(?:if|elif)\s+[^\n:]*\b(?:rpo|selectable_id|option)\b[^\n:]*\b(?:B6P|D3V|SL9|ZZ3|BCP|BCS|BC4|BC7|opt_b6p|opt_d3v|opt_sl9|opt_zz3|opt_bcp|opt_bcs|opt_bc4|opt_bc7)\b/;
+  const forbiddenBranch = /\b(?:if|elif)\s+[^\n:]*\b(?:rpo|selectable_id|option)\b[^\n:]*\b(?:B6P|D3V|SL9|ZZ3|BCP|BCS|BC4|BC7|RXJ|VWD|5ZD|5ZC|RXH|opt_b6p|opt_d3v|opt_sl9|opt_zz3|opt_bcp|opt_bcs|opt_bc4|opt_bc7|opt_rxj|opt_vwd|opt_5zd|opt_5zc|opt_rxh)\b/;
   assert.equal(forbiddenBranch.test(source), false);
 });
