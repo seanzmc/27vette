@@ -10,3 +10,9 @@ bp_center_caps_250,pb_2027_stingray,selectable_set,set_center_caps_250,,250,10,t
 bp_sxb,pb_2027_stingray,selectable,opt_sxb_001,,2095,10,true,Current SXB base price.
 bp_sxr,pb_2027_stingray,selectable,opt_sxr_001,,2095,10,true,Current SXR base price.
 bp_sxt,pb_2027_stingray,selectable,opt_sxt_001,,2695,10,true,Current SXT base price.
+bp_rwh,pb_2027_stingray,selectable,opt_rwh_001,,495,10,true,Current RWH base price.
+bp_sl1,pb_2027_stingray,selectable,opt_sl1_001,,475,10,true,Current SL1 base price.
+bp_wkq,pb_2027_stingray,selectable,opt_wkq_001,,495,10,true,Current WKQ base price.
+bp_wkr,pb_2027_stingray,selectable,opt_wkr_001,,1275,10,true,Current WKR base price.
+bp_rnx,pb_2027_stingray,selectable,opt_rnx_001,,495,10,true,Current RNX base price.
+bp_rwj,pb_2027_stingray,selectable,opt_rwj_001,,495,10,true,Current RWJ base price.

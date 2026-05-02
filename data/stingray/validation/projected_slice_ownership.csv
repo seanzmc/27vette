@@ -1,19 +1,33 @@
-record_type,source_rpo,target_rpo,rpo,ownership,reason,active
-selectable,,,B6P,projected_owned,Engine Appearance projected slice,true
-selectable,,,D3V,projected_owned,Engine Appearance projected slice,true
-selectable,,,SL9,projected_owned,Engine Appearance projected slice,true
-selectable,,,ZZ3,projected_owned,Engine Appearance projected slice,true
-selectable,,,BCP,projected_owned,Engine Appearance projected slice,true
-selectable,,,BCS,projected_owned,Engine Appearance projected slice,true
-selectable,,,BC4,projected_owned,Engine Appearance projected slice,true
-selectable,,,BC7,projected_owned,Engine Appearance projected slice,true
-selectable,,,RXJ,projected_owned,Center Cap projected slice,true
-selectable,,,VWD,projected_owned,Center Cap projected slice,true
-selectable,,,5ZD,projected_owned,Center Cap projected slice,true
-selectable,,,5ZC,projected_owned,Center Cap projected slice,true
-selectable,,,RXH,projected_owned,Center Cap projected slice,true
-selectable,,,SXB,projected_owned,Suede Trunk Liner projected slice,true
-selectable,,,SXR,projected_owned,Suede Trunk Liner projected slice,true
-selectable,,,SXT,projected_owned,Suede Trunk Liner projected slice,true
-rule,PDV,VWD,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
-priceRule,PDV,VWD,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
+record_type,source_rpo,source_option_id,target_rpo,target_option_id,rpo,ownership,reason,active
+selectable,,,,,B6P,projected_owned,Engine Appearance projected slice,true
+selectable,,,,,D3V,projected_owned,Engine Appearance projected slice,true
+selectable,,,,,SL9,projected_owned,Engine Appearance projected slice,true
+selectable,,,,,ZZ3,projected_owned,Engine Appearance projected slice,true
+selectable,,,,,BCP,projected_owned,Engine Appearance projected slice,true
+selectable,,,,,BCS,projected_owned,Engine Appearance projected slice,true
+selectable,,,,,BC4,projected_owned,Engine Appearance projected slice,true
+selectable,,,,,BC7,projected_owned,Engine Appearance projected slice,true
+selectable,,,,,RXJ,projected_owned,Center Cap projected slice,true
+selectable,,,,,VWD,projected_owned,Center Cap projected slice,true
+selectable,,,,,5ZD,projected_owned,Center Cap projected slice,true
+selectable,,,,,5ZC,projected_owned,Center Cap projected slice,true
+selectable,,,,,RXH,projected_owned,Center Cap projected slice,true
+selectable,,,,,SXB,projected_owned,Suede Trunk Liner projected slice,true
+selectable,,,,,SXR,projected_owned,Suede Trunk Liner projected slice,true
+selectable,,,,,SXT,projected_owned,Suede Trunk Liner projected slice,true
+selectable,,,,,RWH,projected_owned,Car Cover projected slice,true
+selectable,,,,,SL1,projected_owned,Car Cover projected slice,true
+selectable,,,,,WKR,projected_owned,Car Cover projected slice,true
+selectable,,,,,WKQ,projected_owned,Car Cover projected slice,true
+selectable,,,,,RNX,projected_owned,Car Cover projected slice,true
+selectable,,,,,RWJ,projected_owned,Car Cover projected slice,true
+rule,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
+priceRule,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
+rule,WKQ,,5ZU,,,preserved_cross_boundary,Car-cover spoiler exclude remains production-owned in Pass 15,true
+rule,WKQ,,,opt_5zw_001,,preserved_cross_boundary,Car-cover 5ZW rule-only exclude remains production-owned in Pass 15,true
+rule,WKQ,,5ZZ,,,preserved_cross_boundary,Car-cover spoiler exclude remains production-owned in Pass 15,true
+rule,RNX,,5ZU,,,preserved_cross_boundary,Car-cover spoiler exclude remains production-owned in Pass 15,true
+rule,RNX,,,opt_5zw_001,,preserved_cross_boundary,Car-cover 5ZW rule-only exclude remains production-owned in Pass 15,true
+rule,RNX,,5ZZ,,,preserved_cross_boundary,Car-cover spoiler exclude remains production-owned in Pass 15,true
+rule,RNX,,Z51,,,preserved_cross_boundary,Car-cover Z51 exclude remains production-owned in Pass 15,true
+rule,RWJ,,Z51,,,preserved_cross_boundary,Car-cover Z51 exclude remains production-owned in Pass 15,true

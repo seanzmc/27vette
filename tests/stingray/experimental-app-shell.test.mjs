@@ -11,6 +11,7 @@ import { createRuntime, loadGeneratedData } from "./runtime-harness.mjs";
 const FIRST_SLICE_RPOS = new Set(["B6P", "D3V", "SL9", "ZZ3", "BCP", "BCS", "BC4", "BC7"]);
 const Z51_RPOS = new Set(["FE1", "FE2", "FE3", "Z51"]);
 const SUEDE_TRUNK_LINER_RPOS = new Set(["SXB", "SXR", "SXT"]);
+const CAR_COVER_RPOS = new Set(["RWH", "SL1", "WKR", "WKQ", "RNX", "RWJ"]);
 
 function plain(value) {
   return JSON.parse(JSON.stringify(value));
@@ -164,6 +165,33 @@ function suedeTrunkLinerScenarioFacts(data) {
   };
 }
 
+function carCoverScenarioFacts(data) {
+  const indoorRuntime = runtimeFor(data, "1lt_c07");
+  handleRpo(indoorRuntime, "RWH");
+  handleRpo(indoorRuntime, "SL1");
+
+  const outdoorRuntime = runtimeFor(data, "1lt_c07");
+  handleRpo(outdoorRuntime, "RNX");
+  handleRpo(outdoorRuntime, "RWJ");
+
+  const wkqRuntime = runtimeFor(data, "1lt_c07");
+  handleRpo(wkqRuntime, "WKQ");
+
+  const rnxRuntime = runtimeFor(data, "1lt_c07");
+  handleRpo(rnxRuntime, "RNX");
+
+  const z51Runtime = runtimeFor(data, "1lt_c07");
+  handleRpo(z51Runtime, "Z51");
+
+  return {
+    indoor_selected_rpos: rposFromIds(indoorRuntime, indoorRuntime.state.selected, CAR_COVER_RPOS),
+    outdoor_selected_rpos: rposFromIds(outdoorRuntime, outdoorRuntime.state.selected, CAR_COVER_RPOS),
+    wkq_5zz_reason: wkqRuntime.disableReasonForChoice(activeChoiceByRpo(wkqRuntime, "5ZZ")),
+    rnx_z51_reason: rnxRuntime.disableReasonForChoice(activeChoiceByRpo(rnxRuntime, "Z51")),
+    z51_rnx_reason: z51Runtime.disableReasonForChoice(activeChoiceByRpo(z51Runtime, "RNX")),
+  };
+}
+
 const productionData = loadGeneratedData();
 const jsonOverlayData = directJsonOverlay();
 const directDataJs = directDataJsOutput();
@@ -229,4 +257,8 @@ test("experimental app shell runtime behavior matches production: Z51 non-first-
 
 test("experimental app shell runtime behavior matches production: suede trunk liner exclusivity", () => {
   assert.deepEqual(plain(suedeTrunkLinerScenarioFacts(experimentalData)), plain(suedeTrunkLinerScenarioFacts(productionData)));
+});
+
+test("experimental app shell runtime behavior matches production: car cover exclusivity and cross-boundary blocks", () => {
+  assert.deepEqual(plain(carCoverScenarioFacts(experimentalData)), plain(carCoverScenarioFacts(productionData)));
 });

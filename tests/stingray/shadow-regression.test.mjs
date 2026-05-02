@@ -4,6 +4,7 @@ import test from "node:test";
 import { createRuntime, loadGeneratedData, loadShadowData } from "./runtime-harness.mjs";
 
 const FIRST_SLICE_RPOS = new Set(["B6P", "D3V", "SL9", "ZZ3", "BCP", "BCS", "BC4", "BC7"]);
+const CAR_COVER_RPOS = new Set(["RWH", "SL1", "WKR", "WKQ", "RNX", "RWJ"]);
 
 const productionData = loadGeneratedData();
 const shadowData = loadShadowData();
@@ -270,6 +271,33 @@ function suedeTrunkLinerExclusiveScenario(data) {
   };
 }
 
+function carCoverScenario(data) {
+  const indoorRuntime = runtimeFor(data, "1lt_c07");
+  handleRpo(indoorRuntime, "RWH");
+  handleRpo(indoorRuntime, "SL1");
+
+  const outdoorRuntime = runtimeFor(data, "1lt_c07");
+  handleRpo(outdoorRuntime, "RNX");
+  handleRpo(outdoorRuntime, "RWJ");
+
+  const wkqRuntime = runtimeFor(data, "1lt_c07");
+  handleRpo(wkqRuntime, "WKQ");
+
+  const rnxRuntime = runtimeFor(data, "1lt_c07");
+  handleRpo(rnxRuntime, "RNX");
+
+  const z51Runtime = runtimeFor(data, "1lt_c07");
+  handleRpo(z51Runtime, "Z51");
+
+  return {
+    indoor_selected_rpos: rposFromIds(indoorRuntime, indoorRuntime.state.selected, CAR_COVER_RPOS),
+    outdoor_selected_rpos: rposFromIds(outdoorRuntime, outdoorRuntime.state.selected, CAR_COVER_RPOS),
+    wkq_5zz_reason: wkqRuntime.disableReasonForChoice(activeChoiceByRpo(wkqRuntime, "5ZZ")),
+    rnx_z51_reason: rnxRuntime.disableReasonForChoice(activeChoiceByRpo(rnxRuntime, "Z51")),
+    z51_rnx_reason: z51Runtime.disableReasonForChoice(activeChoiceByRpo(z51Runtime, "RNX")),
+  };
+}
+
 function groupedRequirementScenario(data) {
   const runtime = runtimeFor(data, "1lt_c07", { resetDefaults: true });
   handleRpo(runtime, "Z51");
@@ -311,6 +339,7 @@ const broadScenarios = [
   ["spoiler exclusive group replacement", spoilerExclusiveScenario],
   ["center cap accessory exclusive group replacement", accessoryExclusiveScenario],
   ["suede trunk liner exclusive group replacement", suedeTrunkLinerExclusiveScenario],
+  ["car cover exclusivity and cross-boundary blocks", carCoverScenario],
   ["5V7 grouped spoiler requirement", groupedRequirementScenario],
   ["current order, compact order, and exports", orderOutputScenario],
 ];

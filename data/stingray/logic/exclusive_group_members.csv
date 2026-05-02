@@ -11,3 +11,9 @@ excl_center_caps,opt_rxh_001,true
 excl_suede_trunk_liner,opt_sxb_001,true
 excl_suede_trunk_liner,opt_sxr_001,true
 excl_suede_trunk_liner,opt_sxt_001,true
+excl_indoor_car_covers,opt_rwh_001,true
+excl_indoor_car_covers,opt_sl1_001,true
+excl_indoor_car_covers,opt_wkr_001,true
+excl_indoor_car_covers,opt_wkq_001,true
+excl_outdoor_car_covers,opt_rnx_001,true
+excl_outdoor_car_covers,opt_rwj_001,true

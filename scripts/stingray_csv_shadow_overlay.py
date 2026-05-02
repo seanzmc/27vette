@@ -26,7 +26,7 @@ class OverlayError(ValueError):
 
 
 class OwnershipScope:
-    def __init__(self, owned_rpos: set[str], preserved_cross_boundary_records: set[tuple[str, str, str]]) -> None:
+    def __init__(self, owned_rpos: set[str], preserved_cross_boundary_records: set[tuple[str, str, str, str, str]]) -> None:
         self.owned_rpos = owned_rpos
         self.preserved_cross_boundary_records = preserved_cross_boundary_records
 
@@ -60,9 +60,9 @@ def load_fragment(args: argparse.Namespace) -> dict[str, Any]:
 def load_ownership_scope(path: Path) -> OwnershipScope:
     rows = list(csv.DictReader(path.read_text(encoding="utf-8").splitlines()))
     owned_rpos: set[str] = set()
-    preserved_cross_boundary_records: set[tuple[str, str, str]] = set()
+    preserved_cross_boundary_records: set[tuple[str, str, str, str, str]] = set()
     seen_owned_rpos: set[str] = set()
-    seen_preserved_records: set[tuple[str, str, str]] = set()
+    seen_preserved_records: set[tuple[str, str, str, str, str]] = set()
 
     for index, row in enumerate(rows, start=2):
         active = row.get("active", "")
@@ -90,14 +90,18 @@ def load_ownership_scope(path: Path) -> OwnershipScope:
             continue
 
         source_rpo = row.get("source_rpo", "")
+        source_option_id = row.get("source_option_id", "")
         target_rpo = row.get("target_rpo", "")
-        if not source_rpo or not target_rpo:
-            raise OverlayError(f"{path} row {index} preserved_cross_boundary row is missing source_rpo or target_rpo.")
+        target_option_id = row.get("target_option_id", "")
+        if not (source_rpo or source_option_id) or not (target_rpo or target_option_id):
+            raise OverlayError(
+                f"{path} row {index} preserved_cross_boundary row is missing source_rpo/source_option_id or target_rpo/target_option_id."
+            )
         if row.get("rpo", ""):
             raise OverlayError(f"{path} row {index} preserved_cross_boundary row should not set rpo.")
         if record_type == "selectable":
             raise OverlayError(f"{path} row {index} preserved_cross_boundary row must use rule or priceRule.")
-        key = (record_type, source_rpo, target_rpo)
+        key = (record_type, source_rpo, source_option_id, target_rpo, target_option_id)
         if key in seen_preserved_records:
             raise OverlayError(f"{path} has duplicate active preserved_cross_boundary row {key}.")
         seen_preserved_records.add(key)
@@ -249,12 +253,36 @@ def option_id_by_rpo(data: dict[str, Any], rpo: str) -> str:
     return next(iter(option_ids))
 
 
+def production_option_ids(data: dict[str, Any]) -> set[str]:
+    option_ids = {row["option_id"] for row in data.get("choices", []) if row.get("option_id")}
+    option_ids.update(row["source_id"] for row in data.get("rules", []) if row.get("source_id"))
+    option_ids.update(row["target_id"] for row in data.get("rules", []) if row.get("target_id"))
+    option_ids.update(row["condition_option_id"] for row in data.get("priceRules", []) if row.get("condition_option_id"))
+    option_ids.update(row["target_option_id"] for row in data.get("priceRules", []) if row.get("target_option_id"))
+    return option_ids
+
+
+def option_id_by_manifest_ref(data: dict[str, Any], rpo: str, option_id: str) -> str:
+    if option_id:
+        if option_id not in production_option_ids(data):
+            raise OverlayError(f"Preserved cross-boundary option_id {option_id} does not exist in production data.")
+        return option_id
+    if not rpo:
+        raise OverlayError("Preserved cross-boundary row is missing both rpo and option_id for one side.")
+    return option_id_by_rpo(data, rpo)
+
+
 def preserved_record_id_keys(data: dict[str, Any], ownership: OwnershipScope) -> dict[str, set[tuple[str, str]]]:
     keys = {"rules": set(), "priceRules": set()}
     surface_by_record_type = {"rule": "rules", "priceRule": "priceRules"}
-    for record_type, source_rpo, target_rpo in ownership.preserved_cross_boundary_records:
+    for record_type, source_rpo, source_option_id, target_rpo, target_option_id in ownership.preserved_cross_boundary_records:
         surface = surface_by_record_type[record_type]
-        keys[surface].add((option_id_by_rpo(data, source_rpo), option_id_by_rpo(data, target_rpo)))
+        keys[surface].add(
+            (
+                option_id_by_manifest_ref(data, source_rpo, source_option_id),
+                option_id_by_manifest_ref(data, target_rpo, target_option_id),
+            )
+        )
     return keys
 
 

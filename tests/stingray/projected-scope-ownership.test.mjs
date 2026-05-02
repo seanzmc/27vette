@@ -11,7 +11,30 @@ const PYTHON = ".venv/bin/python";
 const OVERLAY_SCRIPT = "scripts/stingray_csv_shadow_overlay.py";
 const FRAGMENT_SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
-const EXPECTED_OWNED_RPOS = ["5ZC", "5ZD", "B6P", "BC4", "BC7", "BCP", "BCS", "D3V", "RXH", "RXJ", "SL9", "SXB", "SXR", "SXT", "VWD", "ZZ3"];
+const EXPECTED_OWNED_RPOS = [
+  "5ZC",
+  "5ZD",
+  "B6P",
+  "BC4",
+  "BC7",
+  "BCP",
+  "BCS",
+  "D3V",
+  "RNX",
+  "RWH",
+  "RWJ",
+  "RXH",
+  "RXJ",
+  "SL1",
+  "SL9",
+  "SXB",
+  "SXR",
+  "SXT",
+  "VWD",
+  "WKQ",
+  "WKR",
+  "ZZ3",
+];
 
 function parseCsv(source) {
   const rows = [];
@@ -90,10 +113,16 @@ function preservedRows(rows = activeManifestRows()) {
     .map((row) => ({
       record_type: row.record_type,
       source_rpo: row.source_rpo,
+      source_option_id: row.source_option_id || "",
       target_rpo: row.target_rpo,
+      target_option_id: row.target_option_id || "",
       ownership: row.ownership,
     }))
-    .sort((a, b) => `${a.record_type}:${a.source_rpo}:${a.target_rpo}`.localeCompare(`${b.record_type}:${b.source_rpo}:${b.target_rpo}`));
+    .sort((a, b) =>
+      `${a.record_type}:${a.source_rpo}:${a.source_option_id}:${a.target_rpo}:${a.target_option_id}`.localeCompare(
+        `${b.record_type}:${b.source_rpo}:${b.source_option_id}:${b.target_rpo}:${b.target_option_id}`
+      )
+    );
 }
 
 function optionIdByRpo(data, rpo) {
@@ -112,6 +141,14 @@ function hasPdvVwdPriceRule(data) {
   const pdv = optionIdByRpo(data, "PDV");
   const vwd = optionIdByRpo(data, "VWD");
   return data.priceRules.some((rule) => rule.condition_option_id === pdv && rule.target_option_id === vwd && Number(rule.price_value) === 0);
+}
+
+function rulesById(data, sourceId, targetId) {
+  return data.rules.filter((rule) => rule.source_id === sourceId && rule.target_id === targetId);
+}
+
+function plain(value) {
+  return JSON.parse(JSON.stringify(value));
 }
 
 function runtimeFor(data, variantId) {
@@ -143,13 +180,81 @@ test("projected ownership manifest declares the current multi-slice control scop
     {
       record_type: "priceRule",
       source_rpo: "PDV",
+      source_option_id: "",
       target_rpo: "VWD",
+      target_option_id: "",
       ownership: "preserved_cross_boundary",
     },
     {
       record_type: "rule",
       source_rpo: "PDV",
+      source_option_id: "",
       target_rpo: "VWD",
+      target_option_id: "",
+      ownership: "preserved_cross_boundary",
+    },
+    {
+      record_type: "rule",
+      source_rpo: "RNX",
+      source_option_id: "",
+      target_rpo: "",
+      target_option_id: "opt_5zw_001",
+      ownership: "preserved_cross_boundary",
+    },
+    {
+      record_type: "rule",
+      source_rpo: "RNX",
+      source_option_id: "",
+      target_rpo: "5ZU",
+      target_option_id: "",
+      ownership: "preserved_cross_boundary",
+    },
+    {
+      record_type: "rule",
+      source_rpo: "RNX",
+      source_option_id: "",
+      target_rpo: "5ZZ",
+      target_option_id: "",
+      ownership: "preserved_cross_boundary",
+    },
+    {
+      record_type: "rule",
+      source_rpo: "RNX",
+      source_option_id: "",
+      target_rpo: "Z51",
+      target_option_id: "",
+      ownership: "preserved_cross_boundary",
+    },
+    {
+      record_type: "rule",
+      source_rpo: "RWJ",
+      source_option_id: "",
+      target_rpo: "Z51",
+      target_option_id: "",
+      ownership: "preserved_cross_boundary",
+    },
+    {
+      record_type: "rule",
+      source_rpo: "WKQ",
+      source_option_id: "",
+      target_rpo: "",
+      target_option_id: "opt_5zw_001",
+      ownership: "preserved_cross_boundary",
+    },
+    {
+      record_type: "rule",
+      source_rpo: "WKQ",
+      source_option_id: "",
+      target_rpo: "5ZU",
+      target_option_id: "",
+      ownership: "preserved_cross_boundary",
+    },
+    {
+      record_type: "rule",
+      source_rpo: "WKQ",
+      source_option_id: "",
+      target_rpo: "5ZZ",
+      target_option_id: "",
       ownership: "preserved_cross_boundary",
     },
   ]);
@@ -165,8 +270,18 @@ test("legacy fragment projected RPO scope equals the ownership manifest", () => 
   assert.deepEqual(fragment.validation_errors, []);
   assert.deepEqual(fragmentRpos, projectedOwnedRpos());
   assert.equal(fragmentRpos.includes("PDV"), false);
+  assert.equal(fragmentRpos.includes("5ZW"), false);
   assert.equal(fragment.rules.some((rule) => rule.source_id === pdv && rule.target_id === vwd), false);
   assert.equal(fragment.priceRules.some((rule) => rule.condition_option_id === pdv && rule.target_option_id === vwd), false);
+});
+
+test("production keeps 5ZW as a rule-only legacy option id", () => {
+  const production = loadGeneratedData();
+
+  assert.equal(production.choices.some((choice) => choice.rpo === "5ZW" || choice.option_id === "opt_5zw_001"), false);
+  assert.equal(production.rules.some((rule) => rule.target_id === "opt_5zw_001"), true);
+  assert.equal(production.rules.some((rule) => rule.source_id === "opt_5zw_001"), true);
+  assert.equal(projectedOwnedRpos().includes("5ZW"), false);
 });
 
 test("shadow overlay preserves manifest-declared PDV to VWD production-owned behavior", () => {
@@ -178,6 +293,10 @@ test("shadow overlay preserves manifest-declared PDV to VWD production-owned beh
   assert.equal(hasPdvVwdRule(shadow), true);
   assert.equal(hasPdvVwdPriceRule(production), true);
   assert.equal(hasPdvVwdPriceRule(shadow), true);
+  assert.equal(rulesById(shadow, "opt_wkq_001", "opt_5zw_001").length, 1);
+  assert.equal(rulesById(shadow, "opt_rnx_001", "opt_5zw_001").length, 1);
+  assert.deepEqual(plain(rulesById(shadow, "opt_wkq_001", "opt_5zw_001")), plain(rulesById(production, "opt_wkq_001", "opt_5zw_001")));
+  assert.deepEqual(plain(rulesById(shadow, "opt_rnx_001", "opt_5zw_001")), plain(rulesById(production, "opt_rnx_001", "opt_5zw_001")));
 
   const directRuntime = runtimeFor(shadow, "1lt_c07");
   const vwd = activeChoiceByRpo(directRuntime, "VWD");
@@ -214,6 +333,17 @@ test("overlay rejects an unclassified cross-boundary production record", () => {
   assert.match(result.stderr, /unclassified cross-boundary/);
 });
 
+test("overlay rejects omitted id-based 5ZW preserved records", () => {
+  const rows = loadManifest().filter((row) => row.target_option_id !== "opt_5zw_001");
+  const tempManifest = writeTempManifest(rows);
+
+  const result = runOverlay(["--ownership-manifest", tempManifest]);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /unclassified cross-boundary/);
+  assert.match(result.stderr, /opt_5zw_001/);
+});
+
 const validationCases = [
   [
     "duplicate active projected-owned RPO",
@@ -248,7 +378,7 @@ const validationCases = [
   [
     "preserved cross-boundary row missing source",
     (rows) => rows.map((row) => (row.record_type === "rule" && row.source_rpo === "PDV" && row.target_rpo === "VWD" ? { ...row, source_rpo: "" } : row)),
-    /preserved_cross_boundary row is missing source_rpo or target_rpo/,
+    /preserved_cross_boundary row is missing source_rpo\/source_option_id or target_rpo\/target_option_id/,
   ],
 ];
 
