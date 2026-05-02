@@ -65,6 +65,7 @@ ws.append(["", "", "S = Standard Equipment  A = Available  -- (dashes) = Not Ava
 ws.append(["Orderable RPO Code", "Ref. Only RPO Code", "Description", "Coupe\\n1YC07\\n1LT", "Mystery Coupe\\n9ZZ07\\n1LT"])
 ws.append(["AAA", "", "Example option requires (BBB)", "A1", "S2"])
 ws.append(["", "CCC", "Reference evidence", "A/D2", "--"])
+ws.append(["CCC", "", "Same code appears as orderable evidence", "A", "A"])
 
 eg = wb.create_sheet("Equipment Groups 1")
 eg.append(["Stingray", "", "", "", ""])
@@ -152,6 +153,11 @@ test("staging audit reports extraction quality without modifying staging evidenc
   assert.equal(audit.readiness.advisory_only, true);
   assert.equal(audit.readiness.ready_for_proposal_generation, false);
   assert.ok(audit.readiness.reasons.includes("unresolved_rows_present"));
+  assert.equal(audit.readiness.primary_variant_matrix_ready, false);
+  assert.equal(audit.readiness.color_trim_ready, false);
+  assert.equal(audit.readiness.pricing_ready, true);
+  assert.equal(audit.readiness.equipment_groups_ready, true);
+  assert.equal(audit.readiness.canonical_proposal_ready, false);
   assert.equal(audit.equipment_groups.cross_check_only, true);
   assert.equal(audit.equipment_groups.variant_matrix_leak_count, 0);
   assert.equal(audit.color_trim.has_interior_and_compatibility_rows, true);
@@ -166,10 +172,49 @@ test("staging audit reports extraction quality without modifying staging evidenc
   assert.ok(audit.footnote_counts.some((row) => row.footnote_scope === "interior_rpo" && row.footnote_refs === "6"));
   assert.ok(audit.unresolved_rows_by_reason.ignored_or_unknown_sheet_with_content >= 1);
   assert.ok(audit.ignored_rows_by_reason.equipment_group_label_row >= 1);
+  assert.ok(audit.suspicious_rows_by_bucket.color_trim_review_only >= 1);
+  assert.ok(audit.suspicious_rows_by_bucket.canonical_review_required >= 1);
+  assert.ok(audit.suspicious_rows_by_bucket.import_map_gap >= 1);
+  assert.ok(audit.suspicious_rows_by_type.model_scope_ambiguous >= 1);
+  assert.ok(audit.suspicious_rows_by_type.rpo_role_overlap >= 1);
+  assert.ok(audit.suspicious_rows_by_readiness_impact.review_required >= 1);
+  assert.ok(audit.suspicious_rows_by_readiness_impact.blocking >= 1);
+  assert.ok(audit.recommended_actions_by_bucket.color_trim_review_only["confirm_model_scope_or_import_map; do_not_variant_expand"] >= 1);
 
   const suspiciousRows = readCsv(path.join(stagingDir, "staging_audit_suspicious_rows.csv"));
+  for (const fieldName of [
+    "suspicion_type",
+    "review_bucket",
+    "recommended_action",
+    "section_family",
+    "rpo",
+    "raw_value",
+    "classification_reason",
+    "readiness_impact",
+  ]) {
+    assert.ok(Object.hasOwn(suspiciousRows[0], fieldName), `${fieldName} should be appended to suspicious rows`);
+  }
   assert.equal(suspiciousRows.some((row) => row.reason === "variant_model_key_needs_review"), true);
   assert.equal(suspiciousRows.some((row) => row.reason === "ignored_or_unknown_sheet_with_content"), true);
+  assert.equal(
+    suspiciousRows.some(
+      (row) =>
+        row.reason === "color_trim_model_key_ambiguous" &&
+        row.review_bucket === "color_trim_review_only" &&
+        row.readiness_impact === "review_required",
+    ),
+    true,
+  );
+  assert.equal(
+    suspiciousRows.some(
+      (row) =>
+        row.reason === "rpo_appears_as_orderable_and_ref_only" &&
+        row.review_bucket === "canonical_review_required" &&
+        row.rpo === "CCC" &&
+        row.classification_reason.includes("orderable and reference-only"),
+    ),
+    true,
+  );
 
   assert.equal(fs.existsSync(path.join(stagingDir, "proposed")), false);
   assert.equal(fs.existsSync(path.join(stagingDir, "catalog", "selectables.csv")), false);
