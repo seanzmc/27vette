@@ -11,8 +11,8 @@ const PYTHON = ".venv/bin/python";
 const OVERLAY_SCRIPT = "scripts/stingray_csv_shadow_overlay.py";
 const FRAGMENT_SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
-const SPOILER_GUARDED_RPOS = ["T0A", "TVS", "5ZZ", "5ZU", "5V7", "Z51", "ZYC", "GBA"];
-const SPOILER_PROJECTED_RPOS = new Set([...SPOILER_GUARDED_RPOS, "5ZW"]);
+const SPOILER_GUARDED_RPOS = ["T0A", "5ZZ", "5ZU", "5V7", "Z51", "ZYC", "GBA"];
+const SPOILER_NOT_PROJECTED_RPOS = new Set([...SPOILER_GUARDED_RPOS, "5ZW"]);
 
 function parseCsv(source) {
   const rows = [];
@@ -146,26 +146,27 @@ function emitFragment() {
   }));
 }
 
-test("Pass 17 guards spoiler-adjacent production options without projecting spoiler ownership", () => {
+test("Pass 23 projects only TVS while other spoiler-adjacent options stay guarded", () => {
   const production = loadGeneratedData();
   const rows = activeManifestRows();
   const projectedRpos = rows.filter((row) => row.ownership === "projected_owned").map((row) => row.rpo);
   const guardedRpos = rows.filter((row) => row.ownership === "production_guarded" && row.record_type === "guardedOption").map((row) => row.rpo).filter(Boolean).sort();
 
   assert.deepEqual(guardedRpos, [...SPOILER_GUARDED_RPOS].sort());
-  for (const rpo of SPOILER_PROJECTED_RPOS) {
-    assert.equal(projectedRpos.includes(rpo), false, `${rpo} should not be projected-owned in Pass 17`);
+  assert.equal(projectedRpos.includes("TVS"), true);
+  for (const rpo of SPOILER_NOT_PROJECTED_RPOS) {
+    assert.equal(projectedRpos.includes(rpo), false, `${rpo} should not be projected-owned in Pass 23`);
   }
   assert.equal(rows.some((row) => row.ownership === "production_guarded" && row.target_option_id === "opt_5zw_001"), true);
   assert.equal(production.choices.some((choice) => choice.rpo === "5ZW" || choice.option_id === "opt_5zw_001"), false);
 });
 
-test("Pass 19 classifies spoiler-adjacent group identities without projecting spoiler choices", () => {
+test("Pass 23 preserves mixed-boundary spoiler group identities without projecting them", () => {
   assert.deepEqual(groupRows(), [
     {
       record_type: "exclusiveGroup",
       group_id: "grp_spoiler_high_wing",
-      ownership: "production_guarded",
+      ownership: "preserved_cross_boundary",
     },
     {
       record_type: "ruleGroup",
@@ -273,17 +274,27 @@ test("spoiler-adjacent runtime cleanup boundaries remain production-runtime-owne
   }
 });
 
-test("overlay rejects missing preserved spoiler replace and rule-only records", () => {
+test("overlay rejects missing preserved TVS replace record", () => {
   const rows = loadManifest().filter(
     (row) =>
-      !(row.record_type === "rule" && row.source_rpo === "TVS" && row.target_rpo === "T0A") &&
+      !(row.record_type === "rule" && row.source_rpo === "TVS" && row.target_rpo === "T0A")
+  );
+  const result = runOverlay(["--ownership-manifest", writeTempManifest(rows)]);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /unclassified cross-boundary records/);
+  assert.match(result.stderr, /opt_tvs_001/);
+});
+
+test("overlay rejects missing preserved 5ZW rule-only asymmetry record", () => {
+  const rows = loadManifest().filter(
+    (row) =>
       !(row.record_type === "rule" && row.source_option_id === "opt_5zw_001" && row.target_rpo === "T0A")
   );
   const result = runOverlay(["--ownership-manifest", writeTempManifest(rows)]);
 
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /unclassified guarded production records/);
-  assert.match(result.stderr, /opt_tvs_001/);
   assert.match(result.stderr, /opt_5zw_001/);
 });
 
@@ -390,6 +401,6 @@ test("overlay rejects missing preserved spoiler priceRule classifications", () =
   const result = runOverlay(["--ownership-manifest", writeTempManifest(rows)]);
 
   assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /unclassified guarded production records/);
+  assert.match(result.stderr, /unclassified cross-boundary records/);
   assert.match(result.stderr, /opt_z51_001/);
 });

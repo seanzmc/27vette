@@ -121,7 +121,14 @@ def load_ownership_scope(path: Path) -> OwnershipScope:
                 raise OverlayError(f"{path} row {index} has unsupported ownership value {ownership!r}.")
             continue
 
-        if record_type in GROUP_RECORD_TYPES and not group_id and ownership in {"projected_owned", "production_guarded"}:
+        has_record_refs = (
+            row.get("rpo", "")
+            or row.get("source_rpo", "")
+            or row.get("source_option_id", "")
+            or row.get("target_rpo", "")
+            or row.get("target_option_id", "")
+        )
+        if record_type in GROUP_RECORD_TYPES and not group_id and not has_record_refs:
             raise OverlayError(f"{path} row {index} group ownership row is missing group_id.")
 
         if group_id:

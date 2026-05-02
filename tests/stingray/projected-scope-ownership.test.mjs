@@ -30,6 +30,7 @@ const EXPECTED_OWNED_RPOS = [
   "SXB",
   "SXR",
   "SXT",
+  "TVS",
   "VWD",
   "WKQ",
   "WKR",
@@ -209,7 +210,7 @@ test("projected ownership manifest declares the current multi-slice control scop
       target_option_id: "opt_5zw_001",
       ownership: "production_guarded",
     },
-    ...["5V7", "5ZU", "5ZZ", "GBA", "T0A", "TVS", "Z51", "ZYC"].map((rpo) => ({
+    ...["5V7", "5ZU", "5ZZ", "GBA", "T0A", "Z51", "ZYC"].map((rpo) => ({
       record_type: "guardedOption",
       rpo,
       target_option_id: "",
@@ -220,7 +221,7 @@ test("projected ownership manifest declares the current multi-slice control scop
     {
       record_type: "exclusiveGroup",
       group_id: "grp_spoiler_high_wing",
-      ownership: "production_guarded",
+      ownership: "preserved_cross_boundary",
     },
     {
       record_type: "ruleGroup",

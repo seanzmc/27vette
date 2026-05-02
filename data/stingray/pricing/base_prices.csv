@@ -16,3 +16,4 @@ bp_wkq,pb_2027_stingray,selectable,opt_wkq_001,,495,10,true,Current WKQ base pri
 bp_wkr,pb_2027_stingray,selectable,opt_wkr_001,,1275,10,true,Current WKR base price.
 bp_rnx,pb_2027_stingray,selectable,opt_rnx_001,,495,10,true,Current RNX base price.
 bp_rwj,pb_2027_stingray,selectable,opt_rwj_001,,495,10,true,Current RWJ base price.
+bp_tvs,pb_2027_stingray,selectable,opt_tvs_001,,995,10,true,Current TVS base price.
