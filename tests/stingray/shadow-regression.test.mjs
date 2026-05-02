@@ -256,6 +256,20 @@ function accessoryExclusiveScenario(data) {
   };
 }
 
+function suedeTrunkLinerExclusiveScenario(data) {
+  const suedeTrunkLinerRpos = new Set(["SXB", "SXR", "SXT"]);
+  const runtime = runtimeFor(data, "1lt_c07");
+  for (const rpo of ["SXB", "SXR"]) {
+    addSelectedRpo(runtime, rpo);
+  }
+  handleRpo(runtime, "SXT");
+  return {
+    selected_rpos: rposFromIds(runtime, runtime.state.selected, suedeTrunkLinerRpos),
+    user_selected_rpos: rposFromIds(runtime, runtime.state.userSelected, suedeTrunkLinerRpos),
+    line_items: lineItemFacts(runtime, suedeTrunkLinerRpos),
+  };
+}
+
 function groupedRequirementScenario(data) {
   const runtime = runtimeFor(data, "1lt_c07", { resetDefaults: true });
   handleRpo(runtime, "Z51");
@@ -296,6 +310,7 @@ const broadScenarios = [
   ["Z51 default replacement and FE3 auto-add", z51Scenario],
   ["spoiler exclusive group replacement", spoilerExclusiveScenario],
   ["center cap accessory exclusive group replacement", accessoryExclusiveScenario],
+  ["suede trunk liner exclusive group replacement", suedeTrunkLinerExclusiveScenario],
   ["5V7 grouped spoiler requirement", groupedRequirementScenario],
   ["current order, compact order, and exports", orderOutputScenario],
 ];

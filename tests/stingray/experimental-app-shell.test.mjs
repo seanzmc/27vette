@@ -10,6 +10,7 @@ import { createRuntime, loadGeneratedData } from "./runtime-harness.mjs";
 
 const FIRST_SLICE_RPOS = new Set(["B6P", "D3V", "SL9", "ZZ3", "BCP", "BCS", "BC4", "BC7"]);
 const Z51_RPOS = new Set(["FE1", "FE2", "FE3", "Z51"]);
+const SUEDE_TRUNK_LINER_RPOS = new Set(["SXB", "SXR", "SXT"]);
 
 function plain(value) {
   return JSON.parse(JSON.stringify(value));
@@ -143,6 +144,26 @@ function z51ScenarioFacts(data) {
   };
 }
 
+function suedeTrunkLinerScenarioFacts(data) {
+  const runtime = runtimeFor(data, "1lt_c07");
+  for (const rpo of ["SXB", "SXR", "SXT"]) {
+    handleRpo(runtime, rpo);
+  }
+  return {
+    selected_rpos: rposFromIds(runtime, runtime.state.selected, SUEDE_TRUNK_LINER_RPOS),
+    line_items: runtime
+      .lineItems()
+      .filter((item) => SUEDE_TRUNK_LINER_RPOS.has(item.rpo))
+      .map((item) => ({
+        rpo: item.rpo,
+        label: item.label,
+        price: Number(item.price || 0),
+        type: item.type,
+      }))
+      .sort((a, b) => `${a.rpo}:${a.type}:${a.label}`.localeCompare(`${b.rpo}:${b.type}:${b.label}`)),
+  };
+}
+
 const productionData = loadGeneratedData();
 const jsonOverlayData = directJsonOverlay();
 const directDataJs = directDataJsOutput();
@@ -204,4 +225,8 @@ for (const [name, variantId, selectedRpos] of firstSliceScenarios) {
 
 test("experimental app shell runtime behavior matches production: Z51 non-first-slice scenario", () => {
   assert.deepEqual(plain(z51ScenarioFacts(experimentalData)), plain(z51ScenarioFacts(productionData)));
+});
+
+test("experimental app shell runtime behavior matches production: suede trunk liner exclusivity", () => {
+  assert.deepEqual(plain(suedeTrunkLinerScenarioFacts(experimentalData)), plain(suedeTrunkLinerScenarioFacts(productionData)));
 });

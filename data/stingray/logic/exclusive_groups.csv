@@ -1,3 +1,4 @@
 exclusive_group_id,label,scope_condition_set_id,max_selected,conflict_policy,message,priority,active,legacy_group_id,legacy_notes
 excl_ls6_engine_covers,LS6 engine covers,,1,block_new_selection,Choose only one LS6 engine cover.,10,true,grp_ls6_engine_covers,LS6 engine cover choices are mutually exclusive within the Engine Appearance section.
 excl_center_caps,Center cap choices,,1,block_new_selection,Choose only one center cap choice.,20,true,excl_center_caps,Center cap choices are mutually exclusive within the Wheels section.
+excl_suede_trunk_liner,Suede trunk liner choices,,1,block_new_selection,Choose only one suede trunk liner.,30,true,excl_suede_trunk_liner,Suede trunk liner choices are mutually exclusive within the Interior Trim section.

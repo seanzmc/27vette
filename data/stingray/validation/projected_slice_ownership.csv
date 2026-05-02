@@ -12,5 +12,8 @@ selectable,,,VWD,projected_owned,Center Cap projected slice,true
 selectable,,,5ZD,projected_owned,Center Cap projected slice,true
 selectable,,,5ZC,projected_owned,Center Cap projected slice,true
 selectable,,,RXH,projected_owned,Center Cap projected slice,true
+selectable,,,SXB,projected_owned,Suede Trunk Liner projected slice,true
+selectable,,,SXR,projected_owned,Suede Trunk Liner projected slice,true
+selectable,,,SXT,projected_owned,Suede Trunk Liner projected slice,true
 rule,PDV,VWD,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
 priceRule,PDV,VWD,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true

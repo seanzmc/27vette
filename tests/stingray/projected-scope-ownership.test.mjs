@@ -11,7 +11,7 @@ const PYTHON = ".venv/bin/python";
 const OVERLAY_SCRIPT = "scripts/stingray_csv_shadow_overlay.py";
 const FRAGMENT_SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
-const EXPECTED_OWNED_RPOS = ["5ZC", "5ZD", "B6P", "BC4", "BC7", "BCP", "BCS", "D3V", "RXH", "RXJ", "SL9", "VWD", "ZZ3"];
+const EXPECTED_OWNED_RPOS = ["5ZC", "5ZD", "B6P", "BC4", "BC7", "BCP", "BCS", "D3V", "RXH", "RXJ", "SL9", "SXB", "SXR", "SXT", "VWD", "ZZ3"];
 
 function parseCsv(source) {
   const rows = [];
@@ -136,6 +136,9 @@ test("projected ownership manifest declares the current multi-slice control scop
 
   assert.deepEqual(projectedOwnedRpos(rows), EXPECTED_OWNED_RPOS);
   assert.equal(projectedOwnedRpos(rows).includes("PDV"), false);
+  assert.equal(projectedOwnedRpos(rows).includes("PEF"), false);
+  assert.equal(projectedOwnedRpos(rows).includes("CAV"), false);
+  assert.equal(projectedOwnedRpos(rows).includes("RIA"), false);
   assert.deepEqual(preservedRows(rows), [
     {
       record_type: "priceRule",
