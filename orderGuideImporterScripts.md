@@ -546,3 +546,513 @@ No raw source edits are required.
 That is the importer foundation.
 
 Once that works for Corvette, you start shaping the parser toward broader Chevrolet exports.
+
+# Prompt
+
+I agree that the whole app doesn't need to be built, but obviously I would want a schema that is not still being developed when I build these scripts so that is definitely a blocking task that I am still working on, but getting there. Again, this conversation should be dedicated primarily to a plan to build the import scripts and your most recent response hit almost every pain point involved with the raw order guides. A couple of things that I want to note: Equipment Groups 1-4 contains no unique information compared to standard equipment, interior, exterior, and mechanical sheets. There are rows that exist in the other sheets that are not in equipment groups though but it is exclusively standard equipment/ auto added, included features. Nothing selectable.
+The other thing I want to point out is that the Colors and Trim sheets are the only sheets that contain information that applies to all variants of the model.
+
+Yes, those two notes materially improve the importer plan.
+
+They change the sheet taxonomy from “parse every sheet as a possible source of canonical truth” to a much cleaner model:
+
+```text
+Primary variant-scoped sheets:
+  Standard Equipment
+  Interior
+  Exterior
+  Mechanical
+
+Derived / cross-check sheets:
+  Equipment Groups
+
+Model-global sheets:
+  Color and Trim
+
+Price source:
+  Price Schedule
+```
+
+That is a much better importer design. The raw export should be parsed with explicit sheet roles instead of treating every sheet equally.
+
+# Big adjustment 1: Equipment Groups should not create selectables
+
+Your clarification is important:
+
+> Equipment Groups 1-4 contains no unique selectable information.
+
+So the importer should **not** use Equipment Groups as a source for new canonical `selectables`.
+
+Instead, Equipment Groups should be treated as a **derived audit/support source**.
+
+## What Equipment Groups should do
+
+It can still be useful for:
+
+```text
+confirming package contents
+confirming standard/included equipment
+capturing included/ref-only features
+cross-checking that primary sheets did not miss anything
+supporting standard-equipment reports
+building import confidence
+```
+
+But it should not independently generate:
+
+```text
+catalog/selectables.csv
+ui/selectable_display.csv
+pricing/base_prices.csv
+```
+
+unless a row is explicitly missing from the primary sheets and gets flagged for review.
+
+## Importer behavior
+
+For Equipment Groups, I would create:
+
+```text
+staging_equipment_group_rows.csv
+```
+
+but mark every row with:
+
+```text
+source_role = derived_equipment_summary
+canonical_candidate = false
+selectable_candidate = false
+```
+
+Possible row dispositions:
+
+```text
+derived_standard_equipment
+derived_auto_added_feature
+derived_included_feature
+crosscheck_only
+needs_review_missing_primary_match
+```
+
+The important rule:
+
+```text
+Equipment Groups can confirm or explain.
+Equipment Groups should not create customer-selectable options.
+```
+
+Tiny goblin-proofing detail: if Equipment Groups contains a row that cannot be matched to Standard Equipment, Interior, Exterior, or Mechanical, the importer should not silently discard it. It should write that row to:
+
+```text
+staging_unresolved_rows.csv
+```
+
+with:
+
+```text
+reason = equipment_group_row_has_no_primary_match
+```
+
+# Big adjustment 2: Color and Trim is model-global
+
+This also changes the importer logic.
+
+The Color and Trim sheets should not be parsed like variant matrix sheets. They apply to all variants of the model, so staging should preserve that broader scope.
+
+Instead of expanding immediately into every variant, the importer should stage rows as:
+
+```text
+scope_type = model
+model_key = stingray
+applies_to_all_variants = true
+```
+
+Then the canonical proposal or compiler can later decide whether to fan those into variant-level generated choice rows.
+
+## Correct staging behavior
+
+For Color and Trim, create something like:
+
+```text
+staging_color_trim_rows.csv
+```
+
+with columns like:
+
+```csv
+source_sheet,source_row,model_key,scope_type,exterior_color_rpo,interior_code,seat_code,trim_level,raw_status,status_symbol,footnote_refs,raw_text
+```
+
+The key is this:
+
+```text
+Do not duplicate Color and Trim rows across every variant during staging.
+```
+
+Keep them model-global until the canonical proposal or compiler needs variant-specific output.
+
+# Updated source precedence
+
+The importer should have an explicit source priority table.
+
+```text
+Price Schedule
+  Source of truth for prices.
+
+Standard Equipment / Interior / Exterior / Mechanical
+  Source of truth for variant-scoped availability and option rows.
+
+Color and Trim
+  Source of truth for model-wide color/interior/trim compatibility.
+
+Equipment Groups
+  Derived summary / cross-check / included-feature support only.
+```
+
+That source precedence should live in an import map, not hard-coded into the parser.
+
+Example:
+
+```csv
+sheet_family,source_role,canonical_priority,creates_selectables,creates_prices,creates_rules,notes
+Price Schedule,price_source,100,false,true,false,Primary price source
+Standard Equipment,primary_variant_matrix,90,true,false,true,Variant-scoped standard and included rows
+Interior,primary_variant_matrix,90,true,false,true,Variant-scoped interior rows
+Exterior,primary_variant_matrix,90,true,false,true,Variant-scoped exterior rows
+Mechanical,primary_variant_matrix,90,true,false,true,Variant-scoped mechanical rows
+Color and Trim,model_global_matrix,85,true,false,true,Model-wide color and trim compatibility
+Equipment Groups,derived_equipment_summary,20,false,false,false,Cross-check and standard/included feature audit only
+```
+
+This gives you one central place to adjust behavior if another Chevrolet guide uses a different structure.
+
+# Updated staging files
+
+I would now define staging output like this:
+
+```text
+build/imports/<year>/<guide_key>/
+  source_profile.json
+
+  staging_sheets.csv
+  staging_variants.csv
+  staging_variant_matrix_rows.csv
+  staging_color_trim_rows.csv
+  staging_price_rows.csv
+  staging_equipment_group_rows.csv
+  staging_rule_phrase_candidates.csv
+  staging_unresolved_rows.csv
+  staging_ignored_rows.csv
+  import_report.json
+```
+
+## `staging_sheets.csv`
+
+Purpose: classify every sheet.
+
+```csv
+sheet_name,sheet_role,section_family,model_group_index,model_key,scope_type,creates_canonical_candidates,notes
+Standard Equipment 1,primary_variant_matrix,standard_equipment,1,stingray,variant,true,
+Equipment Groups 1,derived_equipment_summary,equipment_groups,1,stingray,variant,false,Cross-check only
+Color and Trim 1,model_global_matrix,color_trim,1,stingray,model,true,Applies to all model variants
+Price Schedule,price_source,pricing,,all,model,true,
+```
+
+## `staging_variant_matrix_rows.csv`
+
+Only for:
+
+```text
+Standard Equipment
+Interior
+Exterior
+Mechanical
+```
+
+This captures variant-scoped rows.
+
+```csv
+source_sheet,source_row,model_key,section_family,orderable_rpo,ref_rpo,description,variant_id,body_code,body_style,trim_level,raw_status,status_symbol,footnote_refs,canonical_status,source_detail_raw
+```
+
+## `staging_equipment_group_rows.csv`
+
+Only for Equipment Groups.
+
+```csv
+source_sheet,source_row,model_key,equipment_group_rpo,orderable_rpo,ref_rpo,description,row_kind,matched_primary_row_key,match_status,source_detail_raw
+```
+
+Where:
+
+```text
+row_kind = standard_feature | included_feature | auto_added_feature | reference_only | unknown
+match_status = matched_primary | no_primary_match | duplicate_summary | needs_review
+```
+
+## `staging_color_trim_rows.csv`
+
+Only for Color and Trim.
+
+```csv
+source_sheet,source_row,model_key,scope_type,exterior_color_rpo,exterior_color_name,interior_code,interior_label,seat_code,trim_level,raw_status,status_symbol,footnote_refs,canonical_status,source_detail_raw
+```
+
+With:
+
+```text
+scope_type = model
+```
+
+not variant.
+
+# Updated importer flow
+
+The pipeline becomes:
+
+```text
+1. Profile workbook.
+2. Classify sheets by role.
+3. Extract primary variant matrix rows.
+4. Extract model-global color/trim rows.
+5. Extract price rows.
+6. Extract Equipment Groups as derived/cross-check rows.
+7. Match Equipment Groups rows back to primary rows.
+8. Extract rule phrase candidates from all relevant raw text.
+9. Generate unresolved/review queues.
+10. Only then generate canonical proposals.
+```
+
+Equipment Groups now gets used at step 7, not as a primary source.
+
+# What this means for “any Chevrolet order guide”
+
+This actually helps the stretch goal.
+
+Instead of assuming all Chevrolet guides work like Corvette, your importer can have configurable sheet roles:
+
+```text
+primary_variant_matrix
+model_global_matrix
+derived_equipment_summary
+price_source
+legal_notes
+unknown
+```
+
+For Corvette, Equipment Groups is derived.
+
+For some other Chevrolet model, Equipment Groups might contain unique selectable package data. In that case, the model-family import map can say:
+
+```text
+Equipment Groups = primary_package_source
+```
+
+But for Corvette, your map says:
+
+```text
+Equipment Groups = derived_equipment_summary
+```
+
+That is the right level of generality. The parser stays generic. The source behavior lives in the import profile.
+
+# Schema blocking task: what must be stable first?
+
+You are right that the final canonical schema should be mostly stable before building the proposal generator.
+
+But you do **not** need to wait on every final app detail to build the first two import scripts.
+
+## Can build now
+
+These are safe before the canonical schema is final:
+
+```text
+inspect_order_guide_export.py
+extract_order_guide_staging.py
+```
+
+Why?
+
+Because staging is raw evidence. It does not need to perfectly match final canonical tables.
+
+## Should wait for schema stability
+
+These should wait until the CSV schema is stable:
+
+```text
+propose_canonical_rows.py
+validate_import_proposal.py
+apply_import_proposal.py
+```
+
+The split looks like this:
+
+```text
+Safe now:
+  raw workbook -> staging evidence
+
+Blocked by final schema:
+  staging evidence -> canonical CSV proposals
+```
+
+That lets you move forward without building against a moving target.
+
+# Crack-prevention checklist
+
+Given your two clarifications, I would add these checks to the importer.
+
+## Equipment Groups checks
+
+```text
+Every Equipment Groups row must be classified as non-selectable.
+Every Equipment Groups row should match a primary row or be flagged.
+No canonical selectable may be created solely from Equipment Groups.
+No price may be created solely from Equipment Groups.
+No active dependency/auto-add may be created solely from Equipment Groups without review.
+```
+
+## Color and Trim checks
+
+```text
+Every Color and Trim row must have model-level scope.
+No Color and Trim staging row should be prematurely duplicated per variant.
+Color/interior compatibility should be preserved as matrix data.
+Footnotes/status suffixes must be retained.
+Canonical proposal may expand to variants only after validation.
+```
+
+## Source priority checks
+
+```text
+If the same RPO appears in primary sheets and Equipment Groups, primary sheet wins.
+If the same price appears in a descriptive sheet and Price Schedule, Price Schedule wins.
+If a color/interior compatibility conflict exists, Color and Trim wins unless manually overridden.
+If Equipment Groups has unmatched content, flag it instead of promoting it.
+```
+
+# Revised importer milestones
+
+I would now frame the importer project like this:
+
+## Importer Pass 1: source profiler
+
+Outputs:
+
+```text
+source_profile.json
+staging_sheets.csv
+import_report.json
+```
+
+Success criteria:
+
+```text
+All sheets classified.
+Equipment Groups classified as derived.
+Color and Trim classified as model-global.
+Primary variant matrix sheets detected.
+No canonical rows generated.
+```
+
+## Importer Pass 2: primary matrix extractor
+
+Outputs:
+
+```text
+staging_variants.csv
+staging_variant_matrix_rows.csv
+staging_status_symbols.csv
+```
+
+Success criteria:
+
+```text
+Standard Equipment, Interior, Exterior, Mechanical rows extracted.
+Variant headers detected.
+Raw statuses preserved.
+Footnote refs preserved.
+```
+
+## Importer Pass 3: color and trim extractor
+
+Outputs:
+
+```text
+staging_color_trim_rows.csv
+```
+
+Success criteria:
+
+```text
+Color and Trim rows are model-scoped.
+No premature variant expansion.
+Raw matrix status preserved.
+```
+
+## Importer Pass 4: equipment group cross-check extractor
+
+Outputs:
+
+```text
+staging_equipment_group_rows.csv
+```
+
+Success criteria:
+
+```text
+Equipment Group rows are non-selectable.
+Rows are matched to primary sheets where possible.
+Unmatched rows are flagged.
+```
+
+## Importer Pass 5: price extractor
+
+Outputs:
+
+```text
+staging_price_rows.csv
+```
+
+Success criteria:
+
+```text
+Prices parsed from Price Schedule.
+Price scope preserved.
+No descriptive-sheet price overrides accepted without review.
+```
+
+## Importer Pass 6: rule phrase candidate extractor
+
+Outputs:
+
+```text
+staging_rule_phrase_candidates.csv
+staging_unresolved_rows.csv
+```
+
+Success criteria:
+
+```text
+Requires / includes / not available / removes / choice-of phrases detected.
+Confidence levels assigned.
+Ambiguous phrases flagged for review.
+```
+
+Only after those would I build:
+
+```text
+Importer Pass 7: canonical proposal generator
+```
+
+# Bottom line
+
+Your two corrections make the importer architecture cleaner:
+
+```text
+Equipment Groups = derived cross-check, not selectable source.
+Color and Trim = model-global matrix, not variant-scoped option sheet.
+```
+
+That should be baked into the import map and staging schemas from the beginning.
+
+You still need the canonical CSV schema to settle before writing proposal/app-facing scripts, but you can safely begin with profiler and staging extraction scripts now. Those scripts preserve raw evidence, classify source roles, and make sure nothing slips through the cracks while the final schema finishes hardening.
