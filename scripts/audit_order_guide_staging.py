@@ -11,6 +11,9 @@ from pathlib import Path
 from typing import Any
 
 
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_COLOR_TRIM_SCOPE = ROOT / "data" / "import_maps" / "corvette_2027" / "color_trim_scope.csv"
+
 REQUIRED_FILES = {
     "sheets": "staging_sheets.csv",
     "variants": "staging_variants.csv",
@@ -35,6 +38,16 @@ AUDIT_CSV_HEADERS = {
     "status_counts": ["source_sheet", "sheet_family", "status_context", "status_symbol", "canonical_status", "count"],
     "rpo_counts": ["staging_file", "source_sheet", "model_key", "section_family", "rpo_kind", "rpo", "count"],
     "footnote_counts": ["staging_file", "source_sheet", "model_key", "footnote_scope", "footnote_refs", "count"],
+    "rpo_role_overlaps": [
+        "rpo",
+        "orderable_count",
+        "ref_only_count",
+        "source_sheets",
+        "model_keys",
+        "section_families",
+        "sample_descriptions",
+        "recommended_action",
+    ],
     "suspicious_rows": [
         "source",
         "source_sheet",
@@ -65,6 +78,11 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--staging", required=True, help="Directory containing staging CSVs and import_report.json.")
     parser.add_argument("--out", required=True, help="Path to write staging_audit_report.json.")
+    parser.add_argument(
+        "--color-trim-scope",
+        default=str(DEFAULT_COLOR_TRIM_SCOPE),
+        help="Optional Color/Trim scope review CSV. Missing files are reported, not fatal.",
+    )
     return parser.parse_args()
 
 
@@ -120,6 +138,12 @@ def load_staging(staging_dir: Path) -> tuple[dict[str, list[dict[str, str]]], di
         raise SystemExit(f"Malformed import_report.json: {exc}") from exc
 
     return staging, import_report, sorted(present_optional), sorted(missing_optional)
+
+
+def load_optional_color_trim_scope(path: Path) -> tuple[list[dict[str, str]], bool]:
+    if not path.exists():
+        return [], False
+    return read_csv(path), True
 
 
 def sheet_family_map(sheets: list[dict[str, str]]) -> dict[str, str]:
@@ -253,6 +277,51 @@ def rpo_counts(staging: dict[str, list[dict[str, str]]]) -> list[dict[str, Any]]
         }
         for (file_name, source_sheet, model_key, section_family, rpo_kind, rpo), count in sorted(counts.items())
     ]
+
+
+def rpo_role_overlaps(staging: dict[str, list[dict[str, str]]]) -> list[dict[str, Any]]:
+    by_rpo: dict[str, dict[str, Any]] = {}
+    for row in staging["variant_matrix_rows"]:
+        for field_name, count_name in [("orderable_rpo", "orderable_count"), ("ref_rpo", "ref_only_count")]:
+            rpo = clean(row.get(field_name, ""))
+            if not rpo:
+                continue
+            entry = by_rpo.setdefault(
+                rpo,
+                {
+                    "rpo": rpo,
+                    "orderable_count": 0,
+                    "ref_only_count": 0,
+                    "source_sheets": set(),
+                    "model_keys": set(),
+                    "section_families": set(),
+                    "sample_descriptions": set(),
+                    "recommended_action": "review_orderable_vs_reference_usage_before_proposal",
+                },
+            )
+            entry[count_name] += 1
+            entry["source_sheets"].add(clean(row.get("source_sheet", "")) or "<blank>")
+            entry["model_keys"].add(clean(row.get("model_key", "")) or "<blank>")
+            entry["section_families"].add(clean(row.get("section_family", "")) or "<blank>")
+            description = clean(row.get("description", ""))
+            if description and len(entry["sample_descriptions"]) < 5:
+                entry["sample_descriptions"].add(description)
+    overlaps = []
+    for entry in by_rpo.values():
+        if entry["orderable_count"] and entry["ref_only_count"]:
+            overlaps.append(
+                {
+                    "rpo": entry["rpo"],
+                    "orderable_count": entry["orderable_count"],
+                    "ref_only_count": entry["ref_only_count"],
+                    "source_sheets": "|".join(sorted(entry["source_sheets"])),
+                    "model_keys": "|".join(sorted(entry["model_keys"])),
+                    "section_families": "|".join(sorted(entry["section_families"])),
+                    "sample_descriptions": " | ".join(sorted(entry["sample_descriptions"])),
+                    "recommended_action": entry["recommended_action"],
+                }
+            )
+    return sorted(overlaps, key=lambda row: row["rpo"])
 
 
 def footnote_counts(staging: dict[str, list[dict[str, str]]]) -> list[dict[str, Any]]:
@@ -524,7 +593,66 @@ def color_trim_audit(staging: dict[str, list[dict[str, str]]]) -> dict[str, Any]
     }
 
 
-def domain_readiness(suspicious: list[dict[str, Any]], staging: dict[str, list[dict[str, str]]]) -> dict[str, Any]:
+def observed_color_trim_sections(staging: dict[str, list[dict[str, str]]]) -> list[dict[str, str]]:
+    rows = []
+    for row in staging.get("sheet_sections", []):
+        section_role = clean(row.get("section_role", ""))
+        if not section_role.startswith("color_trim_"):
+            continue
+        rows.append(
+            {
+                "sheet_name": clean(row.get("source_sheet", "")),
+                "section_role": section_role,
+                "section_index": clean(row.get("section_index", "")),
+                "guide_family": clean(row.get("guide_family", "")),
+                "observed_model_key": clean(row.get("model_key", "")),
+                "scope_type": clean(row.get("scope_type", "")),
+            }
+        )
+    return sorted(rows, key=lambda row: (row["sheet_name"], row["section_role"], row["section_index"]))
+
+
+def color_trim_scope_review(staging: dict[str, list[dict[str, str]]], scope_rows: list[dict[str, str]], config_present: bool) -> dict[str, Any]:
+    observed = observed_color_trim_sections(staging)
+    by_key = {(clean(row.get("sheet_name", "")), clean(row.get("section_role", ""))): row for row in scope_rows}
+    missing = []
+    mapped_count = 0
+    accepted_review_only_count = 0
+    review_status_counts: Counter[str] = Counter()
+    canonical_deferred_count = 0
+    for section in observed:
+        mapped = by_key.get((section["sheet_name"], section["section_role"]))
+        if not mapped:
+            missing.append(section)
+            review_status_counts["missing_scope_review"] += 1
+            continue
+        mapped_count += 1
+        review_status = clean(mapped.get("review_status", "")) or "<blank>"
+        review_status_counts[review_status] += 1
+        if review_status == "accepted_review_only":
+            accepted_review_only_count += 1
+            canonical_deferred_count += 1
+    unresolved_count = len(missing) + sum(count for status, count in review_status_counts.items() if status not in {"approved", "accepted_review_only"})
+    ready_for_audit_domain = bool(observed) and unresolved_count == 0
+    return {
+        "color_trim_scope_config_present": config_present,
+        "observed_section_count": len(observed),
+        "mapped_section_count": mapped_count,
+        "missing_section_count": len(missing),
+        "accepted_review_only_count": accepted_review_only_count,
+        "canonical_deferred_count": canonical_deferred_count,
+        "review_status_counts": dict(sorted(review_status_counts.items())),
+        "missing_sections": missing,
+        "ready_for_audit_domain": ready_for_audit_domain,
+        "canonical_import_ready": ready_for_audit_domain and canonical_deferred_count == 0,
+        "notes": [
+            "accepted_review_only means the audit has an intentional disposition, not that the section is ready for canonical import.",
+            "Color/Trim sheet numbering is not inferred as model scope.",
+        ],
+    }
+
+
+def domain_readiness(suspicious: list[dict[str, Any]], staging: dict[str, list[dict[str, str]]], color_trim_scope: dict[str, Any]) -> dict[str, Any]:
     blocking_impacts = {"blocking", "review_required"}
     primary_blockers = [
         row
@@ -552,14 +680,14 @@ def domain_readiness(suspicious: list[dict[str, Any]], staging: dict[str, list[d
     canonical_blockers = [row for row in suspicious if row.get("readiness_impact") in blocking_impacts]
     return {
         "primary_variant_matrix_ready": not primary_blockers,
-        "color_trim_ready": not color_trim_blockers and color_trim_audit(staging)["has_interior_and_compatibility_rows"],
+        "color_trim_ready": color_trim_scope["ready_for_audit_domain"] and color_trim_audit(staging)["has_interior_and_compatibility_rows"],
         "pricing_ready": not pricing_blockers,
         "equipment_groups_ready": equipment_group_summary["cross_check_only"] and not equipment_group_blockers,
-        "canonical_proposal_ready": not canonical_blockers and not staging["unresolved_rows"],
+        "canonical_proposal_ready": not canonical_blockers and not staging["unresolved_rows"] and color_trim_scope["canonical_import_ready"],
     }
 
 
-def readiness(suspicious: list[dict[str, Any]], staging: dict[str, list[dict[str, str]]]) -> dict[str, Any]:
+def readiness(suspicious: list[dict[str, Any]], staging: dict[str, list[dict[str, str]]], color_trim_scope: dict[str, Any]) -> dict[str, Any]:
     reasons = []
     if staging["unresolved_rows"]:
         reasons.append("unresolved_rows_present")
@@ -570,7 +698,11 @@ def readiness(suspicious: list[dict[str, Any]], staging: dict[str, list[dict[str
         reasons.append("equipment_groups_leaked_to_primary_variant_rows")
     if staging.get("color_trim_interior_rows") and not staging.get("color_trim_compatibility_rows"):
         reasons.append("color_trim_compatibility_rows_missing")
-    readiness_by_domain = domain_readiness(suspicious, staging)
+    if not color_trim_scope["ready_for_audit_domain"]:
+        reasons.append("color_trim_scope_review_incomplete")
+    elif not color_trim_scope["canonical_import_ready"]:
+        reasons.append("color_trim_scope_deferred_from_canonical_import")
+    readiness_by_domain = domain_readiness(suspicious, staging, color_trim_scope)
     return {
         "ready_for_proposal_generation": readiness_by_domain["canonical_proposal_ready"] and not reasons,
         "advisory_only": True,
@@ -579,14 +711,17 @@ def readiness(suspicious: list[dict[str, Any]], staging: dict[str, list[dict[str
     }
 
 
-def build_audit(staging_dir: Path) -> tuple[dict[str, Any], dict[str, list[dict[str, Any]]]]:
+def build_audit(staging_dir: Path, color_trim_scope_path: Path = DEFAULT_COLOR_TRIM_SCOPE) -> tuple[dict[str, Any], dict[str, list[dict[str, Any]]]]:
     staging, import_report, present_optional, missing_optional = load_staging(staging_dir)
+    color_trim_scope_rows, color_trim_scope_config_present = load_optional_color_trim_scope(color_trim_scope_path)
     families = sheet_family_map(staging["sheets"])
     model_rows = model_key_counts(staging)
     status_rows = status_counts(staging, families)
     rpo_rows = rpo_counts(staging)
+    rpo_overlap_rows = rpo_role_overlaps(staging)
     footnote_rows = footnote_counts(staging)
     suspicious = classify_suspicious_rows(suspicious_rows(staging), families)
+    color_trim_scope = color_trim_scope_review(staging, color_trim_scope_rows, color_trim_scope_config_present)
     audit = {
         "staging_dir": str(staging_dir),
         "inputs": {
@@ -604,13 +739,19 @@ def build_audit(staging_dir: Path) -> tuple[dict[str, Any], dict[str, list[dict[
         "unresolved_rows_by_reason": dict(sorted(Counter(row.get("reason", "") for row in staging["unresolved_rows"]).items())),
         "equipment_groups": equipment_group_audit(staging),
         "color_trim": color_trim_audit(staging),
+        "color_trim_scope_review": color_trim_scope,
+        "rpo_role_overlap_count": len(rpo_overlap_rows),
+        "rpo_role_overlap_summary": {
+            "recommended_action_counts": dict(sorted(Counter(row["recommended_action"] for row in rpo_overlap_rows).items())),
+            "rpos": [row["rpo"] for row in rpo_overlap_rows],
+        },
         "suspicious_row_count": len(suspicious),
         "suspicious_rows_by_reason": counter_by(suspicious, "reason"),
         "suspicious_rows_by_type": counter_by(suspicious, "suspicion_type"),
         "suspicious_rows_by_bucket": counter_by(suspicious, "review_bucket"),
         "suspicious_rows_by_readiness_impact": counter_by(suspicious, "readiness_impact"),
         "recommended_actions_by_bucket": recommended_actions_by_bucket(suspicious),
-        "readiness": readiness(suspicious, staging),
+        "readiness": readiness(suspicious, staging, color_trim_scope),
         "source_import_report_summary": {
             key: import_report.get(key)
             for key in [
@@ -634,6 +775,7 @@ def build_audit(staging_dir: Path) -> tuple[dict[str, Any], dict[str, list[dict[
         "model_key_counts": model_rows,
         "status_counts": status_rows,
         "rpo_counts": rpo_rows,
+        "rpo_role_overlaps": rpo_overlap_rows,
         "footnote_counts": footnote_rows,
         "suspicious_rows": suspicious,
     }
@@ -643,7 +785,7 @@ def build_audit(staging_dir: Path) -> tuple[dict[str, Any], dict[str, list[dict[
 def main() -> int:
     args = parse_args()
     out_path = Path(args.out)
-    audit, csvs = build_audit(Path(args.staging))
+    audit, csvs = build_audit(Path(args.staging), Path(args.color_trim_scope))
     write_json(out_path, audit)
     out_dir = out_path.parent
     for name, rows in csvs.items():

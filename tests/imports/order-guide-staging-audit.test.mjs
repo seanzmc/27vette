@@ -104,6 +104,9 @@ test("staging audit reports extraction quality without modifying staging evidenc
   const stagingDir = path.join(tmpDir, "staging");
   const auditPath = path.join(stagingDir, "staging_audit_report.json");
   const secondAuditPath = path.join(stagingDir, "staging_audit_report_second.json");
+  const acceptedScopePath = path.join(tmpDir, "color_trim_scope_accepted.csv");
+  const acceptedAuditPath = path.join(stagingDir, "staging_audit_report_accepted_scope.json");
+  const missingScopeAuditPath = path.join(stagingDir, "staging_audit_report_missing_scope.json");
   makeFixture(source);
 
   execFileSync(PYTHON, [INSPECT_SCRIPT, "--source", source, "--out", profilePath], {
@@ -131,6 +134,7 @@ test("staging audit reports extraction quality without modifying staging evidenc
     "staging_audit_model_key_counts.csv",
     "staging_audit_status_counts.csv",
     "staging_audit_rpo_counts.csv",
+    "staging_audit_rpo_role_overlaps.csv",
     "staging_audit_footnote_counts.csv",
     "staging_audit_suspicious_rows.csv",
   ]) {
@@ -161,6 +165,10 @@ test("staging audit reports extraction quality without modifying staging evidenc
   assert.equal(audit.equipment_groups.cross_check_only, true);
   assert.equal(audit.equipment_groups.variant_matrix_leak_count, 0);
   assert.equal(audit.color_trim.has_interior_and_compatibility_rows, true);
+  assert.equal(audit.color_trim_scope_review.color_trim_scope_config_present, true);
+  assert.equal(audit.color_trim_scope_review.ready_for_audit_domain, false);
+  assert.equal(audit.color_trim_scope_review.review_status_counts.needs_review >= 1, true);
+  assert.equal(audit.color_trim_scope_review.missing_section_count, 0);
   assert.ok(audit.variant_columns_by_sheet["Standard Equipment 1"].some((row) => row.body_code === "1YC07" && row.model_key === "stingray"));
   assert.ok(audit.variant_columns_by_sheet["Standard Equipment 1"].some((row) => row.body_code === "9ZZ07" && row.model_key === ""));
   assert.ok(audit.row_counts.variant_matrix_rows.total_rows >= 4);
@@ -180,6 +188,19 @@ test("staging audit reports extraction quality without modifying staging evidenc
   assert.ok(audit.suspicious_rows_by_readiness_impact.review_required >= 1);
   assert.ok(audit.suspicious_rows_by_readiness_impact.blocking >= 1);
   assert.ok(audit.recommended_actions_by_bucket.color_trim_review_only["confirm_model_scope_or_import_map; do_not_variant_expand"] >= 1);
+  assert.equal(audit.rpo_role_overlap_count >= 1, true);
+  assert.equal(audit.rpo_role_overlap_summary.rpos.includes("CCC"), true);
+
+  const rpoRoleOverlaps = readCsv(path.join(stagingDir, "staging_audit_rpo_role_overlaps.csv"));
+  const cccOverlap = rpoRoleOverlaps.find((row) => row.rpo === "CCC");
+  assert.ok(cccOverlap, "CCC should be surfaced in the role-overlap review CSV");
+  assert.equal(Number(cccOverlap.orderable_count) >= 1, true);
+  assert.equal(Number(cccOverlap.ref_only_count) >= 1, true);
+  assert.match(cccOverlap.source_sheets, /Standard Equipment 1/);
+  assert.match(cccOverlap.model_keys, /stingray/);
+  assert.match(cccOverlap.section_families, /standard_equipment/);
+  assert.match(cccOverlap.sample_descriptions, /Reference evidence/);
+  assert.equal(cccOverlap.recommended_action, "review_orderable_vs_reference_usage_before_proposal");
 
   const suspiciousRows = readCsv(path.join(stagingDir, "staging_audit_suspicious_rows.csv"));
   for (const fieldName of [
@@ -229,6 +250,43 @@ test("staging audit reports extraction quality without modifying staging evidenc
     fs.readFileSync(auditPath, "utf8").replace(/staging_audit_report\.json/g, "staging_audit_report_second.json"),
     fs.readFileSync(secondAuditPath, "utf8"),
   );
+
+  fs.writeFileSync(
+    acceptedScopePath,
+    [
+      "sheet_name,section_role,guide_family,model_key,scope_type,confidence,review_status,notes",
+      "Color and Trim 1,color_trim_interior_matrix,corvette,,model_global,confirmed,accepted_review_only,Accepted as review-only scope for audit domain.",
+      "Color and Trim 1,color_trim_compatibility_matrix,corvette,,model_global,confirmed,accepted_review_only,Accepted as review-only scope for audit domain.",
+      "Color and Trim 1,color_trim_disclosure,corvette,,model_global,confirmed,accepted_review_only,Accepted as review-only scope for audit domain.",
+      "",
+    ].join("\n"),
+  );
+  execFileSync(PYTHON, [AUDIT_SCRIPT, "--staging", stagingDir, "--out", acceptedAuditPath, "--color-trim-scope", acceptedScopePath], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+  });
+  const acceptedAudit = JSON.parse(fs.readFileSync(acceptedAuditPath, "utf8"));
+  assert.equal(acceptedAudit.color_trim_scope_review.ready_for_audit_domain, true);
+  assert.equal(acceptedAudit.color_trim_scope_review.canonical_import_ready, false);
+  assert.equal(acceptedAudit.readiness.color_trim_ready, true);
+  assert.equal(acceptedAudit.readiness.canonical_proposal_ready, false);
+  assert.ok(acceptedAudit.readiness.reasons.includes("color_trim_scope_deferred_from_canonical_import"));
+
+  execFileSync(PYTHON, [AUDIT_SCRIPT, "--staging", stagingDir, "--out", missingScopeAuditPath, "--color-trim-scope", path.join(tmpDir, "missing_color_trim_scope.csv")], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+  });
+  const missingScopeAudit = JSON.parse(fs.readFileSync(missingScopeAuditPath, "utf8"));
+  assert.equal(missingScopeAudit.color_trim_scope_review.color_trim_scope_config_present, false);
+  assert.equal(missingScopeAudit.color_trim_scope_review.missing_section_count >= 1, true);
+  assert.deepEqual(Object.keys(missingScopeAudit.color_trim_scope_review.missing_sections[0]).sort(), [
+    "guide_family",
+    "observed_model_key",
+    "scope_type",
+    "section_index",
+    "section_role",
+    "sheet_name",
+  ]);
 });
 
 test("staging audit exits nonzero for missing required inputs only", () => {

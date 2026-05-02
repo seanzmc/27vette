@@ -1,0 +1,7 @@
+sheet_name,section_role,guide_family,model_key,scope_type,confidence,review_status,notes
+Color and Trim 1,color_trim_interior_matrix,corvette,,model_global,needs_review,needs_review,"Observed in the 2027 Corvette export; model scope needs explicit review before canonical proposal work."
+Color and Trim 1,color_trim_compatibility_matrix,corvette,,model_global,needs_review,needs_review,"Observed in the 2027 Corvette export; model scope needs explicit review before canonical proposal work."
+Color and Trim 1,color_trim_disclosure,corvette,,model_global,needs_review,needs_review,"Review-only disclosure evidence; do not convert to canonical behavior in this pass."
+Color and Trim 2,color_trim_interior_matrix,corvette,,model_global,needs_review,needs_review,"Observed in the 2027 Corvette export; model scope needs explicit review before canonical proposal work."
+Color and Trim 2,color_trim_compatibility_matrix,corvette,,model_global,needs_review,needs_review,"Observed in the 2027 Corvette export; model scope needs explicit review before canonical proposal work."
+Color and Trim 2,color_trim_disclosure,corvette,,model_global,needs_review,needs_review,"Review-only disclosure evidence; do not convert to canonical behavior in this pass."
