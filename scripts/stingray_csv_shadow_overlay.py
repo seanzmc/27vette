@@ -360,7 +360,42 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--fragment-json", default="")
     parser.add_argument("--out", default="")
     parser.add_argument("--pretty", action="store_true")
+    parser.add_argument("--as-data-js", action="store_true")
     return parser.parse_args()
+
+
+def format_shadow_json(shadow: dict[str, Any], pretty: bool = False) -> str:
+    indent = 2 if pretty else None
+    return json.dumps(shadow, indent=indent, sort_keys=True, separators=None if pretty else (",", ":"))
+
+
+def format_data_js(shadow: dict[str, Any], pretty: bool = False) -> str:
+    registry_json = json.dumps(
+        {
+            "defaultModelKey": "stingray",
+            "models": {
+                "stingray": {
+                    "key": "stingray",
+                    "label": "Stingray",
+                    "modelName": "Corvette Stingray",
+                    "exportSlug": "stingray",
+                    "data": shadow,
+                }
+            },
+        },
+        indent=2 if pretty else None,
+        sort_keys=True,
+        separators=None if pretty else (",", ":"),
+    )
+    if pretty:
+        return (
+            f"window.CORVETTE_FORM_DATA = {registry_json};\n"
+            "window.STINGRAY_FORM_DATA = window.CORVETTE_FORM_DATA.models.stingray.data;"
+        )
+    return (
+        f"window.CORVETTE_FORM_DATA={registry_json};\n"
+        "window.STINGRAY_FORM_DATA=window.CORVETTE_FORM_DATA.models.stingray.data;"
+    )
 
 
 def main() -> None:
@@ -369,8 +404,7 @@ def main() -> None:
         production = load_production_data(Path(args.production_data))
         fragment = load_fragment(args)
         shadow = overlay_shadow_data(production, fragment)
-        indent = 2 if args.pretty else None
-        output = json.dumps(shadow, indent=indent, sort_keys=True, separators=None if args.pretty else (",", ":"))
+        output = format_data_js(shadow, args.pretty) if args.as_data_js else format_shadow_json(shadow, args.pretty)
         if args.out:
             output_path = Path(args.out)
             output_path.parent.mkdir(parents=True, exist_ok=True)
