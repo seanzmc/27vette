@@ -480,13 +480,16 @@ def assert_no_unreplaced_owned_records(
     unclassified_cross_boundary = []
     for row in normalize(production_rows):
         ids = [row.get(field, "") for field in id_fields]
+        row_key = tuple(ids)
         if not any(item in projected_ids for item in ids):
             continue
+        if row_key in preserved_keys:
+            continue
         if any(item and item not in projected_ids for item in ids):
-            if tuple(ids) not in preserved_keys and normalized_json(row) not in fragment_records:
+            if normalized_json(row) not in fragment_records:
                 unclassified_cross_boundary.append(row)
             continue
-        if tuple(ids) not in fragment_keys:
+        if row_key not in fragment_keys:
             dropped.append(row)
     if unclassified_cross_boundary:
         raise OverlayError(f"{surface} has unclassified cross-boundary records: {unclassified_cross_boundary[:5]}.")

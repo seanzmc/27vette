@@ -8,8 +8,9 @@ import { createRuntime, loadGeneratedData, loadShadowData } from "./runtime-harn
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
-const TVS_RPOS = new Set(["TVS"]);
-const NON_TVS_SPOILER_RPOS = new Set(["5ZZ", "5ZU", "Z51", "5V7", "ZYC", "GBA", "5ZW"]);
+const T0A_RPOS = new Set(["T0A"]);
+const NON_T0A_SPOILER_RPOS = new Set(["5ZZ", "5ZU", "Z51", "5V7", "ZYC", "GBA", "5ZW"]);
+const Z51_INCLUDE_TARGETS = new Set(["FE3", "G0K", "G96", "J55", "M1N", "QTU", "V08"]);
 
 function parseCsv(source) {
   const rows = [];
@@ -76,13 +77,22 @@ function optionIdByRpo(data, rpo) {
   return choice.option_id;
 }
 
-function tvsOptionIds(data) {
-  return new Set(data.choices.filter((choice) => TVS_RPOS.has(choice.rpo)).map((choice) => choice.option_id));
+function optionIdsByRpo(data) {
+  const byRpo = new Map();
+  for (const choice of data.choices) {
+    if (!choice.rpo) continue;
+    byRpo.set(choice.rpo, choice.option_id);
+  }
+  return byRpo;
+}
+
+function t0aOptionIds(data) {
+  return new Set(data.choices.filter((choice) => T0A_RPOS.has(choice.rpo)).map((choice) => choice.option_id));
 }
 
 function normalizeChoices(rows) {
   return Array.from(rows)
-    .filter((choice) => TVS_RPOS.has(choice.rpo))
+    .filter((choice) => T0A_RPOS.has(choice.rpo))
     .map((choice) => ({
       choice_id: choice.choice_id,
       option_id: choice.option_id,
@@ -129,32 +139,6 @@ function normalizeRules(rows, optionId) {
     .sort((a, b) => `${a.source_id}:${a.rule_type}:${a.target_id}`.localeCompare(`${b.source_id}:${b.rule_type}:${b.target_id}`));
 }
 
-function normalizePriceRules(rows, optionId) {
-  return rows
-    .filter((rule) => rule.condition_option_id === optionId || rule.target_option_id === optionId)
-    .map((rule) => ({
-      condition_option_id: rule.condition_option_id,
-      target_option_id: rule.target_option_id,
-      price_rule_type: rule.price_rule_type,
-      price_value: Number(rule.price_value || 0),
-      body_style_scope: rule.body_style_scope || "",
-      trim_level_scope: rule.trim_level_scope || "",
-      variant_scope: rule.variant_scope || "",
-      review_flag: rule.review_flag,
-      notes: rule.notes,
-    }))
-    .sort((a, b) => `${a.condition_option_id}:${a.target_option_id}:${a.price_value}`.localeCompare(`${b.condition_option_id}:${b.target_option_id}:${b.price_value}`));
-}
-
-function optionIdsByRpo(data) {
-  const byRpo = new Map();
-  for (const choice of data.choices) {
-    if (!choice.rpo) continue;
-    byRpo.set(choice.rpo, choice.option_id);
-  }
-  return byRpo;
-}
-
 function runtimeFor(data, variantId) {
   const runtime = createRuntime(data);
   const variant = data.variants.find((item) => item.variant_id === variantId);
@@ -185,111 +169,129 @@ function selectedRpos(runtime, rpos) {
     .sort();
 }
 
+function autoAddedRpos(runtime, rpos) {
+  return [...runtime.computeAutoAdded().keys()]
+    .map((optionId) => runtime.activeChoiceRows().find((choice) => choice.option_id === optionId)?.rpo)
+    .filter((rpo) => rpos.has(rpo))
+    .sort();
+}
+
 function manifestHas(expected) {
   return activeManifestRows().some((row) => Object.entries(expected).every(([key, value]) => row[key] === value));
 }
 
-test("CSV evaluator prices direct TVS selection", () => {
-  const result = evaluate("1lt_c07", ["opt_tvs_001"]);
-  const line = result.selected_lines.find((item) => item.selectable_id === "opt_tvs_001");
+test("CSV evaluator prices direct T0A selection without projecting Z51 behavior", () => {
+  const result = evaluate("1lt_c07", ["opt_t0a_001"]);
+  const line = result.selected_lines.find((item) => item.selectable_id === "opt_t0a_001");
 
-  assert.equal(line?.final_price_usd, 995);
-  assert.deepEqual(result.conflicts, []);
+  assert.equal(line?.rpo, "T0A");
+  assert.equal(line?.label, "Z51 Spoiler");
+  assert.equal(line?.final_price_usd, 0);
+  assert.deepEqual(result.validation_errors, []);
+  assert.equal(result.selected_lines.some((item) => Z51_INCLUDE_TARGETS.has(item.rpo)), false);
 });
 
-test("CSV TVS legacy fragment matches generated TVS choices without projecting the spoiler group", () => {
+test("CSV T0A legacy fragment matches generated T0A choices without projecting spoiler group or Z51 includes", () => {
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
 
   assert.deepEqual(projected.validation_errors, []);
-  assert.deepEqual([...tvsOptionIds(projected)].sort(), ["opt_tvs_001"]);
+  assert.deepEqual([...t0aOptionIds(projected)].sort(), ["opt_t0a_001"]);
   assert.deepEqual(normalizeChoices(projected.choices), normalizeChoices(production.choices));
   assert.equal(projected.exclusiveGroups.some((group) => group.group_id === "grp_spoiler_high_wing"), false);
   assert.equal(projected.ruleGroups.length, 0);
-  for (const rpo of NON_TVS_SPOILER_RPOS) {
+  for (const rpo of NON_T0A_SPOILER_RPOS) {
     assert.equal(projected.choices.some((choice) => choice.rpo === rpo || choice.option_id === `opt_${rpo.toLowerCase()}_001`), false);
+  }
+  for (const rpo of Z51_INCLUDE_TARGETS) {
+    assert.equal(projected.choices.some((choice) => choice.rpo === rpo), false);
+    assert.equal(projected.rules.some((rule) => rule.target_id === `opt_${rpo.toLowerCase()}_001`), false);
   }
 });
 
-test("ownership manifest projects only TVS and preserves every TVS-touching production boundary", () => {
+test("ownership manifest projects only T0A and preserves every T0A-touching production boundary", () => {
   const production = loadGeneratedData();
   const byRpo = optionIdsByRpo(production);
-  const tvsId = byRpo.get("TVS");
+  const t0aId = byRpo.get("T0A");
   const productionRules = production.rules
-    .filter((rule) => rule.source_id === tvsId || rule.target_id === tvsId)
-    .map((rule) => [rule.source_id, rule.target_id, rule.rule_type, rule.runtime_action])
+    .filter((rule) => rule.source_id === t0aId || rule.target_id === t0aId)
+    .map((rule) => [rule.source_id, rule.target_id, rule.rule_type, rule.auto_add, rule.runtime_action])
     .sort();
   const productionPriceRules = production.priceRules
-    .filter((rule) => rule.condition_option_id === tvsId || rule.target_option_id === tvsId)
+    .filter((rule) => rule.condition_option_id === t0aId || rule.target_option_id === t0aId)
     .map((rule) => [rule.condition_option_id, rule.target_option_id, rule.price_rule_type, Number(rule.price_value || 0)])
     .sort();
   const productionGroups = production.exclusiveGroups
-    .filter((group) => group.option_ids.includes(tvsId))
+    .filter((group) => group.option_ids.includes(t0aId))
     .map((group) => group.group_id)
     .sort();
   const productionRuleGroups = production.ruleGroups
-    .filter((group) => group.source_id === tvsId || group.target_ids.includes(tvsId))
+    .filter((group) => group.source_id === t0aId || group.target_ids.includes(t0aId))
     .map((group) => group.group_id)
     .sort();
 
   assert.deepEqual(plain(productionRules), plain([
-    [byRpo.get("5V7"), tvsId, "excludes", "active"],
-    ["opt_5vm_001", tvsId, "excludes", "active"],
-    ["opt_5w8_001", tvsId, "excludes", "active"],
-    [tvsId, byRpo.get("T0A"), "excludes", "replace"],
+    [byRpo.get("5ZU"), t0aId, "excludes", "False", "replace"],
+    ["opt_5zw_001", t0aId, "excludes", "False", "active"],
+    [byRpo.get("5ZZ"), t0aId, "excludes", "False", "replace"],
+    [byRpo.get("Z51"), t0aId, "includes", "True", "active"],
+    [t0aId, byRpo.get("Z51"), "requires", "False", "active"],
+    [byRpo.get("TVS"), t0aId, "excludes", "False", "replace"],
   ].sort()));
-  assert.deepEqual(plain(productionPriceRules), plain([[byRpo.get("Z51"), tvsId, "override", 0]]));
+  assert.deepEqual(plain(productionPriceRules), []);
   assert.deepEqual(plain(productionGroups), ["grp_spoiler_high_wing"]);
   assert.deepEqual(plain(productionRuleGroups), []);
 
-  assert.equal(manifestHas({ record_type: "selectable", rpo: "TVS", ownership: "projected_owned" }), true);
+  assert.equal(manifestHas({ record_type: "selectable", rpo: "T0A", ownership: "projected_owned" }), true);
   assert.equal(manifestHas({ record_type: "exclusiveGroup", group_id: "grp_spoiler_high_wing", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "Z51", target_rpo: "T0A", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "T0A", target_rpo: "Z51", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "TVS", target_rpo: "T0A", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "priceRule", source_rpo: "Z51", target_rpo: "TVS", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_rpo: "TVS", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5vm_001", target_rpo: "TVS", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5w8_001", target_rpo: "TVS", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5ZZ", target_rpo: "T0A", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5ZU", target_rpo: "T0A", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5zw_001", target_rpo: "T0A", ownership: "preserved_cross_boundary" }), true);
 
-  for (const rpo of NON_TVS_SPOILER_RPOS) {
+  for (const rpo of NON_T0A_SPOILER_RPOS) {
     assert.equal(manifestHas({ record_type: "selectable", rpo, ownership: "projected_owned" }), false);
   }
 });
 
-test("shadow overlay preserves TVS production-owned rules priceRules and spoiler group", () => {
+test("shadow overlay preserves T0A production-owned rules and spoiler group", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
-  const tvsId = optionIdByRpo(production, "TVS");
+  const t0aId = optionIdByRpo(production, "T0A");
   const productionGroup = production.exclusiveGroups.find((group) => group.group_id === "grp_spoiler_high_wing");
   const shadowGroup = shadow.exclusiveGroups.find((group) => group.group_id === "grp_spoiler_high_wing");
 
   assert.deepEqual(plain(shadowGroup), plain(productionGroup));
-  assert.deepEqual(plain(normalizeRules(shadow.rules, tvsId)), plain(normalizeRules(production.rules, tvsId)));
-  assert.deepEqual(plain(normalizePriceRules(shadow.priceRules, tvsId)), plain(normalizePriceRules(production.priceRules, tvsId)));
+  assert.deepEqual(plain(normalizeRules(shadow.rules, t0aId)), plain(normalizeRules(production.rules, t0aId)));
+  assert.deepEqual(plain(shadow.priceRules.filter((rule) => rule.condition_option_id === t0aId || rule.target_option_id === t0aId)), []);
 });
 
-test("shadow TVS runtime pricing replacement conflicts and exclusivity match production", () => {
+test("shadow T0A runtime requirements auto-add replacement and exclusivity match production", () => {
   for (const data of [loadGeneratedData(), loadShadowData()]) {
     const directRuntime = runtimeFor(data, "1lt_c07");
-    const tvs = activeChoiceByRpo(directRuntime, "TVS");
-    handleRpo(directRuntime, "TVS");
-    assert.equal(directRuntime.optionPrice(tvs.option_id), 995);
+    handleRpo(directRuntime, "T0A");
+    assert.deepEqual(selectedRpos(directRuntime, new Set(["T0A", "Z51"])), []);
+    assert.match(directRuntime.disableReasonForChoice(activeChoiceByRpo(directRuntime, "T0A")), /Requires Z51/);
 
     const z51Runtime = runtimeFor(data, "1lt_c07");
-    const t0a = activeChoiceByRpo(z51Runtime, "T0A");
     handleRpo(z51Runtime, "Z51");
-    assert.equal(z51Runtime.computeAutoAdded().has(t0a.option_id), true);
-    handleRpo(z51Runtime, "TVS");
-    assert.equal(z51Runtime.optionPrice(activeChoiceByRpo(z51Runtime, "TVS").option_id), 0);
-    assert.equal(z51Runtime.computeAutoAdded().has(t0a.option_id), false);
-    assert.deepEqual(selectedRpos(z51Runtime, new Set(["T0A", "TVS"])), ["TVS"]);
+    assert.deepEqual(selectedRpos(z51Runtime, new Set(["T0A", "Z51"])), ["Z51"]);
+    assert.deepEqual(autoAddedRpos(z51Runtime, new Set(["T0A"])), ["T0A"]);
 
-    const fiveV7Runtime = runtimeFor(data, "1lt_c07");
-    handleRpo(fiveV7Runtime, "5ZZ");
-    handleRpo(fiveV7Runtime, "5V7");
-    assert.match(fiveV7Runtime.disableReasonForChoice(activeChoiceByRpo(fiveV7Runtime, "TVS")), /Blocked by 5V7/);
+    for (const replacementRpo of ["TVS", "5ZZ", "5ZU"]) {
+      const replacementRuntime = runtimeFor(data, "1lt_c07");
+      if (replacementRpo === "5ZU") handleRpo(replacementRuntime, "GBA");
+      handleRpo(replacementRuntime, "Z51");
+      handleRpo(replacementRuntime, replacementRpo);
+      assert.deepEqual(selectedRpos(replacementRuntime, new Set(["T0A", "TVS", "5ZZ", "5ZU"])), [replacementRpo]);
+      assert.deepEqual(autoAddedRpos(replacementRuntime, new Set(["T0A"])), []);
+    }
 
     const exclusiveRuntime = runtimeFor(data, "1lt_c07");
-    handleRpo(exclusiveRuntime, "5ZZ");
+    handleRpo(exclusiveRuntime, "Z51");
+    handleRpo(exclusiveRuntime, "T0A");
     handleRpo(exclusiveRuntime, "TVS");
     assert.deepEqual(selectedRpos(exclusiveRuntime, new Set(["T0A", "TVS", "5ZZ", "5ZU"])), ["TVS"]);
   }
