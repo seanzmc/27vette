@@ -1,0 +1,9 @@
+phrase_type,pattern,confidence,notes
+requires,\brequires?\b,high,Potential dependency language.
+included_with,\bincluded with\b,high,Potential included-with language; staging candidate only.
+not_available_with,\bnot available with\b,high,Potential exclusion language.
+removes,\bremoves?\b,high,Potential removal/delete language.
+deletes,\bdeletes?\b,high,Potential deletion language.
+choice_of,\bchoice of\b,medium,Potential choice-set language.
+only_available_with,\bonly available with\b,high,Potential scoped availability language.
+when_ordered_with,\bwhen ordered with\b,high,Potential conditional language.

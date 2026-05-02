@@ -1,0 +1,8 @@
+sheet_name_pattern,sheet_role,section_family,scope_type,creates_canonical_candidates,model_key,model_group_index,model_group_index_source,notes
+^Price Schedule$,price_source,pricing,model_global,false,corvette,,none,Price Schedule extraction is staging evidence only; no final price semantics are inferred.
+^Standard Equipment (?P<index>\d+)$,primary_variant_matrix,standard_equipment,variant_scoped,true,corvette,,sheet_number,Primary variant-scoped matrix sheet.
+^Interior (?P<index>\d+)$,primary_variant_matrix,interior,variant_scoped,true,corvette,,sheet_number,Primary variant-scoped matrix sheet.
+^Exterior (?P<index>\d+)$,primary_variant_matrix,exterior,variant_scoped,true,corvette,,sheet_number,Primary variant-scoped matrix sheet.
+^Mechanical (?P<index>\d+)$,primary_variant_matrix,mechanical,variant_scoped,true,corvette,,sheet_number,Primary variant-scoped matrix sheet.
+^Equipment Groups (?P<index>\d+)$,derived_equipment_summary,equipment_groups,derived_cross_check,false,corvette,,sheet_number,Derived/cross-check sheet; rows unmatched to primary sheets are flagged and never promoted.
+^Color and Trim (?P<index>\d+)$,model_global_matrix,color_trim,model_global,false,corvette,,none,Color and Trim sheets are model-global, but their model grouping must come from sheet_roles.csv or be marked unresolved/ambiguous. Do not infer that Color and Trim numbering automatically matches Standard Equipment/Interior/Exterior/Mechanical numbering.

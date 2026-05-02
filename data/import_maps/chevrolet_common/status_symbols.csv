@@ -1,0 +1,8 @@
+raw_symbol,canonical_status,meaning,notes
+S,standard,Standard Equipment,May include footnote suffixes such as S1.
+A,available,Available,May include footnote suffixes such as A1.
+D,adi_available,ADI Available,May include footnote suffixes.
+--,not_available,Not Available,Dashes indicate unavailable.
+■,included_equipment_group,Included in Equipment Group,Derived equipment group evidence only in this scaffold.
+□,included_equipment_group_upgradeable,Included in Equipment Group but upgradeable,Derived equipment group evidence only in this scaffold.
+*,multiple_models_marker,Available on multiple models marker,Preserve as raw evidence.
