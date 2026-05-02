@@ -35,7 +35,23 @@ AUDIT_CSV_HEADERS = {
     "status_counts": ["source_sheet", "sheet_family", "status_context", "status_symbol", "canonical_status", "count"],
     "rpo_counts": ["staging_file", "source_sheet", "model_key", "section_family", "rpo_kind", "rpo", "count"],
     "footnote_counts": ["staging_file", "source_sheet", "model_key", "footnote_scope", "footnote_refs", "count"],
-    "suspicious_rows": ["source", "source_sheet", "source_row", "model_key", "severity", "reason", "raw_values"],
+    "suspicious_rows": [
+        "source",
+        "source_sheet",
+        "source_row",
+        "model_key",
+        "severity",
+        "reason",
+        "raw_values",
+        "suspicion_type",
+        "review_bucket",
+        "recommended_action",
+        "section_family",
+        "rpo",
+        "raw_value",
+        "classification_reason",
+        "readiness_impact",
+    ],
 }
 
 
@@ -249,21 +265,16 @@ def footnote_counts(staging: dict[str, list[dict[str, str]]]) -> list[dict[str, 
     counts: Counter[tuple[str, str, str, str, str]] = Counter()
     for file_name, scope_field, refs_field, fallback_scope in specs:
         for row in staging.get(file_name, []):
-            refs = row.get(refs_field, "")
-            if not refs:
-                continue
-            scope = row.get(scope_field, "") or fallback_scope
-            for ref in refs.split("|"):
-                if ref:
-                    counts[
-                        (
-                            file_name,
-                            row.get("source_sheet", ""),
-                            row.get("model_key", "") or "<blank>",
-                            scope,
-                            ref,
-                        )
-                    ] += 1
+            for scope, ref in iter_footnote_pairs(row.get(scope_field, ""), row.get(refs_field, ""), fallback_scope):
+                counts[
+                    (
+                        file_name,
+                        row.get("source_sheet", ""),
+                        row.get("model_key", "") or "<blank>",
+                        scope,
+                        ref,
+                    )
+                ] += 1
     return [
         {
             "staging_file": file_name,
@@ -275,6 +286,20 @@ def footnote_counts(staging: dict[str, list[dict[str, str]]]) -> list[dict[str, 
         }
         for (file_name, source_sheet, model_key, scope, refs), count in sorted(counts.items())
     ]
+
+
+def iter_footnote_pairs(scope_value: str, refs_value: str, fallback_scope: str) -> list[tuple[str, str]]:
+    refs = [ref for ref in clean(refs_value).split("|") if ref]
+    if not refs:
+        return []
+    scopes = [scope for scope in clean(scope_value).split("|") if scope]
+    if not scopes:
+        scopes = [fallback_scope]
+    if len(scopes) == len(refs):
+        return list(zip(scopes, refs))
+    if len(scopes) == 1:
+        return [(scopes[0], ref) for ref in refs]
+    return [("|".join(scopes), ref) for ref in refs]
 
 
 def duplicate_variant_rows(rows: list[dict[str, str]]) -> list[dict[str, Any]]:
@@ -375,6 +400,106 @@ def suspicious_rows(staging: dict[str, list[dict[str, str]]]) -> list[dict[str, 
     return sorted(rows_out, key=lambda row: (row["source_sheet"], row["model_key"], row["source_row"], row["reason"], row["source"]))
 
 
+def classify_suspicious_rows(rows: list[dict[str, Any]], families: dict[str, str]) -> list[dict[str, Any]]:
+    classified = [classify_suspicious_row(row, families) for row in rows]
+    return sorted(
+        classified,
+        key=lambda row: (
+            row.get("source_sheet", ""),
+            row.get("model_key", ""),
+            row.get("section_family", ""),
+            row.get("source_row", ""),
+            row.get("rpo", ""),
+            row.get("raw_value", ""),
+            row.get("reason", ""),
+            row.get("source", ""),
+        ),
+    )
+
+
+def classify_suspicious_row(row: dict[str, Any], families: dict[str, str]) -> dict[str, Any]:
+    reason = clean(row.get("reason", ""))
+    source = clean(row.get("source", ""))
+    source_sheet = clean(row.get("source_sheet", ""))
+    raw_values = clean(row.get("raw_values", ""))
+    section_family = families.get(source_sheet, "")
+    rpo = raw_values if reason == "rpo_appears_as_orderable_and_ref_only" else ""
+    raw_value = raw_values
+    classification = {
+        "suspicion_type": "unclassified_suspicion",
+        "review_bucket": "canonical_review_required",
+        "recommended_action": "review_before_proposal_generation",
+        "classification_reason": "No specific audit classification matched; preserve for human review.",
+        "readiness_impact": "review_required",
+    }
+    if reason == "color_trim_model_key_ambiguous" or source.startswith("color_trim_"):
+        classification = {
+            "suspicion_type": "model_scope_ambiguous",
+            "review_bucket": "color_trim_review_only",
+            "recommended_action": "confirm_model_scope_or_import_map; do_not_variant_expand",
+            "classification_reason": "Color/Trim rows are model-scoped evidence; ambiguous model_key remains visible until explicitly mapped or accepted.",
+            "readiness_impact": "review_required",
+        }
+    elif reason == "rpo_appears_as_orderable_and_ref_only":
+        classification = {
+            "suspicion_type": "rpo_role_overlap",
+            "review_bucket": "canonical_review_required",
+            "recommended_action": "review_orderable_vs_reference_usage_before_proposal",
+            "classification_reason": "The same raw RPO appears in both orderable and reference-only staging evidence.",
+            "readiness_impact": "review_required",
+        }
+    elif "equipment_group" in reason or "Equipment Groups" in source_sheet:
+        classification = {
+            "suspicion_type": "derived_equipment_crosscheck",
+            "review_bucket": "equipment_group_crosscheck_only",
+            "recommended_action": "keep_as_cross_check; do_not_promote_to_selectable",
+            "classification_reason": "Equipment Groups are derived/cross-check evidence in this importer pass.",
+            "readiness_impact": "advisory",
+        }
+    elif reason == "variant_model_key_needs_review":
+        classification = {
+            "suspicion_type": "model_key_unresolved",
+            "review_bucket": "import_map_gap",
+            "recommended_action": "review_variant_header_body_code_mapping",
+            "classification_reason": "Variant-scoped evidence lacks a resolved model_key and may need an import-map update.",
+            "readiness_impact": "blocking",
+        }
+    elif source == "unresolved_rows":
+        classification = {
+            "suspicion_type": "unresolved_staging_evidence",
+            "review_bucket": "import_map_gap",
+            "recommended_action": "classify_source_row_or_add_safe_ignore_reason",
+            "classification_reason": "A meaningful nonblank staging row could not be safely classified.",
+            "readiness_impact": "review_required",
+        }
+    elif source.startswith("price"):
+        classification = {
+            "suspicion_type": "price_evidence_review",
+            "review_bucket": "price_schedule_review_only",
+            "recommended_action": "review_price_source_evidence_before_pricing_proposal",
+            "classification_reason": "Price schedule evidence is staging-only and should be reviewed separately.",
+            "readiness_impact": "review_required",
+        }
+    return {
+        **row,
+        **classification,
+        "section_family": section_family,
+        "rpo": rpo,
+        "raw_value": raw_value,
+    }
+
+
+def counter_by(rows: list[dict[str, Any]], field_name: str) -> dict[str, int]:
+    return dict(sorted(Counter(clean(row.get(field_name, "")) or "<blank>" for row in rows).items()))
+
+
+def recommended_actions_by_bucket(rows: list[dict[str, Any]]) -> dict[str, dict[str, int]]:
+    result: dict[str, Counter[str]] = defaultdict(Counter)
+    for row in rows:
+        result[clean(row.get("review_bucket", "")) or "<blank>"][clean(row.get("recommended_action", "")) or "<blank>"] += 1
+    return {bucket: dict(sorted(actions.items())) for bucket, actions in sorted(result.items())}
+
+
 def equipment_group_audit(staging: dict[str, list[dict[str, str]]]) -> dict[str, Any]:
     leaked_primary_rows = [row for row in staging["variant_matrix_rows"] if "Equipment Groups" in row.get("source_sheet", "")]
     rows = staging.get("equipment_group_rows", [])
@@ -399,21 +524,58 @@ def color_trim_audit(staging: dict[str, list[dict[str, str]]]) -> dict[str, Any]
     }
 
 
+def domain_readiness(suspicious: list[dict[str, Any]], staging: dict[str, list[dict[str, str]]]) -> dict[str, Any]:
+    blocking_impacts = {"blocking", "review_required"}
+    primary_blockers = [
+        row
+        for row in suspicious
+        if row.get("review_bucket") == "import_map_gap"
+        and row.get("readiness_impact") in blocking_impacts
+        and row.get("source") in {"variant_matrix_rows", "unresolved_rows"}
+    ]
+    color_trim_blockers = [
+        row
+        for row in suspicious
+        if row.get("review_bucket") == "color_trim_review_only" and row.get("readiness_impact") in blocking_impacts
+    ]
+    pricing_blockers = [
+        row
+        for row in suspicious
+        if row.get("review_bucket") == "price_schedule_review_only" and row.get("readiness_impact") in blocking_impacts
+    ]
+    equipment_group_summary = equipment_group_audit(staging)
+    equipment_group_blockers = [
+        row
+        for row in suspicious
+        if row.get("review_bucket") == "equipment_group_crosscheck_only" and row.get("readiness_impact") == "blocking"
+    ]
+    canonical_blockers = [row for row in suspicious if row.get("readiness_impact") in blocking_impacts]
+    return {
+        "primary_variant_matrix_ready": not primary_blockers,
+        "color_trim_ready": not color_trim_blockers and color_trim_audit(staging)["has_interior_and_compatibility_rows"],
+        "pricing_ready": not pricing_blockers,
+        "equipment_groups_ready": equipment_group_summary["cross_check_only"] and not equipment_group_blockers,
+        "canonical_proposal_ready": not canonical_blockers and not staging["unresolved_rows"],
+    }
+
+
 def readiness(suspicious: list[dict[str, Any]], staging: dict[str, list[dict[str, str]]]) -> dict[str, Any]:
     reasons = []
     if staging["unresolved_rows"]:
         reasons.append("unresolved_rows_present")
-    review_suspicious = [row for row in suspicious if row.get("severity") == "review"]
+    review_suspicious = [row for row in suspicious if row.get("readiness_impact") in {"blocking", "review_required"}]
     if review_suspicious:
         reasons.append("suspicious_review_rows_present")
     if not equipment_group_audit(staging)["cross_check_only"]:
         reasons.append("equipment_groups_leaked_to_primary_variant_rows")
     if staging.get("color_trim_interior_rows") and not staging.get("color_trim_compatibility_rows"):
         reasons.append("color_trim_compatibility_rows_missing")
+    readiness_by_domain = domain_readiness(suspicious, staging)
     return {
-        "ready_for_proposal_generation": not reasons,
+        "ready_for_proposal_generation": readiness_by_domain["canonical_proposal_ready"] and not reasons,
         "advisory_only": True,
         "reasons": sorted(set(reasons)),
+        **readiness_by_domain,
     }
 
 
@@ -424,11 +586,11 @@ def build_audit(staging_dir: Path) -> tuple[dict[str, Any], dict[str, list[dict[
     status_rows = status_counts(staging, families)
     rpo_rows = rpo_counts(staging)
     footnote_rows = footnote_counts(staging)
-    suspicious = suspicious_rows(staging)
+    suspicious = classify_suspicious_rows(suspicious_rows(staging), families)
     audit = {
         "staging_dir": str(staging_dir),
         "inputs": {
-            "required_files": sorted(REQUIRED_FILES.values()) + ["import_report.json"],
+            "required_files": sorted([*REQUIRED_FILES.values(), "import_report.json"]),
             "optional_files_present": present_optional,
             "optional_files_missing": missing_optional,
         },
@@ -443,6 +605,11 @@ def build_audit(staging_dir: Path) -> tuple[dict[str, Any], dict[str, list[dict[
         "equipment_groups": equipment_group_audit(staging),
         "color_trim": color_trim_audit(staging),
         "suspicious_row_count": len(suspicious),
+        "suspicious_rows_by_reason": counter_by(suspicious, "reason"),
+        "suspicious_rows_by_type": counter_by(suspicious, "suspicion_type"),
+        "suspicious_rows_by_bucket": counter_by(suspicious, "review_bucket"),
+        "suspicious_rows_by_readiness_impact": counter_by(suspicious, "readiness_impact"),
+        "recommended_actions_by_bucket": recommended_actions_by_bucket(suspicious),
         "readiness": readiness(suspicious, staging),
         "source_import_report_summary": {
             key: import_report.get(key)
