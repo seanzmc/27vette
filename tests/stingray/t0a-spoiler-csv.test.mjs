@@ -9,7 +9,7 @@ const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const T0A_RPOS = new Set(["T0A"]);
-const NON_T0A_SPOILER_RPOS = new Set(["5ZZ", "5ZU", "Z51", "5V7", "ZYC", "GBA", "5ZW"]);
+const NON_T0A_SPOILER_RPOS = new Set(["5ZU", "Z51", "5V7", "ZYC", "GBA", "5ZW"]);
 const Z51_INCLUDE_TARGETS = new Set(["FE3", "G0K", "G96", "J55", "M1N", "QTU", "V08"]);
 
 function parseCsv(source) {
@@ -209,7 +209,7 @@ test("CSV T0A legacy fragment matches generated T0A choices without projecting s
   }
 });
 
-test("ownership manifest projects only T0A and preserves every T0A-touching production boundary", () => {
+test("ownership manifest projects T0A and preserves every T0A-touching production boundary", () => {
   const production = loadGeneratedData();
   const byRpo = optionIdsByRpo(production);
   const t0aId = byRpo.get("T0A");

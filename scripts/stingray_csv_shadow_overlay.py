@@ -780,6 +780,7 @@ def overlay_shadow_data(production: dict[str, Any], fragment: dict[str, Any], ow
         if any(option_id in production_ids for option_id in row.get("option_ids", []))
         and row.get("group_id") not in fragment_exclusive_group_keys
         and row.get("group_id") not in ownership.preserved_group_ids["exclusiveGroups"]
+        and row.get("group_id") not in ownership.guarded_group_ids["exclusiveGroups"]
     ]
     if unreplaced_exclusive_groups:
         raise OverlayError(f"exclusiveGroups has unreplaced migrated-slice-owned records: {unreplaced_exclusive_groups[:5]}.")
@@ -792,6 +793,7 @@ def overlay_shadow_data(production: dict[str, Any], fragment: dict[str, Any], ow
         )
         and row.get("group_id") not in fragment_rule_group_keys
         and row.get("group_id") not in ownership.preserved_group_ids["ruleGroups"]
+        and row.get("group_id") not in ownership.guarded_group_ids["ruleGroups"]
     ]
     if unreplaced_rule_groups:
         raise OverlayError(f"ruleGroups has unreplaced migrated-slice-owned records: {unreplaced_rule_groups[:5]}.")

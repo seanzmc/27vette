@@ -11,7 +11,7 @@ const PYTHON = ".venv/bin/python";
 const OVERLAY_SCRIPT = "scripts/stingray_csv_shadow_overlay.py";
 const FRAGMENT_SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
-const SPOILER_GUARDED_RPOS = ["5ZZ", "5ZU", "5V7", "Z51", "ZYC", "GBA"];
+const SPOILER_GUARDED_RPOS = ["5ZU", "5V7", "Z51", "ZYC", "GBA"];
 const SPOILER_NOT_PROJECTED_RPOS = new Set([...SPOILER_GUARDED_RPOS, "5ZW"]);
 
 function parseCsv(source) {
@@ -146,7 +146,7 @@ function emitFragment() {
   }));
 }
 
-test("Pass 25 projects only TVS and T0A while other spoiler-adjacent options stay guarded", () => {
+test("Pass 27 projects TVS T0A and 5ZZ while other spoiler-adjacent options stay guarded", () => {
   const production = loadGeneratedData();
   const rows = activeManifestRows();
   const projectedRpos = rows.filter((row) => row.ownership === "projected_owned").map((row) => row.rpo);
@@ -155,14 +155,15 @@ test("Pass 25 projects only TVS and T0A while other spoiler-adjacent options sta
   assert.deepEqual(guardedRpos, [...SPOILER_GUARDED_RPOS].sort());
   assert.equal(projectedRpos.includes("TVS"), true);
   assert.equal(projectedRpos.includes("T0A"), true);
+  assert.equal(projectedRpos.includes("5ZZ"), true);
   for (const rpo of SPOILER_NOT_PROJECTED_RPOS) {
-    assert.equal(projectedRpos.includes(rpo), false, `${rpo} should not be projected-owned in Pass 25`);
+    assert.equal(projectedRpos.includes(rpo), false, `${rpo} should not be projected-owned in Pass 27`);
   }
   assert.equal(rows.some((row) => row.ownership === "production_guarded" && row.target_option_id === "opt_5zw_001"), true);
   assert.equal(production.choices.some((choice) => choice.rpo === "5ZW" || choice.option_id === "opt_5zw_001"), false);
 });
 
-test("Pass 25 preserves mixed-boundary spoiler group identities without projecting them", () => {
+test("Pass 27 preserves mixed-boundary spoiler group identities without projecting them", () => {
   assert.deepEqual(groupRows(), [
     {
       record_type: "exclusiveGroup",
