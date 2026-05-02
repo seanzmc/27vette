@@ -14,6 +14,7 @@ const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.c
 const EXPECTED_OWNED_RPOS = [
   "5ZC",
   "5ZD",
+  "5ZU",
   "5ZZ",
   "B6P",
   "BC4",
@@ -212,7 +213,7 @@ test("projected ownership manifest declares the current multi-slice control scop
       target_option_id: "opt_5zw_001",
       ownership: "production_guarded",
     },
-    ...["5V7", "5ZU", "GBA", "Z51", "ZYC"].map((rpo) => ({
+    ...["5V7", "GBA", "Z51", "ZYC"].map((rpo) => ({
       record_type: "guardedOption",
       rpo,
       target_option_id: "",
