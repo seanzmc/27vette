@@ -168,15 +168,43 @@ function activeChoiceByRpo(runtime, rpo) {
   return choice;
 }
 
+function hasPreservedRow(rows, expected) {
+  return rows.some((row) => Object.entries(expected).every(([key, value]) => row[key] === value));
+}
+
 test("projected ownership manifest declares the current multi-slice control scope", () => {
   const rows = activeManifestRows();
+  const preserved = preservedRows(rows);
+  const guardedRows = rows
+    .filter((row) => row.ownership === "production_guarded")
+    .map((row) => ({
+      record_type: row.record_type,
+      rpo: row.rpo,
+      target_option_id: row.target_option_id || "",
+      ownership: row.ownership,
+    }))
+    .sort((a, b) => `${a.record_type}:${a.rpo}:${a.target_option_id}`.localeCompare(`${b.record_type}:${b.rpo}:${b.target_option_id}`));
 
   assert.deepEqual(projectedOwnedRpos(rows), EXPECTED_OWNED_RPOS);
   assert.equal(projectedOwnedRpos(rows).includes("PDV"), false);
   assert.equal(projectedOwnedRpos(rows).includes("PEF"), false);
   assert.equal(projectedOwnedRpos(rows).includes("CAV"), false);
   assert.equal(projectedOwnedRpos(rows).includes("RIA"), false);
-  assert.deepEqual(preservedRows(rows), [
+  assert.deepEqual(guardedRows, [
+    {
+      record_type: "guardedOption",
+      rpo: "",
+      target_option_id: "opt_5zw_001",
+      ownership: "production_guarded",
+    },
+    ...["5V7", "5ZU", "5ZZ", "GBA", "T0A", "TVS", "Z51", "ZYC"].map((rpo) => ({
+      record_type: "guardedOption",
+      rpo,
+      target_option_id: "",
+      ownership: "production_guarded",
+    })),
+  ]);
+  for (const expected of [
     {
       record_type: "priceRule",
       source_rpo: "PDV",
@@ -185,79 +213,19 @@ test("projected ownership manifest declares the current multi-slice control scop
       target_option_id: "",
       ownership: "preserved_cross_boundary",
     },
-    {
-      record_type: "rule",
-      source_rpo: "PDV",
-      source_option_id: "",
-      target_rpo: "VWD",
-      target_option_id: "",
-      ownership: "preserved_cross_boundary",
-    },
-    {
-      record_type: "rule",
-      source_rpo: "RNX",
-      source_option_id: "",
-      target_rpo: "",
-      target_option_id: "opt_5zw_001",
-      ownership: "preserved_cross_boundary",
-    },
-    {
-      record_type: "rule",
-      source_rpo: "RNX",
-      source_option_id: "",
-      target_rpo: "5ZU",
-      target_option_id: "",
-      ownership: "preserved_cross_boundary",
-    },
-    {
-      record_type: "rule",
-      source_rpo: "RNX",
-      source_option_id: "",
-      target_rpo: "5ZZ",
-      target_option_id: "",
-      ownership: "preserved_cross_boundary",
-    },
-    {
-      record_type: "rule",
-      source_rpo: "RNX",
-      source_option_id: "",
-      target_rpo: "Z51",
-      target_option_id: "",
-      ownership: "preserved_cross_boundary",
-    },
-    {
-      record_type: "rule",
-      source_rpo: "RWJ",
-      source_option_id: "",
-      target_rpo: "Z51",
-      target_option_id: "",
-      ownership: "preserved_cross_boundary",
-    },
-    {
-      record_type: "rule",
-      source_rpo: "WKQ",
-      source_option_id: "",
-      target_rpo: "",
-      target_option_id: "opt_5zw_001",
-      ownership: "preserved_cross_boundary",
-    },
-    {
-      record_type: "rule",
-      source_rpo: "WKQ",
-      source_option_id: "",
-      target_rpo: "5ZU",
-      target_option_id: "",
-      ownership: "preserved_cross_boundary",
-    },
-    {
-      record_type: "rule",
-      source_rpo: "WKQ",
-      source_option_id: "",
-      target_rpo: "5ZZ",
-      target_option_id: "",
-      ownership: "preserved_cross_boundary",
-    },
-  ]);
+    { record_type: "rule", source_rpo: "PDV", source_option_id: "", target_rpo: "VWD", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", source_rpo: "WKQ", source_option_id: "", target_rpo: "", target_option_id: "opt_5zw_001", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", source_rpo: "RNX", source_option_id: "", target_rpo: "", target_option_id: "opt_5zw_001", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", source_rpo: "TVS", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", source_rpo: "5ZZ", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", source_rpo: "5ZU", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", source_rpo: "", source_option_id: "opt_5zw_001", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "priceRule", source_rpo: "Z51", source_option_id: "", target_rpo: "TVS", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "ruleGroup", source_rpo: "5V7", source_option_id: "", target_rpo: "5ZZ", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "ruleGroup", source_rpo: "5ZU", source_option_id: "", target_rpo: "GBA", target_option_id: "", ownership: "preserved_cross_boundary" },
+  ]) {
+    assert.equal(hasPreservedRow(preserved, expected), true, `missing preserved row ${JSON.stringify(expected)}`);
+  }
 });
 
 test("legacy fragment projected RPO scope equals the ownership manifest", () => {

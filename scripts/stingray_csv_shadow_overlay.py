@@ -17,8 +17,8 @@ from stingray_csv_first_slice import DEFAULT_PACKAGE, CsvSlice
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_PRODUCTION_DATA = ROOT / "form-app" / "data.js"
 DEFAULT_OWNERSHIP_MANIFEST = DEFAULT_PACKAGE / "validation" / "projected_slice_ownership.csv"
-SUPPORTED_OWNERSHIP_VALUES = {"projected_owned", "preserved_cross_boundary"}
-SUPPORTED_RECORD_TYPES = {"selectable", "rule", "priceRule"}
+SUPPORTED_OWNERSHIP_VALUES = {"projected_owned", "preserved_cross_boundary", "production_guarded"}
+SUPPORTED_RECORD_TYPES = {"selectable", "guardedOption", "rule", "priceRule", "ruleGroup"}
 
 
 class OverlayError(ValueError):
@@ -26,8 +26,14 @@ class OverlayError(ValueError):
 
 
 class OwnershipScope:
-    def __init__(self, owned_rpos: set[str], preserved_cross_boundary_records: set[tuple[str, str, str, str, str]]) -> None:
+    def __init__(
+        self,
+        owned_rpos: set[str],
+        guarded_option_refs: set[tuple[str, str]],
+        preserved_cross_boundary_records: set[tuple[str, str, str, str, str]],
+    ) -> None:
         self.owned_rpos = owned_rpos
+        self.guarded_option_refs = guarded_option_refs
         self.preserved_cross_boundary_records = preserved_cross_boundary_records
 
 
@@ -60,8 +66,10 @@ def load_fragment(args: argparse.Namespace) -> dict[str, Any]:
 def load_ownership_scope(path: Path) -> OwnershipScope:
     rows = list(csv.DictReader(path.read_text(encoding="utf-8").splitlines()))
     owned_rpos: set[str] = set()
+    guarded_option_refs: set[tuple[str, str]] = set()
     preserved_cross_boundary_records: set[tuple[str, str, str, str, str]] = set()
     seen_owned_rpos: set[str] = set()
+    seen_guarded_refs: set[tuple[str, str]] = set()
     seen_preserved_records: set[tuple[str, str, str, str, str]] = set()
 
     for index, row in enumerate(rows, start=2):
@@ -83,10 +91,30 @@ def load_ownership_scope(path: Path) -> OwnershipScope:
                 raise OverlayError(f"{path} row {index} projected_owned row is missing rpo.")
             if record_type != "selectable":
                 raise OverlayError(f"{path} row {index} projected_owned row must use record_type selectable.")
+            if row.get("source_rpo", "") or row.get("source_option_id", "") or row.get("target_rpo", "") or row.get("target_option_id", ""):
+                raise OverlayError(f"{path} row {index} projected_owned row should not set source/target refs.")
             if rpo in seen_owned_rpos:
                 raise OverlayError(f"{path} has duplicate active projected_owned RPO {rpo}.")
             seen_owned_rpos.add(rpo)
             owned_rpos.add(rpo)
+            continue
+
+        if ownership == "production_guarded":
+            if record_type != "guardedOption":
+                raise OverlayError(f"{path} row {index} production_guarded row must use record_type guardedOption.")
+            rpo = row.get("rpo", "")
+            option_id = row.get("target_option_id", "") or row.get("source_option_id", "")
+            if not (rpo or option_id):
+                raise OverlayError(f"{path} row {index} production_guarded row is missing rpo or option_id.")
+            if rpo and option_id:
+                raise OverlayError(f"{path} row {index} production_guarded row must use either rpo or option_id, not both.")
+            if row.get("source_rpo", "") or row.get("target_rpo", ""):
+                raise OverlayError(f"{path} row {index} production_guarded row should not set source_rpo or target_rpo.")
+            key = (rpo, option_id)
+            if key in seen_guarded_refs:
+                raise OverlayError(f"{path} has duplicate active production_guarded row {key}.")
+            seen_guarded_refs.add(key)
+            guarded_option_refs.add(key)
             continue
 
         source_rpo = row.get("source_rpo", "")
@@ -99,15 +127,19 @@ def load_ownership_scope(path: Path) -> OwnershipScope:
             )
         if row.get("rpo", ""):
             raise OverlayError(f"{path} row {index} preserved_cross_boundary row should not set rpo.")
-        if record_type == "selectable":
-            raise OverlayError(f"{path} row {index} preserved_cross_boundary row must use rule or priceRule.")
+        if record_type not in {"rule", "priceRule", "ruleGroup"}:
+            raise OverlayError(f"{path} row {index} preserved_cross_boundary row must use rule, priceRule, or ruleGroup.")
         key = (record_type, source_rpo, source_option_id, target_rpo, target_option_id)
         if key in seen_preserved_records:
             raise OverlayError(f"{path} has duplicate active preserved_cross_boundary row {key}.")
         seen_preserved_records.add(key)
         preserved_cross_boundary_records.add(key)
 
-    return OwnershipScope(owned_rpos=owned_rpos, preserved_cross_boundary_records=preserved_cross_boundary_records)
+    return OwnershipScope(
+        owned_rpos=owned_rpos,
+        guarded_option_refs=guarded_option_refs,
+        preserved_cross_boundary_records=preserved_cross_boundary_records,
+    )
 
 
 def normalized_json(value: Any) -> str:
@@ -216,6 +248,27 @@ def normalize_price_rules(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     )
 
 
+def normalize_rule_groups(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return sorted(
+        [
+            {
+                "group_id": row["group_id"],
+                "group_type": row["group_type"],
+                "source_id": row["source_id"],
+                "target_ids": list(row.get("target_ids", [])),
+                "body_style_scope": row.get("body_style_scope", ""),
+                "trim_level_scope": row.get("trim_level_scope", ""),
+                "variant_scope": row.get("variant_scope", ""),
+                "disabled_reason": row["disabled_reason"],
+                "active": row["active"],
+                "notes": row.get("notes", ""),
+            }
+            for row in rows
+        ],
+        key=lambda item: item["group_id"],
+    )
+
+
 def normalize_exclusive_groups(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return sorted(
         [
@@ -273,8 +326,8 @@ def option_id_by_manifest_ref(data: dict[str, Any], rpo: str, option_id: str) ->
 
 
 def preserved_record_id_keys(data: dict[str, Any], ownership: OwnershipScope) -> dict[str, set[tuple[str, str]]]:
-    keys = {"rules": set(), "priceRules": set()}
-    surface_by_record_type = {"rule": "rules", "priceRule": "priceRules"}
+    keys = {"rules": set(), "priceRules": set(), "ruleGroups": set()}
+    surface_by_record_type = {"rule": "rules", "priceRule": "priceRules", "ruleGroup": "ruleGroups"}
     for record_type, source_rpo, source_option_id, target_rpo, target_option_id in ownership.preserved_cross_boundary_records:
         surface = surface_by_record_type[record_type]
         keys[surface].add(
@@ -284,6 +337,37 @@ def preserved_record_id_keys(data: dict[str, Any], ownership: OwnershipScope) ->
             )
         )
     return keys
+
+
+def guarded_option_ids(data: dict[str, Any], ownership: OwnershipScope) -> set[str]:
+    ids: set[str] = set()
+    for rpo, option_id in ownership.guarded_option_refs:
+        ids.add(option_id_by_manifest_ref(data, rpo, option_id))
+    return ids
+
+
+def rule_group_member_keys(rows: list[dict[str, Any]]) -> set[tuple[str, str]]:
+    return {
+        (row.get("source_id", ""), target_id)
+        for row in rows
+        for target_id in row.get("target_ids", [])
+    }
+
+
+def assert_preserved_records_exist(data: dict[str, Any], preserved_keys_by_surface: dict[str, set[tuple[str, str]]]) -> None:
+    production_keys_by_surface = {
+        "rules": {(row.get("source_id", ""), row.get("target_id", "")) for row in data.get("rules", [])},
+        "priceRules": {(row.get("condition_option_id", ""), row.get("target_option_id", "")) for row in data.get("priceRules", [])},
+        "ruleGroups": rule_group_member_keys(data.get("ruleGroups", [])),
+    }
+    missing = []
+    for surface, preserved_keys in preserved_keys_by_surface.items():
+        missing.extend(
+            {"surface": surface, "source_id": source_id, "target_id": target_id}
+            for source_id, target_id in sorted(preserved_keys - production_keys_by_surface[surface])
+        )
+    if missing:
+        raise OverlayError(f"Preserved production records do not exist: {missing[:5]}.")
 
 
 def assert_same_normalized(surface: str, left: list[dict[str, Any]], right: list[dict[str, Any]]) -> None:
@@ -322,6 +406,54 @@ def assert_no_unreplaced_owned_records(
         raise OverlayError(f"{surface} has unclassified cross-boundary records: {unclassified_cross_boundary[:5]}.")
     if dropped:
         raise OverlayError(f"{surface} has unreplaced migrated-slice-owned records: {dropped[:5]}.")
+
+
+def assert_no_unclassified_guarded_records(
+    surface: str,
+    production_rows: list[dict[str, Any]],
+    fragment_rows: list[dict[str, Any]],
+    normalize: Callable[[list[dict[str, Any]]], list[dict[str, Any]]],
+    id_fields: tuple[str, str],
+    guarded_ids: set[str],
+    preserved_keys: set[tuple[str, str]],
+) -> None:
+    fragment_keys = {tuple(row.get(field, "") for field in id_fields) for row in normalize(fragment_rows)}
+    unclassified = []
+    for row in normalize(production_rows):
+        ids = tuple(row.get(field, "") for field in id_fields)
+        if not any(option_id in guarded_ids for option_id in ids):
+            continue
+        if ids not in preserved_keys and ids not in fragment_keys:
+            unclassified.append(row)
+    if unclassified:
+        raise OverlayError(f"{surface} has unclassified guarded production records: {unclassified[:5]}.")
+
+
+def assert_no_unclassified_guarded_rule_groups(
+    production_rows: list[dict[str, Any]],
+    fragment_rows: list[dict[str, Any]],
+    guarded_ids: set[str],
+    preserved_keys: set[tuple[str, str]],
+) -> None:
+    fragment_keys = rule_group_member_keys(fragment_rows)
+    unclassified = []
+    for row in normalize_rule_groups(production_rows):
+        source_id = row.get("source_id", "")
+        for target_id in row.get("target_ids", []):
+            if source_id not in guarded_ids and target_id not in guarded_ids:
+                continue
+            key = (source_id, target_id)
+            if key not in preserved_keys and key not in fragment_keys:
+                unclassified.append(
+                    {
+                        "group_id": row["group_id"],
+                        "group_type": row["group_type"],
+                        "source_id": source_id,
+                        "target_id": target_id,
+                    }
+                )
+    if unclassified:
+        raise OverlayError(f"ruleGroups has unclassified guarded production records: {unclassified[:5]}.")
 
 
 def replace_by_key(
@@ -388,6 +520,8 @@ def overlay_shadow_data(production: dict[str, Any], fragment: dict[str, Any], ow
     if production_ids != fragment_ids:
         raise OverlayError(f"Fragment legacy option IDs do not match production: {sorted(production_ids)} != {sorted(fragment_ids)}.")
     preserved_keys_by_surface = preserved_record_id_keys(production, ownership)
+    guarded_ids = guarded_option_ids(production, ownership)
+    assert_preserved_records_exist(production, preserved_keys_by_surface)
 
     removed_choices = [row for row in production.get("choices", []) if row.get("rpo") in rpos]
     fragment_rule_keys = {
@@ -441,6 +575,30 @@ def overlay_shadow_data(production: dict[str, Any], fragment: dict[str, Any], ow
         ("condition_option_id", "target_option_id"),
         production_ids,
         preserved_keys_by_surface["priceRules"],
+    )
+    assert_no_unclassified_guarded_records(
+        "rules",
+        production.get("rules", []),
+        fragment.get("rules", []),
+        normalize_rules,
+        ("source_id", "target_id"),
+        guarded_ids,
+        preserved_keys_by_surface["rules"],
+    )
+    assert_no_unclassified_guarded_records(
+        "priceRules",
+        production.get("priceRules", []),
+        fragment.get("priceRules", []),
+        normalize_price_rules,
+        ("condition_option_id", "target_option_id"),
+        guarded_ids,
+        preserved_keys_by_surface["priceRules"],
+    )
+    assert_no_unclassified_guarded_rule_groups(
+        production.get("ruleGroups", []),
+        fragment.get("ruleGroups", []),
+        guarded_ids,
+        preserved_keys_by_surface["ruleGroups"],
     )
     unreplaced_exclusive_groups = [
         row
