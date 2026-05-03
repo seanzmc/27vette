@@ -105,8 +105,10 @@ test("staging audit reports extraction quality without modifying staging evidenc
   const auditPath = path.join(stagingDir, "staging_audit_report.json");
   const secondAuditPath = path.join(stagingDir, "staging_audit_report_second.json");
   const acceptedScopePath = path.join(tmpDir, "color_trim_scope_accepted.csv");
+  const acceptedRpoDecisionPath = path.join(tmpDir, "rpo_role_overlaps_accepted.csv");
   const acceptedAuditPath = path.join(stagingDir, "staging_audit_report_accepted_scope.json");
   const missingScopeAuditPath = path.join(stagingDir, "staging_audit_report_missing_scope.json");
+  const missingDecisionAuditPath = path.join(stagingDir, "staging_audit_report_missing_decision.json");
   makeFixture(source);
 
   execFileSync(PYTHON, [INSPECT_SCRIPT, "--source", source, "--out", profilePath], {
@@ -190,6 +192,12 @@ test("staging audit reports extraction quality without modifying staging evidenc
   assert.ok(audit.recommended_actions_by_bucket.color_trim_review_only["confirm_model_scope_or_import_map; do_not_variant_expand"] >= 1);
   assert.equal(audit.rpo_role_overlap_count >= 1, true);
   assert.equal(audit.rpo_role_overlap_summary.rpos.includes("CCC"), true);
+  assert.equal(audit.rpo_role_overlap_decisions.config_present, true);
+  assert.equal(audit.rpo_role_overlap_decisions.observed_overlap_count >= 1, true);
+  assert.equal(audit.rpo_role_overlap_decisions.missing_rpos.includes("CCC"), true);
+  assert.equal(audit.rpo_role_overlap_decisions.mapped_overlap_count, 0);
+  assert.equal(audit.rpo_role_overlap_decisions.resolved_overlap_count, 0);
+  assert.equal(audit.rpo_role_overlap_decisions.unused_decision_count >= 1, true);
 
   const rpoRoleOverlaps = readCsv(path.join(stagingDir, "staging_audit_rpo_role_overlaps.csv"));
   const cccOverlap = rpoRoleOverlaps.find((row) => row.rpo === "CCC");
@@ -201,6 +209,9 @@ test("staging audit reports extraction quality without modifying staging evidenc
   assert.match(cccOverlap.section_families, /standard_equipment/);
   assert.match(cccOverlap.sample_descriptions, /Reference evidence/);
   assert.equal(cccOverlap.recommended_action, "review_orderable_vs_reference_usage_before_proposal");
+  assert.equal(cccOverlap.decision_review_status, "");
+  assert.equal(cccOverlap.decision_classification, "");
+  assert.equal(cccOverlap.decision_canonical_handling, "");
 
   const suspiciousRows = readCsv(path.join(stagingDir, "staging_audit_suspicious_rows.csv"));
   for (const fieldName of [
@@ -232,7 +243,8 @@ test("staging audit reports extraction quality without modifying staging evidenc
         row.reason === "rpo_appears_as_orderable_and_ref_only" &&
         row.review_bucket === "canonical_review_required" &&
         row.rpo === "CCC" &&
-        row.classification_reason.includes("orderable and reference-only"),
+        row.classification_reason.includes("orderable and reference-only") &&
+        row.decision_review_status === "",
     ),
     true,
   );
@@ -261,13 +273,30 @@ test("staging audit reports extraction quality without modifying staging evidenc
       "",
     ].join("\n"),
   );
-  execFileSync(PYTHON, [AUDIT_SCRIPT, "--staging", stagingDir, "--out", acceptedAuditPath, "--color-trim-scope", acceptedScopePath], {
-    cwd: process.cwd(),
-    encoding: "utf8",
-  });
+  fs.writeFileSync(
+    acceptedRpoDecisionPath,
+    [
+      "rpo,review_status,classification,canonical_handling,recommended_action,notes",
+      "CCC,accepted_expected_overlap,orderable_and_ref_only_expected,keep_separate_evidence,review_orderable_vs_reference_usage_before_proposal,Accepted in synthetic audit fixture.",
+      "UNUSED,accepted_expected_overlap,orderable_and_ref_only_expected,keep_separate_evidence,review_orderable_vs_reference_usage_before_proposal,Stale fixture decision row.",
+      "",
+    ].join("\n"),
+  );
+  execFileSync(
+    PYTHON,
+    [AUDIT_SCRIPT, "--staging", stagingDir, "--out", acceptedAuditPath, "--color-trim-scope", acceptedScopePath, "--rpo-role-overlaps", acceptedRpoDecisionPath],
+    {
+      cwd: process.cwd(),
+      encoding: "utf8",
+    },
+  );
   const acceptedAudit = JSON.parse(fs.readFileSync(acceptedAuditPath, "utf8"));
   assert.equal(acceptedAudit.color_trim_scope_review.ready_for_audit_domain, true);
   assert.equal(acceptedAudit.color_trim_scope_review.canonical_import_ready, false);
+  assert.equal(acceptedAudit.rpo_role_overlap_decisions.mapped_overlap_count, 1);
+  assert.equal(acceptedAudit.rpo_role_overlap_decisions.resolved_overlap_count, 1);
+  assert.equal(acceptedAudit.rpo_role_overlap_decisions.unused_decision_rpos.includes("UNUSED"), true);
+  assert.equal(acceptedAudit.readiness.rpo_role_overlaps_ready, true);
   assert.equal(acceptedAudit.readiness.color_trim_ready, true);
   assert.equal(acceptedAudit.readiness.canonical_proposal_ready, false);
   assert.ok(acceptedAudit.readiness.reasons.includes("color_trim_scope_deferred_from_canonical_import"));
@@ -287,6 +316,18 @@ test("staging audit reports extraction quality without modifying staging evidenc
     "section_role",
     "sheet_name",
   ]);
+
+  execFileSync(
+    PYTHON,
+    [AUDIT_SCRIPT, "--staging", stagingDir, "--out", missingDecisionAuditPath, "--rpo-role-overlaps", path.join(tmpDir, "missing_rpo_role_overlaps.csv")],
+    {
+      cwd: process.cwd(),
+      encoding: "utf8",
+    },
+  );
+  const missingDecisionAudit = JSON.parse(fs.readFileSync(missingDecisionAuditPath, "utf8"));
+  assert.equal(missingDecisionAudit.rpo_role_overlap_decisions.config_present, false);
+  assert.equal(missingDecisionAudit.rpo_role_overlap_decisions.missing_rpos.includes("CCC"), true);
 });
 
 test("staging audit exits nonzero for missing required inputs only", () => {

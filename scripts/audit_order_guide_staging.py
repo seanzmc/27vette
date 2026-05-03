@@ -13,6 +13,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COLOR_TRIM_SCOPE = ROOT / "data" / "import_maps" / "corvette_2027" / "color_trim_scope.csv"
+DEFAULT_RPO_ROLE_OVERLAPS = ROOT / "data" / "import_maps" / "corvette_2027" / "rpo_role_overlaps.csv"
 
 REQUIRED_FILES = {
     "sheets": "staging_sheets.csv",
@@ -47,6 +48,11 @@ AUDIT_CSV_HEADERS = {
         "section_families",
         "sample_descriptions",
         "recommended_action",
+        "decision_review_status",
+        "decision_classification",
+        "decision_canonical_handling",
+        "decision_recommended_action",
+        "decision_notes",
     ],
     "suspicious_rows": [
         "source",
@@ -64,6 +70,10 @@ AUDIT_CSV_HEADERS = {
         "raw_value",
         "classification_reason",
         "readiness_impact",
+        "decision_review_status",
+        "decision_classification",
+        "decision_canonical_handling",
+        "decision_recommended_action",
     ],
 }
 
@@ -82,6 +92,11 @@ def parse_args() -> argparse.Namespace:
         "--color-trim-scope",
         default=str(DEFAULT_COLOR_TRIM_SCOPE),
         help="Optional Color/Trim scope review CSV. Missing files are reported, not fatal.",
+    )
+    parser.add_argument(
+        "--rpo-role-overlaps",
+        default=str(DEFAULT_RPO_ROLE_OVERLAPS),
+        help="Optional RPO role-overlap decision CSV. Missing files are reported, not fatal.",
     )
     return parser.parse_args()
 
@@ -141,6 +156,12 @@ def load_staging(staging_dir: Path) -> tuple[dict[str, list[dict[str, str]]], di
 
 
 def load_optional_color_trim_scope(path: Path) -> tuple[list[dict[str, str]], bool]:
+    if not path.exists():
+        return [], False
+    return read_csv(path), True
+
+
+def load_optional_rpo_overlap_decisions(path: Path) -> tuple[list[dict[str, str]], bool]:
     if not path.exists():
         return [], False
     return read_csv(path), True
@@ -324,6 +345,78 @@ def rpo_role_overlaps(staging: dict[str, list[dict[str, str]]]) -> list[dict[str
     return sorted(overlaps, key=lambda row: row["rpo"])
 
 
+def rpo_decision_by_rpo(decision_rows: list[dict[str, str]]) -> dict[str, dict[str, str]]:
+    return {clean(row.get("rpo", "")): row for row in decision_rows if clean(row.get("rpo", ""))}
+
+
+def decision_value(decision: dict[str, str] | None, field_name: str) -> str:
+    if not decision:
+        return ""
+    return clean(decision.get(field_name, ""))
+
+
+def rpo_overlap_decision_resolved(decision: dict[str, str] | None) -> bool:
+    if not decision:
+        return False
+    review_status = clean(decision.get("review_status", ""))
+    canonical_handling = clean(decision.get("canonical_handling", ""))
+    return review_status in {"approved", "accepted_expected_overlap"} and canonical_handling not in {"", "needs_manual_mapping"}
+
+
+def apply_rpo_overlap_decisions(rows: list[dict[str, Any]], decisions: dict[str, dict[str, str]]) -> list[dict[str, Any]]:
+    enriched = []
+    for row in rows:
+        decision = decisions.get(clean(row.get("rpo", "")))
+        enriched.append(
+            {
+                **row,
+                "decision_review_status": decision_value(decision, "review_status"),
+                "decision_classification": decision_value(decision, "classification"),
+                "decision_canonical_handling": decision_value(decision, "canonical_handling"),
+                "decision_recommended_action": decision_value(decision, "recommended_action"),
+                "decision_notes": decision_value(decision, "notes"),
+            }
+        )
+    return enriched
+
+
+def rpo_overlap_decision_review(rows: list[dict[str, Any]], decision_rows: list[dict[str, str]], config_present: bool) -> dict[str, Any]:
+    observed_rpos = {clean(row.get("rpo", "")) for row in rows if clean(row.get("rpo", ""))}
+    decision_rpos = {clean(row.get("rpo", "")) for row in decision_rows if clean(row.get("rpo", ""))}
+    mapped_rpos = observed_rpos & decision_rpos
+    missing_rpos = sorted(observed_rpos - decision_rpos)
+    unused_rpos = sorted(decision_rpos - observed_rpos)
+    decisions = rpo_decision_by_rpo(decision_rows)
+    review_status_counts: Counter[str] = Counter()
+    canonical_handling_counts: Counter[str] = Counter()
+    resolved_rpos = []
+    deferred_rpos = []
+    for rpo in sorted(mapped_rpos):
+        decision = decisions[rpo]
+        review_status = clean(decision.get("review_status", "")) or "<blank>"
+        canonical_handling = clean(decision.get("canonical_handling", "")) or "<blank>"
+        review_status_counts[review_status] += 1
+        canonical_handling_counts[canonical_handling] += 1
+        if rpo_overlap_decision_resolved(decision):
+            resolved_rpos.append(rpo)
+        if review_status == "deferred":
+            deferred_rpos.append(rpo)
+    return {
+        "config_present": config_present,
+        "observed_overlap_count": len(observed_rpos),
+        "mapped_overlap_count": len(mapped_rpos),
+        "resolved_overlap_count": len(resolved_rpos),
+        "missing_overlap_count": len(missing_rpos),
+        "unused_decision_count": len(unused_rpos),
+        "review_status_counts": dict(sorted(review_status_counts.items())),
+        "canonical_handling_counts": dict(sorted(canonical_handling_counts.items())),
+        "missing_rpos": missing_rpos,
+        "resolved_rpos": resolved_rpos,
+        "deferred_rpos": deferred_rpos,
+        "unused_decision_rpos": unused_rpos,
+    }
+
+
 def footnote_counts(staging: dict[str, list[dict[str, str]]]) -> list[dict[str, Any]]:
     specs = [
         ("variant_matrix_rows", "footnote_scope", "footnote_refs", "status_cell"),
@@ -484,6 +577,22 @@ def classify_suspicious_rows(rows: list[dict[str, Any]], families: dict[str, str
             row.get("source", ""),
         ),
     )
+
+
+def apply_suspicious_rpo_decisions(rows: list[dict[str, Any]], decisions: dict[str, dict[str, str]]) -> list[dict[str, Any]]:
+    enriched = []
+    for row in rows:
+        decision = decisions.get(clean(row.get("rpo", ""))) if row.get("reason") == "rpo_appears_as_orderable_and_ref_only" else None
+        enriched.append(
+            {
+                **row,
+                "decision_review_status": decision_value(decision, "review_status"),
+                "decision_classification": decision_value(decision, "classification"),
+                "decision_canonical_handling": decision_value(decision, "canonical_handling"),
+                "decision_recommended_action": decision_value(decision, "recommended_action"),
+            }
+        )
+    return enriched
 
 
 def classify_suspicious_row(row: dict[str, Any], families: dict[str, str]) -> dict[str, Any]:
@@ -652,7 +761,18 @@ def color_trim_scope_review(staging: dict[str, list[dict[str, str]]], scope_rows
     }
 
 
-def domain_readiness(suspicious: list[dict[str, Any]], staging: dict[str, list[dict[str, str]]], color_trim_scope: dict[str, Any]) -> dict[str, Any]:
+def row_blocks_canonical(row: dict[str, Any], rpo_decision_summary: dict[str, Any]) -> bool:
+    if row.get("reason") == "rpo_appears_as_orderable_and_ref_only":
+        return clean(row.get("rpo", "")) not in set(rpo_decision_summary.get("resolved_rpos", []))
+    return row.get("readiness_impact") in {"blocking", "review_required"}
+
+
+def domain_readiness(
+    suspicious: list[dict[str, Any]],
+    staging: dict[str, list[dict[str, str]]],
+    color_trim_scope: dict[str, Any],
+    rpo_decision_summary: dict[str, Any],
+) -> dict[str, Any]:
     blocking_impacts = {"blocking", "review_required"}
     primary_blockers = [
         row
@@ -677,21 +797,27 @@ def domain_readiness(suspicious: list[dict[str, Any]], staging: dict[str, list[d
         for row in suspicious
         if row.get("review_bucket") == "equipment_group_crosscheck_only" and row.get("readiness_impact") == "blocking"
     ]
-    canonical_blockers = [row for row in suspicious if row.get("readiness_impact") in blocking_impacts]
+    canonical_blockers = [row for row in suspicious if row_blocks_canonical(row, rpo_decision_summary)]
     return {
         "primary_variant_matrix_ready": not primary_blockers,
         "color_trim_ready": color_trim_scope["ready_for_audit_domain"] and color_trim_audit(staging)["has_interior_and_compatibility_rows"],
         "pricing_ready": not pricing_blockers,
         "equipment_groups_ready": equipment_group_summary["cross_check_only"] and not equipment_group_blockers,
+        "rpo_role_overlaps_ready": rpo_decision_summary["observed_overlap_count"] == rpo_decision_summary["resolved_overlap_count"],
         "canonical_proposal_ready": not canonical_blockers and not staging["unresolved_rows"] and color_trim_scope["canonical_import_ready"],
     }
 
 
-def readiness(suspicious: list[dict[str, Any]], staging: dict[str, list[dict[str, str]]], color_trim_scope: dict[str, Any]) -> dict[str, Any]:
+def readiness(
+    suspicious: list[dict[str, Any]],
+    staging: dict[str, list[dict[str, str]]],
+    color_trim_scope: dict[str, Any],
+    rpo_decision_summary: dict[str, Any],
+) -> dict[str, Any]:
     reasons = []
     if staging["unresolved_rows"]:
         reasons.append("unresolved_rows_present")
-    review_suspicious = [row for row in suspicious if row.get("readiness_impact") in {"blocking", "review_required"}]
+    review_suspicious = [row for row in suspicious if row_blocks_canonical(row, rpo_decision_summary)]
     if review_suspicious:
         reasons.append("suspicious_review_rows_present")
     if not equipment_group_audit(staging)["cross_check_only"]:
@@ -702,7 +828,11 @@ def readiness(suspicious: list[dict[str, Any]], staging: dict[str, list[dict[str
         reasons.append("color_trim_scope_review_incomplete")
     elif not color_trim_scope["canonical_import_ready"]:
         reasons.append("color_trim_scope_deferred_from_canonical_import")
-    readiness_by_domain = domain_readiness(suspicious, staging, color_trim_scope)
+    if rpo_decision_summary["missing_overlap_count"] or rpo_decision_summary["mapped_overlap_count"] != rpo_decision_summary["resolved_overlap_count"]:
+        reasons.append("rpo_overlap_decisions_incomplete")
+    if rpo_decision_summary["deferred_rpos"]:
+        reasons.append("rpo_overlap_decisions_deferred")
+    readiness_by_domain = domain_readiness(suspicious, staging, color_trim_scope, rpo_decision_summary)
     return {
         "ready_for_proposal_generation": readiness_by_domain["canonical_proposal_ready"] and not reasons,
         "advisory_only": True,
@@ -711,16 +841,23 @@ def readiness(suspicious: list[dict[str, Any]], staging: dict[str, list[dict[str
     }
 
 
-def build_audit(staging_dir: Path, color_trim_scope_path: Path = DEFAULT_COLOR_TRIM_SCOPE) -> tuple[dict[str, Any], dict[str, list[dict[str, Any]]]]:
+def build_audit(
+    staging_dir: Path,
+    color_trim_scope_path: Path = DEFAULT_COLOR_TRIM_SCOPE,
+    rpo_role_overlaps_path: Path = DEFAULT_RPO_ROLE_OVERLAPS,
+) -> tuple[dict[str, Any], dict[str, list[dict[str, Any]]]]:
     staging, import_report, present_optional, missing_optional = load_staging(staging_dir)
     color_trim_scope_rows, color_trim_scope_config_present = load_optional_color_trim_scope(color_trim_scope_path)
+    rpo_decision_rows, rpo_decision_config_present = load_optional_rpo_overlap_decisions(rpo_role_overlaps_path)
+    rpo_decisions = rpo_decision_by_rpo(rpo_decision_rows)
     families = sheet_family_map(staging["sheets"])
     model_rows = model_key_counts(staging)
     status_rows = status_counts(staging, families)
     rpo_rows = rpo_counts(staging)
-    rpo_overlap_rows = rpo_role_overlaps(staging)
+    rpo_overlap_rows = apply_rpo_overlap_decisions(rpo_role_overlaps(staging), rpo_decisions)
+    rpo_decision_summary = rpo_overlap_decision_review(rpo_overlap_rows, rpo_decision_rows, rpo_decision_config_present)
     footnote_rows = footnote_counts(staging)
-    suspicious = classify_suspicious_rows(suspicious_rows(staging), families)
+    suspicious = apply_suspicious_rpo_decisions(classify_suspicious_rows(suspicious_rows(staging), families), rpo_decisions)
     color_trim_scope = color_trim_scope_review(staging, color_trim_scope_rows, color_trim_scope_config_present)
     audit = {
         "staging_dir": str(staging_dir),
@@ -745,13 +882,14 @@ def build_audit(staging_dir: Path, color_trim_scope_path: Path = DEFAULT_COLOR_T
             "recommended_action_counts": dict(sorted(Counter(row["recommended_action"] for row in rpo_overlap_rows).items())),
             "rpos": [row["rpo"] for row in rpo_overlap_rows],
         },
+        "rpo_role_overlap_decisions": rpo_decision_summary,
         "suspicious_row_count": len(suspicious),
         "suspicious_rows_by_reason": counter_by(suspicious, "reason"),
         "suspicious_rows_by_type": counter_by(suspicious, "suspicion_type"),
         "suspicious_rows_by_bucket": counter_by(suspicious, "review_bucket"),
         "suspicious_rows_by_readiness_impact": counter_by(suspicious, "readiness_impact"),
         "recommended_actions_by_bucket": recommended_actions_by_bucket(suspicious),
-        "readiness": readiness(suspicious, staging, color_trim_scope),
+        "readiness": readiness(suspicious, staging, color_trim_scope, rpo_decision_summary),
         "source_import_report_summary": {
             key: import_report.get(key)
             for key in [
@@ -785,7 +923,7 @@ def build_audit(staging_dir: Path, color_trim_scope_path: Path = DEFAULT_COLOR_T
 def main() -> int:
     args = parse_args()
     out_path = Path(args.out)
-    audit, csvs = build_audit(Path(args.staging), Path(args.color_trim_scope))
+    audit, csvs = build_audit(Path(args.staging), Path(args.color_trim_scope), Path(args.rpo_role_overlaps))
     write_json(out_path, audit)
     out_dir = out_path.parent
     for name, rows in csvs.items():
