@@ -32,6 +32,7 @@ opt_rwu_001,option,RWU,"LPO, Cargo area organizer","Collapsible, Genuine Corvett
 opt_s2l_001,option,S2L,"LPO, Set of premium leather weekend/travel bags",Genuine Corvette Accessory,true,,Standalone LPO Interior accessory choice.
 opt_vyw_001,option,VYW,"LPO, Floor mats","Premium carpeted with car silhouette logo on Stingray, Grand Sport, ZR1 and ZR1X models, Genuine Corvette Accessory",true,,Standalone LPO Interior accessory choice.
 opt_w2d_001,option,W2D,"LPO, Cargo net set",Genuine Corvette Accessory,true,cs_1lt,Standalone LPO Interior accessory choice; current generated data makes W2D 1LT-only.
+opt_eri_001,option,ERI,Battery Protection Package,,true,,Standalone mechanical accessory choice.
 opt_slk_001,option,SLK,"LPO, Rear hatch strut bracket","Edge Red, Genuine Corvette Accessory",true,,Engine Appearance LPO add-on choice.
 opt_sln_001,option,SLN,"LPO, Visible carbon fiber engine cross brace with Jake logo",Genuine Corvette Accessory,true,,Engine Appearance LPO add-on choice.
 opt_vup_001,option,VUP,"LPO, Engine Bay closeout graphics",Genuine Corvette Accessory,true,,Engine Appearance LPO add-on choice.
