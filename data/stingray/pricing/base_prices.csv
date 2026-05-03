@@ -34,4 +34,6 @@ bp_eri,pb_2027_stingray,selectable,opt_eri_001,,100,10,true,Current ERI base pri
 bp_shq,pb_2027_stingray,selectable,opt_shq_001,,295,10,true,Current SHQ base price.
 bp_shw,pb_2027_stingray,selectable,opt_shw_001,,295,10,true,Current SHW base price.
 bp_sb7,pb_2027_stingray,selectable,opt_sb7_001,,595,10,true,Current SB7 base price.
+bp_sng,pb_2027_stingray,selectable,opt_sng_001,,320,10,true,Current SNG base price.
+bp_sht,pb_2027_stingray,selectable,opt_sht_001,,495,10,true,Current SHT base price.
 bp_edu,pb_2027_stingray,selectable,opt_edu_001,,995,10,true,Current EDU base price.

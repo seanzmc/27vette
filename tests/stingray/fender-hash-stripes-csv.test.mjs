@@ -26,8 +26,6 @@ const STRIPE_SECTION_PRODUCTION_RPOS = new Set([
   "DZU",
   "DZX",
   "DZV",
-  "SHT",
-  "SNG",
 ]);
 const NEARBY_PACKAGE_RPOS = new Set(["PDV", "PCX"]);
 const EXPECTED_PRICES = new Map([

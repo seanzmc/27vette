@@ -8,7 +8,12 @@ import { createRuntime, loadGeneratedData, loadShadowData } from "./runtime-harn
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
-const SB7_SOURCE_TEXT_STRIPE_RPOS = new Set([
+const TECH_BRONZE_GRAPHICS_RPOS = new Set(["SHT", "SNG"]);
+const EXPECTED_PRICES = new Map([
+  ["SHT", 495],
+  ["SNG", 320],
+]);
+const SHT_SOURCE_TEXT_STRIPE_RPOS = new Set([
   "DPB",
   "DPC",
   "DPG",
@@ -26,10 +31,19 @@ const SB7_SOURCE_TEXT_STRIPE_RPOS = new Set([
   "DZV",
   "DZX",
 ]);
+const SHT_SOURCE_TEXT_MISSING_RPOS = new Set(["DTB"]);
 const OUT_OF_SCOPE_RPOS = new Set([
-  "PDV",
   "PCX",
-  ...SB7_SOURCE_TEXT_STRIPE_RPOS,
+  "SFZ",
+  "5DG",
+  "PDV",
+  "EYK",
+  "R8C",
+  "S47",
+  "SFE",
+  "SPY",
+  "SPZ",
+  ...SHT_SOURCE_TEXT_STRIPE_RPOS,
 ]);
 
 function parseCsv(source) {
@@ -125,7 +139,7 @@ function selectedRpos(runtime, rpos) {
 
 function normalizeChoices(rows) {
   return Array.from(rows)
-    .filter((choice) => choice.rpo === "SB7")
+    .filter((choice) => TECH_BRONZE_GRAPHICS_RPOS.has(choice.rpo))
     .map((choice) => ({
       choice_id: choice.choice_id,
       option_id: choice.option_id,
@@ -181,131 +195,126 @@ function lineByRpo(runtime, rpo) {
 }
 
 function sourceTextRpos(choice) {
-  return new Set((choice.source_detail_raw.match(/\b[A-Z0-9]{2,3}\b/g) || []).filter((rpo) => !new Set(["RPO", "LPO", "PDV"]).has(rpo)));
+  return new Set((choice.source_detail_raw.match(/\b[A-Z0-9]{2,3}\b/g) || []).filter((rpo) => !new Set(["RPO", "LPO", "PCX"]).has(rpo)));
 }
 
-test("CSV SB7 legacy fragment matches generated choice metadata and direct price", () => {
+test("CSV evaluator prices direct Tech Bronze graphics selections", () => {
   const production = loadGeneratedData();
-  const projected = emitCsvLegacyFragment();
-  const sb7Id = optionIdByRpo(production, "SB7");
-  const result = evaluate("1lt_c07", [sb7Id]);
-  const line = result.selected_lines.find((item) => item.rpo === "SB7");
 
-  assert.deepEqual(projected.validation_errors, []);
-  assert.deepEqual(normalizeChoices(projected.choices), normalizeChoices(production.choices));
-  assert.equal(line?.final_price_usd, 595);
-  assert.deepEqual(result.validation_errors, []);
-});
+  for (const [rpo, price] of EXPECTED_PRICES.entries()) {
+    const result = evaluate("1lt_c07", [optionIdByRpo(production, rpo)]);
+    const line = result.selected_lines.find((item) => item.rpo === rpo);
 
-test("SB7 projected choice stays available across all Stingray variants", () => {
-  const projected = emitCsvLegacyFragment();
-  const choices = normalizeChoices(projected.choices);
-
-  assert.equal(choices.length, 6);
-  assert.deepEqual(
-    choices.map((choice) => [choice.variant_id, choice.status, choice.status_label, choice.selectable, choice.active]),
-    [
-      ["1lt_c07", "available", "Available", "True", "True"],
-      ["1lt_c67", "available", "Available", "True", "True"],
-      ["2lt_c07", "available", "Available", "True", "True"],
-      ["2lt_c67", "available", "Available", "True", "True"],
-      ["3lt_c07", "available", "Available", "True", "True"],
-      ["3lt_c67", "available", "Available", "True", "True"],
-    ]
-  );
-});
-
-test("SB7 source-text stripe constraints are same-section single-select peers", () => {
-  const data = loadGeneratedData();
-  const sb7 = data.choices.find((choice) => choice.rpo === "SB7" && choice.active === "True");
-  assert.ok(sb7);
-  assert.deepEqual(sourceTextRpos(sb7), SB7_SOURCE_TEXT_STRIPE_RPOS);
-
-  const section = data.sections.find((item) => item.section_id === sb7.section_id);
-  assert.equal(section?.selection_mode, "single_select_opt");
-
-  for (const rpo of SB7_SOURCE_TEXT_STRIPE_RPOS) {
-    const peer = data.choices.find((choice) => choice.rpo === rpo && choice.active === "True");
-    assert.ok(peer, `${rpo} should resolve to an active generated choice`);
-    assert.equal(peer.section_id, sb7.section_id, `${rpo} should remain a same-section Stripes peer of SB7`);
-    assert.equal(peer.selection_mode, "single_select_opt", `${rpo} should remain covered by Stripes single-select behavior`);
+    assert.equal(line?.final_price_usd, price);
+    assert.deepEqual(result.validation_errors, []);
   }
 });
 
-test("shadow runtime preserves SB7 Stripes single-select behavior", () => {
-  for (const data of [loadGeneratedData(), loadShadowData()]) {
-    for (const rpo of SB7_SOURCE_TEXT_STRIPE_RPOS) {
-      const sb7First = runtimeFor(data, "1lt_c07");
-      sb7First.handleChoice(activeChoiceByRpo(sb7First, "SB7"));
-      sb7First.handleChoice(activeChoiceByRpo(sb7First, rpo));
-      assert.deepEqual(selectedRpos(sb7First, new Set(["SB7", rpo])), [rpo]);
+test("CSV Tech Bronze graphics legacy fragment matches generated choices", () => {
+  const production = loadGeneratedData();
+  const projected = emitCsvLegacyFragment();
 
-      const stripeFirst = runtimeFor(data, "1lt_c07");
-      stripeFirst.handleChoice(activeChoiceByRpo(stripeFirst, rpo));
-      stripeFirst.handleChoice(activeChoiceByRpo(stripeFirst, "SB7"));
-      assert.deepEqual(selectedRpos(stripeFirst, new Set(["SB7", rpo])), ["SB7"]);
+  assert.deepEqual(projected.validation_errors, []);
+  assert.deepEqual(normalizeChoices(projected.choices), normalizeChoices(production.choices));
+});
+
+test("SHT source-text constraints are structured records or same-section single-select peers", () => {
+  const data = loadGeneratedData();
+  const sht = data.choices.find((choice) => choice.rpo === "SHT" && choice.active === "True");
+  assert.ok(sht);
+
+  const expectedSourceTextRpos = new Set(["PDV", "SB7", ...SHT_SOURCE_TEXT_STRIPE_RPOS, ...SHT_SOURCE_TEXT_MISSING_RPOS]);
+  assert.deepEqual(sourceTextRpos(sht), expectedSourceTextRpos);
+  assert.ok(rule(data, "SHT", "PDV", "excludes"), "SHT should have a structured SHT -> PDV exclude");
+
+  const section = data.sections.find((item) => item.section_id === sht.section_id);
+  assert.equal(section?.selection_mode, "single_select_opt");
+
+  for (const rpo of ["SB7", ...SHT_SOURCE_TEXT_STRIPE_RPOS]) {
+    const peer = data.choices.find((choice) => choice.rpo === rpo && choice.active === "True");
+    assert.ok(peer, `${rpo} should resolve to an active generated choice`);
+    assert.equal(peer.section_id, sht.section_id, `${rpo} should remain a same-section Stripes peer of SHT`);
+    assert.equal(peer.selection_mode, "single_select_opt", `${rpo} should remain covered by Stripes single-select behavior`);
+  }
+
+  for (const rpo of SHT_SOURCE_TEXT_MISSING_RPOS) {
+    assert.equal(data.choices.some((choice) => choice.rpo === rpo && choice.active === "True"), false, `${rpo} should not become a fake selectable`);
+  }
+});
+
+test("shadow runtime preserves Tech Bronze graphics single-select behavior with SB7 and named stripe peers", () => {
+  const peerRpos = new Set(["SB7", ...SHT_SOURCE_TEXT_STRIPE_RPOS]);
+
+  for (const data of [loadGeneratedData(), loadShadowData()]) {
+    for (const techBronzeRpo of TECH_BRONZE_GRAPHICS_RPOS) {
+      for (const peerRpo of peerRpos) {
+        const techFirst = runtimeFor(data, "1lt_c07");
+        techFirst.handleChoice(activeChoiceByRpo(techFirst, techBronzeRpo));
+        techFirst.handleChoice(activeChoiceByRpo(techFirst, peerRpo));
+        assert.deepEqual(selectedRpos(techFirst, new Set([techBronzeRpo, peerRpo])), [peerRpo]);
+
+        const peerFirst = runtimeFor(data, "1lt_c07");
+        peerFirst.handleChoice(activeChoiceByRpo(peerFirst, peerRpo));
+        peerFirst.handleChoice(activeChoiceByRpo(peerFirst, techBronzeRpo));
+        assert.deepEqual(selectedRpos(peerFirst, new Set([techBronzeRpo, peerRpo])), [techBronzeRpo]);
+      }
     }
   }
 });
 
-test("shadow runtime preserves PDV package behavior for SB7", () => {
+test("shadow runtime preserves PCX package behavior for Tech Bronze graphics", () => {
   for (const data of [loadGeneratedData(), loadShadowData()]) {
     const packageRuntime = runtimeFor(data, "1lt_c07");
-    packageRuntime.handleChoice(activeChoiceByRpo(packageRuntime, "PDV"));
-    assert.equal(lineByRpo(packageRuntime, "SB7")?.type, "auto_added");
-    assert.equal(lineByRpo(packageRuntime, "SB7")?.price, 0);
+    packageRuntime.handleChoice(activeChoiceByRpo(packageRuntime, "PCX"));
+    for (const rpo of TECH_BRONZE_GRAPHICS_RPOS) {
+      assert.equal(lineByRpo(packageRuntime, rpo)?.type, "auto_added");
+      assert.equal(lineByRpo(packageRuntime, rpo)?.price, 0);
+    }
 
-    const memberFirstRuntime = runtimeFor(data, "1lt_c07");
-    memberFirstRuntime.handleChoice(activeChoiceByRpo(memberFirstRuntime, "SB7"));
-    memberFirstRuntime.handleChoice(activeChoiceByRpo(memberFirstRuntime, "PDV"));
-    assert.equal(lineByRpo(memberFirstRuntime, "SB7")?.type, "selected");
-    assert.equal(lineByRpo(memberFirstRuntime, "SB7")?.price, 0);
+    for (const rpo of TECH_BRONZE_GRAPHICS_RPOS) {
+      const memberFirstRuntime = runtimeFor(data, "1lt_c07");
+      memberFirstRuntime.handleChoice(activeChoiceByRpo(memberFirstRuntime, rpo));
+      memberFirstRuntime.handleChoice(activeChoiceByRpo(memberFirstRuntime, "PCX"));
+      assert.equal(lineByRpo(memberFirstRuntime, rpo)?.type, "selected");
+      assert.equal(lineByRpo(memberFirstRuntime, rpo)?.price, 0);
+      assert.equal(memberFirstRuntime.lineItems().filter((line) => line.rpo === rpo).length, 1);
+    }
   }
 });
 
-test("shadow runtime preserves PCX and SB7 mutual blocking", () => {
-  for (const data of [loadGeneratedData(), loadShadowData()]) {
-    const pcxFirst = runtimeFor(data, "1lt_c07");
-    pcxFirst.handleChoice(activeChoiceByRpo(pcxFirst, "PCX"));
-    assert.match(pcxFirst.disableReasonForChoice(activeChoiceByRpo(pcxFirst, "SB7")), /Blocked by PCX/);
-    pcxFirst.handleChoice(activeChoiceByRpo(pcxFirst, "SB7"));
-    assert.deepEqual(selectedRpos(pcxFirst, new Set(["PCX", "SB7"])), ["PCX"]);
-
-    const sb7First = runtimeFor(data, "1lt_c07");
-    sb7First.handleChoice(activeChoiceByRpo(sb7First, "SB7"));
-    assert.match(sb7First.disableReasonForChoice(activeChoiceByRpo(sb7First, "PCX")), /Conflicts with SB7/);
-    sb7First.handleChoice(activeChoiceByRpo(sb7First, "PCX"));
-    assert.deepEqual(selectedRpos(sb7First, new Set(["PCX", "SB7"])), ["SB7"]);
-  }
-});
-
-test("SB7 package and graphics boundaries remain production-owned and preserved", () => {
+test("Tech Bronze graphics package boundaries remain production-owned and preserved", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
   const fragment = emitCsvLegacyFragment();
-
-  assert.deepEqual(plain(rule(shadow, "PDV", "SB7", "includes")), plain(rule(production, "PDV", "SB7", "includes")));
-  assert.deepEqual(plain(priceRule(shadow, "PDV", "SB7", 0)), plain(priceRule(production, "PDV", "SB7", 0)));
-  assert.deepEqual(plain(rule(shadow, "PCX", "SB7", "excludes")), plain(rule(production, "PCX", "SB7", "excludes")));
-
-  const pdvId = optionIdByRpo(production, "PDV");
   const pcxId = optionIdByRpo(production, "PCX");
-  const sb7Id = optionIdByRpo(production, "SB7");
-  assert.equal(fragment.rules.some((item) => item.source_id === pdvId && item.target_id === sb7Id), false);
-  assert.equal(fragment.rules.some((item) => item.source_id === pcxId && item.target_id === sb7Id), false);
-  assert.equal(fragment.priceRules.some((item) => item.condition_option_id === pdvId && item.target_option_id === sb7Id), false);
 
-  assert.equal(manifestHas({ record_type: "selectable", rpo: "SB7", ownership: "projected_owned" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "PDV", target_rpo: "SB7", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "priceRule", source_rpo: "PDV", target_rpo: "SB7", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCX", target_rpo: "SB7", ownership: "preserved_cross_boundary" }), true);
+  for (const rpo of TECH_BRONZE_GRAPHICS_RPOS) {
+    assert.deepEqual(plain(rule(shadow, "PCX", rpo, "includes")), plain(rule(production, "PCX", rpo, "includes")));
+    assert.deepEqual(plain(priceRule(shadow, "PCX", rpo, 0)), plain(priceRule(production, "PCX", rpo, 0)));
+
+    const targetId = optionIdByRpo(production, rpo);
+    assert.equal(fragment.rules.some((item) => item.source_id === pcxId && item.target_id === targetId), false);
+    assert.equal(fragment.priceRules.some((item) => item.condition_option_id === pcxId && item.target_option_id === targetId), false);
+
+    assert.equal(manifestHas({ record_type: "selectable", rpo, ownership: "projected_owned" }), true);
+    assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCX", target_rpo: rpo, ownership: "preserved_cross_boundary" }), true);
+    assert.equal(manifestHas({ record_type: "priceRule", source_rpo: "PCX", target_rpo: rpo, ownership: "preserved_cross_boundary" }), true);
+  }
+
+  assert.deepEqual(plain(rule(shadow, "SHT", "PDV", "excludes")), plain(rule(production, "SHT", "PDV", "excludes")));
+  const shtId = optionIdByRpo(production, "SHT");
+  const pdvId = optionIdByRpo(production, "PDV");
+  assert.equal(fragment.rules.some((item) => item.source_id === shtId && item.target_id === pdvId), false);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "SHT", target_rpo: "PDV", ownership: "preserved_cross_boundary" }), true);
 });
 
-test("SB7 projection does not claim broader graphics or package rows", () => {
+test("Tech Bronze graphics projection does not claim broader graphics, badge, wheel, or package rows", () => {
   const owned = projectedOwnedRpos();
 
-  assert.equal(owned.has("SB7"), true);
+  for (const rpo of TECH_BRONZE_GRAPHICS_RPOS) {
+    assert.equal(owned.has(rpo), true);
+  }
   for (const rpo of OUT_OF_SCOPE_RPOS) {
-    assert.equal(owned.has(rpo), false, `${rpo} should remain outside the SB7 Stingray R graphics slice`);
+    assert.equal(owned.has(rpo), false, `${rpo} should remain outside the SHT/SNG Tech Bronze graphics slice`);
   }
 });
