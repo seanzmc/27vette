@@ -40,6 +40,9 @@ opt_sng_001,option,SNG,"LPO, Fender hash stripes","Carbon Flash Metallic with Te
 opt_sht_001,option,SHT,"LPO, Jake hood graphic with Tech Bronze accent",Genuine Corvette Accessory,true,,Tech Bronze hood graphic choice; PCX and PDV package boundaries remain production-owned.
 opt_sfz_001,option,SFZ,"LPO, Dark Stealth crossed flags emblem","Front on Stingray models, Genuine Corvette Accessory",true,,Dark Stealth badge member choice; PCX R88 EYK and stripe boundaries remain production-owned.
 opt_r88_001,option,R88,"LPO, Illuminated crossed flags emblem","Front, Genuine Corvette Accessory",true,,Illuminated crossed flags emblem choice; SFZ EYK and stripe boundaries remain production-owned.
+opt_rin_001,option,RIN,"LPO, Rear Corvette script badge in Arctic White",Genuine Corvette Accessory,true,,Rear script badge member choice; peer excludes remain production-owned.
+opt_sl8_001,option,SL8,"LPO, Rear Corvette script badge in Edge Red",Genuine Corvette Accessory,true,,Rear script badge member choice; peer excludes remain production-owned.
+opt_rik_001,option,RIK,"LPO, Rear Corvette script badge in Torch Red",Genuine Corvette Accessory,true,,Rear script badge member choice; peer excludes remain production-owned.
 opt_edu_001,option,EDU,Carbon Flash and body-color accents,"Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",true,,Standalone Exterior Accents choice; section metadata and EFY paint behavior remain production-owned.
 opt_slk_001,option,SLK,"LPO, Rear hatch strut bracket","Edge Red, Genuine Corvette Accessory",true,,Engine Appearance LPO add-on choice.
 opt_sln_001,option,SLN,"LPO, Visible carbon fiber engine cross brace with Jake logo",Genuine Corvette Accessory,true,,Engine Appearance LPO add-on choice.
