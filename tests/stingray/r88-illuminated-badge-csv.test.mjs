@@ -8,7 +8,7 @@ import { createRuntime, loadGeneratedData, loadShadowData } from "./runtime-harn
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
-const SFZ_SOURCE_TEXT_STRIPE_RPOS = new Set([
+const R88_SOURCE_TEXT_STRIPE_RPOS = new Set([
   "DPB",
   "DPC",
   "DPG",
@@ -23,17 +23,14 @@ const SFZ_SOURCE_TEXT_STRIPE_RPOS = new Set([
   "DUK",
   "DUW",
 ]);
-const SFZ_SOURCE_TEXT_MISSING_RPOS = new Set(["DTB"]);
+const R88_SOURCE_TEXT_MISSING_RPOS = new Set(["DTB"]);
 const OUT_OF_SCOPE_RPOS = new Set([
-  "PCX",
   "EYK",
-  "5DG",
-  "S47",
-  "SFE",
-  "SPY",
-  "SPZ",
-  "R8C",
-  ...SFZ_SOURCE_TEXT_STRIPE_RPOS,
+  "EYT",
+  "RIN",
+  "SL8",
+  "RIK",
+  ...R88_SOURCE_TEXT_STRIPE_RPOS,
 ]);
 
 function parseCsv(source) {
@@ -129,7 +126,7 @@ function selectedRpos(runtime, rpos) {
 
 function normalizeChoices(rows) {
   return Array.from(rows)
-    .filter((choice) => choice.rpo === "SFZ")
+    .filter((choice) => choice.rpo === "R88")
     .map((choice) => ({
       choice_id: choice.choice_id,
       option_id: choice.option_id,
@@ -172,14 +169,6 @@ function rule(data, sourceRpo, targetRpo, ruleType) {
   return data.rules.find((item) => item.source_id === sourceId && item.target_id === targetId && item.rule_type === ruleType);
 }
 
-function priceRule(data, sourceRpo, targetRpo, priceValue) {
-  const sourceId = optionIdByRpo(data, sourceRpo);
-  const targetId = optionIdByRpo(data, targetRpo);
-  return data.priceRules.find(
-    (item) => item.condition_option_id === sourceId && item.target_option_id === targetId && Number(item.price_value) === priceValue
-  );
-}
-
 function groupIdsTouchingOption(groups, optionId) {
   return groups
     .filter((group) => group.option_ids.includes(optionId))
@@ -199,19 +188,19 @@ function lineByRpo(runtime, rpo) {
 }
 
 function sourceTextRpos(choice) {
-  return new Set((choice.source_detail_raw.match(/\b[A-Z0-9]{2,3}\b/g) || []).filter((rpo) => !new Set(["RPO", "LPO", "PCX"]).has(rpo)));
+  return new Set((choice.source_detail_raw.match(/\b[A-Z0-9]{2,3}\b/g) || []).filter((rpo) => !new Set(["RPO", "LPO"]).has(rpo)));
 }
 
-test("CSV evaluator prices direct SFZ Dark Stealth badge selection", () => {
+test("CSV evaluator prices direct R88 Illuminated crossed flags emblem selection", () => {
   const production = loadGeneratedData();
-  const result = evaluate("1lt_c07", [optionIdByRpo(production, "SFZ")]);
-  const line = result.selected_lines.find((item) => item.rpo === "SFZ");
+  const result = evaluate("1lt_c07", [optionIdByRpo(production, "R88")]);
+  const line = result.selected_lines.find((item) => item.rpo === "R88");
 
-  assert.equal(line?.final_price_usd, 250);
+  assert.equal(line?.final_price_usd, 695);
   assert.deepEqual(result.validation_errors, []);
 });
 
-test("CSV SFZ legacy fragment matches generated choices and all-variant availability", () => {
+test("CSV R88 legacy fragment matches generated choices and all-variant availability", () => {
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
   const choices = normalizeChoices(projected.choices);
@@ -222,49 +211,49 @@ test("CSV SFZ legacy fragment matches generated choices and all-variant availabi
   assert.deepEqual(
     choices.map((choice) => [choice.variant_id, choice.status, choice.status_label, choice.selectable, choice.active, choice.base_price]),
     [
-      ["1lt_c07", "available", "Available", "True", "True", 250],
-      ["1lt_c67", "available", "Available", "True", "True", 250],
-      ["2lt_c07", "available", "Available", "True", "True", 250],
-      ["2lt_c67", "available", "Available", "True", "True", 250],
-      ["3lt_c07", "available", "Available", "True", "True", 250],
-      ["3lt_c67", "available", "Available", "True", "True", 250],
+      ["1lt_c07", "available", "Available", "True", "True", 695],
+      ["1lt_c67", "available", "Available", "True", "True", 695],
+      ["2lt_c07", "available", "Available", "True", "True", 695],
+      ["2lt_c67", "available", "Available", "True", "True", 695],
+      ["3lt_c07", "available", "Available", "True", "True", 695],
+      ["3lt_c67", "available", "Available", "True", "True", 695],
     ]
   );
 });
 
-test("SFZ source-text constraints are structured records or explicitly absent generated choices", () => {
+test("R88 source-text constraints are structured records or explicitly absent generated choices", () => {
   const data = loadGeneratedData();
-  const sfz = data.choices.find((choice) => choice.rpo === "SFZ" && choice.active === "True");
-  assert.ok(sfz);
+  const r88 = data.choices.find((choice) => choice.rpo === "R88" && choice.active === "True");
+  assert.ok(r88);
 
-  const expectedSourceTextRpos = new Set(["EYK", ...SFZ_SOURCE_TEXT_STRIPE_RPOS, ...SFZ_SOURCE_TEXT_MISSING_RPOS]);
-  assert.deepEqual(sourceTextRpos(sfz), expectedSourceTextRpos);
+  const expectedSourceTextRpos = new Set(["SFZ", "EYK", ...R88_SOURCE_TEXT_STRIPE_RPOS, ...R88_SOURCE_TEXT_MISSING_RPOS]);
+  assert.deepEqual(sourceTextRpos(r88), expectedSourceTextRpos);
 
-  assert.ok(rule(data, "SFZ", "EYK", "excludes"), "SFZ should have a structured SFZ -> EYK exclude");
-  for (const rpo of SFZ_SOURCE_TEXT_STRIPE_RPOS) {
+  assert.ok(rule(data, "R88", "SFZ", "excludes"), "R88 should have a structured R88 -> SFZ exclude");
+  assert.ok(rule(data, "R88", "EYK", "excludes"), "R88 should have a structured R88 -> EYK exclude");
+  for (const rpo of R88_SOURCE_TEXT_STRIPE_RPOS) {
     const peer = data.choices.find((choice) => choice.rpo === rpo && choice.active === "True");
     assert.ok(peer, `${rpo} should resolve to an active generated choice`);
     assert.equal(peer.section_id, "sec_stri_001", `${rpo} should remain in the Stripes section`);
     assert.equal(peer.selection_mode, "single_select_opt", `${rpo} should remain an optional Stripes peer`);
-    assert.ok(rule(data, "SFZ", rpo, "excludes"), `SFZ should preserve a structured SFZ -> ${rpo} exclude`);
+    assert.ok(rule(data, "R88", rpo, "excludes"), `R88 should preserve a structured R88 -> ${rpo} exclude`);
   }
 
-  for (const rpo of SFZ_SOURCE_TEXT_MISSING_RPOS) {
+  for (const rpo of R88_SOURCE_TEXT_MISSING_RPOS) {
     assert.equal(data.choices.some((choice) => choice.rpo === rpo && choice.active === "True"), false, `${rpo} should not become a fake selectable`);
   }
 });
 
-test("production has only classified structured records touching SFZ", () => {
+test("production has only classified structured records touching R88", () => {
   const data = loadGeneratedData();
-  const sfzId = optionIdByRpo(data, "SFZ");
+  const r88Id = optionIdByRpo(data, "R88");
   const allowedRuleKeys = new Set([
-    "PCX->SFZ:includes",
     "R88->SFZ:excludes",
-    "SFZ->EYK:excludes",
-    ...[...SFZ_SOURCE_TEXT_STRIPE_RPOS].map((rpo) => `SFZ->${rpo}:excludes`),
+    "R88->EYK:excludes",
+    ...[...R88_SOURCE_TEXT_STRIPE_RPOS].map((rpo) => `R88->${rpo}:excludes`),
   ]);
   const ruleKeys = data.rules
-    .filter((item) => item.source_id === sfzId || item.target_id === sfzId)
+    .filter((item) => item.source_id === r88Id || item.target_id === r88Id)
     .map((item) => {
       const source = data.choices.find((choice) => choice.option_id === item.source_id)?.rpo || item.source_id;
       const target = data.choices.find((choice) => choice.option_id === item.target_id)?.rpo || item.target_id;
@@ -273,85 +262,62 @@ test("production has only classified structured records touching SFZ", () => {
     .sort();
 
   assert.deepEqual(plain(ruleKeys), plain([...allowedRuleKeys].sort()));
-  const priceRuleKeys = data.priceRules
-    .filter((item) => item.condition_option_id === sfzId || item.target_option_id === sfzId)
-    .map((item) => {
-      const source = data.choices.find((choice) => choice.option_id === item.condition_option_id)?.rpo || item.condition_option_id;
-      const target = data.choices.find((choice) => choice.option_id === item.target_option_id)?.rpo || item.target_option_id;
-      return `${source}->${target}:${item.price_rule_type}:${Number(item.price_value)}`;
-    });
-  assert.deepEqual(plain(priceRuleKeys), ["PCX->SFZ:override:0"]);
-  assert.deepEqual(plain(groupIdsTouchingOption(data.exclusiveGroups, sfzId)), []);
-  assert.deepEqual(plain(ruleGroupIdsTouchingOption(data.ruleGroups, sfzId)), []);
+  assert.deepEqual(plain(data.priceRules.filter((item) => item.condition_option_id === r88Id || item.target_option_id === r88Id)), []);
+  assert.deepEqual(plain(groupIdsTouchingOption(data.exclusiveGroups, r88Id)), []);
+  assert.deepEqual(plain(ruleGroupIdsTouchingOption(data.ruleGroups, r88Id)), []);
 });
 
-test("shadow runtime preserves SFZ package pricing and badge/stripe blocks", () => {
+test("shadow runtime preserves R88 badge and stripe blocks", () => {
   for (const data of [loadGeneratedData(), loadShadowData()]) {
     const directRuntime = runtimeFor(data, "1lt_c07");
-    directRuntime.handleChoice(activeChoiceByRpo(directRuntime, "SFZ"));
-    assert.deepEqual(selectedRpos(directRuntime, new Set(["SFZ"])), ["SFZ"]);
-    assert.equal(lineByRpo(directRuntime, "SFZ")?.price, 250);
-    assert.equal(lineByRpo(directRuntime, "SFZ")?.type, "selected");
-    assert.match(directRuntime.disableReasonForChoice(activeChoiceByRpo(directRuntime, "R88")), /Conflicts with SFZ/);
-    assert.match(directRuntime.disableReasonForChoice(activeChoiceByRpo(directRuntime, "EYK")), /Blocked by SFZ/);
-    for (const rpo of SFZ_SOURCE_TEXT_STRIPE_RPOS) {
-      assert.match(directRuntime.disableReasonForChoice(activeChoiceByRpo(directRuntime, rpo)), /Blocked by SFZ/);
+    directRuntime.handleChoice(activeChoiceByRpo(directRuntime, "R88"));
+    assert.deepEqual(selectedRpos(directRuntime, new Set(["R88"])), ["R88"]);
+    assert.equal(lineByRpo(directRuntime, "R88")?.price, 695);
+    assert.equal(lineByRpo(directRuntime, "R88")?.type, "selected");
+    assert.match(directRuntime.disableReasonForChoice(activeChoiceByRpo(directRuntime, "SFZ")), /Blocked by R88/);
+    assert.match(directRuntime.disableReasonForChoice(activeChoiceByRpo(directRuntime, "EYK")), /Blocked by R88/);
+    for (const rpo of R88_SOURCE_TEXT_STRIPE_RPOS) {
+      assert.match(directRuntime.disableReasonForChoice(activeChoiceByRpo(directRuntime, rpo)), /Blocked by R88/);
     }
 
-    const packageRuntime = runtimeFor(data, "1lt_c07");
-    packageRuntime.handleChoice(activeChoiceByRpo(packageRuntime, "PCX"));
-    assert.equal(lineByRpo(packageRuntime, "SFZ")?.type, "auto_added");
-    assert.equal(lineByRpo(packageRuntime, "SFZ")?.price, 0);
-
-    const memberFirstRuntime = runtimeFor(data, "1lt_c07");
-    memberFirstRuntime.handleChoice(activeChoiceByRpo(memberFirstRuntime, "SFZ"));
-    memberFirstRuntime.handleChoice(activeChoiceByRpo(memberFirstRuntime, "PCX"));
-    assert.equal(lineByRpo(memberFirstRuntime, "SFZ")?.type, "selected");
-    assert.equal(lineByRpo(memberFirstRuntime, "SFZ")?.price, 0);
-    assert.equal(memberFirstRuntime.lineItems().filter((line) => line.rpo === "SFZ").length, 1);
-
-    const r88Runtime = runtimeFor(data, "1lt_c07");
-    r88Runtime.handleChoice(activeChoiceByRpo(r88Runtime, "R88"));
-    assert.match(r88Runtime.disableReasonForChoice(activeChoiceByRpo(r88Runtime, "SFZ")), /Blocked by R88/);
+    const sfzRuntime = runtimeFor(data, "1lt_c07");
+    sfzRuntime.handleChoice(activeChoiceByRpo(sfzRuntime, "SFZ"));
+    assert.match(sfzRuntime.disableReasonForChoice(activeChoiceByRpo(sfzRuntime, "R88")), /Conflicts with SFZ/);
   }
 });
 
-test("SFZ boundaries remain production-owned and preserved", () => {
+test("R88 boundaries remain production-owned and preserved", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
   const fragment = emitCsvLegacyFragment();
-  const sfzId = optionIdByRpo(production, "SFZ");
+  const r88Id = optionIdByRpo(production, "R88");
 
-  assert.deepEqual(plain(rule(shadow, "PCX", "SFZ", "includes")), plain(rule(production, "PCX", "SFZ", "includes")));
-  assert.deepEqual(plain(priceRule(shadow, "PCX", "SFZ", 0)), plain(priceRule(production, "PCX", "SFZ", 0)));
   assert.deepEqual(plain(rule(shadow, "R88", "SFZ", "excludes")), plain(rule(production, "R88", "SFZ", "excludes")));
-  assert.deepEqual(plain(rule(shadow, "SFZ", "EYK", "excludes")), plain(rule(production, "SFZ", "EYK", "excludes")));
-  for (const rpo of SFZ_SOURCE_TEXT_STRIPE_RPOS) {
-    assert.deepEqual(plain(rule(shadow, "SFZ", rpo, "excludes")), plain(rule(production, "SFZ", rpo, "excludes")));
+  assert.deepEqual(plain(rule(shadow, "R88", "EYK", "excludes")), plain(rule(production, "R88", "EYK", "excludes")));
+  for (const rpo of R88_SOURCE_TEXT_STRIPE_RPOS) {
+    assert.deepEqual(plain(rule(shadow, "R88", rpo, "excludes")), plain(rule(production, "R88", rpo, "excludes")));
   }
 
-  assert.equal(fragment.rules.some((item) => item.source_id === sfzId || item.target_id === sfzId), false);
-  assert.equal(fragment.priceRules.some((item) => item.condition_option_id === sfzId || item.target_option_id === sfzId), false);
+  assert.equal(fragment.rules.some((item) => item.source_id === r88Id || item.target_id === r88Id), false);
+  assert.equal(fragment.priceRules.some((item) => item.condition_option_id === r88Id || item.target_option_id === r88Id), false);
 
-  assert.equal(manifestHas({ record_type: "selectable", rpo: "SFZ", ownership: "projected_owned" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCX", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "priceRule", source_rpo: "PCX", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "selectable", rpo: "R88", ownership: "projected_owned" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "SFZ", target_rpo: "EYK", ownership: "preserved_cross_boundary" }), true);
-  for (const rpo of SFZ_SOURCE_TEXT_STRIPE_RPOS) {
-    assert.equal(manifestHas({ record_type: "rule", source_rpo: "SFZ", target_rpo: rpo, ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: "EYK", ownership: "preserved_cross_boundary" }), true);
+  for (const rpo of R88_SOURCE_TEXT_STRIPE_RPOS) {
+    assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: rpo, ownership: "preserved_cross_boundary" }), true);
   }
 });
 
-test("SFZ projection does not claim PCX badges wheels stripes or missing DTB", () => {
+test("R88 projection does not claim badge section script badges stripes or missing DTB", () => {
   const production = loadGeneratedData();
   const owned = projectedOwnedRpos();
 
-  assert.equal(owned.has("SFZ"), true);
+  assert.equal(owned.has("R88"), true);
   for (const rpo of OUT_OF_SCOPE_RPOS) {
-    assert.equal(owned.has(rpo), false, `${rpo} should remain outside the SFZ Dark Stealth badge member slice`);
+    assert.equal(owned.has(rpo), false, `${rpo} should remain outside the R88 Illuminated badge member slice`);
   }
-  for (const rpo of SFZ_SOURCE_TEXT_MISSING_RPOS) {
+  for (const rpo of R88_SOURCE_TEXT_MISSING_RPOS) {
     assert.equal(production.choices.some((choice) => choice.rpo === rpo || choice.option_id === `opt_${rpo.toLowerCase()}_001`), false);
     assert.equal(owned.has(rpo), false);
   }

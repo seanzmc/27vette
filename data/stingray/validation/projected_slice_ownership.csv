@@ -42,6 +42,7 @@ selectable,,,,,,SB7,projected_owned,SB7 Stingray R graphics projected slice,true
 selectable,,,,,,SNG,projected_owned,Tech Bronze graphics projected slice,true
 selectable,,,,,,SHT,projected_owned,Tech Bronze graphics projected slice,true
 selectable,,,,,,SFZ,projected_owned,SFZ Dark Stealth badge member projected slice,true
+selectable,,,,,,R88,projected_owned,R88 Illuminated crossed flags emblem projected slice,true
 selectable,,,,,,EDU,projected_owned,EDU Exterior Accents standalone projected slice,true
 rule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
 priceRule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
@@ -55,7 +56,21 @@ priceRule,,PCX,,SHT,,,preserved_cross_boundary,PCX package source remains produc
 rule,,SHT,,PDV,,,preserved_cross_boundary,SHT to PDV package exclude remains production-owned in Pass 61,true
 rule,,PCX,,SFZ,,,preserved_cross_boundary,PCX package source remains production-owned for SFZ in Pass 63,true
 priceRule,,PCX,,SFZ,,,preserved_cross_boundary,PCX package source remains production-owned for SFZ in Pass 63,true
-rule,,R88,,SFZ,,,preserved_cross_boundary,R88 badge-adjacent exclude remains production-owned for SFZ in Pass 63,true
+rule,,R88,,SFZ,,,preserved_cross_boundary,R88 to SFZ badge exclude remains production-owned in Pass 65,true
+rule,,R88,,EYK,,,preserved_cross_boundary,R88 to required badge section exclude remains production-owned in Pass 65,true
+rule,,R88,,DPB,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
+rule,,R88,,DPC,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
+rule,,R88,,DPG,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
+rule,,R88,,DPL,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
+rule,,R88,,DPT,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
+rule,,R88,,DSY,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
+rule,,R88,,DSZ,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
+rule,,R88,,DT0,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
+rule,,R88,,DTH,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
+rule,,R88,,DUB,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
+rule,,R88,,DUE,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
+rule,,R88,,DUK,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
+rule,,R88,,DUW,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
 rule,,SFZ,,EYK,,,preserved_cross_boundary,SFZ to badge section exclude remains production-owned in Pass 63,true
 rule,,SFZ,,DPB,,,preserved_cross_boundary,SFZ to full-length stripe exclude remains production-owned in Pass 63,true
 rule,,SFZ,,DPC,,,preserved_cross_boundary,SFZ to full-length stripe exclude remains production-owned in Pass 63,true
