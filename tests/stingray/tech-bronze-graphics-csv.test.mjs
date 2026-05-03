@@ -34,7 +34,6 @@ const SHT_SOURCE_TEXT_STRIPE_RPOS = new Set([
 const SHT_SOURCE_TEXT_MISSING_RPOS = new Set(["DTB"]);
 const OUT_OF_SCOPE_RPOS = new Set([
   "PCX",
-  "SFZ",
   "5DG",
   "PDV",
   "EYK",
