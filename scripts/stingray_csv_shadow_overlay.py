@@ -478,6 +478,45 @@ def assert_projected_rule_group_ownership(fragment: dict[str, Any], ownership: O
         raise OverlayError(f"projected ruleGroup targets are not projected-owned: {unowned_targets[:5]}.")
 
 
+def assert_projected_package_record_ownership(fragment: dict[str, Any], projected_ids: set[str]) -> None:
+    # Default Pass 53 policy: projected package-driven include records and
+    # included-zero priceRules require projected-owned package sources and
+    # projected-owned emitted targets. Cross-owned package/member edges remain
+    # production-owned/preserved unless a later exception model is approved.
+    unowned_include_sources = []
+    unowned_include_targets = []
+    for row in fragment.get("rules", []):
+        if row.get("rule_type", "") != "includes" or row.get("auto_add", "") != "True":
+            continue
+        source_id = row.get("source_id", "")
+        target_id = row.get("target_id", "")
+        if source_id not in projected_ids:
+            unowned_include_sources.append({"source_id": source_id, "target_id": target_id})
+        if target_id not in projected_ids:
+            unowned_include_targets.append({"source_id": source_id, "target_id": target_id})
+
+    unowned_price_rule_sources = []
+    unowned_price_rule_targets = []
+    for row in fragment.get("priceRules", []):
+        if row.get("price_rule_type", "") != "override" or int(row.get("price_value") or 0) != 0:
+            continue
+        source_id = row.get("condition_option_id", "")
+        target_id = row.get("target_option_id", "")
+        if source_id not in projected_ids:
+            unowned_price_rule_sources.append({"condition_option_id": source_id, "target_option_id": target_id})
+        if target_id not in projected_ids:
+            unowned_price_rule_targets.append({"condition_option_id": source_id, "target_option_id": target_id})
+
+    if unowned_include_sources:
+        raise OverlayError(f"projected package include source is not projected-owned: {unowned_include_sources[:5]}.")
+    if unowned_include_targets:
+        raise OverlayError(f"projected package include targets are not projected-owned: {unowned_include_targets[:5]}.")
+    if unowned_price_rule_sources:
+        raise OverlayError(f"projected package priceRule source is not projected-owned: {unowned_price_rule_sources[:5]}.")
+    if unowned_price_rule_targets:
+        raise OverlayError(f"projected package priceRule targets are not projected-owned: {unowned_price_rule_targets[:5]}.")
+
+
 def assert_same_normalized(surface: str, left: list[dict[str, Any]], right: list[dict[str, Any]]) -> None:
     left_rows = [normalized_json(row) for row in left]
     right_rows = [normalized_json(row) for row in right]
@@ -670,6 +709,7 @@ def overlay_shadow_data(production: dict[str, Any], fragment: dict[str, Any], ow
     assert_preserved_records_exist(production, ownership, preserved_keys_by_surface)
     assert_projected_groups_exist(fragment, ownership)
     assert_projected_rule_group_ownership(fragment, ownership, fragment_ids)
+    assert_projected_package_record_ownership(fragment, fragment_ids)
 
     removed_choices = [row for row in production.get("choices", []) if row.get("rpo") in rpos]
     fragment_rule_keys = {
