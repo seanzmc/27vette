@@ -29,6 +29,8 @@ selectable,,,,,,5V7,projected_owned,5V7 ground effects projected slice,true
 selectable,,,,,,SLK,projected_owned,Engine Appearance LPO add-on projected slice,true
 selectable,,,,,,SLN,projected_owned,Engine Appearance LPO add-on projected slice,true
 selectable,,,,,,VUP,projected_owned,Engine Appearance LPO add-on projected slice,true
+selectable,,,,,,SDA,projected_owned,Simple LPO Exterior standalone projected slice,true
+selectable,,,,,,VTB,projected_owned,Simple LPO Exterior standalone projected slice,true
 rule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
 priceRule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
 rule,,WKQ,,5ZU,,,preserved_cross_boundary,Car-cover spoiler exclude remains production-owned in Pass 15,true

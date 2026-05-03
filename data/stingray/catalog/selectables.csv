@@ -26,6 +26,8 @@ opt_t0a_001,option,T0A,Z51 Spoiler,,true,,T0A Z51 spoiler choice.
 opt_5zz_001,option,5ZZ,"LPO, High wing spoiler","Carbon Flash Metallic-painted, Genuine Corvette Accessory",true,,5ZZ high-wing spoiler choice.
 opt_5zu_001,option,5ZU,"LPO, High wing spoiler, Body color","Body-color, G8G, GBA, GKZ only. Genuine Corvette Accessory",true,,5ZU body-color high-wing spoiler choice.
 opt_5v7_001,option,5V7,"LPO, Black Ground Effects",Genuine Corvette Accessory,true,,5V7 black ground effects choice.
+opt_sda_001,option,SDA,"LPO, Black recovery hook",Genuine Corvette Accessory,true,,Standalone LPO Exterior accessory choice.
+opt_vtb_001,option,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",Genuine Corvette Accessory,true,,Standalone LPO Exterior accessory choice.
 opt_slk_001,option,SLK,"LPO, Rear hatch strut bracket","Edge Red, Genuine Corvette Accessory",true,,Engine Appearance LPO add-on choice.
 opt_sln_001,option,SLN,"LPO, Visible carbon fiber engine cross brace with Jake logo",Genuine Corvette Accessory,true,,Engine Appearance LPO add-on choice.
 opt_vup_001,option,VUP,"LPO, Engine Bay closeout graphics",Genuine Corvette Accessory,true,,Engine Appearance LPO add-on choice.
