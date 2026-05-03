@@ -31,6 +31,10 @@ selectable,,,,,,SLN,projected_owned,Engine Appearance LPO add-on projected slice
 selectable,,,,,,VUP,projected_owned,Engine Appearance LPO add-on projected slice,true
 selectable,,,,,,SDA,projected_owned,Simple LPO Exterior standalone projected slice,true
 selectable,,,,,,VTB,projected_owned,Simple LPO Exterior standalone projected slice,true
+selectable,,,,,,RWU,projected_owned,LPO Interior standalone accessory projected slice,true
+selectable,,,,,,S2L,projected_owned,LPO Interior standalone accessory projected slice,true
+selectable,,,,,,VYW,projected_owned,LPO Interior standalone accessory projected slice,true
+selectable,,,,,,W2D,projected_owned,LPO Interior standalone accessory projected slice,true
 rule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
 priceRule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
 rule,,WKQ,,5ZU,,,preserved_cross_boundary,Car-cover spoiler exclude remains production-owned in Pass 15,true

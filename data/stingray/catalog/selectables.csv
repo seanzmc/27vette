@@ -28,6 +28,10 @@ opt_5zu_001,option,5ZU,"LPO, High wing spoiler, Body color","Body-color, G8G, GB
 opt_5v7_001,option,5V7,"LPO, Black Ground Effects",Genuine Corvette Accessory,true,,5V7 black ground effects choice.
 opt_sda_001,option,SDA,"LPO, Black recovery hook",Genuine Corvette Accessory,true,,Standalone LPO Exterior accessory choice.
 opt_vtb_001,option,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",Genuine Corvette Accessory,true,,Standalone LPO Exterior accessory choice.
+opt_rwu_001,option,RWU,"LPO, Cargo area organizer","Collapsible, Genuine Corvette Accessory",true,,Standalone LPO Interior accessory choice.
+opt_s2l_001,option,S2L,"LPO, Set of premium leather weekend/travel bags",Genuine Corvette Accessory,true,,Standalone LPO Interior accessory choice.
+opt_vyw_001,option,VYW,"LPO, Floor mats","Premium carpeted with car silhouette logo on Stingray, Grand Sport, ZR1 and ZR1X models, Genuine Corvette Accessory",true,,Standalone LPO Interior accessory choice.
+opt_w2d_001,option,W2D,"LPO, Cargo net set",Genuine Corvette Accessory,true,cs_1lt,Standalone LPO Interior accessory choice; current generated data makes W2D 1LT-only.
 opt_slk_001,option,SLK,"LPO, Rear hatch strut bracket","Edge Red, Genuine Corvette Accessory",true,,Engine Appearance LPO add-on choice.
 opt_sln_001,option,SLN,"LPO, Visible carbon fiber engine cross brace with Jake logo",Genuine Corvette Accessory,true,,Engine Appearance LPO add-on choice.
 opt_vup_001,option,VUP,"LPO, Engine Bay closeout graphics",Genuine Corvette Accessory,true,,Engine Appearance LPO add-on choice.
