@@ -150,7 +150,11 @@ test("Pass 29 projects TVS T0A 5ZZ and 5ZU while other spoiler-adjacent options 
   const production = loadGeneratedData();
   const rows = activeManifestRows();
   const projectedRpos = rows.filter((row) => row.ownership === "projected_owned").map((row) => row.rpo);
-  const guardedRpos = rows.filter((row) => row.ownership === "production_guarded" && row.record_type === "guardedOption").map((row) => row.rpo).filter(Boolean).sort();
+  const guardedRpos = rows
+    .filter((row) => row.ownership === "production_guarded" && row.record_type === "guardedOption")
+    .map((row) => row.rpo)
+    .filter((rpo) => SPOILER_GUARDED_RPOS.includes(rpo))
+    .sort();
 
   assert.deepEqual(guardedRpos, [...SPOILER_GUARDED_RPOS].sort());
   assert.equal(projectedRpos.includes("TVS"), true);

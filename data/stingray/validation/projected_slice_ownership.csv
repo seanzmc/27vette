@@ -47,6 +47,9 @@ selectable,,,,,,RIN,projected_owned,Rear script badge member projected slice,tru
 selectable,,,,,,SL8,projected_owned,Rear script badge member projected slice,true
 selectable,,,,,,RIK,projected_owned,Rear script badge member projected slice,true
 selectable,,,,,,EDU,projected_owned,EDU Exterior Accents standalone projected slice,true
+guardedOption,,,,,,EYK,production_guarded,Required Badges Chrome badge choice remains production-owned before required-section migration,true
+guardedOption,,,,,opt_eyt_001,,production_guarded,Required Badges Carbon Flash default remains production-owned before required-section migration,true
+guardedOption,,,,,opt_eyt_002,,production_guarded,Standard Options EYT display-only duplicate remains production-owned before required-section migration,true
 rule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
 priceRule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
 rule,,PDV,,SB7,,,preserved_cross_boundary,PDV package source remains production-owned for SB7 in Pass 59,true
@@ -59,6 +62,7 @@ priceRule,,PCX,,SHT,,,preserved_cross_boundary,PCX package source remains produc
 rule,,SHT,,PDV,,,preserved_cross_boundary,SHT to PDV package exclude remains production-owned in Pass 61,true
 rule,,PCX,,SFZ,,,preserved_cross_boundary,PCX package source remains production-owned for SFZ in Pass 63,true
 priceRule,,PCX,,SFZ,,,preserved_cross_boundary,PCX package source remains production-owned for SFZ in Pass 63,true
+rule,,PCX,,EYK,,,preserved_cross_boundary,PCX to required Badges Chrome exclude remains production-owned in Pass 69,true
 rule,,R88,,SFZ,,,preserved_cross_boundary,R88 to SFZ badge exclude remains production-owned in Pass 65,true
 rule,,R88,,EYK,,,preserved_cross_boundary,R88 to required badge section exclude remains production-owned in Pass 65,true
 rule,,R88,,DPB,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true

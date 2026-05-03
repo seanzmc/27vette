@@ -351,6 +351,23 @@ def projected_option_ids(data: dict[str, Any], rpos: set[str]) -> set[str]:
     return {row["option_id"] for row in data.get("choices", []) if row.get("rpo") in rpos}
 
 
+def assert_projected_choice_option_id_coverage(production: dict[str, Any], fragment: dict[str, Any], rpos: set[str]) -> None:
+    # Projected selectable ownership is RPO-scoped. If production has duplicate
+    # legacy option IDs for one RPO, the fragment must intentionally emit them all.
+    for rpo in sorted(rpos):
+        production_ids = {row["option_id"] for row in production.get("choices", []) if row.get("rpo") == rpo}
+        fragment_ids = {row["option_id"] for row in fragment.get("choices", []) if row.get("rpo") == rpo}
+        if production_ids == fragment_ids:
+            continue
+        missing = sorted(production_ids - fragment_ids)
+        extra = sorted(fragment_ids - production_ids)
+        raise OverlayError(
+            f"Projected RPO {rpo} replacement is incomplete: projected ownership is RPO-scoped, "
+            f"so fragment choices must include every production option_id for that RPO. "
+            f"Missing option_ids: {missing}. Extra option_ids: {extra}."
+        )
+
+
 def option_id_by_rpo(data: dict[str, Any], rpo: str) -> str:
     option_ids = {row["option_id"] for row in data.get("choices", []) if row.get("rpo") == rpo}
     if len(option_ids) != 1:
@@ -700,6 +717,7 @@ def overlay_shadow_data(production: dict[str, Any], fragment: dict[str, Any], ow
         raise OverlayError("Fragment variants do not match production variants.")
 
     rpos = projected_rpos(fragment, ownership)
+    assert_projected_choice_option_id_coverage(production, fragment, rpos)
     production_ids = projected_option_ids(production, rpos)
     fragment_ids = projected_option_ids(fragment, rpos)
     if production_ids != fragment_ids:

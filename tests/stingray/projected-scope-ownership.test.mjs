@@ -235,7 +235,19 @@ test("projected ownership manifest declares the current multi-slice control scop
       target_option_id: "opt_5zw_001",
       ownership: "production_guarded",
     },
-    ...["GBA", "Z51", "ZYC"].map((rpo) => ({
+    {
+      record_type: "guardedOption",
+      rpo: "",
+      target_option_id: "opt_eyt_001",
+      ownership: "production_guarded",
+    },
+    {
+      record_type: "guardedOption",
+      rpo: "",
+      target_option_id: "opt_eyt_002",
+      ownership: "production_guarded",
+    },
+    ...["EYK", "GBA", "Z51", "ZYC"].map((rpo) => ({
       record_type: "guardedOption",
       rpo,
       target_option_id: "",
@@ -280,6 +292,7 @@ test("projected ownership manifest declares the current multi-slice control scop
     { record_type: "rule", group_id: "", source_rpo: "SHT", source_option_id: "", target_rpo: "PDV", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SFZ", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "priceRule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SFZ", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "EYK", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "R88", source_option_id: "", target_rpo: "SFZ", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "R88", source_option_id: "", target_rpo: "EYK", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "R88", source_option_id: "", target_rpo: "DPB", target_option_id: "", ownership: "preserved_cross_boundary" },

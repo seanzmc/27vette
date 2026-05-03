@@ -1,0 +1,7 @@
+decision_id,selected_option_id,decision_status,notes
+availability_schema_policy,availability_selectable_variant,approved,"Use one row per selectable plus variant_id. Preserve available/standard/not_available only."
+first_apply_boundary,boundary_reconciliation_first,approved,"Produce a reconciliation report against canonical CSV before any apply."
+proposal_metadata_policy,metadata_import_audit,approved,"Preserve proposal metadata in audit/provenance outputs, not business tables."
+section_mapping_policy,section_import_map,approved,"Use an explicit import map for section_family to section_id/step_id before apply."
+selectable_id_policy,selectable_id_model_rpo,approved,"Derive canonical IDs from model_key plus RPO plus deterministic disambiguator when needed, but reconcile against existing canonical IDs first."
+source_refs_policy,source_refs_member_table,approved,"Use a normalized source-ref member table linking canonical rows to source refs, not pipe-delimited source refs in business rows."
