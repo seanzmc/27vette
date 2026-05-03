@@ -26,7 +26,6 @@ const STRIPE_SECTION_PRODUCTION_RPOS = new Set([
   "DZU",
   "DZX",
   "DZV",
-  "SB7",
   "SHT",
   "SNG",
 ]);

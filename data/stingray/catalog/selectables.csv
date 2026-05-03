@@ -35,6 +35,7 @@ opt_w2d_001,option,W2D,"LPO, Cargo net set",Genuine Corvette Accessory,true,cs_1
 opt_eri_001,option,ERI,Battery Protection Package,,true,,Standalone mechanical accessory choice.
 opt_shq_001,option,SHQ,"LPO, Fender hash stripes","Silver with Carbon Flash Metallic accent, Genuine Corvette Accessory",true,,Isolated fender hash stripe choice.
 opt_shw_001,option,SHW,"LPO, Fender hash stripes","Carbon Flash Metallic with Edge Red accent, Genuine Corvette Accessory",true,,Isolated fender hash stripe choice.
+opt_sb7_001,option,SB7,"LPO, Corvette Racing Themed Graphics Package with Jake and Stingray R logos",Genuine Corvette Accessory,true,,Stingray R graphics choice; PDV and PCX package boundaries remain production-owned.
 opt_edu_001,option,EDU,Carbon Flash and body-color accents,"Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",true,,Standalone Exterior Accents choice; section metadata and EFY paint behavior remain production-owned.
 opt_slk_001,option,SLK,"LPO, Rear hatch strut bracket","Edge Red, Genuine Corvette Accessory",true,,Engine Appearance LPO add-on choice.
 opt_sln_001,option,SLN,"LPO, Visible carbon fiber engine cross brace with Jake logo",Genuine Corvette Accessory,true,,Engine Appearance LPO add-on choice.
