@@ -160,7 +160,7 @@ test("staging audit reports extraction quality without modifying staging evidenc
   assert.equal(audit.readiness.ready_for_proposal_generation, false);
   assert.ok(audit.readiness.reasons.includes("unresolved_rows_present"));
   assert.equal(audit.readiness.primary_variant_matrix_ready, false);
-  assert.equal(audit.readiness.color_trim_ready, false);
+  assert.equal(audit.readiness.color_trim_ready, true);
   assert.equal(audit.readiness.pricing_ready, true);
   assert.equal(audit.readiness.equipment_groups_ready, true);
   assert.equal(audit.readiness.canonical_proposal_ready, false);
@@ -168,8 +168,9 @@ test("staging audit reports extraction quality without modifying staging evidenc
   assert.equal(audit.equipment_groups.variant_matrix_leak_count, 0);
   assert.equal(audit.color_trim.has_interior_and_compatibility_rows, true);
   assert.equal(audit.color_trim_scope_review.color_trim_scope_config_present, true);
-  assert.equal(audit.color_trim_scope_review.ready_for_audit_domain, false);
-  assert.equal(audit.color_trim_scope_review.review_status_counts.needs_review >= 1, true);
+  assert.equal(audit.color_trim_scope_review.ready_for_audit_domain, true);
+  assert.equal(audit.color_trim_scope_review.canonical_import_ready, false);
+  assert.equal(audit.color_trim_scope_review.review_status_counts.accepted_review_only >= 1, true);
   assert.equal(audit.color_trim_scope_review.missing_section_count, 0);
   assert.ok(audit.variant_columns_by_sheet["Standard Equipment 1"].some((row) => row.body_code === "1YC07" && row.model_key === "stingray"));
   assert.ok(audit.variant_columns_by_sheet["Standard Equipment 1"].some((row) => row.body_code === "9ZZ07" && row.model_key === ""));
