@@ -33,6 +33,9 @@ opt_s2l_001,option,S2L,"LPO, Set of premium leather weekend/travel bags",Genuine
 opt_vyw_001,option,VYW,"LPO, Floor mats","Premium carpeted with car silhouette logo on Stingray, Grand Sport, ZR1 and ZR1X models, Genuine Corvette Accessory",true,,Standalone LPO Interior accessory choice.
 opt_w2d_001,option,W2D,"LPO, Cargo net set",Genuine Corvette Accessory,true,cs_1lt,Standalone LPO Interior accessory choice; current generated data makes W2D 1LT-only.
 opt_eri_001,option,ERI,Battery Protection Package,,true,,Standalone mechanical accessory choice.
+opt_shq_001,option,SHQ,"LPO, Fender hash stripes","Silver with Carbon Flash Metallic accent, Genuine Corvette Accessory",true,,Isolated fender hash stripe choice.
+opt_shw_001,option,SHW,"LPO, Fender hash stripes","Carbon Flash Metallic with Edge Red accent, Genuine Corvette Accessory",true,,Isolated fender hash stripe choice.
+opt_edu_001,option,EDU,Carbon Flash and body-color accents,"Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",true,,Standalone Exterior Accents choice; section metadata and EFY paint behavior remain production-owned.
 opt_slk_001,option,SLK,"LPO, Rear hatch strut bracket","Edge Red, Genuine Corvette Accessory",true,,Engine Appearance LPO add-on choice.
 opt_sln_001,option,SLN,"LPO, Visible carbon fiber engine cross brace with Jake logo",Genuine Corvette Accessory,true,,Engine Appearance LPO add-on choice.
 opt_vup_001,option,VUP,"LPO, Engine Bay closeout graphics",Genuine Corvette Accessory,true,,Engine Appearance LPO add-on choice.

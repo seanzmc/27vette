@@ -31,3 +31,6 @@ bp_s2l,pb_2027_stingray,selectable,opt_s2l_001,,1695,10,true,Current S2L base pr
 bp_vyw,pb_2027_stingray,selectable,opt_vyw_001,,275,10,true,Current VYW base price.
 bp_w2d,pb_2027_stingray,selectable,opt_w2d_001,,125,10,true,Current W2D base price.
 bp_eri,pb_2027_stingray,selectable,opt_eri_001,,100,10,true,Current ERI base price.
+bp_shq,pb_2027_stingray,selectable,opt_shq_001,,295,10,true,Current SHQ base price.
+bp_shw,pb_2027_stingray,selectable,opt_shw_001,,295,10,true,Current SHW base price.
+bp_edu,pb_2027_stingray,selectable,opt_edu_001,,995,10,true,Current EDU base price.

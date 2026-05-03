@@ -36,6 +36,9 @@ selectable,,,,,,S2L,projected_owned,LPO Interior standalone accessory projected 
 selectable,,,,,,VYW,projected_owned,LPO Interior standalone accessory projected slice,true
 selectable,,,,,,W2D,projected_owned,LPO Interior standalone accessory projected slice,true
 selectable,,,,,,ERI,projected_owned,Battery Protection standalone mechanical accessory projected slice,true
+selectable,,,,,,SHQ,projected_owned,Fender hash stripe pair projected slice,true
+selectable,,,,,,SHW,projected_owned,Fender hash stripe pair projected slice,true
+selectable,,,,,,EDU,projected_owned,EDU Exterior Accents standalone projected slice,true
 rule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
 priceRule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
 rule,,WKQ,,5ZU,,,preserved_cross_boundary,Car-cover spoiler exclude remains production-owned in Pass 15,true
