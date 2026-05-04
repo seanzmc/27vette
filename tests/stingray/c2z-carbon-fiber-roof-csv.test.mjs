@@ -8,7 +8,7 @@ import { createRuntime, loadGeneratedData, loadShadowData } from "./runtime-harn
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
-const CC3_RPO = "CC3";
+const C2Z_RPO = "C2Z";
 const ROOF_PRODUCTION_RPOS = new Set(["CF7", "CM9"]);
 
 function parseCsv(source) {
@@ -84,9 +84,9 @@ function optionIdByRpo(data, rpo) {
   return [...ids][0];
 }
 
-function normalizeCc3Choices(rows) {
+function normalizeC2zChoices(rows) {
   return Array.from(rows)
-    .filter((choice) => choice.rpo === CC3_RPO)
+    .filter((choice) => choice.rpo === C2Z_RPO)
     .map((choice) => ({
       choice_id: choice.choice_id,
       option_id: choice.option_id,
@@ -147,12 +147,6 @@ function selectedRpos(runtime, rpos) {
     .sort();
 }
 
-function rule(data, sourceRpo, targetRpo, ruleType) {
-  const sourceId = optionIdByRpo(data, sourceRpo);
-  const targetId = optionIdByRpo(data, targetRpo);
-  return data.rules.find((item) => item.source_id === sourceId && item.target_id === targetId && item.rule_type === ruleType);
-}
-
 function rulesTouching(data, rpos) {
   const ids = new Set(data.choices.filter((choice) => rpos.has(choice.rpo)).map((choice) => choice.option_id));
   return data.rules
@@ -191,69 +185,68 @@ function groupIdsTouching(data, rpo) {
   };
 }
 
-test("CSV evaluator prices direct CC3 transparent Roof selection", () => {
+test("CSV evaluator prices direct C2Z carbon fiber Roof selection", () => {
   const production = loadGeneratedData();
-  const result = evaluate("1lt_c07", [optionIdByRpo(production, CC3_RPO)]);
+  const result = evaluate("1lt_c07", [optionIdByRpo(production, C2Z_RPO)]);
 
   assert.deepEqual(result.validation_errors, []);
-  assert.equal(result.selected_lines.find((line) => line.rpo === CC3_RPO)?.final_price_usd, 995);
+  assert.equal(result.selected_lines.find((line) => line.rpo === C2Z_RPO)?.final_price_usd, 2595);
 });
 
-test("CSV CC3 legacy fragment matches generated required Roof choice rows", () => {
+test("CSV C2Z legacy fragment matches generated required Roof choice rows", () => {
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
-  const choices = normalizeCc3Choices(projected.choices);
+  const choices = normalizeC2zChoices(projected.choices);
 
   assert.deepEqual(projected.validation_errors, []);
-  assert.deepEqual(choices, normalizeCc3Choices(production.choices));
+  assert.deepEqual(choices, normalizeC2zChoices(production.choices));
   assert.equal(choices.length, 6);
   assert.deepEqual(
     choices.map((choice) => [choice.variant_id, choice.status, choice.status_label, choice.selectable, choice.active, choice.base_price]),
     [
-      ["1lt_c07", "available", "Available", "True", "True", 995],
-      ["1lt_c67", "unavailable", "Not Available", "True", "True", 995],
-      ["2lt_c07", "available", "Available", "True", "True", 995],
-      ["2lt_c67", "unavailable", "Not Available", "True", "True", 995],
-      ["3lt_c07", "available", "Available", "True", "True", 995],
-      ["3lt_c67", "unavailable", "Not Available", "True", "True", 995],
+      ["1lt_c07", "available", "Available", "True", "True", 2595],
+      ["1lt_c67", "unavailable", "Not Available", "True", "True", 2595],
+      ["2lt_c07", "available", "Available", "True", "True", 2595],
+      ["2lt_c67", "unavailable", "Not Available", "True", "True", 2595],
+      ["3lt_c07", "available", "Available", "True", "True", 2595],
+      ["3lt_c67", "unavailable", "Not Available", "True", "True", 2595],
     ]
   );
 });
 
-test("CC3 projection claims only the transparent Roof row and preserves Roof model boundaries", () => {
+test("C2Z projection claims only the carbon fiber Roof row and preserves Roof model boundaries", () => {
   const owned = projectedOwnedRpos();
 
-  assert.equal(owned.has(CC3_RPO), true);
+  assert.equal(owned.has(C2Z_RPO), true);
+  assert.equal(owned.has("CC3"), true);
   for (const rpo of ROOF_PRODUCTION_RPOS) {
-    assert.equal(owned.has(rpo), false, `${rpo} should remain outside the CC3 slice`);
+    assert.equal(owned.has(rpo), false, `${rpo} should remain outside the C2Z slice`);
   }
   assert.equal(activeManifestRows().some((row) => row.record_type === "section" || row.group_id === "sec_roof_001" || row.group_id === "sec_stan_002"), false);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "SBT", target_rpo: "CC3", ownership: "preserved_cross_boundary" }), true);
 });
 
-test("production has only classified records touching CC3", () => {
+test("production has no structured records touching C2Z", () => {
   const production = loadGeneratedData();
 
-  assert.deepEqual(plain(rulesTouching(production, new Set([CC3_RPO]))), ["SBT->CC3:excludes:False"]);
-  assert.deepEqual(plain(priceRulesTouching(production, new Set([CC3_RPO]))), []);
-  assert.deepEqual(plain(groupIdsTouching(production, CC3_RPO)), {
+  assert.deepEqual(plain(rulesTouching(production, new Set([C2Z_RPO]))), []);
+  assert.deepEqual(plain(priceRulesTouching(production, new Set([C2Z_RPO]))), []);
+  assert.deepEqual(plain(groupIdsTouching(production, C2Z_RPO)), {
     exclusiveGroups: [],
     ruleGroups: [],
   });
 });
 
-test("shadow overlay preserves SBT to CC3 and does not emit owned Roof rule surfaces", () => {
+test("shadow overlay does not emit owned C2Z rule surfaces", () => {
   const production = loadGeneratedData();
-  const shadow = loadShadowData();
   const fragment = emitCsvLegacyFragment();
-  const cc3Id = optionIdByRpo(production, CC3_RPO);
+  const c2zId = optionIdByRpo(production, C2Z_RPO);
 
-  assert.deepEqual(plain(rule(shadow, "SBT", CC3_RPO, "excludes")), plain(rule(production, "SBT", CC3_RPO, "excludes")));
-  assert.equal(fragment.rules.some((item) => item.source_id === cc3Id || item.target_id === cc3Id), false);
-  assert.equal(fragment.priceRules.some((item) => item.condition_option_id === cc3Id || item.target_option_id === cc3Id), false);
+  assert.equal(fragment.rules.some((item) => item.source_id === c2zId || item.target_id === c2zId), false);
+  assert.equal(fragment.priceRules.some((item) => item.condition_option_id === c2zId || item.target_option_id === c2zId), false);
 });
 
-test("shadow runtime preserves required Roof defaults, CC3 replacement, and SBT boundary", () => {
+test("shadow runtime preserves required Roof defaults C2Z replacement and SBT compatibility", () => {
   const roofRpos = new Set(["CF7", "CM9", "C2Z", "CC3", "D84", "D86"]);
   for (const data of [loadGeneratedData(), loadShadowData()]) {
     const coupeDefault = runtimeFor(data, "1lt_c07");
@@ -261,31 +254,28 @@ test("shadow runtime preserves required Roof defaults, CC3 replacement, and SBT 
 
     const convertibleDefault = runtimeFor(data, "1lt_c67");
     assert.deepEqual(selectedRpos(convertibleDefault, roofRpos), ["CM9"]);
-    assert.equal(convertibleDefault.disableReasonForChoice(choiceByRpo(convertibleDefault, CC3_RPO)), "Not available for this body and trim.");
+    assert.equal(convertibleDefault.disableReasonForChoice(choiceByRpo(convertibleDefault, C2Z_RPO)), "Not available for this body and trim.");
 
-    const cc3Runtime = runtimeFor(data, "1lt_c07");
-    const cc3 = activeChoiceByRpo(cc3Runtime, CC3_RPO);
-    cc3Runtime.handleChoice(cc3);
-    assert.deepEqual(selectedRpos(cc3Runtime, roofRpos), ["CC3"]);
-    assert.equal(cc3Runtime.optionPrice(cc3.option_id), 995);
+    const c2zRuntime = runtimeFor(data, "1lt_c07");
+    const c2z = activeChoiceByRpo(c2zRuntime, C2Z_RPO);
+    c2zRuntime.handleChoice(c2z);
+    assert.deepEqual(selectedRpos(c2zRuntime, roofRpos), ["C2Z"]);
+    assert.equal(c2zRuntime.optionPrice(c2z.option_id), 2595);
 
-    cc3Runtime.handleChoice(activeChoiceByRpo(cc3Runtime, "CF7"));
-    assert.deepEqual(selectedRpos(cc3Runtime, roofRpos), ["CF7"]);
+    c2zRuntime.handleChoice(activeChoiceByRpo(c2zRuntime, "CC3"));
+    assert.deepEqual(selectedRpos(c2zRuntime, roofRpos), ["CC3"]);
+    c2zRuntime.handleChoice(activeChoiceByRpo(c2zRuntime, C2Z_RPO));
+    assert.deepEqual(selectedRpos(c2zRuntime, roofRpos), ["C2Z"]);
 
     const sbtRuntime = runtimeFor(data, "1lt_c07");
     const sbt = activeChoiceByRpo(sbtRuntime, "SBT");
-    const blockedCc3 = activeChoiceByRpo(sbtRuntime, CC3_RPO);
+    const compatibleC2z = activeChoiceByRpo(sbtRuntime, C2Z_RPO);
+    const blockedCc3 = activeChoiceByRpo(sbtRuntime, "CC3");
     sbtRuntime.handleChoice(sbt);
+    assert.equal(sbtRuntime.disableReasonForChoice(compatibleC2z), "");
     assert.equal(sbtRuntime.disableReasonForChoice(blockedCc3), "Blocked by SBT LPO, Dual roof.");
-    sbtRuntime.handleChoice(blockedCc3);
-    assert.equal(sbtRuntime.state.selected.has(blockedCc3.option_id), false);
-
-    const cc3FirstRuntime = runtimeFor(data, "1lt_c07");
-    const selectedCc3 = activeChoiceByRpo(cc3FirstRuntime, CC3_RPO);
-    const blockedSbt = activeChoiceByRpo(cc3FirstRuntime, "SBT");
-    cc3FirstRuntime.handleChoice(selectedCc3);
-    assert.equal(cc3FirstRuntime.disableReasonForChoice(blockedSbt), "Conflicts with CC3 Roof panel.");
-    cc3FirstRuntime.handleChoice(blockedSbt);
-    assert.equal(cc3FirstRuntime.state.selected.has(blockedSbt.option_id), false);
+    sbtRuntime.handleChoice(compatibleC2z);
+    assert.equal(sbtRuntime.state.selected.has(sbt.option_id), true);
+    assert.equal(sbtRuntime.state.selected.has(compatibleC2z.option_id), true);
   }
 });

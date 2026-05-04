@@ -40,7 +40,10 @@ opt_ryt_001,option,RYT,"LPO, First Aid Kit",Genuine Corvette Accessory,true,,Roa
 opt_s08_001,option,S08,"LPO, Highway Safety Kit",Genuine Corvette Accessory,true,,Roadside safety package member choice; PDY package is projected-owned.
 opt_sbt_001,option,SBT,"LPO, Dual roof","Adds transparent removable roof panel and includes (SC7) roof panel storage pouch, Genuine Corvette Accessories",true,cs_coupe,Dual roof package source choice; CC3 roof boundary remains production-owned.
 opt_sc7_001,option,SC7,"LPO, Roof panel storage pouch",Genuine Corvette Accessory,true,cs_coupe,Dual roof package member choice; SBT package is projected-owned.
+opt_c2z_001,option,C2Z,Roof panel,"Visible carbon fiber with body-color surround, removable",true,cs_coupe,Carbon fiber Roof panel choice; Roof section and defaults remain production-owned.
 opt_cc3_001,option,CC3,Roof panel,"Transparent, removable",true,cs_coupe,Transparent Roof panel choice; SBT boundary and Roof section remain production-owned.
+opt_d84_001,option,D84,Convertible top,Carbon Flash-painted nacelles and roof,true,cs_convertible,Convertible Roof panel choice; GBA paint boundary remains production-owned.
+opt_d86_001,option,D86,Convertible top,Carbon Flash-painted nacelles and body-color roof,true,cs_convertible,Convertible Roof panel choice; GBA paint boundary remains production-owned.
 opt_eri_001,option,ERI,Battery Protection Package,,true,,Standalone mechanical accessory choice.
 opt_shq_001,option,SHQ,"LPO, Fender hash stripes","Silver with Carbon Flash Metallic accent, Genuine Corvette Accessory",true,,Isolated fender hash stripe choice.
 opt_shw_001,option,SHW,"LPO, Fender hash stripes","Carbon Flash Metallic with Edge Red accent, Genuine Corvette Accessory",true,,Isolated fender hash stripe choice.
