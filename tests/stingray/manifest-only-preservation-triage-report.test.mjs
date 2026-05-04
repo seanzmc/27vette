@@ -94,6 +94,52 @@ const GROUP_DETAIL_FIELDS = [
   "target_projection_statuses",
 ];
 
+const ROLLUP_FIELDS = {
+  source_category_rollup: "source_category",
+  target_category_rollup: "target_category",
+  source_section_rollup: "source_section",
+  target_section_rollup: "target_section",
+  source_ownership_status_rollup: "source_ownership_status",
+  target_ownership_status_rollup: "target_ownership_status",
+  source_projection_status_rollup: "source_projection_status",
+  target_projection_status_rollup: "target_projection_status",
+};
+
+const DIRECTION_ROLLUP_FIELDS = {
+  ownership_direction_rollup: ["source_ownership_status", "target_ownership_status"],
+  projection_direction_rollup: ["source_projection_status", "target_projection_status"],
+};
+
+const EXPECTED_OWNERSHIP_DIRECTION_COUNTS = [
+  ["production_owned->production_owned", 12, 12, 12],
+  ["production_owned->projected_owned", 14, 14, 9],
+  ["projected_owned->production_owned", 36, 36, 36],
+  ["projected_owned->projected_owned", 21, 21, 21],
+];
+
+const EXPECTED_PROJECTION_DIRECTION_COUNTS = [
+  ["not_projected->not_projected", 12, 12, 12],
+  ["not_projected->projected_owned", 14, 14, 9],
+  ["projected_owned->not_projected", 36, 36, 36],
+  ["projected_owned->projected_owned", 21, 21, 21],
+];
+
+const EXPECTED_OWNERSHIP_PROJECTION_DIRECTION_COUNTS = [
+  ["production_owned/not_projected->production_owned/not_projected", 12, 12, 12],
+  ["production_owned/not_projected->projected_owned/projected_owned", 14, 14, 9],
+  ["projected_owned/projected_owned->production_owned/not_projected", 36, 36, 36],
+  ["projected_owned/projected_owned->projected_owned/projected_owned", 21, 21, 21],
+];
+
+const SLICE_ROLLUP_FIELDS = {
+  source_category_rollup: "source_category",
+  target_category_rollup: "target_category",
+  source_section_rollup: "source_section",
+  target_section_rollup: "target_section",
+  source_label_rollup: "source_label",
+  target_label_rollup: "target_label",
+};
+
 function publicTriageRow(row) {
   return {
     manifest_row_id: row.manifest_row_id,
@@ -109,6 +155,103 @@ function publicTriageRow(row) {
     candidate_status: row.candidate_status,
     notes: row.notes,
   };
+}
+
+function normalizedRollupKeys(value) {
+  const values = Array.isArray(value) ? value : [value];
+  const keys = values
+    .filter((item) => item !== null && item !== undefined && item !== "")
+    .map((item) => String(item));
+  return keys.length ? [...new Set(keys)].sort() : ["__missing__"];
+}
+
+function expectedRollup(rows, field) {
+  const buckets = new Map();
+  for (const row of rows) {
+    for (const key of normalizedRollupKeys(row[field])) {
+      if (!buckets.has(key)) {
+        buckets.set(key, {
+          key,
+          row_count: 0,
+          recordIds: new Set(),
+          groupKeys: new Set(),
+        });
+      }
+      const bucket = buckets.get(key);
+      bucket.row_count += 1;
+      bucket.recordIds.add(row.manifest_row_id);
+      bucket.groupKeys.add(row.group_key);
+    }
+  }
+  return [...buckets.values()]
+    .map((bucket) => ({
+      key: bucket.key,
+      row_count: bucket.row_count,
+      record_count: bucket.recordIds.size,
+      group_count: bucket.groupKeys.size,
+      group_keys: [...bucket.groupKeys].sort(),
+    }))
+    .sort((left, right) => (left.key < right.key ? -1 : left.key > right.key ? 1 : 0));
+}
+
+function expectedDirectionRollup(rows, sourceField, targetField) {
+  const buckets = new Map();
+  for (const row of rows) {
+    const sourceKeys = normalizedRollupKeys(row[sourceField]);
+    const targetKeys = normalizedRollupKeys(row[targetField]);
+    for (const sourceKey of sourceKeys) {
+      for (const targetKey of targetKeys) {
+        const key = `${sourceKey}->${targetKey}`;
+        if (!buckets.has(key)) {
+          buckets.set(key, {
+            key,
+            source_key: sourceKey,
+            target_key: targetKey,
+            row_count: 0,
+            recordIds: new Set(),
+            groupKeys: new Set(),
+          });
+        }
+        const bucket = buckets.get(key);
+        bucket.row_count += 1;
+        bucket.recordIds.add(row.manifest_row_id);
+        bucket.groupKeys.add(row.group_key);
+      }
+    }
+  }
+  return [...buckets.values()]
+    .map((bucket) => ({
+      key: bucket.key,
+      source_key: bucket.source_key,
+      target_key: bucket.target_key,
+      row_count: bucket.row_count,
+      record_count: bucket.recordIds.size,
+      group_count: bucket.groupKeys.size,
+      group_keys: [...bucket.groupKeys].sort(),
+    }))
+    .sort((left, right) => (left.key < right.key ? -1 : left.key > right.key ? 1 : 0));
+}
+
+function expectedOwnershipProjectionDirectionRollup(rows) {
+  return expectedDirectionRollup(
+    rows.map((row) => ({
+      ...row,
+      source_ownership_projection_status: `${normalizedRollupKeys(row.source_ownership_status)[0]}/${normalizedRollupKeys(row.source_projection_status)[0]}`,
+      target_ownership_projection_status: `${normalizedRollupKeys(row.target_ownership_status)[0]}/${normalizedRollupKeys(row.target_projection_status)[0]}`,
+    })),
+    "source_ownership_projection_status",
+    "target_ownership_projection_status"
+  );
+}
+
+function rollupCounts(rollup) {
+  return rollup.map((item) => [item.key, item.row_count, item.record_count, item.group_count]);
+}
+
+function combinedDirectionKeyForRow(row) {
+  const sourceKey = `${normalizedRollupKeys(row.source_ownership_status)[0]}/${normalizedRollupKeys(row.source_projection_status)[0]}`;
+  const targetKey = `${normalizedRollupKeys(row.target_ownership_status)[0]}/${normalizedRollupKeys(row.target_projection_status)[0]}`;
+  return `${sourceKey}->${targetKey}`;
 }
 
 test("manifest-only preservation triage reports exactly the census manifest-only rows", () => {
@@ -214,6 +357,109 @@ test("manifest-only preservation triage reports exactly the census manifest-only
     triage.report.multi_row_groups.every((group) => GROUP_DETAIL_FIELDS.every((field) => Object.hasOwn(group, field))),
     true
   );
+
+  const reportGroupKeys = new Set(triage.report.groups.map((group) => group.group_key));
+  for (const [rollupField, rowField] of Object.entries(ROLLUP_FIELDS)) {
+    assert.equal(Object.hasOwn(triage.report, rollupField), true);
+    assert.equal(Array.isArray(triage.report[rollupField]), true);
+    assert.deepEqual(triage.report[rollupField], expectedRollup(triage.report.rows, rowField));
+    assert.equal(
+      triage.report[rollupField].reduce((total, item) => total + item.row_count, 0),
+      triage.report.manifest_only_preservation_row_count
+    );
+    for (const item of triage.report[rollupField]) {
+      assert.deepEqual(Object.keys(item).sort(), ["group_count", "group_keys", "key", "record_count", "row_count"]);
+      assert.deepEqual(item.group_keys, [...item.group_keys].sort());
+      assert.equal(item.group_count, new Set(item.group_keys).size);
+      assert.equal(item.group_keys.every((groupKey) => reportGroupKeys.has(groupKey)), true);
+    }
+    const hasMissingRows = triage.report.rows.some((row) => normalizedRollupKeys(row[rowField]).includes("__missing__"));
+    assert.equal(triage.report[rollupField].some((item) => item.key === "__missing__"), hasMissingRows);
+  }
+
+  for (const [rollupField, [sourceField, targetField]] of Object.entries(DIRECTION_ROLLUP_FIELDS)) {
+    assert.equal(Object.hasOwn(triage.report, rollupField), true);
+    assert.equal(Array.isArray(triage.report[rollupField]), true);
+    assert.deepEqual(triage.report[rollupField], expectedDirectionRollup(triage.report.rows, sourceField, targetField));
+    assert.equal(
+      triage.report[rollupField].reduce((total, item) => total + item.row_count, 0),
+      triage.report.manifest_only_preservation_row_count
+    );
+    for (const item of triage.report[rollupField]) {
+      assert.deepEqual(Object.keys(item).sort(), ["group_count", "group_keys", "key", "record_count", "row_count", "source_key", "target_key"]);
+      assert.match(item.key, /->/);
+      assert.equal(item.key, `${item.source_key}->${item.target_key}`);
+      assert.deepEqual(item.group_keys, [...item.group_keys].sort());
+      assert.equal(item.group_count, new Set(item.group_keys).size);
+      assert.equal(item.group_keys.every((groupKey) => reportGroupKeys.has(groupKey)), true);
+    }
+  }
+  assert.deepEqual(rollupCounts(triage.report.ownership_direction_rollup), EXPECTED_OWNERSHIP_DIRECTION_COUNTS);
+  assert.deepEqual(rollupCounts(triage.report.projection_direction_rollup), EXPECTED_PROJECTION_DIRECTION_COUNTS);
+
+  assert.equal(Object.hasOwn(triage.report, "ownership_projection_direction_rollup"), true);
+  assert.equal(Array.isArray(triage.report.ownership_projection_direction_rollup), true);
+  assert.deepEqual(
+    triage.report.ownership_projection_direction_rollup,
+    expectedOwnershipProjectionDirectionRollup(triage.report.rows)
+  );
+  assert.deepEqual(
+    rollupCounts(triage.report.ownership_projection_direction_rollup),
+    EXPECTED_OWNERSHIP_PROJECTION_DIRECTION_COUNTS
+  );
+  assert.equal(
+    triage.report.ownership_projection_direction_rollup.reduce((total, item) => total + item.row_count, 0),
+    triage.report.manifest_only_preservation_row_count
+  );
+
+  assert.equal(Object.hasOwn(triage.report, "ownership_projection_direction_slices"), true);
+  assert.equal(Array.isArray(triage.report.ownership_projection_direction_slices), true);
+  assert.equal(
+    triage.report.ownership_projection_direction_slices.length,
+    triage.report.ownership_projection_direction_rollup.length
+  );
+  assert.deepEqual(
+    triage.report.ownership_projection_direction_slices.map((slice) => slice.key),
+    triage.report.ownership_projection_direction_rollup.map((item) => item.key)
+  );
+  assert.deepEqual(
+    triage.report.ownership_projection_direction_slices.map((slice) => slice.key),
+    [
+      "production_owned/not_projected->production_owned/not_projected",
+      "production_owned/not_projected->projected_owned/projected_owned",
+      "projected_owned/projected_owned->production_owned/not_projected",
+      "projected_owned/projected_owned->projected_owned/projected_owned",
+    ]
+  );
+  for (const slice of triage.report.ownership_projection_direction_slices) {
+    const directionRow = triage.report.ownership_projection_direction_rollup.find((item) => item.key === slice.key);
+    const sliceRows = triage.report.rows.filter((row) => combinedDirectionKeyForRow(row) === slice.key);
+    assert.ok(directionRow);
+    assert.equal(slice.source_key, directionRow.source_key);
+    assert.equal(slice.target_key, directionRow.target_key);
+    assert.equal(slice.row_count, directionRow.row_count);
+    assert.equal(slice.record_count, directionRow.record_count);
+    assert.equal(slice.group_count, directionRow.group_count);
+    assert.deepEqual(slice.group_keys, directionRow.group_keys);
+    assert.equal(slice.row_count, sliceRows.length);
+    assert.equal(slice.record_count, new Set(sliceRows.map((row) => row.manifest_row_id)).size);
+    assert.equal(slice.group_count, new Set(sliceRows.map((row) => row.group_key)).size);
+    assert.equal(slice.group_keys.length, slice.group_count);
+    assert.deepEqual(slice.group_keys, [...slice.group_keys].sort());
+    assert.equal(slice.group_keys.every((groupKey) => reportGroupKeys.has(groupKey)), true);
+    for (const [rollupField, rowField] of Object.entries(SLICE_ROLLUP_FIELDS)) {
+      assert.equal(Object.hasOwn(slice, rollupField), true);
+      assert.deepEqual(slice[rollupField], expectedRollup(sliceRows, rowField));
+      assert.equal(
+        slice[rollupField].reduce((total, item) => total + item.row_count, 0),
+        slice.row_count
+      );
+      for (const item of slice[rollupField]) {
+        assert.deepEqual(Object.keys(item).sort(), ["group_count", "group_keys", "key", "record_count", "row_count"]);
+        assert.equal(item.group_keys.every((groupKey) => slice.group_keys.includes(groupKey)), true);
+      }
+    }
+  }
 });
 
 test("manifest-only preservation triage rejects data-js mode and leaves default overlay output alone", () => {

@@ -1239,6 +1239,142 @@ def sorted_group_values(group: dict[str, set[str]]) -> dict[str, list[str]]:
     return {key: sorted(values) for key, values in group.items()}
 
 
+def manifest_only_rollup_values(value: Any) -> list[Any]:
+    if isinstance(value, list):
+        return [item for child in value for item in manifest_only_rollup_values(child)]
+    if isinstance(value, tuple):
+        return [item for child in value for item in manifest_only_rollup_values(child)]
+    if isinstance(value, set):
+        return [item for child in sorted(value, key=str) for item in manifest_only_rollup_values(child)]
+    return [value]
+
+
+def manifest_only_rollup_keys(value: Any) -> list[str]:
+    keys = sorted({str(item) for item in manifest_only_rollup_values(value) if item is not None and str(item) != ""})
+    return keys or ["__missing__"]
+
+
+def manifest_only_preservation_rollup(rows: list[dict[str, Any]], field: str) -> list[dict[str, Any]]:
+    buckets: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        for key in manifest_only_rollup_keys(row.get(field)):
+            bucket = buckets.setdefault(
+                key,
+                {
+                    "row_count": 0,
+                    "record_ids": set(),
+                    "group_keys": set(),
+                },
+            )
+            bucket["row_count"] += 1
+            bucket["record_ids"].add(row["manifest_row_id"])
+            bucket["group_keys"].add(row["group_key"])
+    return [
+        {
+            "key": key,
+            "row_count": bucket["row_count"],
+            "record_count": len(bucket["record_ids"]),
+            "group_count": len(bucket["group_keys"]),
+            "group_keys": sorted(bucket["group_keys"]),
+        }
+        for key, bucket in sorted(buckets.items())
+    ]
+
+
+def build_direction_rollup(rows: list[dict[str, Any]], source_field: str, target_field: str) -> list[dict[str, Any]]:
+    buckets: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        for source_key in manifest_only_rollup_keys(row.get(source_field)):
+            for target_key in manifest_only_rollup_keys(row.get(target_field)):
+                key = f"{source_key}->{target_key}"
+                bucket = buckets.setdefault(
+                    key,
+                    {
+                        "source_key": source_key,
+                        "target_key": target_key,
+                        "row_count": 0,
+                        "record_ids": set(),
+                        "group_keys": set(),
+                    },
+                )
+                bucket["row_count"] += 1
+                bucket["record_ids"].add(row["manifest_row_id"])
+                bucket["group_keys"].add(row["group_key"])
+    return [
+        {
+            "key": key,
+            "source_key": bucket["source_key"],
+            "target_key": bucket["target_key"],
+            "row_count": bucket["row_count"],
+            "record_count": len(bucket["record_ids"]),
+            "group_count": len(bucket["group_keys"]),
+            "group_keys": sorted(bucket["group_keys"]),
+        }
+        for key, bucket in sorted(buckets.items())
+    ]
+
+
+def manifest_only_ownership_projection_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    combined_rows = []
+    for row in rows:
+        source_keys = [
+            f"{ownership_key}/{projection_key}"
+            for ownership_key in manifest_only_rollup_keys(row.get("source_ownership_status"))
+            for projection_key in manifest_only_rollup_keys(row.get("source_projection_status"))
+        ]
+        target_keys = [
+            f"{ownership_key}/{projection_key}"
+            for ownership_key in manifest_only_rollup_keys(row.get("target_ownership_status"))
+            for projection_key in manifest_only_rollup_keys(row.get("target_projection_status"))
+        ]
+        combined_rows.append(
+            {
+                **row,
+                "source_ownership_projection_status": source_keys,
+                "target_ownership_projection_status": target_keys,
+            }
+        )
+    return combined_rows
+
+
+def ownership_projection_direction_slices(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    combined_rows = manifest_only_ownership_projection_rows(rows)
+    slices = []
+    for direction in build_direction_rollup(
+        combined_rows,
+        "source_ownership_projection_status",
+        "target_ownership_projection_status",
+    ):
+        slice_rows = [
+            row
+            for row in combined_rows
+            if direction["key"]
+            in {
+                f"{source_key}->{target_key}"
+                for source_key in manifest_only_rollup_keys(row.get("source_ownership_projection_status"))
+                for target_key in manifest_only_rollup_keys(row.get("target_ownership_projection_status"))
+            }
+        ]
+        slices.append(
+            {
+                "key": direction["key"],
+                "source_key": direction["source_key"],
+                "target_key": direction["target_key"],
+                "row_count": direction["row_count"],
+                "record_count": direction["record_count"],
+                "group_count": direction["group_count"],
+                "group_keys": direction["group_keys"],
+                "source_category_rollup": manifest_only_preservation_rollup(slice_rows, "source_category"),
+                "target_category_rollup": manifest_only_preservation_rollup(slice_rows, "target_category"),
+                "source_section_rollup": manifest_only_preservation_rollup(slice_rows, "source_section"),
+                "target_section_rollup": manifest_only_preservation_rollup(slice_rows, "target_section"),
+                "source_label_rollup": manifest_only_preservation_rollup(slice_rows, "source_label"),
+                "target_label_rollup": manifest_only_preservation_rollup(slice_rows, "target_label"),
+            }
+        )
+    return slices
+
+
 def manifest_only_preservation_triage_report(census_report: dict[str, Any], data: dict[str, Any]) -> dict[str, Any]:
     detail_lookup = manifest_only_option_detail_lookup(data)
     rows = [
@@ -1395,6 +1531,22 @@ def manifest_only_preservation_triage_report(census_report: dict[str, Any], data
         "max_group_row_count": max(group_row_counts) if group_row_counts else 0,
         "group_row_count_distribution": group_row_count_distribution,
         "multi_row_groups": multi_row_groups,
+        "source_category_rollup": manifest_only_preservation_rollup(rows, "source_category"),
+        "target_category_rollup": manifest_only_preservation_rollup(rows, "target_category"),
+        "source_section_rollup": manifest_only_preservation_rollup(rows, "source_section"),
+        "target_section_rollup": manifest_only_preservation_rollup(rows, "target_section"),
+        "source_ownership_status_rollup": manifest_only_preservation_rollup(rows, "source_ownership_status"),
+        "target_ownership_status_rollup": manifest_only_preservation_rollup(rows, "target_ownership_status"),
+        "source_projection_status_rollup": manifest_only_preservation_rollup(rows, "source_projection_status"),
+        "target_projection_status_rollup": manifest_only_preservation_rollup(rows, "target_projection_status"),
+        "ownership_direction_rollup": build_direction_rollup(rows, "source_ownership_status", "target_ownership_status"),
+        "projection_direction_rollup": build_direction_rollup(rows, "source_projection_status", "target_projection_status"),
+        "ownership_projection_direction_rollup": build_direction_rollup(
+            manifest_only_ownership_projection_rows(rows),
+            "source_ownership_projection_status",
+            "target_ownership_projection_status",
+        ),
+        "ownership_projection_direction_slices": ownership_projection_direction_slices(rows),
         "groups": groups,
         "rows": rows,
     }
