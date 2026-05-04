@@ -131,6 +131,8 @@ guardedOption,,,,,,5V7,production_guarded,Spoiler-adjacent ground-effects guarde
 guardedOption,,,,,,Z51,production_guarded,Spoiler-adjacent package guarded production option in Pass 17,true
 guardedOption,,,,,,ZYC,production_guarded,Spoiler-adjacent appearance guarded production option in Pass 17,true
 guardedOption,,,,,,GBA,production_guarded,Spoiler-adjacent paint guarded production option in Pass 17,true
+guardedOption,,,,,opt_5vm_001,,production_guarded,Ground-effects rule-only legacy option id guarded in Pass 97,true
+guardedOption,,,,,opt_5w8_001,,production_guarded,Ground-effects rule-only legacy option id guarded in Pass 97,true
 guardedOption,,,,,opt_5zw_001,,production_guarded,Spoiler rule-only legacy option id guarded in Pass 17,true
 exclusiveGroup,grp_spoiler_high_wing,,,,,,projected_owned,Spoiler exclusive group projected after all members became projected-owned,true
 ruleGroup,grp_5v7_spoiler_requirement,,,,,,projected_owned,5V7 spoiler requires-any group projected after source and targets became projected-owned,true
@@ -177,6 +179,8 @@ rule,,TVS,,T0A,,,preserved_cross_boundary,Spoiler replace rule remains productio
 priceRule,,Z51,,TVS,,,preserved_cross_boundary,Z51 to TVS price override remains production-owned in Pass 17,true
 rule,,PCU,,,opt_5vm_001,,preserved_cross_boundary,PCU to ground-effects rule-only legacy-ID exclude remains production-owned in Pass 95,true
 rule,,PCU,,,opt_5w8_001,,preserved_cross_boundary,PCU to ground-effects rule-only legacy-ID exclude remains production-owned in Pass 95,true
+rule,,,opt_5vm_001,,opt_5w8_001,,preserved_cross_boundary,Ground-effects rule-only internal exclude remains production-owned in Pass 97,true
+rule,,,opt_5w8_001,,opt_5vm_001,,preserved_cross_boundary,Ground-effects rule-only internal exclude remains production-owned in Pass 97,true
 rule,,,opt_5vm_001,STI,,,preserved_cross_boundary,Ground-effects rule-only legacy-ID exclude remains production-owned for STI in Pass 93,true
 rule,,STI,,,opt_5vm_001,,preserved_cross_boundary,STI to ground-effects rule-only legacy-ID exclude remains production-owned in Pass 93,true
 rule,,,opt_5w8_001,STI,,,preserved_cross_boundary,Ground-effects rule-only legacy-ID exclude remains production-owned for STI in Pass 93,true

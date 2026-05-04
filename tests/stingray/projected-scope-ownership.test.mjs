@@ -252,6 +252,18 @@ test("projected ownership manifest declares the current multi-slice control scop
     {
       record_type: "guardedOption",
       rpo: "",
+      target_option_id: "opt_5vm_001",
+      ownership: "production_guarded",
+    },
+    {
+      record_type: "guardedOption",
+      rpo: "",
+      target_option_id: "opt_5w8_001",
+      ownership: "production_guarded",
+    },
+    {
+      record_type: "guardedOption",
+      rpo: "",
       target_option_id: "opt_5zw_001",
       ownership: "production_guarded",
     },
@@ -304,6 +316,8 @@ test("projected ownership manifest declares the current multi-slice control scop
     { record_type: "rule", group_id: "", source_rpo: "SBT", source_option_id: "", target_rpo: "CC3", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PCU", source_option_id: "", target_rpo: "", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PCU", source_option_id: "", target_rpo: "", target_option_id: "opt_5w8_001", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_5vm_001", target_rpo: "", target_option_id: "opt_5w8_001", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_5w8_001", target_rpo: "", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_5vm_001", target_rpo: "STI", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "STI", source_option_id: "", target_rpo: "", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_5w8_001", target_rpo: "STI", target_option_id: "", ownership: "preserved_cross_boundary" },
@@ -430,13 +444,13 @@ test("overlay rejects an unclassified cross-boundary production record", () => {
 });
 
 test("overlay rejects omitted id-based 5ZW preserved records", () => {
-  const rows = loadManifest().filter((row) => row.target_option_id !== "opt_5zw_001");
+  const rows = loadManifest().filter((row) => !(row.ownership === "preserved_cross_boundary" && row.target_option_id === "opt_5zw_001"));
   const tempManifest = writeTempManifest(rows);
 
   const result = runOverlay(["--ownership-manifest", tempManifest]);
 
   assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /unclassified cross-boundary/);
+  assert.match(result.stderr, /unclassified (cross-boundary|guarded production)/);
   assert.match(result.stderr, /opt_5zw_001/);
 });
 

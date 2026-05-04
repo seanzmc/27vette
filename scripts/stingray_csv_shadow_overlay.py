@@ -387,6 +387,10 @@ def production_option_ids(data: dict[str, Any]) -> set[str]:
     return option_ids
 
 
+def production_choice_option_ids(data: dict[str, Any]) -> set[str]:
+    return {row["option_id"] for row in data.get("choices", []) if row.get("option_id")}
+
+
 def option_id_by_manifest_ref(data: dict[str, Any], rpo: str, option_id: str) -> str:
     if option_id:
         if option_id not in production_option_ids(data):
@@ -416,6 +420,17 @@ def guarded_option_ids(data: dict[str, Any], ownership: OwnershipScope) -> set[s
     for rpo, option_id in ownership.guarded_option_refs:
         ids.add(option_id_by_manifest_ref(data, rpo, option_id))
     return ids
+
+
+def assert_preserved_option_id_refs_are_guarded(data: dict[str, Any], ownership: OwnershipScope, guarded_ids: set[str]) -> None:
+    choice_ids = production_choice_option_ids(data)
+    unguarded = []
+    for record_type, _source_rpo, source_option_id, _target_rpo, target_option_id in sorted(ownership.preserved_cross_boundary_records):
+        for option_id in (source_option_id, target_option_id):
+            if option_id and option_id not in choice_ids and option_id not in guarded_ids:
+                unguarded.append({"record_type": record_type, "option_id": option_id})
+    if unguarded:
+        raise OverlayError(f"unguarded rule-only preserved option_id refs: {unguarded[:5]}.")
 
 
 def rule_group_member_keys(rows: list[dict[str, Any]]) -> set[tuple[str, str]]:
@@ -724,6 +739,7 @@ def overlay_shadow_data(production: dict[str, Any], fragment: dict[str, Any], ow
         raise OverlayError(f"Fragment legacy option IDs do not match production: {sorted(production_ids)} != {sorted(fragment_ids)}.")
     preserved_keys_by_surface = preserved_record_id_keys(production, ownership)
     guarded_ids = guarded_option_ids(production, ownership)
+    assert_preserved_option_id_refs_are_guarded(production, ownership, guarded_ids)
     assert_preserved_records_exist(production, ownership, preserved_keys_by_surface)
     assert_projected_groups_exist(fragment, ownership)
     assert_projected_rule_group_ownership(fragment, ownership, fragment_ids)
