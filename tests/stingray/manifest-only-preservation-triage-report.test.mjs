@@ -319,6 +319,56 @@ const LEDGER_FORBIDDEN_PACKET_KEYS = [
 
 const LEDGER_ADVICE_TERMS = /\b(stale|cleanup|candidate|recommendation|migrate|future)\b/i;
 
+const DECISION_LEDGER_VALIDATION_REPORT_KEYS = [
+  "current_group_count",
+  "duplicate_group_count",
+  "duplicate_groups",
+  "errors",
+  "groups",
+  "ledger_row_count",
+  "matched_group_count",
+  "missing_group_count",
+  "missing_groups",
+  "review_value_error_count",
+  "review_value_errors",
+  "schema_error_count",
+  "schema_errors",
+  "schema_version",
+  "status",
+  "unknown_group_count",
+  "unknown_groups",
+];
+
+const DECISION_LEDGER_VALIDATION_GROUP_KEYS = [
+  "decision",
+  "decision_reason",
+  "direction_key",
+  "followup_action",
+  "group_key",
+  "matched",
+  "notes",
+  "review_status",
+  "reviewed_at",
+  "reviewer",
+];
+
+const DECISION_LEDGER_VALIDATION_ERROR_KEYS = [
+  "actual",
+  "error_type",
+  "expected",
+  "field",
+  "group_key",
+  "message",
+];
+
+const VALIDATION_REPORT_FORBIDDEN_KEYS = [
+  "recommended_action",
+  "migration_ready",
+  "apply",
+  "patch",
+  "manifest_update",
+];
+
 const PACKET_TOP_LEVEL_KEYS = [
   "csv",
   "direction_counts",
@@ -630,6 +680,70 @@ function ledgerRowsToObjects(dataRows) {
 
 function ledgerObjectsToCsvRows(rows, fields = DECISION_LEDGER_FIELDS) {
   return rows.map((row) => fields.map((field) => row[field] ?? ""));
+}
+
+function assertNoValidationAdviceFields(value) {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      assertNoValidationAdviceFields(item);
+    }
+    return;
+  }
+  if (!value || typeof value !== "object") {
+    return;
+  }
+  for (const [key, child] of Object.entries(value)) {
+    assert.equal(VALIDATION_REPORT_FORBIDDEN_KEYS.includes(key), false, `validation report advice-like key: ${key}`);
+    if (DECISION_LEDGER_REVIEW_FIELDS.includes(key)) {
+      continue;
+    }
+    assertNoValidationAdviceFields(child);
+  }
+}
+
+function assertValidationReportSchema(report) {
+  assert.deepEqual(Object.keys(report), DECISION_LEDGER_VALIDATION_REPORT_KEYS);
+  for (const field of [
+    "ledger_row_count",
+    "current_group_count",
+    "matched_group_count",
+    "missing_group_count",
+    "unknown_group_count",
+    "duplicate_group_count",
+    "schema_error_count",
+    "review_value_error_count",
+  ]) {
+    assert.equal(typeof report[field], "number", field);
+  }
+  for (const field of [
+    "groups",
+    "errors",
+    "missing_groups",
+    "unknown_groups",
+    "duplicate_groups",
+    "schema_errors",
+    "review_value_errors",
+  ]) {
+    assert.equal(Array.isArray(report[field]), true, field);
+  }
+  for (const group of report.groups) {
+    assert.deepEqual(Object.keys(group), DECISION_LEDGER_VALIDATION_GROUP_KEYS);
+  }
+  for (const collection of [
+    report.errors,
+    report.missing_groups,
+    report.unknown_groups,
+    report.duplicate_groups,
+    report.schema_errors,
+    report.review_value_errors,
+  ]) {
+    for (const error of collection) {
+      assert.deepEqual(Object.keys(error), DECISION_LEDGER_VALIDATION_ERROR_KEYS);
+      assert.equal(typeof error.error_type, "string");
+      assert.equal(typeof error.message, "string");
+    }
+  }
+  assertNoValidationAdviceFields(report);
 }
 
 function expectedDecisionLedgerRows(report) {
@@ -1173,20 +1287,7 @@ test("manifest-only preservation validates a completed decision ledger read-only
   assert.ok(fs.existsSync(validation.out));
   assert.ok(fs.existsSync(validation.validationOut));
   assert.equal(validation.report.status, "allowed");
-  assert.deepEqual(Object.keys(validation.validationReport), [
-    "current_group_count",
-    "duplicate_group_count",
-    "errors",
-    "groups",
-    "ledger_row_count",
-    "matched_group_count",
-    "missing_group_count",
-    "review_value_error_count",
-    "schema_error_count",
-    "schema_version",
-    "status",
-    "unknown_group_count",
-  ]);
+  assertValidationReportSchema(validation.validationReport);
   assert.equal(validation.validationReport.schema_version, 1);
   assert.equal(validation.validationReport.status, "allowed");
   assert.equal(validation.validationReport.ledger_row_count, 78);
@@ -1198,19 +1299,12 @@ test("manifest-only preservation validates a completed decision ledger read-only
   assert.equal(validation.validationReport.schema_error_count, 0);
   assert.equal(validation.validationReport.review_value_error_count, 0);
   assert.deepEqual(validation.validationReport.errors, []);
+  assert.deepEqual(validation.validationReport.missing_groups, []);
+  assert.deepEqual(validation.validationReport.unknown_groups, []);
+  assert.deepEqual(validation.validationReport.duplicate_groups, []);
+  assert.deepEqual(validation.validationReport.schema_errors, []);
+  assert.deepEqual(validation.validationReport.review_value_errors, []);
   assert.equal(validation.validationReport.groups.length, 78);
-  assert.deepEqual(Object.keys(validation.validationReport.groups[0]), [
-    "decision",
-    "decision_reason",
-    "direction_key",
-    "followup_action",
-    "group_key",
-    "matched",
-    "notes",
-    "review_status",
-    "reviewed_at",
-    "reviewer",
-  ]);
   assert.deepEqual(
     validation.validationReport.groups.map((group) => group.group_key),
     ledgerRows.map((row) => row.group_key)
@@ -1233,18 +1327,21 @@ test("manifest-only preservation blocks malformed decision ledgers", () => {
       header: ledgerHeader,
       rows: baseRows.slice(1),
       expected: { missing_group_count: 1 },
+      errorTypes: ["missing_group"],
     },
     {
       name: "duplicate group",
       header: ledgerHeader,
       rows: [baseRows[0], baseRows[0], ...baseRows.slice(1)],
       expected: { duplicate_group_count: 1 },
+      errorTypes: ["duplicate_group"],
     },
     {
       name: "unknown group",
       header: ledgerHeader,
       rows: [{ ...baseRows[0], group_key: "unknown_group" }, ...baseRows.slice(1)],
       expected: { unknown_group_count: 1, missing_group_count: 1 },
+      errorTypes: ["missing_group", "unknown_group"],
     },
     {
       name: "bad header",
@@ -1252,42 +1349,49 @@ test("manifest-only preservation blocks malformed decision ledgers", () => {
       rows: baseRows,
       fields: ledgerHeader.filter((field) => field !== "notes"),
       expected: { schema_error_count: 1 },
+      errorTypes: ["bad_header"],
     },
     {
       name: "context mismatch",
       header: ledgerHeader,
       rows: [{ ...baseRows[0], source_ids: "changed_source" }, ...baseRows.slice(1)],
       expected: { schema_error_count: 1 },
+      errorTypes: ["context_mismatch"],
     },
     {
       name: "direction mismatch",
       header: ledgerHeader,
       rows: [{ ...baseRows[0], direction_key: "wrong->direction" }, ...baseRows.slice(1)],
       expected: { schema_error_count: 1 },
+      errorTypes: ["direction_mismatch"],
     },
     {
       name: "invalid review status",
       header: ledgerHeader,
       rows: [{ ...baseRows[0], review_status: "done" }, ...baseRows.slice(1)],
       expected: { review_value_error_count: 1 },
+      errorTypes: ["invalid_review_status"],
     },
     {
       name: "invalid decision",
       header: ledgerHeader,
       rows: [{ ...baseRows[0], decision: "migrate_now" }, ...baseRows.slice(1)],
       expected: { review_value_error_count: 1 },
+      errorTypes: ["invalid_decision"],
     },
     {
       name: "invalid followup action",
       header: ledgerHeader,
       rows: [{ ...baseRows[0], followup_action: "ship_it" }, ...baseRows.slice(1)],
       expected: { review_value_error_count: 1 },
+      errorTypes: ["invalid_followup_action"],
     },
     {
       name: "invalid reviewed date",
       header: ledgerHeader,
       rows: [{ ...baseRows[0], reviewed_at: "05/04/2026" }, ...baseRows.slice(1)],
       expected: { review_value_error_count: 1 },
+      errorTypes: ["invalid_reviewed_at"],
     },
   ];
 
@@ -1297,11 +1401,31 @@ test("manifest-only preservation blocks malformed decision ledgers", () => {
     const validation = runDecisionLedgerValidation(ledgerPath);
     assert.notEqual(validation.result.status, 0, fixture.name);
     assert.ok(fs.existsSync(validation.validationOut), fixture.name);
+    assertValidationReportSchema(validation.validationReport);
     assert.equal(validation.validationReport.status, "blocking", fixture.name);
     for (const [field, count] of Object.entries(fixture.expected)) {
       assert.equal(validation.validationReport[field], count, fixture.name);
     }
     assert.equal(validation.validationReport.errors.length > 0, true, fixture.name);
+    assert.deepEqual(
+      [...new Set(validation.validationReport.errors.map((error) => error.error_type))].sort(),
+      fixture.errorTypes,
+      fixture.name
+    );
+    assert.equal(
+      validation.validationReport.errors.length,
+      validation.validationReport.missing_groups.length +
+        validation.validationReport.unknown_groups.length +
+        validation.validationReport.duplicate_groups.length +
+        validation.validationReport.schema_errors.length +
+        validation.validationReport.review_value_errors.length,
+      fixture.name
+    );
+    assert.equal(validation.validationReport.missing_group_count, validation.validationReport.missing_groups.length, fixture.name);
+    assert.equal(validation.validationReport.unknown_group_count, validation.validationReport.unknown_groups.length, fixture.name);
+    assert.equal(validation.validationReport.duplicate_group_count, validation.validationReport.duplicate_groups.length, fixture.name);
+    assert.equal(validation.validationReport.schema_error_count, validation.validationReport.schema_errors.length, fixture.name);
+    assert.equal(validation.validationReport.review_value_error_count, validation.validationReport.review_value_errors.length, fixture.name);
   }
 });
 

@@ -2330,11 +2330,33 @@ def valid_decision_ledger_reviewed_at(value: str) -> bool:
     return value == "" or re.fullmatch(r"\d{4}-\d{2}-\d{2}", value) is not None
 
 
+def decision_ledger_validation_error(
+    error_type: str,
+    group_key: str | None = None,
+    field: str | None = None,
+    expected: Any = None,
+    actual: Any = None,
+    message: str = "",
+) -> dict[str, Any]:
+    return {
+        "error_type": error_type,
+        "group_key": group_key,
+        "field": field,
+        "expected": expected,
+        "actual": actual,
+        "message": message,
+    }
+
+
 def decision_ledger_validation_report(report: dict[str, Any], ledger_csv: str) -> dict[str, Any]:
     expected_rows = build_decision_ledger_rows(report)
     expected_by_group = {row["group_key"]: row for row in expected_rows}
     groups: list[dict[str, Any]] = []
-    errors: list[dict[str, str]] = []
+    missing_groups: list[dict[str, Any]] = []
+    unknown_groups: list[dict[str, Any]] = []
+    duplicate_groups: list[dict[str, Any]] = []
+    schema_errors: list[dict[str, Any]] = []
+    review_value_errors: list[dict[str, Any]] = []
     schema_error_count = 0
     review_value_error_count = 0
     unknown_group_keys: set[str] = set()
@@ -2349,24 +2371,33 @@ def decision_ledger_validation_report(report: dict[str, Any], ledger_csv: str) -
 
     if actual_header != DECISION_LEDGER_CSV_FIELDS:
         schema_error_count += 1
-        errors.append(
-            {
-                "kind": "bad_header",
-                "message": "decision ledger header does not match expected schema",
-            }
+        schema_errors.append(
+            decision_ledger_validation_error(
+                "bad_header",
+                field="header",
+                expected=DECISION_LEDGER_CSV_FIELDS,
+                actual=actual_header,
+                message="decision ledger header does not match expected schema",
+            )
         )
+        errors = missing_groups + unknown_groups + duplicate_groups + schema_errors + review_value_errors
         return {
             "schema_version": 1,
             "status": "blocking",
             "ledger_row_count": len(actual_rows),
             "current_group_count": len(expected_rows),
             "matched_group_count": 0,
-            "missing_group_count": len(expected_rows),
+            "missing_group_count": 0,
             "unknown_group_count": 0,
             "duplicate_group_count": 0,
             "schema_error_count": schema_error_count,
             "review_value_error_count": review_value_error_count,
             "groups": groups,
+            "missing_groups": missing_groups,
+            "unknown_groups": unknown_groups,
+            "duplicate_groups": duplicate_groups,
+            "schema_errors": schema_errors,
+            "review_value_errors": review_value_errors,
             "errors": errors,
         }
 
@@ -2376,26 +2407,53 @@ def decision_ledger_validation_report(report: dict[str, Any], ledger_csv: str) -
         matched = expected is not None and group_key not in seen_group_keys
         if not group_key:
             schema_error_count += 1
-            errors.append({"kind": "missing_group_key", "row": str(index), "message": "ledger row is missing group_key"})
+            schema_errors.append(
+                decision_ledger_validation_error(
+                    "context_mismatch",
+                    field="group_key",
+                    expected=None,
+                    actual="",
+                    message=f"ledger row {index} is missing group_key",
+                )
+            )
         elif expected is None:
             unknown_group_keys.add(group_key)
-            errors.append({"kind": "unknown_group", "row": str(index), "group_key": group_key, "message": "ledger row group_key is not in current report groups"})
+            unknown_groups.append(
+                decision_ledger_validation_error(
+                    "unknown_group",
+                    group_key=group_key,
+                    field="group_key",
+                    expected=None,
+                    actual=group_key,
+                    message="ledger row group_key is not in current report groups",
+                )
+            )
         elif group_key in seen_group_keys:
             duplicate_group_keys.add(group_key)
-            errors.append({"kind": "duplicate_group", "row": str(index), "group_key": group_key, "message": "ledger row group_key appears more than once"})
+            duplicate_groups.append(
+                decision_ledger_validation_error(
+                    "duplicate_group",
+                    group_key=group_key,
+                    field="group_key",
+                    expected="exactly one row",
+                    actual="duplicate row",
+                    message="ledger row group_key appears more than once",
+                )
+            )
         else:
             matched_group_keys.add(group_key)
             for field in DECISION_LEDGER_CONTEXT_FIELDS:
                 if row.get(field, "") != expected[field]:
                     schema_error_count += 1
-                    errors.append(
-                        {
-                            "kind": "context_mismatch",
-                            "row": str(index),
-                            "group_key": group_key,
-                            "field": field,
-                            "message": "ledger generated/context field does not match current report",
-                        }
+                    schema_errors.append(
+                        decision_ledger_validation_error(
+                            "direction_mismatch" if field == "direction_key" else "context_mismatch",
+                            group_key=group_key,
+                            field=field,
+                            expected=expected[field],
+                            actual=row.get(field, ""),
+                            message="ledger generated/context field does not match current report",
+                        )
                     )
         seen_group_keys.add(group_key)
 
@@ -2406,16 +2464,52 @@ def decision_ledger_validation_report(report: dict[str, Any], ledger_csv: str) -
         review_errors_before = review_value_error_count
         if review_status not in DECISION_LEDGER_ALLOWED_REVIEW_STATUS:
             review_value_error_count += 1
-            errors.append({"kind": "invalid_review_status", "row": str(index), "group_key": group_key, "message": "review_status is not allowed"})
+            review_value_errors.append(
+                decision_ledger_validation_error(
+                    "invalid_review_status",
+                    group_key=group_key,
+                    field="review_status",
+                    expected=sorted(DECISION_LEDGER_ALLOWED_REVIEW_STATUS),
+                    actual=review_status,
+                    message="review_status is not allowed",
+                )
+            )
         if decision not in DECISION_LEDGER_ALLOWED_DECISION:
             review_value_error_count += 1
-            errors.append({"kind": "invalid_decision", "row": str(index), "group_key": group_key, "message": "decision is not allowed"})
+            review_value_errors.append(
+                decision_ledger_validation_error(
+                    "invalid_decision",
+                    group_key=group_key,
+                    field="decision",
+                    expected=sorted(DECISION_LEDGER_ALLOWED_DECISION),
+                    actual=decision,
+                    message="decision is not allowed",
+                )
+            )
         if followup_action not in DECISION_LEDGER_ALLOWED_FOLLOWUP_ACTION:
             review_value_error_count += 1
-            errors.append({"kind": "invalid_followup_action", "row": str(index), "group_key": group_key, "message": "followup_action is not allowed"})
+            review_value_errors.append(
+                decision_ledger_validation_error(
+                    "invalid_followup_action",
+                    group_key=group_key,
+                    field="followup_action",
+                    expected=sorted(DECISION_LEDGER_ALLOWED_FOLLOWUP_ACTION),
+                    actual=followup_action,
+                    message="followup_action is not allowed",
+                )
+            )
         if not valid_decision_ledger_reviewed_at(reviewed_at):
             review_value_error_count += 1
-            errors.append({"kind": "invalid_reviewed_at", "row": str(index), "group_key": group_key, "message": "reviewed_at must be blank or YYYY-MM-DD"})
+            review_value_errors.append(
+                decision_ledger_validation_error(
+                    "invalid_reviewed_at",
+                    group_key=group_key,
+                    field="reviewed_at",
+                    expected="YYYY-MM-DD or blank",
+                    actual=reviewed_at,
+                    message="reviewed_at must be blank or YYYY-MM-DD",
+                )
+            )
 
         groups.append(
             {
@@ -2434,11 +2528,21 @@ def decision_ledger_validation_report(report: dict[str, Any], ledger_csv: str) -
 
     missing_group_keys = set(expected_by_group) - matched_group_keys
     for group_key in sorted(missing_group_keys):
-        errors.append({"kind": "missing_group", "group_key": group_key, "message": "current report group is missing from ledger"})
+        missing_groups.append(
+            decision_ledger_validation_error(
+                "missing_group",
+                group_key=group_key,
+                field="group_key",
+                expected=group_key,
+                actual=None,
+                message="current report group is missing from ledger",
+            )
+        )
 
     unknown_group_count = len(unknown_group_keys)
     duplicate_group_count = len(duplicate_group_keys)
     missing_group_count = len(missing_group_keys)
+    errors = missing_groups + unknown_groups + duplicate_groups + schema_errors + review_value_errors
     status = (
         "blocking"
         if schema_error_count
@@ -2460,6 +2564,11 @@ def decision_ledger_validation_report(report: dict[str, Any], ledger_csv: str) -
         "schema_error_count": schema_error_count,
         "review_value_error_count": review_value_error_count,
         "groups": groups,
+        "missing_groups": missing_groups,
+        "unknown_groups": unknown_groups,
+        "duplicate_groups": duplicate_groups,
+        "schema_errors": schema_errors,
+        "review_value_errors": review_value_errors,
         "errors": errors,
     }
 
