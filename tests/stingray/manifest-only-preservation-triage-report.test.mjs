@@ -207,6 +207,35 @@ const DIRECTION_SLICE_ROW_FIELDS = [
   "candidate_status",
 ];
 
+const PACKET_TOP_LEVEL_KEYS = [
+  "csv",
+  "direction_counts",
+  "generated_outputs",
+  "multi_row_groups",
+  "schema_version",
+  "status",
+  "summary",
+];
+
+const PACKET_GENERATED_OUTPUT_KEYS = [
+  "direction_slice_rows_csv",
+  "manifest_only_preservation_triage_json",
+];
+
+const PACKET_SUMMARY_KEYS = [
+  "group_count",
+  "invalid_preserved_count",
+  "manifest_only_preservation_record_count",
+  "manifest_only_preservation_row_count",
+  "multi_row_group_count",
+  "single_row_group_count",
+];
+
+const PACKET_DIRECTION_COUNT_KEYS = ["group_count", "key", "record_count", "row_count"];
+const PACKET_MULTI_ROW_GROUP_KEYS = ["group_key", "manifest_only_preservation_row_count", "manifest_row_ids"];
+const PACKET_CSV_KEYS = ["header", "row_count", "written"];
+const PACKET_ADVICE_TERMS = /\b(stale|cleanup|candidate|recommendation|migrate|future)\b/i;
+
 function publicTriageRow(row) {
   return {
     manifest_row_id: row.manifest_row_id,
@@ -394,6 +423,42 @@ function parseCsv(text) {
     rows.push(row);
   }
   return rows;
+}
+
+function assertNoPacketAdviceLanguage(value, path = []) {
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => assertNoPacketAdviceLanguage(item, [...path, String(index)]));
+    return;
+  }
+  if (value && typeof value === "object") {
+    for (const [key, child] of Object.entries(value)) {
+      assert.equal(PACKET_ADVICE_TERMS.test(key), false, `advice-like packet key: ${[...path, key].join(".")}`);
+      if (path.length === 0 && key === "generated_outputs") {
+        continue;
+      }
+      assertNoPacketAdviceLanguage(child, [...path, key]);
+    }
+    return;
+  }
+  if (typeof value === "string") {
+    assert.equal(PACKET_ADVICE_TERMS.test(value), false, `advice-like packet value: ${path.join(".")}`);
+  }
+}
+
+function assertPacketSchema(packet) {
+  assert.deepEqual(Object.keys(packet), PACKET_TOP_LEVEL_KEYS);
+  assert.deepEqual(Object.keys(packet.generated_outputs), PACKET_GENERATED_OUTPUT_KEYS);
+  assert.deepEqual(Object.keys(packet.summary), PACKET_SUMMARY_KEYS);
+  assert.deepEqual(Object.keys(packet.csv), PACKET_CSV_KEYS);
+  assert.equal(packet.direction_counts.length > 0, true);
+  assert.equal(packet.multi_row_groups.length > 0, true);
+  for (const item of packet.direction_counts) {
+    assert.deepEqual(Object.keys(item), PACKET_DIRECTION_COUNT_KEYS);
+  }
+  for (const item of packet.multi_row_groups) {
+    assert.deepEqual(Object.keys(item), PACKET_MULTI_ROW_GROUP_KEYS);
+  }
+  assertNoPacketAdviceLanguage(packet);
 }
 
 test("manifest-only preservation triage reports exactly the census manifest-only rows", () => {
@@ -680,6 +745,7 @@ test("manifest-only preservation triage writes a review packet manifest sidecar"
   assert.ok(fs.existsSync(triage.csvOut));
   assert.ok(fs.existsSync(triage.packetOut));
 
+  assertPacketSchema(triage.packet);
   assert.equal(triage.packet.schema_version, 1);
   assert.equal(triage.packet.status, triage.report.status);
   assert.deepEqual(triage.packet.generated_outputs, {
@@ -716,12 +782,17 @@ test("manifest-only preservation triage writes a review packet manifest sidecar"
     row_count: triage.report.direction_slice_rows.length,
     header: DIRECTION_SLICE_ROW_FIELDS,
   });
+  const csvRows = parseCsv(triage.csv);
+  const [csvHeader, ...csvDataRows] = csvRows;
+  assert.deepEqual(triage.packet.csv.header, csvHeader);
+  assert.equal(triage.packet.csv.row_count, csvDataRows.length);
 
   const noCsv = runManifestOnlyTriageWithReviewPacket({ includeCsv: false });
   assert.equal(noCsv.result.status, 0, noCsv.result.stderr);
   assert.ok(fs.existsSync(noCsv.out));
   assert.ok(fs.existsSync(noCsv.packetOut));
   assert.equal(noCsv.csvOut, null);
+  assertPacketSchema(noCsv.packet);
   assert.deepEqual(noCsv.packet.generated_outputs, {
     manifest_only_preservation_triage_json: noCsv.out,
     direction_slice_rows_csv: null,
@@ -739,6 +810,23 @@ test("manifest-only preservation triage writes a review packet manifest sidecar"
     multi_row_group_count: noCsv.report.multi_row_group_count,
     invalid_preserved_count: noCsv.report.invalid_preserved_count,
   });
+  assert.deepEqual(
+    noCsv.packet.direction_counts,
+    noCsv.report.ownership_projection_direction_rollup.map(({ key, row_count, record_count, group_count }) => ({
+      key,
+      row_count,
+      record_count,
+      group_count,
+    }))
+  );
+  assert.deepEqual(
+    noCsv.packet.multi_row_groups,
+    noCsv.report.multi_row_groups.map(({ group_key, manifest_only_preservation_row_count, manifest_row_ids }) => ({
+      group_key,
+      manifest_only_preservation_row_count,
+      manifest_row_ids,
+    }))
+  );
 });
 
 test("manifest-only preservation triage rejects data-js mode and leaves default overlay output alone", () => {
