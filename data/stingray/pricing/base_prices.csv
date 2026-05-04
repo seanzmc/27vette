@@ -41,4 +41,7 @@ bp_r88,pb_2027_stingray,selectable,opt_r88_001,,695,10,true,Current R88 base pri
 bp_rin,pb_2027_stingray,selectable,opt_rin_001,,440,10,true,Current RIN base price.
 bp_sl8,pb_2027_stingray,selectable,opt_sl8_001,,495,10,true,Current SL8 base price.
 bp_rik,pb_2027_stingray,selectable,opt_rik_001,,395,10,true,Current RIK base price.
+bp_eyk,pb_2027_stingray,selectable,opt_eyk_001,,395,10,true,Current EYK base price.
+bp_eyt_badges,pb_2027_stingray,selectable,opt_eyt_001,,0,10,true,Current EYT required Badges default base price.
+bp_eyt_standard,pb_2027_stingray,selectable,opt_eyt_002,,0,10,true,Current EYT Standard Options display-only duplicate base price.
 bp_edu,pb_2027_stingray,selectable,opt_edu_001,,995,10,true,Current EDU base price.

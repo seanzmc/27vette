@@ -22,7 +22,7 @@ const EXPECTED_PEER_EXCLUDES = new Set([
   "SL8->RIK:excludes",
   "SL8->RIN:excludes",
 ]);
-const PRODUCTION_OWNED_OUT_OF_SCOPE_RPOS = new Set(["EYK", "EYT", "PCX", "PDV"]);
+const PRODUCTION_OWNED_OUT_OF_SCOPE_RPOS = new Set(["PCX", "PDV"]);
 
 function parseCsv(source) {
   const rows = [];

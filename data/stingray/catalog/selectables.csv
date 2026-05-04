@@ -43,6 +43,9 @@ opt_r88_001,option,R88,"LPO, Illuminated crossed flags emblem","Front, Genuine C
 opt_rin_001,option,RIN,"LPO, Rear Corvette script badge in Arctic White",Genuine Corvette Accessory,true,,Rear script badge member choice; peer excludes remain production-owned.
 opt_sl8_001,option,SL8,"LPO, Rear Corvette script badge in Edge Red",Genuine Corvette Accessory,true,,Rear script badge member choice; peer excludes remain production-owned.
 opt_rik_001,option,RIK,"LPO, Rear Corvette script badge in Torch Red",Genuine Corvette Accessory,true,,Rear script badge member choice; peer excludes remain production-owned.
+opt_eyk_001,option,EYK,Chrome Exterior Badge Package,,true,,Required Badges Chrome badge selectable choice; inbound PCX R88 SFZ excludes remain production-owned.
+opt_eyt_001,option,EYT,Carbon Flash Exterior Badge Package,,true,,Required Badges Carbon Flash default selectable choice.
+opt_eyt_002,option,EYT,Carbon Flash Exterior Badge Package,,true,,Standard Options display-only duplicate for required Badges default.
 opt_edu_001,option,EDU,Carbon Flash and body-color accents,"Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",true,,Standalone Exterior Accents choice; section metadata and EFY paint behavior remain production-owned.
 opt_slk_001,option,SLK,"LPO, Rear hatch strut bracket","Edge Red, Genuine Corvette Accessory",true,,Engine Appearance LPO add-on choice.
 opt_sln_001,option,SLN,"LPO, Visible carbon fiber engine cross brace with Jake logo",Genuine Corvette Accessory,true,,Engine Appearance LPO add-on choice.

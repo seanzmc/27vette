@@ -25,8 +25,6 @@ const R88_SOURCE_TEXT_STRIPE_RPOS = new Set([
 ]);
 const R88_SOURCE_TEXT_MISSING_RPOS = new Set(["DTB"]);
 const OUT_OF_SCOPE_RPOS = new Set([
-  "EYK",
-  "EYT",
   ...R88_SOURCE_TEXT_STRIPE_RPOS,
 ]);
 

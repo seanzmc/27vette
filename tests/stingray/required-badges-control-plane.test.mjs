@@ -258,15 +258,15 @@ test("overlay accepts projected duplicate-RPO EYT only when every production cho
   assert.deepEqual(plain(normalizeChoices(shadow.choices.filter((choice) => choice.rpo === "EYT"))), plain(normalizeChoices(eytChoices)));
 });
 
-test("current manifest guards required Badges without claiming section metadata or EYK choices", () => {
+test("current manifest projects required Badges choices without claiming section metadata", () => {
   const production = loadGeneratedData();
   const owned = projectedOwnedRpos();
 
-  assert.equal(owned.has("EYK"), false);
-  assert.equal(owned.has("EYT"), false);
-  assert.equal(manifestHas({ record_type: "guardedOption", rpo: "EYK", ownership: "production_guarded" }), true);
-  assert.equal(manifestHas({ record_type: "guardedOption", target_option_id: "opt_eyt_001", ownership: "production_guarded" }), true);
-  assert.equal(manifestHas({ record_type: "guardedOption", target_option_id: "opt_eyt_002", ownership: "production_guarded" }), true);
+  assert.equal(owned.has("EYK"), true);
+  assert.equal(owned.has("EYT"), true);
+  assert.equal(manifestHas({ record_type: "guardedOption", rpo: "EYK", ownership: "production_guarded" }), false);
+  assert.equal(manifestHas({ record_type: "guardedOption", target_option_id: "opt_eyt_001", ownership: "production_guarded" }), false);
+  assert.equal(manifestHas({ record_type: "guardedOption", target_option_id: "opt_eyt_002", ownership: "production_guarded" }), false);
   assert.equal(activeManifestRows().some((row) => row.record_type === "section" || row.group_id === "sec_badg_001"), false);
   for (const [sourceRpo, targetRpo] of EYK_INBOUND_EXCLUDES) {
     assert.ok(rule(production, sourceRpo, targetRpo, "excludes"), `${sourceRpo} -> ${targetRpo} should exist in production`);

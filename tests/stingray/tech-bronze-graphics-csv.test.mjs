@@ -36,7 +36,6 @@ const OUT_OF_SCOPE_RPOS = new Set([
   "PCX",
   "5DG",
   "PDV",
-  "EYK",
   "R8C",
   "S47",
   "SFE",

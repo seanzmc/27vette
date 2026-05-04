@@ -46,10 +46,12 @@ selectable,,,,,,R88,projected_owned,R88 Illuminated crossed flags emblem project
 selectable,,,,,,RIN,projected_owned,Rear script badge member projected slice,true
 selectable,,,,,,SL8,projected_owned,Rear script badge member projected slice,true
 selectable,,,,,,RIK,projected_owned,Rear script badge member projected slice,true
+selectable,,,,,,EYK,projected_owned,Required Badges slice,true
+selectable,,,,,,EYT,projected_owned,Required Badges duplicate-RPO slice,true
 selectable,,,,,,EDU,projected_owned,EDU Exterior Accents standalone projected slice,true
-guardedOption,,,,,,EYK,production_guarded,Required Badges Chrome badge choice remains production-owned before required-section migration,true
-guardedOption,,,,,opt_eyt_001,,production_guarded,Required Badges Carbon Flash default remains production-owned before required-section migration,true
-guardedOption,,,,,opt_eyt_002,,production_guarded,Standard Options EYT display-only duplicate remains production-owned before required-section migration,true
+guardedOption,,,,,,EYK,production_guarded,Required Badges Chrome badge choice remained production-owned before Pass 71,false
+guardedOption,,,,,opt_eyt_001,,production_guarded,Required Badges Carbon Flash default remained production-owned before Pass 71,false
+guardedOption,,,,,opt_eyt_002,,production_guarded,Standard Options EYT display-only duplicate remained production-owned before Pass 71,false
 rule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
 priceRule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
 rule,,PDV,,SB7,,,preserved_cross_boundary,PDV package source remains production-owned for SB7 in Pass 59,true
