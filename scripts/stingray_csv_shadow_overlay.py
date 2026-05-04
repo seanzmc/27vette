@@ -20,6 +20,15 @@ DEFAULT_OWNERSHIP_MANIFEST = DEFAULT_PACKAGE / "validation" / "projected_slice_o
 SUPPORTED_OWNERSHIP_VALUES = {"projected_owned", "preserved_cross_boundary", "production_guarded"}
 GROUP_RECORD_TYPES = {"exclusiveGroup", "ruleGroup"}
 SUPPORTED_RECORD_TYPES = {"selectable", "guardedOption", "rule", "priceRule", "ruleGroup", "exclusiveGroup"}
+STRUCTURED_REF_NAMESPACE_ORDER = {
+    "active_choice": 0,
+    "production_guarded": 1,
+    "interior_source": 2,
+    "unresolved": 3,
+}
+UNRESOLVED_STRUCTURED_REF_NOTE = (
+    "Structured reference does not resolve to an active choice, production_guarded option, or interior source."
+)
 
 
 class OverlayError(ValueError):
@@ -395,29 +404,64 @@ def production_interior_ids(data: dict[str, Any]) -> set[str]:
     return {row["interior_id"] for row in data.get("interiors", []) if row.get("interior_id")}
 
 
+def structured_record_ref(
+    ref_id: str,
+    source_kind: str,
+    source_id: str,
+    field: str,
+    reference_path: str,
+) -> dict[str, str]:
+    return {
+        "ref_id": ref_id,
+        "source_kind": source_kind,
+        "source_id": source_id,
+        "reference_kind": "structured_ref",
+        "reference_path": reference_path,
+        "field": field,
+    }
+
+
 def structured_record_refs(data: dict[str, Any]) -> list[dict[str, str]]:
     refs: list[dict[str, str]] = []
     for row in data.get("rules", []):
         if row.get("source_id"):
-            refs.append({"surface": "rules", "field": "source_id", "id": row["source_id"]})
+            refs.append(structured_record_ref(row["source_id"], "rule", row.get("rule_id", ""), "source_id", "rules[].source_id"))
         if row.get("target_id"):
-            refs.append({"surface": "rules", "field": "target_id", "id": row["target_id"]})
+            refs.append(structured_record_ref(row["target_id"], "rule", row.get("rule_id", ""), "target_id", "rules[].target_id"))
     for row in data.get("priceRules", []):
         if row.get("condition_option_id"):
-            refs.append({"surface": "priceRules", "field": "condition_option_id", "id": row["condition_option_id"]})
+            refs.append(
+                structured_record_ref(
+                    row["condition_option_id"],
+                    "priceRule",
+                    row.get("price_rule_id", ""),
+                    "condition_option_id",
+                    "priceRules[].condition_option_id",
+                )
+            )
         if row.get("target_option_id"):
-            refs.append({"surface": "priceRules", "field": "target_option_id", "id": row["target_option_id"]})
+            refs.append(
+                structured_record_ref(
+                    row["target_option_id"],
+                    "priceRule",
+                    row.get("price_rule_id", ""),
+                    "target_option_id",
+                    "priceRules[].target_option_id",
+                )
+            )
     for row in data.get("ruleGroups", []):
         if row.get("source_id"):
-            refs.append({"surface": "ruleGroups", "field": "source_id", "id": row["source_id"]})
+            refs.append(
+                structured_record_ref(row["source_id"], "ruleGroup", row.get("group_id", ""), "source_id", "ruleGroups[].source_id")
+            )
         refs.extend(
-            {"surface": "ruleGroups", "field": "target_ids", "id": target_id}
+            structured_record_ref(target_id, "ruleGroup", row.get("group_id", ""), "target_ids", "ruleGroups[].target_ids[]")
             for target_id in row.get("target_ids", [])
             if target_id
         )
     for row in data.get("exclusiveGroups", []):
         refs.extend(
-            {"surface": "exclusiveGroups", "field": "option_ids", "id": option_id}
+            structured_record_ref(option_id, "exclusiveGroup", row.get("group_id", ""), "option_ids", "exclusiveGroups[].option_ids[]")
             for option_id in row.get("option_ids", [])
             if option_id
         )
@@ -471,16 +515,72 @@ def assert_structured_refs_have_known_namespace(data: dict[str, Any], guarded_id
     unknown = []
     seen: set[tuple[str, str, str]] = set()
     for ref in structured_record_refs(data):
-        ref_id = ref["id"]
+        ref_id = ref["ref_id"]
         if ref_id in valid_ids:
             continue
-        key = (ref["surface"], ref["field"], ref_id)
+        key = (ref["source_kind"], ref["field"], ref_id)
         if key in seen:
             continue
         seen.add(key)
         unknown.append(ref)
     if unknown:
         raise OverlayError(f"unknown structured non-choice refs: {unknown[:5]}.")
+
+
+def structured_ref_namespace(ref_id: str, choice_ids: set[str], guarded_ids: set[str], interior_ids: set[str]) -> str:
+    if ref_id in choice_ids:
+        return "active_choice"
+    if ref_id in guarded_ids:
+        return "production_guarded"
+    if ref_id in interior_ids:
+        return "interior_source"
+    return "unresolved"
+
+
+def structured_ref_report_sort_key(row: dict[str, str]) -> tuple[int, str, str, str, str, str, str]:
+    return (
+        STRUCTURED_REF_NAMESPACE_ORDER[row["namespace"]],
+        row["ref_id"],
+        row["source_kind"],
+        row["source_id"],
+        row["reference_kind"],
+        row["reference_path"],
+        row["field"],
+    )
+
+
+def structured_reference_namespace_report(data: dict[str, Any], guarded_ids: set[str]) -> dict[str, Any]:
+    choice_ids = production_choice_option_ids(data)
+    interior_ids = production_interior_ids(data)
+    rows = []
+    for ref in structured_record_refs(data):
+        namespace = structured_ref_namespace(ref["ref_id"], choice_ids, guarded_ids, interior_ids)
+        status = "blocking" if namespace == "unresolved" else "allowed"
+        rows.append(
+            {
+                "ref_id": ref["ref_id"],
+                "namespace": namespace,
+                "source_kind": ref["source_kind"],
+                "source_id": ref["source_id"],
+                "reference_kind": ref["reference_kind"],
+                "reference_path": ref["reference_path"],
+                "field": ref["field"],
+                "status": status,
+                "notes": UNRESOLVED_STRUCTURED_REF_NOTE if status == "blocking" else "",
+            }
+        )
+    rows.sort(key=structured_ref_report_sort_key)
+    counts_by_namespace = {namespace: 0 for namespace in STRUCTURED_REF_NAMESPACE_ORDER}
+    for row in rows:
+        counts_by_namespace[row["namespace"]] += 1
+    unresolved_count = counts_by_namespace["unresolved"]
+    return {
+        "schema_version": 1,
+        "status": "blocking" if unresolved_count else "allowed",
+        "counts_by_namespace": counts_by_namespace,
+        "unresolved_count": unresolved_count,
+        "references": rows,
+    }
 
 
 def assert_preserved_option_id_refs_are_guarded(data: dict[str, Any], ownership: OwnershipScope, guarded_ids: set[str]) -> None:
@@ -1016,6 +1116,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--out", default="")
     parser.add_argument("--pretty", action="store_true")
     parser.add_argument("--as-data-js", action="store_true")
+    parser.add_argument("--structured-reference-namespace-report", action="store_true")
     return parser.parse_args()
 
 
@@ -1053,20 +1154,41 @@ def format_data_js(shadow: dict[str, Any], pretty: bool = False) -> str:
     )
 
 
+def format_report_json(report: dict[str, Any], pretty: bool = False) -> str:
+    return json.dumps(report, indent=2 if pretty else None, sort_keys=True, separators=None if pretty else (",", ":"))
+
+
+def write_or_print_output(output: str, out: str) -> None:
+    if out:
+        output_path = Path(out)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(output + "\n", encoding="utf-8")
+    else:
+        print(output)
+
+
 def main() -> None:
     args = parse_args()
     try:
+        if args.structured_reference_namespace_report and args.as_data_js:
+            raise OverlayError("--structured-reference-namespace-report cannot be combined with --as-data-js.")
+        if args.structured_reference_namespace_report and not args.out:
+            raise OverlayError("--structured-reference-namespace-report requires --out.")
         production = load_production_data(Path(args.production_data))
         fragment = load_fragment(args)
         ownership = load_ownership_scope(Path(args.ownership_manifest))
+        if args.structured_reference_namespace_report:
+            assert_guarded_option_refs_are_not_interiors(production, ownership)
+            guarded_ids = guarded_option_ids(production, ownership)
+            report = structured_reference_namespace_report(production, guarded_ids)
+            write_or_print_output(format_report_json(report, args.pretty), args.out)
+            if report["unresolved_count"]:
+                raise OverlayError(f"blocking unresolved structured refs: {report['unresolved_count']}.")
+            overlay_shadow_data(production, fragment, ownership)
+            return
         shadow = overlay_shadow_data(production, fragment, ownership)
         output = format_data_js(shadow, args.pretty) if args.as_data_js else format_shadow_json(shadow, args.pretty)
-        if args.out:
-            output_path = Path(args.out)
-            output_path.parent.mkdir(parents=True, exist_ok=True)
-            output_path.write_text(output + "\n", encoding="utf-8")
-        else:
-            print(output)
+        write_or_print_output(output, args.out)
     except (OSError, json.JSONDecodeError, OverlayError, KeyError, ValueError) as error:
         print(f"shadow overlay failed: {error}", file=sys.stderr)
         sys.exit(1)
