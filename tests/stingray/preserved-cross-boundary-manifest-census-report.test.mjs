@@ -121,12 +121,18 @@ test("preserved cross-boundary manifest census reports every active row determin
   assert.equal(run.result.status, 0, run.result.stderr);
   assert.equal(run.report.schema_version, 1);
   assert.equal(run.report.status, "allowed");
-  assert.equal(run.report.active_preserved_cross_boundary_count, 122);
-  assert.equal(run.report.rows.length, 122);
+  assert.equal(run.report.active_preserved_cross_boundary_count, undefined);
+  assert.equal(run.report.used_by_current_guarded_structured_refs_count, undefined);
+  assert.equal(run.report.not_currently_used_count, undefined);
+  assert.equal(run.report.active_preserved_cross_boundary_row_count, 122);
+  assert.equal(run.report.active_preserved_cross_boundary_record_count, 122);
+  assert.equal(run.report.rows.length, run.report.active_preserved_cross_boundary_row_count);
   assert.equal(run.report.current_guarded_structured_reference_count, 43);
-  assert.equal(run.report.used_by_current_guarded_structured_refs_count, 43);
   assert.equal(run.report.current_guarded_manifest_row_count, 39);
-  assert.equal(run.report.not_currently_used_count, 83);
+  assert.equal(run.report.current_guarded_preserved_record_count, 39);
+  assert.equal(run.report.current_guarded_group_membership_count, 43);
+  assert.equal(run.report.manifest_only_preservation_row_count, 83);
+  assert.equal(run.report.manifest_only_preservation_record_count, 83);
   assert.equal(run.report.invalid_preserved_count, 0);
 
   assert.deepEqual(run.report.rows, [...run.report.rows].sort(compareRows));
@@ -134,10 +140,15 @@ test("preserved cross-boundary manifest census reports every active row determin
   assert.equal(run.report.rows.every((row) => /^csv_row_\d+$/.test(row.manifest_row_id)), true);
 
   const currentGuardedRows = run.report.rows.filter((row) => row.candidate_status === "current_guarded_dependency");
+  const manifestOnlyRows = run.report.rows.filter((row) => row.candidate_status === "manifest_only_preservation");
+  const invalidRows = run.report.rows.filter((row) => row.candidate_status === "invalid_preserved");
   assert.equal(currentGuardedRows.length, 39);
+  assert.equal(currentGuardedRows.length, run.report.current_guarded_manifest_row_count);
+  assert.equal(manifestOnlyRows.length, run.report.manifest_only_preservation_row_count);
+  assert.equal(invalidRows.length, run.report.invalid_preserved_count);
   assert.equal(
     currentGuardedRows.reduce((total, row) => total + row.current_reference_count, 0),
-    43
+    run.report.current_guarded_structured_reference_count
   );
   assert.equal(currentGuardedRows.every((row) => row.ref_id && row.group_key === row.ref_id), true);
   assert.equal(run.report.rows.some((row) => row.ref_id === null && row.pair_key && row.group_key === row.pair_key), true);
@@ -159,6 +170,12 @@ test("preserved cross-boundary manifest census reports every active row determin
     opt_cf8_001: 13,
     opt_ryq_001: 1,
   });
+  assert.equal(
+    run.report.groups
+      .filter((group) => guardedIds.has(group.group_key))
+      .reduce((total, group) => total + group.current_guarded_group_membership_count, 0),
+    run.report.current_guarded_group_membership_count
+  );
 });
 
 test("preserved cross-boundary manifest census classifies invalid temp rows as blocking", () => {
@@ -214,7 +231,8 @@ test("preserved cross-boundary manifest census classifies invalid temp rows as b
   assert.notEqual(run.result.status, 0);
   assert.match(run.result.stderr, /preserved cross-boundary manifest census blocking findings/);
   assert.equal(run.report.status, "blocking");
-  assert.equal(run.report.active_preserved_cross_boundary_count, 125);
+  assert.equal(run.report.active_preserved_cross_boundary_row_count, 125);
+  assert.equal(run.report.active_preserved_cross_boundary_record_count, 125);
   assert.equal(run.report.invalid_preserved_count, 3);
   assert.equal(run.report.rows.filter((row) => row.candidate_status === "invalid_preserved").length, 3);
   assert.equal(run.report.rows.some((row) => row.ref_id === interiorId && row.candidate_status === "invalid_preserved"), true);

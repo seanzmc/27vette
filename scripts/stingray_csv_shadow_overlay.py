@@ -1090,7 +1090,8 @@ def preserved_cross_boundary_manifest_census_report(
                     "group_key": group_key,
                     "ref_id": group_ref_id,
                     "pair_key": group_pair_key,
-                    "active_preserved_row_count": 0,
+                    "active_preserved_group_membership_count": 0,
+                    "current_guarded_group_membership_count": 0,
                     "current_guarded_structured_reference_count": 0,
                     "used_by_current_guarded_structured_refs": False,
                     "candidate_statuses": set(),
@@ -1100,7 +1101,9 @@ def preserved_cross_boundary_manifest_census_report(
                     "target_ids": set(),
                 },
             )
-            group["active_preserved_row_count"] += 1
+            group["active_preserved_group_membership_count"] += 1
+            if row["is_current_guarded_structured_ref"]:
+                group["current_guarded_group_membership_count"] += 1
             group["current_guarded_structured_reference_count"] += row["current_ref_counts"].get(group_key, 0)
             group["used_by_current_guarded_structured_refs"] = (
                 group["used_by_current_guarded_structured_refs"] or row["is_current_guarded_structured_ref"]
@@ -1119,7 +1122,8 @@ def preserved_cross_boundary_manifest_census_report(
                 "group_key": group["group_key"],
                 "ref_id": group["ref_id"],
                 "pair_key": group["pair_key"],
-                "active_preserved_row_count": group["active_preserved_row_count"],
+                "active_preserved_group_membership_count": group["active_preserved_group_membership_count"],
+                "current_guarded_group_membership_count": group["current_guarded_group_membership_count"],
                 "current_guarded_structured_reference_count": group["current_guarded_structured_reference_count"],
                 "used_by_current_guarded_structured_refs": group["used_by_current_guarded_structured_refs"],
                 "candidate_status": preserved_manifest_census_candidate_statuses(candidate_statuses),
@@ -1136,17 +1140,25 @@ def preserved_cross_boundary_manifest_census_report(
 
     current_guarded_manifest_row_count = sum(1 for row in rows if row["is_current_guarded_structured_ref"])
     current_guarded_structured_reference_count = sum(row["current_reference_count"] for row in rows)
+    current_guarded_group_membership_count = sum(
+        group["current_guarded_group_membership_count"]
+        for group in groups
+        if group["candidate_status"] == "current_guarded_dependency"
+    )
     invalid_preserved_count = sum(1 for row in rows if row["candidate_status"] == "invalid_preserved")
-    not_currently_used_count = sum(1 for row in rows if row["candidate_status"] == "manifest_only_preservation")
+    manifest_only_preservation_row_count = sum(1 for row in rows if row["candidate_status"] == "manifest_only_preservation")
 
     return {
         "schema_version": 1,
         "status": "blocking" if invalid_preserved_count else "allowed",
-        "active_preserved_cross_boundary_count": len(rows),
-        "used_by_current_guarded_structured_refs_count": current_guarded_structured_reference_count,
+        "active_preserved_cross_boundary_row_count": len(rows),
+        "active_preserved_cross_boundary_record_count": len(ownership.preserved_cross_boundary_records),
         "current_guarded_structured_reference_count": current_guarded_structured_reference_count,
         "current_guarded_manifest_row_count": current_guarded_manifest_row_count,
-        "not_currently_used_count": not_currently_used_count,
+        "current_guarded_preserved_record_count": current_guarded_manifest_row_count,
+        "current_guarded_group_membership_count": current_guarded_group_membership_count,
+        "manifest_only_preservation_row_count": manifest_only_preservation_row_count,
+        "manifest_only_preservation_record_count": manifest_only_preservation_row_count,
         "invalid_preserved_count": invalid_preserved_count,
         "groups": groups,
         "rows": rows,
