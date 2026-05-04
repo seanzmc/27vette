@@ -2153,6 +2153,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--preserved-cross-boundary-manifest-census", action="store_true")
     parser.add_argument("--manifest-only-preservation-triage", action="store_true")
     parser.add_argument("--direction-slice-rows-csv-out", default="")
+    parser.add_argument("--review-packet-manifest-out", default="")
     return parser.parse_args()
 
 
@@ -2213,6 +2214,47 @@ def write_direction_slice_rows_csv(rows: list[dict[str, Any]], out: str) -> None
             writer.writerow({field: "" if row.get(field) is None else row.get(field, "") for field in DIRECTION_SLICE_ROWS_CSV_FIELDS})
 
 
+def manifest_only_review_packet_manifest(report: dict[str, Any], json_out: str, csv_out: str) -> dict[str, Any]:
+    return {
+        "schema_version": 1,
+        "status": report["status"],
+        "generated_outputs": {
+            "manifest_only_preservation_triage_json": json_out,
+            "direction_slice_rows_csv": csv_out or None,
+        },
+        "summary": {
+            "manifest_only_preservation_row_count": report["manifest_only_preservation_row_count"],
+            "manifest_only_preservation_record_count": report["manifest_only_preservation_record_count"],
+            "group_count": report["group_count"],
+            "single_row_group_count": report["single_row_group_count"],
+            "multi_row_group_count": report["multi_row_group_count"],
+            "invalid_preserved_count": report["invalid_preserved_count"],
+        },
+        "direction_counts": [
+            {
+                "key": row["key"],
+                "row_count": row["row_count"],
+                "record_count": row["record_count"],
+                "group_count": row["group_count"],
+            }
+            for row in report["ownership_projection_direction_rollup"]
+        ],
+        "multi_row_groups": [
+            {
+                "group_key": row["group_key"],
+                "manifest_only_preservation_row_count": row["manifest_only_preservation_row_count"],
+                "manifest_row_ids": row["manifest_row_ids"],
+            }
+            for row in report["multi_row_groups"]
+        ],
+        "csv": {
+            "written": bool(csv_out),
+            "row_count": len(report["direction_slice_rows"]) if csv_out else None,
+            "header": DIRECTION_SLICE_ROWS_CSV_FIELDS if csv_out else None,
+        },
+    }
+
+
 def main() -> None:
     args = parse_args()
     try:
@@ -2239,6 +2281,8 @@ def main() -> None:
             raise OverlayError("--manifest-only-preservation-triage requires --out.")
         if args.direction_slice_rows_csv_out and not args.manifest_only_preservation_triage:
             raise OverlayError("--direction-slice-rows-csv-out requires --manifest-only-preservation-triage.")
+        if args.review_packet_manifest_out and not args.manifest_only_preservation_triage:
+            raise OverlayError("--review-packet-manifest-out requires --manifest-only-preservation-triage.")
         production = load_production_data(Path(args.production_data))
         fragment = load_fragment(args)
         ownership = load_ownership_scope(Path(args.ownership_manifest))
@@ -2283,6 +2327,9 @@ def main() -> None:
             write_or_print_output(format_report_json(report, args.pretty), args.out)
             if args.direction_slice_rows_csv_out:
                 write_direction_slice_rows_csv(report["direction_slice_rows"], args.direction_slice_rows_csv_out)
+            if args.review_packet_manifest_out:
+                packet = manifest_only_review_packet_manifest(report, args.out, args.direction_slice_rows_csv_out)
+                write_or_print_output(format_report_json(packet, args.pretty), args.review_packet_manifest_out)
             if namespace_report["unresolved_count"]:
                 raise OverlayError(f"blocking unresolved structured refs: {namespace_report['unresolved_count']}.")
             if args.preserved_cross_boundary_contract_report and report["status"] == "blocking":

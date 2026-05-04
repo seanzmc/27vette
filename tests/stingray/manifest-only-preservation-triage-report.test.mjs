@@ -48,6 +48,31 @@ function runManifestOnlyTriageWithCsv() {
   };
 }
 
+function runManifestOnlyTriageWithReviewPacket({ includeCsv = true } = {}) {
+  const out = tempPath("manifest-only-preservation-triage.json");
+  const csvOut = includeCsv ? tempPath("direction-slice-rows.csv") : null;
+  const packetOut = tempPath("review-packet-manifest.json");
+  const args = ["--manifest-only-preservation-triage", "--out", out];
+  if (includeCsv) {
+    args.push("--direction-slice-rows-csv-out", csvOut);
+  }
+  args.push("--review-packet-manifest-out", packetOut);
+  const result = spawnSync(PYTHON, [OVERLAY_SCRIPT, ...args], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+    maxBuffer: 8 * 1024 * 1024,
+  });
+  return {
+    out,
+    csvOut,
+    packetOut,
+    result,
+    report: fs.existsSync(out) ? JSON.parse(fs.readFileSync(out, "utf8")) : null,
+    packet: fs.existsSync(packetOut) ? JSON.parse(fs.readFileSync(packetOut, "utf8")) : null,
+    csv: csvOut && fs.existsSync(csvOut) ? fs.readFileSync(csvOut, "utf8") : "",
+  };
+}
+
 function defaultOverlayStdout() {
   return spawnSync(PYTHON, [OVERLAY_SCRIPT], {
     cwd: process.cwd(),
@@ -648,10 +673,79 @@ test("manifest-only preservation triage exports direction slice rows as a CSV si
   );
 });
 
+test("manifest-only preservation triage writes a review packet manifest sidecar", () => {
+  const triage = runManifestOnlyTriageWithReviewPacket();
+  assert.equal(triage.result.status, 0, triage.result.stderr);
+  assert.ok(fs.existsSync(triage.out));
+  assert.ok(fs.existsSync(triage.csvOut));
+  assert.ok(fs.existsSync(triage.packetOut));
+
+  assert.equal(triage.packet.schema_version, 1);
+  assert.equal(triage.packet.status, triage.report.status);
+  assert.deepEqual(triage.packet.generated_outputs, {
+    manifest_only_preservation_triage_json: triage.out,
+    direction_slice_rows_csv: triage.csvOut,
+  });
+  assert.deepEqual(triage.packet.summary, {
+    manifest_only_preservation_row_count: triage.report.manifest_only_preservation_row_count,
+    manifest_only_preservation_record_count: triage.report.manifest_only_preservation_record_count,
+    group_count: triage.report.group_count,
+    single_row_group_count: triage.report.single_row_group_count,
+    multi_row_group_count: triage.report.multi_row_group_count,
+    invalid_preserved_count: triage.report.invalid_preserved_count,
+  });
+  assert.deepEqual(
+    triage.packet.direction_counts,
+    triage.report.ownership_projection_direction_rollup.map(({ key, row_count, record_count, group_count }) => ({
+      key,
+      row_count,
+      record_count,
+      group_count,
+    }))
+  );
+  assert.deepEqual(
+    triage.packet.multi_row_groups,
+    triage.report.multi_row_groups.map(({ group_key, manifest_only_preservation_row_count, manifest_row_ids }) => ({
+      group_key,
+      manifest_only_preservation_row_count,
+      manifest_row_ids,
+    }))
+  );
+  assert.deepEqual(triage.packet.csv, {
+    written: true,
+    row_count: triage.report.direction_slice_rows.length,
+    header: DIRECTION_SLICE_ROW_FIELDS,
+  });
+
+  const noCsv = runManifestOnlyTriageWithReviewPacket({ includeCsv: false });
+  assert.equal(noCsv.result.status, 0, noCsv.result.stderr);
+  assert.ok(fs.existsSync(noCsv.out));
+  assert.ok(fs.existsSync(noCsv.packetOut));
+  assert.equal(noCsv.csvOut, null);
+  assert.deepEqual(noCsv.packet.generated_outputs, {
+    manifest_only_preservation_triage_json: noCsv.out,
+    direction_slice_rows_csv: null,
+  });
+  assert.deepEqual(noCsv.packet.csv, {
+    written: false,
+    row_count: null,
+    header: null,
+  });
+  assert.deepEqual(noCsv.packet.summary, {
+    manifest_only_preservation_row_count: noCsv.report.manifest_only_preservation_row_count,
+    manifest_only_preservation_record_count: noCsv.report.manifest_only_preservation_record_count,
+    group_count: noCsv.report.group_count,
+    single_row_group_count: noCsv.report.single_row_group_count,
+    multi_row_group_count: noCsv.report.multi_row_group_count,
+    invalid_preserved_count: noCsv.report.invalid_preserved_count,
+  });
+});
+
 test("manifest-only preservation triage rejects data-js mode and leaves default overlay output alone", () => {
   const out = tempPath("manifest-only-triage-data-js.json");
   const csvOut = tempPath("manifest-only-triage-data-js.csv");
-  const invalid = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--manifest-only-preservation-triage", "--as-data-js", "--out", out, "--direction-slice-rows-csv-out", csvOut], {
+  const packetOut = tempPath("manifest-only-triage-data-js-packet.json");
+  const invalid = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--manifest-only-preservation-triage", "--as-data-js", "--out", out, "--direction-slice-rows-csv-out", csvOut, "--review-packet-manifest-out", packetOut], {
     cwd: process.cwd(),
     encoding: "utf8",
     maxBuffer: 8 * 1024 * 1024,
@@ -660,6 +754,7 @@ test("manifest-only preservation triage rejects data-js mode and leaves default 
   assert.match(invalid.stderr, /cannot be combined with --as-data-js/);
   assert.equal(fs.existsSync(out), false);
   assert.equal(fs.existsSync(csvOut), false);
+  assert.equal(fs.existsSync(packetOut), false);
 
   const csvWithoutOwningMode = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--direction-slice-rows-csv-out", tempPath("direction-slice-rows.csv")], {
     cwd: process.cwd(),
@@ -668,6 +763,14 @@ test("manifest-only preservation triage rejects data-js mode and leaves default 
   });
   assert.notEqual(csvWithoutOwningMode.status, 0);
   assert.match(csvWithoutOwningMode.stderr, /--direction-slice-rows-csv-out requires --manifest-only-preservation-triage/);
+
+  const packetWithoutOwningMode = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--review-packet-manifest-out", tempPath("review-packet-manifest.json")], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+    maxBuffer: 8 * 1024 * 1024,
+  });
+  assert.notEqual(packetWithoutOwningMode.status, 0);
+  assert.match(packetWithoutOwningMode.stderr, /--review-packet-manifest-out requires --manifest-only-preservation-triage/);
 
   const stdoutRun = defaultOverlayStdout();
   const outRun = defaultOverlayOutFile();
