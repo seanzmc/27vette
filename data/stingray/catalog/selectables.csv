@@ -28,6 +28,8 @@ opt_5zu_001,option,5ZU,"LPO, High wing spoiler, Body color","Body-color, G8G, GB
 opt_5v7_001,option,5V7,"LPO, Black Ground Effects",Genuine Corvette Accessory,true,,5V7 black ground effects choice.
 opt_sda_001,option,SDA,"LPO, Black recovery hook",Genuine Corvette Accessory,true,,Standalone LPO Exterior accessory choice.
 opt_vtb_001,option,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",Genuine Corvette Accessory,true,,Standalone LPO Exterior accessory choice.
+opt_vqk_001,option,VQK,"LPO, Custom splash guards","Black, Genuine Corvette Accessory",true,,Protection package member choice; PCU package boundary remains production-owned.
+opt_vwe_001,option,VWE,"LPO, Front radiator grille screens",Genuine Corvette Accessory,true,,Protection package member choice; PCU package boundary remains production-owned.
 opt_rwu_001,option,RWU,"LPO, Cargo area organizer","Collapsible, Genuine Corvette Accessory",true,,Standalone LPO Interior accessory choice.
 opt_s2l_001,option,S2L,"LPO, Set of premium leather weekend/travel bags",Genuine Corvette Accessory,true,,Standalone LPO Interior accessory choice.
 opt_vyw_001,option,VYW,"LPO, Floor mats","Premium carpeted with car silhouette logo on Stingray, Grand Sport, ZR1 and ZR1X models, Genuine Corvette Accessory",true,,Standalone LPO Interior accessory choice.
@@ -40,6 +42,10 @@ opt_ryt_001,option,RYT,"LPO, First Aid Kit",Genuine Corvette Accessory,true,,Roa
 opt_s08_001,option,S08,"LPO, Highway Safety Kit",Genuine Corvette Accessory,true,,Roadside safety package member choice; PDY package is projected-owned.
 opt_sbt_001,option,SBT,"LPO, Dual roof","Adds transparent removable roof panel and includes (SC7) roof panel storage pouch, Genuine Corvette Accessories",true,cs_coupe,Dual roof package source choice; CC3 roof boundary remains production-owned.
 opt_sc7_001,option,SC7,"LPO, Roof panel storage pouch",Genuine Corvette Accessory,true,cs_coupe,Dual roof package member choice; SBT package is projected-owned.
+opt_cf7_001,option,CF7,Roof panel,"Body-color, removable",true,cs_coupe,Required Roof coupe default selectable choice.
+opt_cf7_002,option,CF7,Roof panel,"Body-color, removable",true,cs_coupe,Standard Options display-only duplicate for coupe Roof default.
+opt_cm9_001,option,CM9,Convertible top,"Retractable, power-folding hard top, painted body-color roof, remote control (down only), includes power glass rear window with integral defogger",true,cs_convertible,Required Roof convertible default selectable choice.
+opt_cm9_002,option,CM9,Convertible top,"Retractable, power-folding hard top, painted body-color roof, remote control (down only), includes power glass rear window with integral defogger",true,cs_convertible,Standard Options display-only duplicate for convertible Roof default.
 opt_c2z_001,option,C2Z,Roof panel,"Visible carbon fiber with body-color surround, removable",true,cs_coupe,Carbon fiber Roof panel choice; Roof section and defaults remain production-owned.
 opt_cc3_001,option,CC3,Roof panel,"Transparent, removable",true,cs_coupe,Transparent Roof panel choice; SBT boundary and Roof section remain production-owned.
 opt_d84_001,option,D84,Convertible top,Carbon Flash-painted nacelles and roof,true,cs_convertible,Convertible Roof panel choice; GBA paint boundary remains production-owned.

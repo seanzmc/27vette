@@ -26,6 +26,8 @@ bp_sln,pb_2027_stingray,selectable,opt_sln_001,,2895,10,true,Current SLN base pr
 bp_vup,pb_2027_stingray,selectable,opt_vup_001,,575,10,true,Current VUP base price.
 bp_sda,pb_2027_stingray,selectable,opt_sda_001,,150,10,true,Current SDA base price.
 bp_vtb,pb_2027_stingray,selectable,opt_vtb_001,,150,10,true,Current VTB base price.
+bp_vqk,pb_2027_stingray,selectable,opt_vqk_001,,395,10,true,Current VQK base price.
+bp_vwe,pb_2027_stingray,selectable,opt_vwe_001,,695,10,true,Current VWE base price.
 bp_rwu,pb_2027_stingray,selectable,opt_rwu_001,,175,10,true,Current RWU base price.
 bp_s2l,pb_2027_stingray,selectable,opt_s2l_001,,1695,10,true,Current S2L base price.
 bp_vyw,pb_2027_stingray,selectable,opt_vyw_001,,275,10,true,Current VYW base price.
@@ -52,6 +54,10 @@ bp_rik,pb_2027_stingray,selectable,opt_rik_001,,395,10,true,Current RIK base pri
 bp_eyk,pb_2027_stingray,selectable,opt_eyk_001,,395,10,true,Current EYK base price.
 bp_eyt_badges,pb_2027_stingray,selectable,opt_eyt_001,,0,10,true,Current EYT required Badges default base price.
 bp_eyt_standard,pb_2027_stingray,selectable,opt_eyt_002,,0,10,true,Current EYT Standard Options display-only duplicate base price.
+bp_cf7_roof,pb_2027_stingray,selectable,opt_cf7_001,,0,10,true,Current CF7 required Roof default base price.
+bp_cf7_standard,pb_2027_stingray,selectable,opt_cf7_002,,0,10,true,Current CF7 Standard Options display-only duplicate base price.
+bp_cm9_roof,pb_2027_stingray,selectable,opt_cm9_001,,0,10,true,Current CM9 required Roof default base price.
+bp_cm9_standard,pb_2027_stingray,selectable,opt_cm9_002,,0,10,true,Current CM9 Standard Options display-only duplicate base price.
 bp_c2z,pb_2027_stingray,selectable,opt_c2z_001,,2595,10,true,Current C2Z base price.
 bp_cc3,pb_2027_stingray,selectable,opt_cc3_001,,995,10,true,Current CC3 base price.
 bp_d84,pb_2027_stingray,selectable,opt_d84_001,,1295,10,true,Current D84 base price.

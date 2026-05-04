@@ -9,7 +9,7 @@ const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const CC3_RPO = "CC3";
-const ROOF_PRODUCTION_RPOS = new Set(["CF7", "CM9"]);
+const ROOF_PRODUCTION_RPOS = new Set();
 
 function parseCsv(source) {
   const rows = [];

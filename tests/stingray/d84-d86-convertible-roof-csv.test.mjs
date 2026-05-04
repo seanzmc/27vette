@@ -10,7 +10,6 @@ const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const ROOF_RPOS = new Set(["CF7", "CM9", "C2Z", "CC3", "D84", "D86"]);
 const CONVERTIBLE_ROOF_RPOS = new Set(["D84", "D86"]);
-const ROOF_DEFAULT_RPOS = new Set(["CF7", "CM9"]);
 
 function parseCsv(source) {
   const rows = [];
@@ -239,7 +238,7 @@ test("D84 and D86 projection preserves paint and Roof model boundaries", () => {
   for (const rpo of CONVERTIBLE_ROOF_RPOS) {
     assert.equal(owned.has(rpo), true);
   }
-  for (const rpo of ["GBA", "ZYC", ...ROOF_DEFAULT_RPOS]) {
+  for (const rpo of ["GBA", "ZYC"]) {
     assert.equal(owned.has(rpo), false, `${rpo} should remain outside the D84/D86 slice`);
   }
   assert.equal(activeManifestRows().some((row) => row.record_type === "section" || row.group_id === "sec_roof_001" || row.group_id === "sec_stan_002"), false);
