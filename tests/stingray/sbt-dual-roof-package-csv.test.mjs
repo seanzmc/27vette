@@ -10,7 +10,7 @@ const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const SBT_PACKAGE_RPOS = new Set(["SBT", "SC7"]);
 const INCLUDED_EDGES = [["SBT", "SC7"]];
-const ROOF_BOUNDARY_RPOS = new Set(["CC3"]);
+const ROOF_MODEL_RPOS = new Set(["CF7", "CM9", "C2Z", "D84", "D86"]);
 
 function parseCsv(source) {
   const rows = [];
@@ -265,7 +265,7 @@ test("SBT package cluster satisfies projected-owned package policy without claim
   for (const rpo of SBT_PACKAGE_RPOS) {
     assert.equal(owned.has(rpo), true, `${rpo} should be projected-owned`);
   }
-  for (const rpo of ROOF_BOUNDARY_RPOS) {
+  for (const rpo of ROOF_MODEL_RPOS) {
     assert.equal(owned.has(rpo), false, `${rpo} should remain outside the SBT package slice`);
   }
   assert.deepEqual(preservedSbtSc7Rows(), [], "SBT -> SC7 package records should not be preserved cross-boundary rows");

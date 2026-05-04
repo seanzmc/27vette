@@ -23,6 +23,7 @@ const EXPECTED_OWNED_RPOS = [
   "BCP",
   "BCS",
   "CAV",
+  "CC3",
   "D3V",
   "EDU",
   "ERI",

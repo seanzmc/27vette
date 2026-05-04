@@ -52,4 +52,5 @@ bp_rik,pb_2027_stingray,selectable,opt_rik_001,,395,10,true,Current RIK base pri
 bp_eyk,pb_2027_stingray,selectable,opt_eyk_001,,395,10,true,Current EYK base price.
 bp_eyt_badges,pb_2027_stingray,selectable,opt_eyt_001,,0,10,true,Current EYT required Badges default base price.
 bp_eyt_standard,pb_2027_stingray,selectable,opt_eyt_002,,0,10,true,Current EYT Standard Options display-only duplicate base price.
+bp_cc3,pb_2027_stingray,selectable,opt_cc3_001,,995,10,true,Current CC3 base price.
 bp_edu,pb_2027_stingray,selectable,opt_edu_001,,995,10,true,Current EDU base price.

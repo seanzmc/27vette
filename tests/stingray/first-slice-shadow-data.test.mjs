@@ -4,7 +4,7 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
-const FIRST_SLICE_RPOS = new Set(["B6P", "D3V", "SL9", "ZZ3", "BCP", "BCS", "BC4", "BC7", "PEF", "CAV", "RIA", "PDY", "RYT", "S08", "SBT", "SC7"]);
+const FIRST_SLICE_RPOS = new Set(["B6P", "D3V", "SL9", "ZZ3", "BCP", "BCS", "BC4", "BC7", "PEF", "CAV", "RIA", "PDY", "RYT", "S08", "SBT", "SC7", "CC3"]);
 const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set(["opt_sbt_001->opt_cc3_001"]);
 
 function loadGeneratedData() {
