@@ -31,6 +31,10 @@ UNRESOLVED_STRUCTURED_REF_NOTE = (
 )
 PRODUCTION_GUARDED_PRESERVED_NOTE = "Production-guarded structured reference has active preserved_cross_boundary manifest evidence."
 PRODUCTION_GUARDED_REVIEW_NOTE = "Production-guarded structured reference needs review before any migration decision."
+PRESERVED_CROSS_BOUNDARY_MATCH_NOTE = "Production-guarded structured reference is backed by active preserved_cross_boundary manifest evidence."
+PRESERVED_CROSS_BOUNDARY_STALE_NOTE = "Active preserved_cross_boundary manifest row points at a guarded ID with no current structured reference."
+PRESERVED_CROSS_BOUNDARY_INVALID_NOTE = "Active preserved_cross_boundary manifest row points outside the guarded structured-reference contract."
+PRESERVED_CROSS_BOUNDARY_UNGUARDED_NOTE = "Production-guarded structured reference has no matching active preserved_cross_boundary manifest evidence."
 
 
 class OverlayError(ValueError):
@@ -691,6 +695,255 @@ def production_guarded_structured_reference_triage_report(
     }
 
 
+def tolerant_option_id_by_manifest_ref(data: dict[str, Any], rpo: str, option_id: str) -> str:
+    if option_id:
+        return option_id
+    if not rpo:
+        return ""
+    option_ids = {row["option_id"] for row in data.get("choices", []) if row.get("rpo") == rpo}
+    if len(option_ids) == 1:
+        return next(iter(option_ids))
+    return rpo
+
+
+def preserved_ref_namespace(ref_id: str, choice_ids: set[str], projected_ids: set[str], guarded_ids: set[str], interior_ids: set[str]) -> str:
+    if ref_id in interior_ids:
+        return "interior_source"
+    if ref_id in projected_ids:
+        return "active_projected_owned_choice"
+    if ref_id in choice_ids:
+        return "active_choice"
+    if ref_id in guarded_ids:
+        return "production_guarded"
+    return "unknown"
+
+
+def structured_rows_by_record_side(data: dict[str, Any]) -> dict[tuple[str, str, str, str, str], list[dict[str, str]]]:
+    rows: dict[tuple[str, str, str, str, str], list[dict[str, str]]] = {}
+
+    def add(record_type: str, source_id: str, target_id: str, ref_id: str, field: str, ref: dict[str, str]) -> None:
+        rows.setdefault((record_type, source_id, target_id, ref_id, field), []).append(ref)
+
+    for row in data.get("rules", []):
+        source_id = row.get("source_id", "")
+        target_id = row.get("target_id", "")
+        if source_id:
+            add("rule", source_id, target_id, source_id, "source_id", structured_record_ref(source_id, "rule", row.get("rule_id", ""), "source_id", "rules[].source_id"))
+        if target_id:
+            add("rule", source_id, target_id, target_id, "target_id", structured_record_ref(target_id, "rule", row.get("rule_id", ""), "target_id", "rules[].target_id"))
+    for row in data.get("priceRules", []):
+        source_id = row.get("condition_option_id", "")
+        target_id = row.get("target_option_id", "")
+        if source_id:
+            add(
+                "priceRule",
+                source_id,
+                target_id,
+                source_id,
+                "condition_option_id",
+                structured_record_ref(source_id, "priceRule", row.get("price_rule_id", ""), "condition_option_id", "priceRules[].condition_option_id"),
+            )
+        if target_id:
+            add(
+                "priceRule",
+                source_id,
+                target_id,
+                target_id,
+                "target_option_id",
+                structured_record_ref(target_id, "priceRule", row.get("price_rule_id", ""), "target_option_id", "priceRules[].target_option_id"),
+            )
+    for row in data.get("ruleGroups", []):
+        source_id = row.get("source_id", "")
+        for target_id in row.get("target_ids", []):
+            if source_id:
+                add(
+                    "ruleGroup",
+                    source_id,
+                    target_id,
+                    source_id,
+                    "source_id",
+                    structured_record_ref(source_id, "ruleGroup", row.get("group_id", ""), "source_id", "ruleGroups[].source_id"),
+                )
+            if target_id:
+                add(
+                    "ruleGroup",
+                    source_id,
+                    target_id,
+                    target_id,
+                    "target_ids",
+                    structured_record_ref(target_id, "ruleGroup", row.get("group_id", ""), "target_ids", "ruleGroups[].target_ids[]"),
+                )
+    return rows
+
+
+def preserved_contract_row_sort_key(row: dict[str, str]) -> tuple[str, str, str, str, str, str, str, str]:
+    return (
+        row["ref_id"],
+        row["manifest_status"],
+        row["namespace"],
+        row["source_kind"],
+        row["source_id"],
+        row["reference_kind"],
+        row["reference_path"],
+        row["field"],
+    )
+
+
+def manifest_structured_lookup_field(record_type: str, field: str) -> str:
+    if record_type == "priceRule":
+        return "condition_option_id" if field == "source_id" else "target_option_id"
+    if record_type == "ruleGroup":
+        return "source_id" if field == "source_id" else "target_ids"
+    return field
+
+
+def preserved_cross_boundary_contract_report(
+    data: dict[str, Any],
+    ownership: OwnershipScope,
+    namespace_report: dict[str, Any],
+    guarded_ids: set[str],
+    projected_ids: set[str],
+) -> dict[str, Any]:
+    choice_ids = production_choice_option_ids(data)
+    interior_ids = production_interior_ids(data)
+    current_rows_by_side = structured_rows_by_record_side(data)
+    current_guarded_rows = [row for row in namespace_report["references"] if row["namespace"] == "production_guarded"]
+    current_guarded_keys = {
+        (row["ref_id"], row["source_kind"], row["source_id"], row["field"])
+        for row in current_guarded_rows
+    }
+    matched_guarded_keys: set[tuple[str, str, str, str]] = set()
+    matches = []
+    stale_preserved = []
+    invalid_preserved = []
+
+    for record_type, source_rpo, source_option_id, target_rpo, target_option_id in sorted(ownership.preserved_cross_boundary_records):
+        source_id = tolerant_option_id_by_manifest_ref(data, source_rpo, source_option_id)
+        target_id = tolerant_option_id_by_manifest_ref(data, target_rpo, target_option_id)
+        side_refs = [
+            (source_id, "source_id", preserved_ref_namespace(source_id, choice_ids, projected_ids, guarded_ids, interior_ids)),
+            (target_id, "target_id", preserved_ref_namespace(target_id, choice_ids, projected_ids, guarded_ids, interior_ids)),
+        ]
+        pair_has_current_record = any(
+            current_rows_by_side.get((record_type, source_id, target_id, ref_id, manifest_structured_lookup_field(record_type, field)))
+            for ref_id, field, _namespace in side_refs
+        )
+        invalid_side_refs = [
+            (ref_id, field, namespace)
+            for ref_id, field, namespace in side_refs
+            if namespace in {"interior_source", "unknown"}
+        ]
+        if (
+            not invalid_side_refs
+            and not pair_has_current_record
+            and all(namespace == "active_projected_owned_choice" for _ref_id, _field, namespace in side_refs)
+        ):
+            invalid_side_refs = side_refs
+        if invalid_side_refs:
+            for ref_id, field, namespace in invalid_side_refs:
+                invalid_preserved.append(
+                    {
+                        "ref_id": ref_id,
+                        "manifest_status": "invalid_preserved",
+                        "namespace": namespace,
+                        "source_kind": record_type,
+                        "source_id": f"{source_id}->{target_id}",
+                        "reference_kind": "manifest_ref",
+                        "reference_path": f"ownership.preserved_cross_boundary.{field}",
+                        "field": field,
+                        "status": "blocking",
+                        "notes": PRESERVED_CROSS_BOUNDARY_INVALID_NOTE,
+                    }
+                )
+            continue
+        if not any(namespace == "production_guarded" for _ref_id, _field, namespace in side_refs):
+            continue
+
+        for ref_id, field, namespace in side_refs:
+            if namespace != "production_guarded":
+                continue
+            manifest_status = "matched"
+            destination = matches
+            notes = PRESERVED_CROSS_BOUNDARY_MATCH_NOTE
+            lookup_field = manifest_structured_lookup_field(record_type, field)
+            structured_rows = current_rows_by_side.get((record_type, source_id, target_id, ref_id, lookup_field), [])
+            if not structured_rows:
+                manifest_status = "stale_preserved"
+                destination = stale_preserved
+                notes = PRESERVED_CROSS_BOUNDARY_STALE_NOTE
+                structured_rows = [
+                    structured_record_ref(
+                        ref_id,
+                        record_type,
+                        f"{source_id}->{target_id}",
+                        lookup_field,
+                        f"manifest.preserved_cross_boundary.{field}",
+                    )
+                ]
+            for structured_row in structured_rows:
+                row = {
+                    "ref_id": ref_id,
+                    "manifest_status": manifest_status,
+                    "namespace": namespace,
+                    "source_kind": structured_row["source_kind"],
+                    "source_id": structured_row["source_id"],
+                    "reference_kind": structured_row["reference_kind"],
+                    "reference_path": structured_row["reference_path"],
+                    "field": structured_row["field"],
+                    "status": "allowed" if manifest_status == "matched" else "blocking",
+                    "notes": notes,
+                }
+                destination.append(row)
+                if manifest_status == "matched":
+                    matched_guarded_keys.add((row["ref_id"], row["source_kind"], row["source_id"], row["field"]))
+
+    unguarded_production_guarded = []
+    for row in current_guarded_rows:
+        key = (row["ref_id"], row["source_kind"], row["source_id"], row["field"])
+        if key in matched_guarded_keys:
+            continue
+        unguarded_production_guarded.append(
+            {
+                "ref_id": row["ref_id"],
+                "manifest_status": "unguarded_production_guarded",
+                "namespace": row["namespace"],
+                "source_kind": row["source_kind"],
+                "source_id": row["source_id"],
+                "reference_kind": row["reference_kind"],
+                "reference_path": row["reference_path"],
+                "field": row["field"],
+                "status": "blocking",
+                "notes": PRESERVED_CROSS_BOUNDARY_UNGUARDED_NOTE,
+            }
+        )
+
+    for rows in (matches, stale_preserved, unguarded_production_guarded, invalid_preserved):
+        rows.sort(key=preserved_contract_row_sort_key)
+
+    guarded_reference_count = len(current_guarded_rows)
+    matched_count = len(matches)
+    unguarded_count = len(unguarded_production_guarded)
+    stale_count = len(stale_preserved)
+    invalid_count = len(invalid_preserved)
+    parity_ok = guarded_reference_count == matched_count + unguarded_count
+    status = "allowed" if parity_ok and not stale_count and not unguarded_count and not invalid_count else "blocking"
+    return {
+        "schema_version": 1,
+        "status": status,
+        "guarded_reference_count": guarded_reference_count,
+        "preserved_cross_boundary_count": len(ownership.preserved_cross_boundary_records),
+        "matched_count": matched_count,
+        "stale_preserved_count": stale_count,
+        "unguarded_production_guarded_count": unguarded_count,
+        "invalid_preserved_count": invalid_count,
+        "count_parity_ok": parity_ok,
+        "matches": matches,
+        "stale_preserved": stale_preserved,
+        "unguarded_production_guarded": unguarded_production_guarded,
+        "invalid_preserved": invalid_preserved,
+    }
+
+
 def assert_preserved_option_id_refs_are_guarded(data: dict[str, Any], ownership: OwnershipScope, guarded_ids: set[str]) -> None:
     choice_ids = production_choice_option_ids(data)
     unguarded = []
@@ -1226,6 +1479,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--as-data-js", action="store_true")
     parser.add_argument("--structured-reference-namespace-report", action="store_true")
     parser.add_argument("--production-guarded-structured-reference-triage", action="store_true")
+    parser.add_argument("--preserved-cross-boundary-contract-report", action="store_true")
     return parser.parse_args()
 
 
@@ -1279,7 +1533,11 @@ def write_or_print_output(output: str, out: str) -> None:
 def main() -> None:
     args = parse_args()
     try:
-        report_mode_count = int(args.structured_reference_namespace_report) + int(args.production_guarded_structured_reference_triage)
+        report_mode_count = (
+            int(args.structured_reference_namespace_report)
+            + int(args.production_guarded_structured_reference_triage)
+            + int(args.preserved_cross_boundary_contract_report)
+        )
         if report_mode_count > 1:
             raise OverlayError("Only one report mode can be requested at a time.")
         if report_mode_count and args.as_data_js:
@@ -1288,6 +1546,8 @@ def main() -> None:
             raise OverlayError("--structured-reference-namespace-report requires --out.")
         if args.production_guarded_structured_reference_triage and not args.out:
             raise OverlayError("--production-guarded-structured-reference-triage requires --out.")
+        if args.preserved_cross_boundary_contract_report and not args.out:
+            raise OverlayError("--preserved-cross-boundary-contract-report requires --out.")
         production = load_production_data(Path(args.production_data))
         fragment = load_fragment(args)
         ownership = load_ownership_scope(Path(args.ownership_manifest))
@@ -1301,9 +1561,26 @@ def main() -> None:
                     namespace_report,
                     preserved_guarded_option_ids(production, ownership, guarded_ids),
                 )
+            if args.preserved_cross_boundary_contract_report:
+                projected_ids = projected_option_ids(production, ownership.owned_rpos)
+                report = preserved_cross_boundary_contract_report(
+                    production,
+                    ownership,
+                    namespace_report,
+                    guarded_ids,
+                    projected_ids,
+                )
             write_or_print_output(format_report_json(report, args.pretty), args.out)
             if namespace_report["unresolved_count"]:
                 raise OverlayError(f"blocking unresolved structured refs: {namespace_report['unresolved_count']}.")
+            if args.preserved_cross_boundary_contract_report and report["status"] == "blocking":
+                raise OverlayError(
+                    "preserved cross-boundary contract blocking findings: "
+                    f"stale={report['stale_preserved_count']}, "
+                    f"unguarded={report['unguarded_production_guarded_count']}, "
+                    f"invalid={report['invalid_preserved_count']}, "
+                    f"count_parity_ok={report['count_parity_ok']}."
+                )
             overlay_shadow_data(production, fragment, ownership)
             return
         shadow = overlay_shadow_data(production, fragment, ownership)
