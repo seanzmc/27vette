@@ -22,12 +22,14 @@ const EXPECTED_OWNED_RPOS = [
   "BC7",
   "BCP",
   "BCS",
+  "CAV",
   "D3V",
   "EDU",
   "ERI",
   "EYK",
   "EYT",
   "R88",
+  "RIA",
   "RIK",
   "RIN",
   "RNX",
@@ -228,8 +230,8 @@ test("projected ownership manifest declares the current multi-slice control scop
   assert.deepEqual(projectedOwnedRpos(rows), EXPECTED_OWNED_RPOS);
   assert.equal(projectedOwnedRpos(rows).includes("PDV"), false);
   assert.equal(projectedOwnedRpos(rows).includes("PEF"), false);
-  assert.equal(projectedOwnedRpos(rows).includes("CAV"), false);
-  assert.equal(projectedOwnedRpos(rows).includes("RIA"), false);
+  assert.equal(projectedOwnedRpos(rows).includes("CAV"), true);
+  assert.equal(projectedOwnedRpos(rows).includes("RIA"), true);
   assert.deepEqual(guardedRows, [
     {
       record_type: "guardedOption",
@@ -280,6 +282,10 @@ test("projected ownership manifest declares the current multi-slice control scop
     { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SHT", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "priceRule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SHT", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "SHT", source_option_id: "", target_rpo: "PDV", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "PEF", source_option_id: "", target_rpo: "CAV", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "priceRule", group_id: "", source_rpo: "PEF", source_option_id: "", target_rpo: "CAV", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "PEF", source_option_id: "", target_rpo: "RIA", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "priceRule", group_id: "", source_rpo: "PEF", source_option_id: "", target_rpo: "RIA", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SFZ", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "priceRule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SFZ", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "EYK", target_option_id: "", ownership: "preserved_cross_boundary" },

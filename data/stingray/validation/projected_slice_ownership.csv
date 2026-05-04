@@ -35,6 +35,8 @@ selectable,,,,,,RWU,projected_owned,LPO Interior standalone accessory projected 
 selectable,,,,,,S2L,projected_owned,LPO Interior standalone accessory projected slice,true
 selectable,,,,,,VYW,projected_owned,LPO Interior standalone accessory projected slice,true
 selectable,,,,,,W2D,projected_owned,LPO Interior standalone accessory projected slice,true
+selectable,,,,,,RIA,projected_owned,Contoured liner member projected slice; PEF package remains production-owned,true
+selectable,,,,,,CAV,projected_owned,Contoured liner member projected slice; PEF package remains production-owned,true
 selectable,,,,,,ERI,projected_owned,Battery Protection standalone mechanical accessory projected slice,true
 selectable,,,,,,SHQ,projected_owned,Fender hash stripe pair projected slice,true
 selectable,,,,,,SHW,projected_owned,Fender hash stripe pair projected slice,true
@@ -62,6 +64,10 @@ priceRule,,PCX,,SNG,,,preserved_cross_boundary,PCX package source remains produc
 rule,,PCX,,SHT,,,preserved_cross_boundary,PCX package source remains production-owned for SHT in Pass 61,true
 priceRule,,PCX,,SHT,,,preserved_cross_boundary,PCX package source remains production-owned for SHT in Pass 61,true
 rule,,SHT,,PDV,,,preserved_cross_boundary,SHT to PDV package exclude remains production-owned in Pass 61,true
+rule,,PEF,,CAV,,,preserved_cross_boundary,PEF package include remains production-owned in Pass 74,true
+priceRule,,PEF,,CAV,,,preserved_cross_boundary,PEF package included-zero priceRule remains production-owned in Pass 74,true
+rule,,PEF,,RIA,,,preserved_cross_boundary,PEF package include remains production-owned in Pass 74,true
+priceRule,,PEF,,RIA,,,preserved_cross_boundary,PEF package included-zero priceRule remains production-owned in Pass 74,true
 rule,,PCX,,SFZ,,,preserved_cross_boundary,PCX package source remains production-owned for SFZ in Pass 63,true
 priceRule,,PCX,,SFZ,,,preserved_cross_boundary,PCX package source remains production-owned for SFZ in Pass 63,true
 rule,,PCX,,EYK,,,preserved_cross_boundary,PCX to required Badges Chrome exclude remains production-owned in Pass 69,true

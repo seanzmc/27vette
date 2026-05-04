@@ -32,6 +32,8 @@ opt_rwu_001,option,RWU,"LPO, Cargo area organizer","Collapsible, Genuine Corvett
 opt_s2l_001,option,S2L,"LPO, Set of premium leather weekend/travel bags",Genuine Corvette Accessory,true,,Standalone LPO Interior accessory choice.
 opt_vyw_001,option,VYW,"LPO, Floor mats","Premium carpeted with car silhouette logo on Stingray, Grand Sport, ZR1 and ZR1X models, Genuine Corvette Accessory",true,,Standalone LPO Interior accessory choice.
 opt_w2d_001,option,W2D,"LPO, Cargo net set",Genuine Corvette Accessory,true,cs_1lt,Standalone LPO Interior accessory choice; current generated data makes W2D 1LT-only.
+opt_ria_001,option,RIA,"LPO, All-weather floor liners with Jake logo",Genuine Corvette Accessory,true,,Contoured liner member choice; PEF package boundary remains production-owned.
+opt_cav_001,option,CAV,"LPO, Contoured cargo area liners with Jake logo",Genuine Corvette Accessory,true,,Contoured liner member choice; PEF package boundary remains production-owned.
 opt_eri_001,option,ERI,Battery Protection Package,,true,,Standalone mechanical accessory choice.
 opt_shq_001,option,SHQ,"LPO, Fender hash stripes","Silver with Carbon Flash Metallic accent, Genuine Corvette Accessory",true,,Isolated fender hash stripe choice.
 opt_shw_001,option,SHW,"LPO, Fender hash stripes","Carbon Flash Metallic with Edge Red accent, Genuine Corvette Accessory",true,,Isolated fender hash stripe choice.
