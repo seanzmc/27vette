@@ -1165,6 +1165,89 @@ def preserved_cross_boundary_manifest_census_report(
     }
 
 
+def manifest_only_preservation_triage_group_sort_key(group: dict[str, Any]) -> tuple[str, str, str]:
+    return (group["group_key"], group["source_ids"][0] if group["source_ids"] else "", group["target_ids"][0] if group["target_ids"] else "")
+
+
+def manifest_only_preservation_triage_report(census_report: dict[str, Any]) -> dict[str, Any]:
+    rows = [
+        {
+            "manifest_row_id": row["manifest_row_id"],
+            "ref_id": row["ref_id"],
+            "pair_key": row["pair_key"],
+            "group_key": row["group_key"],
+            "source_kind": row["source_kind"],
+            "source_id": row["source_id"],
+            "target_kind": row["target_kind"],
+            "target_id": row["target_id"],
+            "manifest_status": row["manifest_status"],
+            "ownership_status": row["ownership_status"],
+            "candidate_status": row["candidate_status"],
+            "notes": row["notes"],
+        }
+        for row in census_report["rows"]
+        if row["candidate_status"] == "manifest_only_preservation"
+    ]
+
+    grouped: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        group = grouped.setdefault(
+            row["group_key"],
+            {
+                "group_key": row["group_key"],
+                "pair_key": row["pair_key"] if row["ref_id"] is None else "",
+                "ref_id": row["ref_id"],
+                "manifest_only_preservation_row_count": 0,
+                "manifest_only_preservation_record_count": 0,
+                "source_kinds": set(),
+                "source_ids": set(),
+                "target_kinds": set(),
+                "target_ids": set(),
+                "ownership_statuses": set(),
+                "candidate_status": "manifest_only_preservation",
+                "notes": "Active preserved_cross_boundary rows that are valid but not current production_guarded structured-reference dependencies.",
+            },
+        )
+        group["manifest_only_preservation_row_count"] += 1
+        group["manifest_only_preservation_record_count"] += 1
+        group["source_kinds"].add(row["source_kind"])
+        group["source_ids"].add(row["source_id"])
+        group["target_kinds"].add(row["target_kind"])
+        group["target_ids"].add(row["target_id"])
+        group["ownership_statuses"].add(row["ownership_status"])
+
+    groups = []
+    for group in grouped.values():
+        groups.append(
+            {
+                "group_key": group["group_key"],
+                "pair_key": group["pair_key"],
+                "ref_id": group["ref_id"],
+                "manifest_only_preservation_row_count": group["manifest_only_preservation_row_count"],
+                "manifest_only_preservation_record_count": group["manifest_only_preservation_record_count"],
+                "source_kinds": sorted(group["source_kinds"]),
+                "source_ids": sorted(group["source_ids"]),
+                "target_kinds": sorted(group["target_kinds"]),
+                "target_ids": sorted(group["target_ids"]),
+                "ownership_statuses": sorted(group["ownership_statuses"]),
+                "candidate_status": group["candidate_status"],
+                "notes": group["notes"],
+            }
+        )
+    groups.sort(key=manifest_only_preservation_triage_group_sort_key)
+
+    invalid_preserved_count = census_report["invalid_preserved_count"]
+    return {
+        "schema_version": 1,
+        "status": "blocking" if invalid_preserved_count else "allowed",
+        "manifest_only_preservation_row_count": len(rows),
+        "manifest_only_preservation_record_count": len(rows),
+        "invalid_preserved_count": invalid_preserved_count,
+        "groups": groups,
+        "rows": rows,
+    }
+
+
 def assert_preserved_option_id_refs_are_guarded(data: dict[str, Any], ownership: OwnershipScope, guarded_ids: set[str]) -> None:
     choice_ids = production_choice_option_ids(data)
     unguarded = []
@@ -1702,6 +1785,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--production-guarded-structured-reference-triage", action="store_true")
     parser.add_argument("--preserved-cross-boundary-contract-report", action="store_true")
     parser.add_argument("--preserved-cross-boundary-manifest-census", action="store_true")
+    parser.add_argument("--manifest-only-preservation-triage", action="store_true")
     return parser.parse_args()
 
 
@@ -1760,6 +1844,7 @@ def main() -> None:
             + int(args.production_guarded_structured_reference_triage)
             + int(args.preserved_cross_boundary_contract_report)
             + int(args.preserved_cross_boundary_manifest_census)
+            + int(args.manifest_only_preservation_triage)
         )
         if report_mode_count > 1:
             raise OverlayError("Only one report mode can be requested at a time.")
@@ -1773,6 +1858,8 @@ def main() -> None:
             raise OverlayError("--preserved-cross-boundary-contract-report requires --out.")
         if args.preserved_cross_boundary_manifest_census and not args.out:
             raise OverlayError("--preserved-cross-boundary-manifest-census requires --out.")
+        if args.manifest_only_preservation_triage and not args.out:
+            raise OverlayError("--manifest-only-preservation-triage requires --out.")
         production = load_production_data(Path(args.production_data))
         fragment = load_fragment(args)
         ownership = load_ownership_scope(Path(args.ownership_manifest))
@@ -1804,6 +1891,16 @@ def main() -> None:
                     guarded_ids,
                     projected_ids,
                 )
+            if args.manifest_only_preservation_triage:
+                projected_ids = projected_option_ids(production, ownership.owned_rpos)
+                census_report = preserved_cross_boundary_manifest_census_report(
+                    production,
+                    ownership,
+                    namespace_report,
+                    guarded_ids,
+                    projected_ids,
+                )
+                report = manifest_only_preservation_triage_report(census_report)
             write_or_print_output(format_report_json(report, args.pretty), args.out)
             if namespace_report["unresolved_count"]:
                 raise OverlayError(f"blocking unresolved structured refs: {namespace_report['unresolved_count']}.")
@@ -1818,6 +1915,11 @@ def main() -> None:
             if args.preserved_cross_boundary_manifest_census and report["status"] == "blocking":
                 raise OverlayError(
                     "preserved cross-boundary manifest census blocking findings: "
+                    f"invalid={report['invalid_preserved_count']}."
+                )
+            if args.manifest_only_preservation_triage and report["status"] == "blocking":
+                raise OverlayError(
+                    "manifest-only preservation triage blocking findings: "
                     f"invalid={report['invalid_preserved_count']}."
                 )
             overlay_shadow_data(production, fragment, ownership)
