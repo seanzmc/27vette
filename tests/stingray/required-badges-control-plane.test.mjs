@@ -10,6 +10,7 @@ import { createRuntime, loadGeneratedData, loadShadowData } from "./runtime-harn
 const PYTHON = ".venv/bin/python";
 const OVERLAY_SCRIPT = "scripts/stingray_csv_shadow_overlay.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
+const GUARDED_NON_CHOICE_OPTION_IDS = new Set(["opt_5vm_001", "opt_5w8_001", "opt_5zw_001", "opt_cf8_001", "opt_ryq_001"]);
 const EYK_INBOUND_EXCLUDES = [
   ["PCX", "EYK"],
   ["R88", "EYK"],
@@ -181,6 +182,14 @@ function eytProjectionManifestRows() {
       reason: "Required Badges duplicate-RPO fixture.",
       active: "true",
     },
+    ...activeManifestRows().filter(
+      (row) =>
+        (row.record_type === "guardedOption" &&
+          row.ownership === "production_guarded" &&
+          GUARDED_NON_CHOICE_OPTION_IDS.has(row.target_option_id)) ||
+        (row.ownership === "preserved_cross_boundary" &&
+          (GUARDED_NON_CHOICE_OPTION_IDS.has(row.source_option_id) || GUARDED_NON_CHOICE_OPTION_IDS.has(row.target_option_id)))
+    ),
   ];
 }
 

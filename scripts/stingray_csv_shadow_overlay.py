@@ -391,6 +391,39 @@ def production_choice_option_ids(data: dict[str, Any]) -> set[str]:
     return {row["option_id"] for row in data.get("choices", []) if row.get("option_id")}
 
 
+def production_interior_ids(data: dict[str, Any]) -> set[str]:
+    return {row["interior_id"] for row in data.get("interiors", []) if row.get("interior_id")}
+
+
+def structured_record_refs(data: dict[str, Any]) -> list[dict[str, str]]:
+    refs: list[dict[str, str]] = []
+    for row in data.get("rules", []):
+        if row.get("source_id"):
+            refs.append({"surface": "rules", "field": "source_id", "id": row["source_id"]})
+        if row.get("target_id"):
+            refs.append({"surface": "rules", "field": "target_id", "id": row["target_id"]})
+    for row in data.get("priceRules", []):
+        if row.get("condition_option_id"):
+            refs.append({"surface": "priceRules", "field": "condition_option_id", "id": row["condition_option_id"]})
+        if row.get("target_option_id"):
+            refs.append({"surface": "priceRules", "field": "target_option_id", "id": row["target_option_id"]})
+    for row in data.get("ruleGroups", []):
+        if row.get("source_id"):
+            refs.append({"surface": "ruleGroups", "field": "source_id", "id": row["source_id"]})
+        refs.extend(
+            {"surface": "ruleGroups", "field": "target_ids", "id": target_id}
+            for target_id in row.get("target_ids", [])
+            if target_id
+        )
+    for row in data.get("exclusiveGroups", []):
+        refs.extend(
+            {"surface": "exclusiveGroups", "field": "option_ids", "id": option_id}
+            for option_id in row.get("option_ids", [])
+            if option_id
+        )
+    return refs
+
+
 def option_id_by_manifest_ref(data: dict[str, Any], rpo: str, option_id: str) -> str:
     if option_id:
         if option_id not in production_option_ids(data):
@@ -420,6 +453,34 @@ def guarded_option_ids(data: dict[str, Any], ownership: OwnershipScope) -> set[s
     for rpo, option_id in ownership.guarded_option_refs:
         ids.add(option_id_by_manifest_ref(data, rpo, option_id))
     return ids
+
+
+def assert_guarded_option_refs_are_not_interiors(data: dict[str, Any], ownership: OwnershipScope) -> None:
+    interior_ids = production_interior_ids(data)
+    invalid = [
+        {"rpo": rpo, "option_id": option_id}
+        for rpo, option_id in sorted(ownership.guarded_option_refs)
+        if rpo in interior_ids or option_id in interior_ids
+    ]
+    if invalid:
+        raise OverlayError(f"interior source ids cannot be production_guarded option refs: {invalid[:5]}.")
+
+
+def assert_structured_refs_have_known_namespace(data: dict[str, Any], guarded_ids: set[str]) -> None:
+    valid_ids = production_choice_option_ids(data) | production_interior_ids(data) | guarded_ids
+    unknown = []
+    seen: set[tuple[str, str, str]] = set()
+    for ref in structured_record_refs(data):
+        ref_id = ref["id"]
+        if ref_id in valid_ids:
+            continue
+        key = (ref["surface"], ref["field"], ref_id)
+        if key in seen:
+            continue
+        seen.add(key)
+        unknown.append(ref)
+    if unknown:
+        raise OverlayError(f"unknown structured non-choice refs: {unknown[:5]}.")
 
 
 def assert_preserved_option_id_refs_are_guarded(data: dict[str, Any], ownership: OwnershipScope, guarded_ids: set[str]) -> None:
@@ -738,8 +799,10 @@ def overlay_shadow_data(production: dict[str, Any], fragment: dict[str, Any], ow
     if production_ids != fragment_ids:
         raise OverlayError(f"Fragment legacy option IDs do not match production: {sorted(production_ids)} != {sorted(fragment_ids)}.")
     preserved_keys_by_surface = preserved_record_id_keys(production, ownership)
+    assert_guarded_option_refs_are_not_interiors(production, ownership)
     guarded_ids = guarded_option_ids(production, ownership)
     assert_preserved_option_id_refs_are_guarded(production, ownership, guarded_ids)
+    assert_structured_refs_have_known_namespace(production, guarded_ids)
     assert_preserved_records_exist(production, ownership, preserved_keys_by_surface)
     assert_projected_groups_exist(fragment, ownership)
     assert_projected_rule_group_ownership(fragment, ownership, fragment_ids)
