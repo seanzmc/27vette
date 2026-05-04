@@ -396,6 +396,8 @@ const VALIDATION_REPORT_FORBIDDEN_KEYS = [
   "apply",
   "patch",
   "manifest_update",
+  "cleanup",
+  "future_candidate",
 ];
 
 const PACKET_TOP_LEVEL_KEYS = [
@@ -822,6 +824,30 @@ function assertValidationSummarySchema(summary) {
     }));
   }
   assertNoValidationAdviceFields(summary);
+}
+
+function assertValidationSummaryParity(summary, validationReport) {
+  assert.equal(summary.status, validationReport.status);
+  assert.equal(summary.ledger_row_count, validationReport.ledger_row_count);
+  assert.equal(summary.current_group_count, validationReport.current_group_count);
+  assert.equal(summary.matched_group_count, validationReport.matched_group_count);
+  assert.deepEqual(summary.error_counts, {
+    missing_group_count: validationReport.missing_group_count,
+    unknown_group_count: validationReport.unknown_group_count,
+    duplicate_group_count: validationReport.duplicate_group_count,
+    schema_error_count: validationReport.schema_error_count,
+    review_value_error_count: validationReport.review_value_error_count,
+  });
+  assert.deepEqual(summary.review_field_counts, expectedValidationSummary(validationReport).review_field_counts);
+  for (const field of DECISION_LEDGER_VALIDATION_SUMMARY_REVIEW_FIELDS) {
+    assert.equal(
+      Object.values(summary.review_field_counts[field]).reduce((total, count) => total + count, 0),
+      validationReport.groups.length,
+      field
+    );
+    const hasBlank = validationReport.groups.some((group) => (group[field] ?? "") === "");
+    assert.equal(Object.hasOwn(summary.review_field_counts[field], ""), hasBlank, field);
+  }
 }
 
 function expectedDecisionLedgerRows(report) {
@@ -1419,6 +1445,7 @@ test("manifest-only preservation writes a compact decision ledger validation sum
   assertValidationReportSchema(validation.validationReport);
   assertValidationSummarySchema(validation.summary);
   assert.deepEqual(validation.summary, expectedValidationSummary(validation.validationReport));
+  assertValidationSummaryParity(validation.summary, validation.validationReport);
   assert.equal(validation.summary.status, "allowed");
   assert.deepEqual(validation.summary.error_counts, {
     missing_group_count: 0,
@@ -1447,6 +1474,7 @@ test("manifest-only preservation writes a compact decision ledger validation sum
   assertValidationReportSchema(blocking.validationReport);
   assertValidationSummarySchema(blocking.summary);
   assert.deepEqual(blocking.summary, expectedValidationSummary(blocking.validationReport));
+  assertValidationSummaryParity(blocking.summary, blocking.validationReport);
   assert.equal(blocking.summary.status, "blocking");
   assert.equal(blocking.summary.error_counts.review_value_error_count, 1);
 });
