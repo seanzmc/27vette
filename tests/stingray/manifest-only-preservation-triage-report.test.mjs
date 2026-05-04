@@ -1078,6 +1078,34 @@ test("manifest-only preservation triage writes a blank decision ledger template"
   assert.equal(ledgerOnlyRows.length, 78);
 });
 
+test("manifest-only preservation full review bundle command writes the canonical outputs", () => {
+  const bundle = runManifestOnlyTriageWithDecisionLedger();
+  assert.equal(bundle.result.status, 0, bundle.result.stderr);
+  assert.ok(fs.existsSync(bundle.out));
+  assert.ok(fs.existsSync(bundle.csvOut));
+  assert.ok(fs.existsSync(bundle.packetOut));
+  assert.ok(fs.existsSync(bundle.ledgerOut));
+
+  assert.equal(bundle.report.status, "allowed");
+  assert.equal(bundle.report.manifest_only_preservation_row_count, 83);
+  assert.equal(bundle.report.group_count, 78);
+  assert.equal(bundle.report.invalid_preserved_count, 0);
+
+  const [directionHeader, ...directionDataRows] = parseCsv(bundle.csv);
+  assert.deepEqual(directionHeader, DIRECTION_SLICE_ROW_FIELDS);
+  assert.equal(directionDataRows.length, bundle.report.direction_slice_rows.length);
+  assert.equal(directionDataRows.length, 83);
+
+  assertPacketSchema(bundle.packet);
+  assert.equal(bundle.packet.status, "allowed");
+  assert.equal(bundle.packet.csv.written, true);
+
+  const [ledgerHeader, ...ledgerDataRows] = parseCsv(bundle.ledger);
+  assert.deepEqual(ledgerHeader, DECISION_LEDGER_FIELDS);
+  assert.equal(ledgerDataRows.length, bundle.report.groups.length);
+  assert.equal(ledgerDataRows.length, 78);
+});
+
 test("manifest-only preservation triage rejects data-js mode and leaves default overlay output alone", () => {
   const out = tempPath("manifest-only-triage-data-js.json");
   const csvOut = tempPath("manifest-only-triage-data-js.csv");
