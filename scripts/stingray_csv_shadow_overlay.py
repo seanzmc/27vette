@@ -29,6 +29,8 @@ STRUCTURED_REF_NAMESPACE_ORDER = {
 UNRESOLVED_STRUCTURED_REF_NOTE = (
     "Structured reference does not resolve to an active choice, production_guarded option, or interior source."
 )
+PRODUCTION_GUARDED_PRESERVED_NOTE = "Production-guarded structured reference has active preserved_cross_boundary manifest evidence."
+PRODUCTION_GUARDED_REVIEW_NOTE = "Production-guarded structured reference needs review before any migration decision."
 
 
 class OverlayError(ValueError):
@@ -583,6 +585,112 @@ def structured_reference_namespace_report(data: dict[str, Any], guarded_ids: set
     }
 
 
+def preserved_guarded_option_ids(data: dict[str, Any], ownership: OwnershipScope, guarded_ids: set[str]) -> set[str]:
+    preserved_ids: set[str] = set()
+    for _record_type, source_rpo, source_option_id, target_rpo, target_option_id in ownership.preserved_cross_boundary_records:
+        for option_id in (
+            option_id_by_manifest_ref(data, source_rpo, source_option_id),
+            option_id_by_manifest_ref(data, target_rpo, target_option_id),
+        ):
+            if option_id in guarded_ids:
+                preserved_ids.add(option_id)
+    return preserved_ids
+
+
+def production_guarded_candidate_status(ref_id: str, preserved_guarded_ids: set[str]) -> str:
+    if ref_id in preserved_guarded_ids:
+        return "cross_boundary_preserved"
+    return "review_required"
+
+
+def production_guarded_candidate_notes(candidate_status: str) -> str:
+    if candidate_status == "cross_boundary_preserved":
+        return PRODUCTION_GUARDED_PRESERVED_NOTE
+    return PRODUCTION_GUARDED_REVIEW_NOTE
+
+
+def production_guarded_triage_reference_sort_key(row: dict[str, str]) -> tuple[str, str, str, str, str, str]:
+    return (
+        row["ref_id"],
+        row["source_kind"],
+        row["source_id"],
+        row["reference_kind"],
+        row["reference_path"],
+        row["field"],
+    )
+
+
+def production_guarded_structured_reference_triage_report(
+    namespace_report: dict[str, Any],
+    preserved_guarded_ids: set[str],
+) -> dict[str, Any]:
+    references = []
+    for row in namespace_report["references"]:
+        if row["namespace"] != "production_guarded":
+            continue
+        candidate_status = production_guarded_candidate_status(row["ref_id"], preserved_guarded_ids)
+        references.append(
+            {
+                "ref_id": row["ref_id"],
+                "namespace": row["namespace"],
+                "source_kind": row["source_kind"],
+                "source_id": row["source_id"],
+                "reference_kind": row["reference_kind"],
+                "reference_path": row["reference_path"],
+                "field": row["field"],
+                "status": row["status"],
+                "candidate_status": candidate_status,
+                "notes": production_guarded_candidate_notes(candidate_status),
+            }
+        )
+    references.sort(key=production_guarded_triage_reference_sort_key)
+
+    grouped: dict[str, dict[str, Any]] = {}
+    for row in references:
+        group = grouped.setdefault(
+            row["ref_id"],
+            {
+                "guarded_ref_id": row["ref_id"],
+                "referenced_by_count": 0,
+                "source_kinds": set(),
+                "source_ids": set(),
+                "reference_kinds": set(),
+                "reference_paths": set(),
+                "candidate_statuses": set(),
+            },
+        )
+        group["referenced_by_count"] += 1
+        group["source_kinds"].add(row["source_kind"])
+        group["source_ids"].add(row["source_id"])
+        group["reference_kinds"].add(row["reference_kind"])
+        group["reference_paths"].add(row["reference_path"])
+        group["candidate_statuses"].add(row["candidate_status"])
+
+    groups = []
+    for group in grouped.values():
+        candidate_statuses = group.pop("candidate_statuses")
+        groups.append(
+            {
+                "guarded_ref_id": group["guarded_ref_id"],
+                "referenced_by_count": group["referenced_by_count"],
+                "source_kinds": sorted(group["source_kinds"]),
+                "source_ids": sorted(group["source_ids"]),
+                "reference_kinds": sorted(group["reference_kinds"]),
+                "reference_paths": sorted(group["reference_paths"]),
+                "candidate_status": "cross_boundary_preserved" if candidate_statuses == {"cross_boundary_preserved"} else "review_required",
+            }
+        )
+    groups.sort(key=lambda group: group["guarded_ref_id"])
+
+    return {
+        "schema_version": 1,
+        "status": "allowed",
+        "production_guarded_count": len(references),
+        "groups": groups,
+        "references": references,
+    }
+
+
 def assert_preserved_option_id_refs_are_guarded(data: dict[str, Any], ownership: OwnershipScope, guarded_ids: set[str]) -> None:
     choice_ids = production_choice_option_ids(data)
     unguarded = []
@@ -1117,6 +1225,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--pretty", action="store_true")
     parser.add_argument("--as-data-js", action="store_true")
     parser.add_argument("--structured-reference-namespace-report", action="store_true")
+    parser.add_argument("--production-guarded-structured-reference-triage", action="store_true")
     return parser.parse_args()
 
 
@@ -1170,20 +1279,31 @@ def write_or_print_output(output: str, out: str) -> None:
 def main() -> None:
     args = parse_args()
     try:
-        if args.structured_reference_namespace_report and args.as_data_js:
-            raise OverlayError("--structured-reference-namespace-report cannot be combined with --as-data-js.")
+        report_mode_count = int(args.structured_reference_namespace_report) + int(args.production_guarded_structured_reference_triage)
+        if report_mode_count > 1:
+            raise OverlayError("Only one report mode can be requested at a time.")
+        if report_mode_count and args.as_data_js:
+            raise OverlayError("report modes cannot be combined with --as-data-js.")
         if args.structured_reference_namespace_report and not args.out:
             raise OverlayError("--structured-reference-namespace-report requires --out.")
+        if args.production_guarded_structured_reference_triage and not args.out:
+            raise OverlayError("--production-guarded-structured-reference-triage requires --out.")
         production = load_production_data(Path(args.production_data))
         fragment = load_fragment(args)
         ownership = load_ownership_scope(Path(args.ownership_manifest))
-        if args.structured_reference_namespace_report:
+        if report_mode_count:
             assert_guarded_option_refs_are_not_interiors(production, ownership)
             guarded_ids = guarded_option_ids(production, ownership)
-            report = structured_reference_namespace_report(production, guarded_ids)
+            namespace_report = structured_reference_namespace_report(production, guarded_ids)
+            report = namespace_report
+            if args.production_guarded_structured_reference_triage:
+                report = production_guarded_structured_reference_triage_report(
+                    namespace_report,
+                    preserved_guarded_option_ids(production, ownership, guarded_ids),
+                )
             write_or_print_output(format_report_json(report, args.pretty), args.out)
-            if report["unresolved_count"]:
-                raise OverlayError(f"blocking unresolved structured refs: {report['unresolved_count']}.")
+            if namespace_report["unresolved_count"]:
+                raise OverlayError(f"blocking unresolved structured refs: {namespace_report['unresolved_count']}.")
             overlay_shadow_data(production, fragment, ownership)
             return
         shadow = overlay_shadow_data(production, fragment, ownership)
