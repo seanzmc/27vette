@@ -1169,7 +1169,78 @@ def manifest_only_preservation_triage_group_sort_key(group: dict[str, Any]) -> t
     return (group["group_key"], group["source_ids"][0] if group["source_ids"] else "", group["target_ids"][0] if group["target_ids"] else "")
 
 
-def manifest_only_preservation_triage_report(census_report: dict[str, Any]) -> dict[str, Any]:
+def sorted_nonempty_values(values: list[Any]) -> list[str]:
+    return sorted({str(value) for value in values if value not in {None, ""}})
+
+
+def first_or_none(values: list[str]) -> str | None:
+    return values[0] if values else None
+
+
+def manifest_only_side_ownership_status(namespace: str) -> str:
+    if namespace == "active_projected_owned_choice":
+        return "projected_owned"
+    if namespace == "active_choice":
+        return "production_owned"
+    if namespace == "production_guarded":
+        return "production_guarded"
+    if namespace == "interior_source":
+        return "interior_source"
+    return "unknown"
+
+
+def manifest_only_side_projection_status(namespace: str) -> str:
+    if namespace == "active_projected_owned_choice":
+        return "projected_owned"
+    return "not_projected"
+
+
+def manifest_only_option_detail_lookup(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    existing_option_ids = production_option_ids(data)
+    choices_by_option_id: dict[str, list[dict[str, Any]]] = {}
+    for row in sorted(
+        data.get("choices", []),
+        key=lambda item: (int(item.get("display_order") or 0), item.get("choice_id", ""), item.get("option_id", "")),
+    ):
+        option_id = row.get("option_id", "")
+        if option_id:
+            choices_by_option_id.setdefault(option_id, []).append(row)
+
+    details: dict[str, dict[str, Any]] = {}
+    for option_id in sorted(existing_option_ids | set(choices_by_option_id)):
+        choice_rows = choices_by_option_id.get(option_id, [])
+        details[option_id] = {
+            "label": first_or_none(sorted_nonempty_values([row.get("label") for row in choice_rows])),
+            "category": first_or_none(sorted_nonempty_values([row.get("category_name") for row in choice_rows])),
+            "section": first_or_none(sorted_nonempty_values([row.get("section_name") for row in choice_rows])),
+            "exists": option_id in existing_option_ids,
+        }
+    return details
+
+
+def manifest_only_enriched_side_fields(
+    prefix: str,
+    option_id: str,
+    namespace: str,
+    detail_lookup: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    detail = detail_lookup.get(option_id, {"label": None, "category": None, "section": None, "exists": False})
+    return {
+        f"{prefix}_label": detail["label"],
+        f"{prefix}_category": detail["category"],
+        f"{prefix}_section": detail["section"],
+        f"{prefix}_ownership_status": manifest_only_side_ownership_status(namespace),
+        f"{prefix}_projection_status": manifest_only_side_projection_status(namespace),
+        f"{prefix}_exists": bool(detail["exists"]),
+    }
+
+
+def sorted_group_values(group: dict[str, set[str]]) -> dict[str, list[str]]:
+    return {key: sorted(values) for key, values in group.items()}
+
+
+def manifest_only_preservation_triage_report(census_report: dict[str, Any], data: dict[str, Any]) -> dict[str, Any]:
+    detail_lookup = manifest_only_option_detail_lookup(data)
     rows = [
         {
             "manifest_row_id": row["manifest_row_id"],
@@ -1184,6 +1255,8 @@ def manifest_only_preservation_triage_report(census_report: dict[str, Any]) -> d
             "ownership_status": row["ownership_status"],
             "candidate_status": row["candidate_status"],
             "notes": row["notes"],
+            **manifest_only_enriched_side_fields("source", row["source_id"], row["source_kind"], detail_lookup),
+            **manifest_only_enriched_side_fields("target", row["target_id"], row["target_kind"], detail_lookup),
         }
         for row in census_report["rows"]
         if row["candidate_status"] == "manifest_only_preservation"
@@ -1206,6 +1279,16 @@ def manifest_only_preservation_triage_report(census_report: dict[str, Any]) -> d
                 "ownership_statuses": set(),
                 "candidate_status": "manifest_only_preservation",
                 "notes": "Active preserved_cross_boundary rows that are valid but not current production_guarded structured-reference dependencies.",
+                "source_labels": set(),
+                "target_labels": set(),
+                "source_categories": set(),
+                "target_categories": set(),
+                "source_sections": set(),
+                "target_sections": set(),
+                "source_ownership_statuses": set(),
+                "target_ownership_statuses": set(),
+                "source_projection_statuses": set(),
+                "target_projection_statuses": set(),
             },
         )
         group["manifest_only_preservation_row_count"] += 1
@@ -1215,6 +1298,22 @@ def manifest_only_preservation_triage_report(census_report: dict[str, Any]) -> d
         group["target_kinds"].add(row["target_kind"])
         group["target_ids"].add(row["target_id"])
         group["ownership_statuses"].add(row["ownership_status"])
+        aggregate_fields = {
+            "source_label": "source_labels",
+            "target_label": "target_labels",
+            "source_category": "source_categories",
+            "target_category": "target_categories",
+            "source_section": "source_sections",
+            "target_section": "target_sections",
+            "source_ownership_status": "source_ownership_statuses",
+            "target_ownership_status": "target_ownership_statuses",
+            "source_projection_status": "source_projection_statuses",
+            "target_projection_status": "target_projection_statuses",
+        }
+        for field, aggregate_field in aggregate_fields.items():
+            value = row[field]
+            if value is not None:
+                group[aggregate_field].add(value)
 
     groups = []
     for group in grouped.values():
@@ -1232,6 +1331,20 @@ def manifest_only_preservation_triage_report(census_report: dict[str, Any]) -> d
                 "ownership_statuses": sorted(group["ownership_statuses"]),
                 "candidate_status": group["candidate_status"],
                 "notes": group["notes"],
+                **sorted_group_values(
+                    {
+                        "source_labels": group["source_labels"],
+                        "target_labels": group["target_labels"],
+                        "source_categories": group["source_categories"],
+                        "target_categories": group["target_categories"],
+                        "source_sections": group["source_sections"],
+                        "target_sections": group["target_sections"],
+                        "source_ownership_statuses": group["source_ownership_statuses"],
+                        "target_ownership_statuses": group["target_ownership_statuses"],
+                        "source_projection_statuses": group["source_projection_statuses"],
+                        "target_projection_statuses": group["target_projection_statuses"],
+                    }
+                ),
             }
         )
     groups.sort(key=manifest_only_preservation_triage_group_sort_key)
@@ -1254,6 +1367,16 @@ def manifest_only_preservation_triage_report(census_report: dict[str, Any]) -> d
             "manifest_row_ids": sorted(row["manifest_row_id"] for row in rows if row["group_key"] == group["group_key"]),
             "candidate_status": group["candidate_status"],
             "notes": group["notes"],
+            "source_labels": group["source_labels"],
+            "target_labels": group["target_labels"],
+            "source_categories": group["source_categories"],
+            "target_categories": group["target_categories"],
+            "source_sections": group["source_sections"],
+            "target_sections": group["target_sections"],
+            "source_ownership_statuses": group["source_ownership_statuses"],
+            "target_ownership_statuses": group["target_ownership_statuses"],
+            "source_projection_statuses": group["source_projection_statuses"],
+            "target_projection_statuses": group["target_projection_statuses"],
         }
         for group in groups
         if group["manifest_only_preservation_row_count"] > 1
@@ -1929,7 +2052,7 @@ def main() -> None:
                     guarded_ids,
                     projected_ids,
                 )
-                report = manifest_only_preservation_triage_report(census_report)
+                report = manifest_only_preservation_triage_report(census_report, production)
             write_or_print_output(format_report_json(report, args.pretty), args.out)
             if namespace_report["unresolved_count"]:
                 raise OverlayError(f"blocking unresolved structured refs: {namespace_report['unresolved_count']}.")

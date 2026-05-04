@@ -66,6 +66,34 @@ function compareGroups(left, right) {
   return 0;
 }
 
+const ROW_DETAIL_FIELDS = [
+  "source_label",
+  "target_label",
+  "source_category",
+  "target_category",
+  "source_section",
+  "target_section",
+  "source_ownership_status",
+  "target_ownership_status",
+  "source_projection_status",
+  "target_projection_status",
+  "source_exists",
+  "target_exists",
+];
+
+const GROUP_DETAIL_FIELDS = [
+  "source_labels",
+  "target_labels",
+  "source_categories",
+  "target_categories",
+  "source_sections",
+  "target_sections",
+  "source_ownership_statuses",
+  "target_ownership_statuses",
+  "source_projection_statuses",
+  "target_projection_statuses",
+];
+
 function publicTriageRow(row) {
   return {
     manifest_row_id: row.manifest_row_id,
@@ -104,7 +132,7 @@ test("manifest-only preservation triage reports exactly the census manifest-only
   const expectedRows = census.report.rows
     .filter((row) => row.candidate_status === "manifest_only_preservation")
     .map(publicTriageRow);
-  assert.deepEqual(triage.report.rows, expectedRows);
+  assert.deepEqual(triage.report.rows.map(publicTriageRow), expectedRows);
   assert.deepEqual(triage.report.rows, [...triage.report.rows].sort(compareRows));
   assert.deepEqual(triage.report.groups, [...triage.report.groups].sort(compareGroups));
 
@@ -113,6 +141,12 @@ test("manifest-only preservation triage reports exactly the census manifest-only
   assert.equal(triage.report.rows.some((row) => row.candidate_status === "invalid_preserved"), false);
   assert.equal(triage.report.rows.some((row) => row.ref_id?.startsWith("3LT_")), false);
   assert.equal(triage.report.rows.some((row) => row.source_kind === "unknown" || row.target_kind === "unknown"), false);
+  assert.equal(
+    triage.report.rows.every((row) => ROW_DETAIL_FIELDS.every((field) => Object.hasOwn(row, field))),
+    true
+  );
+  assert.equal(triage.report.rows.every((row) => typeof row.source_exists === "boolean"), true);
+  assert.equal(triage.report.rows.every((row) => typeof row.target_exists === "boolean"), true);
 
   const rowGroupKeys = new Set(triage.report.rows.map((row) => row.group_key));
   assert.equal(triage.report.groups.length, rowGroupKeys.size);
@@ -125,6 +159,18 @@ test("manifest-only preservation triage reports exactly the census manifest-only
     triage.report.manifest_only_preservation_record_count
   );
   assert.equal(triage.report.groups.every((group) => group.candidate_status === "manifest_only_preservation"), true);
+  assert.equal(
+    triage.report.groups.every((group) => GROUP_DETAIL_FIELDS.every((field) => Object.hasOwn(group, field))),
+    true
+  );
+  assert.equal(
+    triage.report.groups.every((group) => GROUP_DETAIL_FIELDS.every((field) => Array.isArray(group[field]))),
+    true
+  );
+  assert.equal(
+    triage.report.groups.every((group) => GROUP_DETAIL_FIELDS.every((field) => group[field].every((value) => value !== null))),
+    true
+  );
 
   const groupRowCounts = triage.report.groups.map((group) => group.manifest_only_preservation_row_count);
   const distribution = groupRowCounts.reduce((counts, rowCount) => {
@@ -164,6 +210,10 @@ test("manifest-only preservation triage reports exactly the census manifest-only
   );
   assert.equal(triage.report.multi_row_groups.every((group) => group.candidate_status === "manifest_only_preservation"), true);
   assert.equal(triage.report.multi_row_groups.every((group) => !/stale|cleanup|migration/i.test(group.notes)), true);
+  assert.equal(
+    triage.report.multi_row_groups.every((group) => GROUP_DETAIL_FIELDS.every((field) => Object.hasOwn(group, field))),
+    true
+  );
 });
 
 test("manifest-only preservation triage rejects data-js mode and leaves default overlay output alone", () => {
