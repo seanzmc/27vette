@@ -1235,6 +1235,29 @@ def manifest_only_preservation_triage_report(census_report: dict[str, Any]) -> d
             }
         )
     groups.sort(key=manifest_only_preservation_triage_group_sort_key)
+    group_row_counts = [group["manifest_only_preservation_row_count"] for group in groups]
+    group_row_count_distribution: dict[str, int] = {}
+    for row_count in group_row_counts:
+        key = str(row_count)
+        group_row_count_distribution[key] = group_row_count_distribution.get(key, 0) + 1
+    multi_row_groups = [
+        {
+            "group_key": group["group_key"],
+            "ref_id": group["ref_id"],
+            "pair_key": group["pair_key"],
+            "manifest_only_preservation_row_count": group["manifest_only_preservation_row_count"],
+            "manifest_only_preservation_record_count": group["manifest_only_preservation_record_count"],
+            "source_kinds": group["source_kinds"],
+            "source_ids": group["source_ids"],
+            "target_kinds": group["target_kinds"],
+            "target_ids": group["target_ids"],
+            "manifest_row_ids": sorted(row["manifest_row_id"] for row in rows if row["group_key"] == group["group_key"]),
+            "candidate_status": group["candidate_status"],
+            "notes": group["notes"],
+        }
+        for group in groups
+        if group["manifest_only_preservation_row_count"] > 1
+    ]
 
     invalid_preserved_count = census_report["invalid_preserved_count"]
     return {
@@ -1243,6 +1266,12 @@ def manifest_only_preservation_triage_report(census_report: dict[str, Any]) -> d
         "manifest_only_preservation_row_count": len(rows),
         "manifest_only_preservation_record_count": len(rows),
         "invalid_preserved_count": invalid_preserved_count,
+        "group_count": len(groups),
+        "single_row_group_count": sum(1 for row_count in group_row_counts if row_count == 1),
+        "multi_row_group_count": len(multi_row_groups),
+        "max_group_row_count": max(group_row_counts) if group_row_counts else 0,
+        "group_row_count_distribution": group_row_count_distribution,
+        "multi_row_groups": multi_row_groups,
         "groups": groups,
         "rows": rows,
     }

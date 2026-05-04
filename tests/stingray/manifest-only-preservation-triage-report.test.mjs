@@ -95,6 +95,11 @@ test("manifest-only preservation triage reports exactly the census manifest-only
   assert.equal(triage.report.manifest_only_preservation_record_count, 83);
   assert.equal(triage.report.invalid_preserved_count, 0);
   assert.equal(triage.report.rows.length, triage.report.manifest_only_preservation_row_count);
+  assert.equal(triage.report.group_count, 78);
+  assert.equal(triage.report.single_row_group_count, 73);
+  assert.equal(triage.report.multi_row_group_count, 5);
+  assert.equal(triage.report.max_group_row_count, 2);
+  assert.deepEqual(triage.report.group_row_count_distribution, { "1": 73, "2": 5 });
 
   const expectedRows = census.report.rows
     .filter((row) => row.candidate_status === "manifest_only_preservation")
@@ -120,6 +125,45 @@ test("manifest-only preservation triage reports exactly the census manifest-only
     triage.report.manifest_only_preservation_record_count
   );
   assert.equal(triage.report.groups.every((group) => group.candidate_status === "manifest_only_preservation"), true);
+
+  const groupRowCounts = triage.report.groups.map((group) => group.manifest_only_preservation_row_count);
+  const distribution = groupRowCounts.reduce((counts, rowCount) => {
+    counts[String(rowCount)] = (counts[String(rowCount)] || 0) + 1;
+    return counts;
+  }, {});
+  assert.equal(triage.report.group_count, triage.report.groups.length);
+  assert.equal(
+    triage.report.single_row_group_count,
+    triage.report.groups.filter((group) => group.manifest_only_preservation_row_count === 1).length
+  );
+  assert.equal(
+    triage.report.multi_row_group_count,
+    triage.report.groups.filter((group) => group.manifest_only_preservation_row_count > 1).length
+  );
+  assert.equal(triage.report.max_group_row_count, Math.max(...groupRowCounts));
+  assert.deepEqual(triage.report.group_row_count_distribution, distribution);
+  assert.equal(
+    Object.values(triage.report.group_row_count_distribution).reduce((total, count) => total + count, 0),
+    triage.report.group_count
+  );
+  assert.equal(
+    triage.report.groups.reduce((total, group) => total + group.manifest_only_preservation_row_count, 0),
+    triage.report.manifest_only_preservation_row_count
+  );
+  assert.equal(triage.report.multi_row_groups.length, triage.report.multi_row_group_count);
+  assert.equal(triage.report.multi_row_groups.every((group) => group.manifest_only_preservation_row_count === 2), true);
+  assert.deepEqual(
+    triage.report.multi_row_groups.map((group) => group.group_key),
+    [
+      "opt_pcx_001->opt_sfz_001",
+      "opt_pcx_001->opt_sht_001",
+      "opt_pcx_001->opt_sng_001",
+      "opt_pdv_001->opt_sb7_001",
+      "opt_pdv_001->opt_vwd_001",
+    ]
+  );
+  assert.equal(triage.report.multi_row_groups.every((group) => group.candidate_status === "manifest_only_preservation"), true);
+  assert.equal(triage.report.multi_row_groups.every((group) => !/stale|cleanup|migration/i.test(group.notes)), true);
 });
 
 test("manifest-only preservation triage rejects data-js mode and leaves default overlay output alone", () => {
