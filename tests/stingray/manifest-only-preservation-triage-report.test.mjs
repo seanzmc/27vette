@@ -275,6 +275,19 @@ const DECISION_LEDGER_REVIEW_FIELDS = [
   "notes",
 ];
 
+const DECISION_LEDGER_CONTEXT_FIELDS = DECISION_LEDGER_FIELDS.filter(
+  (field) => !DECISION_LEDGER_REVIEW_FIELDS.includes(field)
+);
+
+const LEDGER_FORBIDDEN_PACKET_KEYS = [
+  "decision_ledger",
+  "ledger",
+  "review_status",
+  "decision",
+];
+
+const LEDGER_ADVICE_TERMS = /\b(stale|cleanup|candidate|recommendation|migrate|future)\b/i;
+
 const PACKET_TOP_LEVEL_KEYS = [
   "csv",
   "direction_counts",
@@ -552,6 +565,26 @@ function assertPacketSchema(packet) {
     assert.deepEqual(Object.keys(item), PACKET_MULTI_ROW_GROUP_KEYS);
   }
   assertNoPacketAdviceLanguage(packet);
+}
+
+function collectObjectKeys(value, keys = []) {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      collectObjectKeys(item, keys);
+    }
+    return keys;
+  }
+  if (value && typeof value === "object") {
+    for (const [key, child] of Object.entries(value)) {
+      keys.push(key);
+      collectObjectKeys(child, keys);
+    }
+  }
+  return keys;
+}
+
+function ledgerRowsToObjects(dataRows) {
+  return dataRows.map((row) => Object.fromEntries(DECISION_LEDGER_FIELDS.map((field, index) => [field, row[index]])));
 }
 
 function expectedDecisionLedgerRows(report) {
@@ -968,27 +1001,56 @@ test("manifest-only preservation triage writes a blank decision ledger template"
   assert.ok(fs.existsSync(triage.packetOut));
   assert.ok(fs.existsSync(triage.ledgerOut));
   assertPacketSchema(triage.packet);
+  assert.equal(LEDGER_FORBIDDEN_PACKET_KEYS.some((key) => collectObjectKeys(triage.packet).includes(key)), false);
+  const [directionCsvHeader, ...directionCsvDataRows] = parseCsv(triage.csv);
+  assert.deepEqual(directionCsvHeader, DIRECTION_SLICE_ROW_FIELDS);
+  assert.equal(directionCsvDataRows.length, triage.report.direction_slice_rows.length);
 
   const ledgerRows = parseCsv(triage.ledger);
   const [header, ...dataRows] = ledgerRows;
   assert.deepEqual(header, DECISION_LEDGER_FIELDS);
   assert.equal(dataRows.length, triage.report.groups.length);
+  assert.equal(dataRows.length, triage.report.group_count);
   assert.equal(dataRows.length, 78);
+  assert.equal(joinedValues([]), "");
+  assert.equal(joinedValues(null), "");
+  assert.equal(joinedValues(["beta", "alpha", "beta"]), "alpha | beta");
 
-  const actualRows = dataRows.map((row) => Object.fromEntries(DECISION_LEDGER_FIELDS.map((field, index) => [field, row[index]])));
-  assert.deepEqual(actualRows, expectedDecisionLedgerRows(triage.report));
+  const actualRows = ledgerRowsToObjects(dataRows);
+  const expectedRows = expectedDecisionLedgerRows(triage.report);
+  assert.deepEqual(actualRows, expectedRows);
   assert.deepEqual(
     actualRows,
     [...actualRows].sort((left, right) => left.direction_key.localeCompare(right.direction_key) || left.group_key.localeCompare(right.group_key))
   );
-  assert.equal(
-    actualRows.every((row) => DECISION_LEDGER_REVIEW_FIELDS.every((field) => row[field] === "")),
-    true
-  );
-  assert.equal(
-    DECISION_LEDGER_REVIEW_FIELDS.every((field) => !/stale|cleanup|candidate|recommendation|migrate|future/i.test(field)),
-    true
-  );
+  assert.equal(DECISION_LEDGER_FIELDS.every((field) => !LEDGER_ADVICE_TERMS.test(field)), true);
+
+  const groupsByKey = new Map();
+  for (const group of triage.report.groups) {
+    assert.equal(groupsByKey.has(group.group_key), false);
+    groupsByKey.set(group.group_key, group);
+  }
+  const expectedRowsByGroupKey = new Map();
+  for (const row of expectedRows) {
+    assert.equal(expectedRowsByGroupKey.has(row.group_key), false);
+    expectedRowsByGroupKey.set(row.group_key, row);
+  }
+  const actualRowsByGroupKey = new Map();
+  for (const row of actualRows) {
+    assert.equal(actualRowsByGroupKey.has(row.group_key), false);
+    assert.equal(groupsByKey.has(row.group_key), true);
+    assert.equal(expectedRowsByGroupKey.has(row.group_key), true);
+    actualRowsByGroupKey.set(row.group_key, row);
+    const expectedRow = expectedRowsByGroupKey.get(row.group_key);
+    for (const field of DECISION_LEDGER_CONTEXT_FIELDS) {
+      assert.equal(row[field], expectedRow[field]);
+    }
+    for (const field of DECISION_LEDGER_REVIEW_FIELDS) {
+      assert.equal(row[field], "");
+      assert.equal(LEDGER_ADVICE_TERMS.test(row[field]), false);
+    }
+  }
+  assert.equal(actualRowsByGroupKey.size, triage.report.group_count);
 
   const groupDirectionCounts = new Map();
   for (const row of actualRows) {
