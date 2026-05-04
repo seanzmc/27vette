@@ -4,8 +4,42 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
-const FIRST_SLICE_RPOS = new Set(["B6P", "D3V", "SL9", "ZZ3", "BCP", "BCS", "BC4", "BC7", "PEF", "CAV", "RIA", "PDY", "RYT", "S08", "SBT", "SC7", "C2Z", "CC3"]);
-const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set(["opt_sbt_001->opt_cc3_001"]);
+const FIRST_SLICE_RPOS = new Set([
+  "B6P",
+  "D3V",
+  "SL9",
+  "ZZ3",
+  "BCP",
+  "BCS",
+  "BC4",
+  "BC7",
+  "PEF",
+  "CAV",
+  "RIA",
+  "PDY",
+  "RYT",
+  "S08",
+  "SBT",
+  "SC7",
+  "C2Z",
+  "CC3",
+  "PCU",
+  "STI",
+  "VQK",
+  "VWE",
+]);
+const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set([
+  "opt_sbt_001->opt_cc3_001",
+  "opt_pcu_001->opt_5v7_001",
+  "opt_pcu_001->opt_5vm_001",
+  "opt_pcu_001->opt_5w8_001",
+  "opt_5v7_001->opt_sti_001",
+  "opt_sti_001->opt_5v7_001",
+  "opt_5vm_001->opt_sti_001",
+  "opt_sti_001->opt_5vm_001",
+  "opt_5w8_001->opt_sti_001",
+  "opt_sti_001->opt_5w8_001",
+]);
 
 function loadGeneratedData() {
   const context = { window: {} };

@@ -26,11 +26,12 @@ opt_t0a_001,option,T0A,Z51 Spoiler,,true,,T0A Z51 spoiler choice.
 opt_5zz_001,option,5ZZ,"LPO, High wing spoiler","Carbon Flash Metallic-painted, Genuine Corvette Accessory",true,,5ZZ high-wing spoiler choice.
 opt_5zu_001,option,5ZU,"LPO, High wing spoiler, Body color","Body-color, G8G, GBA, GKZ only. Genuine Corvette Accessory",true,,5ZU body-color high-wing spoiler choice.
 opt_5v7_001,option,5V7,"LPO, Black Ground Effects",Genuine Corvette Accessory,true,,5V7 black ground effects choice.
+opt_pcu_001,option,PCU,"LPO, Stingray Protection Package","Includes (VWE) front radiator grille screens LPO, (STI) Black composite rocker extensions LPO, and (VQK) Black custom splash guards LPO, Genuine Corvette Accessories",true,,Protection package source choice; ground-effects boundaries remain production-owned.
 opt_sda_001,option,SDA,"LPO, Black recovery hook",Genuine Corvette Accessory,true,,Standalone LPO Exterior accessory choice.
 opt_vtb_001,option,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",Genuine Corvette Accessory,true,,Standalone LPO Exterior accessory choice.
-opt_sti_001,option,STI,"LPO, Composite rocker extensions","Black, Genuine Corvette Accessory",true,,Protection package member choice; PCU package and ground-effects boundaries remain production-owned.
-opt_vqk_001,option,VQK,"LPO, Custom splash guards","Black, Genuine Corvette Accessory",true,,Protection package member choice; PCU package boundary remains production-owned.
-opt_vwe_001,option,VWE,"LPO, Front radiator grille screens",Genuine Corvette Accessory,true,,Protection package member choice; PCU package boundary remains production-owned.
+opt_sti_001,option,STI,"LPO, Composite rocker extensions","Black, Genuine Corvette Accessory",true,,Protection package member choice; PCU package is projected-owned and ground-effects boundaries remain production-owned.
+opt_vqk_001,option,VQK,"LPO, Custom splash guards","Black, Genuine Corvette Accessory",true,,Protection package member choice; PCU package is projected-owned.
+opt_vwe_001,option,VWE,"LPO, Front radiator grille screens",Genuine Corvette Accessory,true,,Protection package member choice; PCU package is projected-owned.
 opt_rwu_001,option,RWU,"LPO, Cargo area organizer","Collapsible, Genuine Corvette Accessory",true,,Standalone LPO Interior accessory choice.
 opt_s2l_001,option,S2L,"LPO, Set of premium leather weekend/travel bags",Genuine Corvette Accessory,true,,Standalone LPO Interior accessory choice.
 opt_vyw_001,option,VYW,"LPO, Floor mats","Premium carpeted with car silhouette logo on Stingray, Grand Sport, ZR1 and ZR1X models, Genuine Corvette Accessory",true,,Standalone LPO Interior accessory choice.

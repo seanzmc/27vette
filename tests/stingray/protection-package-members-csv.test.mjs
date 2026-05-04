@@ -230,20 +230,19 @@ test("CSV VQK and VWE legacy fragment matches generated choices and all-variant 
   );
 });
 
-test("ownership preserves the PCU boundary for VQK and VWE members", () => {
+test("ownership projects VQK and VWE with the PCU package source", () => {
   const owned = projectedOwnedRpos();
   const production = loadGeneratedData();
 
   assert.equal(owned.has("VQK"), true);
   assert.equal(owned.has("VWE"), true);
-  assert.equal(owned.has("PCU"), false);
+  assert.equal(owned.has("PCU"), true);
   assert.equal(optionIdsByRpo(production, "5VM").length, 0);
   assert.equal(optionIdsByRpo(production, "5W8").length, 0);
 
+  assert.equal(manifestHas({ record_type: "selectable", rpo: "PCU", ownership: "projected_owned" }), true);
   for (const rpo of PROTECTION_MEMBER_RPOS) {
     assert.equal(manifestHas({ record_type: "selectable", rpo, ownership: "projected_owned" }), true);
-    assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCU", target_rpo: rpo, ownership: "preserved_cross_boundary" }), true);
-    assert.equal(manifestHas({ record_type: "priceRule", source_rpo: "PCU", target_rpo: rpo, ownership: "preserved_cross_boundary" }), true);
   }
 });
 
@@ -258,7 +257,7 @@ test("production has only classified PCU package records touching VQK and VWE", 
   });
 });
 
-test("shadow overlay preserves PCU package include and included-zero priceRules for VQK and VWE", () => {
+test("shadow overlay projects PCU package include and included-zero priceRules for VQK and VWE", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
 

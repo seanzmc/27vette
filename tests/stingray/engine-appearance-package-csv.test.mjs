@@ -10,7 +10,7 @@ const FRAGMENT_SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 
 const ENGINE_PACKAGE_RPOS = new Set(["B6P", "D3V", "SL9", "ZZ3", "BC4", "BCP", "BCS", "BC7"]);
-const OUT_OF_SCOPE_PACKAGE_RPOS = new Set(["PDV", "PCU", "PCX", "Z51"]);
+const OUT_OF_SCOPE_PACKAGE_RPOS = new Set(["PDV", "PCX", "Z51"]);
 const INCLUDED_EDGES = [
   ["B6P", "D3V"],
   ["B6P", "SL9"],
