@@ -27,6 +27,27 @@ function runReport(flag, args = []) {
   };
 }
 
+function runManifestOnlyTriageWithCsv() {
+  const out = tempPath("manifest-only-preservation-triage.json");
+  const csvOut = tempPath("direction-slice-rows.csv");
+  const result = spawnSync(
+    PYTHON,
+    [OVERLAY_SCRIPT, "--manifest-only-preservation-triage", "--out", out, "--direction-slice-rows-csv-out", csvOut],
+    {
+      cwd: process.cwd(),
+      encoding: "utf8",
+      maxBuffer: 8 * 1024 * 1024,
+    }
+  );
+  return {
+    out,
+    csvOut,
+    result,
+    report: fs.existsSync(out) ? JSON.parse(fs.readFileSync(out, "utf8")) : null,
+    csv: fs.existsSync(csvOut) ? fs.readFileSync(csvOut, "utf8") : "",
+  };
+}
+
 function defaultOverlayStdout() {
   return spawnSync(PYTHON, [OVERLAY_SCRIPT], {
     cwd: process.cwd(),
@@ -313,6 +334,43 @@ function expectedDirectionSliceRows(rows) {
     .sort(compareDirectionSliceRows);
 }
 
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let quoted = false;
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    if (quoted) {
+      if (char === "\"" && text[index + 1] === "\"") {
+        field += "\"";
+        index += 1;
+      } else if (char === "\"") {
+        quoted = false;
+      } else {
+        field += char;
+      }
+    } else if (char === "\"") {
+      quoted = true;
+    } else if (char === ",") {
+      row.push(field);
+      field = "";
+    } else if (char === "\n") {
+      row.push(field);
+      rows.push(row);
+      row = [];
+      field = "";
+    } else if (char !== "\r") {
+      field += char;
+    }
+  }
+  if (field || row.length) {
+    row.push(field);
+    rows.push(row);
+  }
+  return rows;
+}
+
 test("manifest-only preservation triage reports exactly the census manifest-only rows", () => {
   const triage = runReport("--manifest-only-preservation-triage");
   const census = runReport("--preserved-cross-boundary-manifest-census");
@@ -561,9 +619,39 @@ test("manifest-only preservation triage reports exactly the census manifest-only
   );
 });
 
+test("manifest-only preservation triage exports direction slice rows as a CSV sidecar", () => {
+  const triage = runManifestOnlyTriageWithCsv();
+  assert.equal(triage.result.status, 0, triage.result.stderr);
+  assert.ok(fs.existsSync(triage.out));
+  assert.ok(fs.existsSync(triage.csvOut));
+  assert.equal(triage.report.status, "allowed");
+
+  const csvRows = parseCsv(triage.csv);
+  const [header, ...dataRows] = csvRows;
+  assert.deepEqual(header, DIRECTION_SLICE_ROW_FIELDS);
+  assert.equal(dataRows.length, triage.report.direction_slice_rows.length);
+  assert.equal(dataRows.length, 83);
+
+  const expectedRows = triage.report.direction_slice_rows.map((row) =>
+    DIRECTION_SLICE_ROW_FIELDS.map((field) => (row[field] === null || row[field] === undefined ? "" : String(row[field])))
+  );
+  assert.deepEqual(dataRows, expectedRows);
+  assert.equal(dataRows.flat().includes("null"), false);
+
+  const directionCounts = new Map();
+  for (const row of dataRows) {
+    directionCounts.set(row[0], (directionCounts.get(row[0]) || 0) + 1);
+  }
+  assert.deepEqual(
+    [...directionCounts.entries()].sort(([left], [right]) => left.localeCompare(right)),
+    EXPECTED_OWNERSHIP_PROJECTION_DIRECTION_COUNTS.map(([key, rowCount]) => [key, rowCount])
+  );
+});
+
 test("manifest-only preservation triage rejects data-js mode and leaves default overlay output alone", () => {
   const out = tempPath("manifest-only-triage-data-js.json");
-  const invalid = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--manifest-only-preservation-triage", "--as-data-js", "--out", out], {
+  const csvOut = tempPath("manifest-only-triage-data-js.csv");
+  const invalid = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--manifest-only-preservation-triage", "--as-data-js", "--out", out, "--direction-slice-rows-csv-out", csvOut], {
     cwd: process.cwd(),
     encoding: "utf8",
     maxBuffer: 8 * 1024 * 1024,
@@ -571,6 +659,15 @@ test("manifest-only preservation triage rejects data-js mode and leaves default 
   assert.notEqual(invalid.status, 0);
   assert.match(invalid.stderr, /cannot be combined with --as-data-js/);
   assert.equal(fs.existsSync(out), false);
+  assert.equal(fs.existsSync(csvOut), false);
+
+  const csvWithoutOwningMode = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--direction-slice-rows-csv-out", tempPath("direction-slice-rows.csv")], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+    maxBuffer: 8 * 1024 * 1024,
+  });
+  assert.notEqual(csvWithoutOwningMode.status, 0);
+  assert.match(csvWithoutOwningMode.stderr, /--direction-slice-rows-csv-out requires --manifest-only-preservation-triage/);
 
   const stdoutRun = defaultOverlayStdout();
   const outRun = defaultOverlayOutFile();

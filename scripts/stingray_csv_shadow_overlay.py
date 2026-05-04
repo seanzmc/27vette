@@ -35,6 +35,26 @@ PRESERVED_CROSS_BOUNDARY_MATCH_NOTE = "Production-guarded structured reference i
 PRESERVED_CROSS_BOUNDARY_STALE_NOTE = "Active preserved_cross_boundary manifest row points at a guarded ID with no current structured reference."
 PRESERVED_CROSS_BOUNDARY_INVALID_NOTE = "Active preserved_cross_boundary manifest row points outside the guarded structured-reference contract."
 PRESERVED_CROSS_BOUNDARY_UNGUARDED_NOTE = "Production-guarded structured reference has no matching active preserved_cross_boundary manifest evidence."
+DIRECTION_SLICE_ROWS_CSV_FIELDS = [
+    "direction_key",
+    "manifest_row_id",
+    "group_key",
+    "ref_id",
+    "pair_key",
+    "source_id",
+    "source_label",
+    "source_category",
+    "source_section",
+    "source_ownership_status",
+    "source_projection_status",
+    "target_id",
+    "target_label",
+    "target_category",
+    "target_section",
+    "target_ownership_status",
+    "target_projection_status",
+    "candidate_status",
+]
 
 
 class OverlayError(ValueError):
@@ -2132,6 +2152,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--preserved-cross-boundary-contract-report", action="store_true")
     parser.add_argument("--preserved-cross-boundary-manifest-census", action="store_true")
     parser.add_argument("--manifest-only-preservation-triage", action="store_true")
+    parser.add_argument("--direction-slice-rows-csv-out", default="")
     return parser.parse_args()
 
 
@@ -2182,6 +2203,16 @@ def write_or_print_output(output: str, out: str) -> None:
         print(output)
 
 
+def write_direction_slice_rows_csv(rows: list[dict[str, Any]], out: str) -> None:
+    output_path = Path(out)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=DIRECTION_SLICE_ROWS_CSV_FIELDS)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({field: "" if row.get(field) is None else row.get(field, "") for field in DIRECTION_SLICE_ROWS_CSV_FIELDS})
+
+
 def main() -> None:
     args = parse_args()
     try:
@@ -2206,6 +2237,8 @@ def main() -> None:
             raise OverlayError("--preserved-cross-boundary-manifest-census requires --out.")
         if args.manifest_only_preservation_triage and not args.out:
             raise OverlayError("--manifest-only-preservation-triage requires --out.")
+        if args.direction_slice_rows_csv_out and not args.manifest_only_preservation_triage:
+            raise OverlayError("--direction-slice-rows-csv-out requires --manifest-only-preservation-triage.")
         production = load_production_data(Path(args.production_data))
         fragment = load_fragment(args)
         ownership = load_ownership_scope(Path(args.ownership_manifest))
@@ -2248,6 +2281,8 @@ def main() -> None:
                 )
                 report = manifest_only_preservation_triage_report(census_report, production)
             write_or_print_output(format_report_json(report, args.pretty), args.out)
+            if args.direction_slice_rows_csv_out:
+                write_direction_slice_rows_csv(report["direction_slice_rows"], args.direction_slice_rows_csv_out)
             if namespace_report["unresolved_count"]:
                 raise OverlayError(f"blocking unresolved structured refs: {namespace_report['unresolved_count']}.")
             if args.preserved_cross_boundary_contract_report and report["status"] == "blocking":
