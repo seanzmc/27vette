@@ -47,6 +47,7 @@ class OwnershipScope:
         owned_rpos: set[str],
         guarded_option_refs: set[tuple[str, str]],
         preserved_cross_boundary_records: set[tuple[str, str, str, str, str]],
+        preserved_cross_boundary_rows: list[dict[str, str]],
         guarded_group_ids: dict[str, set[str]],
         preserved_group_ids: dict[str, set[str]],
         projected_group_ids: dict[str, set[str]],
@@ -54,6 +55,7 @@ class OwnershipScope:
         self.owned_rpos = owned_rpos
         self.guarded_option_refs = guarded_option_refs
         self.preserved_cross_boundary_records = preserved_cross_boundary_records
+        self.preserved_cross_boundary_rows = preserved_cross_boundary_rows
         self.guarded_group_ids = guarded_group_ids
         self.preserved_group_ids = preserved_group_ids
         self.projected_group_ids = projected_group_ids
@@ -90,6 +92,7 @@ def load_ownership_scope(path: Path) -> OwnershipScope:
     owned_rpos: set[str] = set()
     guarded_option_refs: set[tuple[str, str]] = set()
     preserved_cross_boundary_records: set[tuple[str, str, str, str, str]] = set()
+    preserved_cross_boundary_rows: list[dict[str, str]] = []
     guarded_group_ids: dict[str, set[str]] = {"exclusiveGroups": set(), "ruleGroups": set()}
     preserved_group_ids: dict[str, set[str]] = {"exclusiveGroups": set(), "ruleGroups": set()}
     projected_group_ids: dict[str, set[str]] = {"exclusiveGroups": set(), "ruleGroups": set()}
@@ -198,11 +201,22 @@ def load_ownership_scope(path: Path) -> OwnershipScope:
             raise OverlayError(f"{path} has duplicate active preserved_cross_boundary row {key}.")
         seen_preserved_records.add(key)
         preserved_cross_boundary_records.add(key)
+        preserved_cross_boundary_rows.append(
+            {
+                "manifest_row_id": f"csv_row_{index}",
+                "record_type": record_type,
+                "source_rpo": source_rpo,
+                "source_option_id": source_option_id,
+                "target_rpo": target_rpo,
+                "target_option_id": target_option_id,
+            }
+        )
 
     return OwnershipScope(
         owned_rpos=owned_rpos,
         guarded_option_refs=guarded_option_refs,
         preserved_cross_boundary_records=preserved_cross_boundary_records,
+        preserved_cross_boundary_rows=preserved_cross_boundary_rows,
         guarded_group_ids=guarded_group_ids,
         preserved_group_ids=preserved_group_ids,
         projected_group_ids=projected_group_ids,
@@ -944,6 +958,201 @@ def preserved_cross_boundary_contract_report(
     }
 
 
+def preserved_manifest_census_row_sort_key(row: dict[str, Any]) -> tuple[str, str, str, str, str, str, str, str, str]:
+    return (
+        row["candidate_status"],
+        row["group_key"],
+        row["manifest_row_id"],
+        row["ref_id"] or "",
+        row["pair_key"],
+        row["source_kind"],
+        row["source_id"],
+        row["target_kind"],
+        row["target_id"],
+    )
+
+
+def preserved_manifest_census_group_sort_key(group: dict[str, Any]) -> str:
+    return group["group_key"]
+
+
+def preserved_manifest_census_candidate_statuses(statuses: set[str]) -> str:
+    if "invalid_preserved" in statuses:
+        return "invalid_preserved"
+    if "current_guarded_dependency" in statuses:
+        return "current_guarded_dependency"
+    return "manifest_only_preservation"
+
+
+def preserved_cross_boundary_manifest_census_report(
+    data: dict[str, Any],
+    ownership: OwnershipScope,
+    namespace_report: dict[str, Any],
+    guarded_ids: set[str],
+    projected_ids: set[str],
+) -> dict[str, Any]:
+    choice_ids = production_choice_option_ids(data)
+    interior_ids = production_interior_ids(data)
+    current_rows_by_side = structured_rows_by_record_side(data)
+    current_guarded_rows = [row for row in namespace_report["references"] if row["namespace"] == "production_guarded"]
+    rows: list[dict[str, Any]] = []
+
+    for manifest_row in ownership.preserved_cross_boundary_rows:
+        record_type = manifest_row["record_type"]
+        source_id = tolerant_option_id_by_manifest_ref(data, manifest_row["source_rpo"], manifest_row["source_option_id"])
+        target_id = tolerant_option_id_by_manifest_ref(data, manifest_row["target_rpo"], manifest_row["target_option_id"])
+        pair_key = f"{source_id}->{target_id}"
+        side_refs = [
+            (source_id, "source_id", preserved_ref_namespace(source_id, choice_ids, projected_ids, guarded_ids, interior_ids)),
+            (target_id, "target_id", preserved_ref_namespace(target_id, choice_ids, projected_ids, guarded_ids, interior_ids)),
+        ]
+        current_reference_rows = [
+            structured_row
+            for ref_id, field, namespace in side_refs
+            if namespace == "production_guarded"
+            for structured_row in current_rows_by_side.get(
+                (record_type, source_id, target_id, ref_id, manifest_structured_lookup_field(record_type, field)),
+                [],
+            )
+        ]
+        invalid_refs = [
+            (ref_id, namespace)
+            for ref_id, _field, namespace in side_refs
+            if namespace in {"interior_source", "unknown"}
+        ]
+        pair_has_current_record = bool(current_reference_rows) or any(
+            current_rows_by_side.get((record_type, source_id, target_id, ref_id, manifest_structured_lookup_field(record_type, field)))
+            for ref_id, field, _namespace in side_refs
+        )
+        invalid_projected_pair = (
+            not invalid_refs
+            and not pair_has_current_record
+            and all(namespace == "active_projected_owned_choice" for _ref_id, _field, namespace in side_refs)
+        )
+        guarded_ref_ids = sorted({ref_id for ref_id, _field, namespace in side_refs if namespace == "production_guarded"})
+
+        if invalid_refs:
+            candidate_status = "invalid_preserved"
+            ref_id = invalid_refs[0][0]
+            group_key = ref_id
+            notes = PRESERVED_CROSS_BOUNDARY_INVALID_NOTE
+        elif invalid_projected_pair:
+            candidate_status = "invalid_preserved"
+            ref_id = None
+            group_key = pair_key
+            notes = PRESERVED_CROSS_BOUNDARY_INVALID_NOTE
+        elif current_reference_rows:
+            candidate_status = "current_guarded_dependency"
+            ref_id = guarded_ref_ids[0] if guarded_ref_ids else None
+            group_key = ref_id or pair_key
+            notes = PRESERVED_CROSS_BOUNDARY_MATCH_NOTE
+        else:
+            candidate_status = "manifest_only_preservation"
+            ref_id = guarded_ref_ids[0] if guarded_ref_ids else None
+            group_key = ref_id or pair_key
+            notes = "Active preserved_cross_boundary manifest row is valid but not a current production_guarded structured-reference dependency."
+
+        rows.append(
+            {
+                "manifest_row_id": manifest_row["manifest_row_id"],
+                "ref_id": ref_id,
+                "pair_key": pair_key,
+                "group_key": group_key,
+                "manifest_status": "active",
+                "source_kind": side_refs[0][2],
+                "source_id": source_id,
+                "target_kind": side_refs[1][2],
+                "target_id": target_id,
+                "ownership_status": "preserved_cross_boundary",
+                "is_current_guarded_structured_ref": bool(current_reference_rows),
+                "current_reference_count": len(current_reference_rows),
+                "current_ref_ids": sorted({row["ref_id"] for row in current_reference_rows}),
+                "current_ref_counts": {
+                    ref_id: sum(1 for row in current_reference_rows if row["ref_id"] == ref_id)
+                    for ref_id in sorted({row["ref_id"] for row in current_reference_rows})
+                },
+                "candidate_status": candidate_status,
+                "notes": notes,
+            }
+        )
+
+    rows.sort(key=preserved_manifest_census_row_sort_key)
+
+    grouped: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        row_group_keys = row["current_ref_ids"] if row["is_current_guarded_structured_ref"] else [row["group_key"]]
+        for group_key in row_group_keys:
+            group_ref_id = group_key if row["is_current_guarded_structured_ref"] else row["ref_id"]
+            group_pair_key = "" if group_ref_id else row["pair_key"]
+            group = grouped.setdefault(
+                group_key,
+                {
+                    "group_key": group_key,
+                    "ref_id": group_ref_id,
+                    "pair_key": group_pair_key,
+                    "active_preserved_row_count": 0,
+                    "current_guarded_structured_reference_count": 0,
+                    "used_by_current_guarded_structured_refs": False,
+                    "candidate_statuses": set(),
+                    "source_kinds": set(),
+                    "source_ids": set(),
+                    "target_kinds": set(),
+                    "target_ids": set(),
+                },
+            )
+            group["active_preserved_row_count"] += 1
+            group["current_guarded_structured_reference_count"] += row["current_ref_counts"].get(group_key, 0)
+            group["used_by_current_guarded_structured_refs"] = (
+                group["used_by_current_guarded_structured_refs"] or row["is_current_guarded_structured_ref"]
+            )
+            group["candidate_statuses"].add(row["candidate_status"])
+            group["source_kinds"].add(row["source_kind"])
+            group["source_ids"].add(row["source_id"])
+            group["target_kinds"].add(row["target_kind"])
+            group["target_ids"].add(row["target_id"])
+
+    groups = []
+    for group in grouped.values():
+        candidate_statuses = group.pop("candidate_statuses")
+        groups.append(
+            {
+                "group_key": group["group_key"],
+                "ref_id": group["ref_id"],
+                "pair_key": group["pair_key"],
+                "active_preserved_row_count": group["active_preserved_row_count"],
+                "current_guarded_structured_reference_count": group["current_guarded_structured_reference_count"],
+                "used_by_current_guarded_structured_refs": group["used_by_current_guarded_structured_refs"],
+                "candidate_status": preserved_manifest_census_candidate_statuses(candidate_statuses),
+                "source_kinds": sorted(group["source_kinds"]),
+                "source_ids": sorted(group["source_ids"]),
+                "target_kinds": sorted(group["target_kinds"]),
+                "target_ids": sorted(group["target_ids"]),
+            }
+        )
+    groups.sort(key=preserved_manifest_census_group_sort_key)
+    for row in rows:
+        row.pop("current_ref_counts")
+        row.pop("current_ref_ids")
+
+    current_guarded_manifest_row_count = sum(1 for row in rows if row["is_current_guarded_structured_ref"])
+    current_guarded_structured_reference_count = sum(row["current_reference_count"] for row in rows)
+    invalid_preserved_count = sum(1 for row in rows if row["candidate_status"] == "invalid_preserved")
+    not_currently_used_count = sum(1 for row in rows if row["candidate_status"] == "manifest_only_preservation")
+
+    return {
+        "schema_version": 1,
+        "status": "blocking" if invalid_preserved_count else "allowed",
+        "active_preserved_cross_boundary_count": len(rows),
+        "used_by_current_guarded_structured_refs_count": current_guarded_structured_reference_count,
+        "current_guarded_structured_reference_count": current_guarded_structured_reference_count,
+        "current_guarded_manifest_row_count": current_guarded_manifest_row_count,
+        "not_currently_used_count": not_currently_used_count,
+        "invalid_preserved_count": invalid_preserved_count,
+        "groups": groups,
+        "rows": rows,
+    }
+
+
 def assert_preserved_option_id_refs_are_guarded(data: dict[str, Any], ownership: OwnershipScope, guarded_ids: set[str]) -> None:
     choice_ids = production_choice_option_ids(data)
     unguarded = []
@@ -1480,6 +1689,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--structured-reference-namespace-report", action="store_true")
     parser.add_argument("--production-guarded-structured-reference-triage", action="store_true")
     parser.add_argument("--preserved-cross-boundary-contract-report", action="store_true")
+    parser.add_argument("--preserved-cross-boundary-manifest-census", action="store_true")
     return parser.parse_args()
 
 
@@ -1537,6 +1747,7 @@ def main() -> None:
             int(args.structured_reference_namespace_report)
             + int(args.production_guarded_structured_reference_triage)
             + int(args.preserved_cross_boundary_contract_report)
+            + int(args.preserved_cross_boundary_manifest_census)
         )
         if report_mode_count > 1:
             raise OverlayError("Only one report mode can be requested at a time.")
@@ -1548,6 +1759,8 @@ def main() -> None:
             raise OverlayError("--production-guarded-structured-reference-triage requires --out.")
         if args.preserved_cross_boundary_contract_report and not args.out:
             raise OverlayError("--preserved-cross-boundary-contract-report requires --out.")
+        if args.preserved_cross_boundary_manifest_census and not args.out:
+            raise OverlayError("--preserved-cross-boundary-manifest-census requires --out.")
         production = load_production_data(Path(args.production_data))
         fragment = load_fragment(args)
         ownership = load_ownership_scope(Path(args.ownership_manifest))
@@ -1570,6 +1783,15 @@ def main() -> None:
                     guarded_ids,
                     projected_ids,
                 )
+            if args.preserved_cross_boundary_manifest_census:
+                projected_ids = projected_option_ids(production, ownership.owned_rpos)
+                report = preserved_cross_boundary_manifest_census_report(
+                    production,
+                    ownership,
+                    namespace_report,
+                    guarded_ids,
+                    projected_ids,
+                )
             write_or_print_output(format_report_json(report, args.pretty), args.out)
             if namespace_report["unresolved_count"]:
                 raise OverlayError(f"blocking unresolved structured refs: {namespace_report['unresolved_count']}.")
@@ -1580,6 +1802,11 @@ def main() -> None:
                     f"unguarded={report['unguarded_production_guarded_count']}, "
                     f"invalid={report['invalid_preserved_count']}, "
                     f"count_parity_ok={report['count_parity_ok']}."
+                )
+            if args.preserved_cross_boundary_manifest_census and report["status"] == "blocking":
+                raise OverlayError(
+                    "preserved cross-boundary manifest census blocking findings: "
+                    f"invalid={report['invalid_preserved_count']}."
                 )
             overlay_shadow_data(production, fragment, ownership)
             return
