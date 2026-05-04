@@ -140,6 +140,27 @@ const SLICE_ROLLUP_FIELDS = {
   target_label_rollup: "target_label",
 };
 
+const DIRECTION_SLICE_ROW_FIELDS = [
+  "direction_key",
+  "manifest_row_id",
+  "group_key",
+  "ref_id",
+  "pair_key",
+  "source_id",
+  "source_label",
+  "source_category",
+  "source_section",
+  "source_ownership_status",
+  "source_projection_status",
+  "target_id",
+  "target_label",
+  "target_category",
+  "target_section",
+  "target_ownership_status",
+  "target_projection_status",
+  "candidate_status",
+];
+
 function publicTriageRow(row) {
   return {
     manifest_row_id: row.manifest_row_id,
@@ -252,6 +273,44 @@ function combinedDirectionKeyForRow(row) {
   const sourceKey = `${normalizedRollupKeys(row.source_ownership_status)[0]}/${normalizedRollupKeys(row.source_projection_status)[0]}`;
   const targetKey = `${normalizedRollupKeys(row.target_ownership_status)[0]}/${normalizedRollupKeys(row.target_projection_status)[0]}`;
   return `${sourceKey}->${targetKey}`;
+}
+
+function publicDirectionSliceRow(row) {
+  return Object.fromEntries(DIRECTION_SLICE_ROW_FIELDS.map((field) => [field, row[field]]));
+}
+
+function compareDirectionSliceRows(left, right) {
+  const fields = ["direction_key", "group_key", "manifest_row_id", "source_id", "target_id"];
+  for (const field of fields) {
+    const delta = String(left[field] ?? "").localeCompare(String(right[field] ?? ""));
+    if (delta !== 0) return delta;
+  }
+  return 0;
+}
+
+function expectedDirectionSliceRows(rows) {
+  return rows
+    .map((row) => ({
+      direction_key: combinedDirectionKeyForRow(row),
+      manifest_row_id: row.manifest_row_id,
+      group_key: row.group_key,
+      ref_id: row.ref_id,
+      pair_key: row.pair_key,
+      source_id: row.source_id,
+      source_label: row.source_label,
+      source_category: row.source_category,
+      source_section: row.source_section,
+      source_ownership_status: row.source_ownership_status,
+      source_projection_status: row.source_projection_status,
+      target_id: row.target_id,
+      target_label: row.target_label,
+      target_category: row.target_category,
+      target_section: row.target_section,
+      target_ownership_status: row.target_ownership_status,
+      target_projection_status: row.target_projection_status,
+      candidate_status: row.candidate_status,
+    }))
+    .sort(compareDirectionSliceRows);
 }
 
 test("manifest-only preservation triage reports exactly the census manifest-only rows", () => {
@@ -460,6 +519,46 @@ test("manifest-only preservation triage reports exactly the census manifest-only
       }
     }
   }
+
+  assert.equal(Object.hasOwn(triage.report, "direction_slice_rows"), true);
+  assert.equal(Array.isArray(triage.report.direction_slice_rows), true);
+  assert.equal(triage.report.direction_slice_rows.length, triage.report.rows.length);
+  assert.equal(triage.report.direction_slice_rows.length, triage.report.manifest_only_preservation_row_count);
+  assert.deepEqual(
+    new Set(triage.report.direction_slice_rows.map((row) => row.direction_key)),
+    new Set(triage.report.ownership_projection_direction_slices.map((slice) => slice.key))
+  );
+  assert.deepEqual(
+    triage.report.direction_slice_rows.map(publicDirectionSliceRow),
+    expectedDirectionSliceRows(triage.report.rows)
+  );
+  assert.deepEqual(
+    triage.report.direction_slice_rows,
+    [...triage.report.direction_slice_rows].sort(compareDirectionSliceRows)
+  );
+  const directionSliceRowsByKey = new Map();
+  for (const row of triage.report.direction_slice_rows) {
+    assert.deepEqual(Object.keys(row).sort(), [...DIRECTION_SLICE_ROW_FIELDS].sort());
+    assert.equal(row.direction_key, combinedDirectionKeyForRow(row));
+    assert.equal(row.candidate_status, "manifest_only_preservation");
+    directionSliceRowsByKey.set(row.direction_key, (directionSliceRowsByKey.get(row.direction_key) || 0) + 1);
+    const matchingRows = triage.report.rows.filter(
+      (candidate) => candidate.manifest_row_id === row.manifest_row_id && candidate.group_key === row.group_key
+    );
+    assert.equal(matchingRows.length, 1);
+    assert.deepEqual(publicDirectionSliceRow(row), {
+      ...publicDirectionSliceRow(matchingRows[0]),
+      direction_key: combinedDirectionKeyForRow(matchingRows[0]),
+    });
+  }
+  assert.deepEqual(
+    [...directionSliceRowsByKey.entries()].sort(([left], [right]) => left.localeCompare(right)),
+    EXPECTED_OWNERSHIP_PROJECTION_DIRECTION_COUNTS.map(([key, rowCount]) => [key, rowCount])
+  );
+  assert.deepEqual(
+    [...directionSliceRowsByKey.entries()].sort(([left], [right]) => left.localeCompare(right)),
+    triage.report.ownership_projection_direction_slices.map((slice) => [slice.key, slice.row_count])
+  );
 });
 
 test("manifest-only preservation triage rejects data-js mode and leaves default overlay output alone", () => {

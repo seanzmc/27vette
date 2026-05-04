@@ -1314,27 +1314,68 @@ def build_direction_rollup(rows: list[dict[str, Any]], source_field: str, target
     ]
 
 
+def manifest_only_ownership_projection_keys(row: dict[str, Any], prefix: str) -> list[str]:
+    return [
+        f"{ownership_key}/{projection_key}"
+        for ownership_key in manifest_only_rollup_keys(row.get(f"{prefix}_ownership_status"))
+        for projection_key in manifest_only_rollup_keys(row.get(f"{prefix}_projection_status"))
+    ]
+
+
 def manifest_only_ownership_projection_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     combined_rows = []
     for row in rows:
-        source_keys = [
-            f"{ownership_key}/{projection_key}"
-            for ownership_key in manifest_only_rollup_keys(row.get("source_ownership_status"))
-            for projection_key in manifest_only_rollup_keys(row.get("source_projection_status"))
-        ]
-        target_keys = [
-            f"{ownership_key}/{projection_key}"
-            for ownership_key in manifest_only_rollup_keys(row.get("target_ownership_status"))
-            for projection_key in manifest_only_rollup_keys(row.get("target_projection_status"))
-        ]
         combined_rows.append(
             {
                 **row,
-                "source_ownership_projection_status": source_keys,
-                "target_ownership_projection_status": target_keys,
+                "source_ownership_projection_status": manifest_only_ownership_projection_keys(row, "source"),
+                "target_ownership_projection_status": manifest_only_ownership_projection_keys(row, "target"),
             }
         )
     return combined_rows
+
+
+def manifest_only_direction_key(row: dict[str, Any]) -> str:
+    source_keys = manifest_only_ownership_projection_keys(row, "source")
+    target_keys = manifest_only_ownership_projection_keys(row, "target")
+    return f"{source_keys[0]}->{target_keys[0]}"
+
+
+def direction_slice_row_sort_key(row: dict[str, Any]) -> tuple[str, str, str, str, str]:
+    return (
+        row["direction_key"],
+        row["group_key"],
+        row["manifest_row_id"],
+        row["source_id"],
+        row["target_id"],
+    )
+
+
+def direction_slice_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    flat_rows = [
+        {
+            "direction_key": manifest_only_direction_key(row),
+            "manifest_row_id": row["manifest_row_id"],
+            "group_key": row["group_key"],
+            "ref_id": row["ref_id"],
+            "pair_key": row["pair_key"],
+            "source_id": row["source_id"],
+            "source_label": row["source_label"],
+            "source_category": row["source_category"],
+            "source_section": row["source_section"],
+            "source_ownership_status": row["source_ownership_status"],
+            "source_projection_status": row["source_projection_status"],
+            "target_id": row["target_id"],
+            "target_label": row["target_label"],
+            "target_category": row["target_category"],
+            "target_section": row["target_section"],
+            "target_ownership_status": row["target_ownership_status"],
+            "target_projection_status": row["target_projection_status"],
+            "candidate_status": row["candidate_status"],
+        }
+        for row in rows
+    ]
+    return sorted(flat_rows, key=direction_slice_row_sort_key)
 
 
 def ownership_projection_direction_slices(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -1547,6 +1588,7 @@ def manifest_only_preservation_triage_report(census_report: dict[str, Any], data
             "target_ownership_projection_status",
         ),
         "ownership_projection_direction_slices": ownership_projection_direction_slices(rows),
+        "direction_slice_rows": direction_slice_rows(rows),
         "groups": groups,
         "rows": rows,
     }
