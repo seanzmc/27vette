@@ -28,6 +28,7 @@ opt_5zu_001,option,5ZU,"LPO, High wing spoiler, Body color","Body-color, G8G, GB
 opt_5v7_001,option,5V7,"LPO, Black Ground Effects",Genuine Corvette Accessory,true,,5V7 black ground effects choice.
 opt_sda_001,option,SDA,"LPO, Black recovery hook",Genuine Corvette Accessory,true,,Standalone LPO Exterior accessory choice.
 opt_vtb_001,option,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",Genuine Corvette Accessory,true,,Standalone LPO Exterior accessory choice.
+opt_sti_001,option,STI,"LPO, Composite rocker extensions","Black, Genuine Corvette Accessory",true,,Protection package member choice; PCU package and ground-effects boundaries remain production-owned.
 opt_vqk_001,option,VQK,"LPO, Custom splash guards","Black, Genuine Corvette Accessory",true,,Protection package member choice; PCU package boundary remains production-owned.
 opt_vwe_001,option,VWE,"LPO, Front radiator grille screens",Genuine Corvette Accessory,true,,Protection package member choice; PCU package boundary remains production-owned.
 opt_rwu_001,option,RWU,"LPO, Cargo area organizer","Collapsible, Genuine Corvette Accessory",true,,Standalone LPO Interior accessory choice.

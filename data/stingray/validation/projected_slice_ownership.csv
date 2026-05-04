@@ -31,6 +31,7 @@ selectable,,,,,,SLN,projected_owned,Engine Appearance LPO add-on projected slice
 selectable,,,,,,VUP,projected_owned,Engine Appearance LPO add-on projected slice,true
 selectable,,,,,,SDA,projected_owned,Simple LPO Exterior standalone projected slice,true
 selectable,,,,,,VTB,projected_owned,Simple LPO Exterior standalone projected slice,true
+selectable,,,,,,STI,projected_owned,Protection package rocker extension member projected slice,true
 selectable,,,,,,VQK,projected_owned,Protection package member projected slice,true
 selectable,,,,,,VWE,projected_owned,Protection package member projected slice,true
 selectable,,,,,,RWU,projected_owned,LPO Interior standalone accessory projected slice,true
@@ -177,6 +178,12 @@ rule,,PCU,,VQK,,,preserved_cross_boundary,PCU package source remains production-
 priceRule,,PCU,,VQK,,,preserved_cross_boundary,PCU package source remains production-owned for VQK in Pass 91,true
 rule,,PCU,,VWE,,,preserved_cross_boundary,PCU package source remains production-owned for VWE in Pass 91,true
 priceRule,,PCU,,VWE,,,preserved_cross_boundary,PCU package source remains production-owned for VWE in Pass 91,true
+rule,,PCU,,STI,,,preserved_cross_boundary,PCU package source remains production-owned for STI in Pass 93,true
+priceRule,,PCU,,STI,,,preserved_cross_boundary,PCU package source remains production-owned for STI in Pass 93,true
+rule,,,opt_5vm_001,STI,,,preserved_cross_boundary,Ground-effects rule-only legacy-ID exclude remains production-owned for STI in Pass 93,true
+rule,,STI,,,opt_5vm_001,,preserved_cross_boundary,STI to ground-effects rule-only legacy-ID exclude remains production-owned in Pass 93,true
+rule,,,opt_5w8_001,STI,,,preserved_cross_boundary,Ground-effects rule-only legacy-ID exclude remains production-owned for STI in Pass 93,true
+rule,,STI,,,opt_5w8_001,,preserved_cross_boundary,STI to ground-effects rule-only legacy-ID exclude remains production-owned in Pass 93,true
 ruleGroup,,5V7,,5ZU,,,preserved_cross_boundary,5V7 spoiler requires-any group member remains production-owned in Pass 17,false
 ruleGroup,,5V7,,5ZZ,,,preserved_cross_boundary,5V7 spoiler requires-any group member remains production-owned in Pass 17,false
 ruleGroup,,5ZU,,G8G,,,preserved_cross_boundary,5ZU paint requires-any group member remains production-owned in Pass 17,true

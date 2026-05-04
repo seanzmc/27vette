@@ -8,7 +8,7 @@ import { createRuntime, loadGeneratedData, loadShadowData } from "./runtime-harn
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
-const PROTECTION_MEMBER_RPOS = new Set(["VQK", "VWE"]);
+const STI_RPOS = new Set(["STI"]);
 
 function parseCsv(source) {
   const rows = [];
@@ -108,7 +108,7 @@ function activeChoiceByRpo(runtime, rpo) {
 
 function normalizeChoices(rows) {
   return Array.from(rows)
-    .filter((choice) => PROTECTION_MEMBER_RPOS.has(choice.rpo))
+    .filter((choice) => STI_RPOS.has(choice.rpo))
     .map((choice) => ({
       choice_id: choice.choice_id,
       option_id: choice.option_id,
@@ -137,16 +137,16 @@ function normalizeChoices(rows) {
     .sort((a, b) => a.choice_id.localeCompare(b.choice_id));
 }
 
-function pcuMemberRecords(data) {
+function pcuStiRecords(data) {
   const pcu = optionIdByRpo(data, "PCU");
-  const targets = ["VQK", "VWE"].map((rpo) => optionIdByRpo(data, rpo)).sort();
+  const sti = optionIdByRpo(data, "STI");
   return {
     rules: data.rules
-      .filter((rule) => rule.source_id === pcu && rule.rule_type === "includes" && targets.includes(rule.target_id))
+      .filter((rule) => rule.source_id === pcu && rule.rule_type === "includes" && rule.target_id === sti)
       .map((rule) => rule.target_id)
       .sort(),
     priceRules: data.priceRules
-      .filter((rule) => rule.condition_option_id === pcu && targets.includes(rule.target_option_id) && Number(rule.price_value) === 0)
+      .filter((rule) => rule.condition_option_id === pcu && rule.target_option_id === sti && Number(rule.price_value) === 0)
       .map((rule) => rule.target_option_id)
       .sort(),
   };
@@ -194,121 +194,122 @@ function lineByRpo(runtime, rpo) {
   return runtime.lineItems().find((line) => line.rpo === rpo);
 }
 
-test("CSV evaluator prices direct VQK and VWE protection member selections", () => {
+test("CSV evaluator prices direct STI protection member selection", () => {
   const production = loadGeneratedData();
-  const result = evaluate("1lt_c07", [optionIdByRpo(production, "VQK"), optionIdByRpo(production, "VWE")]);
+  const result = evaluate("1lt_c07", [optionIdByRpo(production, "STI")]);
 
   assert.deepEqual(result.validation_errors, []);
-  assert.equal(result.selected_lines.find((line) => line.rpo === "VQK")?.final_price_usd, 395);
-  assert.equal(result.selected_lines.find((line) => line.rpo === "VWE")?.final_price_usd, 695);
+  assert.equal(result.selected_lines.find((line) => line.rpo === "STI")?.final_price_usd, 675);
 });
 
-test("CSV VQK and VWE legacy fragment matches generated choices and all-variant availability", () => {
+test("CSV STI legacy fragment matches generated choices and all-variant availability", () => {
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
   const choices = normalizeChoices(projected.choices);
 
   assert.deepEqual(projected.validation_errors, []);
   assert.deepEqual(choices, normalizeChoices(production.choices));
-  assert.equal(choices.length, 12);
+  assert.equal(choices.length, 6);
   assert.deepEqual(
     choices.map((choice) => [choice.rpo, choice.variant_id, choice.status, choice.status_label, choice.selectable, choice.active, choice.base_price]),
     [
-      ["VQK", "1lt_c07", "available", "Available", "True", "True", 395],
-      ["VWE", "1lt_c07", "available", "Available", "True", "True", 695],
-      ["VQK", "1lt_c67", "available", "Available", "True", "True", 395],
-      ["VWE", "1lt_c67", "available", "Available", "True", "True", 695],
-      ["VQK", "2lt_c07", "available", "Available", "True", "True", 395],
-      ["VWE", "2lt_c07", "available", "Available", "True", "True", 695],
-      ["VQK", "2lt_c67", "available", "Available", "True", "True", 395],
-      ["VWE", "2lt_c67", "available", "Available", "True", "True", 695],
-      ["VQK", "3lt_c07", "available", "Available", "True", "True", 395],
-      ["VWE", "3lt_c07", "available", "Available", "True", "True", 695],
-      ["VQK", "3lt_c67", "available", "Available", "True", "True", 395],
-      ["VWE", "3lt_c67", "available", "Available", "True", "True", 695],
+      ["STI", "1lt_c07", "available", "Available", "True", "True", 675],
+      ["STI", "1lt_c67", "available", "Available", "True", "True", 675],
+      ["STI", "2lt_c07", "available", "Available", "True", "True", 675],
+      ["STI", "2lt_c67", "available", "Available", "True", "True", 675],
+      ["STI", "3lt_c07", "available", "Available", "True", "True", 675],
+      ["STI", "3lt_c67", "available", "Available", "True", "True", 675],
     ]
   );
 });
 
-test("ownership preserves the PCU boundary for VQK and VWE members", () => {
+test("ownership projects STI without PCU or fake ground-effects selectables", () => {
   const owned = projectedOwnedRpos();
   const production = loadGeneratedData();
 
-  assert.equal(owned.has("VQK"), true);
-  assert.equal(owned.has("VWE"), true);
+  assert.equal(owned.has("STI"), true);
   assert.equal(owned.has("PCU"), false);
+  assert.equal(owned.has("5V7"), true);
   assert.equal(optionIdsByRpo(production, "5VM").length, 0);
   assert.equal(optionIdsByRpo(production, "5W8").length, 0);
 
-  for (const rpo of PROTECTION_MEMBER_RPOS) {
-    assert.equal(manifestHas({ record_type: "selectable", rpo, ownership: "projected_owned" }), true);
-    assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCU", target_rpo: rpo, ownership: "preserved_cross_boundary" }), true);
-    assert.equal(manifestHas({ record_type: "priceRule", source_rpo: "PCU", target_rpo: rpo, ownership: "preserved_cross_boundary" }), true);
-  }
+  assert.equal(manifestHas({ record_type: "selectable", rpo: "STI", ownership: "projected_owned" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCU", target_rpo: "STI", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "priceRule", source_rpo: "PCU", target_rpo: "STI", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_rpo: "STI", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "STI", target_rpo: "5V7", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5vm_001", target_rpo: "STI", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "STI", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5w8_001", target_rpo: "STI", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "STI", target_option_id: "opt_5w8_001", ownership: "preserved_cross_boundary" }), true);
 });
 
-test("production has only classified PCU package records touching VQK and VWE", () => {
+test("production has only classified PCU and ground-effects records touching STI", () => {
   const production = loadGeneratedData();
 
-  assert.deepEqual(plain(ruleKeysTouching(production, PROTECTION_MEMBER_RPOS)), ["PCU->VQK:includes:True", "PCU->VWE:includes:True"]);
-  assert.deepEqual(plain(priceRuleKeysTouching(production, PROTECTION_MEMBER_RPOS)), ["PCU->VQK:override:0", "PCU->VWE:override:0"]);
-  assert.deepEqual(plain(groupIdsTouching(production, PROTECTION_MEMBER_RPOS)), {
+  assert.deepEqual(plain(ruleKeysTouching(production, STI_RPOS)), [
+    "5V7->STI:excludes:False",
+    "PCU->STI:includes:True",
+    "STI->5V7:excludes:False",
+    "STI->opt_5vm_001:excludes:False",
+    "STI->opt_5w8_001:excludes:False",
+    "opt_5vm_001->STI:excludes:False",
+    "opt_5w8_001->STI:excludes:False",
+  ]);
+  assert.deepEqual(plain(priceRuleKeysTouching(production, STI_RPOS)), ["PCU->STI:override:0"]);
+  assert.deepEqual(plain(groupIdsTouching(production, STI_RPOS)), {
     exclusiveGroups: [],
     ruleGroups: [],
   });
 });
 
-test("shadow overlay preserves PCU package include and included-zero priceRules for VQK and VWE", () => {
+test("shadow overlay preserves PCU package and ground-effects boundaries for STI", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
 
-  assert.deepEqual(plain(pcuMemberRecords(shadow)), plain(pcuMemberRecords(production)));
-  assert.deepEqual(plain(pcuMemberRecords(shadow)), {
-    rules: [optionIdByRpo(production, "VQK"), optionIdByRpo(production, "VWE")],
-    priceRules: [optionIdByRpo(production, "VQK"), optionIdByRpo(production, "VWE")],
-  });
+  assert.deepEqual(plain(pcuStiRecords(shadow)), plain(pcuStiRecords(production)));
+  assert.deepEqual(plain(ruleKeysTouching(shadow, STI_RPOS)), plain(ruleKeysTouching(production, STI_RPOS)));
+  assert.deepEqual(plain(priceRuleKeysTouching(shadow, STI_RPOS)), plain(priceRuleKeysTouching(production, STI_RPOS)));
 });
 
-test("shadow VQK and VWE runtime package behavior matches production", () => {
+test("shadow STI runtime package and 5V7 boundary behavior matches production", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
 
   const directRuntime = runtimeFor(shadow, "1lt_c07");
-  const directVqk = activeChoiceByRpo(directRuntime, "VQK");
-  const directVwe = activeChoiceByRpo(directRuntime, "VWE");
-  directRuntime.handleChoice(directVqk);
-  directRuntime.handleChoice(directVwe);
-  assert.equal(lineByRpo(directRuntime, "VQK")?.price, 395);
-  assert.equal(lineByRpo(directRuntime, "VWE")?.price, 695);
+  const directSti = activeChoiceByRpo(directRuntime, "STI");
+  directRuntime.handleChoice(directSti);
+  assert.equal(lineByRpo(directRuntime, "STI")?.price, 675);
 
   for (const data of [production, shadow]) {
     const packageRuntime = runtimeFor(data, "1lt_c07");
     const pcu = activeChoiceByRpo(packageRuntime, "PCU");
-    const vqk = activeChoiceByRpo(packageRuntime, "VQK");
-    const vwe = activeChoiceByRpo(packageRuntime, "VWE");
+    const sti = activeChoiceByRpo(packageRuntime, "STI");
     packageRuntime.handleChoice(pcu);
-    assert.equal(packageRuntime.computeAutoAdded().has(vqk.option_id), true);
-    assert.equal(packageRuntime.computeAutoAdded().has(vwe.option_id), true);
-    assert.equal(packageRuntime.optionPrice(vqk.option_id), 0);
-    assert.equal(packageRuntime.optionPrice(vwe.option_id), 0);
+    assert.equal(packageRuntime.computeAutoAdded().has(sti.option_id), true);
+    assert.equal(packageRuntime.optionPrice(sti.option_id), 0);
 
     const memberFirstRuntime = runtimeFor(data, "1lt_c07");
-    const memberFirstVqk = activeChoiceByRpo(memberFirstRuntime, "VQK");
-    const memberFirstVwe = activeChoiceByRpo(memberFirstRuntime, "VWE");
+    const memberFirstSti = activeChoiceByRpo(memberFirstRuntime, "STI");
     const memberFirstPcu = activeChoiceByRpo(memberFirstRuntime, "PCU");
-    memberFirstRuntime.handleChoice(memberFirstVqk);
-    memberFirstRuntime.handleChoice(memberFirstVwe);
+    memberFirstRuntime.handleChoice(memberFirstSti);
     memberFirstRuntime.handleChoice(memberFirstPcu);
-    assert.equal(memberFirstRuntime.state.selected.has(memberFirstVqk.option_id), true);
-    assert.equal(memberFirstRuntime.state.selected.has(memberFirstVwe.option_id), true);
-    assert.equal(memberFirstRuntime.computeAutoAdded().has(memberFirstVqk.option_id), false);
-    assert.equal(memberFirstRuntime.computeAutoAdded().has(memberFirstVwe.option_id), false);
-    assert.equal(memberFirstRuntime.optionPrice(memberFirstVqk.option_id), 0);
-    assert.equal(memberFirstRuntime.optionPrice(memberFirstVwe.option_id), 0);
+    assert.equal(memberFirstRuntime.state.selected.has(memberFirstSti.option_id), true);
+    assert.equal(memberFirstRuntime.computeAutoAdded().has(memberFirstSti.option_id), false);
+    assert.equal(memberFirstRuntime.optionPrice(memberFirstSti.option_id), 0);
 
     memberFirstRuntime.handleChoice(memberFirstPcu);
     assert.equal(memberFirstRuntime.state.selected.has(memberFirstPcu.option_id), false);
-    assert.equal(memberFirstRuntime.optionPrice(memberFirstVqk.option_id), 395);
-    assert.equal(memberFirstRuntime.optionPrice(memberFirstVwe.option_id), 695);
+    assert.equal(memberFirstRuntime.optionPrice(memberFirstSti.option_id), 675);
+
+    const stiRuntime = runtimeFor(data, "1lt_c07");
+    stiRuntime.handleChoice(activeChoiceByRpo(stiRuntime, "5ZZ"));
+    stiRuntime.handleChoice(activeChoiceByRpo(stiRuntime, "STI"));
+    assert.match(stiRuntime.disableReasonForChoice(activeChoiceByRpo(stiRuntime, "5V7")), /Blocked by STI/);
+
+    const fiveV7Runtime = runtimeFor(data, "1lt_c07");
+    fiveV7Runtime.handleChoice(activeChoiceByRpo(fiveV7Runtime, "5ZZ"));
+    fiveV7Runtime.handleChoice(activeChoiceByRpo(fiveV7Runtime, "5V7"));
+    assert.match(fiveV7Runtime.disableReasonForChoice(activeChoiceByRpo(fiveV7Runtime, "STI")), /Blocked by 5V7/);
   }
 });
