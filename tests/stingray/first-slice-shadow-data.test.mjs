@@ -4,7 +4,7 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
-const FIRST_SLICE_RPOS = new Set(["B6P", "D3V", "SL9", "ZZ3", "BCP", "BCS", "BC4", "BC7"]);
+const FIRST_SLICE_RPOS = new Set(["B6P", "D3V", "SL9", "ZZ3", "BCP", "BCS", "BC4", "BC7", "PEF", "CAV", "RIA"]);
 
 function loadGeneratedData() {
   const context = { window: {} };

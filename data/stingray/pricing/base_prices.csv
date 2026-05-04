@@ -30,6 +30,7 @@ bp_rwu,pb_2027_stingray,selectable,opt_rwu_001,,175,10,true,Current RWU base pri
 bp_s2l,pb_2027_stingray,selectable,opt_s2l_001,,1695,10,true,Current S2L base price.
 bp_vyw,pb_2027_stingray,selectable,opt_vyw_001,,275,10,true,Current VYW base price.
 bp_w2d,pb_2027_stingray,selectable,opt_w2d_001,,125,10,true,Current W2D base price.
+bp_pef,pb_2027_stingray,selectable,opt_pef_001,,475,10,true,Current PEF base price.
 bp_ria,pb_2027_stingray,selectable,opt_ria_001,,265,10,true,Current RIA base price.
 bp_cav,pb_2027_stingray,selectable,opt_cav_001,,230,10,true,Current CAV base price.
 bp_eri,pb_2027_stingray,selectable,opt_eri_001,,100,10,true,Current ERI base price.
