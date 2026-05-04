@@ -2221,6 +2221,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--validate-decision-ledger-csv", default="")
     parser.add_argument("--decision-ledger-validation-report-out", default="")
     parser.add_argument("--decision-ledger-validation-summary-out", default="")
+    parser.add_argument("--manual-review-readiness-checkpoint-out", default="")
     return parser.parse_args()
 
 
@@ -2607,6 +2608,51 @@ def decision_ledger_validation_summary(validation_report: dict[str, Any]) -> dic
     }
 
 
+def manual_review_readiness_checkpoint(
+    report: dict[str, Any],
+    validation_report: dict[str, Any],
+    validation_summary: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    error_counts = (
+        validation_summary["error_counts"]
+        if validation_summary
+        else {
+            "missing_group_count": validation_report["missing_group_count"],
+            "unknown_group_count": validation_report["unknown_group_count"],
+            "duplicate_group_count": validation_report["duplicate_group_count"],
+            "schema_error_count": validation_report["schema_error_count"],
+            "review_value_error_count": validation_report["review_value_error_count"],
+        }
+    )
+    error_count = sum(error_counts.values())
+    ready_for_manual_review = (
+        report["status"] == "allowed"
+        and report["invalid_preserved_count"] == 0
+        and validation_report["status"] == "allowed"
+        and validation_report["matched_group_count"] == validation_report["current_group_count"]
+        and validation_report["ledger_row_count"] == validation_report["current_group_count"]
+    )
+    return {
+        "schema_version": 1,
+        "status": "ready_for_manual_review" if ready_for_manual_review else "blocked",
+        "not_migration_ready": True,
+        "inputs": {
+            "manifest_only_report_status": report["status"],
+            "validation_report_status": validation_report["status"],
+        },
+        "counts": {
+            "manifest_only_preservation_row_count": report["manifest_only_preservation_row_count"],
+            "group_count": report["group_count"],
+            "invalid_preserved_count": report["invalid_preserved_count"],
+            "ledger_row_count": validation_report["ledger_row_count"],
+            "current_group_count": validation_report["current_group_count"],
+            "matched_group_count": validation_report["matched_group_count"],
+            "error_count": error_count,
+        },
+        "required_next_step": "manual_review",
+    }
+
+
 def manifest_only_review_packet_manifest(report: dict[str, Any], json_out: str, csv_out: str) -> dict[str, Any]:
     return {
         "schema_version": 1,
@@ -2684,6 +2730,8 @@ def main() -> None:
             raise OverlayError("--decision-ledger-validation-report-out requires --validate-decision-ledger-csv.")
         if args.decision_ledger_validation_summary_out and not args.validate_decision_ledger_csv:
             raise OverlayError("--decision-ledger-validation-summary-out requires --validate-decision-ledger-csv.")
+        if args.manual_review_readiness_checkpoint_out and not args.validate_decision_ledger_csv:
+            raise OverlayError("--manual-review-readiness-checkpoint-out requires --validate-decision-ledger-csv.")
         production = load_production_data(Path(args.production_data))
         fragment = load_fragment(args)
         ownership = load_ownership_scope(Path(args.ownership_manifest))
@@ -2734,6 +2782,7 @@ def main() -> None:
             if args.decision_ledger_csv_out:
                 write_decision_ledger_csv(report, args.decision_ledger_csv_out)
             ledger_validation_report = None
+            ledger_validation_summary = None
             if args.validate_decision_ledger_csv:
                 ledger_validation_report = decision_ledger_validation_report(report, args.validate_decision_ledger_csv)
                 if args.decision_ledger_validation_report_out:
@@ -2746,6 +2795,12 @@ def main() -> None:
                     write_or_print_output(
                         format_report_json(ledger_validation_summary, args.pretty),
                         args.decision_ledger_validation_summary_out,
+                    )
+                if args.manual_review_readiness_checkpoint_out:
+                    checkpoint = manual_review_readiness_checkpoint(report, ledger_validation_report, ledger_validation_summary)
+                    write_or_print_output(
+                        format_report_json(checkpoint, args.pretty),
+                        args.manual_review_readiness_checkpoint_out,
                     )
             if namespace_report["unresolved_count"]:
                 raise OverlayError(f"blocking unresolved structured refs: {namespace_report['unresolved_count']}.")

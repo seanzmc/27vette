@@ -110,6 +110,9 @@ function runDecisionLedgerValidation(ledgerPath, extraArgs = []) {
   const summaryOut = extraArgs.includes("--decision-ledger-validation-summary-out")
     ? extraArgs[extraArgs.indexOf("--decision-ledger-validation-summary-out") + 1]
     : null;
+  const checkpointOut = extraArgs.includes("--manual-review-readiness-checkpoint-out")
+    ? extraArgs[extraArgs.indexOf("--manual-review-readiness-checkpoint-out") + 1]
+    : null;
   const result = spawnSync(
     PYTHON,
     [
@@ -137,6 +140,8 @@ function runDecisionLedgerValidation(ledgerPath, extraArgs = []) {
     validationReport: fs.existsSync(validationOut) ? JSON.parse(fs.readFileSync(validationOut, "utf8")) : null,
     summaryOut,
     summary: summaryOut && fs.existsSync(summaryOut) ? JSON.parse(fs.readFileSync(summaryOut, "utf8")) : null,
+    checkpointOut,
+    checkpoint: checkpointOut && fs.existsSync(checkpointOut) ? JSON.parse(fs.readFileSync(checkpointOut, "utf8")) : null,
   };
 }
 
@@ -390,6 +395,30 @@ const DECISION_LEDGER_VALIDATION_SUMMARY_REVIEW_FIELDS = [
   "review_status",
 ];
 
+const MANUAL_REVIEW_CHECKPOINT_KEYS = [
+  "counts",
+  "inputs",
+  "not_migration_ready",
+  "required_next_step",
+  "schema_version",
+  "status",
+];
+
+const MANUAL_REVIEW_CHECKPOINT_INPUT_KEYS = [
+  "manifest_only_report_status",
+  "validation_report_status",
+];
+
+const MANUAL_REVIEW_CHECKPOINT_COUNT_KEYS = [
+  "current_group_count",
+  "error_count",
+  "group_count",
+  "invalid_preserved_count",
+  "ledger_row_count",
+  "manifest_only_preservation_row_count",
+  "matched_group_count",
+];
+
 const VALIDATION_REPORT_FORBIDDEN_KEYS = [
   "recommended_action",
   "migration_ready",
@@ -399,6 +428,9 @@ const VALIDATION_REPORT_FORBIDDEN_KEYS = [
   "cleanup",
   "future_candidate",
 ];
+
+const MANUAL_REVIEW_CHECKPOINT_FORBIDDEN_TERMS =
+  /\b(ready_for_migration|auto_migrate|recommended_action|apply_patch|manifest_update)\b/i;
 
 const PACKET_TOP_LEVEL_KEYS = [
   "csv",
@@ -848,6 +880,77 @@ function assertValidationSummaryParity(summary, validationReport) {
     const hasBlank = validationReport.groups.some((group) => (group[field] ?? "") === "");
     assert.equal(Object.hasOwn(summary.review_field_counts[field], ""), hasBlank, field);
   }
+}
+
+function validationErrorCount(validationReport) {
+  return (
+    validationReport.missing_group_count +
+    validationReport.unknown_group_count +
+    validationReport.duplicate_group_count +
+    validationReport.schema_error_count +
+    validationReport.review_value_error_count
+  );
+}
+
+function expectedManualReviewCheckpoint(report, validationReport) {
+  const readyForManualReview =
+    report.status === "allowed" &&
+    report.invalid_preserved_count === 0 &&
+    validationReport.status === "allowed" &&
+    validationReport.matched_group_count === validationReport.current_group_count &&
+    validationReport.ledger_row_count === validationReport.current_group_count;
+  return {
+    schema_version: 1,
+    status: readyForManualReview ? "ready_for_manual_review" : "blocked",
+    not_migration_ready: true,
+    inputs: {
+      manifest_only_report_status: report.status,
+      validation_report_status: validationReport.status,
+    },
+    counts: {
+      manifest_only_preservation_row_count: report.manifest_only_preservation_row_count,
+      group_count: report.group_count,
+      invalid_preserved_count: report.invalid_preserved_count,
+      ledger_row_count: validationReport.ledger_row_count,
+      current_group_count: validationReport.current_group_count,
+      matched_group_count: validationReport.matched_group_count,
+      error_count: validationErrorCount(validationReport),
+    },
+    required_next_step: "manual_review",
+  };
+}
+
+function assertNoCheckpointForbiddenTerms(value) {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      assertNoCheckpointForbiddenTerms(item);
+    }
+    return;
+  }
+  if (value && typeof value === "object") {
+    for (const [key, child] of Object.entries(value)) {
+      assert.equal(MANUAL_REVIEW_CHECKPOINT_FORBIDDEN_TERMS.test(key), false, `checkpoint forbidden key: ${key}`);
+      assertNoCheckpointForbiddenTerms(child);
+    }
+    return;
+  }
+  if (typeof value === "string") {
+    assert.equal(MANUAL_REVIEW_CHECKPOINT_FORBIDDEN_TERMS.test(value), false, `checkpoint forbidden value: ${value}`);
+  }
+}
+
+function assertManualReviewCheckpointSchema(checkpoint) {
+  assert.deepEqual(Object.keys(checkpoint), MANUAL_REVIEW_CHECKPOINT_KEYS);
+  assert.deepEqual(Object.keys(checkpoint.inputs), MANUAL_REVIEW_CHECKPOINT_INPUT_KEYS);
+  assert.deepEqual(Object.keys(checkpoint.counts), MANUAL_REVIEW_CHECKPOINT_COUNT_KEYS);
+  assert.equal(checkpoint.schema_version, 1);
+  assert.equal(["ready_for_manual_review", "blocked"].includes(checkpoint.status), true);
+  assert.equal(checkpoint.not_migration_ready, true);
+  assert.equal(checkpoint.required_next_step, "manual_review");
+  for (const field of MANUAL_REVIEW_CHECKPOINT_COUNT_KEYS) {
+    assert.equal(typeof checkpoint.counts[field], "number", field);
+  }
+  assertNoCheckpointForbiddenTerms(checkpoint);
 }
 
 function expectedDecisionLedgerRows(report) {
@@ -1479,6 +1582,66 @@ test("manifest-only preservation writes a compact decision ledger validation sum
   assert.equal(blocking.summary.error_counts.review_value_error_count, 1);
 });
 
+test("manifest-only preservation writes a manual review readiness checkpoint", () => {
+  const bundle = runManifestOnlyTriageWithDecisionLedger();
+  assert.equal(bundle.result.status, 0, bundle.result.stderr);
+  const [ledgerHeader, ...ledgerDataRows] = parseCsv(bundle.ledger);
+  const ledgerRows = ledgerRowsToObjects(ledgerDataRows);
+  ledgerRows[0].review_status = "reviewed";
+  ledgerRows[0].decision = "preserve";
+  ledgerRows[0].followup_action = "none";
+  ledgerRows[1].review_status = "pending";
+  ledgerRows[1].decision = "needs_research";
+  ledgerRows[1].followup_action = "open_question";
+  const filledLedger = tempPath("filled-decision-ledger-checkpoint.csv");
+  writeCsv(filledLedger, ledgerHeader, ledgerObjectsToCsvRows(ledgerRows));
+  const summaryOut = tempPath("decision-ledger-validation-summary-checkpoint.json");
+  const checkpointOut = tempPath("manual-review-readiness-checkpoint.json");
+
+  const validation = runDecisionLedgerValidation(filledLedger, [
+    "--decision-ledger-validation-summary-out",
+    summaryOut,
+    "--manual-review-readiness-checkpoint-out",
+    checkpointOut,
+  ]);
+  assert.equal(validation.result.status, 0, validation.result.stderr);
+  assert.ok(fs.existsSync(validation.validationOut));
+  assert.ok(fs.existsSync(summaryOut));
+  assert.ok(fs.existsSync(checkpointOut));
+  assertValidationReportSchema(validation.validationReport);
+  assertValidationSummarySchema(validation.summary);
+  assertManualReviewCheckpointSchema(validation.checkpoint);
+  assert.deepEqual(validation.checkpoint, expectedManualReviewCheckpoint(validation.report, validation.validationReport));
+  assert.equal(validation.checkpoint.status, "ready_for_manual_review");
+  assert.equal(validation.checkpoint.not_migration_ready, true);
+  assert.equal(validation.checkpoint.required_next_step, "manual_review");
+  assert.equal(validation.checkpoint.counts.error_count, 0);
+
+  const blockingRows = [{ ...ledgerRows[0], decision: "migrate_now" }, ...ledgerRows.slice(1)];
+  const blockingLedger = tempPath("blocking-decision-ledger-checkpoint.csv");
+  const blockingSummaryOut = tempPath("blocking-decision-ledger-validation-summary-checkpoint.json");
+  const blockingCheckpointOut = tempPath("blocking-manual-review-readiness-checkpoint.json");
+  writeCsv(blockingLedger, ledgerHeader, ledgerObjectsToCsvRows(blockingRows));
+  const blocking = runDecisionLedgerValidation(blockingLedger, [
+    "--decision-ledger-validation-summary-out",
+    blockingSummaryOut,
+    "--manual-review-readiness-checkpoint-out",
+    blockingCheckpointOut,
+  ]);
+  assert.notEqual(blocking.result.status, 0);
+  assert.ok(fs.existsSync(blocking.validationOut));
+  assert.ok(fs.existsSync(blockingSummaryOut));
+  assert.ok(fs.existsSync(blockingCheckpointOut));
+  assertValidationReportSchema(blocking.validationReport);
+  assertValidationSummarySchema(blocking.summary);
+  assertManualReviewCheckpointSchema(blocking.checkpoint);
+  assert.deepEqual(blocking.checkpoint, expectedManualReviewCheckpoint(blocking.report, blocking.validationReport));
+  assert.equal(blocking.checkpoint.status, "blocked");
+  assert.equal(blocking.checkpoint.not_migration_ready, true);
+  assert.equal(blocking.checkpoint.required_next_step, "manual_review");
+  assert.equal(blocking.checkpoint.counts.error_count, 1);
+});
+
 test("manifest-only preservation blocks malformed decision ledgers", () => {
   const bundle = runManifestOnlyTriageWithDecisionLedger();
   assert.equal(bundle.result.status, 0, bundle.result.stderr);
@@ -1599,7 +1762,8 @@ test("manifest-only preservation triage rejects data-js mode and leaves default 
   const ledgerOut = tempPath("manifest-only-triage-data-js-ledger.csv");
   const validationOut = tempPath("manifest-only-triage-data-js-ledger-validation.json");
   const summaryOut = tempPath("manifest-only-triage-data-js-ledger-validation-summary.json");
-  const invalid = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--manifest-only-preservation-triage", "--as-data-js", "--out", out, "--direction-slice-rows-csv-out", csvOut, "--review-packet-manifest-out", packetOut, "--decision-ledger-csv-out", ledgerOut, "--validate-decision-ledger-csv", ledgerOut, "--decision-ledger-validation-report-out", validationOut, "--decision-ledger-validation-summary-out", summaryOut], {
+  const checkpointOut = tempPath("manifest-only-triage-data-js-manual-review-checkpoint.json");
+  const invalid = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--manifest-only-preservation-triage", "--as-data-js", "--out", out, "--direction-slice-rows-csv-out", csvOut, "--review-packet-manifest-out", packetOut, "--decision-ledger-csv-out", ledgerOut, "--validate-decision-ledger-csv", ledgerOut, "--decision-ledger-validation-report-out", validationOut, "--decision-ledger-validation-summary-out", summaryOut, "--manual-review-readiness-checkpoint-out", checkpointOut], {
     cwd: process.cwd(),
     encoding: "utf8",
     maxBuffer: 8 * 1024 * 1024,
@@ -1612,6 +1776,7 @@ test("manifest-only preservation triage rejects data-js mode and leaves default 
   assert.equal(fs.existsSync(ledgerOut), false);
   assert.equal(fs.existsSync(validationOut), false);
   assert.equal(fs.existsSync(summaryOut), false);
+  assert.equal(fs.existsSync(checkpointOut), false);
 
   const csvWithoutOwningMode = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--direction-slice-rows-csv-out", tempPath("direction-slice-rows.csv")], {
     cwd: process.cwd(),
@@ -1660,6 +1825,14 @@ test("manifest-only preservation triage rejects data-js mode and leaves default 
   });
   assert.notEqual(validationSummaryWithoutLedger.status, 0);
   assert.match(validationSummaryWithoutLedger.stderr, /--decision-ledger-validation-summary-out requires --validate-decision-ledger-csv/);
+
+  const manualReviewCheckpointWithoutLedger = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--manual-review-readiness-checkpoint-out", tempPath("manual-review-readiness-checkpoint.json")], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+    maxBuffer: 8 * 1024 * 1024,
+  });
+  assert.notEqual(manualReviewCheckpointWithoutLedger.status, 0);
+  assert.match(manualReviewCheckpointWithoutLedger.stderr, /--manual-review-readiness-checkpoint-out requires --validate-decision-ledger-csv/);
 
   const stdoutRun = defaultOverlayStdout();
   const outRun = defaultOverlayOutFile();
