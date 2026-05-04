@@ -8,10 +8,10 @@ import { createRuntime, loadGeneratedData, loadShadowData } from "./runtime-harn
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
-const PEF_PACKAGE_RPOS = new Set(["PEF", "CAV", "RIA"]);
+const PDY_PACKAGE_RPOS = new Set(["PDY", "RYT", "S08"]);
 const INCLUDED_EDGES = [
-  ["PEF", "CAV"],
-  ["PEF", "RIA"],
+  ["PDY", "RYT"],
+  ["PDY", "S08"],
 ];
 const OUT_OF_SCOPE_RPOS = new Set([]);
 
@@ -105,7 +105,7 @@ function runtimeFor(data, variantId) {
 
 function normalizeChoices(rows) {
   return Array.from(rows)
-    .filter((choice) => choice.rpo === "PEF")
+    .filter((choice) => PDY_PACKAGE_RPOS.has(choice.rpo))
     .map((choice) => ({
       choice_id: choice.choice_id,
       option_id: choice.option_id,
@@ -196,13 +196,13 @@ function groupIdsTouching(data, rpos) {
   };
 }
 
-function preservedPefRows() {
+function preservedPdyRows() {
   return activeManifestRows()
     .filter(
       (row) =>
         row.ownership === "preserved_cross_boundary" &&
-        row.source_rpo === "PEF" &&
-        ["CAV", "RIA"].includes(row.target_rpo) &&
+        row.source_rpo === "PDY" &&
+        ["RYT", "S08"].includes(row.target_rpo) &&
         ["rule", "priceRule"].includes(row.record_type)
     )
     .map((row) => `${row.record_type}:${row.source_rpo}->${row.target_rpo}`)
@@ -213,50 +213,39 @@ function lineByRpo(runtime, rpo) {
   return runtime.lineItems().find((line) => line.rpo === rpo);
 }
 
-test("CSV evaluator prices direct PEF Contoured Liner package selection", () => {
+test("CSV evaluator prices direct PDY Roadside Safety package selection", () => {
   const production = loadGeneratedData();
-  const result = evaluate("1lt_c07", [optionIdByRpo(production, "PEF")]);
+  const result = evaluate("1lt_c07", [optionIdByRpo(production, "PDY")]);
 
   assert.deepEqual(result.validation_errors, []);
-  assert.equal(result.selected_lines.find((line) => line.rpo === "PEF")?.final_price_usd, 475);
-  assert.equal(result.selected_lines.find((line) => line.rpo === "CAV")?.final_price_usd, 0);
-  assert.equal(result.selected_lines.find((line) => line.rpo === "RIA")?.final_price_usd, 0);
+  assert.equal(result.selected_lines.find((line) => line.rpo === "PDY")?.final_price_usd, 195);
+  assert.equal(result.selected_lines.find((line) => line.rpo === "RYT")?.final_price_usd, 0);
+  assert.equal(result.selected_lines.find((line) => line.rpo === "S08")?.final_price_usd, 0);
 });
 
-test("CSV PEF legacy fragment matches generated choices and all-variant availability", () => {
+test("CSV PDY legacy fragment matches generated choices and all-variant availability", () => {
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
   const choices = normalizeChoices(projected.choices);
 
   assert.deepEqual(projected.validation_errors, []);
   assert.deepEqual(choices, normalizeChoices(production.choices));
-  assert.equal(choices.length, 6);
-  assert.deepEqual(
-    choices.map((choice) => [choice.variant_id, choice.status, choice.status_label, choice.selectable, choice.active, choice.base_price]),
-    [
-      ["1lt_c07", "available", "Available", "True", "True", 475],
-      ["1lt_c67", "available", "Available", "True", "True", 475],
-      ["2lt_c07", "available", "Available", "True", "True", 475],
-      ["2lt_c67", "available", "Available", "True", "True", 475],
-      ["3lt_c07", "available", "Available", "True", "True", 475],
-      ["3lt_c67", "available", "Available", "True", "True", 475],
-    ]
-  );
+  assert.equal(choices.length, 18);
 });
 
-test("PEF package cluster satisfies projected-owned source and target policy", () => {
+test("PDY package cluster satisfies projected-owned source and target policy", () => {
   const owned = projectedOwnedRpos();
 
-  for (const rpo of PEF_PACKAGE_RPOS) {
+  for (const rpo of PDY_PACKAGE_RPOS) {
     assert.equal(owned.has(rpo), true, `${rpo} should be projected-owned`);
   }
   for (const rpo of OUT_OF_SCOPE_RPOS) {
-    assert.equal(owned.has(rpo), false, `${rpo} should remain outside the PEF package slice`);
+    assert.equal(owned.has(rpo), false, `${rpo} should remain outside the PDY package slice`);
   }
-  assert.deepEqual(preservedPefRows(), [], "PEF package records should no longer be preserved cross-boundary rows");
+  assert.deepEqual(preservedPdyRows(), [], "PDY package records should not be preserved cross-boundary rows");
 });
 
-test("CSV PEF legacy fragment emits package include rules and included-zero priceRules", () => {
+test("CSV PDY legacy fragment emits package include rules and included-zero priceRules", () => {
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
 
@@ -277,64 +266,64 @@ test("CSV PEF legacy fragment emits package include rules and included-zero pric
   }
 });
 
-test("production has only PEF package records touching the fully owned liner cluster", () => {
+test("production has only PDY package records touching the fully owned roadside safety cluster", () => {
   const production = loadGeneratedData();
 
-  assert.deepEqual(plain(ruleKeysTouching(production, PEF_PACKAGE_RPOS)), ["PEF->CAV:includes:True", "PEF->RIA:includes:True"]);
-  assert.deepEqual(plain(priceRuleKeysTouching(production, PEF_PACKAGE_RPOS)), ["PEF->CAV:override:0", "PEF->RIA:override:0"]);
-  assert.deepEqual(plain(groupIdsTouching(production, PEF_PACKAGE_RPOS)), {
+  assert.deepEqual(plain(ruleKeysTouching(production, PDY_PACKAGE_RPOS)), ["PDY->RYT:includes:True", "PDY->S08:includes:True"]);
+  assert.deepEqual(plain(priceRuleKeysTouching(production, PDY_PACKAGE_RPOS)), ["PDY->RYT:override:0", "PDY->S08:override:0"]);
+  assert.deepEqual(plain(groupIdsTouching(production, PDY_PACKAGE_RPOS)), {
     exclusiveGroups: [],
     ruleGroups: [],
   });
 });
 
-test("shadow overlay projects PEF package records instead of preserving them", () => {
+test("shadow overlay projects PDY package records instead of preserving them", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
 
-  assert.deepEqual(plain(packageRuleKeys(shadow, "PEF", ["CAV", "RIA"])), plain(packageRuleKeys(production, "PEF", ["CAV", "RIA"])));
-  assert.deepEqual(plain(packagePriceRuleKeys(shadow, "PEF", ["CAV", "RIA"])), plain(packagePriceRuleKeys(production, "PEF", ["CAV", "RIA"])));
-  assert.deepEqual(plain(preservedPefRows()), []);
+  assert.deepEqual(plain(packageRuleKeys(shadow, "PDY", ["RYT", "S08"])), plain(packageRuleKeys(production, "PDY", ["RYT", "S08"])));
+  assert.deepEqual(plain(packagePriceRuleKeys(shadow, "PDY", ["RYT", "S08"])), plain(packagePriceRuleKeys(production, "PDY", ["RYT", "S08"])));
+  assert.deepEqual(plain(preservedPdyRows()), []);
 });
 
-test("shadow PEF runtime package behavior matches production", () => {
+test("shadow PDY runtime package behavior matches production", () => {
   for (const data of [loadGeneratedData(), loadShadowData()]) {
     const directRuntime = runtimeFor(data, "1lt_c07");
-    const directCav = activeChoiceByRpo(directRuntime, "CAV");
-    const directRia = activeChoiceByRpo(directRuntime, "RIA");
-    directRuntime.handleChoice(directCav);
-    directRuntime.handleChoice(directRia);
-    assert.equal(lineByRpo(directRuntime, "CAV")?.price, 230);
-    assert.equal(lineByRpo(directRuntime, "RIA")?.price, 265);
+    const directRyt = activeChoiceByRpo(directRuntime, "RYT");
+    const directS08 = activeChoiceByRpo(directRuntime, "S08");
+    directRuntime.handleChoice(directRyt);
+    directRuntime.handleChoice(directS08);
+    assert.equal(lineByRpo(directRuntime, "RYT")?.price, 60);
+    assert.equal(lineByRpo(directRuntime, "S08")?.price, 150);
 
     const packageRuntime = runtimeFor(data, "1lt_c07");
-    const pef = activeChoiceByRpo(packageRuntime, "PEF");
-    const cav = activeChoiceByRpo(packageRuntime, "CAV");
-    const ria = activeChoiceByRpo(packageRuntime, "RIA");
-    packageRuntime.handleChoice(pef);
-    assert.equal(lineByRpo(packageRuntime, "PEF")?.price, 475);
-    assert.equal(packageRuntime.computeAutoAdded().has(cav.option_id), true);
-    assert.equal(packageRuntime.computeAutoAdded().has(ria.option_id), true);
-    assert.equal(packageRuntime.optionPrice(cav.option_id), 0);
-    assert.equal(packageRuntime.optionPrice(ria.option_id), 0);
+    const pdy = activeChoiceByRpo(packageRuntime, "PDY");
+    const ryt = activeChoiceByRpo(packageRuntime, "RYT");
+    const s08 = activeChoiceByRpo(packageRuntime, "S08");
+    packageRuntime.handleChoice(pdy);
+    assert.equal(lineByRpo(packageRuntime, "PDY")?.price, 195);
+    assert.equal(packageRuntime.computeAutoAdded().has(ryt.option_id), true);
+    assert.equal(packageRuntime.computeAutoAdded().has(s08.option_id), true);
+    assert.equal(packageRuntime.optionPrice(ryt.option_id), 0);
+    assert.equal(packageRuntime.optionPrice(s08.option_id), 0);
 
     const memberFirstRuntime = runtimeFor(data, "1lt_c07");
-    const memberFirstCav = activeChoiceByRpo(memberFirstRuntime, "CAV");
-    const memberFirstRia = activeChoiceByRpo(memberFirstRuntime, "RIA");
-    const memberFirstPef = activeChoiceByRpo(memberFirstRuntime, "PEF");
-    memberFirstRuntime.handleChoice(memberFirstCav);
-    memberFirstRuntime.handleChoice(memberFirstRia);
-    memberFirstRuntime.handleChoice(memberFirstPef);
-    assert.equal(memberFirstRuntime.lineItems().filter((line) => line.rpo === "CAV").length, 1);
-    assert.equal(memberFirstRuntime.lineItems().filter((line) => line.rpo === "RIA").length, 1);
-    assert.equal(memberFirstRuntime.computeAutoAdded().has(memberFirstCav.option_id), false);
-    assert.equal(memberFirstRuntime.computeAutoAdded().has(memberFirstRia.option_id), false);
-    assert.equal(memberFirstRuntime.optionPrice(memberFirstCav.option_id), 0);
-    assert.equal(memberFirstRuntime.optionPrice(memberFirstRia.option_id), 0);
+    const memberFirstRyt = activeChoiceByRpo(memberFirstRuntime, "RYT");
+    const memberFirstS08 = activeChoiceByRpo(memberFirstRuntime, "S08");
+    const memberFirstPdy = activeChoiceByRpo(memberFirstRuntime, "PDY");
+    memberFirstRuntime.handleChoice(memberFirstRyt);
+    memberFirstRuntime.handleChoice(memberFirstS08);
+    memberFirstRuntime.handleChoice(memberFirstPdy);
+    assert.equal(memberFirstRuntime.lineItems().filter((line) => line.rpo === "RYT").length, 1);
+    assert.equal(memberFirstRuntime.lineItems().filter((line) => line.rpo === "S08").length, 1);
+    assert.equal(memberFirstRuntime.computeAutoAdded().has(memberFirstRyt.option_id), false);
+    assert.equal(memberFirstRuntime.computeAutoAdded().has(memberFirstS08.option_id), false);
+    assert.equal(memberFirstRuntime.optionPrice(memberFirstRyt.option_id), 0);
+    assert.equal(memberFirstRuntime.optionPrice(memberFirstS08.option_id), 0);
 
-    memberFirstRuntime.handleChoice(memberFirstPef);
-    assert.equal(memberFirstRuntime.state.selected.has(memberFirstPef.option_id), false);
-    assert.equal(memberFirstRuntime.optionPrice(memberFirstCav.option_id), 230);
-    assert.equal(memberFirstRuntime.optionPrice(memberFirstRia.option_id), 265);
+    memberFirstRuntime.handleChoice(memberFirstPdy);
+    assert.equal(memberFirstRuntime.state.selected.has(memberFirstPdy.option_id), false);
+    assert.equal(memberFirstRuntime.optionPrice(memberFirstRyt.option_id), 60);
+    assert.equal(memberFirstRuntime.optionPrice(memberFirstS08.option_id), 150);
   }
 });

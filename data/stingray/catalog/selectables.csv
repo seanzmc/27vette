@@ -35,6 +35,11 @@ opt_w2d_001,option,W2D,"LPO, Cargo net set",Genuine Corvette Accessory,true,cs_1
 opt_pef_001,option,PEF,"LPO, Contoured Liner Protection Package","Includes (CAV) contoured cargo area liners with Jake logo and (RIA) all-weather floor liners with Jake logo, Genuine Corvette Accessory",true,,Contoured liner package source choice.
 opt_ria_001,option,RIA,"LPO, All-weather floor liners with Jake logo",Genuine Corvette Accessory,true,,Contoured liner member choice; PEF package is projected-owned.
 opt_cav_001,option,CAV,"LPO, Contoured cargo area liners with Jake logo",Genuine Corvette Accessory,true,,Contoured liner member choice; PEF package is projected-owned.
+opt_pdy_001,option,PDY,"LPO, Roadside Safety Package","Includes (RYT) First Aid Kit, LPO and (S08) Highway Safety Kit, LPO, Genuine Corvette Accessory",true,,Roadside safety package source choice.
+opt_ryt_001,option,RYT,"LPO, First Aid Kit",Genuine Corvette Accessory,true,,Roadside safety package member choice; PDY package is projected-owned.
+opt_s08_001,option,S08,"LPO, Highway Safety Kit",Genuine Corvette Accessory,true,,Roadside safety package member choice; PDY package is projected-owned.
+opt_sbt_001,option,SBT,"LPO, Dual roof","Adds transparent removable roof panel and includes (SC7) roof panel storage pouch, Genuine Corvette Accessories",true,cs_coupe,Dual roof package source choice; CC3 roof boundary remains production-owned.
+opt_sc7_001,option,SC7,"LPO, Roof panel storage pouch",Genuine Corvette Accessory,true,cs_coupe,Dual roof package member choice; SBT package is projected-owned.
 opt_eri_001,option,ERI,Battery Protection Package,,true,,Standalone mechanical accessory choice.
 opt_shq_001,option,SHQ,"LPO, Fender hash stripes","Silver with Carbon Flash Metallic accent, Genuine Corvette Accessory",true,,Isolated fender hash stripe choice.
 opt_shw_001,option,SHW,"LPO, Fender hash stripes","Carbon Flash Metallic with Edge Red accent, Genuine Corvette Accessory",true,,Isolated fender hash stripe choice.

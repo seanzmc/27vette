@@ -9,7 +9,7 @@ const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const LPO_INTERIOR_STANDALONE_RPOS = new Set(["RWU", "S2L", "VYW", "W2D"]);
-const NEARBY_UNOWNED_LPO_INTERIOR_RPOS = new Set(["PDY", "RYT", "S08", "SBT", "SC7"]);
+const NEARBY_UNOWNED_LPO_INTERIOR_RPOS = new Set([]);
 const EXPECTED_PRICES = new Map([
   ["RWU", 175],
   ["S2L", 1695],

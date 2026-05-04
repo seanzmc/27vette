@@ -4,7 +4,8 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
-const FIRST_SLICE_RPOS = new Set(["B6P", "D3V", "SL9", "ZZ3", "BCP", "BCS", "BC4", "BC7", "PEF", "CAV", "RIA"]);
+const FIRST_SLICE_RPOS = new Set(["B6P", "D3V", "SL9", "ZZ3", "BCP", "BCS", "BC4", "BC7", "PEF", "CAV", "RIA", "PDY", "RYT", "S08", "SBT", "SC7"]);
+const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set(["opt_sbt_001->opt_cc3_001"]);
 
 function loadGeneratedData() {
   const context = { window: {} };
@@ -192,6 +193,10 @@ function normalizeExclusiveGroups(rows) {
     .sort((a, b) => a.group_id.localeCompare(b.group_id));
 }
 
+function ruleKey(rule) {
+  return `${rule.source_id}->${rule.target_id}`;
+}
+
 function nonFirstSliceSlices(data, firstSliceIds) {
   return {
     choices: normalizeChoices(data.choices.filter((choice) => !FIRST_SLICE_RPOS.has(choice.rpo))),
@@ -300,7 +305,9 @@ test("shadow assembly substitutes first-slice records from CSV fragment", () => 
     normalizeChoices(csvFragment.choices.filter((choice) => FIRST_SLICE_RPOS.has(choice.rpo)))
   );
   assert.deepEqual(
-    normalizeRules(shadowData.rules.filter((rule) => shadowIds.has(rule.source_id) || shadowIds.has(rule.target_id))),
+    normalizeRules(
+      shadowData.rules.filter((rule) => (shadowIds.has(rule.source_id) || shadowIds.has(rule.target_id)) && !PRESERVED_FIRST_SLICE_RULE_KEYS.has(ruleKey(rule)))
+    ),
     normalizeRules(csvFragment.rules)
   );
   assert.deepEqual(

@@ -8,12 +8,9 @@ import { createRuntime, loadGeneratedData, loadShadowData } from "./runtime-harn
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
-const PEF_PACKAGE_RPOS = new Set(["PEF", "CAV", "RIA"]);
-const INCLUDED_EDGES = [
-  ["PEF", "CAV"],
-  ["PEF", "RIA"],
-];
-const OUT_OF_SCOPE_RPOS = new Set([]);
+const SBT_PACKAGE_RPOS = new Set(["SBT", "SC7"]);
+const INCLUDED_EDGES = [["SBT", "SC7"]];
+const ROOF_BOUNDARY_RPOS = new Set(["CC3"]);
 
 function parseCsv(source) {
   const rows = [];
@@ -92,6 +89,12 @@ function activeChoiceByRpo(runtime, rpo) {
   return choice;
 }
 
+function choiceByRpo(runtime, rpo) {
+  const choice = runtime.activeChoiceRows().find((item) => item.rpo === rpo && item.active === "True");
+  assert.ok(choice, `${rpo} should have an active choice row`);
+  return choice;
+}
+
 function runtimeFor(data, variantId) {
   const runtime = createRuntime(data);
   const variant = data.variants.find((item) => item.variant_id === variantId);
@@ -105,7 +108,7 @@ function runtimeFor(data, variantId) {
 
 function normalizeChoices(rows) {
   return Array.from(rows)
-    .filter((choice) => choice.rpo === "PEF")
+    .filter((choice) => SBT_PACKAGE_RPOS.has(choice.rpo))
     .map((choice) => ({
       choice_id: choice.choice_id,
       option_id: choice.option_id,
@@ -196,15 +199,22 @@ function groupIdsTouching(data, rpos) {
   };
 }
 
-function preservedPefRows() {
+function preservedSbtSc7Rows() {
   return activeManifestRows()
     .filter(
       (row) =>
         row.ownership === "preserved_cross_boundary" &&
-        row.source_rpo === "PEF" &&
-        ["CAV", "RIA"].includes(row.target_rpo) &&
+        row.source_rpo === "SBT" &&
+        row.target_rpo === "SC7" &&
         ["rule", "priceRule"].includes(row.record_type)
     )
+    .map((row) => `${row.record_type}:${row.source_rpo}->${row.target_rpo}`)
+    .sort();
+}
+
+function preservedSbtCc3Rows() {
+  return activeManifestRows()
+    .filter((row) => row.ownership === "preserved_cross_boundary" && row.source_rpo === "SBT" && row.target_rpo === "CC3" && row.record_type === "rule")
     .map((row) => `${row.record_type}:${row.source_rpo}->${row.target_rpo}`)
     .sort();
 }
@@ -213,50 +223,56 @@ function lineByRpo(runtime, rpo) {
   return runtime.lineItems().find((line) => line.rpo === rpo);
 }
 
-test("CSV evaluator prices direct PEF Contoured Liner package selection", () => {
+test("CSV evaluator prices direct SBT Dual roof package selection", () => {
   const production = loadGeneratedData();
-  const result = evaluate("1lt_c07", [optionIdByRpo(production, "PEF")]);
+  const result = evaluate("1lt_c07", [optionIdByRpo(production, "SBT")]);
 
   assert.deepEqual(result.validation_errors, []);
-  assert.equal(result.selected_lines.find((line) => line.rpo === "PEF")?.final_price_usd, 475);
-  assert.equal(result.selected_lines.find((line) => line.rpo === "CAV")?.final_price_usd, 0);
-  assert.equal(result.selected_lines.find((line) => line.rpo === "RIA")?.final_price_usd, 0);
+  assert.equal(result.selected_lines.find((line) => line.rpo === "SBT")?.final_price_usd, 2525);
+  assert.equal(result.selected_lines.find((line) => line.rpo === "SC7")?.final_price_usd, 0);
 });
 
-test("CSV PEF legacy fragment matches generated choices and all-variant availability", () => {
+test("CSV SBT legacy fragment matches generated choices and coupe-only availability", () => {
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
   const choices = normalizeChoices(projected.choices);
 
   assert.deepEqual(projected.validation_errors, []);
   assert.deepEqual(choices, normalizeChoices(production.choices));
-  assert.equal(choices.length, 6);
+  assert.equal(choices.length, 12);
   assert.deepEqual(
-    choices.map((choice) => [choice.variant_id, choice.status, choice.status_label, choice.selectable, choice.active, choice.base_price]),
+    choices.map((choice) => [choice.rpo, choice.variant_id, choice.status, choice.status_label, choice.selectable, choice.active, choice.base_price]),
     [
-      ["1lt_c07", "available", "Available", "True", "True", 475],
-      ["1lt_c67", "available", "Available", "True", "True", 475],
-      ["2lt_c07", "available", "Available", "True", "True", 475],
-      ["2lt_c67", "available", "Available", "True", "True", 475],
-      ["3lt_c07", "available", "Available", "True", "True", 475],
-      ["3lt_c67", "available", "Available", "True", "True", 475],
+      ["SBT", "1lt_c07", "available", "Available", "True", "True", 2525],
+      ["SC7", "1lt_c07", "available", "Available", "True", "True", 195],
+      ["SBT", "1lt_c67", "unavailable", "Not Available", "True", "True", 2525],
+      ["SC7", "1lt_c67", "unavailable", "Not Available", "True", "True", 195],
+      ["SBT", "2lt_c07", "available", "Available", "True", "True", 2525],
+      ["SC7", "2lt_c07", "available", "Available", "True", "True", 195],
+      ["SBT", "2lt_c67", "unavailable", "Not Available", "True", "True", 2525],
+      ["SC7", "2lt_c67", "unavailable", "Not Available", "True", "True", 195],
+      ["SBT", "3lt_c07", "available", "Available", "True", "True", 2525],
+      ["SC7", "3lt_c07", "available", "Available", "True", "True", 195],
+      ["SBT", "3lt_c67", "unavailable", "Not Available", "True", "True", 2525],
+      ["SC7", "3lt_c67", "unavailable", "Not Available", "True", "True", 195],
     ]
   );
 });
 
-test("PEF package cluster satisfies projected-owned source and target policy", () => {
+test("SBT package cluster satisfies projected-owned package policy without claiming Roof", () => {
   const owned = projectedOwnedRpos();
 
-  for (const rpo of PEF_PACKAGE_RPOS) {
+  for (const rpo of SBT_PACKAGE_RPOS) {
     assert.equal(owned.has(rpo), true, `${rpo} should be projected-owned`);
   }
-  for (const rpo of OUT_OF_SCOPE_RPOS) {
-    assert.equal(owned.has(rpo), false, `${rpo} should remain outside the PEF package slice`);
+  for (const rpo of ROOF_BOUNDARY_RPOS) {
+    assert.equal(owned.has(rpo), false, `${rpo} should remain outside the SBT package slice`);
   }
-  assert.deepEqual(preservedPefRows(), [], "PEF package records should no longer be preserved cross-boundary rows");
+  assert.deepEqual(preservedSbtSc7Rows(), [], "SBT -> SC7 package records should not be preserved cross-boundary rows");
+  assert.deepEqual(preservedSbtCc3Rows(), ["rule:SBT->CC3"], "SBT -> CC3 roof exclude should remain preserved");
 });
 
-test("CSV PEF legacy fragment emits package include rules and included-zero priceRules", () => {
+test("CSV SBT legacy fragment emits package include rule and included-zero priceRule", () => {
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
 
@@ -277,64 +293,77 @@ test("CSV PEF legacy fragment emits package include rules and included-zero pric
   }
 });
 
-test("production has only PEF package records touching the fully owned liner cluster", () => {
+test("production has only classified records touching SBT and SC7", () => {
   const production = loadGeneratedData();
 
-  assert.deepEqual(plain(ruleKeysTouching(production, PEF_PACKAGE_RPOS)), ["PEF->CAV:includes:True", "PEF->RIA:includes:True"]);
-  assert.deepEqual(plain(priceRuleKeysTouching(production, PEF_PACKAGE_RPOS)), ["PEF->CAV:override:0", "PEF->RIA:override:0"]);
-  assert.deepEqual(plain(groupIdsTouching(production, PEF_PACKAGE_RPOS)), {
+  assert.deepEqual(plain(ruleKeysTouching(production, SBT_PACKAGE_RPOS)), ["SBT->CC3:excludes:False", "SBT->SC7:includes:True"]);
+  assert.deepEqual(plain(priceRuleKeysTouching(production, SBT_PACKAGE_RPOS)), ["SBT->SC7:override:0"]);
+  assert.deepEqual(plain(groupIdsTouching(production, SBT_PACKAGE_RPOS)), {
     exclusiveGroups: [],
     ruleGroups: [],
   });
 });
 
-test("shadow overlay projects PEF package records instead of preserving them", () => {
+test("shadow overlay projects SBT package records and preserves SBT to CC3", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
+  const fragment = emitCsvLegacyFragment();
+  const sbtId = optionIdByRpo(production, "SBT");
+  const sc7Id = optionIdByRpo(production, "SC7");
+  const cc3Id = optionIdByRpo(production, "CC3");
 
-  assert.deepEqual(plain(packageRuleKeys(shadow, "PEF", ["CAV", "RIA"])), plain(packageRuleKeys(production, "PEF", ["CAV", "RIA"])));
-  assert.deepEqual(plain(packagePriceRuleKeys(shadow, "PEF", ["CAV", "RIA"])), plain(packagePriceRuleKeys(production, "PEF", ["CAV", "RIA"])));
-  assert.deepEqual(plain(preservedPefRows()), []);
+  assert.deepEqual(plain(packageRuleKeys(shadow, "SBT", ["SC7"])), plain(packageRuleKeys(production, "SBT", ["SC7"])));
+  assert.deepEqual(plain(packagePriceRuleKeys(shadow, "SBT", ["SC7"])), plain(packagePriceRuleKeys(production, "SBT", ["SC7"])));
+  assert.deepEqual(plain(preservedSbtSc7Rows()), []);
+
+  const productionRoofRule = production.rules.find((rule) => rule.source_id === sbtId && rule.target_id === cc3Id && rule.rule_type === "excludes");
+  const shadowRoofRule = shadow.rules.find((rule) => rule.source_id === sbtId && rule.target_id === cc3Id && rule.rule_type === "excludes");
+  assert.deepEqual(plain(shadowRoofRule), plain(productionRoofRule));
+  assert.equal(fragment.rules.some((rule) => rule.source_id === sbtId && rule.target_id === cc3Id), false);
+  assert.equal(fragment.rules.some((rule) => rule.source_id === sbtId && rule.target_id === sc7Id), true);
 });
 
-test("shadow PEF runtime package behavior matches production", () => {
+test("shadow SBT runtime package and Roof boundary behavior matches production", () => {
   for (const data of [loadGeneratedData(), loadShadowData()]) {
     const directRuntime = runtimeFor(data, "1lt_c07");
-    const directCav = activeChoiceByRpo(directRuntime, "CAV");
-    const directRia = activeChoiceByRpo(directRuntime, "RIA");
-    directRuntime.handleChoice(directCav);
-    directRuntime.handleChoice(directRia);
-    assert.equal(lineByRpo(directRuntime, "CAV")?.price, 230);
-    assert.equal(lineByRpo(directRuntime, "RIA")?.price, 265);
+    const directSc7 = activeChoiceByRpo(directRuntime, "SC7");
+    directRuntime.handleChoice(directSc7);
+    assert.equal(lineByRpo(directRuntime, "SC7")?.price, 195);
 
     const packageRuntime = runtimeFor(data, "1lt_c07");
-    const pef = activeChoiceByRpo(packageRuntime, "PEF");
-    const cav = activeChoiceByRpo(packageRuntime, "CAV");
-    const ria = activeChoiceByRpo(packageRuntime, "RIA");
-    packageRuntime.handleChoice(pef);
-    assert.equal(lineByRpo(packageRuntime, "PEF")?.price, 475);
-    assert.equal(packageRuntime.computeAutoAdded().has(cav.option_id), true);
-    assert.equal(packageRuntime.computeAutoAdded().has(ria.option_id), true);
-    assert.equal(packageRuntime.optionPrice(cav.option_id), 0);
-    assert.equal(packageRuntime.optionPrice(ria.option_id), 0);
+    const sbt = activeChoiceByRpo(packageRuntime, "SBT");
+    const sc7 = activeChoiceByRpo(packageRuntime, "SC7");
+    const cc3 = activeChoiceByRpo(packageRuntime, "CC3");
+    packageRuntime.handleChoice(sbt);
+    assert.equal(lineByRpo(packageRuntime, "SBT")?.price, 2525);
+    assert.equal(packageRuntime.computeAutoAdded().has(sc7.option_id), true);
+    assert.equal(packageRuntime.optionPrice(sc7.option_id), 0);
+    assert.equal(packageRuntime.disableReasonForChoice(cc3), "Blocked by SBT LPO, Dual roof.");
+    packageRuntime.handleChoice(cc3);
+    assert.equal(packageRuntime.state.selected.has(cc3.option_id), false);
 
     const memberFirstRuntime = runtimeFor(data, "1lt_c07");
-    const memberFirstCav = activeChoiceByRpo(memberFirstRuntime, "CAV");
-    const memberFirstRia = activeChoiceByRpo(memberFirstRuntime, "RIA");
-    const memberFirstPef = activeChoiceByRpo(memberFirstRuntime, "PEF");
-    memberFirstRuntime.handleChoice(memberFirstCav);
-    memberFirstRuntime.handleChoice(memberFirstRia);
-    memberFirstRuntime.handleChoice(memberFirstPef);
-    assert.equal(memberFirstRuntime.lineItems().filter((line) => line.rpo === "CAV").length, 1);
-    assert.equal(memberFirstRuntime.lineItems().filter((line) => line.rpo === "RIA").length, 1);
-    assert.equal(memberFirstRuntime.computeAutoAdded().has(memberFirstCav.option_id), false);
-    assert.equal(memberFirstRuntime.computeAutoAdded().has(memberFirstRia.option_id), false);
-    assert.equal(memberFirstRuntime.optionPrice(memberFirstCav.option_id), 0);
-    assert.equal(memberFirstRuntime.optionPrice(memberFirstRia.option_id), 0);
+    const memberFirstSc7 = activeChoiceByRpo(memberFirstRuntime, "SC7");
+    const memberFirstSbt = activeChoiceByRpo(memberFirstRuntime, "SBT");
+    memberFirstRuntime.handleChoice(memberFirstSc7);
+    memberFirstRuntime.handleChoice(memberFirstSbt);
+    assert.equal(memberFirstRuntime.lineItems().filter((line) => line.rpo === "SC7").length, 1);
+    assert.equal(memberFirstRuntime.computeAutoAdded().has(memberFirstSc7.option_id), false);
+    assert.equal(memberFirstRuntime.optionPrice(memberFirstSc7.option_id), 0);
+    memberFirstRuntime.handleChoice(memberFirstSbt);
+    assert.equal(memberFirstRuntime.state.selected.has(memberFirstSbt.option_id), false);
+    assert.equal(memberFirstRuntime.optionPrice(memberFirstSc7.option_id), 195);
 
-    memberFirstRuntime.handleChoice(memberFirstPef);
-    assert.equal(memberFirstRuntime.state.selected.has(memberFirstPef.option_id), false);
-    assert.equal(memberFirstRuntime.optionPrice(memberFirstCav.option_id), 230);
-    assert.equal(memberFirstRuntime.optionPrice(memberFirstRia.option_id), 265);
+    const cc3FirstRuntime = runtimeFor(data, "1lt_c07");
+    const cc3First = activeChoiceByRpo(cc3FirstRuntime, "CC3");
+    const blockedSbt = activeChoiceByRpo(cc3FirstRuntime, "SBT");
+    cc3FirstRuntime.handleChoice(cc3First);
+    assert.equal(cc3FirstRuntime.disableReasonForChoice(blockedSbt), "Conflicts with CC3 Roof panel.");
+    cc3FirstRuntime.handleChoice(blockedSbt);
+    assert.equal(cc3FirstRuntime.state.selected.has(blockedSbt.option_id), false);
+
+    const convertibleRuntime = runtimeFor(data, "1lt_c67");
+    assert.equal(convertibleRuntime.disableReasonForChoice(choiceByRpo(convertibleRuntime, "SBT")), "Not available for this body and trim.");
+    assert.equal(convertibleRuntime.disableReasonForChoice(choiceByRpo(convertibleRuntime, "SC7")), "Not available for this body and trim.");
   }
 });
