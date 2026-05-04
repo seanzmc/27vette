@@ -104,6 +104,37 @@ function runManifestOnlyTriageWithDecisionLedger({ includeCsv = true, includePac
   };
 }
 
+function runDecisionLedgerValidation(ledgerPath, extraArgs = []) {
+  const out = tempPath("manifest-only-preservation-triage.json");
+  const validationOut = tempPath("decision-ledger-validation-report.json");
+  const result = spawnSync(
+    PYTHON,
+    [
+      OVERLAY_SCRIPT,
+      "--manifest-only-preservation-triage",
+      "--out",
+      out,
+      "--validate-decision-ledger-csv",
+      ledgerPath,
+      "--decision-ledger-validation-report-out",
+      validationOut,
+      ...extraArgs,
+    ],
+    {
+      cwd: process.cwd(),
+      encoding: "utf8",
+      maxBuffer: 8 * 1024 * 1024,
+    }
+  );
+  return {
+    out,
+    validationOut,
+    result,
+    report: fs.existsSync(out) ? JSON.parse(fs.readFileSync(out, "utf8")) : null,
+    validationReport: fs.existsSync(validationOut) ? JSON.parse(fs.readFileSync(validationOut, "utf8")) : null,
+  };
+}
+
 function defaultOverlayStdout() {
   return spawnSync(PYTHON, [OVERLAY_SCRIPT], {
     cwd: process.cwd(),
@@ -531,6 +562,16 @@ function parseCsv(text) {
   return rows;
 }
 
+function formatCsvCell(value) {
+  const text = value === null || value === undefined ? "" : String(value);
+  return /[",\r\n]/.test(text) ? `"${text.replaceAll("\"", "\"\"")}"` : text;
+}
+
+function writeCsv(pathname, header, rows) {
+  const lines = [header, ...rows].map((row) => row.map(formatCsvCell).join(","));
+  fs.writeFileSync(pathname, `${lines.join("\n")}\n`, "utf8");
+}
+
 function assertNoPacketAdviceLanguage(value, path = []) {
   if (Array.isArray(value)) {
     value.forEach((item, index) => assertNoPacketAdviceLanguage(item, [...path, String(index)]));
@@ -585,6 +626,10 @@ function collectObjectKeys(value, keys = []) {
 
 function ledgerRowsToObjects(dataRows) {
   return dataRows.map((row) => Object.fromEntries(DECISION_LEDGER_FIELDS.map((field, index) => [field, row[index]])));
+}
+
+function ledgerObjectsToCsvRows(rows, fields = DECISION_LEDGER_FIELDS) {
+  return rows.map((row) => fields.map((field) => row[field] ?? ""));
 }
 
 function expectedDecisionLedgerRows(report) {
@@ -1106,12 +1151,167 @@ test("manifest-only preservation full review bundle command writes the canonical
   assert.equal(ledgerDataRows.length, 78);
 });
 
+test("manifest-only preservation validates a completed decision ledger read-only", () => {
+  const bundle = runManifestOnlyTriageWithDecisionLedger();
+  assert.equal(bundle.result.status, 0, bundle.result.stderr);
+  const [ledgerHeader, ...ledgerDataRows] = parseCsv(bundle.ledger);
+  const ledgerRows = ledgerRowsToObjects(ledgerDataRows);
+  ledgerRows[0].review_status = "reviewed";
+  ledgerRows[0].reviewer = "Sean";
+  ledgerRows[0].reviewed_at = "2026-05-04";
+  ledgerRows[0].decision = "preserve";
+  ledgerRows[0].decision_reason = "manual review";
+  ledgerRows[0].followup_action = "none";
+  ledgerRows[1].review_status = "pending";
+  ledgerRows[1].decision = "needs_research";
+  ledgerRows[1].followup_action = "open_question";
+  const filledLedger = tempPath("filled-decision-ledger.csv");
+  writeCsv(filledLedger, ledgerHeader, ledgerObjectsToCsvRows(ledgerRows));
+
+  const validation = runDecisionLedgerValidation(filledLedger);
+  assert.equal(validation.result.status, 0, validation.result.stderr);
+  assert.ok(fs.existsSync(validation.out));
+  assert.ok(fs.existsSync(validation.validationOut));
+  assert.equal(validation.report.status, "allowed");
+  assert.deepEqual(Object.keys(validation.validationReport), [
+    "current_group_count",
+    "duplicate_group_count",
+    "errors",
+    "groups",
+    "ledger_row_count",
+    "matched_group_count",
+    "missing_group_count",
+    "review_value_error_count",
+    "schema_error_count",
+    "schema_version",
+    "status",
+    "unknown_group_count",
+  ]);
+  assert.equal(validation.validationReport.schema_version, 1);
+  assert.equal(validation.validationReport.status, "allowed");
+  assert.equal(validation.validationReport.ledger_row_count, 78);
+  assert.equal(validation.validationReport.current_group_count, 78);
+  assert.equal(validation.validationReport.matched_group_count, 78);
+  assert.equal(validation.validationReport.missing_group_count, 0);
+  assert.equal(validation.validationReport.unknown_group_count, 0);
+  assert.equal(validation.validationReport.duplicate_group_count, 0);
+  assert.equal(validation.validationReport.schema_error_count, 0);
+  assert.equal(validation.validationReport.review_value_error_count, 0);
+  assert.deepEqual(validation.validationReport.errors, []);
+  assert.equal(validation.validationReport.groups.length, 78);
+  assert.deepEqual(Object.keys(validation.validationReport.groups[0]), [
+    "decision",
+    "decision_reason",
+    "direction_key",
+    "followup_action",
+    "group_key",
+    "matched",
+    "notes",
+    "review_status",
+    "reviewed_at",
+    "reviewer",
+  ]);
+  assert.deepEqual(
+    validation.validationReport.groups.map((group) => group.group_key),
+    ledgerRows.map((row) => row.group_key)
+  );
+  assert.equal(validation.validationReport.groups[0].matched, true);
+  assert.equal(validation.validationReport.groups[0].review_status, "reviewed");
+  assert.equal(validation.validationReport.groups[0].decision, "preserve");
+  assert.equal(validation.validationReport.groups[1].review_status, "pending");
+  assert.equal(validation.validationReport.groups[1].decision, "needs_research");
+});
+
+test("manifest-only preservation blocks malformed decision ledgers", () => {
+  const bundle = runManifestOnlyTriageWithDecisionLedger();
+  assert.equal(bundle.result.status, 0, bundle.result.stderr);
+  const [ledgerHeader, ...ledgerDataRows] = parseCsv(bundle.ledger);
+  const baseRows = ledgerRowsToObjects(ledgerDataRows);
+  const cases = [
+    {
+      name: "missing group",
+      header: ledgerHeader,
+      rows: baseRows.slice(1),
+      expected: { missing_group_count: 1 },
+    },
+    {
+      name: "duplicate group",
+      header: ledgerHeader,
+      rows: [baseRows[0], baseRows[0], ...baseRows.slice(1)],
+      expected: { duplicate_group_count: 1 },
+    },
+    {
+      name: "unknown group",
+      header: ledgerHeader,
+      rows: [{ ...baseRows[0], group_key: "unknown_group" }, ...baseRows.slice(1)],
+      expected: { unknown_group_count: 1, missing_group_count: 1 },
+    },
+    {
+      name: "bad header",
+      header: ledgerHeader.filter((field) => field !== "notes"),
+      rows: baseRows,
+      fields: ledgerHeader.filter((field) => field !== "notes"),
+      expected: { schema_error_count: 1 },
+    },
+    {
+      name: "context mismatch",
+      header: ledgerHeader,
+      rows: [{ ...baseRows[0], source_ids: "changed_source" }, ...baseRows.slice(1)],
+      expected: { schema_error_count: 1 },
+    },
+    {
+      name: "direction mismatch",
+      header: ledgerHeader,
+      rows: [{ ...baseRows[0], direction_key: "wrong->direction" }, ...baseRows.slice(1)],
+      expected: { schema_error_count: 1 },
+    },
+    {
+      name: "invalid review status",
+      header: ledgerHeader,
+      rows: [{ ...baseRows[0], review_status: "done" }, ...baseRows.slice(1)],
+      expected: { review_value_error_count: 1 },
+    },
+    {
+      name: "invalid decision",
+      header: ledgerHeader,
+      rows: [{ ...baseRows[0], decision: "migrate_now" }, ...baseRows.slice(1)],
+      expected: { review_value_error_count: 1 },
+    },
+    {
+      name: "invalid followup action",
+      header: ledgerHeader,
+      rows: [{ ...baseRows[0], followup_action: "ship_it" }, ...baseRows.slice(1)],
+      expected: { review_value_error_count: 1 },
+    },
+    {
+      name: "invalid reviewed date",
+      header: ledgerHeader,
+      rows: [{ ...baseRows[0], reviewed_at: "05/04/2026" }, ...baseRows.slice(1)],
+      expected: { review_value_error_count: 1 },
+    },
+  ];
+
+  for (const fixture of cases) {
+    const ledgerPath = tempPath(`${fixture.name.replaceAll(" ", "-")}.csv`);
+    writeCsv(ledgerPath, fixture.header, ledgerObjectsToCsvRows(fixture.rows, fixture.fields ?? DECISION_LEDGER_FIELDS));
+    const validation = runDecisionLedgerValidation(ledgerPath);
+    assert.notEqual(validation.result.status, 0, fixture.name);
+    assert.ok(fs.existsSync(validation.validationOut), fixture.name);
+    assert.equal(validation.validationReport.status, "blocking", fixture.name);
+    for (const [field, count] of Object.entries(fixture.expected)) {
+      assert.equal(validation.validationReport[field], count, fixture.name);
+    }
+    assert.equal(validation.validationReport.errors.length > 0, true, fixture.name);
+  }
+});
+
 test("manifest-only preservation triage rejects data-js mode and leaves default overlay output alone", () => {
   const out = tempPath("manifest-only-triage-data-js.json");
   const csvOut = tempPath("manifest-only-triage-data-js.csv");
   const packetOut = tempPath("manifest-only-triage-data-js-packet.json");
   const ledgerOut = tempPath("manifest-only-triage-data-js-ledger.csv");
-  const invalid = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--manifest-only-preservation-triage", "--as-data-js", "--out", out, "--direction-slice-rows-csv-out", csvOut, "--review-packet-manifest-out", packetOut, "--decision-ledger-csv-out", ledgerOut], {
+  const validationOut = tempPath("manifest-only-triage-data-js-ledger-validation.json");
+  const invalid = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--manifest-only-preservation-triage", "--as-data-js", "--out", out, "--direction-slice-rows-csv-out", csvOut, "--review-packet-manifest-out", packetOut, "--decision-ledger-csv-out", ledgerOut, "--validate-decision-ledger-csv", ledgerOut, "--decision-ledger-validation-report-out", validationOut], {
     cwd: process.cwd(),
     encoding: "utf8",
     maxBuffer: 8 * 1024 * 1024,
@@ -1122,6 +1322,7 @@ test("manifest-only preservation triage rejects data-js mode and leaves default 
   assert.equal(fs.existsSync(csvOut), false);
   assert.equal(fs.existsSync(packetOut), false);
   assert.equal(fs.existsSync(ledgerOut), false);
+  assert.equal(fs.existsSync(validationOut), false);
 
   const csvWithoutOwningMode = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--direction-slice-rows-csv-out", tempPath("direction-slice-rows.csv")], {
     cwd: process.cwd(),
@@ -1146,6 +1347,22 @@ test("manifest-only preservation triage rejects data-js mode and leaves default 
   });
   assert.notEqual(ledgerWithoutOwningMode.status, 0);
   assert.match(ledgerWithoutOwningMode.stderr, /--decision-ledger-csv-out requires --manifest-only-preservation-triage/);
+
+  const validateWithoutOwningMode = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--validate-decision-ledger-csv", tempPath("decision-ledger.csv")], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+    maxBuffer: 8 * 1024 * 1024,
+  });
+  assert.notEqual(validateWithoutOwningMode.status, 0);
+  assert.match(validateWithoutOwningMode.stderr, /--validate-decision-ledger-csv requires --manifest-only-preservation-triage/);
+
+  const validationReportWithoutLedger = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--decision-ledger-validation-report-out", tempPath("decision-ledger-validation.json")], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+    maxBuffer: 8 * 1024 * 1024,
+  });
+  assert.notEqual(validationReportWithoutLedger.status, 0);
+  assert.match(validationReportWithoutLedger.stderr, /--decision-ledger-validation-report-out requires --validate-decision-ledger-csv/);
 
   const stdoutRun = defaultOverlayStdout();
   const outRun = defaultOverlayOutFile();

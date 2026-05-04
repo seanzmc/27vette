@@ -90,6 +90,12 @@ DECISION_LEDGER_REVIEW_FIELDS = [
     "followup_action",
     "notes",
 ]
+DECISION_LEDGER_CONTEXT_FIELDS = [
+    field for field in DECISION_LEDGER_CSV_FIELDS if field not in DECISION_LEDGER_REVIEW_FIELDS
+]
+DECISION_LEDGER_ALLOWED_REVIEW_STATUS = {"", "pending", "reviewed"}
+DECISION_LEDGER_ALLOWED_DECISION = {"", "preserve", "migrate_later", "needs_research", "remove_preservation"}
+DECISION_LEDGER_ALLOWED_FOLLOWUP_ACTION = {"", "none", "open_question", "create_pass_spec", "defer"}
 
 
 class OverlayError(ValueError):
@@ -2212,6 +2218,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--direction-slice-rows-csv-out", default="")
     parser.add_argument("--review-packet-manifest-out", default="")
     parser.add_argument("--decision-ledger-csv-out", default="")
+    parser.add_argument("--validate-decision-ledger-csv", default="")
+    parser.add_argument("--decision-ledger-validation-report-out", default="")
     return parser.parse_args()
 
 
@@ -2276,7 +2284,7 @@ def decision_ledger_joined_values(value: Any) -> str:
     return " | ".join(key for key in manifest_only_rollup_keys(value) if key != "__missing__")
 
 
-def write_decision_ledger_csv(report: dict[str, Any], out: str) -> None:
+def build_decision_ledger_rows(report: dict[str, Any]) -> list[dict[str, str]]:
     manifest_rows_by_group: dict[str, list[str]] = {}
     for row in report["rows"]:
         manifest_rows_by_group.setdefault(row["group_key"], []).append(row["manifest_row_id"])
@@ -2285,8 +2293,8 @@ def write_decision_ledger_csv(report: dict[str, Any], out: str) -> None:
         ledger_row = {
             "group_key": group["group_key"],
             "direction_key": manifest_only_group_direction_key(group),
-            "manifest_only_preservation_row_count": group["manifest_only_preservation_row_count"],
-            "manifest_only_preservation_record_count": group["manifest_only_preservation_record_count"],
+            "manifest_only_preservation_row_count": str(group["manifest_only_preservation_row_count"]),
+            "manifest_only_preservation_record_count": str(group["manifest_only_preservation_record_count"]),
             "source_ids": decision_ledger_joined_values(group["source_ids"]),
             "source_labels": decision_ledger_joined_values(group["source_labels"]),
             "source_categories": decision_ledger_joined_values(group["source_categories"]),
@@ -2304,7 +2312,11 @@ def write_decision_ledger_csv(report: dict[str, Any], out: str) -> None:
         ledger_row.update({field: "" for field in DECISION_LEDGER_REVIEW_FIELDS})
         ledger_rows.append(ledger_row)
     ledger_rows.sort(key=lambda row: (row["direction_key"], row["group_key"]))
+    return ledger_rows
 
+
+def write_decision_ledger_csv(report: dict[str, Any], out: str) -> None:
+    ledger_rows = build_decision_ledger_rows(report)
     output_path = Path(out)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8", newline="") as handle:
@@ -2312,6 +2324,144 @@ def write_decision_ledger_csv(report: dict[str, Any], out: str) -> None:
         writer.writeheader()
         for row in ledger_rows:
             writer.writerow({field: "" if row.get(field) is None else row.get(field, "") for field in DECISION_LEDGER_CSV_FIELDS})
+
+
+def valid_decision_ledger_reviewed_at(value: str) -> bool:
+    return value == "" or re.fullmatch(r"\d{4}-\d{2}-\d{2}", value) is not None
+
+
+def decision_ledger_validation_report(report: dict[str, Any], ledger_csv: str) -> dict[str, Any]:
+    expected_rows = build_decision_ledger_rows(report)
+    expected_by_group = {row["group_key"]: row for row in expected_rows}
+    groups: list[dict[str, Any]] = []
+    errors: list[dict[str, str]] = []
+    schema_error_count = 0
+    review_value_error_count = 0
+    unknown_group_keys: set[str] = set()
+    duplicate_group_keys: set[str] = set()
+    seen_group_keys: set[str] = set()
+    matched_group_keys: set[str] = set()
+
+    with Path(ledger_csv).open("r", encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        actual_header = reader.fieldnames or []
+        actual_rows = list(reader)
+
+    if actual_header != DECISION_LEDGER_CSV_FIELDS:
+        schema_error_count += 1
+        errors.append(
+            {
+                "kind": "bad_header",
+                "message": "decision ledger header does not match expected schema",
+            }
+        )
+        return {
+            "schema_version": 1,
+            "status": "blocking",
+            "ledger_row_count": len(actual_rows),
+            "current_group_count": len(expected_rows),
+            "matched_group_count": 0,
+            "missing_group_count": len(expected_rows),
+            "unknown_group_count": 0,
+            "duplicate_group_count": 0,
+            "schema_error_count": schema_error_count,
+            "review_value_error_count": review_value_error_count,
+            "groups": groups,
+            "errors": errors,
+        }
+
+    for index, row in enumerate(actual_rows, start=2):
+        group_key = row.get("group_key", "")
+        expected = expected_by_group.get(group_key)
+        matched = expected is not None and group_key not in seen_group_keys
+        if not group_key:
+            schema_error_count += 1
+            errors.append({"kind": "missing_group_key", "row": str(index), "message": "ledger row is missing group_key"})
+        elif expected is None:
+            unknown_group_keys.add(group_key)
+            errors.append({"kind": "unknown_group", "row": str(index), "group_key": group_key, "message": "ledger row group_key is not in current report groups"})
+        elif group_key in seen_group_keys:
+            duplicate_group_keys.add(group_key)
+            errors.append({"kind": "duplicate_group", "row": str(index), "group_key": group_key, "message": "ledger row group_key appears more than once"})
+        else:
+            matched_group_keys.add(group_key)
+            for field in DECISION_LEDGER_CONTEXT_FIELDS:
+                if row.get(field, "") != expected[field]:
+                    schema_error_count += 1
+                    errors.append(
+                        {
+                            "kind": "context_mismatch",
+                            "row": str(index),
+                            "group_key": group_key,
+                            "field": field,
+                            "message": "ledger generated/context field does not match current report",
+                        }
+                    )
+        seen_group_keys.add(group_key)
+
+        review_status = row.get("review_status", "")
+        decision = row.get("decision", "")
+        followup_action = row.get("followup_action", "")
+        reviewed_at = row.get("reviewed_at", "")
+        review_errors_before = review_value_error_count
+        if review_status not in DECISION_LEDGER_ALLOWED_REVIEW_STATUS:
+            review_value_error_count += 1
+            errors.append({"kind": "invalid_review_status", "row": str(index), "group_key": group_key, "message": "review_status is not allowed"})
+        if decision not in DECISION_LEDGER_ALLOWED_DECISION:
+            review_value_error_count += 1
+            errors.append({"kind": "invalid_decision", "row": str(index), "group_key": group_key, "message": "decision is not allowed"})
+        if followup_action not in DECISION_LEDGER_ALLOWED_FOLLOWUP_ACTION:
+            review_value_error_count += 1
+            errors.append({"kind": "invalid_followup_action", "row": str(index), "group_key": group_key, "message": "followup_action is not allowed"})
+        if not valid_decision_ledger_reviewed_at(reviewed_at):
+            review_value_error_count += 1
+            errors.append({"kind": "invalid_reviewed_at", "row": str(index), "group_key": group_key, "message": "reviewed_at must be blank or YYYY-MM-DD"})
+
+        groups.append(
+            {
+                "group_key": group_key,
+                "direction_key": row.get("direction_key", ""),
+                "matched": matched and review_value_error_count == review_errors_before,
+                "review_status": review_status,
+                "reviewer": row.get("reviewer", ""),
+                "reviewed_at": reviewed_at,
+                "decision": decision,
+                "decision_reason": row.get("decision_reason", ""),
+                "followup_action": followup_action,
+                "notes": row.get("notes", ""),
+            }
+        )
+
+    missing_group_keys = set(expected_by_group) - matched_group_keys
+    for group_key in sorted(missing_group_keys):
+        errors.append({"kind": "missing_group", "group_key": group_key, "message": "current report group is missing from ledger"})
+
+    unknown_group_count = len(unknown_group_keys)
+    duplicate_group_count = len(duplicate_group_keys)
+    missing_group_count = len(missing_group_keys)
+    status = (
+        "blocking"
+        if schema_error_count
+        or review_value_error_count
+        or unknown_group_count
+        or duplicate_group_count
+        or missing_group_count
+        else "allowed"
+    )
+    return {
+        "schema_version": 1,
+        "status": status,
+        "ledger_row_count": len(actual_rows),
+        "current_group_count": len(expected_rows),
+        "matched_group_count": len(matched_group_keys),
+        "missing_group_count": missing_group_count,
+        "unknown_group_count": unknown_group_count,
+        "duplicate_group_count": duplicate_group_count,
+        "schema_error_count": schema_error_count,
+        "review_value_error_count": review_value_error_count,
+        "groups": groups,
+        "errors": errors,
+    }
 
 
 def manifest_only_review_packet_manifest(report: dict[str, Any], json_out: str, csv_out: str) -> dict[str, Any]:
@@ -2385,6 +2535,10 @@ def main() -> None:
             raise OverlayError("--review-packet-manifest-out requires --manifest-only-preservation-triage.")
         if args.decision_ledger_csv_out and not args.manifest_only_preservation_triage:
             raise OverlayError("--decision-ledger-csv-out requires --manifest-only-preservation-triage.")
+        if args.validate_decision_ledger_csv and not args.manifest_only_preservation_triage:
+            raise OverlayError("--validate-decision-ledger-csv requires --manifest-only-preservation-triage.")
+        if args.decision_ledger_validation_report_out and not args.validate_decision_ledger_csv:
+            raise OverlayError("--decision-ledger-validation-report-out requires --validate-decision-ledger-csv.")
         production = load_production_data(Path(args.production_data))
         fragment = load_fragment(args)
         ownership = load_ownership_scope(Path(args.ownership_manifest))
@@ -2434,6 +2588,14 @@ def main() -> None:
                 write_or_print_output(format_report_json(packet, args.pretty), args.review_packet_manifest_out)
             if args.decision_ledger_csv_out:
                 write_decision_ledger_csv(report, args.decision_ledger_csv_out)
+            ledger_validation_report = None
+            if args.validate_decision_ledger_csv:
+                ledger_validation_report = decision_ledger_validation_report(report, args.validate_decision_ledger_csv)
+                if args.decision_ledger_validation_report_out:
+                    write_or_print_output(
+                        format_report_json(ledger_validation_report, args.pretty),
+                        args.decision_ledger_validation_report_out,
+                    )
             if namespace_report["unresolved_count"]:
                 raise OverlayError(f"blocking unresolved structured refs: {namespace_report['unresolved_count']}.")
             if args.preserved_cross_boundary_contract_report and report["status"] == "blocking":
@@ -2453,6 +2615,15 @@ def main() -> None:
                 raise OverlayError(
                     "manifest-only preservation triage blocking findings: "
                     f"invalid={report['invalid_preserved_count']}."
+                )
+            if ledger_validation_report and ledger_validation_report["status"] == "blocking":
+                raise OverlayError(
+                    "decision ledger validation blocking findings: "
+                    f"missing={ledger_validation_report['missing_group_count']}, "
+                    f"unknown={ledger_validation_report['unknown_group_count']}, "
+                    f"duplicate={ledger_validation_report['duplicate_group_count']}, "
+                    f"schema={ledger_validation_report['schema_error_count']}, "
+                    f"review={ledger_validation_report['review_value_error_count']}."
                 )
             overlay_shadow_data(production, fragment, ownership)
             return
