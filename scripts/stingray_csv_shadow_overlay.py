@@ -2220,6 +2220,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--decision-ledger-csv-out", default="")
     parser.add_argument("--validate-decision-ledger-csv", default="")
     parser.add_argument("--decision-ledger-validation-report-out", default="")
+    parser.add_argument("--decision-ledger-validation-summary-out", default="")
     return parser.parse_args()
 
 
@@ -2573,6 +2574,39 @@ def decision_ledger_validation_report(report: dict[str, Any], ledger_csv: str) -
     }
 
 
+def decision_ledger_validation_count_values(groups: list[dict[str, Any]], field: str) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for group in groups:
+        value = group.get(field, "") or ""
+        counts[value] = counts.get(value, 0) + 1
+    return {
+        key: counts[key]
+        for key in sorted(counts, key=lambda item: (item != "", item))
+    }
+
+
+def decision_ledger_validation_summary(validation_report: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "schema_version": 1,
+        "status": validation_report["status"],
+        "ledger_row_count": validation_report["ledger_row_count"],
+        "current_group_count": validation_report["current_group_count"],
+        "matched_group_count": validation_report["matched_group_count"],
+        "error_counts": {
+            "missing_group_count": validation_report["missing_group_count"],
+            "unknown_group_count": validation_report["unknown_group_count"],
+            "duplicate_group_count": validation_report["duplicate_group_count"],
+            "schema_error_count": validation_report["schema_error_count"],
+            "review_value_error_count": validation_report["review_value_error_count"],
+        },
+        "review_field_counts": {
+            "decision": decision_ledger_validation_count_values(validation_report["groups"], "decision"),
+            "followup_action": decision_ledger_validation_count_values(validation_report["groups"], "followup_action"),
+            "review_status": decision_ledger_validation_count_values(validation_report["groups"], "review_status"),
+        },
+    }
+
+
 def manifest_only_review_packet_manifest(report: dict[str, Any], json_out: str, csv_out: str) -> dict[str, Any]:
     return {
         "schema_version": 1,
@@ -2648,6 +2682,8 @@ def main() -> None:
             raise OverlayError("--validate-decision-ledger-csv requires --manifest-only-preservation-triage.")
         if args.decision_ledger_validation_report_out and not args.validate_decision_ledger_csv:
             raise OverlayError("--decision-ledger-validation-report-out requires --validate-decision-ledger-csv.")
+        if args.decision_ledger_validation_summary_out and not args.validate_decision_ledger_csv:
+            raise OverlayError("--decision-ledger-validation-summary-out requires --validate-decision-ledger-csv.")
         production = load_production_data(Path(args.production_data))
         fragment = load_fragment(args)
         ownership = load_ownership_scope(Path(args.ownership_manifest))
@@ -2704,6 +2740,12 @@ def main() -> None:
                     write_or_print_output(
                         format_report_json(ledger_validation_report, args.pretty),
                         args.decision_ledger_validation_report_out,
+                    )
+                if args.decision_ledger_validation_summary_out:
+                    ledger_validation_summary = decision_ledger_validation_summary(ledger_validation_report)
+                    write_or_print_output(
+                        format_report_json(ledger_validation_summary, args.pretty),
+                        args.decision_ledger_validation_summary_out,
                     )
             if namespace_report["unresolved_count"]:
                 raise OverlayError(f"blocking unresolved structured refs: {namespace_report['unresolved_count']}.")

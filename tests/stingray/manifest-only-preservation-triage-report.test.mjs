@@ -107,6 +107,9 @@ function runManifestOnlyTriageWithDecisionLedger({ includeCsv = true, includePac
 function runDecisionLedgerValidation(ledgerPath, extraArgs = []) {
   const out = tempPath("manifest-only-preservation-triage.json");
   const validationOut = tempPath("decision-ledger-validation-report.json");
+  const summaryOut = extraArgs.includes("--decision-ledger-validation-summary-out")
+    ? extraArgs[extraArgs.indexOf("--decision-ledger-validation-summary-out") + 1]
+    : null;
   const result = spawnSync(
     PYTHON,
     [
@@ -132,6 +135,8 @@ function runDecisionLedgerValidation(ledgerPath, extraArgs = []) {
     result,
     report: fs.existsSync(out) ? JSON.parse(fs.readFileSync(out, "utf8")) : null,
     validationReport: fs.existsSync(validationOut) ? JSON.parse(fs.readFileSync(validationOut, "utf8")) : null,
+    summaryOut,
+    summary: summaryOut && fs.existsSync(summaryOut) ? JSON.parse(fs.readFileSync(summaryOut, "utf8")) : null,
   };
 }
 
@@ -359,6 +364,30 @@ const DECISION_LEDGER_VALIDATION_ERROR_KEYS = [
   "field",
   "group_key",
   "message",
+];
+
+const DECISION_LEDGER_VALIDATION_SUMMARY_KEYS = [
+  "current_group_count",
+  "error_counts",
+  "ledger_row_count",
+  "matched_group_count",
+  "review_field_counts",
+  "schema_version",
+  "status",
+];
+
+const DECISION_LEDGER_VALIDATION_SUMMARY_ERROR_COUNT_KEYS = [
+  "duplicate_group_count",
+  "missing_group_count",
+  "review_value_error_count",
+  "schema_error_count",
+  "unknown_group_count",
+];
+
+const DECISION_LEDGER_VALIDATION_SUMMARY_REVIEW_FIELDS = [
+  "decision",
+  "followup_action",
+  "review_status",
 ];
 
 const VALIDATION_REPORT_FORBIDDEN_KEYS = [
@@ -744,6 +773,55 @@ function assertValidationReportSchema(report) {
     }
   }
   assertNoValidationAdviceFields(report);
+}
+
+function sortedCountEntries(counts) {
+  return Object.entries(counts).sort(([left], [right]) => {
+    if (left === "") return -1;
+    if (right === "") return 1;
+    return left.localeCompare(right);
+  });
+}
+
+function expectedValidationSummary(validationReport) {
+  const reviewFieldCounts = {};
+  for (const field of DECISION_LEDGER_VALIDATION_SUMMARY_REVIEW_FIELDS) {
+    const counts = new Map();
+    for (const group of validationReport.groups) {
+      const value = group[field] ?? "";
+      counts.set(value, (counts.get(value) || 0) + 1);
+    }
+    reviewFieldCounts[field] = Object.fromEntries(sortedCountEntries(Object.fromEntries(counts)));
+  }
+  return {
+    schema_version: 1,
+    status: validationReport.status,
+    ledger_row_count: validationReport.ledger_row_count,
+    current_group_count: validationReport.current_group_count,
+    matched_group_count: validationReport.matched_group_count,
+    error_counts: {
+      missing_group_count: validationReport.missing_group_count,
+      unknown_group_count: validationReport.unknown_group_count,
+      duplicate_group_count: validationReport.duplicate_group_count,
+      schema_error_count: validationReport.schema_error_count,
+      review_value_error_count: validationReport.review_value_error_count,
+    },
+    review_field_counts: reviewFieldCounts,
+  };
+}
+
+function assertValidationSummarySchema(summary) {
+  assert.deepEqual(Object.keys(summary), DECISION_LEDGER_VALIDATION_SUMMARY_KEYS);
+  assert.deepEqual(Object.keys(summary.error_counts), DECISION_LEDGER_VALIDATION_SUMMARY_ERROR_COUNT_KEYS);
+  assert.deepEqual(Object.keys(summary.review_field_counts), DECISION_LEDGER_VALIDATION_SUMMARY_REVIEW_FIELDS);
+  for (const field of DECISION_LEDGER_VALIDATION_SUMMARY_REVIEW_FIELDS) {
+    assert.deepEqual(Object.keys(summary.review_field_counts[field]), Object.keys(summary.review_field_counts[field]).sort((left, right) => {
+      if (left === "") return -1;
+      if (right === "") return 1;
+      return left.localeCompare(right);
+    }));
+  }
+  assertNoValidationAdviceFields(summary);
 }
 
 function expectedDecisionLedgerRows(report) {
@@ -1316,6 +1394,63 @@ test("manifest-only preservation validates a completed decision ledger read-only
   assert.equal(validation.validationReport.groups[1].decision, "needs_research");
 });
 
+test("manifest-only preservation writes a compact decision ledger validation summary", () => {
+  const bundle = runManifestOnlyTriageWithDecisionLedger();
+  assert.equal(bundle.result.status, 0, bundle.result.stderr);
+  const [ledgerHeader, ...ledgerDataRows] = parseCsv(bundle.ledger);
+  const ledgerRows = ledgerRowsToObjects(ledgerDataRows);
+  ledgerRows[0].review_status = "reviewed";
+  ledgerRows[0].decision = "preserve";
+  ledgerRows[0].followup_action = "none";
+  ledgerRows[1].review_status = "pending";
+  ledgerRows[1].decision = "needs_research";
+  ledgerRows[1].followup_action = "open_question";
+  const filledLedger = tempPath("filled-decision-ledger.csv");
+  writeCsv(filledLedger, ledgerHeader, ledgerObjectsToCsvRows(ledgerRows));
+  const summaryOut = tempPath("decision-ledger-validation-summary.json");
+
+  const validation = runDecisionLedgerValidation(filledLedger, [
+    "--decision-ledger-validation-summary-out",
+    summaryOut,
+  ]);
+  assert.equal(validation.result.status, 0, validation.result.stderr);
+  assert.ok(fs.existsSync(validation.validationOut));
+  assert.ok(fs.existsSync(summaryOut));
+  assertValidationReportSchema(validation.validationReport);
+  assertValidationSummarySchema(validation.summary);
+  assert.deepEqual(validation.summary, expectedValidationSummary(validation.validationReport));
+  assert.equal(validation.summary.status, "allowed");
+  assert.deepEqual(validation.summary.error_counts, {
+    missing_group_count: 0,
+    unknown_group_count: 0,
+    duplicate_group_count: 0,
+    schema_error_count: 0,
+    review_value_error_count: 0,
+  });
+  assert.deepEqual(validation.summary.review_field_counts.review_status, {
+    "": 76,
+    pending: 1,
+    reviewed: 1,
+  });
+
+  const blockingRows = [{ ...ledgerRows[0], decision: "migrate_now" }, ...ledgerRows.slice(1)];
+  const blockingLedger = tempPath("blocking-decision-ledger.csv");
+  const blockingSummaryOut = tempPath("blocking-decision-ledger-validation-summary.json");
+  writeCsv(blockingLedger, ledgerHeader, ledgerObjectsToCsvRows(blockingRows));
+  const blocking = runDecisionLedgerValidation(blockingLedger, [
+    "--decision-ledger-validation-summary-out",
+    blockingSummaryOut,
+  ]);
+  assert.notEqual(blocking.result.status, 0);
+  assert.ok(fs.existsSync(blocking.validationOut));
+  assert.ok(fs.existsSync(blockingSummaryOut));
+  assertValidationReportSchema(blocking.validationReport);
+  assertValidationSummarySchema(blocking.summary);
+  assert.deepEqual(blocking.summary, expectedValidationSummary(blocking.validationReport));
+  assert.equal(blocking.summary.status, "blocking");
+  assert.equal(blocking.summary.error_counts.review_value_error_count, 1);
+});
+
 test("manifest-only preservation blocks malformed decision ledgers", () => {
   const bundle = runManifestOnlyTriageWithDecisionLedger();
   assert.equal(bundle.result.status, 0, bundle.result.stderr);
@@ -1435,7 +1570,8 @@ test("manifest-only preservation triage rejects data-js mode and leaves default 
   const packetOut = tempPath("manifest-only-triage-data-js-packet.json");
   const ledgerOut = tempPath("manifest-only-triage-data-js-ledger.csv");
   const validationOut = tempPath("manifest-only-triage-data-js-ledger-validation.json");
-  const invalid = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--manifest-only-preservation-triage", "--as-data-js", "--out", out, "--direction-slice-rows-csv-out", csvOut, "--review-packet-manifest-out", packetOut, "--decision-ledger-csv-out", ledgerOut, "--validate-decision-ledger-csv", ledgerOut, "--decision-ledger-validation-report-out", validationOut], {
+  const summaryOut = tempPath("manifest-only-triage-data-js-ledger-validation-summary.json");
+  const invalid = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--manifest-only-preservation-triage", "--as-data-js", "--out", out, "--direction-slice-rows-csv-out", csvOut, "--review-packet-manifest-out", packetOut, "--decision-ledger-csv-out", ledgerOut, "--validate-decision-ledger-csv", ledgerOut, "--decision-ledger-validation-report-out", validationOut, "--decision-ledger-validation-summary-out", summaryOut], {
     cwd: process.cwd(),
     encoding: "utf8",
     maxBuffer: 8 * 1024 * 1024,
@@ -1447,6 +1583,7 @@ test("manifest-only preservation triage rejects data-js mode and leaves default 
   assert.equal(fs.existsSync(packetOut), false);
   assert.equal(fs.existsSync(ledgerOut), false);
   assert.equal(fs.existsSync(validationOut), false);
+  assert.equal(fs.existsSync(summaryOut), false);
 
   const csvWithoutOwningMode = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--direction-slice-rows-csv-out", tempPath("direction-slice-rows.csv")], {
     cwd: process.cwd(),
@@ -1487,6 +1624,14 @@ test("manifest-only preservation triage rejects data-js mode and leaves default 
   });
   assert.notEqual(validationReportWithoutLedger.status, 0);
   assert.match(validationReportWithoutLedger.stderr, /--decision-ledger-validation-report-out requires --validate-decision-ledger-csv/);
+
+  const validationSummaryWithoutLedger = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--decision-ledger-validation-summary-out", tempPath("decision-ledger-validation-summary.json")], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+    maxBuffer: 8 * 1024 * 1024,
+  });
+  assert.notEqual(validationSummaryWithoutLedger.status, 0);
+  assert.match(validationSummaryWithoutLedger.stderr, /--decision-ledger-validation-summary-out requires --validate-decision-ledger-csv/);
 
   const stdoutRun = defaultOverlayStdout();
   const outRun = defaultOverlayOutFile();
