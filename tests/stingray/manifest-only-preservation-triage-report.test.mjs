@@ -73,6 +73,37 @@ function runManifestOnlyTriageWithReviewPacket({ includeCsv = true } = {}) {
   };
 }
 
+function runManifestOnlyTriageWithDecisionLedger({ includeCsv = true, includePacket = true } = {}) {
+  const out = tempPath("manifest-only-preservation-triage.json");
+  const csvOut = includeCsv ? tempPath("direction-slice-rows.csv") : null;
+  const packetOut = includePacket ? tempPath("review-packet-manifest.json") : null;
+  const ledgerOut = tempPath("decision-ledger.csv");
+  const args = ["--manifest-only-preservation-triage", "--out", out];
+  if (includeCsv) {
+    args.push("--direction-slice-rows-csv-out", csvOut);
+  }
+  if (includePacket) {
+    args.push("--review-packet-manifest-out", packetOut);
+  }
+  args.push("--decision-ledger-csv-out", ledgerOut);
+  const result = spawnSync(PYTHON, [OVERLAY_SCRIPT, ...args], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+    maxBuffer: 8 * 1024 * 1024,
+  });
+  return {
+    out,
+    csvOut,
+    packetOut,
+    ledgerOut,
+    result,
+    report: fs.existsSync(out) ? JSON.parse(fs.readFileSync(out, "utf8")) : null,
+    packet: packetOut && fs.existsSync(packetOut) ? JSON.parse(fs.readFileSync(packetOut, "utf8")) : null,
+    csv: csvOut && fs.existsSync(csvOut) ? fs.readFileSync(csvOut, "utf8") : "",
+    ledger: fs.existsSync(ledgerOut) ? fs.readFileSync(ledgerOut, "utf8") : "",
+  };
+}
+
 function defaultOverlayStdout() {
   return spawnSync(PYTHON, [OVERLAY_SCRIPT], {
     cwd: process.cwd(),
@@ -205,6 +236,43 @@ const DIRECTION_SLICE_ROW_FIELDS = [
   "target_ownership_status",
   "target_projection_status",
   "candidate_status",
+];
+
+const DECISION_LEDGER_FIELDS = [
+  "group_key",
+  "direction_key",
+  "manifest_only_preservation_row_count",
+  "manifest_only_preservation_record_count",
+  "source_ids",
+  "source_labels",
+  "source_categories",
+  "source_sections",
+  "source_ownership_statuses",
+  "source_projection_statuses",
+  "target_ids",
+  "target_labels",
+  "target_categories",
+  "target_sections",
+  "target_ownership_statuses",
+  "target_projection_statuses",
+  "manifest_row_ids",
+  "review_status",
+  "reviewer",
+  "reviewed_at",
+  "decision",
+  "decision_reason",
+  "followup_action",
+  "notes",
+];
+
+const DECISION_LEDGER_REVIEW_FIELDS = [
+  "review_status",
+  "reviewer",
+  "reviewed_at",
+  "decision",
+  "decision_reason",
+  "followup_action",
+  "notes",
 ];
 
 const PACKET_TOP_LEVEL_KEYS = [
@@ -350,6 +418,31 @@ function combinedDirectionKeyForRow(row) {
   return `${sourceKey}->${targetKey}`;
 }
 
+function directionKeyForGroup(group) {
+  const sourceOwnershipKeys = normalizedRollupKeys(group.source_ownership_statuses);
+  const sourceProjectionKeys = normalizedRollupKeys(group.source_projection_statuses);
+  const targetOwnershipKeys = normalizedRollupKeys(group.target_ownership_statuses);
+  const targetProjectionKeys = normalizedRollupKeys(group.target_projection_statuses);
+  if (
+    sourceOwnershipKeys.length === 1 &&
+    sourceProjectionKeys.length === 1 &&
+    targetOwnershipKeys.length === 1 &&
+    targetProjectionKeys.length === 1
+  ) {
+    return `${sourceOwnershipKeys[0]}/${sourceProjectionKeys[0]}->${targetOwnershipKeys[0]}/${targetProjectionKeys[0]}`;
+  }
+  return [
+    sourceOwnershipKeys.join(" | "),
+    sourceProjectionKeys.join(" | "),
+    targetOwnershipKeys.join(" | "),
+    targetProjectionKeys.join(" | "),
+  ].join("__mixed__");
+}
+
+function joinedValues(value) {
+  return normalizedRollupKeys(value).filter((item) => item !== "__missing__").join(" | ");
+}
+
 function publicDirectionSliceRow(row) {
   return Object.fromEntries(DIRECTION_SLICE_ROW_FIELDS.map((field) => [field, row[field]]));
 }
@@ -459,6 +552,44 @@ function assertPacketSchema(packet) {
     assert.deepEqual(Object.keys(item), PACKET_MULTI_ROW_GROUP_KEYS);
   }
   assertNoPacketAdviceLanguage(packet);
+}
+
+function expectedDecisionLedgerRows(report) {
+  const rowsByGroup = new Map(report.rows.map((row) => [row.group_key, []]));
+  for (const row of report.rows) {
+    rowsByGroup.get(row.group_key).push(row.manifest_row_id);
+  }
+  return report.groups
+    .map((group) => ({
+      group_key: group.group_key,
+      direction_key: directionKeyForGroup(group),
+      manifest_only_preservation_row_count: String(group.manifest_only_preservation_row_count),
+      manifest_only_preservation_record_count: String(group.manifest_only_preservation_record_count),
+      source_ids: joinedValues(group.source_ids),
+      source_labels: joinedValues(group.source_labels),
+      source_categories: joinedValues(group.source_categories),
+      source_sections: joinedValues(group.source_sections),
+      source_ownership_statuses: joinedValues(group.source_ownership_statuses),
+      source_projection_statuses: joinedValues(group.source_projection_statuses),
+      target_ids: joinedValues(group.target_ids),
+      target_labels: joinedValues(group.target_labels),
+      target_categories: joinedValues(group.target_categories),
+      target_sections: joinedValues(group.target_sections),
+      target_ownership_statuses: joinedValues(group.target_ownership_statuses),
+      target_projection_statuses: joinedValues(group.target_projection_statuses),
+      manifest_row_ids: [...rowsByGroup.get(group.group_key)].sort().join(" | "),
+      review_status: "",
+      reviewer: "",
+      reviewed_at: "",
+      decision: "",
+      decision_reason: "",
+      followup_action: "",
+      notes: "",
+    }))
+    .sort((left, right) => {
+      const directionDelta = left.direction_key.localeCompare(right.direction_key);
+      return directionDelta || left.group_key.localeCompare(right.group_key);
+    });
 }
 
 test("manifest-only preservation triage reports exactly the census manifest-only rows", () => {
@@ -829,11 +960,68 @@ test("manifest-only preservation triage writes a review packet manifest sidecar"
   );
 });
 
+test("manifest-only preservation triage writes a blank decision ledger template", () => {
+  const triage = runManifestOnlyTriageWithDecisionLedger();
+  assert.equal(triage.result.status, 0, triage.result.stderr);
+  assert.ok(fs.existsSync(triage.out));
+  assert.ok(fs.existsSync(triage.csvOut));
+  assert.ok(fs.existsSync(triage.packetOut));
+  assert.ok(fs.existsSync(triage.ledgerOut));
+  assertPacketSchema(triage.packet);
+
+  const ledgerRows = parseCsv(triage.ledger);
+  const [header, ...dataRows] = ledgerRows;
+  assert.deepEqual(header, DECISION_LEDGER_FIELDS);
+  assert.equal(dataRows.length, triage.report.groups.length);
+  assert.equal(dataRows.length, 78);
+
+  const actualRows = dataRows.map((row) => Object.fromEntries(DECISION_LEDGER_FIELDS.map((field, index) => [field, row[index]])));
+  assert.deepEqual(actualRows, expectedDecisionLedgerRows(triage.report));
+  assert.deepEqual(
+    actualRows,
+    [...actualRows].sort((left, right) => left.direction_key.localeCompare(right.direction_key) || left.group_key.localeCompare(right.group_key))
+  );
+  assert.equal(
+    actualRows.every((row) => DECISION_LEDGER_REVIEW_FIELDS.every((field) => row[field] === "")),
+    true
+  );
+  assert.equal(
+    DECISION_LEDGER_REVIEW_FIELDS.every((field) => !/stale|cleanup|candidate|recommendation|migrate|future/i.test(field)),
+    true
+  );
+
+  const groupDirectionCounts = new Map();
+  for (const row of actualRows) {
+    groupDirectionCounts.set(row.direction_key, (groupDirectionCounts.get(row.direction_key) || 0) + 1);
+  }
+  assert.deepEqual(
+    [...groupDirectionCounts.entries()].sort(([left], [right]) => left.localeCompare(right)),
+    [
+      ["production_owned/not_projected->production_owned/not_projected", 12],
+      ["production_owned/not_projected->projected_owned/projected_owned", 9],
+      ["projected_owned/projected_owned->production_owned/not_projected", 36],
+      ["projected_owned/projected_owned->projected_owned/projected_owned", 21],
+    ]
+  );
+  assert.equal(actualRows.some((row) => row.manifest_row_ids.includes(" | ")), true);
+
+  const ledgerOnly = runManifestOnlyTriageWithDecisionLedger({ includeCsv: false, includePacket: false });
+  assert.equal(ledgerOnly.result.status, 0, ledgerOnly.result.stderr);
+  assert.ok(fs.existsSync(ledgerOnly.out));
+  assert.ok(fs.existsSync(ledgerOnly.ledgerOut));
+  assert.equal(ledgerOnly.csvOut, null);
+  assert.equal(ledgerOnly.packetOut, null);
+  const [ledgerOnlyHeader, ...ledgerOnlyRows] = parseCsv(ledgerOnly.ledger);
+  assert.deepEqual(ledgerOnlyHeader, DECISION_LEDGER_FIELDS);
+  assert.equal(ledgerOnlyRows.length, 78);
+});
+
 test("manifest-only preservation triage rejects data-js mode and leaves default overlay output alone", () => {
   const out = tempPath("manifest-only-triage-data-js.json");
   const csvOut = tempPath("manifest-only-triage-data-js.csv");
   const packetOut = tempPath("manifest-only-triage-data-js-packet.json");
-  const invalid = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--manifest-only-preservation-triage", "--as-data-js", "--out", out, "--direction-slice-rows-csv-out", csvOut, "--review-packet-manifest-out", packetOut], {
+  const ledgerOut = tempPath("manifest-only-triage-data-js-ledger.csv");
+  const invalid = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--manifest-only-preservation-triage", "--as-data-js", "--out", out, "--direction-slice-rows-csv-out", csvOut, "--review-packet-manifest-out", packetOut, "--decision-ledger-csv-out", ledgerOut], {
     cwd: process.cwd(),
     encoding: "utf8",
     maxBuffer: 8 * 1024 * 1024,
@@ -843,6 +1031,7 @@ test("manifest-only preservation triage rejects data-js mode and leaves default 
   assert.equal(fs.existsSync(out), false);
   assert.equal(fs.existsSync(csvOut), false);
   assert.equal(fs.existsSync(packetOut), false);
+  assert.equal(fs.existsSync(ledgerOut), false);
 
   const csvWithoutOwningMode = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--direction-slice-rows-csv-out", tempPath("direction-slice-rows.csv")], {
     cwd: process.cwd(),
@@ -859,6 +1048,14 @@ test("manifest-only preservation triage rejects data-js mode and leaves default 
   });
   assert.notEqual(packetWithoutOwningMode.status, 0);
   assert.match(packetWithoutOwningMode.stderr, /--review-packet-manifest-out requires --manifest-only-preservation-triage/);
+
+  const ledgerWithoutOwningMode = spawnSync(PYTHON, [OVERLAY_SCRIPT, "--decision-ledger-csv-out", tempPath("decision-ledger.csv")], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+    maxBuffer: 8 * 1024 * 1024,
+  });
+  assert.notEqual(ledgerWithoutOwningMode.status, 0);
+  assert.match(ledgerWithoutOwningMode.stderr, /--decision-ledger-csv-out requires --manifest-only-preservation-triage/);
 
   const stdoutRun = defaultOverlayStdout();
   const outRun = defaultOverlayOutFile();

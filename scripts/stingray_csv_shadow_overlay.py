@@ -55,6 +55,41 @@ DIRECTION_SLICE_ROWS_CSV_FIELDS = [
     "target_projection_status",
     "candidate_status",
 ]
+DECISION_LEDGER_CSV_FIELDS = [
+    "group_key",
+    "direction_key",
+    "manifest_only_preservation_row_count",
+    "manifest_only_preservation_record_count",
+    "source_ids",
+    "source_labels",
+    "source_categories",
+    "source_sections",
+    "source_ownership_statuses",
+    "source_projection_statuses",
+    "target_ids",
+    "target_labels",
+    "target_categories",
+    "target_sections",
+    "target_ownership_statuses",
+    "target_projection_statuses",
+    "manifest_row_ids",
+    "review_status",
+    "reviewer",
+    "reviewed_at",
+    "decision",
+    "decision_reason",
+    "followup_action",
+    "notes",
+]
+DECISION_LEDGER_REVIEW_FIELDS = [
+    "review_status",
+    "reviewer",
+    "reviewed_at",
+    "decision",
+    "decision_reason",
+    "followup_action",
+    "notes",
+]
 
 
 class OverlayError(ValueError):
@@ -1361,6 +1396,28 @@ def manifest_only_direction_key(row: dict[str, Any]) -> str:
     return f"{source_keys[0]}->{target_keys[0]}"
 
 
+def manifest_only_group_direction_key(group: dict[str, Any]) -> str:
+    source_ownership_keys = manifest_only_rollup_keys(group.get("source_ownership_statuses"))
+    source_projection_keys = manifest_only_rollup_keys(group.get("source_projection_statuses"))
+    target_ownership_keys = manifest_only_rollup_keys(group.get("target_ownership_statuses"))
+    target_projection_keys = manifest_only_rollup_keys(group.get("target_projection_statuses"))
+    if (
+        len(source_ownership_keys) == 1
+        and len(source_projection_keys) == 1
+        and len(target_ownership_keys) == 1
+        and len(target_projection_keys) == 1
+    ):
+        return f"{source_ownership_keys[0]}/{source_projection_keys[0]}->{target_ownership_keys[0]}/{target_projection_keys[0]}"
+    return "__mixed__".join(
+        [
+            " | ".join(source_ownership_keys),
+            " | ".join(source_projection_keys),
+            " | ".join(target_ownership_keys),
+            " | ".join(target_projection_keys),
+        ]
+    )
+
+
 def direction_slice_row_sort_key(row: dict[str, Any]) -> tuple[str, str, str, str, str]:
     return (
         row["direction_key"],
@@ -2154,6 +2211,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--manifest-only-preservation-triage", action="store_true")
     parser.add_argument("--direction-slice-rows-csv-out", default="")
     parser.add_argument("--review-packet-manifest-out", default="")
+    parser.add_argument("--decision-ledger-csv-out", default="")
     return parser.parse_args()
 
 
@@ -2212,6 +2270,48 @@ def write_direction_slice_rows_csv(rows: list[dict[str, Any]], out: str) -> None
         writer.writeheader()
         for row in rows:
             writer.writerow({field: "" if row.get(field) is None else row.get(field, "") for field in DIRECTION_SLICE_ROWS_CSV_FIELDS})
+
+
+def decision_ledger_joined_values(value: Any) -> str:
+    return " | ".join(key for key in manifest_only_rollup_keys(value) if key != "__missing__")
+
+
+def write_decision_ledger_csv(report: dict[str, Any], out: str) -> None:
+    manifest_rows_by_group: dict[str, list[str]] = {}
+    for row in report["rows"]:
+        manifest_rows_by_group.setdefault(row["group_key"], []).append(row["manifest_row_id"])
+    ledger_rows = []
+    for group in report["groups"]:
+        ledger_row = {
+            "group_key": group["group_key"],
+            "direction_key": manifest_only_group_direction_key(group),
+            "manifest_only_preservation_row_count": group["manifest_only_preservation_row_count"],
+            "manifest_only_preservation_record_count": group["manifest_only_preservation_record_count"],
+            "source_ids": decision_ledger_joined_values(group["source_ids"]),
+            "source_labels": decision_ledger_joined_values(group["source_labels"]),
+            "source_categories": decision_ledger_joined_values(group["source_categories"]),
+            "source_sections": decision_ledger_joined_values(group["source_sections"]),
+            "source_ownership_statuses": decision_ledger_joined_values(group["source_ownership_statuses"]),
+            "source_projection_statuses": decision_ledger_joined_values(group["source_projection_statuses"]),
+            "target_ids": decision_ledger_joined_values(group["target_ids"]),
+            "target_labels": decision_ledger_joined_values(group["target_labels"]),
+            "target_categories": decision_ledger_joined_values(group["target_categories"]),
+            "target_sections": decision_ledger_joined_values(group["target_sections"]),
+            "target_ownership_statuses": decision_ledger_joined_values(group["target_ownership_statuses"]),
+            "target_projection_statuses": decision_ledger_joined_values(group["target_projection_statuses"]),
+            "manifest_row_ids": " | ".join(sorted(manifest_rows_by_group[group["group_key"]])),
+        }
+        ledger_row.update({field: "" for field in DECISION_LEDGER_REVIEW_FIELDS})
+        ledger_rows.append(ledger_row)
+    ledger_rows.sort(key=lambda row: (row["direction_key"], row["group_key"]))
+
+    output_path = Path(out)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=DECISION_LEDGER_CSV_FIELDS)
+        writer.writeheader()
+        for row in ledger_rows:
+            writer.writerow({field: "" if row.get(field) is None else row.get(field, "") for field in DECISION_LEDGER_CSV_FIELDS})
 
 
 def manifest_only_review_packet_manifest(report: dict[str, Any], json_out: str, csv_out: str) -> dict[str, Any]:
@@ -2283,6 +2383,8 @@ def main() -> None:
             raise OverlayError("--direction-slice-rows-csv-out requires --manifest-only-preservation-triage.")
         if args.review_packet_manifest_out and not args.manifest_only_preservation_triage:
             raise OverlayError("--review-packet-manifest-out requires --manifest-only-preservation-triage.")
+        if args.decision_ledger_csv_out and not args.manifest_only_preservation_triage:
+            raise OverlayError("--decision-ledger-csv-out requires --manifest-only-preservation-triage.")
         production = load_production_data(Path(args.production_data))
         fragment = load_fragment(args)
         ownership = load_ownership_scope(Path(args.ownership_manifest))
@@ -2330,6 +2432,8 @@ def main() -> None:
             if args.review_packet_manifest_out:
                 packet = manifest_only_review_packet_manifest(report, args.out, args.direction_slice_rows_csv_out)
                 write_or_print_output(format_report_json(packet, args.pretty), args.review_packet_manifest_out)
+            if args.decision_ledger_csv_out:
+                write_decision_ledger_csv(report, args.decision_ledger_csv_out)
             if namespace_report["unresolved_count"]:
                 raise OverlayError(f"blocking unresolved structured refs: {namespace_report['unresolved_count']}.")
             if args.preserved_cross_boundary_contract_report and report["status"] == "blocking":
