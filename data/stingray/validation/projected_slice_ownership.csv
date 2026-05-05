@@ -132,8 +132,6 @@ rule,,PDV,,DZU,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary re
 rule,,PDV,,DZV,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
 rule,,PDV,,DZX,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
 rule,,SBT,,CC3,,,preserved_cross_boundary,SBT to Roof panel exclude remains production-owned in Pass 80,true
-rule,,R88,,SFZ,,,preserved_cross_boundary,R88 to SFZ badge exclude remains production-owned in Pass 65,true
-rule,,R88,,EYK,,,preserved_cross_boundary,R88 to required badge section exclude remains production-owned in Pass 65,true
 rule,,DPB,,GTR,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DPC,,GBK,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DPG,,G26,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
@@ -150,11 +148,8 @@ rule,,DUW,,GTR,,,preserved_cross_boundary,Pass 134 Stripe paint availability bou
 rule,,DZU,,GBK,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DZX,,GKZ,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DZX,,GPH,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,SFZ,,EYK,,,preserved_cross_boundary,SFZ to badge section exclude remains production-owned in Pass 63,true
 rule,,WKQ,,,opt_5zw_001,,preserved_cross_boundary,Car-cover 5ZW rule-only exclude remains production-owned in Pass 15,true
-rule,,WKQ,,5ZZ,,,preserved_cross_boundary,Car-cover spoiler exclude remains production-owned in Pass 15,true
 rule,,RNX,,,opt_5zw_001,,preserved_cross_boundary,Car-cover 5ZW rule-only exclude remains production-owned in Pass 15,true
-rule,,RNX,,5ZZ,,,preserved_cross_boundary,Car-cover spoiler exclude remains production-owned in Pass 15,true
 rule,,RNX,,Z51,,,preserved_cross_boundary,Car-cover Z51 exclude remains production-owned in Pass 15,true
 rule,,RWJ,,Z51,,,preserved_cross_boundary,Car-cover Z51 exclude remains production-owned in Pass 15,true
 guardedOption,,,,,,5V7,production_guarded,Spoiler-adjacent ground-effects guarded production option in Pass 17,false
@@ -171,8 +166,6 @@ ruleGroup,grp_5v7_spoiler_requirement,,,,,,projected_owned,5V7 spoiler requires-
 ruleGroup,grp_5zu_paint_requirement,,,,,,production_guarded,5ZU paint requires-any group remains production-owned in Pass 19,true
 rule,,5V7,,,opt_5vm_001,,preserved_cross_boundary,Spoiler control-plane adjacent legacy-ID exclude remains production-owned in Pass 17,true
 rule,,5V7,,,opt_5w8_001,,preserved_cross_boundary,Spoiler control-plane adjacent legacy-ID exclude remains production-owned in Pass 17,true
-rule,,5V7,,STI,,,preserved_cross_boundary,Spoiler control-plane adjacent exclude remains production-owned in Pass 17,true
-rule,,5V7,,TVS,,,preserved_cross_boundary,Spoiler control-plane adjacent exclude remains production-owned in Pass 17,true
 rule,,5V7,,Z51,,,preserved_cross_boundary,Spoiler control-plane adjacent exclude remains production-owned in Pass 17,true
 rule,,,opt_5vm_001,5V7,,,preserved_cross_boundary,Spoiler control-plane adjacent legacy-ID exclude remains production-owned in Pass 17,true
 rule,,,opt_5vm_001,TVS,,,preserved_cross_boundary,Spoiler control-plane adjacent legacy-ID exclude remains production-owned in Pass 17,true
@@ -194,7 +187,6 @@ rule,,D86,,GBA,,,preserved_cross_boundary,Spoiler-adjacent paint exclude remains
 rule,,EFY,,GBA,,,preserved_cross_boundary,Spoiler-adjacent paint exclude remains production-owned in Pass 17,true
 rule,,FE2,,Z51,,,preserved_cross_boundary,Spoiler-adjacent suspension exclude remains production-owned in Pass 17,true
 rule,,FE4,,Z51,,,preserved_cross_boundary,Spoiler-adjacent suspension requirement remains production-owned in Pass 17,true
-rule,,PCU,,5V7,,,preserved_cross_boundary,Spoiler-adjacent package exclude remains production-owned in Pass 17,true
 rule,,Z51,,FE3,,,preserved_cross_boundary,Z51 package include remains production-owned in Pass 17,true
 rule,,Z51,,G0K,,,preserved_cross_boundary,Z51 package include remains production-owned in Pass 17,true
 rule,,Z51,,G96,,,preserved_cross_boundary,Z51 package include remains production-owned in Pass 17,true

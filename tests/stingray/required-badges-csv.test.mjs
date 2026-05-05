@@ -14,6 +14,7 @@ const EYK_INBOUND_EXCLUDES = [
   ["R88", "EYK"],
   ["SFZ", "EYK"],
 ];
+const CSV_OWNED_EYK_INBOUND_EXCLUDE_SOURCES = new Set(["R88", "SFZ"]);
 
 function parseCsv(source) {
   const rows = [];
@@ -248,7 +249,10 @@ test("required Badges projection preserves inbound EYK rules and emits only migr
 
   for (const [sourceRpo, targetRpo] of EYK_INBOUND_EXCLUDES) {
     assert.deepEqual(plain(rule(shadow, sourceRpo, targetRpo, "excludes")), plain(rule(production, sourceRpo, targetRpo, "excludes")));
-    assert.equal(manifestHas({ record_type: "rule", source_rpo: sourceRpo, target_rpo: targetRpo, ownership: "preserved_cross_boundary" }), true);
+    assert.equal(
+      manifestHas({ record_type: "rule", source_rpo: sourceRpo, target_rpo: targetRpo, ownership: "preserved_cross_boundary" }),
+      !CSV_OWNED_EYK_INBOUND_EXCLUDE_SOURCES.has(sourceRpo)
+    );
   }
 
   assert.deepEqual(plain(rule(fragment, "R88", "EYK", "excludes")), plain(rule(production, "R88", "EYK", "excludes")));

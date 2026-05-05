@@ -344,8 +344,8 @@ test("SFZ boundaries remain production-equivalent across preserved and migrated 
   assert.equal(manifestHas({ record_type: "selectable", rpo: "SFZ", ownership: "projected_owned" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCX", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "priceRule", source_rpo: "PCX", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "SFZ", target_rpo: "EYK", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), false);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "SFZ", target_rpo: "EYK", ownership: "preserved_cross_boundary" }), false);
   for (const rpo of SFZ_SOURCE_TEXT_STRIPE_RPOS) {
     assert.equal(manifestHas({ record_type: "rule", source_rpo: "SFZ", target_rpo: rpo, ownership: "preserved_cross_boundary" }), false);
   }

@@ -248,8 +248,8 @@ test("ownership manifest projects 5ZZ and preserves every 5ZZ-touching productio
   assert.equal(manifestHas({ record_type: "exclusiveGroup", group_id: "grp_spoiler_high_wing", ownership: "projected_owned" }), true);
   assert.equal(manifestHas({ record_type: "ruleGroup", group_id: "grp_5v7_spoiler_requirement", ownership: "projected_owned" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "5ZZ", target_rpo: "T0A", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "WKQ", target_rpo: "5ZZ", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "RNX", target_rpo: "5ZZ", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "WKQ", target_rpo: "5ZZ", ownership: "preserved_cross_boundary" }), false);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "RNX", target_rpo: "5ZZ", ownership: "preserved_cross_boundary" }), false);
   assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5vm_001", target_rpo: "5ZZ", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5w8_001", target_rpo: "5ZZ", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5V7", target_rpo: "5ZZ", ownership: "preserved_cross_boundary" }), false);

@@ -305,8 +305,8 @@ test("R88 boundaries remain production-equivalent across preserved and migrated 
   assert.equal(fragment.priceRules.some((item) => item.condition_option_id === r88Id || item.target_option_id === r88Id), false);
 
   assert.equal(manifestHas({ record_type: "selectable", rpo: "R88", ownership: "projected_owned" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: "EYK", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), false);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: "EYK", ownership: "preserved_cross_boundary" }), false);
   for (const rpo of R88_SOURCE_TEXT_STRIPE_RPOS) {
     assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: rpo, ownership: "preserved_cross_boundary" }), false);
   }

@@ -21,6 +21,16 @@ const PASS137_EXCLUDE_PAIRS = [
 const PASS138_EXCLUDE_PAIRS = [
   ["dep_excl_sti_5v7", "opt_sti_001", "opt_5v7_001", "cs_selected_5v7"],
 ];
+const PASS139_ALREADY_CSV_OWNED_EXCLUDES = [
+  ["dep_excl_5v7_sti", "5V7", "STI"],
+  ["dep_excl_5v7_tvs", "5V7", "TVS"],
+  ["dep_excl_pcu_5v7", "PCU", "5V7"],
+  ["dep_excl_r88_eyk", "R88", "EYK"],
+  ["dep_excl_r88_sfz", "R88", "SFZ"],
+  ["dep_excl_sfz_eyk", "SFZ", "EYK"],
+  ["dep_excl_wkq_5zz", "WKQ", "5ZZ"],
+  ["dep_excl_rnx_5zz", "RNX", "5ZZ"],
+];
 const PASS135_FULL_LENGTH_STRIPE_RPOS = [
   "DPB",
   "DPC",
@@ -474,6 +484,34 @@ test("pass 138 migrated STI to 5V7 exclude emits production-shaped legacy rule",
     assert.deepEqual(
       Object.fromEntries(fields.map((field) => [field, projectedRule[field]])),
       Object.fromEntries(fields.map((field) => [field, productionRule[field]]))
+    );
+  }
+});
+
+test("pass 139 already CSV-owned excludes are not preserved as production-owned boundaries", () => {
+  const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
+  const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
+
+  assert.equal(rules.length, 45);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 43);
+
+  for (const [ruleId, sourceRpo, targetRpo] of PASS139_ALREADY_CSV_OWNED_EXCLUDES) {
+    assert.ok(
+      rules.some((rule) => rule.rule_id === ruleId && rule.rule_type === "excludes" && rule.active === "true"),
+      `${ruleId} should be active in dependency_rules.csv`
+    );
+    assert.equal(
+      manifestRows.some(
+        (row) =>
+          row.active === "true" &&
+          row.record_type === "rule" &&
+          row.source_rpo === sourceRpo &&
+          row.target_rpo === targetRpo &&
+          row.ownership === "preserved_cross_boundary"
+      ),
+      false,
+      `${sourceRpo} -> ${targetRpo} should not remain preserved once dependency_rules.csv owns it`
     );
   }
 });

@@ -16,6 +16,7 @@ const EYK_INBOUND_EXCLUDES = [
   ["R88", "EYK"],
   ["SFZ", "EYK"],
 ];
+const CSV_OWNED_EYK_INBOUND_EXCLUDE_SOURCES = new Set(["R88", "SFZ"]);
 
 function parseCsv(source) {
   const rows = [];
@@ -279,6 +280,9 @@ test("current manifest projects required Badges choices without claiming section
   assert.equal(activeManifestRows().some((row) => row.record_type === "section" || row.group_id === "sec_badg_001"), false);
   for (const [sourceRpo, targetRpo] of EYK_INBOUND_EXCLUDES) {
     assert.ok(rule(production, sourceRpo, targetRpo, "excludes"), `${sourceRpo} -> ${targetRpo} should exist in production`);
-    assert.equal(manifestHas({ record_type: "rule", source_rpo: sourceRpo, target_rpo: targetRpo, ownership: "preserved_cross_boundary" }), true);
+    assert.equal(
+      manifestHas({ record_type: "rule", source_rpo: sourceRpo, target_rpo: targetRpo, ownership: "preserved_cross_boundary" }),
+      !CSV_OWNED_EYK_INBOUND_EXCLUDE_SOURCES.has(sourceRpo)
+    );
   }
 });

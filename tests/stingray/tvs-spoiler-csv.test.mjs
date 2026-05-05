@@ -248,7 +248,7 @@ test("ownership manifest projects TVS and preserves every TVS-touching productio
   assert.equal(manifestHas({ record_type: "exclusiveGroup", group_id: "grp_spoiler_high_wing", ownership: "projected_owned" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "TVS", target_rpo: "T0A", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "priceRule", source_rpo: "Z51", target_rpo: "TVS", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_rpo: "TVS", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_rpo: "TVS", ownership: "preserved_cross_boundary" }), false);
   assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5vm_001", target_rpo: "TVS", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5w8_001", target_rpo: "TVS", ownership: "preserved_cross_boundary" }), true);
 
