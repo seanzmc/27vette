@@ -682,8 +682,9 @@ class CsvSlice:
         target_display = self.display_row(target_selectable_id)
         rule_type = row["rule_type"]
         if rule_type == "requires":
-            target_type = "option" if row["subject_selector_type"] == "selectable" else "main"
-            source_type = "option" if row["subject_selector_type"] == "selectable" else "main"
+            scoped_direct_selectable = row["subject_selector_type"] == "selectable" and row.get("applies_when_condition_set_id", "")
+            target_type = "option" if scoped_direct_selectable else "main"
+            source_type = "option" if scoped_direct_selectable else "main"
         else:
             target_type = "main"
             source_type = "main"

@@ -281,8 +281,8 @@ test("rear script badge dependency rules migrate the six production peer exclude
   const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
 
-  assert.equal(rules.length, 94);
-  assert.equal(rules.filter((item) => item.rule_type === "requires").length, 2);
+  assert.equal(rules.length, 95);
+  assert.equal(rules.filter((item) => item.rule_type === "requires").length, 3);
   assert.equal(rules.filter((item) => item.rule_type === "excludes").length, 92);
 
   for (const [ruleId, , , sourceId, targetId, conditionSetId] of PASS136_EXCLUDE_PAIRS) {

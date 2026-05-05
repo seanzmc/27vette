@@ -102,7 +102,6 @@ rule,,5DO,,SPY,,,preserved_cross_boundary,Pass 149 newly projected target bounda
 rule,,5DO,,SPZ,,,preserved_cross_boundary,Pass 149 newly projected target boundary remains production-owned,true
 rule,,BV4,,R8C,,,preserved_cross_boundary,Pass 149 newly projected target boundary remains production-owned,true
 rule,,R8C,,CFX,,,preserved_cross_boundary,Pass 149 newly projected target boundary remains production-owned,true
-rule,,SPZ,,SPY,,,preserved_cross_boundary,Pass 149 newly projected target boundary remains production-owned,true
 rule,,DPB,,GTR,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DPC,,GBK,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DPG,,G26,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
