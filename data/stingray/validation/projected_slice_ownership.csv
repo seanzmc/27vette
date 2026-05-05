@@ -150,12 +150,6 @@ rule,,DUW,,GTR,,,preserved_cross_boundary,Pass 134 Stripe paint availability bou
 rule,,DZU,,GBK,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DZX,,GKZ,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DZX,,GPH,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,RIN,,RIK,,,preserved_cross_boundary,Rear script badge peer exclude remains production-owned in Pass 67,true
-rule,,RIN,,SL8,,,preserved_cross_boundary,Rear script badge peer exclude remains production-owned in Pass 67,true
-rule,,SL8,,RIN,,,preserved_cross_boundary,Rear script badge peer exclude remains production-owned in Pass 67,true
-rule,,SL8,,RIK,,,preserved_cross_boundary,Rear script badge peer exclude remains production-owned in Pass 67,true
-rule,,RIK,,RIN,,,preserved_cross_boundary,Rear script badge peer exclude remains production-owned in Pass 67,true
-rule,,RIK,,SL8,,,preserved_cross_boundary,Rear script badge peer exclude remains production-owned in Pass 67,true
 rule,,SFZ,,EYK,,,preserved_cross_boundary,SFZ to badge section exclude remains production-owned in Pass 63,true
 rule,,WKQ,,5ZU,,,preserved_cross_boundary,Car-cover spoiler exclude remains production-owned in Pass 15,true
 rule,,WKQ,,,opt_5zw_001,,preserved_cross_boundary,Car-cover 5ZW rule-only exclude remains production-owned in Pass 15,true

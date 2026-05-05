@@ -22,6 +22,14 @@ const EXPECTED_PEER_EXCLUDES = new Set([
   "SL8->RIK:excludes",
   "SL8->RIN:excludes",
 ]);
+const PASS136_EXCLUDE_PAIRS = [
+  ["dep_excl_rin_rik", "RIN", "RIK", "opt_rin_001", "opt_rik_001", "cs_selected_rik"],
+  ["dep_excl_rin_sl8", "RIN", "SL8", "opt_rin_001", "opt_sl8_001", "cs_selected_sl8"],
+  ["dep_excl_sl8_rin", "SL8", "RIN", "opt_sl8_001", "opt_rin_001", "cs_selected_rin"],
+  ["dep_excl_sl8_rik", "SL8", "RIK", "opt_sl8_001", "opt_rik_001", "cs_selected_rik"],
+  ["dep_excl_rik_rin", "RIK", "RIN", "opt_rik_001", "opt_rin_001", "cs_selected_rin"],
+  ["dep_excl_rik_sl8", "RIK", "SL8", "opt_rik_001", "opt_sl8_001", "cs_selected_sl8"],
+];
 const PRODUCTION_OWNED_OUT_OF_SCOPE_RPOS = new Set(["PCX", "PDV"]);
 
 function parseCsv(source) {
@@ -268,20 +276,66 @@ test("shadow runtime preserves rear script badge peer blocking", () => {
   }
 });
 
-test("rear script badge boundaries remain production-owned and preserved", () => {
+test("rear script badge dependency rules migrate the six production peer excludes", () => {
+  const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
+  const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
+  const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
+
+  assert.equal(rules.length, 42);
+  assert.equal(rules.filter((item) => item.rule_type === "requires").length, 2);
+  assert.equal(rules.filter((item) => item.rule_type === "excludes").length, 40);
+
+  for (const [ruleId, , , sourceId, targetId, conditionSetId] of PASS136_EXCLUDE_PAIRS) {
+    const dependencyRule = rules.find((item) => item.rule_id === ruleId);
+    assert.ok(dependencyRule, `${ruleId} should exist`);
+    assert.equal(dependencyRule.rule_type, "excludes");
+    assert.equal(dependencyRule.subject_selector_type, "selectable");
+    assert.equal(dependencyRule.subject_selector_id, sourceId);
+    assert.equal(dependencyRule.subject_must_be_selected, "true");
+    assert.equal(dependencyRule.target_condition_set_id, conditionSetId);
+    assert.equal(dependencyRule.violation_behavior, "disable_and_block");
+    assert.equal(dependencyRule.active, "true");
+
+    assert.ok(conditionSets.find((item) => item.condition_set_id === conditionSetId), `${conditionSetId} should exist`);
+    assert.ok(
+      conditionTerms.find(
+        (item) =>
+          item.condition_set_id === conditionSetId &&
+          item.term_type === "selected" &&
+          item.left_ref === targetId &&
+          item.operator === "is_true"
+      ),
+      `${conditionSetId} should select ${targetId}`
+    );
+  }
+});
+
+test("rear script badge peer excludes compile as production-shaped dependency rules", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
   const fragment = emitCsvLegacyFragment();
   const rearScriptIds = new Set([...REAR_SCRIPT_RPOS].map((rpo) => optionIdByRpo(production, rpo)));
 
-  for (const key of EXPECTED_PEER_EXCLUDES) {
-    const [sourceRpo, rest] = key.split("->");
-    const [targetRpo, ruleType] = rest.split(":");
+  for (const [, sourceRpo, targetRpo, sourceId, targetId, conditionSetId] of PASS136_EXCLUDE_PAIRS) {
+    const ruleType = "excludes";
     assert.deepEqual(plain(rule(shadow, sourceRpo, targetRpo, ruleType)), plain(rule(production, sourceRpo, targetRpo, ruleType)));
-    assert.equal(manifestHas({ record_type: "rule", source_rpo: sourceRpo, target_rpo: targetRpo, ownership: "preserved_cross_boundary" }), true);
+    assert.deepEqual(plain(rule(fragment, sourceRpo, targetRpo, ruleType)), plain(rule(production, sourceRpo, targetRpo, ruleType)));
+    assert.equal(manifestHas({ record_type: "rule", source_rpo: sourceRpo, target_rpo: targetRpo, ownership: "preserved_cross_boundary" }), false);
+
+    const result = evaluate("1lt_c07", [sourceId, targetId]);
+    const conflict = result.conflicts.find((item) => item.rule_id === rule(`dep_excl_${sourceRpo.toLowerCase()}_${targetRpo.toLowerCase()}`));
+    assert.equal(result.validation_errors.length, 0);
+    assert.equal(conflict?.conflict_source, "dependency_rule");
+    assert.equal(conflict?.target_condition_set_id, conditionSetId);
   }
 
-  assert.equal(fragment.rules.some((item) => rearScriptIds.has(item.source_id) || rearScriptIds.has(item.target_id)), false);
+  assert.deepEqual(
+    fragment.rules
+      .filter((item) => rearScriptIds.has(item.source_id) || rearScriptIds.has(item.target_id))
+      .map((item) => `${rpoByOptionId(production).get(item.source_id)}->${rpoByOptionId(production).get(item.target_id)}:${item.rule_type}`)
+      .sort(),
+    [...EXPECTED_PEER_EXCLUDES].sort()
+  );
   assert.equal(fragment.priceRules.some((item) => rearScriptIds.has(item.condition_option_id) || rearScriptIds.has(item.target_option_id)), false);
   assert.deepEqual(plain(groupIdsTouchingRearScripts(fragment.exclusiveGroups, production)), []);
   assertNoRearScriptExclusiveGroup(fragment);

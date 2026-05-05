@@ -28,3 +28,6 @@ cs_selected_dub,g1,1,selected,opt_dub_001,is_true,,false
 cs_selected_due,g1,1,selected,opt_due_001,is_true,,false
 cs_selected_duk,g1,1,selected,opt_duk_001,is_true,,false
 cs_selected_duw,g1,1,selected,opt_duw_001,is_true,,false
+cs_selected_rin,g1,1,selected,opt_rin_001,is_true,,false
+cs_selected_sl8,g1,1,selected,opt_sl8_001,is_true,,false
+cs_selected_rik,g1,1,selected,opt_rik_001,is_true,,false
