@@ -110,14 +110,12 @@ const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set([
   "opt_rnx_001->opt_5zw_001",
   "opt_rnx_001->opt_z51_001",
   "opt_pcx_001->opt_eyk_001",
-  "opt_pcx_001->opt_sfz_001",
   ...PASS135_FULL_LENGTH_STRIPE_OPTION_IDS.map((optionId) => `opt_cf8_001->${optionId}`),
   ...PASS135_FULL_LENGTH_STRIPE_OPTION_IDS.map((optionId) => `opt_pcx_001->${optionId}`),
   ...PRESERVED_STRIPE_PAINT_RULE_KEYS,
 ]);
 const PRESERVED_FIRST_SLICE_PRICE_RULE_KEYS = new Set([
   "opt_z51_001->opt_tvs_001",
-  "opt_pcx_001->opt_sfz_001",
 ]);
 
 function loadGeneratedData() {

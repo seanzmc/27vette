@@ -277,7 +277,7 @@ test("shadow runtime preserves PCX package behavior for Tech Bronze graphics", (
   }
 });
 
-test("Tech Bronze graphics package boundaries remain production-owned and preserved", () => {
+test("Tech Bronze graphics package include boundaries are CSV-owned while SHT to PDV remains preserved", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
   const fragment = emitCsvLegacyFragment();
@@ -285,15 +285,21 @@ test("Tech Bronze graphics package boundaries remain production-owned and preser
 
   for (const rpo of TECH_BRONZE_GRAPHICS_RPOS) {
     assert.deepEqual(plain(rule(shadow, "PCX", rpo, "includes")), plain(rule(production, "PCX", rpo, "includes")));
-    assert.deepEqual(plain(priceRule(shadow, "PCX", rpo, 0)), plain(priceRule(production, "PCX", rpo, 0)));
 
     const targetId = optionIdByRpo(production, rpo);
-    assert.equal(fragment.rules.some((item) => item.source_id === pcxId && item.target_id === targetId), false);
-    assert.equal(fragment.priceRules.some((item) => item.condition_option_id === pcxId && item.target_option_id === targetId), false);
+    assert.deepEqual(plain(priceRule(shadow, "PCX", rpo, 0)), {
+      ...plain(priceRule(production, "PCX", rpo, 0)),
+      price_rule_id: `pr_${pcxId}_${targetId}_included_zero`,
+    });
+    assert.deepEqual(plain(rule(fragment, "PCX", rpo, "includes")), plain(rule(production, "PCX", rpo, "includes")));
+    assert.deepEqual(plain(priceRule(fragment, "PCX", rpo, 0)), {
+      ...plain(priceRule(production, "PCX", rpo, 0)),
+      price_rule_id: `pr_${pcxId}_${targetId}_included_zero`,
+    });
 
     assert.equal(manifestHas({ record_type: "selectable", rpo, ownership: "projected_owned" }), true);
-    assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCX", target_rpo: rpo, ownership: "preserved_cross_boundary" }), true);
-    assert.equal(manifestHas({ record_type: "priceRule", source_rpo: "PCX", target_rpo: rpo, ownership: "preserved_cross_boundary" }), true);
+    assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCX", target_rpo: rpo, ownership: "preserved_cross_boundary" }), false);
+    assert.equal(manifestHas({ record_type: "priceRule", source_rpo: "PCX", target_rpo: rpo, ownership: "preserved_cross_boundary" }), false);
   }
 
   assert.deepEqual(plain(rule(shadow, "SHT", "PDV", "excludes")), plain(rule(production, "SHT", "PDV", "excludes")));

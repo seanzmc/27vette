@@ -323,13 +323,7 @@ test("projected ownership manifest declares the current multi-slice control scop
     },
   ]);
   for (const expected of [
-    { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SNG", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "priceRule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SNG", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SHT", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "priceRule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SHT", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "SHT", source_option_id: "", target_rpo: "PDV", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SFZ", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "priceRule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SFZ", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "PDV", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "R8C", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "S47", target_option_id: "", ownership: "preserved_cross_boundary" },
@@ -438,7 +432,7 @@ test("overlay rejects a manifest that omits a projected fragment RPO", () => {
 });
 
 test("overlay rejects an unclassified cross-boundary production record", () => {
-  const rows = loadManifest().filter((row) => !(row.ownership === "preserved_cross_boundary" && row.source_rpo === "PCX" && row.target_rpo === "SNG"));
+  const rows = loadManifest().filter((row) => !(row.ownership === "preserved_cross_boundary" && row.source_rpo === "PCX" && row.target_rpo === "5DG"));
   const tempManifest = writeTempManifest(rows);
 
   const result = runOverlay(["--ownership-manifest", tempManifest]);
@@ -466,7 +460,7 @@ const validationCases = [
   ],
   [
     "duplicate active preserved cross-boundary row",
-    (rows) => [...rows, { ...rows.find((row) => row.record_type === "rule" && row.source_rpo === "PCX" && row.target_rpo === "SNG") }],
+    (rows) => [...rows, { ...rows.find((row) => row.record_type === "rule" && row.source_rpo === "PCX" && row.target_rpo === "5DG") }],
     /duplicate active preserved_cross_boundary row/,
   ],
   [
@@ -491,7 +485,7 @@ const validationCases = [
   ],
   [
     "preserved cross-boundary row missing source",
-    (rows) => rows.map((row) => (row.record_type === "rule" && row.source_rpo === "PCX" && row.target_rpo === "SNG" ? { ...row, source_rpo: "" } : row)),
+    (rows) => rows.map((row) => (row.record_type === "rule" && row.source_rpo === "PCX" && row.target_rpo === "5DG" ? { ...row, source_rpo: "" } : row)),
     /preserved_cross_boundary row is missing source_rpo\/source_option_id or target_rpo\/target_option_id/,
   ],
   [

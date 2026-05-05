@@ -320,16 +320,25 @@ test("SFZ boundaries remain production-equivalent across preserved and migrated 
   const sfzId = optionIdByRpo(production, "SFZ");
 
   assert.deepEqual(plain(rule(shadow, "PCX", "SFZ", "includes")), plain(rule(production, "PCX", "SFZ", "includes")));
-  assert.deepEqual(plain(priceRule(shadow, "PCX", "SFZ", 0)), plain(priceRule(production, "PCX", "SFZ", 0)));
+  assert.deepEqual(plain(priceRule(shadow, "PCX", "SFZ", 0)), {
+    ...plain(priceRule(production, "PCX", "SFZ", 0)),
+    price_rule_id: `pr_${optionIdByRpo(production, "PCX")}_${sfzId}_included_zero`,
+  });
   assert.deepEqual(plain(rule(shadow, "R88", "SFZ", "excludes")), plain(rule(production, "R88", "SFZ", "excludes")));
   assert.deepEqual(plain(rule(shadow, "SFZ", "EYK", "excludes")), plain(rule(production, "SFZ", "EYK", "excludes")));
   for (const rpo of SFZ_SOURCE_TEXT_STRIPE_RPOS) {
     assert.deepEqual(plain(rule(shadow, "SFZ", rpo, "excludes")), plain(rule(production, "SFZ", rpo, "excludes")));
   }
 
+  assert.deepEqual(plain(rule(fragment, "PCX", "SFZ", "includes")), plain(rule(production, "PCX", "SFZ", "includes")));
+  assert.deepEqual(plain(priceRule(fragment, "PCX", "SFZ", 0)), {
+    ...plain(priceRule(production, "PCX", "SFZ", 0)),
+    price_rule_id: `pr_${optionIdByRpo(production, "PCX")}_${sfzId}_included_zero`,
+  });
   assert.deepEqual(plain(rule(fragment, "R88", "SFZ", "excludes")), plain(rule(production, "R88", "SFZ", "excludes")));
   assert.deepEqual(plain(rule(fragment, "SFZ", "EYK", "excludes")), plain(rule(production, "SFZ", "EYK", "excludes")));
   const migratedSfzRuleKeys = new Set([
+    `${optionIdByRpo(production, "PCX")}->${sfzId}`,
     `${optionIdByRpo(production, "R88")}->${sfzId}`,
     `${sfzId}->${optionIdByRpo(production, "EYK")}`,
     ...[...SFZ_SOURCE_TEXT_STRIPE_RPOS].map((rpo) => `${sfzId}->${optionIdByRpo(production, rpo)}`),
@@ -338,11 +347,11 @@ test("SFZ boundaries remain production-equivalent across preserved and migrated 
     fragment.rules.some((item) => (item.source_id === sfzId || item.target_id === sfzId) && !migratedSfzRuleKeys.has(`${item.source_id}->${item.target_id}`)),
     false
   );
-  assert.equal(fragment.priceRules.some((item) => item.condition_option_id === sfzId || item.target_option_id === sfzId), false);
+  assert.equal(fragment.priceRules.some((item) => (item.condition_option_id === sfzId || item.target_option_id === sfzId) && item.condition_option_id !== optionIdByRpo(production, "PCX")), false);
 
   assert.equal(manifestHas({ record_type: "selectable", rpo: "SFZ", ownership: "projected_owned" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCX", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "priceRule", source_rpo: "PCX", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCX", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), false);
+  assert.equal(manifestHas({ record_type: "priceRule", source_rpo: "PCX", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), false);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), false);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "SFZ", target_rpo: "EYK", ownership: "preserved_cross_boundary" }), false);
   for (const rpo of SFZ_SOURCE_TEXT_STRIPE_RPOS) {
