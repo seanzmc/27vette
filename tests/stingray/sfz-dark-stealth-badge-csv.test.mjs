@@ -25,7 +25,6 @@ const SFZ_SOURCE_TEXT_STRIPE_RPOS = new Set([
 ]);
 const SFZ_SOURCE_TEXT_MISSING_RPOS = new Set(["DTB"]);
 const OUT_OF_SCOPE_RPOS = new Set([
-  "PCX",
   "5DG",
   "S47",
   "SFE",

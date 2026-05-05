@@ -151,17 +151,17 @@ test("fully owned package fixture emits include rules and included-zero priceRul
 
 test("overlay rejects a projected package include with a production-owned source", () => {
   const result = overlayWithMutatedFragment((fragment, production) => {
-    fragment.rules.push(productionRule(production, "PDV", "VWD"));
+    fragment.rules.push(productionRule(production, "Z51", "T0A"));
   });
 
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /projected package include source is not projected-owned/);
-  assert.match(result.stderr, /opt_pdv_001/);
+  assert.match(result.stderr, /opt_z51_001/);
 });
 
 test("overlay rejects a projected package include with a production-owned target", () => {
   const production = loadGeneratedData();
-  const rule = syntheticPackageRule(production, "B6P", "PDV");
+  const rule = syntheticPackageRule(production, "B6P", "5JR");
   production.rules.push(rule);
 
   const result = overlayWithMutatedFragment((fragment) => {
@@ -170,22 +170,22 @@ test("overlay rejects a projected package include with a production-owned target
 
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /projected package include targets are not projected-owned/);
-  assert.match(result.stderr, /opt_pdv_001/);
+  assert.match(result.stderr, /opt_5jr_001/);
 });
 
 test("overlay rejects a projected package priceRule with a production-owned source", () => {
   const result = overlayWithMutatedFragment((fragment, production) => {
-    fragment.priceRules.push(productionPriceRule(production, "PDV", "VWD"));
+    fragment.priceRules.push(productionPriceRule(production, "Z51", "TVS"));
   });
 
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /projected package priceRule source is not projected-owned/);
-  assert.match(result.stderr, /opt_pdv_001/);
+  assert.match(result.stderr, /opt_z51_001/);
 });
 
 test("overlay rejects a projected package priceRule with a production-owned target", () => {
   const production = loadGeneratedData();
-  const rule = syntheticPackagePriceRule(production, "B6P", "PDV");
+  const rule = syntheticPackagePriceRule(production, "B6P", "5JR");
   production.priceRules.push(rule);
 
   const result = overlayWithMutatedFragment((fragment) => {
@@ -194,7 +194,7 @@ test("overlay rejects a projected package priceRule with a production-owned targ
 
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /projected package priceRule targets are not projected-owned/);
-  assert.match(result.stderr, /opt_pdv_001/);
+  assert.match(result.stderr, /opt_5jr_001/);
 });
 
 test("real cross-owned package examples remain production-owned and preserved", () => {

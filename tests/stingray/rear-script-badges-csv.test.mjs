@@ -30,7 +30,7 @@ const PASS136_EXCLUDE_PAIRS = [
   ["dep_excl_rik_rin", "RIK", "RIN", "opt_rik_001", "opt_rin_001", "cs_selected_rin"],
   ["dep_excl_rik_sl8", "RIK", "SL8", "opt_rik_001", "opt_sl8_001", "cs_selected_sl8"],
 ];
-const PRODUCTION_OWNED_OUT_OF_SCOPE_RPOS = new Set(["PCX", "PDV"]);
+const PRODUCTION_OWNED_OUT_OF_SCOPE_RPOS = new Set([]);
 
 function parseCsv(source) {
   const rows = [];
@@ -281,9 +281,9 @@ test("rear script badge dependency rules migrate the six production peer exclude
   const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
 
-  assert.equal(rules.length, 46);
+  assert.equal(rules.length, 47);
   assert.equal(rules.filter((item) => item.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((item) => item.rule_type === "excludes").length, 44);
+  assert.equal(rules.filter((item) => item.rule_type === "excludes").length, 45);
 
   for (const [ruleId, , , sourceId, targetId, conditionSetId] of PASS136_EXCLUDE_PAIRS) {
     const dependencyRule = rules.find((item) => item.rule_id === ruleId);

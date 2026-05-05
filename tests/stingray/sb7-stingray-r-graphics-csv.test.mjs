@@ -26,10 +26,7 @@ const SB7_SOURCE_TEXT_STRIPE_RPOS = new Set([
   "DZV",
   "DZX",
 ]);
-const OUT_OF_SCOPE_RPOS = new Set([
-  "PDV",
-  "PCX",
-]);
+const OUT_OF_SCOPE_RPOS = new Set([]);
 
 function parseCsv(source) {
   const rows = [];

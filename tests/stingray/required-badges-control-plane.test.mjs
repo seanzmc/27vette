@@ -16,7 +16,7 @@ const EYK_INBOUND_EXCLUDES = [
   ["R88", "EYK"],
   ["SFZ", "EYK"],
 ];
-const CSV_OWNED_EYK_INBOUND_EXCLUDE_SOURCES = new Set(["R88", "SFZ"]);
+const CSV_OWNED_EYK_INBOUND_EXCLUDE_SOURCES = new Set(["PCX", "R88", "SFZ"]);
 
 function parseCsv(source) {
   const rows = [];

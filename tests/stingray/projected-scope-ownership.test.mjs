@@ -51,6 +51,8 @@ const EXPECTED_OWNED_RPOS = [
   "EYK",
   "EYT",
   "PCU",
+  "PCX",
+  "PDV",
   "PDY",
   "PEF",
   "R88",
@@ -260,7 +262,8 @@ test("projected ownership manifest declares the current multi-slice control scop
     .sort((a, b) => `${a.record_type}:${a.rpo}:${a.target_option_id}`.localeCompare(`${b.record_type}:${b.rpo}:${b.target_option_id}`));
 
   assert.deepEqual(projectedOwnedRpos(rows), EXPECTED_OWNED_RPOS);
-  assert.equal(projectedOwnedRpos(rows).includes("PDV"), false);
+  assert.equal(projectedOwnedRpos(rows).includes("PCX"), true);
+  assert.equal(projectedOwnedRpos(rows).includes("PDV"), true);
   assert.equal(projectedOwnedRpos(rows).includes("PEF"), true);
   assert.equal(projectedOwnedRpos(rows).includes("CAV"), true);
   assert.equal(projectedOwnedRpos(rows).includes("RIA"), true);
@@ -340,7 +343,14 @@ test("projected ownership manifest declares the current multi-slice control scop
     { record_type: "rule", group_id: "", source_rpo: "SHT", source_option_id: "", target_rpo: "PDV", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SFZ", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "priceRule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SFZ", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "EYK", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "PDV", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "R8C", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "S47", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SFE", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SPY", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SPZ", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "5DG", target_option_id: "", ownership: "preserved_cross_boundary" },
+    { record_type: "priceRule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "5DG", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PCU", source_option_id: "", target_rpo: "", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PCU", source_option_id: "", target_rpo: "", target_option_id: "opt_5w8_001", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_5vm_001", target_rpo: "", target_option_id: "opt_5w8_001", ownership: "preserved_cross_boundary" },
@@ -385,7 +395,8 @@ test("legacy fragment projected RPO scope equals the ownership manifest", () => 
 
   assert.deepEqual(fragment.validation_errors, []);
   assert.deepEqual(fragmentRpos, projectedOwnedRpos());
-  assert.equal(fragmentRpos.includes("PDV"), false);
+  assert.equal(fragmentRpos.includes("PCX"), true);
+  assert.equal(fragmentRpos.includes("PDV"), true);
   assert.equal(fragmentRpos.includes("5ZW"), false);
   assert.equal(fragment.rules.some((rule) => rule.source_id === pdv && rule.target_id === vwd), false);
   assert.equal(fragment.priceRules.some((rule) => rule.condition_option_id === pdv && rule.target_option_id === vwd), false);
@@ -446,7 +457,7 @@ test("overlay rejects an unclassified cross-boundary production record", () => {
   const result = runOverlay(["--ownership-manifest", tempManifest]);
 
   assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /unclassified cross-boundary/);
+  assert.match(result.stderr, /unclassified cross-boundary|unreplaced migrated-slice-owned/);
 });
 
 test("overlay rejects omitted id-based 5ZW preserved records", () => {

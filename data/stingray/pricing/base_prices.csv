@@ -22,6 +22,8 @@ bp_5zz,pb_2027_stingray,selectable,opt_5zz_001,,1550,10,true,Current 5ZZ base pr
 bp_5zu,pb_2027_stingray,selectable,opt_5zu_001,,1395,10,true,Current 5ZU base price.
 bp_5v7,pb_2027_stingray,selectable,opt_5v7_001,,650,10,true,Current 5V7 base price.
 bp_pcu,pb_2027_stingray,selectable,opt_pcu_001,,1575,10,true,Current PCU base price.
+bp_pdv,pb_2027_stingray,selectable,opt_pdv_001,,750,10,true,Current PDV base price.
+bp_pcx,pb_2027_stingray,selectable,opt_pcx_001,,4595,10,true,Current PCX base price.
 bp_slk,pb_2027_stingray,selectable,opt_slk_001,,1995,10,true,Current SLK base price.
 bp_sln,pb_2027_stingray,selectable,opt_sln_001,,2895,10,true,Current SLN base price.
 bp_vup,pb_2027_stingray,selectable,opt_vup_001,,575,10,true,Current VUP base price.

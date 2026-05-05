@@ -9,7 +9,7 @@ const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const FENDER_HASH_STRIPE_RPOS = new Set(["SHQ", "SHW"]);
-const NEARBY_PACKAGE_RPOS = new Set(["PDV", "PCX"]);
+const NEARBY_PACKAGE_RPOS = new Set([]);
 const EXPECTED_PRICES = new Map([
   ["SHQ", 295],
   ["SHW", 295],

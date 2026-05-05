@@ -14,7 +14,7 @@ const EYK_INBOUND_EXCLUDES = [
   ["R88", "EYK"],
   ["SFZ", "EYK"],
 ];
-const CSV_OWNED_EYK_INBOUND_EXCLUDE_SOURCES = new Set(["R88", "SFZ"]);
+const CSV_OWNED_EYK_INBOUND_EXCLUDE_SOURCES = new Set(["PCX", "R88", "SFZ"]);
 
 function parseCsv(source) {
   const rows = [];
@@ -257,7 +257,9 @@ test("required Badges projection preserves inbound EYK rules and emits only migr
 
   assert.deepEqual(plain(rule(fragment, "R88", "EYK", "excludes")), plain(rule(production, "R88", "EYK", "excludes")));
   assert.deepEqual(plain(rule(fragment, "SFZ", "EYK", "excludes")), plain(rule(production, "SFZ", "EYK", "excludes")));
+  assert.deepEqual(plain(rule(fragment, "PCX", "EYK", "excludes")), plain(rule(production, "PCX", "EYK", "excludes")));
   const migratedBadgeRuleKeys = new Set([
+    `${optionIdByRpo(production, "PCX")}->${eykId}`,
     `${optionIdByRpo(production, "R88")}->${eykId}`,
     `${optionIdByRpo(production, "SFZ")}->${eykId}`,
   ]);
@@ -288,7 +290,7 @@ test("required Badges projection claims only EYK EYT choices, not section metada
   assert.equal(manifestHas({ record_type: "guardedOption", target_option_id: "opt_eyt_001", ownership: "production_guarded" }), false);
   assert.equal(manifestHas({ record_type: "guardedOption", target_option_id: "opt_eyt_002", ownership: "production_guarded" }), false);
 
-  for (const rpo of ["PCX", "PDV", "GBA", "ZYC"]) {
+  for (const rpo of ["GBA", "ZYC"]) {
     assert.equal(owned.has(rpo), false, `${rpo} should remain outside the required Badges slice`);
   }
 });

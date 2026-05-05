@@ -59,6 +59,8 @@ selectable,,,,,,SHW,projected_owned,Fender hash stripe pair projected slice,true
 selectable,,,,,,SB7,projected_owned,SB7 Stingray R graphics projected slice,true
 selectable,,,,,,SNG,projected_owned,Tech Bronze graphics projected slice,true
 selectable,,,,,,SHT,projected_owned,Tech Bronze graphics projected slice,true
+selectable,,,,,,PCX,projected_owned,Pass 141 package source catalog unlock only,true
+selectable,,,,,,PDV,projected_owned,Pass 141 package source catalog unlock only,true
 selectable,,,,,,DPB,projected_owned,Pass 134 Stripes blocker catalog slice,true
 selectable,,,,,,DPC,projected_owned,Pass 134 Stripes blocker catalog slice,true
 selectable,,,,,,DPG,projected_owned,Pass 134 Stripes blocker catalog slice,true
@@ -98,7 +100,14 @@ priceRule,,PCX,,SHT,,,preserved_cross_boundary,PCX package source remains produc
 rule,,SHT,,PDV,,,preserved_cross_boundary,SHT to PDV package exclude remains production-owned in Pass 61,true
 rule,,PCX,,SFZ,,,preserved_cross_boundary,PCX package source remains production-owned for SFZ in Pass 63,true
 priceRule,,PCX,,SFZ,,,preserved_cross_boundary,PCX package source remains production-owned for SFZ in Pass 63,true
-rule,,PCX,,EYK,,,preserved_cross_boundary,PCX to required Badges Chrome exclude remains production-owned in Pass 69,true
+rule,,PCX,,PDV,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by package source catalog unlock remains production-owned,true
+rule,,PCX,,R8C,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by package source catalog unlock remains production-owned,true
+rule,,PCX,,S47,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by package source catalog unlock remains production-owned,true
+rule,,PCX,,SFE,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by package source catalog unlock remains production-owned,true
+rule,,PCX,,SPY,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by package source catalog unlock remains production-owned,true
+rule,,PCX,,SPZ,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by package source catalog unlock remains production-owned,true
+rule,,PCX,,5DG,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by package source catalog unlock remains production-owned,true
+priceRule,,PCX,,5DG,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by package source catalog unlock remains production-owned,true
 rule,,PCX,,DPB,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
 rule,,PCX,,DPC,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
 rule,,PCX,,DPG,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
