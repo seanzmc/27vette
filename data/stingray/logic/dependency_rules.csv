@@ -94,3 +94,9 @@ dep_excl_s47_spy,excludes,selectable,opt_s47_001,true,,cs_selected_spy,disable_a
 dep_excl_spy_s47,excludes,selectable,opt_spy_001,true,,cs_selected_s47,disable_and_block,"Blocked by SPY LPO, Black lug nuts.",353,true
 dep_excl_sfe_spy,excludes,selectable,opt_sfe_001,true,,cs_selected_spy,disable_and_block,"Blocked by SFE LPO, Chrome wheel locks.",354,true
 dep_req_spz_spy,requires,selectable,opt_spz_001,true,,cs_selected_spy,disable_and_block,"Requires SPY LPO, Black lug nuts.",355,true
+dep_excl_5do_r8c,excludes,selectable,opt_5do_001,true,,cs_selected_r8c,disable_and_block,"Blocked by 5DO LPO, 15-spoke bright polished aluminum wheels.",356,true
+dep_excl_5do_s47,excludes,selectable,opt_5do_001,true,,cs_selected_s47,disable_and_block,"Blocked by 5DO LPO, 15-spoke bright polished aluminum wheels.",357,true
+dep_excl_5do_sfe,excludes,selectable,opt_5do_001,true,,cs_selected_sfe,disable_and_block,"Blocked by 5DO LPO, 15-spoke bright polished aluminum wheels.",358,true
+dep_excl_5do_spy,excludes,selectable,opt_5do_001,true,,cs_selected_spy,disable_and_block,"Blocked by 5DO LPO, 15-spoke bright polished aluminum wheels.",359,true
+dep_excl_5do_spz,excludes,selectable,opt_5do_001,true,,cs_selected_spz,disable_and_block,"Blocked by 5DO LPO, 15-spoke bright polished aluminum wheels.",360,true
+dep_excl_bv4_r8c,excludes,selectable,opt_bv4_001,true,,cs_selected_r8c,disable_and_block,"Blocked by BV4 Personalized Plaque.",361,true

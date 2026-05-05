@@ -97,12 +97,6 @@ guardedOption,,,,,,EYK,production_guarded,Required Badges Chrome badge choice re
 guardedOption,,,,,opt_eyt_001,,production_guarded,Required Badges Carbon Flash default remained production-owned before Pass 71,false
 guardedOption,,,,,opt_eyt_002,,production_guarded,Standard Options EYT display-only duplicate remained production-owned before Pass 71,false
 rule,,SHT,,PDV,,,preserved_cross_boundary,SHT to PDV package exclude remains production-owned in Pass 61,true
-rule,,5DO,,R8C,,,preserved_cross_boundary,Pass 149 newly projected target boundary remains production-owned,true
-rule,,5DO,,S47,,,preserved_cross_boundary,Pass 149 newly projected target boundary remains production-owned,true
-rule,,5DO,,SFE,,,preserved_cross_boundary,Pass 149 newly projected target boundary remains production-owned,true
-rule,,5DO,,SPY,,,preserved_cross_boundary,Pass 149 newly projected target boundary remains production-owned,true
-rule,,5DO,,SPZ,,,preserved_cross_boundary,Pass 149 newly projected target boundary remains production-owned,true
-rule,,BV4,,R8C,,,preserved_cross_boundary,Pass 149 newly projected target boundary remains production-owned,true
 rule,,R8C,,CFX,,,preserved_cross_boundary,Pass 149 newly projected target boundary remains production-owned,true
 rule,,DPB,,GTR,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DPC,,GBK,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
