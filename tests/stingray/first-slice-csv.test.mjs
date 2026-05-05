@@ -328,9 +328,9 @@ test("pass 135 dependency_rules CSV migrates only R88 and SFZ full-length stripe
   const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
 
-  assert.equal(rules.length, 36);
+  assert.equal(rules.length, 42);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 34);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 40);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS135_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);

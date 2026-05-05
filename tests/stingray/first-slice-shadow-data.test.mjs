@@ -42,6 +42,9 @@ const FIRST_SLICE_RPOS = new Set([
   "DUE",
   "DUK",
   "DUW",
+  "RIN",
+  "SL8",
+  "RIK",
 ]);
 const PASS135_FULL_LENGTH_STRIPE_OPTION_IDS = [
   "opt_dpb_001",

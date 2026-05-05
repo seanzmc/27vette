@@ -316,14 +316,14 @@ test("rear script badge peer excludes compile as production-shaped dependency ru
   const fragment = emitCsvLegacyFragment();
   const rearScriptIds = new Set([...REAR_SCRIPT_RPOS].map((rpo) => optionIdByRpo(production, rpo)));
 
-  for (const [, sourceRpo, targetRpo, sourceId, targetId, conditionSetId] of PASS136_EXCLUDE_PAIRS) {
+  for (const [ruleId, sourceRpo, targetRpo, sourceId, targetId, conditionSetId] of PASS136_EXCLUDE_PAIRS) {
     const ruleType = "excludes";
     assert.deepEqual(plain(rule(shadow, sourceRpo, targetRpo, ruleType)), plain(rule(production, sourceRpo, targetRpo, ruleType)));
     assert.deepEqual(plain(rule(fragment, sourceRpo, targetRpo, ruleType)), plain(rule(production, sourceRpo, targetRpo, ruleType)));
     assert.equal(manifestHas({ record_type: "rule", source_rpo: sourceRpo, target_rpo: targetRpo, ownership: "preserved_cross_boundary" }), false);
 
     const result = evaluate("1lt_c07", [sourceId, targetId]);
-    const conflict = result.conflicts.find((item) => item.rule_id === rule(`dep_excl_${sourceRpo.toLowerCase()}_${targetRpo.toLowerCase()}`));
+    const conflict = result.conflicts.find((item) => item.rule_id === ruleId);
     assert.equal(result.validation_errors.length, 0);
     assert.equal(conflict?.conflict_source, "dependency_rule");
     assert.equal(conflict?.target_condition_set_id, conditionSetId);
