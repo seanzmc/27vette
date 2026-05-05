@@ -293,7 +293,13 @@ test("R88 boundaries remain production-owned and preserved", () => {
     assert.deepEqual(plain(rule(shadow, "R88", rpo, "excludes")), plain(rule(production, "R88", rpo, "excludes")));
   }
 
-  assert.equal(fragment.rules.some((item) => item.source_id === r88Id || item.target_id === r88Id), false);
+  assert.deepEqual(plain(rule(fragment, "R88", "SFZ", "excludes")), plain(rule(production, "R88", "SFZ", "excludes")));
+  assert.deepEqual(plain(rule(fragment, "R88", "EYK", "excludes")), plain(rule(production, "R88", "EYK", "excludes")));
+  const migratedR88Targets = new Set([optionIdByRpo(production, "SFZ"), optionIdByRpo(production, "EYK")]);
+  assert.equal(
+    fragment.rules.some((item) => (item.source_id === r88Id || item.target_id === r88Id) && !migratedR88Targets.has(item.target_id)),
+    false
+  );
   assert.equal(fragment.priceRules.some((item) => item.condition_option_id === r88Id || item.target_option_id === r88Id), false);
 
   assert.equal(manifestHas({ record_type: "selectable", rpo: "R88", ownership: "projected_owned" }), true);

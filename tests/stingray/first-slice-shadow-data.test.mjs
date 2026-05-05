@@ -40,6 +40,11 @@ const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set([
   "opt_sti_001->opt_5vm_001",
   "opt_5w8_001->opt_sti_001",
   "opt_sti_001->opt_5w8_001",
+  "opt_r88_001->opt_eyk_001",
+  "opt_r88_001->opt_sfz_001",
+  "opt_rnx_001->opt_5zz_001",
+  "opt_sfz_001->opt_eyk_001",
+  "opt_wkq_001->opt_5zz_001",
 ]);
 
 function loadGeneratedData() {

@@ -329,7 +329,16 @@ test("SFZ boundaries remain production-owned and preserved", () => {
     assert.deepEqual(plain(rule(shadow, "SFZ", rpo, "excludes")), plain(rule(production, "SFZ", rpo, "excludes")));
   }
 
-  assert.equal(fragment.rules.some((item) => item.source_id === sfzId || item.target_id === sfzId), false);
+  assert.deepEqual(plain(rule(fragment, "R88", "SFZ", "excludes")), plain(rule(production, "R88", "SFZ", "excludes")));
+  assert.deepEqual(plain(rule(fragment, "SFZ", "EYK", "excludes")), plain(rule(production, "SFZ", "EYK", "excludes")));
+  const migratedSfzRuleKeys = new Set([
+    `${optionIdByRpo(production, "R88")}->${sfzId}`,
+    `${sfzId}->${optionIdByRpo(production, "EYK")}`,
+  ]);
+  assert.equal(
+    fragment.rules.some((item) => (item.source_id === sfzId || item.target_id === sfzId) && !migratedSfzRuleKeys.has(`${item.source_id}->${item.target_id}`)),
+    false
+  );
   assert.equal(fragment.priceRules.some((item) => item.condition_option_id === sfzId || item.target_option_id === sfzId), false);
 
   assert.equal(manifestHas({ record_type: "selectable", rpo: "SFZ", ownership: "projected_owned" }), true);

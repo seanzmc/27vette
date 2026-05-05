@@ -6,6 +6,14 @@ import vm from "node:vm";
 
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
+const PASS132_EXCLUDE_PAIRS = [
+  ["dep_excl_pcu_5v7", "opt_pcu_001", "opt_5v7_001", "cs_selected_5v7"],
+  ["dep_excl_r88_eyk", "opt_r88_001", "opt_eyk_001", "cs_selected_eyk"],
+  ["dep_excl_r88_sfz", "opt_r88_001", "opt_sfz_001", "cs_selected_sfz"],
+  ["dep_excl_rnx_5zz", "opt_rnx_001", "opt_5zz_001", "cs_selected_5zz"],
+  ["dep_excl_sfz_eyk", "opt_sfz_001", "opt_eyk_001", "cs_selected_eyk"],
+  ["dep_excl_wkq_5zz", "opt_wkq_001", "opt_5zz_001", "cs_selected_5zz"],
+];
 
 function evaluate(variantId, selectedIds) {
   const output = execFileSync(PYTHON, [SCRIPT, "--scenario-json", JSON.stringify({ variant_id: variantId, selected_ids: selectedIds })], {
@@ -221,6 +229,60 @@ test("dependency_rules excludes emit production-shaped legacy rules", () => {
       Object.fromEntries(fields.map((field) => [field, projectedRule[field]])),
       Object.fromEntries(fields.map((field) => [field, productionRule[field]]))
     );
+  }
+});
+
+test("pass 132 migrated dependency_rules excludes emit production-shaped legacy rules", () => {
+  const production = loadGeneratedData();
+  const projected = emitCsvLegacyFragment();
+  const fields = [
+    "source_id",
+    "rule_type",
+    "target_id",
+    "target_type",
+    "source_type",
+    "source_section",
+    "target_section",
+    "source_selection_mode",
+    "target_selection_mode",
+    "body_style_scope",
+    "disabled_reason",
+    "auto_add",
+    "active",
+    "runtime_action",
+    "review_flag",
+  ];
+
+  for (const [, sourceId, targetId] of PASS132_EXCLUDE_PAIRS) {
+    const productionRule = production.rules.find(
+      (rule) => rule.source_id === sourceId && rule.target_id === targetId && rule.rule_type === "excludes"
+    );
+    const projectedRule = projected.rules.find(
+      (rule) => rule.source_id === sourceId && rule.target_id === targetId && rule.rule_type === "excludes"
+    );
+
+    assert.ok(productionRule, `production should include ${sourceId} -> ${targetId}`);
+    assert.ok(projectedRule, `projected CSV fragment should include ${sourceId} -> ${targetId}`);
+    assert.deepEqual(
+      Object.fromEntries(fields.map((field) => [field, projectedRule[field]])),
+      Object.fromEntries(fields.map((field) => [field, productionRule[field]]))
+    );
+  }
+});
+
+test("pass 132 migrated dependency_rules excludes report sample dependency conflicts", () => {
+  for (const [ruleId, sourceId, targetId, conditionSetId] of [
+    PASS132_EXCLUDE_PAIRS[0],
+    PASS132_EXCLUDE_PAIRS[1],
+    PASS132_EXCLUDE_PAIRS[3],
+  ]) {
+    const result = evaluate("1lt_c07", [sourceId, targetId]);
+    const conflict = result.conflicts.find((item) => item.rule_id === ruleId);
+
+    assert.equal(result.validation_errors.length, 0);
+    assert.equal(conflict?.conflict_source, "dependency_rule");
+    assert.equal(conflict?.target_condition_set_id, conditionSetId);
+    assert.equal(conflict?.target_selectable_id, targetId);
   }
 });
 

@@ -239,7 +239,7 @@ test("EYT display-only Standard Options duplicate remains production-equivalent"
   }
 });
 
-test("required Badges projection preserves inbound EYK rules and emits no owned rule surfaces", () => {
+test("required Badges projection preserves inbound EYK rules and emits only migrated excludes", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
   const fragment = emitCsvLegacyFragment();
@@ -251,7 +251,20 @@ test("required Badges projection preserves inbound EYK rules and emits no owned 
     assert.equal(manifestHas({ record_type: "rule", source_rpo: sourceRpo, target_rpo: targetRpo, ownership: "preserved_cross_boundary" }), true);
   }
 
-  assert.equal(fragment.rules.some((item) => item.source_id === eykId || item.target_id === eykId || eytIds.includes(item.source_id) || eytIds.includes(item.target_id)), false);
+  assert.deepEqual(plain(rule(fragment, "R88", "EYK", "excludes")), plain(rule(production, "R88", "EYK", "excludes")));
+  assert.deepEqual(plain(rule(fragment, "SFZ", "EYK", "excludes")), plain(rule(production, "SFZ", "EYK", "excludes")));
+  const migratedBadgeRuleKeys = new Set([
+    `${optionIdByRpo(production, "R88")}->${eykId}`,
+    `${optionIdByRpo(production, "SFZ")}->${eykId}`,
+  ]);
+  assert.equal(
+    fragment.rules.some(
+      (item) =>
+        (item.source_id === eykId || item.target_id === eykId || eytIds.includes(item.source_id) || eytIds.includes(item.target_id)) &&
+        !migratedBadgeRuleKeys.has(`${item.source_id}->${item.target_id}`)
+    ),
+    false
+  );
   assert.equal(
     fragment.priceRules.some(
       (item) => item.condition_option_id === eykId || item.target_option_id === eykId || eytIds.includes(item.condition_option_id) || eytIds.includes(item.target_option_id)

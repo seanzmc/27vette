@@ -11,3 +11,7 @@ cs_selected_colored_engine_cover,g1,1,selected_any_in_set,set_ls6_engine_covers_
 cs_1lt,g1,1,context,trim_level,eq,1LT,false
 cs_selected_sti,g1,1,selected,opt_sti_001,is_true,,false
 cs_selected_tvs,g1,1,selected,opt_tvs_001,is_true,,false
+cs_selected_5v7,g1,1,selected,opt_5v7_001,is_true,,false
+cs_selected_eyk,g1,1,selected,opt_eyk_001,is_true,,false
+cs_selected_sfz,g1,1,selected,opt_sfz_001,is_true,,false
+cs_selected_5zz,g1,1,selected,opt_5zz_001,is_true,,false

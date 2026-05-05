@@ -9,3 +9,7 @@ cs_selected_colored_engine_cover,Any colored LS6 engine cover selected,,true
 cs_1lt,1LT trim level,,true
 cs_selected_sti,STI selected,,true
 cs_selected_tvs,TVS selected,,true
+cs_selected_5v7,5V7 selected,,true
+cs_selected_eyk,EYK selected,,true
+cs_selected_sfz,SFZ selected,,true
+cs_selected_5zz,5ZZ selected,,true

@@ -3,3 +3,9 @@ dep_colored_cover_requires_zz3_convertible,requires,selectable_set,set_ls6_engin
 dep_bc7_requires_zz3_convertible,requires,selectable,opt_bc7_001,true,cs_convertible,cs_selected_zz3,disable_and_block,Requires ZZ3 Convertible Engine Appearance Package.,10,true
 dep_excl_5v7_sti,excludes,selectable,opt_5v7_001,true,,cs_selected_sti,disable_and_block,"Blocked by 5V7 LPO, Black Ground Effects.",100,true
 dep_excl_5v7_tvs,excludes,selectable,opt_5v7_001,true,,cs_selected_tvs,disable_and_block,"Blocked by 5V7 LPO, Black Ground Effects.",101,true
+dep_excl_pcu_5v7,excludes,selectable,opt_pcu_001,true,,cs_selected_5v7,disable_and_block,"Blocked by PCU LPO, Stingray Protection Package.",122,true
+dep_excl_r88_eyk,excludes,selectable,opt_r88_001,true,,cs_selected_eyk,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",176,true
+dep_excl_r88_sfz,excludes,selectable,opt_r88_001,true,,cs_selected_sfz,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",177,true
+dep_excl_rnx_5zz,excludes,selectable,opt_rnx_001,true,,cs_selected_5zz,disable_and_block,"Blocked by RNX LPO, Premium outdoor car cover.",182,true
+dep_excl_sfz_eyk,excludes,selectable,opt_sfz_001,true,,cs_selected_eyk,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",200,true
+dep_excl_wkq_5zz,excludes,selectable,opt_wkq_001,true,,cs_selected_5zz,disable_and_block,"Blocked by WKQ LPO, Premium indoor car cover.",208,true
