@@ -88,6 +88,32 @@ const PASS147_INCLUDE_PAIRS = [
   ["aa_pcx_sng", "opt_pcx_001", "opt_sng_001"],
   ["aa_pcx_sht", "opt_pcx_001", "opt_sht_001"],
 ];
+const PASS149_SAFE_TARGET_RPOS = ["5DG", "R8C", "S47", "SFE", "SPY", "SPZ"];
+const PASS149_PRESERVED_BOUNDARIES = [
+  ["rule", "PCX", "5DG"],
+  ["priceRule", "PCX", "5DG"],
+  ["rule", "PCX", "R8C"],
+  ["rule", "PCX", "S47"],
+  ["rule", "PCX", "SFE"],
+  ["rule", "PCX", "SPY"],
+  ["rule", "PCX", "SPZ"],
+  ["rule", "5DG", "R8C"],
+  ["rule", "5DG", "S47"],
+  ["rule", "5DG", "SFE"],
+  ["rule", "5DG", "SPY"],
+  ["rule", "5DG", "SPZ"],
+  ["rule", "5DO", "R8C"],
+  ["rule", "5DO", "S47"],
+  ["rule", "5DO", "SFE"],
+  ["rule", "5DO", "SPY"],
+  ["rule", "5DO", "SPZ"],
+  ["rule", "BV4", "R8C"],
+  ["rule", "R8C", "CFX"],
+  ["rule", "S47", "SPY"],
+  ["rule", "SPY", "S47"],
+  ["rule", "SFE", "SPY"],
+  ["rule", "SPZ", "SPY"],
+];
 const PASS141_PACKAGE_SOURCE_OPTION_IDS = ["opt_pcx_001", "opt_pdv_001"];
 const PASS139_ALREADY_CSV_OWNED_EXCLUDES = [
   ["dep_excl_5v7_sti", "5V7", "STI"],
@@ -693,12 +719,12 @@ test("pass 141 projects only PCX and PDV package source catalog rows", () => {
   const basePrices = parseCsv(fs.readFileSync("data/stingray/pricing/base_prices.csv", "utf8"));
   const ownershipRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
 
-  assert.equal(selectables.length, 89);
-  assert.equal(displayRows.length, 89);
-  assert.equal(basePrices.length, 84);
+  assert.equal(selectables.length, 95);
+  assert.equal(displayRows.length, 95);
+  assert.equal(basePrices.length, 90);
   assert.equal(
     ownershipRows.filter((row) => row.record_type === "selectable" && row.ownership === "projected_owned" && row.active === "true").length,
-    86
+    92
   );
 
   const expected = [
@@ -1390,6 +1416,126 @@ test("pass 148 dependency_rules CSV migrates only PCX to PDV package conflict", 
       `${recordType} ${sourceRpo} -> ${targetRpo} should remain preserved`
     );
   }
+});
+
+test("pass 149 projects only safe missing PCX target catalog rows", () => {
+  const selectables = parseCsv(fs.readFileSync("data/stingray/catalog/selectables.csv", "utf8"));
+  const displayRows = parseCsv(fs.readFileSync("data/stingray/ui/selectable_display.csv", "utf8"));
+  const basePrices = parseCsv(fs.readFileSync("data/stingray/pricing/base_prices.csv", "utf8"));
+  const ownershipRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
+  const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
+  const autoAdds = parseCsv(fs.readFileSync("data/stingray/logic/auto_adds.csv", "utf8"));
+  const production = loadGeneratedData();
+  const projected = emitCsvLegacyFragment();
+  const fields = [
+    "option_id",
+    "rpo",
+    "label",
+    "description",
+    "section_id",
+    "section_name",
+    "category_id",
+    "category_name",
+    "step_key",
+    "choice_mode",
+    "selection_mode",
+    "status",
+    "selectable",
+    "base_price",
+    "display_order",
+  ];
+
+  assert.equal(selectables.length, 95);
+  assert.equal(displayRows.length, 95);
+  assert.equal(basePrices.length, 90);
+  assert.equal(rules.length, 81);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 79);
+  assert.equal(autoAdds.filter((row) => row.active === "true").length, 18);
+
+  for (const rpo of PASS149_SAFE_TARGET_RPOS) {
+    const optionId = `opt_${rpo.toLowerCase()}_001`;
+    const productionChoice = production.choices.find((choice) => choice.option_id === optionId && choice.variant_id === "1lt_c07");
+    assert.ok(productionChoice, `production should include ${optionId}`);
+
+    const selectable = selectables.find((row) => row.selectable_id === optionId);
+    assert.ok(selectable, `${optionId} should exist in selectables.csv`);
+    assert.equal(selectable.selectable_type, "option");
+    assert.equal(selectable.rpo, rpo);
+    assert.equal(selectable.label, productionChoice.label);
+    assert.equal(selectable.description, productionChoice.description);
+    assert.equal(selectable.active, "true");
+    assert.equal(selectable.availability_condition_set_id, "");
+    assert.equal(selectable.notes, "Pass 149 missing PCX target catalog projection only.");
+
+    const display = displayRows.find((row) => row.selectable_id === optionId);
+    assert.ok(display, `${optionId} should exist in selectable_display.csv`);
+    assert.equal(display.legacy_option_id, optionId);
+    assert.equal(display.section_id, productionChoice.section_id);
+    assert.equal(display.section_name, productionChoice.section_name);
+    assert.equal(display.category_id, productionChoice.category_id);
+    assert.equal(display.category_name, productionChoice.category_name);
+    assert.equal(display.step_key, productionChoice.step_key);
+    assert.equal(display.choice_mode, productionChoice.choice_mode);
+    assert.equal(display.selection_mode, productionChoice.selection_mode);
+    assert.equal(display.display_order, String(productionChoice.display_order));
+    assert.equal(display.selectable, "True");
+    assert.equal(display.active, "True");
+    assert.equal(display.label, productionChoice.label);
+    assert.equal(display.description, productionChoice.description);
+    assert.equal(display.source_detail_raw, productionChoice.source_detail_raw || "");
+
+    const basePrice = basePrices.find((row) => row.target_selector_id === optionId);
+    assert.ok(basePrice, `${optionId} should have a base price`);
+    assert.equal(basePrice.target_selector_type, "selectable");
+    assert.equal(basePrice.scope_condition_set_id, "");
+    assert.equal(basePrice.amount_usd, String(productionChoice.base_price));
+    assert.equal(basePrice.active, "true");
+
+    assert.ok(
+      ownershipRows.find(
+        (row) =>
+          row.record_type === "selectable" &&
+          row.rpo === rpo &&
+          row.ownership === "projected_owned" &&
+          row.reason === "Pass 149 missing PCX target catalog projection only" &&
+          row.active === "true"
+      ),
+      `${rpo} should be projected-owned`
+    );
+
+    for (const variantId of ["1lt_c07", "1lt_c67", "2lt_c07", "2lt_c67", "3lt_c07", "3lt_c67"]) {
+      const productionVariantChoice = production.choices.find((choice) => choice.option_id === optionId && choice.variant_id === variantId);
+      const projectedChoice = projected.choices.find((choice) => choice.option_id === optionId && choice.variant_id === variantId);
+
+      assert.ok(productionVariantChoice, `production should include ${variantId} ${optionId}`);
+      assert.ok(projectedChoice, `projected CSV fragment should include ${variantId} ${optionId}`);
+      assert.deepEqual(
+        Object.fromEntries(fields.map((field) => [field, projectedChoice[field]])),
+        Object.fromEntries(fields.map((field) => [field, productionVariantChoice[field]]))
+      );
+    }
+  }
+
+  for (const [recordType, sourceRpo, targetRpo] of PASS149_PRESERVED_BOUNDARIES) {
+    assert.equal(
+      ownershipRows.some(
+        (row) =>
+          row.active === "true" &&
+          row.record_type === recordType &&
+          row.source_rpo === sourceRpo &&
+          row.target_rpo === targetRpo &&
+          row.ownership === "preserved_cross_boundary"
+      ),
+      true,
+      `${recordType} ${sourceRpo} -> ${targetRpo} should remain preserved`
+    );
+  }
+
+  for (const targetRpo of PASS149_SAFE_TARGET_RPOS) {
+    assert.equal(rules.some((rule) => rule.rule_id === `dep_excl_pcx_${targetRpo.toLowerCase()}`), false);
+  }
+  assert.equal(autoAdds.some((row) => row.auto_add_id === "aa_pcx_5dg"), false);
 });
 
 test("pass 144 migrated PDV to Stripe plain excludes emit production-shaped legacy rules", () => {

@@ -32,14 +32,7 @@ const SHT_SOURCE_TEXT_STRIPE_RPOS = new Set([
   "DZX",
 ]);
 const SHT_SOURCE_TEXT_MISSING_RPOS = new Set(["DTB"]);
-const OUT_OF_SCOPE_RPOS = new Set([
-  "5DG",
-  "R8C",
-  "S47",
-  "SFE",
-  "SPY",
-  "SPZ",
-]);
+const OUT_OF_SCOPE_RPOS = new Set([]);
 
 function parseCsv(source) {
   const rows = [];
