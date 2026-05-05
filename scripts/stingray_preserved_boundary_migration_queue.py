@@ -53,6 +53,43 @@ COLOR_RPOS = {"GBA", "GKZ", "GPH", "GTR", "GBK", "G26", "G8G"}
 Z51_PACKAGE_RPOS = {"Z51", "T0A", "TVS", "FE2", "FE3", "FE4", "J55", "G96", "M1N", "QTU", "V08", "ZYC"}
 LEGACY_OR_NON_SELECTABLE_RPOS = {"5VM", "5W8", "5ZW", "CF8", "RYQ", "CFX"}
 LEGACY_OR_NON_SELECTABLE_OPTION_IDS = {"opt_5vm_001", "opt_5w8_001", "opt_5zw_001", "opt_cf8_001", "opt_ryq_001", "opt_cfx_001"}
+LEGACY_RULE_ONLY_RPOS = {"5VM", "5W8", "5ZW"}
+LEGACY_RULE_ONLY_OPTION_IDS = {"opt_5vm_001", "opt_5w8_001", "opt_5zw_001"}
+STRUCTURED_REFERENCE_RPOS = {"CF8", "RYQ"}
+STRUCTURED_REFERENCE_OPTION_IDS = {"opt_cf8_001", "opt_ryq_001"}
+DISPLAY_OR_DUPLICATE_RPOS = {"CFX"}
+DISPLAY_OR_DUPLICATE_OPTION_IDS = {"opt_cfx_001"}
+
+LEGACY_DESIGN_SUBTYPES = [
+    "normal_selectable_misclassified",
+    "rule_only_legacy_option_id",
+    "production_structured_reference",
+    "non_stingray_or_cross_variant_reference",
+    "display_only_or_duplicate_reference",
+    "package_control_plane_reference",
+    "runtime_generated_placeholder",
+    "ambiguous_needs_manual_decision",
+]
+
+RECOMMENDED_HANDLINGS = [
+    "project_as_normal_selectable",
+    "model_as_legacy_reference",
+    "model_as_structured_non_selectable",
+    "keep_preserved_runtime_owned",
+    "requires_schema_design",
+    "requires_manual_review",
+]
+
+LEGACY_IDENTIFIER_GROUPS = ["5VM", "5W8", "5ZW", "CF8", "RYQ", "CFX"]
+STRIPE_RPOS = {"DPB", "DPC", "DPG", "DPL", "DPT", "DSY", "DSZ", "DT0", "DTH", "DUB", "DUE", "DUK", "DUW", "DZU", "DZV", "DZX"}
+ROOF_RPOS = {"CF7", "CF8", "CC3", "C2Z", "D84", "D86", "CM9"}
+EXTERIOR_ACCENT_RPOS = {"EFY", "EDU", "RYQ", "5V7", "STI", "PCU", "5ZU", "5ZZ"}
+PASS_157_SURFACE_GROUPS = {
+    "z51_or_package_adjacent": {"Z51", "T0A", "TVS", "5ZU", "5ZZ", "5V7", "STI", "PCU"},
+    "stripe_rpos": STRIPE_RPOS,
+    "roof_rpos": ROOF_RPOS,
+    "exterior_accent_rpos": EXTERIOR_ACCENT_RPOS,
+}
 
 
 class QueueError(ValueError):
@@ -400,6 +437,210 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     }
 
 
+def canonical_identifier(ref: str) -> str:
+    rpo = rpo_from_option_id(ref)
+    return rpo or ref
+
+
+def row_refs(row: dict[str, Any]) -> set[str]:
+    refs = {
+        row.get("source_rpo", ""),
+        row.get("source_option_id", ""),
+        row.get("target_rpo", ""),
+        row.get("target_option_id", ""),
+        row.get("source_resolved_option_id", ""),
+        row.get("target_resolved_option_id", ""),
+    }
+    canonical = {canonical_identifier(ref) for ref in refs if ref}
+    return {ref for ref in refs if ref} | {ref for ref in canonical if ref}
+
+
+def legacy_identifiers_for_row(row: dict[str, Any]) -> list[str]:
+    refs = row_refs(row)
+    return [identifier for identifier in LEGACY_IDENTIFIER_GROUPS if identifier in refs]
+
+
+def endpoint_status(row: dict[str, Any], side: str) -> str:
+    rpo = row.get(f"{side}_rpo", "")
+    option_id = row.get(f"{side}_option_id", "")
+    resolved_option_id = row.get(f"{side}_resolved_option_id", "")
+    refs = {ref for ref in [rpo, option_id, resolved_option_id, canonical_identifier(option_id), canonical_identifier(resolved_option_id)] if ref}
+    if refs & LEGACY_RULE_ONLY_RPOS or refs & LEGACY_RULE_ONLY_OPTION_IDS:
+        return "rule_only_legacy_option_id"
+    if refs & STRUCTURED_REFERENCE_RPOS or refs & STRUCTURED_REFERENCE_OPTION_IDS:
+        return "production_structured_reference"
+    if refs & DISPLAY_OR_DUPLICATE_RPOS or refs & DISPLAY_OR_DUPLICATE_OPTION_IDS:
+        return "display_only_or_duplicate_reference"
+    if row.get(f"{side}_projected", False):
+        return "projected_owned_selectable"
+    return "unprojected_or_missing"
+
+
+def oracle_behavior(row: dict[str, Any]) -> str:
+    parts: list[str] = []
+    if row.get("oracle_rule_count", 0):
+        rule_type = row.get("oracle_rule_type", "") or "ambiguous"
+        parts.append(f"rule:{rule_type}")
+    if row.get("oracle_price_rule_count", 0):
+        parts.append(f"priceRule:{row['oracle_price_rule_count']}")
+    return " + ".join(parts) if parts else "not_found"
+
+
+def related_surfaces(row: dict[str, Any]) -> list[str]:
+    refs = row_refs(row)
+    return [
+        surface
+        for surface, surface_refs in PASS_157_SURFACE_GROUPS.items()
+        if refs & surface_refs
+    ]
+
+
+def classify_legacy_design_row(row: dict[str, Any]) -> dict[str, str]:
+    refs = row_refs(row)
+    source_status = endpoint_status(row, "source")
+    target_status = endpoint_status(row, "target")
+    surfaces = related_surfaces(row)
+
+    if refs & LEGACY_RULE_ONLY_RPOS or refs & LEGACY_RULE_ONLY_OPTION_IDS:
+        return {
+            "subtype": "rule_only_legacy_option_id",
+            "recommended_handling": "model_as_legacy_reference",
+            "recommended_next_lane": "LANE H: add legacy_reference table or structured-reference support",
+            "should_be_normal_selectable": "no - production uses this as a generated rule-only option id",
+        }
+    if refs & STRUCTURED_REFERENCE_RPOS or refs & STRUCTURED_REFERENCE_OPTION_IDS:
+        return {
+            "subtype": "production_structured_reference",
+            "recommended_handling": "model_as_structured_non_selectable",
+            "recommended_next_lane": "LANE H: add legacy_reference table or structured-reference support",
+            "should_be_normal_selectable": "no - production uses this as a structured non-selectable reference",
+        }
+    if refs & DISPLAY_OR_DUPLICATE_RPOS or refs & DISPLAY_OR_DUPLICATE_OPTION_IDS:
+        return {
+            "subtype": "display_only_or_duplicate_reference",
+            "recommended_handling": "model_as_structured_non_selectable",
+            "recommended_next_lane": "LANE H: add legacy_reference table or structured-reference support",
+            "should_be_normal_selectable": "no - production indicates a display-only or duplicate reference surface",
+        }
+    if source_status == "unprojected_or_missing" or target_status == "unprojected_or_missing":
+        return {
+            "subtype": "normal_selectable_misclassified",
+            "recommended_handling": "project_as_normal_selectable",
+            "recommended_next_lane": "LANE A: project normal selectables misclassified as legacy",
+            "should_be_normal_selectable": "yes - inspect as catalog projection candidate before rule migration",
+        }
+    if "z51_or_package_adjacent" in surfaces:
+        return {
+            "subtype": "package_control_plane_reference",
+            "recommended_handling": "requires_schema_design",
+            "recommended_next_lane": "LANE Z: package-adjacent design",
+            "should_be_normal_selectable": "no - package/control-plane behavior needs design before projection",
+        }
+    return {
+        "subtype": "ambiguous_needs_manual_decision",
+        "recommended_handling": "requires_manual_review",
+        "recommended_next_lane": "LANE G: manual review list only",
+        "should_be_normal_selectable": "unknown - needs manual decision",
+    }
+
+
+def build_legacy_nonselectable_design_report(args: argparse.Namespace) -> dict[str, Any]:
+    queue = build_report(args)
+    legacy_rows = [
+        row
+        for row in queue["rows"]
+        if row.get("bucket", "") == "legacy_rule_only_or_non_selectable"
+    ]
+    design_rows: list[dict[str, Any]] = []
+    for row in legacy_rows:
+        decision = classify_legacy_design_row(row)
+        design_rows.append(
+            {
+                "manifest_row_id": row["manifest_row_id"],
+                "record_type": row["record_type"],
+                "source_rpo": row["source_rpo"],
+                "source_option_id": row["source_option_id"],
+                "target_rpo": row["target_rpo"],
+                "target_option_id": row["target_option_id"],
+                "source_resolved_option_id": row["source_resolved_option_id"],
+                "target_resolved_option_id": row["target_resolved_option_id"],
+                "current_reason": row["reason"],
+                "oracle_behavior": oracle_behavior(row),
+                "source_status": endpoint_status(row, "source"),
+                "target_status": endpoint_status(row, "target"),
+                "legacy_identifiers": legacy_identifiers_for_row(row),
+                "related_surfaces": related_surfaces(row),
+                "subtype": decision["subtype"],
+                "recommended_handling": decision["recommended_handling"],
+                "recommended_next_lane": decision["recommended_next_lane"],
+                "should_be_normal_selectable": decision["should_be_normal_selectable"],
+            }
+        )
+
+    design_rows.sort(
+        key=lambda row: (
+            LEGACY_DESIGN_SUBTYPES.index(row["subtype"]),
+            row["record_type"],
+            row["source_rpo"] or row["source_option_id"] or row["source_resolved_option_id"],
+            row["target_rpo"] or row["target_option_id"] or row["target_resolved_option_id"],
+            row["manifest_row_id"],
+        )
+    )
+
+    subtype_counts = Counter(row["subtype"] for row in design_rows)
+    handling_counts = Counter(row["recommended_handling"] for row in design_rows)
+    related_surface_counts = Counter(surface for row in design_rows for surface in row["related_surfaces"])
+    identifier_groups = {
+        identifier: {
+            "count": sum(1 for row in design_rows if identifier in row["legacy_identifiers"]),
+            "manifest_row_ids": [
+                row["manifest_row_id"]
+                for row in design_rows
+                if identifier in row["legacy_identifiers"]
+            ],
+        }
+        for identifier in LEGACY_IDENTIFIER_GROUPS
+    }
+    recommended = recommend_legacy_design_next_lane(subtype_counts)
+    return {
+        "schema_version": 1,
+        "status": "allowed",
+        "source_bucket": "legacy_rule_only_or_non_selectable",
+        "source_row_count": len(legacy_rows),
+        "classified_row_count": len(design_rows),
+        "subtype_summary": {subtype: subtype_counts.get(subtype, 0) for subtype in LEGACY_DESIGN_SUBTYPES},
+        "recommended_handling_summary": {
+            handling: handling_counts.get(handling, 0)
+            for handling in RECOMMENDED_HANDLINGS
+        },
+        "related_surface_summary": {
+            surface: related_surface_counts.get(surface, 0)
+            for surface in PASS_157_SURFACE_GROUPS
+        },
+        "identifier_groups": identifier_groups,
+        "recommended_next_lane": recommended,
+        "rows": design_rows,
+    }
+
+
+def recommend_legacy_design_next_lane(subtype_counts: Counter[str]) -> str:
+    if subtype_counts.get("normal_selectable_misclassified", 0):
+        return f"LANE A: project normal selectables misclassified as legacy ({subtype_counts['normal_selectable_misclassified']} rows)"
+    structured_count = (
+        subtype_counts.get("rule_only_legacy_option_id", 0)
+        + subtype_counts.get("production_structured_reference", 0)
+        + subtype_counts.get("display_only_or_duplicate_reference", 0)
+    )
+    if structured_count:
+        return f"LANE H: add legacy_reference table or structured-reference support ({structured_count} rows)"
+    if subtype_counts.get("runtime_generated_placeholder", 0):
+        return f"LANE F: compiler support for non-selectable reference emission ({subtype_counts['runtime_generated_placeholder']} rows)"
+    ambiguous_count = subtype_counts.get("ambiguous_needs_manual_decision", 0)
+    if ambiguous_count:
+        return f"LANE G: manual review list only ({ambiguous_count} rows)"
+    return "No legacy/non-selectable rows remain."
+
+
 def recommended_next_lane(bucket_summary: dict[str, int]) -> str:
     for bucket in ["ready_plain_exclude", "ready_requires", "ready_include_zero_auto_add"]:
         if bucket_summary.get(bucket, 0):
@@ -429,9 +670,45 @@ def print_text(report: dict[str, Any]) -> None:
         )
 
 
+def print_legacy_nonselectable_design_text(report: dict[str, Any]) -> None:
+    print(f"Legacy/non-selectable preserved rows: {report['source_row_count']}")
+    print()
+    for subtype in LEGACY_DESIGN_SUBTYPES:
+        print(f"{subtype}: {report['subtype_summary'][subtype]}")
+    print()
+    print("Recommended handling summary:")
+    for handling in RECOMMENDED_HANDLINGS:
+        print(f"{handling}: {report['recommended_handling_summary'][handling]}")
+    print()
+    print("Identifier groups:")
+    for identifier in LEGACY_IDENTIFIER_GROUPS:
+        print(f"{identifier}: {report['identifier_groups'][identifier]['count']}")
+    print()
+    print(f"Recommended next action: {report['recommended_next_lane']}")
+    print()
+    print("record_type source target subtype handling next lane oracle behavior")
+    for row in report["rows"]:
+        source = row["source_rpo"] or row["source_option_id"] or row["source_resolved_option_id"]
+        target = row["target_rpo"] or row["target_option_id"] or row["target_resolved_option_id"]
+        print(
+            f"{row['record_type']} {source} {target} {row['subtype']} "
+            f"{row['recommended_handling']} {row['recommended_next_lane']} {row['oracle_behavior']}"
+        )
+
+
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json", action="store_true", help="Write the full report as JSON to stdout.")
+    parser.add_argument(
+        "--legacy-nonselectable-design",
+        action="store_true",
+        help="Write the Pass 157 legacy/non-selectable design report as text.",
+    )
+    parser.add_argument(
+        "--legacy-nonselectable-design-json",
+        action="store_true",
+        help="Write the Pass 157 legacy/non-selectable design report as JSON.",
+    )
     parser.add_argument("--package", default=str(DEFAULT_PACKAGE), help="Stingray CSV package directory.")
     parser.add_argument("--production-data", default=str(DEFAULT_PRODUCTION_DATA), help="Production form-app/data.js oracle path.")
     parser.add_argument("--ownership-manifest", default=str(DEFAULT_OWNERSHIP_MANIFEST), help="Projected slice ownership manifest path.")
@@ -441,11 +718,18 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 def main(argv: list[str]) -> int:
     args = parse_args(argv)
     try:
-        report = build_report(args)
+        if args.legacy_nonselectable_design or args.legacy_nonselectable_design_json:
+            report = build_legacy_nonselectable_design_report(args)
+        else:
+            report = build_report(args)
     except QueueError as error:
         print(str(error), file=sys.stderr)
         return 1
-    if args.json:
+    if args.legacy_nonselectable_design_json:
+        print(json.dumps(report, indent=2, sort_keys=True))
+    elif args.legacy_nonselectable_design:
+        print_legacy_nonselectable_design_text(report)
+    elif args.json:
         print(json.dumps(report, indent=2, sort_keys=True))
     else:
         print_text(report)
