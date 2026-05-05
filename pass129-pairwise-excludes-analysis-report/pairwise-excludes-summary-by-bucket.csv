@@ -1,0 +1,5 @@
+bucket,count,pct_of_pairwise_excludes
+availability_or_variant_behavior,37,24.2
+duplicate_inverse_pair,20,13.1
+true_pairwise_conflict,89,58.2
+unclear_needs_research,7,4.6

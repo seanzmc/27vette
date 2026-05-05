@@ -1,0 +1,5 @@
+proposed_schema_action,count,design_candidate_note
+add_pairwise_excludes_table,89,Design candidate only: no better model was detected from current metadata; may require a direct exclusion rule.
+collapse_duplicate_inverse,20,Design candidate: inverse pair exists; raw rows are preserved but modeling may collapse symmetry.
+manual_research,7,Design candidate: current metadata is insufficient.
+model_as_availability_rule,37,"Design candidate: relationship appears closer to availability, paint, roof, body, or variant behavior."

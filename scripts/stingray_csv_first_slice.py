@@ -180,6 +180,8 @@ class CsvSlice:
         for row in self.tables["dependency_rules"]:
             if not is_active(row):
                 continue
+            if row["rule_type"] not in {"requires", "excludes"}:
+                errors.append(f"dependency_rules uses unsupported rule_type: {row['rule_type']}.")
             self._validate_selector(errors, "dependency_rules", row["subject_selector_type"], row["subject_selector_id"])
             self._validate_condition_ref(errors, "dependency_rules", row.get("applies_when_condition_set_id", ""))
             self._validate_condition_ref(errors, "dependency_rules", row.get("target_condition_set_id", ""))
@@ -429,6 +431,36 @@ class CsvSlice:
                         "conflict_policy": row["conflict_policy"],
                     }
                 )
+        for row in sorted(
+            (item for item in self.tables["dependency_rules"] if is_active(item)),
+            key=lambda item: as_int(item.get("priority", "")),
+        ):
+            if row["rule_type"] != "excludes":
+                continue
+            if as_bool(row["subject_must_be_selected"]) and not self.selector_matches(
+                row["subject_selector_type"],
+                row["subject_selector_id"],
+                selected,
+            ):
+                continue
+            if row["applies_when_condition_set_id"] and not self.condition_matches(
+                row["applies_when_condition_set_id"],
+                context,
+                selected,
+            ):
+                continue
+            target_condition_set_id = row["target_condition_set_id"]
+            if target_condition_set_id and self.condition_matches(target_condition_set_id, context, selected):
+                conflicts.append(
+                    {
+                        "conflict_source": "dependency_rule",
+                        "rule_id": row["rule_id"],
+                        "target_condition_set_id": target_condition_set_id,
+                        "target_selectable_id": self.condition_selected_selectable(target_condition_set_id),
+                        "message": row["message"],
+                        "violation_behavior": row["violation_behavior"],
+                    }
+                )
         return conflicts
 
     def build_lines(
@@ -648,13 +680,20 @@ class CsvSlice:
     def legacy_dependency_rule(self, row: dict[str, str], source_selectable_id: str, target_selectable_id: str) -> dict[str, Any]:
         source_display = self.display_row(source_selectable_id)
         target_display = self.display_row(target_selectable_id)
+        rule_type = row["rule_type"]
+        if rule_type == "requires":
+            target_type = "option" if row["subject_selector_type"] == "selectable" else "main"
+            source_type = "option" if row["subject_selector_type"] == "selectable" else "main"
+        else:
+            target_type = "main"
+            source_type = "main"
         return {
-            "rule_id": f"rule_{self.legacy_option_id(source_selectable_id)}_requires_{self.legacy_option_id(target_selectable_id)}",
+            "rule_id": f"rule_{self.legacy_option_id(source_selectable_id)}_{rule_type}_{self.legacy_option_id(target_selectable_id)}",
             "source_id": self.legacy_option_id(source_selectable_id),
-            "rule_type": "requires",
+            "rule_type": rule_type,
             "target_id": self.legacy_option_id(target_selectable_id),
-            "target_type": "option" if row["subject_selector_type"] == "selectable" else "main",
-            "source_type": "option" if row["subject_selector_type"] == "selectable" else "main",
+            "target_type": target_type,
+            "source_type": source_type,
             "source_section": source_display["section_id"],
             "target_section": target_display["section_id"],
             "source_selection_mode": source_display["selection_mode"],

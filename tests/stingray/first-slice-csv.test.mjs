@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
+import vm from "node:vm";
 
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
@@ -12,6 +13,20 @@ function evaluate(variantId, selectedIds) {
     encoding: "utf8",
   });
   return JSON.parse(output);
+}
+
+function emitCsvLegacyFragment() {
+  const output = execFileSync(PYTHON, [SCRIPT, "--emit-legacy-fragment"], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+  });
+  return JSON.parse(output);
+}
+
+function loadGeneratedData() {
+  const context = { window: {} };
+  vm.runInNewContext(fs.readFileSync("form-app/data.js", "utf8"), context);
+  return context.window.STINGRAY_FORM_DATA;
 }
 
 function lineById(result, selectableId) {
@@ -143,6 +158,70 @@ test("explicit D3V with B6P is not duplicated and is priced as included", () => 
   assert.deepEqual(lineById(result, "opt_sl9_001")?.provenance, ["auto"]);
   assert.equal(lineById(result, "opt_sl9_001")?.final_price_usd, 0);
   assert.deepEqual(result.auto_added_ids, ["opt_sl9_001"]);
+});
+
+test("dependency_rules excludes report directional dependency conflicts", () => {
+  const stiResult = evaluate("1lt_c07", ["opt_5v7_001", "opt_sti_001"]);
+  const stiConflict = stiResult.conflicts.find((conflict) => conflict.rule_id === "dep_excl_5v7_sti");
+
+  assert.equal(stiResult.validation_errors.length, 0);
+  assert.equal(stiConflict?.conflict_source, "dependency_rule");
+  assert.equal(stiConflict?.target_condition_set_id, "cs_selected_sti");
+  assert.equal(stiConflict?.target_selectable_id, "opt_sti_001");
+  assert.equal(stiConflict?.message, "Blocked by 5V7 LPO, Black Ground Effects.");
+
+  const tvsResult = evaluate("1lt_c07", ["opt_5v7_001", "opt_tvs_001"]);
+  const tvsConflict = tvsResult.conflicts.find((conflict) => conflict.rule_id === "dep_excl_5v7_tvs");
+
+  assert.equal(tvsResult.validation_errors.length, 0);
+  assert.equal(tvsConflict?.conflict_source, "dependency_rule");
+  assert.equal(tvsConflict?.target_condition_set_id, "cs_selected_tvs");
+  assert.equal(tvsConflict?.target_selectable_id, "opt_tvs_001");
+  assert.equal(tvsConflict?.message, "Blocked by 5V7 LPO, Black Ground Effects.");
+
+  const inverseResult = evaluate("1lt_c07", ["opt_sti_001", "opt_5v7_001"]);
+  assert.equal(
+    inverseResult.conflicts.some((conflict) => conflict.rule_id === "dep_excl_sti_5v7"),
+    false
+  );
+});
+
+test("dependency_rules excludes emit production-shaped legacy rules", () => {
+  const production = loadGeneratedData();
+  const projected = emitCsvLegacyFragment();
+  const fields = [
+    "source_id",
+    "rule_type",
+    "target_id",
+    "target_type",
+    "source_type",
+    "source_section",
+    "target_section",
+    "source_selection_mode",
+    "target_selection_mode",
+    "body_style_scope",
+    "disabled_reason",
+    "auto_add",
+    "active",
+    "runtime_action",
+    "review_flag",
+  ];
+
+  for (const targetId of ["opt_sti_001", "opt_tvs_001"]) {
+    const productionRule = production.rules.find(
+      (rule) => rule.source_id === "opt_5v7_001" && rule.target_id === targetId && rule.rule_type === "excludes"
+    );
+    const projectedRule = projected.rules.find(
+      (rule) => rule.source_id === "opt_5v7_001" && rule.target_id === targetId && rule.rule_type === "excludes"
+    );
+
+    assert.ok(productionRule, `production should include 5V7 -> ${targetId}`);
+    assert.ok(projectedRule, `projected CSV fragment should include 5V7 -> ${targetId}`);
+    assert.deepEqual(
+      Object.fromEntries(fields.map((field) => [field, projectedRule[field]])),
+      Object.fromEntries(fields.map((field) => [field, productionRule[field]]))
+    );
+  }
 });
 
 test("golden first-slice scenarios are production-derived CSV fixtures", () => {

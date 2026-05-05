@@ -1,3 +1,5 @@
 rule_id,rule_type,subject_selector_type,subject_selector_id,subject_must_be_selected,applies_when_condition_set_id,target_condition_set_id,violation_behavior,message,priority,active
 dep_colored_cover_requires_zz3_convertible,requires,selectable_set,set_ls6_engine_covers_colored,true,cs_convertible,cs_selected_zz3,disable_and_block,Requires ZZ3 Convertible Engine Appearance Package.,10,true
 dep_bc7_requires_zz3_convertible,requires,selectable,opt_bc7_001,true,cs_convertible,cs_selected_zz3,disable_and_block,Requires ZZ3 Convertible Engine Appearance Package.,10,true
+dep_excl_5v7_sti,excludes,selectable,opt_5v7_001,true,,cs_selected_sti,disable_and_block,"Blocked by 5V7 LPO, Black Ground Effects.",100,true
+dep_excl_5v7_tvs,excludes,selectable,opt_5v7_001,true,,cs_selected_tvs,disable_and_block,"Blocked by 5V7 LPO, Black Ground Effects.",101,true

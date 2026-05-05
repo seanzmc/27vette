@@ -34,6 +34,7 @@ const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set([
   "opt_pcu_001->opt_5vm_001",
   "opt_pcu_001->opt_5w8_001",
   "opt_5v7_001->opt_sti_001",
+  "opt_5v7_001->opt_tvs_001",
   "opt_sti_001->opt_5v7_001",
   "opt_5vm_001->opt_sti_001",
   "opt_sti_001->opt_5vm_001",
@@ -342,7 +343,7 @@ test("shadow assembly substitutes first-slice records from CSV fragment", () => 
     normalizeRules(
       shadowData.rules.filter((rule) => (shadowIds.has(rule.source_id) || shadowIds.has(rule.target_id)) && !PRESERVED_FIRST_SLICE_RULE_KEYS.has(ruleKey(rule)))
     ),
-    normalizeRules(csvFragment.rules)
+    normalizeRules(csvFragment.rules.filter((rule) => !PRESERVED_FIRST_SLICE_RULE_KEYS.has(ruleKey(rule))))
   );
   assert.deepEqual(
     normalizePriceRules(
