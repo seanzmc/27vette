@@ -93,6 +93,8 @@ const PASS147_INCLUDE_PAIRS = [
 ];
 const PASS151_INCLUDE_PAIRS = [["aa_pcx_5dg", "opt_pcx_001", "opt_5dg_001"]];
 const PASS149_SAFE_TARGET_RPOS = ["5DG", "R8C", "S47", "SFE", "SPY", "SPZ"];
+const PASS154_SAFE_ENDPOINT_RPOS = ["5DO", "BV4"];
+const PASS154_BLOCKED_ENDPOINT_RPOS = ["CFX"];
 const PASS150_SAFE_PCX_EXCLUDE_RPOS = ["R8C", "S47", "SFE", "SPY", "SPZ"];
 const PASS150_EXCLUDE_PAIRS = PASS150_SAFE_PCX_EXCLUDE_RPOS.map((rpo) => [
   `dep_excl_pcx_${rpo.toLowerCase()}`,
@@ -725,12 +727,12 @@ test("pass 141 projects only PCX and PDV package source catalog rows", () => {
   const basePrices = parseCsv(fs.readFileSync("data/stingray/pricing/base_prices.csv", "utf8"));
   const ownershipRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
 
-  assert.equal(selectables.length, 95);
-  assert.equal(displayRows.length, 95);
-  assert.equal(basePrices.length, 90);
+  assert.equal(selectables.length, 97);
+  assert.equal(displayRows.length, 97);
+  assert.equal(basePrices.length, 92);
   assert.equal(
     ownershipRows.filter((row) => row.record_type === "selectable" && row.ownership === "projected_owned" && row.active === "true").length,
-    92
+    94
   );
 
   const expected = [
@@ -1388,9 +1390,9 @@ test("pass 149 projects only safe missing PCX target catalog rows", () => {
     "display_order",
   ];
 
-  assert.equal(selectables.length, 95);
-  assert.equal(displayRows.length, 95);
-  assert.equal(basePrices.length, 90);
+  assert.equal(selectables.length, 97);
+  assert.equal(displayRows.length, 97);
+  assert.equal(basePrices.length, 92);
   assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
@@ -1477,6 +1479,144 @@ test("pass 149 projects only safe missing PCX target catalog rows", () => {
 
   assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_pcx_5dg"), false);
   assert.ok(autoAdds.find((row) => row.auto_add_id === "aa_pcx_5dg" && row.target_price_policy_id === "included_zero"));
+});
+
+test("pass 154 projects only safe remaining Pass 149 boundary endpoints", () => {
+  const selectables = parseCsv(fs.readFileSync("data/stingray/catalog/selectables.csv", "utf8"));
+  const displayRows = parseCsv(fs.readFileSync("data/stingray/ui/selectable_display.csv", "utf8"));
+  const basePrices = parseCsv(fs.readFileSync("data/stingray/pricing/base_prices.csv", "utf8"));
+  const ownershipRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
+  const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
+  const autoAdds = parseCsv(fs.readFileSync("data/stingray/logic/auto_adds.csv", "utf8"));
+  const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
+  const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
+  const production = loadGeneratedData();
+  const projected = emitCsvLegacyFragment();
+  const fields = [
+    "option_id",
+    "rpo",
+    "label",
+    "description",
+    "section_id",
+    "section_name",
+    "category_id",
+    "category_name",
+    "step_key",
+    "choice_mode",
+    "selection_mode",
+    "status",
+    "selectable",
+    "base_price",
+    "display_order",
+  ];
+
+  assert.equal(selectables.length, 97);
+  assert.equal(displayRows.length, 97);
+  assert.equal(basePrices.length, 92);
+  assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
+  assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
+  assert.equal(conditionSets.length, 42);
+  assert.equal(conditionTerms.length, 44);
+
+  for (const rpo of PASS154_SAFE_ENDPOINT_RPOS) {
+    const optionId = `opt_${rpo.toLowerCase()}_001`;
+    const productionChoice = production.choices.find((choice) => choice.option_id === optionId && choice.variant_id === "1lt_c07");
+    assert.ok(productionChoice, `production should include ${optionId}`);
+    assert.equal(productionChoice.selectable, "True");
+
+    const selectable = selectables.find((row) => row.selectable_id === optionId);
+    assert.ok(selectable, `${optionId} should exist in selectables.csv`);
+    assert.equal(selectable.selectable_type, "option");
+    assert.equal(selectable.rpo, rpo);
+    assert.equal(selectable.label, productionChoice.label);
+    assert.equal(selectable.description, productionChoice.description);
+    assert.equal(selectable.active, "true");
+    assert.equal(selectable.availability_condition_set_id, "");
+    assert.equal(selectable.notes, "Pass 154 missing Pass 149 boundary endpoint catalog projection only.");
+
+    const display = displayRows.find((row) => row.selectable_id === optionId);
+    assert.ok(display, `${optionId} should exist in selectable_display.csv`);
+    assert.equal(display.legacy_option_id, optionId);
+    assert.equal(display.section_id, productionChoice.section_id);
+    assert.equal(display.section_name, productionChoice.section_name);
+    assert.equal(display.category_id, productionChoice.category_id);
+    assert.equal(display.category_name, productionChoice.category_name);
+    assert.equal(display.step_key, productionChoice.step_key);
+    assert.equal(display.choice_mode, productionChoice.choice_mode);
+    assert.equal(display.selection_mode, productionChoice.selection_mode);
+    assert.equal(display.display_order, String(productionChoice.display_order));
+    assert.equal(display.selectable, "True");
+    assert.equal(display.active, "True");
+    assert.equal(display.label, productionChoice.label);
+    assert.equal(display.description, productionChoice.description);
+    assert.equal(display.source_detail_raw, productionChoice.source_detail_raw || "");
+
+    const basePrice = basePrices.find((row) => row.target_selector_id === optionId);
+    assert.ok(basePrice, `${optionId} should have a base price`);
+    assert.equal(basePrice.target_selector_type, "selectable");
+    assert.equal(basePrice.scope_condition_set_id, "");
+    assert.equal(basePrice.amount_usd, String(productionChoice.base_price));
+    assert.equal(basePrice.active, "true");
+
+    assert.ok(
+      ownershipRows.find(
+        (row) =>
+          row.record_type === "selectable" &&
+          row.rpo === rpo &&
+          row.ownership === "projected_owned" &&
+          row.reason === "Pass 154 missing Pass 149 boundary endpoint catalog projection only" &&
+          row.active === "true"
+      ),
+      `${rpo} should be projected-owned`
+    );
+
+    for (const variantId of ["1lt_c07", "1lt_c67", "2lt_c07", "2lt_c67", "3lt_c07", "3lt_c67"]) {
+      const productionVariantChoice = production.choices.find((choice) => choice.option_id === optionId && choice.variant_id === variantId);
+      const projectedChoice = projected.choices.find((choice) => choice.option_id === optionId && choice.variant_id === variantId);
+
+      assert.ok(productionVariantChoice, `production should include ${variantId} ${optionId}`);
+      assert.ok(projectedChoice, `projected CSV fragment should include ${variantId} ${optionId}`);
+      assert.deepEqual(
+        Object.fromEntries(fields.map((field) => [field, projectedChoice[field]])),
+        Object.fromEntries(fields.map((field) => [field, productionVariantChoice[field]]))
+      );
+    }
+  }
+
+  for (const rpo of PASS154_BLOCKED_ENDPOINT_RPOS) {
+    const optionId = `opt_${rpo.toLowerCase()}_001`;
+    const productionChoice = production.choices.find((choice) => choice.option_id === optionId && choice.variant_id === "1lt_c07");
+    assert.ok(productionChoice, `production should include ${optionId}`);
+    assert.equal(productionChoice.selectable, "False");
+    assert.equal(selectables.some((row) => row.selectable_id === optionId), false);
+    assert.equal(displayRows.some((row) => row.selectable_id === optionId), false);
+    assert.equal(basePrices.some((row) => row.target_selector_id === optionId), false);
+    assert.equal(
+      ownershipRows.some((row) => row.record_type === "selectable" && row.rpo === rpo && row.ownership === "projected_owned" && row.active === "true"),
+      false
+    );
+  }
+
+  for (const [recordType, sourceRpo, targetRpo] of PASS152_BLOCKED_PRESERVED_BOUNDARIES) {
+    assert.equal(
+      ownershipRows.some(
+        (row) =>
+          row.active === "true" &&
+          row.record_type === recordType &&
+          row.source_rpo === sourceRpo &&
+          row.target_rpo === targetRpo &&
+          row.ownership === "preserved_cross_boundary"
+      ),
+      true,
+      `${recordType} ${sourceRpo} -> ${targetRpo} should remain preserved`
+    );
+  }
+
+  assert.equal(rules.some((rule) => rule.rule_id.startsWith("dep_excl_5do_")), false);
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_bv4_r8c"), false);
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_r8c_cfx"), false);
 });
 
 test("pass 150 dependency_rules CSV migrates only newly unblocked PCX plain excludes", () => {

@@ -13,6 +13,7 @@ const FRAGMENT_SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const EXPECTED_OWNED_RPOS = [
   "5DG",
+  "5DO",
   "5V7",
   "5ZC",
   "5ZD",
@@ -23,6 +24,7 @@ const EXPECTED_OWNED_RPOS = [
   "BC7",
   "BCP",
   "BCS",
+  "BV4",
   "C2Z",
   "CAV",
   "CC3",

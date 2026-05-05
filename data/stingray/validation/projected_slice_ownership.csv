@@ -61,12 +61,14 @@ selectable,,,,,,SNG,projected_owned,Tech Bronze graphics projected slice,true
 selectable,,,,,,SHT,projected_owned,Tech Bronze graphics projected slice,true
 selectable,,,,,,PCX,projected_owned,Pass 141 package source catalog unlock only,true
 selectable,,,,,,PDV,projected_owned,Pass 141 package source catalog unlock only,true
+selectable,,,,,,5DO,projected_owned,Pass 154 missing Pass 149 boundary endpoint catalog projection only,true
 selectable,,,,,,5DG,projected_owned,Pass 149 missing PCX target catalog projection only,true
 selectable,,,,,,R8C,projected_owned,Pass 149 missing PCX target catalog projection only,true
 selectable,,,,,,S47,projected_owned,Pass 149 missing PCX target catalog projection only,true
 selectable,,,,,,SFE,projected_owned,Pass 149 missing PCX target catalog projection only,true
 selectable,,,,,,SPY,projected_owned,Pass 149 missing PCX target catalog projection only,true
 selectable,,,,,,SPZ,projected_owned,Pass 149 missing PCX target catalog projection only,true
+selectable,,,,,,BV4,projected_owned,Pass 154 missing Pass 149 boundary endpoint catalog projection only,true
 selectable,,,,,,DPB,projected_owned,Pass 134 Stripes blocker catalog slice,true
 selectable,,,,,,DPC,projected_owned,Pass 134 Stripes blocker catalog slice,true
 selectable,,,,,,DPG,projected_owned,Pass 134 Stripes blocker catalog slice,true
