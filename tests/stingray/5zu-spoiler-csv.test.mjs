@@ -219,7 +219,7 @@ test("CSV 5ZU legacy fragment matches generated 5ZU choices and projected spoile
   }
 });
 
-test("ownership manifest projects 5ZU and preserves every 5ZU-touching production boundary", () => {
+test("ownership manifest projects 5ZU and keeps only unmigrated 5ZU-touching production boundaries preserved", () => {
   const production = loadGeneratedData();
   const byRpo = optionIdsByRpo(production);
   const fiveZU = byRpo.get("5ZU");
@@ -252,8 +252,8 @@ test("ownership manifest projects 5ZU and preserves every 5ZU-touching productio
   assert.equal(manifestHas({ record_type: "ruleGroup", group_id: "grp_5v7_spoiler_requirement", ownership: "projected_owned" }), true);
   assert.equal(manifestHas({ record_type: "ruleGroup", group_id: "grp_5zu_paint_requirement", ownership: "production_guarded" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "5ZU", target_rpo: "T0A", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "WKQ", target_rpo: "5ZU", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "RNX", target_rpo: "5ZU", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "WKQ", target_rpo: "5ZU", ownership: "preserved_cross_boundary" }), false);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "RNX", target_rpo: "5ZU", ownership: "preserved_cross_boundary" }), false);
   assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5vm_001", target_rpo: "5ZU", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5w8_001", target_rpo: "5ZU", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5V7", target_rpo: "5ZU", ownership: "preserved_cross_boundary" }), false);

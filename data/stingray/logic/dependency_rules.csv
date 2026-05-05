@@ -19,6 +19,7 @@ dep_excl_r88_dub,excludes,selectable,opt_r88_001,true,,cs_selected_dub,disable_a
 dep_excl_r88_due,excludes,selectable,opt_r88_001,true,,cs_selected_due,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",188,true
 dep_excl_r88_duk,excludes,selectable,opt_r88_001,true,,cs_selected_duk,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",189,true
 dep_excl_r88_duw,excludes,selectable,opt_r88_001,true,,cs_selected_duw,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",190,true
+dep_excl_rnx_5zu,excludes,selectable,opt_rnx_001,true,,cs_selected_5zu,disable_and_block,"Blocked by RNX LPO, Premium outdoor car cover.",191,true
 dep_excl_rnx_5zz,excludes,selectable,opt_rnx_001,true,,cs_selected_5zz,disable_and_block,"Blocked by RNX LPO, Premium outdoor car cover.",182,true
 dep_excl_sfz_eyk,excludes,selectable,opt_sfz_001,true,,cs_selected_eyk,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",200,true
 dep_excl_sfz_dpb,excludes,selectable,opt_sfz_001,true,,cs_selected_dpb,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",201,true
@@ -40,4 +41,5 @@ dep_excl_sl8_rin,excludes,selectable,opt_sl8_001,true,,cs_selected_rin,disable_a
 dep_excl_sl8_rik,excludes,selectable,opt_sl8_001,true,,cs_selected_rik,disable_and_block,"Blocked by SL8 LPO, Rear Corvette script badge in Edge Red.",303,true
 dep_excl_rik_rin,excludes,selectable,opt_rik_001,true,,cs_selected_rin,disable_and_block,"Blocked by RIK LPO, Rear Corvette script badge in Torch Red.",304,true
 dep_excl_rik_sl8,excludes,selectable,opt_rik_001,true,,cs_selected_sl8,disable_and_block,"Blocked by RIK LPO, Rear Corvette script badge in Torch Red.",305,true
+dep_excl_wkq_5zu,excludes,selectable,opt_wkq_001,true,,cs_selected_5zu,disable_and_block,"Blocked by WKQ LPO, Premium indoor car cover.",207,true
 dep_excl_wkq_5zz,excludes,selectable,opt_wkq_001,true,,cs_selected_5zz,disable_and_block,"Blocked by WKQ LPO, Premium indoor car cover.",208,true
