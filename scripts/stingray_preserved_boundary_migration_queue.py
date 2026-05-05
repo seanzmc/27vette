@@ -91,6 +91,19 @@ PASS_157_SURFACE_GROUPS = {
     "roof_rpos": ROOF_RPOS,
     "exterior_accent_rpos": EXTERIOR_ACCENT_RPOS,
 }
+REGISTERED_REFERENCE_PREFLIGHT_BUCKETS = [
+    "reference_selector_candidate",
+    "keep_preserved_runtime_owned",
+    "normal_catalog_projection_candidate",
+    "needs_schema_design",
+    "oracle_mismatch_or_ambiguous",
+]
+REGISTERED_REFERENCE_DECISIONS = [
+    "yes_reference_selector",
+    "no_keep_preserved",
+    "manual_review",
+    "normal_catalog_projection_needed",
+]
 
 
 class QueueError(ValueError):
@@ -214,6 +227,42 @@ def registry_details(refs: set[str], registry: dict[str, dict[str, str]]) -> dic
         "projection_policy": join_unique([row.get("projection_policy", "") for row in matches]),
         "compiler_policy": join_unique([row.get("compiler_policy", "") for row in matches]),
     }
+
+
+def source_refs_for_row(row: dict[str, Any]) -> set[str]:
+    refs = {
+        row.get("source_rpo", ""),
+        row.get("source_option_id", ""),
+        row.get("source_resolved_option_id", ""),
+    }
+    canonical = {canonical_identifier(ref) for ref in refs if ref}
+    return {ref for ref in refs if ref} | {ref for ref in canonical if ref}
+
+
+def target_refs_for_row(row: dict[str, Any]) -> set[str]:
+    refs = {
+        row.get("target_rpo", ""),
+        row.get("target_option_id", ""),
+        row.get("target_resolved_option_id", ""),
+    }
+    canonical = {canonical_identifier(ref) for ref in refs if ref}
+    return {ref for ref in refs if ref} | {ref for ref in canonical if ref}
+
+
+def registered_reference_ids_for_refs(refs: set[str], registry: dict[str, dict[str, str]]) -> list[str]:
+    return [row.get("rpo", "") or row.get("option_id", "") for row in registry_matches(refs, registry)]
+
+
+def reference_role(row: dict[str, Any], registry: dict[str, dict[str, str]]) -> str:
+    source_matches = registered_reference_ids_for_refs(source_refs_for_row(row), registry)
+    target_matches = registered_reference_ids_for_refs(target_refs_for_row(row), registry)
+    if source_matches and target_matches:
+        return "both"
+    if source_matches:
+        return "source"
+    if target_matches:
+        return "target"
+    return ""
 
 
 def production_indexes(data: dict[str, Any]) -> dict[str, Any]:
@@ -672,6 +721,202 @@ def build_legacy_nonselectable_design_report(args: argparse.Namespace) -> dict[s
     }
 
 
+def selector_preflight_decision(row: dict[str, Any]) -> dict[str, Any]:
+    reference_types = set(row.get("reference_type", "").split("|"))
+    oracle = oracle_behavior(row)
+    role = row.get("reference_role", "")
+
+    if "legacy_option_id" in reference_types:
+        if role == "both":
+            candidate_model = "non_selectable_reference_selector_and_selected_reference"
+        elif role == "source":
+            candidate_model = "subject_selector_type=non_selectable_reference"
+        else:
+            candidate_model = "term_type=selected_reference"
+        return {
+            "bucket": "reference_selector_candidate",
+            "candidate_selector_model": "non_selectable_reference_selector",
+            "candidate_selector_detail": candidate_model,
+            "recommended_handling": "yes_reference_selector",
+            "can_migrate_without_customer_selectable_projection": True,
+            "compiler_schema_support_required": True,
+            "rationale": "Registered rule-only legacy option id could be emitted with non-selectable reference selector support without catalog projection.",
+        }
+
+    if "structured_reference" in reference_types:
+        return {
+            "bucket": "keep_preserved_runtime_owned",
+            "candidate_selector_model": "keep_preserved_only",
+            "candidate_selector_detail": "registry explanation only",
+            "recommended_handling": "no_keep_preserved",
+            "can_migrate_without_customer_selectable_projection": False,
+            "compiler_schema_support_required": False,
+            "rationale": "Production structured reference remains runtime/generated-owned until a broader structured-reference model is approved.",
+        }
+
+    if "display_duplicate" in reference_types and oracle == "rule:includes":
+        return {
+            "bucket": "needs_schema_design",
+            "candidate_selector_model": "non_selectable_auto_add_target",
+            "candidate_selector_detail": "auto_add target_selectable_id cannot currently point to a non-selectable reference",
+            "recommended_handling": "manual_review",
+            "can_migrate_without_customer_selectable_projection": False,
+            "compiler_schema_support_required": True,
+            "rationale": "Display duplicate include target may need non-selectable auto-add target support before migration.",
+        }
+
+    if "display_duplicate" in reference_types:
+        return {
+            "bucket": "keep_preserved_runtime_owned",
+            "candidate_selector_model": "keep_preserved_only",
+            "candidate_selector_detail": "display duplicate is not a dependency selector candidate",
+            "recommended_handling": "no_keep_preserved",
+            "can_migrate_without_customer_selectable_projection": False,
+            "compiler_schema_support_required": False,
+            "rationale": "Display duplicate reference should not be treated as a customer-selectable catalog row.",
+        }
+
+    return {
+        "bucket": "oracle_mismatch_or_ambiguous",
+        "candidate_selector_model": "manual_research",
+        "candidate_selector_detail": "registered reference type did not match a known selector preflight rule",
+        "recommended_handling": "manual_review",
+        "can_migrate_without_customer_selectable_projection": False,
+        "compiler_schema_support_required": False,
+        "rationale": "Reference needs manual review before a selector model can be proposed.",
+    }
+
+
+def build_registered_reference_selector_preflight_report(args: argparse.Namespace) -> dict[str, Any]:
+    queue = build_report(args)
+    registry = registry_indexes(load_non_selectable_references(Path(args.non_selectable_references)))
+    registered_rows = [row for row in queue["rows"] if row.get("registered_reference") is True]
+    preflight_rows: list[dict[str, Any]] = []
+    for row in registered_rows:
+        role = reference_role(row, registry)
+        row_with_role = {**row, "reference_role": role}
+        decision = selector_preflight_decision(row_with_role)
+        involved = registered_reference_ids_for_refs(row_refs(row), registry)
+        preflight_rows.append(
+            {
+                "manifest_row_id": row["manifest_row_id"],
+                "record_type": row["record_type"],
+                "source_rpo": row["source_rpo"],
+                "source_option_id": row["source_option_id"],
+                "target_rpo": row["target_rpo"],
+                "target_option_id": row["target_option_id"],
+                "source_resolved_option_id": row["source_resolved_option_id"],
+                "target_resolved_option_id": row["target_resolved_option_id"],
+                "oracle_behavior": oracle_behavior(row),
+                "registered_reference_involved": involved,
+                "reference_role": role,
+                "reference_type": row["reference_type"],
+                "projection_policy": row["projection_policy"],
+                "compiler_policy": row["compiler_policy"],
+                "current_preserved_reason": row["reason"],
+                "candidate_selector_model": decision["candidate_selector_model"],
+                "candidate_selector_detail": decision["candidate_selector_detail"],
+                "recommended_handling": decision["recommended_handling"],
+                "bucket": decision["bucket"],
+                "rationale": decision["rationale"],
+                "can_migrate_without_customer_selectable_projection": decision["can_migrate_without_customer_selectable_projection"],
+                "compiler_schema_support_required": decision["compiler_schema_support_required"],
+            }
+        )
+
+    preflight_rows.sort(
+        key=lambda row: (
+            REGISTERED_REFERENCE_PREFLIGHT_BUCKETS.index(row["bucket"]),
+            row["registered_reference_involved"],
+            row["record_type"],
+            row["source_rpo"] or row["source_option_id"] or row["source_resolved_option_id"],
+            row["target_rpo"] or row["target_option_id"] or row["target_resolved_option_id"],
+            row["manifest_row_id"],
+        )
+    )
+    bucket_counts = Counter(row["bucket"] for row in preflight_rows)
+    reference_summary = build_registered_reference_summary(preflight_rows)
+    compiler_schema_support_required = any(row["compiler_schema_support_required"] for row in preflight_rows)
+    can_migrate_without_projection = any(row["can_migrate_without_customer_selectable_projection"] for row in preflight_rows)
+    return {
+        "schema_version": 1,
+        "status": "allowed",
+        "inspected_row_count": len(preflight_rows),
+        "bucket_summary": {
+            bucket: bucket_counts.get(bucket, 0)
+            for bucket in REGISTERED_REFERENCE_PREFLIGHT_BUCKETS
+        },
+        "reference_summary": reference_summary,
+        "can_any_reference_migrate_without_customer_selectable_projection": can_migrate_without_projection,
+        "compiler_schema_support_required": compiler_schema_support_required,
+        "recommended_next_pass": recommend_registered_reference_next_pass(reference_summary, bucket_counts),
+        "rows": preflight_rows,
+    }
+
+
+def build_registered_reference_summary(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    summary: dict[str, dict[str, Any]] = {}
+    for identifier in LEGACY_IDENTIFIER_GROUPS:
+        matching = [row for row in rows if identifier in row["registered_reference_involved"]]
+        if not matching:
+            continue
+        decisions = Counter(row["recommended_handling"] for row in matching)
+        models = Counter(row["candidate_selector_model"] for row in matching)
+        buckets = Counter(row["bucket"] for row in matching)
+        reference_types = sorted({row["reference_type"] for row in matching if row["reference_type"]})
+        summary[identifier] = {
+            "row_count": len(matching),
+            "source_count": sum(1 for row in matching if row["reference_role"] in {"source", "both"}),
+            "target_count": sum(1 for row in matching if row["reference_role"] in {"target", "both"}),
+            "both_count": sum(1 for row in matching if row["reference_role"] == "both"),
+            "reference_type": "|".join(reference_types),
+            "recommended_handling": decisions.most_common(1)[0][0],
+            "candidate_selector_model": models.most_common(1)[0][0],
+            "dominant_bucket": buckets.most_common(1)[0][0],
+            "compiler_schema_support_required": any(row["compiler_schema_support_required"] for row in matching),
+            "can_migrate_without_customer_selectable_projection": any(
+                row["can_migrate_without_customer_selectable_projection"] for row in matching
+            ),
+        }
+    return summary
+
+
+def recommend_registered_reference_next_pass(
+    reference_summary: dict[str, dict[str, Any]],
+    bucket_counts: Counter[str],
+) -> str:
+    selector_candidates = [
+        identifier
+        for identifier, summary in reference_summary.items()
+        if summary["recommended_handling"] == "yes_reference_selector"
+    ]
+    if selector_candidates:
+        return f"LANE F: design non-selectable reference selector support for {', '.join(selector_candidates)}"
+    if bucket_counts.get("needs_schema_design", 0):
+        return "LANE F: design non-selectable auto-add/reference target support"
+    return "LANE E: keep registered references preserved/runtime-owned unless design scope changes"
+    recommended = recommend_legacy_design_next_lane(subtype_counts)
+    return {
+        "schema_version": 1,
+        "status": "allowed",
+        "source_bucket": "legacy_rule_only_or_non_selectable",
+        "source_row_count": len(legacy_rows),
+        "classified_row_count": len(design_rows),
+        "subtype_summary": {subtype: subtype_counts.get(subtype, 0) for subtype in LEGACY_DESIGN_SUBTYPES},
+        "recommended_handling_summary": {
+            handling: handling_counts.get(handling, 0)
+            for handling in RECOMMENDED_HANDLINGS
+        },
+        "related_surface_summary": {
+            surface: related_surface_counts.get(surface, 0)
+            for surface in PASS_157_SURFACE_GROUPS
+        },
+        "identifier_groups": identifier_groups,
+        "recommended_next_lane": recommended,
+        "rows": design_rows,
+    }
+
+
 def recommend_legacy_design_next_lane(subtype_counts: Counter[str]) -> str:
     if subtype_counts.get("normal_selectable_misclassified", 0):
         return f"LANE A: project normal selectables misclassified as legacy ({subtype_counts['normal_selectable_misclassified']} rows)"
@@ -745,6 +990,37 @@ def print_legacy_nonselectable_design_text(report: dict[str, Any]) -> None:
         )
 
 
+def print_registered_reference_selector_preflight_text(report: dict[str, Any]) -> None:
+    print(f"Registered-reference preserved rows inspected: {report['inspected_row_count']}")
+    print()
+    for bucket in REGISTERED_REFERENCE_PREFLIGHT_BUCKETS:
+        print(f"{bucket}: {report['bucket_summary'][bucket]}")
+    print()
+    print(
+        "Can migrate without customer-selectable projection: "
+        f"{str(report['can_any_reference_migrate_without_customer_selectable_projection']).lower()}"
+    )
+    print(f"Compiler/schema support required: {str(report['compiler_schema_support_required']).lower()}")
+    print(f"Recommended next pass: {report['recommended_next_pass']}")
+    print()
+    print("reference rows decision candidate selector model")
+    for identifier, summary in report["reference_summary"].items():
+        print(
+            f"{identifier} {summary['row_count']} {summary['recommended_handling']} "
+            f"{summary['candidate_selector_model']}"
+        )
+    print()
+    print("record_type source target reference role bucket candidate selector model")
+    for row in report["rows"]:
+        source = row["source_rpo"] or row["source_option_id"] or row["source_resolved_option_id"]
+        target = row["target_rpo"] or row["target_option_id"] or row["target_resolved_option_id"]
+        references = "|".join(row["registered_reference_involved"])
+        print(
+            f"{row['record_type']} {source} {target} {references} {row['reference_role']} "
+            f"{row['bucket']} {row['candidate_selector_model']}"
+        )
+
+
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json", action="store_true", help="Write the full report as JSON to stdout.")
@@ -757,6 +1033,16 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "--legacy-nonselectable-design-json",
         action="store_true",
         help="Write the Pass 157 legacy/non-selectable design report as JSON.",
+    )
+    parser.add_argument(
+        "--registered-reference-selector-preflight",
+        action="store_true",
+        help="Write the Pass 159 registered-reference selector preflight as text.",
+    )
+    parser.add_argument(
+        "--registered-reference-selector-preflight-json",
+        action="store_true",
+        help="Write the Pass 159 registered-reference selector preflight as JSON.",
     )
     parser.add_argument("--package", default=str(DEFAULT_PACKAGE), help="Stingray CSV package directory.")
     parser.add_argument("--production-data", default=str(DEFAULT_PRODUCTION_DATA), help="Production form-app/data.js oracle path.")
@@ -772,14 +1058,20 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 def main(argv: list[str]) -> int:
     args = parse_args(argv)
     try:
-        if args.legacy_nonselectable_design or args.legacy_nonselectable_design_json:
+        if args.registered_reference_selector_preflight or args.registered_reference_selector_preflight_json:
+            report = build_registered_reference_selector_preflight_report(args)
+        elif args.legacy_nonselectable_design or args.legacy_nonselectable_design_json:
             report = build_legacy_nonselectable_design_report(args)
         else:
             report = build_report(args)
     except QueueError as error:
         print(str(error), file=sys.stderr)
         return 1
-    if args.legacy_nonselectable_design_json:
+    if args.registered_reference_selector_preflight_json:
+        print(json.dumps(report, indent=2, sort_keys=True))
+    elif args.registered_reference_selector_preflight:
+        print_registered_reference_selector_preflight_text(report)
+    elif args.legacy_nonselectable_design_json:
         print(json.dumps(report, indent=2, sort_keys=True))
     elif args.legacy_nonselectable_design:
         print_legacy_nonselectable_design_text(report)
