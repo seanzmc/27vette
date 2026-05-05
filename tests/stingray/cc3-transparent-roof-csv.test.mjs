@@ -228,7 +228,7 @@ test("CC3 projection claims only the transparent Roof row and preserves Roof mod
     assert.equal(owned.has(rpo), false, `${rpo} should remain outside the CC3 slice`);
   }
   assert.equal(activeManifestRows().some((row) => row.record_type === "section" || row.group_id === "sec_roof_001" || row.group_id === "sec_stan_002"), false);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "SBT", target_rpo: "CC3", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "SBT", target_rpo: "CC3", ownership: "preserved_cross_boundary" }), false);
 });
 
 test("production has only classified records touching CC3", () => {
@@ -242,14 +242,19 @@ test("production has only classified records touching CC3", () => {
   });
 });
 
-test("shadow overlay preserves SBT to CC3 and does not emit owned Roof rule surfaces", () => {
+test("shadow overlay emits dependency-owned SBT to CC3 and no owned Roof price surfaces", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
   const fragment = emitCsvLegacyFragment();
   const cc3Id = optionIdByRpo(production, CC3_RPO);
+  const sbtId = optionIdByRpo(production, "SBT");
 
   assert.deepEqual(plain(rule(shadow, "SBT", CC3_RPO, "excludes")), plain(rule(production, "SBT", CC3_RPO, "excludes")));
-  assert.equal(fragment.rules.some((item) => item.source_id === cc3Id || item.target_id === cc3Id), false);
+  assert.deepEqual(
+    plain(fragment.rules.filter((item) => item.source_id === cc3Id || item.target_id === cc3Id)),
+    plain([rule(production, "SBT", CC3_RPO, "excludes")])
+  );
+  assert.equal(fragment.rules.some((item) => item.source_id === cc3Id && item.target_id === sbtId), false);
   assert.equal(fragment.priceRules.some((item) => item.condition_option_id === cc3Id || item.target_option_id === cc3Id), false);
 });
 

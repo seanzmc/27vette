@@ -223,7 +223,7 @@ test("C2Z projection claims only the carbon fiber Roof row and preserves Roof mo
     assert.equal(owned.has(rpo), false, `${rpo} should remain outside the C2Z slice`);
   }
   assert.equal(activeManifestRows().some((row) => row.record_type === "section" || row.group_id === "sec_roof_001" || row.group_id === "sec_stan_002"), false);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "SBT", target_rpo: "CC3", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "SBT", target_rpo: "CC3", ownership: "preserved_cross_boundary" }), false);
 });
 
 test("production has no structured records touching C2Z", () => {

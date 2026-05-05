@@ -21,6 +21,9 @@ const PASS137_EXCLUDE_PAIRS = [
 const PASS138_EXCLUDE_PAIRS = [
   ["dep_excl_sti_5v7", "opt_sti_001", "opt_5v7_001", "cs_selected_5v7"],
 ];
+const PASS140_EXCLUDE_PAIRS = [
+  ["dep_excl_sbt_cc3", "opt_sbt_001", "opt_cc3_001", "cs_selected_cc3"],
+];
 const PASS139_ALREADY_CSV_OWNED_EXCLUDES = [
   ["dep_excl_5v7_sti", "5V7", "STI"],
   ["dep_excl_5v7_tvs", "5V7", "TVS"],
@@ -346,9 +349,9 @@ test("pass 135 dependency_rules CSV migrates only R88 and SFZ full-length stripe
   const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
 
-  assert.equal(rules.length, 45);
+  assert.equal(rules.length, 46);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 43);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 44);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS135_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);
@@ -492,9 +495,9 @@ test("pass 139 already CSV-owned excludes are not preserved as production-owned 
   const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
   const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
 
-  assert.equal(rules.length, 45);
+  assert.equal(rules.length, 46);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 43);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 44);
 
   for (const [ruleId, sourceRpo, targetRpo] of PASS139_ALREADY_CSV_OWNED_EXCLUDES) {
     assert.ok(
@@ -513,6 +516,105 @@ test("pass 139 already CSV-owned excludes are not preserved as production-owned 
       false,
       `${sourceRpo} -> ${targetRpo} should not remain preserved once dependency_rules.csv owns it`
     );
+  }
+});
+
+test("pass 140 dependency_rules CSV migrates only SBT to CC3 roof panel exclude", () => {
+  const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
+  const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
+  const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
+  const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
+
+  assert.equal(rules.length, 46);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 44);
+
+  for (const [ruleId, sourceId, targetId, conditionSetId] of PASS140_EXCLUDE_PAIRS) {
+    const rule = rules.find((candidate) => candidate.rule_id === ruleId);
+    assert.ok(rule, `${ruleId} should exist`);
+    assert.equal(rule.rule_type, "excludes");
+    assert.equal(rule.subject_selector_type, "selectable");
+    assert.equal(rule.subject_selector_id, sourceId);
+    assert.equal(rule.subject_must_be_selected, "true");
+    assert.equal(rule.target_condition_set_id, conditionSetId);
+    assert.equal(rule.message, "Blocked by SBT LPO, Dual roof.");
+    assert.equal(rule.active, "true");
+
+    assert.ok(conditionSets.find((conditionSet) => conditionSet.condition_set_id === conditionSetId), `${conditionSetId} should exist`);
+    assert.ok(
+      conditionTerms.find(
+        (term) =>
+          term.condition_set_id === conditionSetId &&
+          term.term_type === "selected" &&
+          term.left_ref === targetId &&
+          term.operator === "is_true"
+      ),
+      `${conditionSetId} should select ${targetId}`
+    );
+  }
+
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_cc3_sbt"), false);
+  assert.equal(
+    manifestRows.some(
+      (row) =>
+        row.active === "true" &&
+        row.record_type === "rule" &&
+        row.source_rpo === "SBT" &&
+        row.target_rpo === "CC3" &&
+        row.ownership === "preserved_cross_boundary"
+    ),
+    false
+  );
+});
+
+test("pass 140 migrated SBT to CC3 exclude emits production-shaped legacy rule", () => {
+  const production = loadGeneratedData();
+  const projected = emitCsvLegacyFragment();
+  const fields = [
+    "source_id",
+    "rule_type",
+    "target_id",
+    "target_type",
+    "source_type",
+    "source_section",
+    "target_section",
+    "source_selection_mode",
+    "target_selection_mode",
+    "body_style_scope",
+    "disabled_reason",
+    "auto_add",
+    "active",
+    "runtime_action",
+    "review_flag",
+  ];
+
+  for (const [, sourceId, targetId] of PASS140_EXCLUDE_PAIRS) {
+    const productionRule = production.rules.find(
+      (rule) => rule.source_id === sourceId && rule.target_id === targetId && rule.rule_type === "excludes"
+    );
+    const projectedRule = projected.rules.find(
+      (rule) => rule.source_id === sourceId && rule.target_id === targetId && rule.rule_type === "excludes"
+    );
+
+    assert.ok(productionRule, `production should include ${sourceId} -> ${targetId}`);
+    assert.ok(projectedRule, `projected CSV fragment should include ${sourceId} -> ${targetId}`);
+    assert.deepEqual(
+      Object.fromEntries(fields.map((field) => [field, projectedRule[field]])),
+      Object.fromEntries(fields.map((field) => [field, productionRule[field]]))
+    );
+  }
+});
+
+test("pass 140 migrated SBT to CC3 exclude reports dependency conflict", () => {
+  for (const [ruleId, sourceId, targetId, conditionSetId] of PASS140_EXCLUDE_PAIRS) {
+    const result = evaluate("1lt_c07", [sourceId, targetId]);
+    const conflict = result.conflicts.find((item) => item.rule_id === ruleId);
+
+    assert.equal(result.validation_errors.length, 0);
+    assert.equal(conflict?.conflict_source, "dependency_rule");
+    assert.equal(conflict?.target_condition_set_id, conditionSetId);
+    assert.equal(conflict?.target_selectable_id, targetId);
+    assert.equal(conflict?.message, "Blocked by SBT LPO, Dual roof.");
   }
 });
 

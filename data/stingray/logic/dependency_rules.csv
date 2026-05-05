@@ -44,3 +44,4 @@ dep_excl_rik_rin,excludes,selectable,opt_rik_001,true,,cs_selected_rin,disable_a
 dep_excl_rik_sl8,excludes,selectable,opt_rik_001,true,,cs_selected_sl8,disable_and_block,"Blocked by RIK LPO, Rear Corvette script badge in Torch Red.",305,true
 dep_excl_wkq_5zu,excludes,selectable,opt_wkq_001,true,,cs_selected_5zu,disable_and_block,"Blocked by WKQ LPO, Premium indoor car cover.",207,true
 dep_excl_wkq_5zz,excludes,selectable,opt_wkq_001,true,,cs_selected_5zz,disable_and_block,"Blocked by WKQ LPO, Premium indoor car cover.",208,true
+dep_excl_sbt_cc3,excludes,selectable,opt_sbt_001,true,,cs_selected_cc3,disable_and_block,"Blocked by SBT LPO, Dual roof.",306,true

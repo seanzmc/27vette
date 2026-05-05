@@ -269,7 +269,7 @@ test("SBT package cluster satisfies projected-owned package policy without claim
     assert.equal(owned.has(rpo), false, `${rpo} should remain outside the SBT package slice`);
   }
   assert.deepEqual(preservedSbtSc7Rows(), [], "SBT -> SC7 package records should not be preserved cross-boundary rows");
-  assert.deepEqual(preservedSbtCc3Rows(), ["rule:SBT->CC3"], "SBT -> CC3 roof exclude should remain preserved");
+  assert.deepEqual(preservedSbtCc3Rows(), [], "SBT -> CC3 roof exclude should not remain preserved after Pass 140 migration");
 });
 
 test("CSV SBT legacy fragment emits package include rule and included-zero priceRule", () => {
@@ -304,7 +304,7 @@ test("production has only classified records touching SBT and SC7", () => {
   });
 });
 
-test("shadow overlay projects SBT package records and preserves SBT to CC3", () => {
+test("shadow overlay projects SBT package records and dependency-owned SBT to CC3", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
   const fragment = emitCsvLegacyFragment();
@@ -318,8 +318,9 @@ test("shadow overlay projects SBT package records and preserves SBT to CC3", () 
 
   const productionRoofRule = production.rules.find((rule) => rule.source_id === sbtId && rule.target_id === cc3Id && rule.rule_type === "excludes");
   const shadowRoofRule = shadow.rules.find((rule) => rule.source_id === sbtId && rule.target_id === cc3Id && rule.rule_type === "excludes");
+  const fragmentRoofRule = fragment.rules.find((rule) => rule.source_id === sbtId && rule.target_id === cc3Id && rule.rule_type === "excludes");
   assert.deepEqual(plain(shadowRoofRule), plain(productionRoofRule));
-  assert.equal(fragment.rules.some((rule) => rule.source_id === sbtId && rule.target_id === cc3Id), false);
+  assert.deepEqual(plain(fragmentRoofRule), plain(productionRoofRule));
   assert.equal(fragment.rules.some((rule) => rule.source_id === sbtId && rule.target_id === sc7Id), true);
 });
 

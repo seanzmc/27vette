@@ -131,7 +131,6 @@ rule,,PDV,,DUW,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary re
 rule,,PDV,,DZU,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
 rule,,PDV,,DZV,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
 rule,,PDV,,DZX,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,SBT,,CC3,,,preserved_cross_boundary,SBT to Roof panel exclude remains production-owned in Pass 80,true
 rule,,DPB,,GTR,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DPC,,GBK,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DPG,,G26,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
