@@ -9,24 +9,6 @@ const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const FENDER_HASH_STRIPE_RPOS = new Set(["SHQ", "SHW"]);
-const STRIPE_SECTION_PRODUCTION_RPOS = new Set([
-  "DTH",
-  "DUB",
-  "DT0",
-  "DUW",
-  "DSY",
-  "DSZ",
-  "DPB",
-  "DPG",
-  "DPL",
-  "DPT",
-  "DPC",
-  "DUK",
-  "DUE",
-  "DZU",
-  "DZX",
-  "DZV",
-]);
 const NEARBY_PACKAGE_RPOS = new Set(["PDV", "PCX"]);
 const EXPECTED_PRICES = new Map([
   ["SHQ", 295],
@@ -199,7 +181,7 @@ test("CSV fender hash stripe legacy fragment matches generated choices", () => {
   assert.deepEqual(normalizeChoices(projected.choices), normalizeChoices(production.choices));
 });
 
-test("ownership manifest projects only SHQ and SHW from the noisy stripe neighborhood", () => {
+test("ownership manifest projects SHQ and SHW without claiming nearby package sources", () => {
   const production = loadGeneratedData();
   const owned = projectedOwnedRpos();
 
@@ -213,7 +195,7 @@ test("ownership manifest projects only SHQ and SHW from the noisy stripe neighbo
     assert.equal(manifestHas({ record_type: "selectable", rpo, ownership: "projected_owned" }), true);
   }
 
-  for (const rpo of [...STRIPE_SECTION_PRODUCTION_RPOS, ...NEARBY_PACKAGE_RPOS]) {
+  for (const rpo of NEARBY_PACKAGE_RPOS) {
     assert.equal(owned.has(rpo), false, `${rpo} should remain outside the SHQ/SHW fender hash stripe slice`);
   }
 });

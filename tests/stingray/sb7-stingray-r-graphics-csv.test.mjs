@@ -29,7 +29,6 @@ const SB7_SOURCE_TEXT_STRIPE_RPOS = new Set([
 const OUT_OF_SCOPE_RPOS = new Set([
   "PDV",
   "PCX",
-  ...SB7_SOURCE_TEXT_STRIPE_RPOS,
 ]);
 
 function parseCsv(source) {

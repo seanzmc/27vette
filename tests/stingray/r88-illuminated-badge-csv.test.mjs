@@ -24,9 +24,7 @@ const R88_SOURCE_TEXT_STRIPE_RPOS = new Set([
   "DUW",
 ]);
 const R88_SOURCE_TEXT_MISSING_RPOS = new Set(["DTB"]);
-const OUT_OF_SCOPE_RPOS = new Set([
-  ...R88_SOURCE_TEXT_STRIPE_RPOS,
-]);
+const OUT_OF_SCOPE_RPOS = new Set([]);
 
 function parseCsv(source) {
   const rows = [];

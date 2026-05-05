@@ -41,7 +41,6 @@ const OUT_OF_SCOPE_RPOS = new Set([
   "SFE",
   "SPY",
   "SPZ",
-  ...SHT_SOURCE_TEXT_STRIPE_RPOS,
 ]);
 
 function parseCsv(source) {

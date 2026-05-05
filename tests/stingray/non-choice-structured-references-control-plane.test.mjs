@@ -207,6 +207,6 @@ test("overlay rejects omitted guarded or preserved CF8 and RYQ non-choice record
   const preservedResult = runOverlay(["--ownership-manifest", writeTempManifest(withoutCf8Boundary)]);
 
   assert.notEqual(preservedResult.status, 0);
-  assert.match(preservedResult.stderr, /unclassified guarded production records/);
+  assert.match(preservedResult.stderr, /unclassified (guarded production|cross-boundary) records/);
   assert.match(preservedResult.stderr, /opt_cf8_001/);
 });

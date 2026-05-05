@@ -99,9 +99,57 @@ rule,,SHT,,PDV,,,preserved_cross_boundary,SHT to PDV package exclude remains pro
 rule,,PCX,,SFZ,,,preserved_cross_boundary,PCX package source remains production-owned for SFZ in Pass 63,true
 priceRule,,PCX,,SFZ,,,preserved_cross_boundary,PCX package source remains production-owned for SFZ in Pass 63,true
 rule,,PCX,,EYK,,,preserved_cross_boundary,PCX to required Badges Chrome exclude remains production-owned in Pass 69,true
+rule,,PCX,,DPB,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PCX,,DPC,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PCX,,DPG,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PCX,,DPL,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PCX,,DPT,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PCX,,DSY,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PCX,,DSZ,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PCX,,DT0,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PCX,,DTH,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PCX,,DUB,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PCX,,DUE,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PCX,,DUK,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PCX,,DUW,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PCX,,DZU,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PCX,,DZV,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PCX,,DZX,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DPB,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DPC,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DPG,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DPL,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DPT,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DSY,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DSZ,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DT0,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DTH,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DUB,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DUE,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DUK,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DUW,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DZU,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DZV,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
+rule,,PDV,,DZX,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
 rule,,SBT,,CC3,,,preserved_cross_boundary,SBT to Roof panel exclude remains production-owned in Pass 80,true
 rule,,R88,,SFZ,,,preserved_cross_boundary,R88 to SFZ badge exclude remains production-owned in Pass 65,true
 rule,,R88,,EYK,,,preserved_cross_boundary,R88 to required badge section exclude remains production-owned in Pass 65,true
+rule,,DPB,,GTR,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DPC,,GBK,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DPG,,G26,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DPL,,GKZ,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DPL,,GPH,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DSY,,G26,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DSZ,,GKZ,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DSZ,,GPH,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DT0,,GBK,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DUE,,GTR,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DUK,,GKZ,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DUK,,GPH,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DUW,,GTR,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DZU,,GBK,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DZX,,GKZ,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DZX,,GPH,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,R88,,DPB,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
 rule,,R88,,DPC,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
 rule,,R88,,DPG,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
