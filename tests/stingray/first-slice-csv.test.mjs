@@ -88,15 +88,16 @@ const PASS147_INCLUDE_PAIRS = [
   ["aa_pcx_sng", "opt_pcx_001", "opt_sng_001"],
   ["aa_pcx_sht", "opt_pcx_001", "opt_sht_001"],
 ];
+const PASS151_INCLUDE_PAIRS = [["aa_pcx_5dg", "opt_pcx_001", "opt_5dg_001"]];
 const PASS149_SAFE_TARGET_RPOS = ["5DG", "R8C", "S47", "SFE", "SPY", "SPZ"];
+const PASS150_SAFE_PCX_EXCLUDE_RPOS = ["R8C", "S47", "SFE", "SPY", "SPZ"];
+const PASS150_EXCLUDE_PAIRS = PASS150_SAFE_PCX_EXCLUDE_RPOS.map((rpo) => [
+  `dep_excl_pcx_${rpo.toLowerCase()}`,
+  "opt_pcx_001",
+  `opt_${rpo.toLowerCase()}_001`,
+  `cs_selected_${rpo.toLowerCase()}`,
+]);
 const PASS149_PRESERVED_BOUNDARIES = [
-  ["rule", "PCX", "5DG"],
-  ["priceRule", "PCX", "5DG"],
-  ["rule", "PCX", "R8C"],
-  ["rule", "PCX", "S47"],
-  ["rule", "PCX", "SFE"],
-  ["rule", "PCX", "SPY"],
-  ["rule", "PCX", "SPZ"],
   ["rule", "5DG", "R8C"],
   ["rule", "5DG", "S47"],
   ["rule", "5DG", "SFE"],
@@ -444,9 +445,9 @@ test("pass 135 dependency_rules CSV migrates only R88 and SFZ full-length stripe
   const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
 
-  assert.equal(rules.length, 81);
+  assert.equal(rules.length, 86);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 79);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS135_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);
@@ -590,9 +591,9 @@ test("pass 139 already CSV-owned excludes are not preserved as production-owned 
   const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
   const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
 
-  assert.equal(rules.length, 81);
+  assert.equal(rules.length, 86);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 79);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
 
   for (const [ruleId, sourceRpo, targetRpo] of PASS139_ALREADY_CSV_OWNED_EXCLUDES) {
     assert.ok(
@@ -620,9 +621,9 @@ test("pass 140 dependency_rules CSV migrates only SBT to CC3 roof panel exclude"
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
   const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
 
-  assert.equal(rules.length, 81);
+  assert.equal(rules.length, 86);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 79);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS140_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);
@@ -816,9 +817,16 @@ test("pass 141 PCX and PDV legacy choices match production with only approved pa
   }
 
   const allowedMigratedPackageRuleKeys = new Set(
-    [...PASS142_EXCLUDE_PAIRS, ...PASS143_EXCLUDE_PAIRS, ...PASS144_EXCLUDE_PAIRS, ...PASS146_INCLUDE_PAIRS, ...PASS147_INCLUDE_PAIRS, ...PASS148_EXCLUDE_PAIRS].map(
-      ([, sourceId, targetId]) => `${sourceId}->${targetId}`
-    )
+    [
+      ...PASS142_EXCLUDE_PAIRS,
+      ...PASS143_EXCLUDE_PAIRS,
+      ...PASS144_EXCLUDE_PAIRS,
+      ...PASS146_INCLUDE_PAIRS,
+      ...PASS147_INCLUDE_PAIRS,
+      ...PASS151_INCLUDE_PAIRS,
+      ...PASS148_EXCLUDE_PAIRS,
+      ...PASS150_EXCLUDE_PAIRS,
+    ].map(([, sourceId, targetId]) => `${sourceId}->${targetId}`)
   );
   assert.equal(
     projected.rules.some(
@@ -861,9 +869,9 @@ test("pass 142 dependency_rules CSV migrates only PCX to EYK badge exclude", () 
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
   const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
 
-  assert.equal(rules.length, 81);
+  assert.equal(rules.length, 86);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 79);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS142_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);
@@ -959,14 +967,15 @@ test("pass 142 migrated PCX to EYK exclude reports dependency conflict", () => {
 });
 
 test("pass 143 dependency_rules CSV migrates only safe PCX plain excludes", () => {
+  const autoAdds = parseCsv(fs.readFileSync("data/stingray/logic/auto_adds.csv", "utf8"));
   const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
   const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
   const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
 
-  assert.equal(rules.length, 81);
+  assert.equal(rules.length, 86);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 79);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS143_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);
@@ -995,11 +1004,6 @@ test("pass 143 dependency_rules CSV migrates only safe PCX plain excludes", () =
   assert.equal(conditionSets.some((conditionSet) => conditionSet.condition_set_id === "cs_selected_pcx"), false);
   assert.equal(conditionTerms.some((term) => term.left_ref === "opt_pcx_001"), false);
   for (const blockedRuleId of [
-    "dep_excl_pcx_r8c",
-    "dep_excl_pcx_s47",
-    "dep_excl_pcx_sfe",
-    "dep_excl_pcx_spy",
-    "dep_excl_pcx_spz",
     "dep_excl_pcx_5dg",
   ]) {
     assert.equal(rules.some((rule) => rule.rule_id === blockedRuleId), false, `${blockedRuleId} should remain unmigrated`);
@@ -1022,29 +1026,7 @@ test("pass 143 dependency_rules CSV migrates only safe PCX plain excludes", () =
     );
   }
 
-  for (const blocked of [
-    ["rule", "PCX", "R8C"],
-    ["rule", "PCX", "S47"],
-    ["rule", "PCX", "SFE"],
-    ["rule", "PCX", "SPY"],
-    ["rule", "PCX", "SPZ"],
-    ["rule", "PCX", "5DG"],
-    ["priceRule", "PCX", "5DG"],
-  ]) {
-    const [recordType, sourceRpo, targetRpo] = blocked;
-    assert.equal(
-      manifestRows.some(
-        (row) =>
-          row.active === "true" &&
-          row.record_type === recordType &&
-          row.source_rpo === sourceRpo &&
-          row.target_rpo === targetRpo &&
-          row.ownership === "preserved_cross_boundary"
-      ),
-      true,
-      `${recordType} ${sourceRpo} -> ${targetRpo} should remain preserved`
-    );
-  }
+  assert.ok(autoAdds.find((row) => row.auto_add_id === "aa_pcx_5dg" && row.target_price_policy_id === "included_zero"));
 });
 
 test("pass 143 migrated PCX plain excludes emit production-shaped legacy rules", () => {
@@ -1104,9 +1086,9 @@ test("pass 144 dependency_rules CSV migrates only safe PDV to Stripe plain exclu
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
   const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
 
-  assert.equal(rules.length, 81);
+  assert.equal(rules.length, 86);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 79);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS144_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);
@@ -1159,10 +1141,10 @@ test("pass 146 auto_adds CSV migrates only PDV package includes for VWD and SB7"
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
 
-  assert.equal(autoAdds.filter((row) => row.active === "true").length, 18);
-  assert.equal(rules.length, 81);
+  assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
+  assert.equal(rules.length, 86);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 79);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
 
   for (const [autoAddId, sourceId, targetId] of PASS146_INCLUDE_PAIRS) {
     const row = autoAdds.find((candidate) => candidate.auto_add_id === autoAddId);
@@ -1211,9 +1193,7 @@ test("pass 146 auto_adds CSV migrates only PDV package includes for VWD and SB7"
     );
   }
 
-  for (const forbiddenId of ["aa_pcx_5dg"]) {
-    assert.equal(autoAdds.some((row) => row.auto_add_id === forbiddenId), false, `${forbiddenId} should remain unmigrated`);
-  }
+  assert.ok(autoAdds.find((row) => row.auto_add_id === "aa_pcx_5dg" && row.target_price_policy_id === "included_zero"));
 });
 
 test("pass 147 auto_adds CSV migrates only PCX package includes for SFZ SNG and SHT", () => {
@@ -1223,10 +1203,10 @@ test("pass 147 auto_adds CSV migrates only PCX package includes for SFZ SNG and 
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
 
-  assert.equal(autoAdds.filter((row) => row.active === "true").length, 18);
-  assert.equal(rules.length, 81);
+  assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
+  assert.equal(rules.length, 86);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 79);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
 
   for (const [autoAddId, sourceId, targetId] of PASS147_INCLUDE_PAIRS) {
     const row = autoAdds.find((candidate) => candidate.auto_add_id === autoAddId);
@@ -1282,28 +1262,7 @@ test("pass 147 auto_adds CSV migrates only PCX package includes for SFZ SNG and 
     );
   }
 
-  for (const [recordType, sourceRpo, targetRpo] of [
-    ["rule", "PCX", "5DG"],
-    ["priceRule", "PCX", "5DG"],
-    ["rule", "PCX", "R8C"],
-    ["rule", "PCX", "S47"],
-    ["rule", "PCX", "SFE"],
-    ["rule", "PCX", "SPY"],
-    ["rule", "PCX", "SPZ"],
-  ]) {
-    assert.equal(
-      manifestRows.some(
-        (row) =>
-          row.active === "true" &&
-          row.record_type === recordType &&
-          row.source_rpo === sourceRpo &&
-          row.target_rpo === targetRpo &&
-          row.ownership === "preserved_cross_boundary"
-      ),
-      true,
-      `${recordType} ${sourceRpo} -> ${targetRpo} should remain preserved`
-    );
-  }
+  assert.ok(autoAdds.find((row) => row.auto_add_id === "aa_pcx_5dg" && row.target_price_policy_id === "included_zero"));
 });
 
 test("pass 148 dependency_rules CSV migrates only PCX to PDV package conflict", () => {
@@ -1332,10 +1291,10 @@ test("pass 148 dependency_rules CSV migrates only PCX to PDV package conflict", 
     "review_flag",
   ];
 
-  assert.equal(autoAdds.filter((row) => row.active === "true").length, 18);
-  assert.equal(rules.length, 81);
+  assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
+  assert.equal(rules.length, 86);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 79);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS148_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);
@@ -1394,28 +1353,7 @@ test("pass 148 dependency_rules CSV migrates only PCX to PDV package conflict", 
     "PCX -> PDV should not remain preserved"
   );
 
-  for (const [recordType, sourceRpo, targetRpo] of [
-    ["rule", "PCX", "5DG"],
-    ["priceRule", "PCX", "5DG"],
-    ["rule", "PCX", "R8C"],
-    ["rule", "PCX", "S47"],
-    ["rule", "PCX", "SFE"],
-    ["rule", "PCX", "SPY"],
-    ["rule", "PCX", "SPZ"],
-  ]) {
-    assert.equal(
-      manifestRows.some(
-        (row) =>
-          row.active === "true" &&
-          row.record_type === recordType &&
-          row.source_rpo === sourceRpo &&
-          row.target_rpo === targetRpo &&
-          row.ownership === "preserved_cross_boundary"
-      ),
-      true,
-      `${recordType} ${sourceRpo} -> ${targetRpo} should remain preserved`
-    );
-  }
+  assert.ok(autoAdds.find((row) => row.auto_add_id === "aa_pcx_5dg" && row.target_price_policy_id === "included_zero"));
 });
 
 test("pass 149 projects only safe missing PCX target catalog rows", () => {
@@ -1448,10 +1386,10 @@ test("pass 149 projects only safe missing PCX target catalog rows", () => {
   assert.equal(selectables.length, 95);
   assert.equal(displayRows.length, 95);
   assert.equal(basePrices.length, 90);
-  assert.equal(rules.length, 81);
+  assert.equal(rules.length, 86);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 79);
-  assert.equal(autoAdds.filter((row) => row.active === "true").length, 18);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
+  assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
 
   for (const rpo of PASS149_SAFE_TARGET_RPOS) {
     const optionId = `opt_${rpo.toLowerCase()}_001`;
@@ -1532,10 +1470,214 @@ test("pass 149 projects only safe missing PCX target catalog rows", () => {
     );
   }
 
-  for (const targetRpo of PASS149_SAFE_TARGET_RPOS) {
-    assert.equal(rules.some((rule) => rule.rule_id === `dep_excl_pcx_${targetRpo.toLowerCase()}`), false);
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_pcx_5dg"), false);
+  assert.ok(autoAdds.find((row) => row.auto_add_id === "aa_pcx_5dg" && row.target_price_policy_id === "included_zero"));
+});
+
+test("pass 150 dependency_rules CSV migrates only newly unblocked PCX plain excludes", () => {
+  const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
+  const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
+  const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
+  const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
+  const selectables = parseCsv(fs.readFileSync("data/stingray/catalog/selectables.csv", "utf8"));
+  const autoAdds = parseCsv(fs.readFileSync("data/stingray/logic/auto_adds.csv", "utf8"));
+  const priceRules = parseCsv(fs.readFileSync("data/stingray/pricing/price_rules.csv", "utf8"));
+  const production = loadGeneratedData();
+  const projected = emitCsvLegacyFragment();
+  const fields = [
+    "source_id",
+    "rule_type",
+    "target_id",
+    "target_type",
+    "source_type",
+    "source_section",
+    "target_section",
+    "source_selection_mode",
+    "target_selection_mode",
+    "body_style_scope",
+    "disabled_reason",
+    "auto_add",
+    "active",
+    "runtime_action",
+    "review_flag",
+  ];
+
+  assert.equal(rules.length, 86);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
+  assert.equal(conditionSets.length, 42);
+  assert.equal(conditionTerms.length, 44);
+  assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
+
+  for (const [ruleId, sourceId, targetId, conditionSetId] of PASS150_EXCLUDE_PAIRS) {
+    const targetRpo = targetId.replace(/^opt_/, "").replace(/_001$/, "").toUpperCase();
+    const rule = rules.find((candidate) => candidate.rule_id === ruleId);
+    assert.ok(rule, `${ruleId} should exist`);
+    assert.equal(rule.rule_type, "excludes");
+    assert.equal(rule.subject_selector_type, "selectable");
+    assert.equal(rule.subject_selector_id, sourceId);
+    assert.equal(rule.subject_must_be_selected, "true");
+    assert.equal(rule.applies_when_condition_set_id, "");
+    assert.equal(rule.target_condition_set_id, conditionSetId);
+    assert.equal(rule.violation_behavior, "disable_and_block");
+    assert.equal(rule.message, "Blocked by PCX LPO, Tech Bronze Accent Package.");
+    assert.equal(rule.active, "true");
+
+    assert.ok(selectables.find((selectable) => selectable.selectable_id === targetId && selectable.active === "true"), `${targetId} should exist`);
+    assert.ok(
+      manifestRows.find(
+        (row) => row.active === "true" && row.record_type === "selectable" && row.rpo === targetRpo && row.ownership === "projected_owned"
+      ),
+      `${targetRpo} should be projected-owned before migration`
+    );
+    assert.ok(conditionSets.find((conditionSet) => conditionSet.condition_set_id === conditionSetId), `${conditionSetId} should exist`);
+    assert.ok(
+      conditionTerms.find(
+        (term) =>
+          term.condition_set_id === conditionSetId &&
+          term.or_group === "g1" &&
+          term.term_type === "selected" &&
+          term.left_ref === targetId &&
+          term.operator === "is_true" &&
+          term.negate === "false"
+      ),
+      `${conditionSetId} should select ${targetId}`
+    );
+
+    const productionRule = production.rules.find(
+      (candidate) => candidate.source_id === sourceId && candidate.target_id === targetId && candidate.rule_type === "excludes"
+    );
+    const projectedRule = projected.rules.find(
+      (candidate) => candidate.source_id === sourceId && candidate.target_id === targetId && candidate.rule_type === "excludes"
+    );
+
+    assert.ok(productionRule, `${sourceId} -> ${targetId} exclude should exist in production`);
+    assert.ok(projectedRule, `${sourceId} -> ${targetId} exclude should exist in projected CSV fragment`);
+    assert.deepEqual(
+      Object.fromEntries(fields.map((field) => [field, projectedRule[field]])),
+      Object.fromEntries(fields.map((field) => [field, productionRule[field]]))
+    );
+    assert.equal(production.priceRules.some((priceRule) => priceRule.condition_option_id === sourceId && priceRule.target_option_id === targetId), false);
+
+    assert.equal(
+      manifestRows.some(
+        (row) =>
+          row.active === "true" &&
+          row.record_type === "rule" &&
+          row.source_rpo === "PCX" &&
+          row.target_rpo === targetRpo &&
+          row.ownership === "preserved_cross_boundary"
+      ),
+      false,
+      `PCX -> ${targetRpo} should not remain preserved`
+    );
   }
-  assert.equal(autoAdds.some((row) => row.auto_add_id === "aa_pcx_5dg"), false);
+
+  for (const [recordType, sourceRpo, targetRpo] of PASS149_PRESERVED_BOUNDARIES) {
+    assert.equal(
+      manifestRows.some(
+        (row) =>
+          row.active === "true" &&
+          row.record_type === recordType &&
+          row.source_rpo === sourceRpo &&
+          row.target_rpo === targetRpo &&
+          row.ownership === "preserved_cross_boundary"
+      ),
+      true,
+      `${recordType} ${sourceRpo} -> ${targetRpo} should remain preserved`
+    );
+  }
+
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_pcx_5dg"), false);
+  assert.equal(conditionSets.some((conditionSet) => conditionSet.condition_set_id === "cs_selected_pcx"), false);
+  assert.equal(conditionTerms.some((term) => term.left_ref === "opt_pcx_001"), false);
+  assert.ok(autoAdds.find((row) => row.auto_add_id === "aa_pcx_5dg" && row.target_price_policy_id === "included_zero"));
+  assert.equal(priceRules.some((row) => row.condition_selector_id === "opt_pcx_001"), false);
+});
+
+test("pass 151 auto_adds CSV migrates only PCX package include for 5DG", () => {
+  const autoAdds = parseCsv(fs.readFileSync("data/stingray/logic/auto_adds.csv", "utf8"));
+  const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
+  const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
+  const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
+  const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
+  const production = loadGeneratedData();
+  const projected = emitCsvLegacyFragment();
+
+  assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
+  assert.equal(rules.length, 86);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
+  assert.equal(conditionSets.length, 42);
+  assert.equal(conditionTerms.length, 44);
+
+  for (const [autoAddId, sourceId, targetId] of PASS151_INCLUDE_PAIRS) {
+    const row = autoAdds.find((candidate) => candidate.auto_add_id === autoAddId);
+    assert.ok(row, `${autoAddId} should exist`);
+    assert.equal(row.source_selector_type, "selectable");
+    assert.equal(row.source_selector_id, sourceId);
+    assert.equal(row.target_selectable_id, targetId);
+    assert.equal(row.target_price_policy_id, "included_zero");
+    assert.equal(row.quantity, "1");
+    assert.equal(row.if_target_already_selected, "convert_existing_to_included");
+    assert.equal(row.removal_policy, "remove_when_no_triggers");
+    assert.equal(row.conflict_policy, "lowest_price_wins");
+    assert.equal(row.cascade, "true");
+    assert.equal(row.priority, "20");
+    assert.equal(row.active, "true");
+
+    const productionRule = production.rules.find((rule) => rule.source_id === sourceId && rule.target_id === targetId && rule.rule_type === "includes");
+    const projectedRule = projected.rules.find((rule) => rule.source_id === sourceId && rule.target_id === targetId && rule.rule_type === "includes");
+    const productionPriceRule = production.priceRules.find(
+      (rule) => rule.condition_option_id === sourceId && rule.target_option_id === targetId && Number(rule.price_value) === 0
+    );
+    const projectedPriceRule = projected.priceRules.find(
+      (rule) => rule.condition_option_id === sourceId && rule.target_option_id === targetId && Number(rule.price_value) === 0
+    );
+
+    assert.ok(productionRule, `${sourceId} -> ${targetId} include should exist in production`);
+    assert.ok(productionPriceRule, `${sourceId} -> ${targetId} priceRule 0 should exist in production`);
+    assert.deepEqual(plain(projectedRule), plain(productionRule));
+    assert.deepEqual(projectedPriceRule, {
+      ...plain(productionPriceRule),
+      price_rule_id: `pr_${sourceId}_${targetId}_included_zero`,
+    });
+  }
+
+  for (const [recordType, sourceRpo, targetRpo] of [
+    ["rule", "PCX", "5DG"],
+    ["priceRule", "PCX", "5DG"],
+  ]) {
+    assert.equal(
+      manifestRows.some(
+        (row) =>
+          row.active === "true" &&
+          row.record_type === recordType &&
+          row.source_rpo === sourceRpo &&
+          row.target_rpo === targetRpo &&
+          row.ownership === "preserved_cross_boundary"
+      ),
+      false,
+      `${recordType} ${sourceRpo} -> ${targetRpo} should not remain preserved`
+    );
+  }
+
+  for (const [recordType, sourceRpo, targetRpo] of PASS149_PRESERVED_BOUNDARIES.filter(([, sourceRpo]) => sourceRpo !== "PCX")) {
+    assert.equal(
+      manifestRows.some(
+        (row) =>
+          row.active === "true" &&
+          row.record_type === recordType &&
+          row.source_rpo === sourceRpo &&
+          row.target_rpo === targetRpo &&
+          row.ownership === "preserved_cross_boundary"
+      ),
+      true,
+      `${recordType} ${sourceRpo} -> ${targetRpo} should remain preserved`
+    );
+  }
+
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_pcx_5dg"), false);
 });
 
 test("pass 144 migrated PDV to Stripe plain excludes emit production-shaped legacy rules", () => {

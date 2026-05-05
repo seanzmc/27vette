@@ -232,21 +232,21 @@ const EXPECTED_OWNERSHIP_DIRECTION_COUNTS = [
   ["production_owned->production_owned", 12, 12, 12],
   ["production_owned->projected_owned", 8, 8, 8],
   ["projected_owned->production_owned", 26, 26, 26],
-  ["projected_owned->projected_owned", 20, 20, 19],
+  ["projected_owned->projected_owned", 13, 13, 13],
 ];
 
 const EXPECTED_PROJECTION_DIRECTION_COUNTS = [
   ["not_projected->not_projected", 12, 12, 12],
   ["not_projected->projected_owned", 8, 8, 8],
   ["projected_owned->not_projected", 26, 26, 26],
-  ["projected_owned->projected_owned", 20, 20, 19],
+  ["projected_owned->projected_owned", 13, 13, 13],
 ];
 
 const EXPECTED_OWNERSHIP_PROJECTION_DIRECTION_COUNTS = [
   ["production_owned/not_projected->production_owned/not_projected", 12, 12, 12],
   ["production_owned/not_projected->projected_owned/projected_owned", 8, 8, 8],
   ["projected_owned/projected_owned->production_owned/not_projected", 26, 26, 26],
-  ["projected_owned/projected_owned->projected_owned/projected_owned", 20, 20, 19],
+  ["projected_owned/projected_owned->projected_owned/projected_owned", 13, 13, 13],
 ];
 
 const SLICE_ROLLUP_FIELDS = {
@@ -711,7 +711,7 @@ function assertPacketSchema(packet) {
   assert.deepEqual(Object.keys(packet.summary), PACKET_SUMMARY_KEYS);
   assert.deepEqual(Object.keys(packet.csv), PACKET_CSV_KEYS);
   assert.equal(packet.direction_counts.length > 0, true);
-  assert.equal(packet.multi_row_groups.length > 0, true);
+  assert.equal(Array.isArray(packet.multi_row_groups), true);
   for (const item of packet.direction_counts) {
     assert.deepEqual(Object.keys(item), PACKET_DIRECTION_COUNT_KEYS);
   }
@@ -999,15 +999,15 @@ test("manifest-only preservation triage reports exactly the census manifest-only
   assert.equal(census.result.status, 0, census.result.stderr);
   assert.equal(triage.report.schema_version, 1);
   assert.equal(triage.report.status, "allowed");
-  assert.equal(triage.report.manifest_only_preservation_row_count, 66);
-  assert.equal(triage.report.manifest_only_preservation_record_count, 66);
+  assert.equal(triage.report.manifest_only_preservation_row_count, 59);
+  assert.equal(triage.report.manifest_only_preservation_record_count, 59);
   assert.equal(triage.report.invalid_preserved_count, 0);
   assert.equal(triage.report.rows.length, triage.report.manifest_only_preservation_row_count);
-  assert.equal(triage.report.group_count, 65);
-  assert.equal(triage.report.single_row_group_count, 64);
-  assert.equal(triage.report.multi_row_group_count, 1);
-  assert.equal(triage.report.max_group_row_count, 2);
-  assert.deepEqual(triage.report.group_row_count_distribution, { "1": 64, "2": 1 });
+  assert.equal(triage.report.group_count, 59);
+  assert.equal(triage.report.single_row_group_count, 59);
+  assert.equal(triage.report.multi_row_group_count, 0);
+  assert.equal(triage.report.max_group_row_count, 1);
+  assert.deepEqual(triage.report.group_row_count_distribution, { "1": 59 });
 
   const expectedRows = census.report.rows
     .filter((row) => row.candidate_status === "manifest_only_preservation")
@@ -1080,7 +1080,7 @@ test("manifest-only preservation triage reports exactly the census manifest-only
   assert.equal(triage.report.multi_row_groups.every((group) => group.manifest_only_preservation_row_count === 2), true);
   assert.deepEqual(
     triage.report.multi_row_groups.map((group) => group.group_key),
-    ["opt_pcx_001->opt_5dg_001"]
+    []
   );
   assert.equal(triage.report.multi_row_groups.every((group) => group.candidate_status === "manifest_only_preservation"), true);
   assert.equal(triage.report.multi_row_groups.every((group) => !/stale|cleanup|migration/i.test(group.notes)), true);
@@ -1244,7 +1244,7 @@ test("manifest-only preservation triage exports direction slice rows as a CSV si
   const [header, ...dataRows] = csvRows;
   assert.deepEqual(header, DIRECTION_SLICE_ROW_FIELDS);
   assert.equal(dataRows.length, triage.report.direction_slice_rows.length);
-  assert.equal(dataRows.length, 66);
+  assert.equal(dataRows.length, 59);
 
   const expectedRows = triage.report.direction_slice_rows.map((row) =>
     DIRECTION_SLICE_ROW_FIELDS.map((field) => (row[field] === null || row[field] === undefined ? "" : String(row[field])))
@@ -1371,7 +1371,7 @@ test("manifest-only preservation triage writes a blank decision ledger template"
   assert.deepEqual(header, DECISION_LEDGER_FIELDS);
   assert.equal(dataRows.length, triage.report.groups.length);
   assert.equal(dataRows.length, triage.report.group_count);
-  assert.equal(dataRows.length, 65);
+  assert.equal(dataRows.length, 59);
   assert.equal(joinedValues([]), "");
   assert.equal(joinedValues(null), "");
   assert.equal(joinedValues(["beta", "alpha", "beta"]), "alpha | beta");
@@ -1422,10 +1422,10 @@ test("manifest-only preservation triage writes a blank decision ledger template"
       ["production_owned/not_projected->production_owned/not_projected", 12],
       ["production_owned/not_projected->projected_owned/projected_owned", 8],
       ["projected_owned/projected_owned->production_owned/not_projected", 26],
-      ["projected_owned/projected_owned->projected_owned/projected_owned", 19],
+      ["projected_owned/projected_owned->projected_owned/projected_owned", 13],
     ]
   );
-  assert.equal(actualRows.some((row) => row.manifest_row_ids.includes(" | ")), true);
+  assert.equal(actualRows.some((row) => row.manifest_row_ids.includes(" | ")), false);
 
   const ledgerOnly = runManifestOnlyTriageWithDecisionLedger({ includeCsv: false, includePacket: false });
   assert.equal(ledgerOnly.result.status, 0, ledgerOnly.result.stderr);
@@ -1435,7 +1435,7 @@ test("manifest-only preservation triage writes a blank decision ledger template"
   assert.equal(ledgerOnly.packetOut, null);
   const [ledgerOnlyHeader, ...ledgerOnlyRows] = parseCsv(ledgerOnly.ledger);
   assert.deepEqual(ledgerOnlyHeader, DECISION_LEDGER_FIELDS);
-  assert.equal(ledgerOnlyRows.length, 65);
+  assert.equal(ledgerOnlyRows.length, 59);
 });
 
 test("manifest-only preservation full review bundle command writes the canonical outputs", () => {
@@ -1447,14 +1447,14 @@ test("manifest-only preservation full review bundle command writes the canonical
   assert.ok(fs.existsSync(bundle.ledgerOut));
 
   assert.equal(bundle.report.status, "allowed");
-  assert.equal(bundle.report.manifest_only_preservation_row_count, 66);
-  assert.equal(bundle.report.group_count, 65);
+  assert.equal(bundle.report.manifest_only_preservation_row_count, 59);
+  assert.equal(bundle.report.group_count, 59);
   assert.equal(bundle.report.invalid_preserved_count, 0);
 
   const [directionHeader, ...directionDataRows] = parseCsv(bundle.csv);
   assert.deepEqual(directionHeader, DIRECTION_SLICE_ROW_FIELDS);
   assert.equal(directionDataRows.length, bundle.report.direction_slice_rows.length);
-  assert.equal(directionDataRows.length, 66);
+  assert.equal(directionDataRows.length, 59);
 
   assertPacketSchema(bundle.packet);
   assert.equal(bundle.packet.status, "allowed");
@@ -1463,7 +1463,7 @@ test("manifest-only preservation full review bundle command writes the canonical
   const [ledgerHeader, ...ledgerDataRows] = parseCsv(bundle.ledger);
   assert.deepEqual(ledgerHeader, DECISION_LEDGER_FIELDS);
   assert.equal(ledgerDataRows.length, bundle.report.groups.length);
-  assert.equal(ledgerDataRows.length, 65);
+  assert.equal(ledgerDataRows.length, 59);
 });
 
 test("manifest-only preservation validates a completed decision ledger read-only", () => {
@@ -1491,9 +1491,9 @@ test("manifest-only preservation validates a completed decision ledger read-only
   assertValidationReportSchema(validation.validationReport);
   assert.equal(validation.validationReport.schema_version, 1);
   assert.equal(validation.validationReport.status, "allowed");
-  assert.equal(validation.validationReport.ledger_row_count, 65);
-  assert.equal(validation.validationReport.current_group_count, 65);
-  assert.equal(validation.validationReport.matched_group_count, 65);
+  assert.equal(validation.validationReport.ledger_row_count, 59);
+  assert.equal(validation.validationReport.current_group_count, 59);
+  assert.equal(validation.validationReport.matched_group_count, 59);
   assert.equal(validation.validationReport.missing_group_count, 0);
   assert.equal(validation.validationReport.unknown_group_count, 0);
   assert.equal(validation.validationReport.duplicate_group_count, 0);
@@ -1505,7 +1505,7 @@ test("manifest-only preservation validates a completed decision ledger read-only
   assert.deepEqual(validation.validationReport.duplicate_groups, []);
   assert.deepEqual(validation.validationReport.schema_errors, []);
   assert.deepEqual(validation.validationReport.review_value_errors, []);
-  assert.equal(validation.validationReport.groups.length, 65);
+  assert.equal(validation.validationReport.groups.length, 59);
   assert.deepEqual(
     validation.validationReport.groups.map((group) => group.group_key),
     ledgerRows.map((row) => row.group_key)
@@ -1552,7 +1552,7 @@ test("manifest-only preservation writes a compact decision ledger validation sum
     review_value_error_count: 0,
   });
   assert.deepEqual(validation.summary.review_field_counts.review_status, {
-    "": 63,
+    "": 57,
     pending: 1,
     reviewed: 1,
   });

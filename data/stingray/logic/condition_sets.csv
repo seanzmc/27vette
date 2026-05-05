@@ -33,6 +33,11 @@ cs_selected_rik,RIK selected,,true
 cs_selected_cc3,CC3 selected,,true
 cs_selected_sb7,SB7 selected,,true
 cs_selected_pdv,PDV selected,,true
+cs_selected_r8c,R8C selected,,true
+cs_selected_s47,S47 selected,,true
+cs_selected_sfe,SFE selected,,true
+cs_selected_spy,SPY selected,,true
+cs_selected_spz,SPZ selected,,true
 cs_selected_dzu,DZU selected,,true
 cs_selected_dzv,DZV selected,,true
 cs_selected_dzx,DZX selected,,true

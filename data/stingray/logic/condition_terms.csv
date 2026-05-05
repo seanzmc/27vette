@@ -35,6 +35,11 @@ cs_selected_rik,g1,1,selected,opt_rik_001,is_true,,false
 cs_selected_cc3,g1,1,selected,opt_cc3_001,is_true,,false
 cs_selected_sb7,g1,1,selected,opt_sb7_001,is_true,,false
 cs_selected_pdv,g1,1,selected,opt_pdv_001,is_true,,false
+cs_selected_r8c,g1,1,selected,opt_r8c_001,is_true,,false
+cs_selected_s47,g1,1,selected,opt_s47_001,is_true,,false
+cs_selected_sfe,g1,1,selected,opt_sfe_001,is_true,,false
+cs_selected_spy,g1,1,selected,opt_spy_001,is_true,,false
+cs_selected_spz,g1,1,selected,opt_spz_001,is_true,,false
 cs_selected_dzu,g1,1,selected,opt_dzu_001,is_true,,false
 cs_selected_dzv,g1,1,selected,opt_dzv_001,is_true,,false
 cs_selected_dzx,g1,1,selected,opt_dzx_001,is_true,,false
