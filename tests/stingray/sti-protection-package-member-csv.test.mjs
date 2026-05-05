@@ -236,7 +236,7 @@ test("ownership projects STI with PCU and without fake ground-effects selectable
   assert.equal(manifestHas({ record_type: "selectable", rpo: "STI", ownership: "projected_owned" }), true);
   assert.equal(manifestHas({ record_type: "selectable", rpo: "PCU", ownership: "projected_owned" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_rpo: "STI", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "STI", target_rpo: "5V7", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "STI", target_rpo: "5V7", ownership: "preserved_cross_boundary" }), false);
   assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5vm_001", target_rpo: "STI", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "STI", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5w8_001", target_rpo: "STI", ownership: "preserved_cross_boundary" }), true);

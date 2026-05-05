@@ -87,7 +87,6 @@ const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set([
   "opt_5zu_001->opt_t0a_001",
   "opt_5v7_001->opt_sti_001",
   "opt_5v7_001->opt_tvs_001",
-  "opt_sti_001->opt_5v7_001",
   "opt_5vm_001->opt_5zu_001",
   "opt_5vm_001->opt_sti_001",
   "opt_sti_001->opt_5vm_001",

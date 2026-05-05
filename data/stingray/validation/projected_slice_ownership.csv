@@ -195,7 +195,6 @@ rule,,EFY,,GBA,,,preserved_cross_boundary,Spoiler-adjacent paint exclude remains
 rule,,FE2,,Z51,,,preserved_cross_boundary,Spoiler-adjacent suspension exclude remains production-owned in Pass 17,true
 rule,,FE4,,Z51,,,preserved_cross_boundary,Spoiler-adjacent suspension requirement remains production-owned in Pass 17,true
 rule,,PCU,,5V7,,,preserved_cross_boundary,Spoiler-adjacent package exclude remains production-owned in Pass 17,true
-rule,,STI,,5V7,,,preserved_cross_boundary,Spoiler-adjacent rocker extension exclude remains production-owned in Pass 17,true
 rule,,Z51,,FE3,,,preserved_cross_boundary,Z51 package include remains production-owned in Pass 17,true
 rule,,Z51,,G0K,,,preserved_cross_boundary,Z51 package include remains production-owned in Pass 17,true
 rule,,Z51,,G96,,,preserved_cross_boundary,Z51 package include remains production-owned in Pass 17,true

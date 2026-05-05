@@ -18,6 +18,9 @@ const PASS137_EXCLUDE_PAIRS = [
   ["dep_excl_wkq_5zu", "opt_wkq_001", "opt_5zu_001", "cs_selected_5zu"],
   ["dep_excl_rnx_5zu", "opt_rnx_001", "opt_5zu_001", "cs_selected_5zu"],
 ];
+const PASS138_EXCLUDE_PAIRS = [
+  ["dep_excl_sti_5v7", "opt_sti_001", "opt_5v7_001", "cs_selected_5v7"],
+];
 const PASS135_FULL_LENGTH_STRIPE_RPOS = [
   "DPB",
   "DPC",
@@ -229,10 +232,11 @@ test("dependency_rules excludes report directional dependency conflicts", () => 
   assert.equal(tvsConflict?.message, "Blocked by 5V7 LPO, Black Ground Effects.");
 
   const inverseResult = evaluate("1lt_c07", ["opt_sti_001", "opt_5v7_001"]);
-  assert.equal(
-    inverseResult.conflicts.some((conflict) => conflict.rule_id === "dep_excl_sti_5v7"),
-    false
-  );
+  const inverseConflict = inverseResult.conflicts.find((conflict) => conflict.rule_id === "dep_excl_sti_5v7");
+  assert.equal(inverseConflict?.conflict_source, "dependency_rule");
+  assert.equal(inverseConflict?.target_condition_set_id, "cs_selected_5v7");
+  assert.equal(inverseConflict?.target_selectable_id, "opt_5v7_001");
+  assert.equal(inverseConflict?.message, "Blocked by STI LPO, Composite rocker extensions.");
 });
 
 test("dependency_rules excludes emit production-shaped legacy rules", () => {
@@ -332,9 +336,9 @@ test("pass 135 dependency_rules CSV migrates only R88 and SFZ full-length stripe
   const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
 
-  assert.equal(rules.length, 44);
+  assert.equal(rules.length, 45);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 42);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 43);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS135_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);
@@ -398,6 +402,80 @@ test("pass 137 dependency_rules CSV migrates only WKQ and RNX to 5ZU excludes", 
   assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_wkq_5zw"), false);
   assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_rnx_5zw"), false);
   assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_rnx_z51"), false);
+});
+
+test("pass 138 dependency_rules CSV migrates only STI to 5V7 reverse exclude", () => {
+  const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
+  const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
+  const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
+
+  for (const [ruleId, sourceId, targetId, conditionSetId] of PASS138_EXCLUDE_PAIRS) {
+    const rule = rules.find((candidate) => candidate.rule_id === ruleId);
+    assert.ok(rule, `${ruleId} should exist`);
+    assert.equal(rule.rule_type, "excludes");
+    assert.equal(rule.subject_selector_type, "selectable");
+    assert.equal(rule.subject_selector_id, sourceId);
+    assert.equal(rule.subject_must_be_selected, "true");
+    assert.equal(rule.target_condition_set_id, conditionSetId);
+    assert.equal(rule.message, "Blocked by STI LPO, Composite rocker extensions.");
+    assert.equal(rule.active, "true");
+
+    assert.ok(conditionSets.find((conditionSet) => conditionSet.condition_set_id === "cs_selected_sti"), "cs_selected_sti should still exist");
+    assert.ok(conditionSets.find((conditionSet) => conditionSet.condition_set_id === conditionSetId), `${conditionSetId} should exist`);
+    assert.ok(
+      conditionTerms.find(
+        (term) =>
+          term.condition_set_id === conditionSetId &&
+          term.term_type === "selected" &&
+          term.left_ref === targetId &&
+          term.operator === "is_true"
+      ),
+      `${conditionSetId} should select ${targetId}`
+    );
+  }
+
+  assert.equal(rules.filter((rule) => rule.rule_id === "dep_excl_5v7_sti").length, 1);
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_sti_5vm"), false);
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_sti_5w8"), false);
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_5v7_z51"), false);
+});
+
+test("pass 138 migrated STI to 5V7 exclude emits production-shaped legacy rule", () => {
+  const production = loadGeneratedData();
+  const projected = emitCsvLegacyFragment();
+  const fields = [
+    "source_id",
+    "rule_type",
+    "target_id",
+    "target_type",
+    "source_type",
+    "source_section",
+    "target_section",
+    "source_selection_mode",
+    "target_selection_mode",
+    "body_style_scope",
+    "disabled_reason",
+    "auto_add",
+    "active",
+    "runtime_action",
+    "review_flag",
+  ];
+
+  for (const [, sourceId, targetId] of PASS138_EXCLUDE_PAIRS) {
+    const productionRule = production.rules.find(
+      (rule) => rule.source_id === sourceId && rule.target_id === targetId && rule.rule_type === "excludes"
+    );
+    const projectedRule = projected.rules.find(
+      (rule) => rule.source_id === sourceId && rule.target_id === targetId && rule.rule_type === "excludes"
+    );
+
+    assert.ok(productionRule, `production should include ${sourceId} -> ${targetId}`);
+    assert.ok(projectedRule, `projected CSV fragment should include ${sourceId} -> ${targetId}`);
+    assert.deepEqual(
+      Object.fromEntries(fields.map((field) => [field, projectedRule[field]])),
+      Object.fromEntries(fields.map((field) => [field, productionRule[field]]))
+    );
+  }
 });
 
 test("pass 137 migrated car-cover to 5ZU excludes emit production-shaped legacy rules", () => {
