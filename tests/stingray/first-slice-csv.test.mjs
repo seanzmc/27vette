@@ -6,6 +6,9 @@ import vm from "node:vm";
 
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
+const EXPECTED_DEPENDENCY_RULE_COUNT = 94;
+const EXPECTED_DEPENDENCY_REQUIRES_COUNT = 2;
+const EXPECTED_DEPENDENCY_EXCLUDES_COUNT = 92;
 const PASS132_EXCLUDE_PAIRS = [
   ["dep_excl_pcu_5v7", "opt_pcu_001", "opt_5v7_001", "cs_selected_5v7"],
   ["dep_excl_r88_eyk", "opt_r88_001", "opt_eyk_001", "cs_selected_eyk"],
@@ -97,23 +100,25 @@ const PASS150_EXCLUDE_PAIRS = PASS150_SAFE_PCX_EXCLUDE_RPOS.map((rpo) => [
   `opt_${rpo.toLowerCase()}_001`,
   `cs_selected_${rpo.toLowerCase()}`,
 ]);
-const PASS149_PRESERVED_BOUNDARIES = [
-  ["rule", "5DG", "R8C"],
-  ["rule", "5DG", "S47"],
-  ["rule", "5DG", "SFE"],
-  ["rule", "5DG", "SPY"],
-  ["rule", "5DG", "SPZ"],
-  ["rule", "5DO", "R8C"],
-  ["rule", "5DO", "S47"],
-  ["rule", "5DO", "SFE"],
-  ["rule", "5DO", "SPY"],
-  ["rule", "5DO", "SPZ"],
-  ["rule", "BV4", "R8C"],
-  ["rule", "R8C", "CFX"],
-  ["rule", "S47", "SPY"],
-  ["rule", "SPY", "S47"],
-  ["rule", "SFE", "SPY"],
-  ["rule", "SPZ", "SPY"],
+const PASS152_SAFE_EXCLUDE_PAIRS = [
+  ["dep_excl_5dg_r8c", "opt_5dg_001", "opt_r8c_001", "cs_selected_r8c"],
+  ["dep_excl_5dg_s47", "opt_5dg_001", "opt_s47_001", "cs_selected_s47"],
+  ["dep_excl_5dg_sfe", "opt_5dg_001", "opt_sfe_001", "cs_selected_sfe"],
+  ["dep_excl_5dg_spy", "opt_5dg_001", "opt_spy_001", "cs_selected_spy"],
+  ["dep_excl_5dg_spz", "opt_5dg_001", "opt_spz_001", "cs_selected_spz"],
+  ["dep_excl_s47_spy", "opt_s47_001", "opt_spy_001", "cs_selected_spy"],
+  ["dep_excl_spy_s47", "opt_spy_001", "opt_s47_001", "cs_selected_s47"],
+  ["dep_excl_sfe_spy", "opt_sfe_001", "opt_spy_001", "cs_selected_spy"],
+];
+const PASS152_BLOCKED_PRESERVED_BOUNDARIES = [
+  ["rule", "5DO", "R8C", "blocked_missing_or_unprojected_source"],
+  ["rule", "5DO", "S47", "blocked_missing_or_unprojected_source"],
+  ["rule", "5DO", "SFE", "blocked_missing_or_unprojected_source"],
+  ["rule", "5DO", "SPY", "blocked_missing_or_unprojected_source"],
+  ["rule", "5DO", "SPZ", "blocked_missing_or_unprojected_source"],
+  ["rule", "BV4", "R8C", "blocked_missing_or_unprojected_source"],
+  ["rule", "R8C", "CFX", "blocked_missing_or_unprojected_target"],
+  ["rule", "SPZ", "SPY", "blocked_include_or_package_behavior"],
 ];
 const PASS141_PACKAGE_SOURCE_OPTION_IDS = ["opt_pcx_001", "opt_pdv_001"];
 const PASS139_ALREADY_CSV_OWNED_EXCLUDES = [
@@ -445,9 +450,9 @@ test("pass 135 dependency_rules CSV migrates only R88 and SFZ full-length stripe
   const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
 
-  assert.equal(rules.length, 86);
-  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
+  assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS135_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);
@@ -591,9 +596,9 @@ test("pass 139 already CSV-owned excludes are not preserved as production-owned 
   const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
   const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
 
-  assert.equal(rules.length, 86);
-  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
+  assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
 
   for (const [ruleId, sourceRpo, targetRpo] of PASS139_ALREADY_CSV_OWNED_EXCLUDES) {
     assert.ok(
@@ -621,9 +626,9 @@ test("pass 140 dependency_rules CSV migrates only SBT to CC3 roof panel exclude"
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
   const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
 
-  assert.equal(rules.length, 86);
-  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
+  assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS140_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);
@@ -869,9 +874,9 @@ test("pass 142 dependency_rules CSV migrates only PCX to EYK badge exclude", () 
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
   const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
 
-  assert.equal(rules.length, 86);
-  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
+  assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS142_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);
@@ -973,9 +978,9 @@ test("pass 143 dependency_rules CSV migrates only safe PCX plain excludes", () =
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
   const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
 
-  assert.equal(rules.length, 86);
-  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
+  assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS143_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);
@@ -1086,9 +1091,9 @@ test("pass 144 dependency_rules CSV migrates only safe PDV to Stripe plain exclu
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
   const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
 
-  assert.equal(rules.length, 86);
-  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
+  assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS144_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);
@@ -1142,9 +1147,9 @@ test("pass 146 auto_adds CSV migrates only PDV package includes for VWD and SB7"
   const projected = emitCsvLegacyFragment();
 
   assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
-  assert.equal(rules.length, 86);
-  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
+  assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
 
   for (const [autoAddId, sourceId, targetId] of PASS146_INCLUDE_PAIRS) {
     const row = autoAdds.find((candidate) => candidate.auto_add_id === autoAddId);
@@ -1204,9 +1209,9 @@ test("pass 147 auto_adds CSV migrates only PCX package includes for SFZ SNG and 
   const projected = emitCsvLegacyFragment();
 
   assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
-  assert.equal(rules.length, 86);
-  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
+  assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
 
   for (const [autoAddId, sourceId, targetId] of PASS147_INCLUDE_PAIRS) {
     const row = autoAdds.find((candidate) => candidate.auto_add_id === autoAddId);
@@ -1292,9 +1297,9 @@ test("pass 148 dependency_rules CSV migrates only PCX to PDV package conflict", 
   ];
 
   assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
-  assert.equal(rules.length, 86);
-  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
+  assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS148_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);
@@ -1386,9 +1391,9 @@ test("pass 149 projects only safe missing PCX target catalog rows", () => {
   assert.equal(selectables.length, 95);
   assert.equal(displayRows.length, 95);
   assert.equal(basePrices.length, 90);
-  assert.equal(rules.length, 86);
-  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
+  assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
   assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
 
   for (const rpo of PASS149_SAFE_TARGET_RPOS) {
@@ -1455,7 +1460,7 @@ test("pass 149 projects only safe missing PCX target catalog rows", () => {
     }
   }
 
-  for (const [recordType, sourceRpo, targetRpo] of PASS149_PRESERVED_BOUNDARIES) {
+  for (const [recordType, sourceRpo, targetRpo] of PASS152_BLOCKED_PRESERVED_BOUNDARIES) {
     assert.equal(
       ownershipRows.some(
         (row) =>
@@ -1502,9 +1507,9 @@ test("pass 150 dependency_rules CSV migrates only newly unblocked PCX plain excl
     "review_flag",
   ];
 
-  assert.equal(rules.length, 86);
-  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
+  assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
   assert.equal(conditionSets.length, 42);
   assert.equal(conditionTerms.length, 44);
   assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
@@ -1573,7 +1578,7 @@ test("pass 150 dependency_rules CSV migrates only newly unblocked PCX plain excl
     );
   }
 
-  for (const [recordType, sourceRpo, targetRpo] of PASS149_PRESERVED_BOUNDARIES) {
+  for (const [recordType, sourceRpo, targetRpo] of PASS152_BLOCKED_PRESERVED_BOUNDARIES) {
     assert.equal(
       manifestRows.some(
         (row) =>
@@ -1605,9 +1610,9 @@ test("pass 151 auto_adds CSV migrates only PCX package include for 5DG", () => {
   const projected = emitCsvLegacyFragment();
 
   assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
-  assert.equal(rules.length, 86);
-  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, 2);
-  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, 84);
+  assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
   assert.equal(conditionSets.length, 42);
   assert.equal(conditionTerms.length, 44);
 
@@ -1662,7 +1667,7 @@ test("pass 151 auto_adds CSV migrates only PCX package include for 5DG", () => {
     );
   }
 
-  for (const [recordType, sourceRpo, targetRpo] of PASS149_PRESERVED_BOUNDARIES.filter(([, sourceRpo]) => sourceRpo !== "PCX")) {
+  for (const [recordType, sourceRpo, targetRpo] of PASS152_BLOCKED_PRESERVED_BOUNDARIES) {
     assert.equal(
       manifestRows.some(
         (row) =>
@@ -1678,6 +1683,138 @@ test("pass 151 auto_adds CSV migrates only PCX package include for 5DG", () => {
   }
 
   assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_pcx_5dg"), false);
+});
+
+test("pass 152 migrates only safe Pass 149 exposed non-PCX plain excludes", () => {
+  const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
+  const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
+  const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
+  const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
+  const selectables = parseCsv(fs.readFileSync("data/stingray/catalog/selectables.csv", "utf8"));
+  const autoAdds = parseCsv(fs.readFileSync("data/stingray/logic/auto_adds.csv", "utf8"));
+  const priceRules = parseCsv(fs.readFileSync("data/stingray/pricing/price_rules.csv", "utf8"));
+  const production = loadGeneratedData();
+  const projected = emitCsvLegacyFragment();
+  const fields = [
+    "source_id",
+    "rule_type",
+    "target_id",
+    "target_type",
+    "source_type",
+    "source_section",
+    "target_section",
+    "source_selection_mode",
+    "target_selection_mode",
+    "body_style_scope",
+    "disabled_reason",
+    "auto_add",
+    "active",
+    "runtime_action",
+    "review_flag",
+  ];
+
+  assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
+  assert.equal(conditionSets.length, 42);
+  assert.equal(conditionTerms.length, 44);
+  assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
+
+  for (const [ruleId, sourceId, targetId, conditionSetId] of PASS152_SAFE_EXCLUDE_PAIRS) {
+    const sourceRpo = sourceId.replace(/^opt_/, "").replace(/_001$/, "").toUpperCase();
+    const targetRpo = targetId.replace(/^opt_/, "").replace(/_001$/, "").toUpperCase();
+    const rule = rules.find((candidate) => candidate.rule_id === ruleId);
+    assert.ok(rule, `${ruleId} should exist`);
+    assert.equal(rule.rule_type, "excludes");
+    assert.equal(rule.subject_selector_type, "selectable");
+    assert.equal(rule.subject_selector_id, sourceId);
+    assert.equal(rule.subject_must_be_selected, "true");
+    assert.equal(rule.applies_when_condition_set_id, "");
+    assert.equal(rule.target_condition_set_id, conditionSetId);
+    assert.equal(rule.violation_behavior, "disable_and_block");
+    assert.equal(rule.active, "true");
+
+    assert.ok(selectables.find((selectable) => selectable.selectable_id === sourceId && selectable.active === "true"), `${sourceId} should exist`);
+    assert.ok(selectables.find((selectable) => selectable.selectable_id === targetId && selectable.active === "true"), `${targetId} should exist`);
+    for (const [rpo, selectableId] of [
+      [sourceRpo, sourceId],
+      [targetRpo, targetId],
+    ]) {
+      assert.ok(
+        manifestRows.find(
+          (row) => row.active === "true" && row.record_type === "selectable" && row.rpo === rpo && row.ownership === "projected_owned"
+        ),
+        `${rpo} should be projected-owned before migration`
+      );
+      assert.ok(selectables.find((selectable) => selectable.selectable_id === selectableId && selectable.active === "true"), `${selectableId} should exist`);
+    }
+    assert.ok(conditionSets.find((conditionSet) => conditionSet.condition_set_id === conditionSetId), `${conditionSetId} should exist`);
+    assert.ok(
+      conditionTerms.find(
+        (term) =>
+          term.condition_set_id === conditionSetId &&
+          term.or_group === "g1" &&
+          term.term_type === "selected" &&
+          term.left_ref === targetId &&
+          term.operator === "is_true" &&
+          term.negate === "false"
+      ),
+      `${conditionSetId} should select ${targetId}`
+    );
+
+    const productionRule = production.rules.find(
+      (candidate) => candidate.source_id === sourceId && candidate.target_id === targetId && candidate.rule_type === "excludes"
+    );
+    const projectedRule = projected.rules.find(
+      (candidate) => candidate.source_id === sourceId && candidate.target_id === targetId && candidate.rule_type === "excludes"
+    );
+
+    assert.ok(productionRule, `${sourceId} -> ${targetId} exclude should exist in production`);
+    assert.ok(projectedRule, `${sourceId} -> ${targetId} exclude should exist in projected CSV fragment`);
+    assert.equal(rule.message, productionRule.disabled_reason);
+    assert.deepEqual(
+      Object.fromEntries(fields.map((field) => [field, projectedRule[field]])),
+      Object.fromEntries(fields.map((field) => [field, productionRule[field]]))
+    );
+    assert.equal(production.priceRules.some((priceRule) => priceRule.condition_option_id === sourceId && priceRule.target_option_id === targetId), false);
+
+    assert.equal(
+      manifestRows.some(
+        (row) =>
+          row.active === "true" &&
+          row.record_type === "rule" &&
+          row.source_rpo === sourceRpo &&
+          row.target_rpo === targetRpo &&
+          row.ownership === "preserved_cross_boundary"
+      ),
+      false,
+      `${sourceRpo} -> ${targetRpo} should not remain preserved`
+    );
+  }
+
+  for (const [recordType, sourceRpo, targetRpo, reason] of PASS152_BLOCKED_PRESERVED_BOUNDARIES) {
+    assert.equal(
+      manifestRows.some(
+        (row) =>
+          row.active === "true" &&
+          row.record_type === recordType &&
+          row.source_rpo === sourceRpo &&
+          row.target_rpo === targetRpo &&
+          row.ownership === "preserved_cross_boundary"
+      ),
+      true,
+      `${recordType} ${sourceRpo} -> ${targetRpo} should remain preserved as ${reason}`
+    );
+  }
+
+  assert.equal(rules.some((rule) => rule.rule_id.startsWith("dep_excl_5do_")), false);
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_bv4_r8c"), false);
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_r8c_cfx"), false);
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_spz_spy"), false);
+  assert.equal(conditionSets.some((conditionSet) => conditionSet.condition_set_id === "cs_selected_5do"), false);
+  assert.equal(conditionSets.some((conditionSet) => conditionSet.condition_set_id === "cs_selected_bv4"), false);
+  assert.equal(conditionSets.some((conditionSet) => conditionSet.condition_set_id === "cs_selected_cfx"), false);
+  assert.equal(priceRules.length, parseCsv(fs.readFileSync("data/stingray/pricing/price_rules.csv", "utf8")).length);
 });
 
 test("pass 144 migrated PDV to Stripe plain excludes emit production-shaped legacy rules", () => {

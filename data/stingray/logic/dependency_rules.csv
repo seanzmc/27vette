@@ -85,3 +85,11 @@ dep_excl_pcx_s47,excludes,selectable,opt_pcx_001,true,,cs_selected_s47,disable_a
 dep_excl_pcx_sfe,excludes,selectable,opt_pcx_001,true,,cs_selected_sfe,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",344,true
 dep_excl_pcx_spy,excludes,selectable,opt_pcx_001,true,,cs_selected_spy,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",345,true
 dep_excl_pcx_spz,excludes,selectable,opt_pcx_001,true,,cs_selected_spz,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",346,true
+dep_excl_5dg_r8c,excludes,selectable,opt_5dg_001,true,,cs_selected_r8c,disable_and_block,"Blocked by 5DG LPO, 20-spoke Tech Bronze aluminum wheels.",347,true
+dep_excl_5dg_s47,excludes,selectable,opt_5dg_001,true,,cs_selected_s47,disable_and_block,"Blocked by 5DG LPO, 20-spoke Tech Bronze aluminum wheels.",348,true
+dep_excl_5dg_sfe,excludes,selectable,opt_5dg_001,true,,cs_selected_sfe,disable_and_block,"Blocked by 5DG LPO, 20-spoke Tech Bronze aluminum wheels.",349,true
+dep_excl_5dg_spy,excludes,selectable,opt_5dg_001,true,,cs_selected_spy,disable_and_block,"Blocked by 5DG LPO, 20-spoke Tech Bronze aluminum wheels.",350,true
+dep_excl_5dg_spz,excludes,selectable,opt_5dg_001,true,,cs_selected_spz,disable_and_block,"Blocked by 5DG LPO, 20-spoke Tech Bronze aluminum wheels.",351,true
+dep_excl_s47_spy,excludes,selectable,opt_s47_001,true,,cs_selected_spy,disable_and_block,"Blocked by S47 LPO, Chrome lug nuts.",352,true
+dep_excl_spy_s47,excludes,selectable,opt_spy_001,true,,cs_selected_s47,disable_and_block,"Blocked by SPY LPO, Black lug nuts.",353,true
+dep_excl_sfe_spy,excludes,selectable,opt_sfe_001,true,,cs_selected_spy,disable_and_block,"Blocked by SFE LPO, Chrome wheel locks.",354,true
