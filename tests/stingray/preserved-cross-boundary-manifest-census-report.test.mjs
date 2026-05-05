@@ -124,15 +124,15 @@ test("preserved cross-boundary manifest census reports every active row determin
   assert.equal(run.report.active_preserved_cross_boundary_count, undefined);
   assert.equal(run.report.used_by_current_guarded_structured_refs_count, undefined);
   assert.equal(run.report.not_currently_used_count, undefined);
-  assert.equal(run.report.active_preserved_cross_boundary_row_count, 170);
-  assert.equal(run.report.active_preserved_cross_boundary_record_count, 170);
+  assert.equal(run.report.active_preserved_cross_boundary_row_count, 144);
+  assert.equal(run.report.active_preserved_cross_boundary_record_count, 144);
   assert.equal(run.report.rows.length, run.report.active_preserved_cross_boundary_row_count);
   assert.equal(run.report.current_guarded_structured_reference_count, 43);
   assert.equal(run.report.current_guarded_manifest_row_count, 39);
   assert.equal(run.report.current_guarded_preserved_record_count, 39);
   assert.equal(run.report.current_guarded_group_membership_count, 43);
-  assert.equal(run.report.manifest_only_preservation_row_count, 131);
-  assert.equal(run.report.manifest_only_preservation_record_count, 131);
+  assert.equal(run.report.manifest_only_preservation_row_count, 105);
+  assert.equal(run.report.manifest_only_preservation_record_count, 105);
   assert.equal(run.report.invalid_preserved_count, 0);
 
   assert.deepEqual(run.report.rows, [...run.report.rows].sort(compareRows));
@@ -231,8 +231,8 @@ test("preserved cross-boundary manifest census classifies invalid temp rows as b
   assert.notEqual(run.result.status, 0);
   assert.match(run.result.stderr, /preserved cross-boundary manifest census blocking findings/);
   assert.equal(run.report.status, "blocking");
-  assert.equal(run.report.active_preserved_cross_boundary_row_count, 173);
-  assert.equal(run.report.active_preserved_cross_boundary_record_count, 173);
+  assert.equal(run.report.active_preserved_cross_boundary_row_count, 147);
+  assert.equal(run.report.active_preserved_cross_boundary_record_count, 147);
   assert.equal(run.report.invalid_preserved_count, 3);
   assert.equal(run.report.rows.filter((row) => row.candidate_status === "invalid_preserved").length, 3);
   assert.equal(run.report.rows.some((row) => row.ref_id === interiorId && row.candidate_status === "invalid_preserved"), true);

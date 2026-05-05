@@ -15,3 +15,16 @@ cs_selected_5v7,g1,1,selected,opt_5v7_001,is_true,,false
 cs_selected_eyk,g1,1,selected,opt_eyk_001,is_true,,false
 cs_selected_sfz,g1,1,selected,opt_sfz_001,is_true,,false
 cs_selected_5zz,g1,1,selected,opt_5zz_001,is_true,,false
+cs_selected_dpb,g1,1,selected,opt_dpb_001,is_true,,false
+cs_selected_dpc,g1,1,selected,opt_dpc_001,is_true,,false
+cs_selected_dpg,g1,1,selected,opt_dpg_001,is_true,,false
+cs_selected_dpl,g1,1,selected,opt_dpl_001,is_true,,false
+cs_selected_dpt,g1,1,selected,opt_dpt_001,is_true,,false
+cs_selected_dsy,g1,1,selected,opt_dsy_001,is_true,,false
+cs_selected_dsz,g1,1,selected,opt_dsz_001,is_true,,false
+cs_selected_dt0,g1,1,selected,opt_dt0_001,is_true,,false
+cs_selected_dth,g1,1,selected,opt_dth_001,is_true,,false
+cs_selected_dub,g1,1,selected,opt_dub_001,is_true,,false
+cs_selected_due,g1,1,selected,opt_due_001,is_true,,false
+cs_selected_duk,g1,1,selected,opt_duk_001,is_true,,false
+cs_selected_duw,g1,1,selected,opt_duw_001,is_true,,false

@@ -314,7 +314,7 @@ test("shadow runtime preserves SFZ package pricing and badge/stripe blocks", () 
   }
 });
 
-test("SFZ boundaries remain production-owned and preserved", () => {
+test("SFZ boundaries remain production-equivalent across preserved and migrated rules", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
   const fragment = emitCsvLegacyFragment();
@@ -333,6 +333,7 @@ test("SFZ boundaries remain production-owned and preserved", () => {
   const migratedSfzRuleKeys = new Set([
     `${optionIdByRpo(production, "R88")}->${sfzId}`,
     `${sfzId}->${optionIdByRpo(production, "EYK")}`,
+    ...[...SFZ_SOURCE_TEXT_STRIPE_RPOS].map((rpo) => `${sfzId}->${optionIdByRpo(production, rpo)}`),
   ]);
   assert.equal(
     fragment.rules.some((item) => (item.source_id === sfzId || item.target_id === sfzId) && !migratedSfzRuleKeys.has(`${item.source_id}->${item.target_id}`)),
@@ -346,7 +347,7 @@ test("SFZ boundaries remain production-owned and preserved", () => {
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "SFZ", target_rpo: "EYK", ownership: "preserved_cross_boundary" }), true);
   for (const rpo of SFZ_SOURCE_TEXT_STRIPE_RPOS) {
-    assert.equal(manifestHas({ record_type: "rule", source_rpo: "SFZ", target_rpo: rpo, ownership: "preserved_cross_boundary" }), true);
+    assert.equal(manifestHas({ record_type: "rule", source_rpo: "SFZ", target_rpo: rpo, ownership: "preserved_cross_boundary" }), false);
   }
 });
 

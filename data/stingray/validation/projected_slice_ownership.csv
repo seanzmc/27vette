@@ -150,19 +150,6 @@ rule,,DUW,,GTR,,,preserved_cross_boundary,Pass 134 Stripe paint availability bou
 rule,,DZU,,GBK,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DZX,,GKZ,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DZX,,GPH,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,R88,,DPB,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
-rule,,R88,,DPC,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
-rule,,R88,,DPG,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
-rule,,R88,,DPL,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
-rule,,R88,,DPT,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
-rule,,R88,,DSY,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
-rule,,R88,,DSZ,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
-rule,,R88,,DT0,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
-rule,,R88,,DTH,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
-rule,,R88,,DUB,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
-rule,,R88,,DUE,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
-rule,,R88,,DUK,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
-rule,,R88,,DUW,,,preserved_cross_boundary,R88 to full-length stripe exclude remains production-owned in Pass 65,true
 rule,,RIN,,RIK,,,preserved_cross_boundary,Rear script badge peer exclude remains production-owned in Pass 67,true
 rule,,RIN,,SL8,,,preserved_cross_boundary,Rear script badge peer exclude remains production-owned in Pass 67,true
 rule,,SL8,,RIN,,,preserved_cross_boundary,Rear script badge peer exclude remains production-owned in Pass 67,true
@@ -170,19 +157,6 @@ rule,,SL8,,RIK,,,preserved_cross_boundary,Rear script badge peer exclude remains
 rule,,RIK,,RIN,,,preserved_cross_boundary,Rear script badge peer exclude remains production-owned in Pass 67,true
 rule,,RIK,,SL8,,,preserved_cross_boundary,Rear script badge peer exclude remains production-owned in Pass 67,true
 rule,,SFZ,,EYK,,,preserved_cross_boundary,SFZ to badge section exclude remains production-owned in Pass 63,true
-rule,,SFZ,,DPB,,,preserved_cross_boundary,SFZ to full-length stripe exclude remains production-owned in Pass 63,true
-rule,,SFZ,,DPC,,,preserved_cross_boundary,SFZ to full-length stripe exclude remains production-owned in Pass 63,true
-rule,,SFZ,,DPG,,,preserved_cross_boundary,SFZ to full-length stripe exclude remains production-owned in Pass 63,true
-rule,,SFZ,,DPL,,,preserved_cross_boundary,SFZ to full-length stripe exclude remains production-owned in Pass 63,true
-rule,,SFZ,,DPT,,,preserved_cross_boundary,SFZ to full-length stripe exclude remains production-owned in Pass 63,true
-rule,,SFZ,,DSY,,,preserved_cross_boundary,SFZ to full-length stripe exclude remains production-owned in Pass 63,true
-rule,,SFZ,,DSZ,,,preserved_cross_boundary,SFZ to full-length stripe exclude remains production-owned in Pass 63,true
-rule,,SFZ,,DT0,,,preserved_cross_boundary,SFZ to full-length stripe exclude remains production-owned in Pass 63,true
-rule,,SFZ,,DTH,,,preserved_cross_boundary,SFZ to full-length stripe exclude remains production-owned in Pass 63,true
-rule,,SFZ,,DUB,,,preserved_cross_boundary,SFZ to full-length stripe exclude remains production-owned in Pass 63,true
-rule,,SFZ,,DUE,,,preserved_cross_boundary,SFZ to full-length stripe exclude remains production-owned in Pass 63,true
-rule,,SFZ,,DUK,,,preserved_cross_boundary,SFZ to full-length stripe exclude remains production-owned in Pass 63,true
-rule,,SFZ,,DUW,,,preserved_cross_boundary,SFZ to full-length stripe exclude remains production-owned in Pass 63,true
 rule,,WKQ,,5ZU,,,preserved_cross_boundary,Car-cover spoiler exclude remains production-owned in Pass 15,true
 rule,,WKQ,,,opt_5zw_001,,preserved_cross_boundary,Car-cover 5ZW rule-only exclude remains production-owned in Pass 15,true
 rule,,WKQ,,5ZZ,,,preserved_cross_boundary,Car-cover spoiler exclude remains production-owned in Pass 15,true

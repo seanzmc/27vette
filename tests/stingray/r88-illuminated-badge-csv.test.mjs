@@ -279,7 +279,7 @@ test("shadow runtime preserves R88 badge and stripe blocks", () => {
   }
 });
 
-test("R88 boundaries remain production-owned and preserved", () => {
+test("R88 boundaries remain production-equivalent across preserved and migrated rules", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
   const fragment = emitCsvLegacyFragment();
@@ -293,7 +293,11 @@ test("R88 boundaries remain production-owned and preserved", () => {
 
   assert.deepEqual(plain(rule(fragment, "R88", "SFZ", "excludes")), plain(rule(production, "R88", "SFZ", "excludes")));
   assert.deepEqual(plain(rule(fragment, "R88", "EYK", "excludes")), plain(rule(production, "R88", "EYK", "excludes")));
-  const migratedR88Targets = new Set([optionIdByRpo(production, "SFZ"), optionIdByRpo(production, "EYK")]);
+  const migratedR88Targets = new Set([
+    optionIdByRpo(production, "SFZ"),
+    optionIdByRpo(production, "EYK"),
+    ...[...R88_SOURCE_TEXT_STRIPE_RPOS].map((rpo) => optionIdByRpo(production, rpo)),
+  ]);
   assert.equal(
     fragment.rules.some((item) => (item.source_id === r88Id || item.target_id === r88Id) && !migratedR88Targets.has(item.target_id)),
     false
@@ -304,7 +308,7 @@ test("R88 boundaries remain production-owned and preserved", () => {
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: "SFZ", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: "EYK", ownership: "preserved_cross_boundary" }), true);
   for (const rpo of R88_SOURCE_TEXT_STRIPE_RPOS) {
-    assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: rpo, ownership: "preserved_cross_boundary" }), true);
+    assert.equal(manifestHas({ record_type: "rule", source_rpo: "R88", target_rpo: rpo, ownership: "preserved_cross_boundary" }), false);
   }
 });
 

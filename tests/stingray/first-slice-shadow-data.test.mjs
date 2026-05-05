@@ -27,7 +27,52 @@ const FIRST_SLICE_RPOS = new Set([
   "STI",
   "VQK",
   "VWE",
+  "R88",
+  "SFZ",
+  "DPB",
+  "DPC",
+  "DPG",
+  "DPL",
+  "DPT",
+  "DSY",
+  "DSZ",
+  "DT0",
+  "DTH",
+  "DUB",
+  "DUE",
+  "DUK",
+  "DUW",
 ]);
+const PASS135_FULL_LENGTH_STRIPE_OPTION_IDS = [
+  "opt_dpb_001",
+  "opt_dpc_001",
+  "opt_dpg_001",
+  "opt_dpl_001",
+  "opt_dpt_001",
+  "opt_dsy_001",
+  "opt_dsz_001",
+  "opt_dt0_001",
+  "opt_dth_001",
+  "opt_dub_001",
+  "opt_due_001",
+  "opt_duk_001",
+  "opt_duw_001",
+];
+const PRESERVED_STRIPE_PAINT_RULE_KEYS = [
+  "opt_dpb_001->opt_gtr_001",
+  "opt_dpc_001->opt_gbk_001",
+  "opt_dpg_001->opt_g26_001",
+  "opt_dpl_001->opt_gkz_001",
+  "opt_dpl_001->opt_gph_001",
+  "opt_dsy_001->opt_g26_001",
+  "opt_dsz_001->opt_gkz_001",
+  "opt_dsz_001->opt_gph_001",
+  "opt_dt0_001->opt_gbk_001",
+  "opt_due_001->opt_gtr_001",
+  "opt_duk_001->opt_gkz_001",
+  "opt_duk_001->opt_gph_001",
+  "opt_duw_001->opt_gtr_001",
+];
 const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set([
   "opt_sbt_001->opt_cc3_001",
   "opt_pcu_001->opt_5v7_001",
@@ -43,8 +88,16 @@ const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set([
   "opt_r88_001->opt_eyk_001",
   "opt_r88_001->opt_sfz_001",
   "opt_rnx_001->opt_5zz_001",
+  "opt_pcx_001->opt_sfz_001",
   "opt_sfz_001->opt_eyk_001",
   "opt_wkq_001->opt_5zz_001",
+  ...PASS135_FULL_LENGTH_STRIPE_OPTION_IDS.map((optionId) => `opt_cf8_001->${optionId}`),
+  ...PASS135_FULL_LENGTH_STRIPE_OPTION_IDS.map((optionId) => `opt_pcx_001->${optionId}`),
+  ...PASS135_FULL_LENGTH_STRIPE_OPTION_IDS.map((optionId) => `opt_pdv_001->${optionId}`),
+  ...PRESERVED_STRIPE_PAINT_RULE_KEYS,
+]);
+const PRESERVED_FIRST_SLICE_PRICE_RULE_KEYS = new Set([
+  "opt_pcx_001->opt_sfz_001",
 ]);
 
 function loadGeneratedData() {
@@ -237,6 +290,10 @@ function ruleKey(rule) {
   return `${rule.source_id}->${rule.target_id}`;
 }
 
+function priceRuleKey(rule) {
+  return `${rule.condition_option_id}->${rule.target_option_id}`;
+}
+
 function nonFirstSliceSlices(data, firstSliceIds) {
   return {
     choices: normalizeChoices(data.choices.filter((choice) => !FIRST_SLICE_RPOS.has(choice.rpo))),
@@ -352,9 +409,13 @@ test("shadow assembly substitutes first-slice records from CSV fragment", () => 
   );
   assert.deepEqual(
     normalizePriceRules(
-      shadowData.priceRules.filter((rule) => shadowIds.has(rule.condition_option_id) || shadowIds.has(rule.target_option_id))
+      shadowData.priceRules.filter(
+        (rule) =>
+          (shadowIds.has(rule.condition_option_id) || shadowIds.has(rule.target_option_id)) &&
+          !PRESERVED_FIRST_SLICE_PRICE_RULE_KEYS.has(priceRuleKey(rule))
+      )
     ),
-    normalizePriceRules(csvFragment.priceRules)
+    normalizePriceRules(csvFragment.priceRules.filter((rule) => !PRESERVED_FIRST_SLICE_PRICE_RULE_KEYS.has(priceRuleKey(rule))))
   );
   assert.deepEqual(
     normalizeExclusiveGroups(shadowData.exclusiveGroups.filter((group) => (group.option_ids || []).some((optionId) => shadowIds.has(optionId)))),

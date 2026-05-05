@@ -6,6 +6,32 @@ dep_excl_5v7_tvs,excludes,selectable,opt_5v7_001,true,,cs_selected_tvs,disable_a
 dep_excl_pcu_5v7,excludes,selectable,opt_pcu_001,true,,cs_selected_5v7,disable_and_block,"Blocked by PCU LPO, Stingray Protection Package.",122,true
 dep_excl_r88_eyk,excludes,selectable,opt_r88_001,true,,cs_selected_eyk,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",176,true
 dep_excl_r88_sfz,excludes,selectable,opt_r88_001,true,,cs_selected_sfz,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",177,true
+dep_excl_r88_dpb,excludes,selectable,opt_r88_001,true,,cs_selected_dpb,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",178,true
+dep_excl_r88_dpc,excludes,selectable,opt_r88_001,true,,cs_selected_dpc,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",179,true
+dep_excl_r88_dpg,excludes,selectable,opt_r88_001,true,,cs_selected_dpg,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",180,true
+dep_excl_r88_dpl,excludes,selectable,opt_r88_001,true,,cs_selected_dpl,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",181,true
+dep_excl_r88_dpt,excludes,selectable,opt_r88_001,true,,cs_selected_dpt,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",182,true
+dep_excl_r88_dsy,excludes,selectable,opt_r88_001,true,,cs_selected_dsy,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",183,true
+dep_excl_r88_dsz,excludes,selectable,opt_r88_001,true,,cs_selected_dsz,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",184,true
+dep_excl_r88_dt0,excludes,selectable,opt_r88_001,true,,cs_selected_dt0,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",185,true
+dep_excl_r88_dth,excludes,selectable,opt_r88_001,true,,cs_selected_dth,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",186,true
+dep_excl_r88_dub,excludes,selectable,opt_r88_001,true,,cs_selected_dub,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",187,true
+dep_excl_r88_due,excludes,selectable,opt_r88_001,true,,cs_selected_due,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",188,true
+dep_excl_r88_duk,excludes,selectable,opt_r88_001,true,,cs_selected_duk,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",189,true
+dep_excl_r88_duw,excludes,selectable,opt_r88_001,true,,cs_selected_duw,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",190,true
 dep_excl_rnx_5zz,excludes,selectable,opt_rnx_001,true,,cs_selected_5zz,disable_and_block,"Blocked by RNX LPO, Premium outdoor car cover.",182,true
 dep_excl_sfz_eyk,excludes,selectable,opt_sfz_001,true,,cs_selected_eyk,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",200,true
+dep_excl_sfz_dpb,excludes,selectable,opt_sfz_001,true,,cs_selected_dpb,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",201,true
+dep_excl_sfz_dpc,excludes,selectable,opt_sfz_001,true,,cs_selected_dpc,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",202,true
+dep_excl_sfz_dpg,excludes,selectable,opt_sfz_001,true,,cs_selected_dpg,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",203,true
+dep_excl_sfz_dpl,excludes,selectable,opt_sfz_001,true,,cs_selected_dpl,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",204,true
+dep_excl_sfz_dpt,excludes,selectable,opt_sfz_001,true,,cs_selected_dpt,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",205,true
+dep_excl_sfz_dsy,excludes,selectable,opt_sfz_001,true,,cs_selected_dsy,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",206,true
+dep_excl_sfz_dsz,excludes,selectable,opt_sfz_001,true,,cs_selected_dsz,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",207,true
+dep_excl_sfz_dt0,excludes,selectable,opt_sfz_001,true,,cs_selected_dt0,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",208,true
+dep_excl_sfz_dth,excludes,selectable,opt_sfz_001,true,,cs_selected_dth,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",209,true
+dep_excl_sfz_dub,excludes,selectable,opt_sfz_001,true,,cs_selected_dub,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",210,true
+dep_excl_sfz_due,excludes,selectable,opt_sfz_001,true,,cs_selected_due,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",211,true
+dep_excl_sfz_duk,excludes,selectable,opt_sfz_001,true,,cs_selected_duk,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",212,true
+dep_excl_sfz_duw,excludes,selectable,opt_sfz_001,true,,cs_selected_duw,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",213,true
 dep_excl_wkq_5zz,excludes,selectable,opt_wkq_001,true,,cs_selected_5zz,disable_and_block,"Blocked by WKQ LPO, Premium indoor car cover.",208,true
