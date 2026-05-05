@@ -1,0 +1,8 @@
+suggested_catalog_slice,missing_selectable_count,blocked_relationship_count,example_rpos,example_labels,rationale
+Stripes,16,58,DPB|DPC|DPG|DPL|DPT|DSY|DSZ|DT0,Asymmetrical Edge Red/Carbon Flash Full Length Dual Racing Stripes|Carbon Flash Metallic Full Length Dual Racing Stripes|Carbon Flash with Blue accent Full Length Dual Racing Stripes|Carbon Flash with Orange accent Full Length Dual Racing Stripes,Touches 58 blocked relationship(s); 26 would have all missing endpoints covered by this slice alone.
+LPO Exterior packages,2,41,PCX|PDV,"LPO, Stingray R Appearance Package|LPO, Tech Bronze Accent Package",Touches 41 blocked relationship(s); 4 would have all missing endpoints covered by this slice alone.
+Wheel Accessory,4,13,S47|SFE|SPY|SPZ,"LPO, Black lug nuts|LPO, Black wheel locks|LPO, Chrome lug nuts|LPO, Chrome wheel locks",Touches 13 blocked relationship(s); 1 would have all missing endpoints covered by this slice alone.
+LPO Wheels,2,10,5DG|5DO,"LPO, 15-spoke bright polished aluminum wheels|LPO, 20-spoke Tech Bronze aluminum wheels",Touches 10 blocked relationship(s); 0 would have all missing endpoints covered by this slice alone.
+Custom Delivery,1,4,R8C,Corvette Museum Delivery,Touches 4 blocked relationship(s); 0 would have all missing endpoints covered by this slice alone.
+Performance packages,1,3,Z51,Z51 Performance Package,Touches 3 blocked relationship(s); 3 would have all missing endpoints covered by this slice alone.
+Interior Trim,1,1,BV4,Personalized Plaque,Touches 1 blocked relationship(s); 0 would have all missing endpoints covered by this slice alone.

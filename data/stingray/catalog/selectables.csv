@@ -58,6 +58,22 @@ opt_shw_001,option,SHW,"LPO, Fender hash stripes","Carbon Flash Metallic with Ed
 opt_sb7_001,option,SB7,"LPO, Corvette Racing Themed Graphics Package with Jake and Stingray R logos",Genuine Corvette Accessory,true,,Stingray R graphics choice; PDV and PCX package boundaries remain production-owned.
 opt_sng_001,option,SNG,"LPO, Fender hash stripes","Carbon Flash Metallic with Tech Bronze accent, Genuine Corvette Accessory",true,,Tech Bronze fender hash stripe choice; PCX package boundary remains production-owned.
 opt_sht_001,option,SHT,"LPO, Jake hood graphic with Tech Bronze accent",Genuine Corvette Accessory,true,,Tech Bronze hood graphic choice; PCX and PDV package boundaries remain production-owned.
+opt_dpb_001,option,DPB,Carbon Flash with Blue accent Full Length Dual Racing Stripes,,true,,DPB Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
+opt_dpc_001,option,DPC,Carbon Flash with Yellow accent Full Length Dual Racing Stripes,,true,,DPC Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
+opt_dpg_001,option,DPG,Carbon Flash with Orange accent Full Length Dual Racing Stripes,,true,,DPG Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
+opt_dpl_001,option,DPL,Carbon Flash with Red accent Full Length Dual Racing Stripes,,true,,DPL Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
+opt_dpt_001,option,DPT,Carbon Flash with Silver accent Full Length Dual Racing Stripes,,true,,DPT Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
+opt_dsy_001,option,DSY,Edge Orange Full Length Dual Racing Stripes,,true,,DSY Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
+opt_dsz_001,option,DSZ,Edge Red Full Length Dual Racing Stripes,,true,,DSZ Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
+opt_dt0_001,option,DT0,Competition Yellow Full Length Dual Racing Stripes,,true,,DT0 Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
+opt_dth_001,option,DTH,Carbon Flash Metallic Full Length Dual Racing Stripes,,true,,DTH Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
+opt_dub_001,option,DUB,Sterling Silver Full Length Dual Racing Stripes,,true,,DUB Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
+opt_due_001,option,DUE,NEW! Asymmetrical Santorini Blue/Carbon Flash Full Length Dual Racing Stripes,,true,,DUE Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
+opt_duk_001,option,DUK,Asymmetrical Edge Red/Carbon Flash Full Length Dual Racing Stripes,,true,,DUK Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
+opt_duw_001,option,DUW,Edge Blue Full Length Dual Racing Stripes,,true,,DUW Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
+opt_dzu_001,option,DZU,Carbon Flash/Competition Yellow Stinger Stripe,,true,,DZU Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
+opt_dzv_001,option,DZV,Carbon Flash/Midnight Silver Stinger Stripe,,true,,DZV Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
+opt_dzx_001,option,DZX,Carbon Flash/Edge Red Stinger Stripe,,true,,DZX Stripe choice projected in Pass 134; paint availability and package boundaries remain production-owned.
 opt_sfz_001,option,SFZ,"LPO, Dark Stealth crossed flags emblem","Front on Stingray models, Genuine Corvette Accessory",true,,Dark Stealth badge member choice; PCX R88 EYK and stripe boundaries remain production-owned.
 opt_r88_001,option,R88,"LPO, Illuminated crossed flags emblem","Front, Genuine Corvette Accessory",true,,Illuminated crossed flags emblem choice; SFZ EYK and stripe boundaries remain production-owned.
 opt_rin_001,option,RIN,"LPO, Rear Corvette script badge in Arctic White",Genuine Corvette Accessory,true,,Rear script badge member choice; peer excludes remain production-owned.

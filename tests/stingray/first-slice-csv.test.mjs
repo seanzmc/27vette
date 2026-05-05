@@ -14,6 +14,24 @@ const PASS132_EXCLUDE_PAIRS = [
   ["dep_excl_sfz_eyk", "opt_sfz_001", "opt_eyk_001", "cs_selected_eyk"],
   ["dep_excl_wkq_5zz", "opt_wkq_001", "opt_5zz_001", "cs_selected_5zz"],
 ];
+const PASS134_STRIPE_OPTION_IDS = [
+  "opt_dpb_001",
+  "opt_dpc_001",
+  "opt_dpg_001",
+  "opt_dpl_001",
+  "opt_dpt_001",
+  "opt_dsy_001",
+  "opt_dsz_001",
+  "opt_dt0_001",
+  "opt_dth_001",
+  "opt_dub_001",
+  "opt_due_001",
+  "opt_duk_001",
+  "opt_duw_001",
+  "opt_dzu_001",
+  "opt_dzv_001",
+  "opt_dzx_001",
+];
 
 function evaluate(variantId, selectedIds) {
   const output = execFileSync(PYTHON, [SCRIPT, "--scenario-json", JSON.stringify({ variant_id: variantId, selected_ids: selectedIds })], {
@@ -284,6 +302,48 @@ test("pass 132 migrated dependency_rules excludes report sample dependency confl
     assert.equal(conflict?.target_condition_set_id, conditionSetId);
     assert.equal(conflict?.target_selectable_id, targetId);
   }
+});
+
+test("pass 134 Stripes catalog slice emits production-equivalent choices", () => {
+  const production = loadGeneratedData();
+  const projected = emitCsvLegacyFragment();
+  const fields = [
+    "option_id",
+    "rpo",
+    "label",
+    "description",
+    "section_id",
+    "section_name",
+    "category_id",
+    "category_name",
+    "step_key",
+    "choice_mode",
+    "selection_mode",
+    "status",
+    "selectable",
+    "base_price",
+    "display_order",
+  ];
+
+  for (const optionId of PASS134_STRIPE_OPTION_IDS) {
+    const productionChoice = production.choices.find((choice) => choice.option_id === optionId && choice.variant_id === "1lt_c07");
+    const projectedChoice = projected.choices.find((choice) => choice.option_id === optionId && choice.variant_id === "1lt_c07");
+
+    assert.ok(productionChoice, `production should include ${optionId}`);
+    assert.ok(projectedChoice, `projected CSV fragment should include ${optionId}`);
+    assert.deepEqual(
+      Object.fromEntries(fields.map((field) => [field, projectedChoice[field]])),
+      Object.fromEntries(fields.map((field) => [field, productionChoice[field]]))
+    );
+  }
+});
+
+test("pass 134 Stripes catalog slice does not migrate exclude rules", () => {
+  const projected = emitCsvLegacyFragment();
+  const stripeIds = new Set(PASS134_STRIPE_OPTION_IDS);
+  const stripeRules = projected.rules.filter((rule) => stripeIds.has(rule.source_id) || stripeIds.has(rule.target_id));
+
+  assert.deepEqual(stripeRules, []);
 });
 
 test("golden first-slice scenarios are production-derived CSV fixtures", () => {
