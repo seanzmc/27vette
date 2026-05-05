@@ -1,32 +1,44 @@
 # Codex Pickup
 
-We were working in `/Users/seandm/Projects/27vette` on the Stingray CSV/shadow migration control plane and narrow projected-owned slices. The latest completed pass was **Pass 102: Interior Source Namespace Validation**. It added validation/tests so structured non-choice references must resolve to one of: active production choice, explicitly `production_guarded` option ID, or valid `data.interiors[].interior_id`. The 30 `3LT_*` IDs are now treated as valid interior runtime source IDs, not missing choices and not guarded option IDs.
+We were working in `/Users/seandm/Projects/27vette` on the Stingray CSV/shadow migration control plane. The latest completed work was **Pass 126: human-readable migration status report**. It generated a workspace audit bundle at `pass126-migration-status-report/` with:
+
+- `migration-status-report.md`
+- `csv-owned-projected.csv`
+- `production-owned-not-projected.csv`
+- `cross-boundary-relationships.csv`
 
 Key decisions:
 
-- Keep migration spec-first and evidence-based.
-- No interior migration yet.
-- No manifest rows or fake selectables for `3LT_*`.
-- Rule-only/non-choice option IDs remain guarded only when they are option-like legacy references: `opt_5vm_001`, `opt_5w8_001`, `opt_5zw_001`, `opt_cf8_001`, `opt_ryq_001`.
-- Interior IDs are a distinct namespace backed by `data.interiors[]`.
-- Unknown non-choice structured refs should fail validation unless guarded or valid interior IDs.
+- CSV/shadow remains experimental only; no source switch or runtime cutover.
+- Production behavior remains the oracle.
+- Reporting is audit-only and non-decisional.
+- “CSV-owned/projected” means currently emitted/owned by the shadow CSV migration package.
+- “Production-owned/not-projected” means still coming from old generated production data, not necessarily bad or missing.
+- Cross-boundary relationships are split between current guarded dependencies and manifest-only preservation rows.
+- Decision ledger review should happen only after reading the migration status map.
 
-Current direction:
+Current reconciled Pass 126 counts:
 
-- The CSV/shadow path now has stronger control-plane validation around projected choices, duplicate RPOs, package ownership, rule-only IDs, non-choice structured refs, and interior source IDs.
-- Continue with evidence/spec-only passes before implementation.
-- Likely next step: inspect whether any interior-source/control-plane documentation or future interior readiness review is needed, without migrating interiors.
+- CSV-owned/projected: 68
+- Production-owned/not-projected: 147
+- Cross-boundary relationship rows: 122
+- Current guarded dependencies: 43
+- Manifest-only preservation rows/groups: 83 / 78
+- Invalid preserved rows: 0
 
-Latest validation:
+Direction:
 
-- Focused Pass 102 test passed.
-- Adjacent control-plane tests passed.
-- Full Stingray ladder passed at `367/367`.
-- `git diff --check` passed.
-- Intended changed files: `scripts/stingray_csv_shadow_overlay.py`, `tests/stingray/interior-source-namespace-control-plane.test.mjs`, `tests/stingray/required-badges-control-plane.test.mjs`.
+- Continue spec-first, evidence-backed, narrow control-plane/report passes before any implementation migration.
+- Use the Pass 126 report to understand migration status by category/section, then use the Pass 125 decision ledger for human review notes.
+- Do not apply ledger decisions or migrate anything until explicitly approved.
 
-User preferences/context:
+Open next steps:
 
-- You want strict scope control, no speculative refactors, production behavior wins, and evidence from actual repo/runtime/tests.
-- For evidence-only passes, do not edit.
-- For implementation passes, use RED-first focused tests, preserve unrelated importer/schema work, and avoid touching production app/runtime/generator/workbook unless explicitly approved.
+- Review `migration-status-report.md` and the three CSV sidecars.
+- Decide which category/section areas need manual review first.
+- Potential next pass: make the migration status report reproducible via a small checked-in helper/test if we want to freeze it, or start reviewing ledger rows using the status report as context.
+
+Important user/business context:
+
+- You are Sean, Corvette specialist at Stingray Chevrolet in Plant City, FL.
+- You’re building structured Corvette order/configuration systems and prefer careful, stepwise, evidence-backed migrations with strict scope control and tests.
