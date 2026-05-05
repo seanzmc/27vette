@@ -88,7 +88,6 @@ const PRESERVED_STRIPE_PAINT_RULE_KEYS = [
 ];
 const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set([
   "opt_sbt_001->opt_cc3_001",
-  "opt_pdv_001->opt_sb7_001",
   "opt_dzu_001->opt_gbk_001",
   "opt_dzx_001->opt_gkz_001",
   "opt_dzx_001->opt_gph_001",
@@ -119,7 +118,6 @@ const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set([
 const PRESERVED_FIRST_SLICE_PRICE_RULE_KEYS = new Set([
   "opt_z51_001->opt_tvs_001",
   "opt_pcx_001->opt_sfz_001",
-  "opt_pdv_001->opt_sb7_001",
 ]);
 
 function loadGeneratedData() {
@@ -427,7 +425,11 @@ test("shadow assembly substitutes first-slice records from CSV fragment", () => 
     normalizeRules(
       shadowData.rules.filter((rule) => (shadowIds.has(rule.source_id) || shadowIds.has(rule.target_id)) && !PRESERVED_FIRST_SLICE_RULE_KEYS.has(ruleKey(rule)))
     ),
-    normalizeRules(csvFragment.rules.filter((rule) => !PRESERVED_FIRST_SLICE_RULE_KEYS.has(ruleKey(rule))))
+    normalizeRules(
+      csvFragment.rules.filter(
+        (rule) => (shadowIds.has(rule.source_id) || shadowIds.has(rule.target_id)) && !PRESERVED_FIRST_SLICE_RULE_KEYS.has(ruleKey(rule))
+      )
+    )
   );
   assert.deepEqual(
     normalizePriceRules(
@@ -437,7 +439,13 @@ test("shadow assembly substitutes first-slice records from CSV fragment", () => 
           !PRESERVED_FIRST_SLICE_PRICE_RULE_KEYS.has(priceRuleKey(rule))
       )
     ),
-    normalizePriceRules(csvFragment.priceRules.filter((rule) => !PRESERVED_FIRST_SLICE_PRICE_RULE_KEYS.has(priceRuleKey(rule))))
+    normalizePriceRules(
+      csvFragment.priceRules.filter(
+        (rule) =>
+          (shadowIds.has(rule.condition_option_id) || shadowIds.has(rule.target_option_id)) &&
+          !PRESERVED_FIRST_SLICE_PRICE_RULE_KEYS.has(priceRuleKey(rule))
+      )
+    )
   );
   assert.deepEqual(
     normalizeExclusiveGroups(shadowData.exclusiveGroups.filter((group) => (group.option_ids || []).some((optionId) => shadowIds.has(optionId)))),

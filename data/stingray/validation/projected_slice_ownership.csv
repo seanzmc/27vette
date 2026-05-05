@@ -88,10 +88,6 @@ selectable,,,,,,EDU,projected_owned,EDU Exterior Accents standalone projected sl
 guardedOption,,,,,,EYK,production_guarded,Required Badges Chrome badge choice remained production-owned before Pass 71,false
 guardedOption,,,,,opt_eyt_001,,production_guarded,Required Badges Carbon Flash default remained production-owned before Pass 71,false
 guardedOption,,,,,opt_eyt_002,,production_guarded,Standard Options EYT display-only duplicate remained production-owned before Pass 71,false
-rule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
-priceRule,,PDV,,VWD,,,preserved_cross_boundary,PDV package source is not migrated in Pass 10,true
-rule,,PDV,,SB7,,,preserved_cross_boundary,PDV package source remains production-owned for SB7 in Pass 59,true
-priceRule,,PDV,,SB7,,,preserved_cross_boundary,PDV package source remains production-owned for SB7 in Pass 59,true
 rule,,PCX,,SNG,,,preserved_cross_boundary,PCX package source remains production-owned for SNG in Pass 61,true
 priceRule,,PCX,,SNG,,,preserved_cross_boundary,PCX package source remains production-owned for SNG in Pass 61,true
 rule,,PCX,,SHT,,,preserved_cross_boundary,PCX package source remains production-owned for SHT in Pass 61,true

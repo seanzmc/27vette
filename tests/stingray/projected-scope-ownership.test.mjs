@@ -323,18 +323,6 @@ test("projected ownership manifest declares the current multi-slice control scop
     },
   ]);
   for (const expected of [
-    {
-      record_type: "priceRule",
-      group_id: "",
-      source_rpo: "PDV",
-      source_option_id: "",
-      target_rpo: "VWD",
-      target_option_id: "",
-      ownership: "preserved_cross_boundary",
-    },
-    { record_type: "rule", group_id: "", source_rpo: "PDV", source_option_id: "", target_rpo: "VWD", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", group_id: "", source_rpo: "PDV", source_option_id: "", target_rpo: "SB7", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "priceRule", group_id: "", source_rpo: "PDV", source_option_id: "", target_rpo: "SB7", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SNG", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "priceRule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SNG", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SHT", target_option_id: "", ownership: "preserved_cross_boundary" },
@@ -397,8 +385,8 @@ test("legacy fragment projected RPO scope equals the ownership manifest", () => 
   assert.equal(fragmentRpos.includes("PCX"), true);
   assert.equal(fragmentRpos.includes("PDV"), true);
   assert.equal(fragmentRpos.includes("5ZW"), false);
-  assert.equal(fragment.rules.some((rule) => rule.source_id === pdv && rule.target_id === vwd), false);
-  assert.equal(fragment.priceRules.some((rule) => rule.condition_option_id === pdv && rule.target_option_id === vwd), false);
+  assert.equal(fragment.rules.some((rule) => rule.source_id === pdv && rule.target_id === vwd && rule.rule_type === "includes"), true);
+  assert.equal(fragment.priceRules.some((rule) => rule.condition_option_id === pdv && rule.target_option_id === vwd && Number(rule.price_value) === 0), true);
 });
 
 test("production keeps 5ZW as a rule-only legacy option id", () => {
@@ -410,7 +398,7 @@ test("production keeps 5ZW as a rule-only legacy option id", () => {
   assert.equal(projectedOwnedRpos().includes("5ZW"), false);
 });
 
-test("shadow overlay preserves manifest-declared PDV to VWD production-owned behavior", () => {
+test("shadow overlay preserves PDV to VWD behavior after CSV package migration", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
 
@@ -450,7 +438,7 @@ test("overlay rejects a manifest that omits a projected fragment RPO", () => {
 });
 
 test("overlay rejects an unclassified cross-boundary production record", () => {
-  const rows = loadManifest().filter((row) => !(row.ownership === "preserved_cross_boundary" && row.source_rpo === "PDV" && row.target_rpo === "VWD"));
+  const rows = loadManifest().filter((row) => !(row.ownership === "preserved_cross_boundary" && row.source_rpo === "PCX" && row.target_rpo === "SNG"));
   const tempManifest = writeTempManifest(rows);
 
   const result = runOverlay(["--ownership-manifest", tempManifest]);
@@ -478,7 +466,7 @@ const validationCases = [
   ],
   [
     "duplicate active preserved cross-boundary row",
-    (rows) => [...rows, { ...rows.find((row) => row.record_type === "rule" && row.source_rpo === "PDV" && row.target_rpo === "VWD") }],
+    (rows) => [...rows, { ...rows.find((row) => row.record_type === "rule" && row.source_rpo === "PCX" && row.target_rpo === "SNG") }],
     /duplicate active preserved_cross_boundary row/,
   ],
   [
@@ -503,7 +491,7 @@ const validationCases = [
   ],
   [
     "preserved cross-boundary row missing source",
-    (rows) => rows.map((row) => (row.record_type === "rule" && row.source_rpo === "PDV" && row.target_rpo === "VWD" ? { ...row, source_rpo: "" } : row)),
+    (rows) => rows.map((row) => (row.record_type === "rule" && row.source_rpo === "PCX" && row.target_rpo === "SNG" ? { ...row, source_rpo: "" } : row)),
     /preserved_cross_boundary row is missing source_rpo\/source_option_id or target_rpo\/target_option_id/,
   ],
   [

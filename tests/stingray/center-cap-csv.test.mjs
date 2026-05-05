@@ -57,6 +57,10 @@ function lineById(result, selectableId) {
   return result.selected_lines.find((line) => line.selectable_id === selectableId);
 }
 
+function plain(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
 function normalizeChoices(rows) {
   return Array.from(rows)
     .filter((choice) => CENTER_CAP_RPOS.has(choice.rpo))
@@ -122,17 +126,38 @@ test("CSV center cap legacy fragment matches generated center cap choices and ex
   assert.deepEqual(normalizeExclusiveGroups(projected.exclusiveGroups, productionOptionIds), normalizeExclusiveGroups(production.exclusiveGroups, productionOptionIds));
 });
 
-test("shadow overlay preserves production-owned PDV to VWD auto-add and pricing behavior", () => {
+test("CSV-owned PDV to VWD include and pricing behavior remains production-equivalent", () => {
+  const production = loadGeneratedData();
+  const fragment = emitCsvLegacyFragment();
   const shadow = loadShadowData();
+  const pdvId = "opt_pdv_001";
+  const vwdId = "opt_vwd_001";
+  const productionRule = production.rules.find((rule) => rule.source_id === pdvId && rule.rule_type === "includes" && rule.target_id === vwdId);
+  const productionPriceRule = production.priceRules.find(
+    (rule) => rule.condition_option_id === pdvId && rule.target_option_id === vwdId && Number(rule.price_value) === 0
+  );
+  const fragmentRule = fragment.rules.find((rule) => rule.source_id === pdvId && rule.rule_type === "includes" && rule.target_id === vwdId);
+  const fragmentPriceRule = fragment.priceRules.find(
+    (rule) => rule.condition_option_id === pdvId && rule.target_option_id === vwdId && Number(rule.price_value) === 0
+  );
   const pdvVwdRule = shadow.rules.find(
-    (rule) => rule.source_id === "opt_pdv_001" && rule.rule_type === "includes" && rule.target_id === "opt_vwd_001"
+    (rule) => rule.source_id === pdvId && rule.rule_type === "includes" && rule.target_id === vwdId
   );
   const pdvVwdPriceRule = shadow.priceRules.find(
-    (rule) => rule.condition_option_id === "opt_pdv_001" && rule.target_option_id === "opt_vwd_001" && Number(rule.price_value) === 0
+    (rule) => rule.condition_option_id === pdvId && rule.target_option_id === vwdId && Number(rule.price_value) === 0
   );
 
-  assert.ok(pdvVwdRule, "PDV -> VWD include rule should remain production-owned in the shadow overlay");
-  assert.ok(pdvVwdPriceRule, "PDV -> VWD priceRule should remain production-owned in the shadow overlay");
+  assert.deepEqual(fragment.validation_errors, []);
+  assert.deepEqual(plain(fragmentRule), plain(productionRule));
+  assert.deepEqual(fragmentPriceRule, {
+    ...plain(productionPriceRule),
+    price_rule_id: "pr_opt_pdv_001_opt_vwd_001_included_zero",
+  });
+  assert.deepEqual(plain(pdvVwdRule), plain(productionRule));
+  assert.deepEqual(pdvVwdPriceRule, {
+    ...plain(productionPriceRule),
+    price_rule_id: "pr_opt_pdv_001_opt_vwd_001_included_zero",
+  });
 
   const directRuntime = runtimeFor(shadow, "1lt_c07");
   const vwd = activeChoiceByRpo(directRuntime, "VWD");

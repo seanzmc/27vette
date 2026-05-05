@@ -197,13 +197,12 @@ test("overlay rejects a projected package priceRule with a production-owned targ
   assert.match(result.stderr, /opt_5jr_001/);
 });
 
-test("real cross-owned package examples remain production-owned and preserved", () => {
+test("only cross-owned package examples remain production-owned and preserved", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
   const fragment = emitLegacyFragment();
 
   const preservedEdges = [
-    ["PDV", "VWD"],
     ["Z51", "T0A"],
   ];
   for (const [sourceRpo, targetRpo] of preservedEdges) {
@@ -216,9 +215,28 @@ test("real cross-owned package examples remain production-owned and preserved", 
     assert.deepEqual(plain(shadowRuleRow), plain(productionRuleRow));
     assert.equal(fragment.rules.some((rule) => rule.source_id === sourceId && rule.target_id === targetId), false);
   }
+
+  for (const targetRpo of ["VWD", "SB7"]) {
+    const sourceId = optionIdByRpo(production, "PDV");
+    const targetId = optionIdByRpo(production, targetRpo);
+    const productionRuleRow = production.rules.find((rule) => rule.source_id === sourceId && rule.target_id === targetId && rule.rule_type === "includes");
+    const fragmentRuleRow = fragment.rules.find((rule) => rule.source_id === sourceId && rule.target_id === targetId && rule.rule_type === "includes");
+    const productionPriceRuleRow = production.priceRules.find(
+      (rule) => rule.condition_option_id === sourceId && rule.target_option_id === targetId && Number(rule.price_value) === 0
+    );
+    const fragmentPriceRuleRow = fragment.priceRules.find(
+      (rule) => rule.condition_option_id === sourceId && rule.target_option_id === targetId && Number(rule.price_value) === 0
+    );
+
+    assert.deepEqual(plain(fragmentRuleRow), plain(productionRuleRow));
+    assert.deepEqual(plain(fragmentPriceRuleRow), {
+      ...plain(productionPriceRuleRow),
+      price_rule_id: `pr_${sourceId}_${targetId}_included_zero`,
+    });
+  }
 });
 
-test("preserved PDV to VWD runtime package behavior remains production-equivalent", () => {
+test("PDV to VWD runtime package behavior remains production-equivalent", () => {
   const shadow = loadShadowData();
 
   const directRuntime = runtimeFor(shadow, "1lt_c07");

@@ -275,24 +275,33 @@ test("shadow runtime preserves PCX and SB7 mutual blocking", () => {
   }
 });
 
-test("SB7 package boundaries remain production-owned while PCX conflict is dependency-owned", () => {
+test("SB7 PDV include is CSV-owned while PCX conflict is dependency-owned", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
   const fragment = emitCsvLegacyFragment();
 
   assert.deepEqual(plain(rule(shadow, "PDV", "SB7", "includes")), plain(rule(production, "PDV", "SB7", "includes")));
-  assert.deepEqual(plain(priceRule(shadow, "PDV", "SB7", 0)), plain(priceRule(production, "PDV", "SB7", 0)));
+  assert.deepEqual(plain(priceRule(shadow, "PDV", "SB7", 0)), {
+    ...plain(priceRule(production, "PDV", "SB7", 0)),
+    price_rule_id: "pr_opt_pdv_001_opt_sb7_001_included_zero",
+  });
   assert.deepEqual(plain(rule(shadow, "PCX", "SB7", "excludes")), plain(rule(production, "PCX", "SB7", "excludes")));
 
   const pdvId = optionIdByRpo(production, "PDV");
   const sb7Id = optionIdByRpo(production, "SB7");
-  assert.equal(fragment.rules.some((item) => item.source_id === pdvId && item.target_id === sb7Id), false);
+  assert.deepEqual(plain(rule(fragment, "PDV", "SB7", "includes")), plain(rule(production, "PDV", "SB7", "includes")));
   assert.deepEqual(plain(rule(fragment, "PCX", "SB7", "excludes")), plain(rule(production, "PCX", "SB7", "excludes")));
-  assert.equal(fragment.priceRules.some((item) => item.condition_option_id === pdvId && item.target_option_id === sb7Id), false);
+  assert.deepEqual(
+    plain(fragment.priceRules.find((item) => item.condition_option_id === pdvId && item.target_option_id === sb7Id && Number(item.price_value) === 0)),
+    {
+      ...plain(priceRule(production, "PDV", "SB7", 0)),
+      price_rule_id: "pr_opt_pdv_001_opt_sb7_001_included_zero",
+    }
+  );
 
   assert.equal(manifestHas({ record_type: "selectable", rpo: "SB7", ownership: "projected_owned" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "PDV", target_rpo: "SB7", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "priceRule", source_rpo: "PDV", target_rpo: "SB7", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "PDV", target_rpo: "SB7", ownership: "preserved_cross_boundary" }), false);
+  assert.equal(manifestHas({ record_type: "priceRule", source_rpo: "PDV", target_rpo: "SB7", ownership: "preserved_cross_boundary" }), false);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCX", target_rpo: "SB7", ownership: "preserved_cross_boundary" }), false);
 });
 
