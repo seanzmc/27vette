@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_PACKAGE = ROOT / "data" / "stingray"
 DEFAULT_PRODUCTION_DATA = ROOT / "form-app" / "data.js"
 DEFAULT_OWNERSHIP_MANIFEST = DEFAULT_PACKAGE / "validation" / "projected_slice_ownership.csv"
+DEFAULT_NON_SELECTABLE_REFERENCES = DEFAULT_PACKAGE / "validation" / "non_selectable_references.csv"
 
 BUCKETS = [
     "ready_plain_exclude",
@@ -173,6 +174,45 @@ def price_rule_pairs(price_rules: list[dict[str, str]]) -> set[tuple[str, str]]:
         (row.get("condition_option_id", ""), row.get("target_option_id", ""))
         for row in price_rules
         if row.get("condition_option_id", "") and row.get("target_option_id", "")
+    }
+
+
+def load_non_selectable_references(path: Path) -> list[dict[str, str]]:
+    if not path.exists():
+        return []
+    return [row for row in load_csv(path) if is_active(row)]
+
+
+def registry_indexes(rows: list[dict[str, str]]) -> dict[str, dict[str, str]]:
+    indexes: dict[str, dict[str, str]] = {}
+    for row in rows:
+        for key in [row.get("rpo", ""), row.get("option_id", ""), row.get("reference_id", "")]:
+            if key:
+                indexes[key] = row
+    return indexes
+
+
+def registry_matches(refs: set[str], registry: dict[str, dict[str, str]]) -> list[dict[str, str]]:
+    matches_by_id: dict[str, dict[str, str]] = {}
+    for ref in refs:
+        row = registry.get(ref)
+        if row:
+            matches_by_id[row.get("reference_id", "")] = row
+    return [matches_by_id[key] for key in sorted(matches_by_id)]
+
+
+def join_unique(values: list[str]) -> str:
+    return "|".join(sorted({value for value in values if value}))
+
+
+def registry_details(refs: set[str], registry: dict[str, dict[str, str]]) -> dict[str, Any]:
+    matches = registry_matches(refs, registry)
+    return {
+        "registered_reference": bool(matches),
+        "registered_references": [row.get("reference_id", "") for row in matches],
+        "reference_type": join_unique([row.get("reference_type", "") for row in matches]),
+        "projection_policy": join_unique([row.get("projection_policy", "") for row in matches]),
+        "compiler_policy": join_unique([row.get("compiler_policy", "") for row in matches]),
     }
 
 
@@ -390,6 +430,7 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     auto_adds = load_csv(package / "logic" / "auto_adds.csv")
     price_policies = load_csv(package / "pricing" / "price_policies.csv")
     price_rules = load_csv(package / "pricing" / "price_rules.csv")
+    non_selectable_references = load_non_selectable_references(Path(args.non_selectable_references))
 
     context = {
         "production_indexes": production_indexes(production_data),
@@ -408,12 +449,15 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
             and row.get("amount_usd", "") == "0"
             for row in price_policies
         ),
+        "non_selectable_registry": registry_indexes(non_selectable_references),
     }
 
     classified_rows = [
         classify_row(row, f"csv_row_{index}", context)
         for index, row in active_preserved
     ]
+    for row in classified_rows:
+        row.update(registry_details(row_refs(row), context["non_selectable_registry"]))
     classified_rows.sort(
         key=lambda row: (
             BUCKETS.index(row["bucket"]),
@@ -570,6 +614,11 @@ def build_legacy_nonselectable_design_report(args: argparse.Namespace) -> dict[s
                 "target_status": endpoint_status(row, "target"),
                 "legacy_identifiers": legacy_identifiers_for_row(row),
                 "related_surfaces": related_surfaces(row),
+                "registered_reference": row["registered_reference"],
+                "registered_references": row["registered_references"],
+                "reference_type": row["reference_type"],
+                "projection_policy": row["projection_policy"],
+                "compiler_policy": row["compiler_policy"],
                 "subtype": decision["subtype"],
                 "recommended_handling": decision["recommended_handling"],
                 "recommended_next_lane": decision["recommended_next_lane"],
@@ -712,6 +761,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--package", default=str(DEFAULT_PACKAGE), help="Stingray CSV package directory.")
     parser.add_argument("--production-data", default=str(DEFAULT_PRODUCTION_DATA), help="Production form-app/data.js oracle path.")
     parser.add_argument("--ownership-manifest", default=str(DEFAULT_OWNERSHIP_MANIFEST), help="Projected slice ownership manifest path.")
+    parser.add_argument(
+        "--non-selectable-references",
+        default=str(DEFAULT_NON_SELECTABLE_REFERENCES),
+        help="Non-selectable reference registry path.",
+    )
     return parser.parse_args(argv)
 
 

@@ -116,6 +116,14 @@ test("preserved boundary migration queue classifies every active preserved row e
 
   assert.notEqual(rowFor(report, "rule", "R8C", "CFX")?.bucket, "ready_plain_exclude");
   assert.equal(rowFor(report, "rule", "R8C", "CFX")?.bucket, "legacy_rule_only_or_non_selectable");
+
+  const legacyRows = report.rows.filter((row) => row.bucket === "legacy_rule_only_or_non_selectable");
+  assert.equal(legacyRows.length, report.bucket_summary.legacy_rule_only_or_non_selectable);
+  assert.equal(legacyRows.every((row) => row.registered_reference === true), true);
+  assert.equal(legacyRows.every((row) => row.reference_type), true);
+  assert.equal(legacyRows.every((row) => row.projection_policy === "never_project_as_selectable"), true);
+  assert.equal(legacyRows.every((row) => row.compiler_policy), true);
+  assert.equal(legacyRows.some((row) => SAFE_BUCKETS.has(row.bucket)), false);
 });
 
 test("preserved boundary migration queue prints a compact human summary", () => {
