@@ -89,7 +89,6 @@ guardedOption,,,,,,EYK,production_guarded,Required Badges Chrome badge choice re
 guardedOption,,,,,opt_eyt_001,,production_guarded,Required Badges Carbon Flash default remained production-owned before Pass 71,false
 guardedOption,,,,,opt_eyt_002,,production_guarded,Standard Options EYT display-only duplicate remained production-owned before Pass 71,false
 rule,,SHT,,PDV,,,preserved_cross_boundary,SHT to PDV package exclude remains production-owned in Pass 61,true
-rule,,PCX,,PDV,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by package source catalog unlock remains production-owned,true
 rule,,PCX,,R8C,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by package source catalog unlock remains production-owned,true
 rule,,PCX,,S47,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by package source catalog unlock remains production-owned,true
 rule,,PCX,,SFE,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by package source catalog unlock remains production-owned,true

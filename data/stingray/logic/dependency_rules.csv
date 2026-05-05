@@ -79,3 +79,4 @@ dep_excl_pdv_duw,excludes,selectable,opt_pdv_001,true,,cs_selected_duw,disable_a
 dep_excl_pdv_dzu,excludes,selectable,opt_pdv_001,true,,cs_selected_dzu,disable_and_block,"Blocked by PDV LPO, Stingray R Appearance Package.",338,true
 dep_excl_pdv_dzv,excludes,selectable,opt_pdv_001,true,,cs_selected_dzv,disable_and_block,"Blocked by PDV LPO, Stingray R Appearance Package.",339,true
 dep_excl_pdv_dzx,excludes,selectable,opt_pdv_001,true,,cs_selected_dzx,disable_and_block,"Blocked by PDV LPO, Stingray R Appearance Package.",340,true
+dep_excl_pcx_pdv,excludes,selectable,opt_pcx_001,true,,cs_selected_pdv,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",341,true
