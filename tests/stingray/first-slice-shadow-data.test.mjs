@@ -89,9 +89,6 @@ const PRESERVED_STRIPE_PAINT_RULE_KEYS = [
 const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set([
   "opt_sbt_001->opt_cc3_001",
   "opt_pdv_001->opt_sb7_001",
-  "opt_pdv_001->opt_dzu_001",
-  "opt_pdv_001->opt_dzv_001",
-  "opt_pdv_001->opt_dzx_001",
   "opt_dzu_001->opt_gbk_001",
   "opt_dzx_001->opt_gkz_001",
   "opt_dzx_001->opt_gph_001",
@@ -117,7 +114,6 @@ const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set([
   "opt_pcx_001->opt_sfz_001",
   ...PASS135_FULL_LENGTH_STRIPE_OPTION_IDS.map((optionId) => `opt_cf8_001->${optionId}`),
   ...PASS135_FULL_LENGTH_STRIPE_OPTION_IDS.map((optionId) => `opt_pcx_001->${optionId}`),
-  ...PASS135_FULL_LENGTH_STRIPE_OPTION_IDS.map((optionId) => `opt_pdv_001->${optionId}`),
   ...PRESERVED_STRIPE_PAINT_RULE_KEYS,
 ]);
 const PRESERVED_FIRST_SLICE_PRICE_RULE_KEYS = new Set([

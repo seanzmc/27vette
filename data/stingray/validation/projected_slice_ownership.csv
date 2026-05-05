@@ -107,22 +107,6 @@ rule,,PCX,,SPY,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by packa
 rule,,PCX,,SPZ,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by package source catalog unlock remains production-owned,true
 rule,,PCX,,5DG,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by package source catalog unlock remains production-owned,true
 priceRule,,PCX,,5DG,,,preserved_cross_boundary,Pass 141 PCX boundary exposed by package source catalog unlock remains production-owned,true
-rule,,PDV,,DPB,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,PDV,,DPC,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,PDV,,DPG,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,PDV,,DPL,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,PDV,,DPT,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,PDV,,DSY,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,PDV,,DSZ,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,PDV,,DT0,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,PDV,,DTH,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,PDV,,DUB,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,PDV,,DUE,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,PDV,,DUK,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,PDV,,DUW,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,PDV,,DZU,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,PDV,,DZV,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
-rule,,PDV,,DZX,,,preserved_cross_boundary,Pass 134 package-to-stripe boundary remains production-owned,true
 rule,,DPB,,GTR,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DPC,,GBK,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DPG,,G26,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
