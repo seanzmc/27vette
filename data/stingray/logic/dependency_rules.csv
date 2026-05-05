@@ -46,3 +46,20 @@ dep_excl_wkq_5zu,excludes,selectable,opt_wkq_001,true,,cs_selected_5zu,disable_a
 dep_excl_wkq_5zz,excludes,selectable,opt_wkq_001,true,,cs_selected_5zz,disable_and_block,"Blocked by WKQ LPO, Premium indoor car cover.",208,true
 dep_excl_sbt_cc3,excludes,selectable,opt_sbt_001,true,,cs_selected_cc3,disable_and_block,"Blocked by SBT LPO, Dual roof.",306,true
 dep_excl_pcx_eyk,excludes,selectable,opt_pcx_001,true,,cs_selected_eyk,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",307,true
+dep_excl_pcx_sb7,excludes,selectable,opt_pcx_001,true,,cs_selected_sb7,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",308,true
+dep_excl_pcx_dpb,excludes,selectable,opt_pcx_001,true,,cs_selected_dpb,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",309,true
+dep_excl_pcx_dpc,excludes,selectable,opt_pcx_001,true,,cs_selected_dpc,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",310,true
+dep_excl_pcx_dpg,excludes,selectable,opt_pcx_001,true,,cs_selected_dpg,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",311,true
+dep_excl_pcx_dpl,excludes,selectable,opt_pcx_001,true,,cs_selected_dpl,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",312,true
+dep_excl_pcx_dpt,excludes,selectable,opt_pcx_001,true,,cs_selected_dpt,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",313,true
+dep_excl_pcx_dsy,excludes,selectable,opt_pcx_001,true,,cs_selected_dsy,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",314,true
+dep_excl_pcx_dsz,excludes,selectable,opt_pcx_001,true,,cs_selected_dsz,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",315,true
+dep_excl_pcx_dt0,excludes,selectable,opt_pcx_001,true,,cs_selected_dt0,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",316,true
+dep_excl_pcx_dth,excludes,selectable,opt_pcx_001,true,,cs_selected_dth,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",317,true
+dep_excl_pcx_dub,excludes,selectable,opt_pcx_001,true,,cs_selected_dub,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",318,true
+dep_excl_pcx_due,excludes,selectable,opt_pcx_001,true,,cs_selected_due,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",319,true
+dep_excl_pcx_duk,excludes,selectable,opt_pcx_001,true,,cs_selected_duk,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",320,true
+dep_excl_pcx_duw,excludes,selectable,opt_pcx_001,true,,cs_selected_duw,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",321,true
+dep_excl_pcx_dzu,excludes,selectable,opt_pcx_001,true,,cs_selected_dzu,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",322,true
+dep_excl_pcx_dzv,excludes,selectable,opt_pcx_001,true,,cs_selected_dzv,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",323,true
+dep_excl_pcx_dzx,excludes,selectable,opt_pcx_001,true,,cs_selected_dzx,disable_and_block,"Blocked by PCX LPO, Tech Bronze Accent Package.",324,true

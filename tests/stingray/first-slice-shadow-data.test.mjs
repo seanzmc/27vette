@@ -51,6 +51,10 @@ const FIRST_SLICE_RPOS = new Set([
   "RIN",
   "SL8",
   "RIK",
+  "SB7",
+  "DZU",
+  "DZV",
+  "DZX",
 ]);
 const PASS135_FULL_LENGTH_STRIPE_OPTION_IDS = [
   "opt_dpb_001",
@@ -84,6 +88,13 @@ const PRESERVED_STRIPE_PAINT_RULE_KEYS = [
 ];
 const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set([
   "opt_sbt_001->opt_cc3_001",
+  "opt_pdv_001->opt_sb7_001",
+  "opt_pdv_001->opt_dzu_001",
+  "opt_pdv_001->opt_dzv_001",
+  "opt_pdv_001->opt_dzx_001",
+  "opt_dzu_001->opt_gbk_001",
+  "opt_dzx_001->opt_gkz_001",
+  "opt_dzx_001->opt_gph_001",
   "opt_pcu_001->opt_5vm_001",
   "opt_pcu_001->opt_5w8_001",
   "opt_5zu_001->opt_t0a_001",
@@ -112,6 +123,7 @@ const PRESERVED_FIRST_SLICE_RULE_KEYS = new Set([
 const PRESERVED_FIRST_SLICE_PRICE_RULE_KEYS = new Set([
   "opt_z51_001->opt_tvs_001",
   "opt_pcx_001->opt_sfz_001",
+  "opt_pdv_001->opt_sb7_001",
 ]);
 
 function loadGeneratedData() {

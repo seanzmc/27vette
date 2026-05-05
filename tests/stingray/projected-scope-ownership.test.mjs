@@ -335,7 +335,6 @@ test("projected ownership manifest declares the current multi-slice control scop
     { record_type: "rule", group_id: "", source_rpo: "PDV", source_option_id: "", target_rpo: "VWD", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PDV", source_option_id: "", target_rpo: "SB7", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "priceRule", group_id: "", source_rpo: "PDV", source_option_id: "", target_rpo: "SB7", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SB7", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SNG", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "priceRule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SNG", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "PCX", source_option_id: "", target_rpo: "SHT", target_option_id: "", ownership: "preserved_cross_boundary" },
