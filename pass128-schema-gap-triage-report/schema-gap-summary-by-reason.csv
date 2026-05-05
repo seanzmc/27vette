@@ -1,0 +1,6 @@
+triage_reason,count,pct_of_schema_gaps
+condition_set_target_mapping_needed,4,1.9
+interior_or_non_option_namespace,45,21.7
+legacy_runtime_special_case,2,1.0
+pairwise_excludes_needs_model,153,73.9
+set_based_relationship_mapper_gap,3,1.4
