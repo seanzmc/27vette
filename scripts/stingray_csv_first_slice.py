@@ -34,6 +34,7 @@ TABLES = {
     "base_prices": "pricing/base_prices.csv",
     "price_policies": "pricing/price_policies.csv",
     "price_rules": "pricing/price_rules.csv",
+    "non_selectable_references": "validation/non_selectable_references.csv",
 }
 
 
@@ -51,6 +52,7 @@ ID_FIELDS = {
     "base_prices": "base_price_id",
     "price_policies": "price_policy_id",
     "price_rules": "price_rule_id",
+    "non_selectable_references": "reference_id",
 }
 
 
@@ -84,6 +86,10 @@ class CsvSlice:
         self.selectable_display = {row["selectable_id"]: row for row in self.tables["selectable_display"]}
         self.price_policies = {row["price_policy_id"]: row for row in self.tables["price_policies"]}
         self.auto_adds = {row["auto_add_id"]: row for row in self.tables["auto_adds"] if is_active(row)}
+        self.non_selectable_references = {
+            row["reference_id"]: row for row in self.tables["non_selectable_references"] if is_active(row)
+        }
+        self.non_selectable_reference_selectors = self._build_non_selectable_reference_selectors()
         self.item_set_members = self._build_item_set_members()
         self.condition_terms = self._build_condition_terms()
         self.rule_group_members = self._build_rule_group_members()
@@ -128,6 +134,17 @@ class CsvSlice:
                 groups[member_id].append(group_id)
         return dict(groups)
 
+    def _build_non_selectable_reference_selectors(self) -> dict[str, dict[str, str]]:
+        selectors: dict[str, dict[str, str]] = {}
+        for row in self.non_selectable_references.values():
+            reference_id = row.get("reference_id", "")
+            rpo = row.get("rpo", "")
+            option_id = row.get("option_id", "")
+            for selector_id in {reference_id, f"ref_{rpo.lower()}" if rpo else "", option_id}:
+                if selector_id:
+                    selectors[selector_id] = row
+        return selectors
+
     def validate(self) -> list[str]:
         errors: list[str] = []
         for table_name, id_field in ID_FIELDS.items():
@@ -164,8 +181,15 @@ class CsvSlice:
                 errors.append(f"condition term references missing selectable: {left_ref}.")
             if term_type == "selected_any_in_set" and left_ref not in self.item_sets:
                 errors.append(f"condition term references missing item set: {left_ref}.")
+            if term_type == "reference_selected":
+                self._validate_non_selectable_reference_ref(errors, "condition_terms", left_ref)
             if not self.supports_condition_term(term_type, row["operator"]):
                 errors.append(f"condition term uses unsupported type/operator: {term_type}/{row['operator']}.")
+
+        for row in self.non_selectable_references.values():
+            option_id = row.get("option_id", "")
+            if option_id and option_id in self.selectables and row.get("projection_policy", "") == "never_project_as_selectable":
+                errors.append(f"non-selectable reference is also a selectable: {option_id}.")
 
         for row in self.tables["auto_adds"]:
             if not is_active(row):
@@ -265,14 +289,24 @@ class CsvSlice:
                 errors.append(f"{table_name} references missing item set: {selector_id}.")
             elif not self.item_set_members.get(selector_id):
                 errors.append(f"{table_name} references item set with no active members: {selector_id}.")
+        elif selector_type == "non_selectable_reference":
+            if table_name != "dependency_rules":
+                errors.append(f"{table_name} uses unsupported selector type: {selector_type}.")
+            else:
+                self._validate_non_selectable_reference_ref(errors, table_name, selector_id)
         else:
             errors.append(f"{table_name} uses unsupported selector type: {selector_type}.")
+
+    def _validate_non_selectable_reference_ref(self, errors: list[str], table_name: str, reference_selector_id: str) -> None:
+        if reference_selector_id not in self.non_selectable_reference_selectors:
+            errors.append(f"{table_name} references unknown non-selectable reference: {reference_selector_id}.")
 
     def supports_condition_term(self, term_type: str, operator: str) -> bool:
         return (term_type, operator) in {
             ("context", "eq"),
             ("selected", "is_true"),
             ("selected_any_in_set", "is_true"),
+            ("reference_selected", "is_true"),
         }
 
     def evaluate(self, variant_id: str, explicit_selected_ids: list[str]) -> dict[str, Any]:
@@ -345,6 +379,9 @@ class CsvSlice:
             return selector_id in selected
         if selector_type == "selectable_set":
             return any(member_id in selected for member_id in self.item_set_members.get(selector_id, []))
+        if selector_type == "non_selectable_reference":
+            option_id = self.non_selectable_reference_option_id(selector_id)
+            return selector_id in selected or bool(option_id and option_id in selected)
         return False
 
     def condition_matches(self, condition_set_id: str, context: dict[str, str], selected: set[str]) -> bool:
@@ -369,6 +406,9 @@ class CsvSlice:
             matched = left_ref in selected
         elif term_type == "selected_any_in_set" and operator == "is_true":
             matched = any(member_id in selected for member_id in self.item_set_members.get(left_ref, []))
+        elif term_type == "reference_selected" and operator == "is_true":
+            option_id = self.non_selectable_reference_option_id(left_ref)
+            matched = left_ref in selected or bool(option_id and option_id in selected)
         else:
             matched = False
         return not matched if as_bool(term.get("negate", "")) else matched
@@ -678,8 +718,8 @@ class CsvSlice:
         }
 
     def legacy_dependency_rule(self, row: dict[str, str], source_selectable_id: str, target_selectable_id: str) -> dict[str, Any]:
-        source_display = self.display_row(source_selectable_id)
-        target_display = self.display_row(target_selectable_id)
+        source_display = self.display_or_reference_row(source_selectable_id)
+        target_display = self.display_or_reference_row(target_selectable_id)
         rule_type = row["rule_type"]
         if rule_type == "requires":
             scoped_direct_selectable = row["subject_selector_type"] == "selectable" and row.get("applies_when_condition_set_id", "")
@@ -796,6 +836,9 @@ class CsvSlice:
             return [selector_id]
         if selector_type == "selectable_set":
             return list(self.item_set_members.get(selector_id, []))
+        if selector_type == "non_selectable_reference":
+            option_id = self.non_selectable_reference_option_id(selector_id)
+            return [option_id] if option_id else []
         return []
 
     def condition_selected_selectable(self, condition_set_id: str) -> str:
@@ -804,7 +847,13 @@ class CsvSlice:
             for term in self.condition_terms.get(condition_set_id, [])
             if term["term_type"] == "selected" and term["operator"] == "is_true" and not as_bool(term.get("negate", ""))
         ]
-        return selected_terms[0] if len(selected_terms) == 1 else ""
+        reference_terms = [
+            self.non_selectable_reference_option_id(term["left_ref"])
+            for term in self.condition_terms.get(condition_set_id, [])
+            if term["term_type"] == "reference_selected" and term["operator"] == "is_true" and not as_bool(term.get("negate", ""))
+        ]
+        endpoint_terms = selected_terms + [term for term in reference_terms if term]
+        return endpoint_terms[0] if len(endpoint_terms) == 1 else ""
 
     def condition_body_style_scope(self, condition_set_id: str) -> str:
         body_terms = [
@@ -836,8 +885,30 @@ class CsvSlice:
     def display_row(self, selectable_id: str) -> dict[str, str]:
         return self.selectable_display.get(selectable_id, {})
 
+    def display_or_reference_row(self, selectable_or_reference_option_id: str) -> dict[str, str]:
+        display = self.display_row(selectable_or_reference_option_id)
+        if display:
+            return display
+        reference = self.reference_for_option_id(selectable_or_reference_option_id)
+        if reference:
+            return {
+                "section_id": "",
+                "selection_mode": "",
+                "source_detail_raw": reference.get("notes", ""),
+            }
+        return {}
+
     def legacy_option_id(self, selectable_id: str) -> str:
         return self.display_row(selectable_id).get("legacy_option_id") or selectable_id
+
+    def reference_for_option_id(self, option_id: str) -> dict[str, str]:
+        for row in self.non_selectable_references.values():
+            if row.get("option_id", "") == option_id:
+                return row
+        return {}
+
+    def non_selectable_reference_option_id(self, reference_selector_id: str) -> str:
+        return self.non_selectable_reference_selectors.get(reference_selector_id, {}).get("option_id", "")
 
 
 def parse_args() -> argparse.Namespace:

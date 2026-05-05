@@ -1,44 +1,38 @@
 # Codex Pickup
 
-We were working in `/Users/seandm/Projects/27vette` on the Stingray CSV/shadow migration control plane. The latest completed work was **Pass 126: human-readable migration status report**. It generated a workspace audit bundle at `pass126-migration-status-report/` with:
+We are continuing the `27vette` schema_refactor to CSV for Stingray CSV-shadow ownership.
 
-- `migration-status-report.md`
-- `csv-owned-projected.csv`
-- `production-owned-not-projected.csv`
-- `cross-boundary-relationships.csv`
+Use disciplined pass workflow:
+
+- spec first
+- provide Codex prompts with recommended reasoning level
+- report-only vs migration scope must be explicit
+
+Current status:
+
+- Pass 156 showed no remaining ready migration rows: 83 preserved rows remain.
+- Pass 157/158/159 split the legacy/non-selectable lane and added `data/stingray/validation/non_selectable_references.csv`.
+- Pass 160 designed Option A for reference support: `subject_selector_type=non_selectable_reference` and `condition_terms.term_type=reference_selected`.
+- Pass 161 implemented support only in `scripts/stingray_csv_first_slice.py`, with synthetic tests. No real migration rows were added.
+- Full ladder after Pass 161 passed: `445/445`.
+- No production/runtime/generated/workbook/form-app files were touched.
+- Real data counts remain unchanged: `dependency_rules.csv` 101 rows, `requires` 3, `excludes` 98, `auto_adds.csv` 19 active, preserved rows 83, `selectables.csv` 97, non-selectable refs 6.
 
 Key decisions:
 
-- CSV/shadow remains experimental only; no source switch or runtime cutover.
-- Production behavior remains the oracle.
-- Reporting is audit-only and non-decisional.
-- “CSV-owned/projected” means currently emitted/owned by the shadow CSV migration package.
-- “Production-owned/not-projected” means still coming from old generated production data, not necessarily bad or missing.
-- Cross-boundary relationships are split between current guarded dependencies and manifest-only preservation rows.
-- Decision ledger review should happen only after reading the migration status map.
-
-Current reconciled Pass 126 counts:
-
-- CSV-owned/projected: 68
-- Production-owned/not-projected: 147
-- Cross-boundary relationship rows: 122
-- Current guarded dependencies: 43
-- Manifest-only preservation rows/groups: 83 / 78
-- Invalid preserved rows: 0
+- Do not project `5VM`, `5W8`, `5ZW`, `CF8`, `RYQ`, or `CFX` as customer selectables.
+- `5VM/5W8/5ZW` can now participate in future CSV-owned dependency rules via registered non-selectable references.
+- `CF8/RYQ` remain runtime-owned structured references.
+- `CFX` remains design-gated for possible non-selectable auto-add/include target support.
 
 Direction:
 
-- Continue spec-first, evidence-backed, narrow control-plane/report passes before any implementation migration.
-- Use the Pass 126 report to understand migration status by category/section, then use the Pass 125 decision ledger for human review notes.
-- Do not apply ledger decisions or migrate anything until explicitly approved.
+- Next useful pass is likely Pass 162: migrate a tiny/safe subset of `5VM/5W8/5ZW` rules using the new reference selector support, or do a final preflight selecting the safest subset.
+- Keep migration small and oracle-confirmed.
+- Do not touch catalog/display/pricing/runtime/generated/workbook.
 
-Open next steps:
+Open questions / next steps:
 
-- Review `migration-status-report.md` and the three CSV sidecars.
-- Decide which category/section areas need manual review first.
-- Potential next pass: make the migration status report reproducible via a small checked-in helper/test if we want to freeze it, or start reviewing ledger rows using the status report as context.
-
-Important user/business context:
-
-- You are Sean, Corvette specialist at Stingray Chevrolet in Plant City, FL.
-- You’re building structured Corvette order/configuration systems and prefer careful, stepwise, evidence-backed migrations with strict scope control and tests.
+- Decide whether Pass 162 should be report-only candidate selection or a micro-migration.
+- If migrating, likely start with simple plain excludes involving projected normal endpoints, not Z51/package-adjacent rows.
+- Ensure any migration adds only dependency/condition rows plus matching ownership cleanup, with production-oracle message parity.

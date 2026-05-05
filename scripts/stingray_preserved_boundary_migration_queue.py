@@ -104,6 +104,25 @@ REGISTERED_REFERENCE_DECISIONS = [
     "manual_review",
     "normal_catalog_projection_needed",
 ]
+REFERENCE_SELECTOR_TARGET_RPOS = {"5VM", "5W8", "5ZW"}
+REFERENCE_SELECTOR_MODEL_NAME = "Option A - non_selectable_reference selector"
+REFERENCE_SELECTOR_SAFETY_RULES = [
+    "non_selectable_reference IDs must exist in non_selectable_references.csv.",
+    "non_selectable_reference IDs must not exist in selectables.csv.",
+    "non_selectable_reference rules may compile to legacy production-shaped rules.",
+    "non_selectable_reference rows must not create UI/display/catalog rows.",
+    "non_selectable_reference condition terms must only be used for registered references.",
+    "Unknown references fail validation.",
+    "A reference with projection_policy=never_project_as_selectable cannot be converted to a normal selectable by migration scripts.",
+]
+REFERENCE_SELECTOR_FUTURE_IMPLEMENTATION_FILES = [
+    "data/stingray/logic/dependency_rules.csv",
+    "data/stingray/logic/condition_sets.csv",
+    "data/stingray/logic/condition_terms.csv",
+    "scripts/stingray_csv_first_slice.py",
+    "tests/stingray/first-slice-csv.test.mjs",
+    "tests/stingray/first-slice-shadow-data.test.mjs",
+]
 
 
 class QueueError(ValueError):
@@ -379,6 +398,14 @@ def classify_row(row: dict[str, str], manifest_row_id: str, context: dict[str, A
     price_rules = indexes["price_rules_by_pair"].get((source_id, target_id), [])
     rule_types = sorted({rule.get("rule_type", "") for rule in rules if rule.get("rule_type", "")})
     oracle_rule_type = rule_types[0] if len(rule_types) == 1 else ""
+    oracle_messages = sorted(
+        {
+            str(rule.get("disabled_reason", "") or rule.get("message", ""))
+            for rule in rules
+            if str(rule.get("disabled_reason", "") or rule.get("message", ""))
+        }
+    )
+    oracle_message = oracle_messages[0] if len(oracle_messages) == 1 else ""
 
     dependency_pairs_set = context["dependency_pairs"]
     auto_add_pairs_set = context["auto_add_pairs"]
@@ -451,6 +478,7 @@ def classify_row(row: dict[str, str], manifest_row_id: str, context: dict[str, A
         "source_resolved_option_id": source_id,
         "target_resolved_option_id": target_id,
         "oracle_rule_type": oracle_rule_type,
+        "oracle_message": oracle_message,
         "oracle_rule_count": len(rules),
         "oracle_price_rule_count": len(price_rules),
         "source_projected": source["projected"],
@@ -808,6 +836,7 @@ def build_registered_reference_selector_preflight_report(args: argparse.Namespac
                 "source_resolved_option_id": row["source_resolved_option_id"],
                 "target_resolved_option_id": row["target_resolved_option_id"],
                 "oracle_behavior": oracle_behavior(row),
+                "oracle_message": row.get("oracle_message", ""),
                 "registered_reference_involved": involved,
                 "reference_role": role,
                 "reference_type": row["reference_type"],
@@ -879,6 +908,235 @@ def build_registered_reference_summary(rows: list[dict[str, Any]]) -> dict[str, 
             ),
         }
     return summary
+
+
+def endpoint_token(row: dict[str, Any], side: str) -> str:
+    rpo = row.get(f"{side}_rpo", "")
+    option_id = row.get(f"{side}_option_id", "")
+    resolved_option_id = row.get(f"{side}_resolved_option_id", "")
+    return rpo or rpo_from_option_id(option_id) or rpo_from_option_id(resolved_option_id) or option_id or resolved_option_id
+
+
+def selector_slug(value: str) -> str:
+    canonical = rpo_from_option_id(value) or value
+    return re.sub(r"[^a-z0-9]+", "_", canonical.lower()).strip("_")
+
+
+def reference_selector_id(identifier: str) -> str:
+    return f"ref_{selector_slug(identifier)}"
+
+
+def registered_reference_for_side(
+    row: dict[str, Any],
+    side: str,
+    registry: dict[str, dict[str, str]],
+) -> dict[str, str] | None:
+    refs = source_refs_for_row(row) if side == "source" else target_refs_for_row(row)
+    matches = [
+        match
+        for match in registry_matches(refs, registry)
+        if (match.get("rpo", "") or rpo_from_option_id(match.get("option_id", ""))) in REFERENCE_SELECTOR_TARGET_RPOS
+    ]
+    if len(matches) == 1:
+        return matches[0]
+    return None
+
+
+def proposed_reference_or_selectable_selector(
+    row: dict[str, Any],
+    side: str,
+    registry: dict[str, dict[str, str]],
+) -> dict[str, str]:
+    reference = registered_reference_for_side(row, side, registry)
+    if reference:
+        identifier = reference.get("rpo", "") or rpo_from_option_id(reference.get("option_id", ""))
+        return {
+            "selector_type": "non_selectable_reference",
+            "selector_id": reference_selector_id(identifier),
+            "registry_reference_id": reference.get("reference_id", ""),
+            "projection_policy": reference.get("projection_policy", ""),
+        }
+    return {
+        "selector_type": "selectable",
+        "selector_id": row.get(f"{side}_resolved_option_id", "") or row.get(f"{side}_option_id", ""),
+        "registry_reference_id": "",
+        "projection_policy": "",
+    }
+
+
+def proposed_condition_for_target(row: dict[str, Any], registry: dict[str, dict[str, str]]) -> dict[str, Any]:
+    reference = registered_reference_for_side(row, "target", registry)
+    target = endpoint_token(row, "target")
+    target_slug = selector_slug(target)
+    if reference:
+        identifier = reference.get("rpo", "") or rpo_from_option_id(reference.get("option_id", ""))
+        ref_id = reference_selector_id(identifier)
+        condition_set_id = f"cs_ref_selected_{selector_slug(identifier)}"
+        return {
+            "condition_set": {
+                "condition_set_id": condition_set_id,
+                "description": f"{identifier} registered non-selectable reference is selected.",
+                "status": "future_reference_condition_set",
+            },
+            "condition_term": {
+                "condition_set_id": condition_set_id,
+                "or_group": "g1",
+                "term_order": "1",
+                "term_type": "reference_selected",
+                "left_ref": ref_id,
+                "operator": "is_true",
+                "right_value": "",
+                "negate": "false",
+                "registry_reference_id": reference.get("reference_id", ""),
+            },
+        }
+    condition_set_id = f"cs_selected_{target_slug}"
+    return {
+        "condition_set": {
+            "condition_set_id": condition_set_id,
+            "description": f"{target} selectable is selected.",
+            "status": "existing_or_standard_selected_condition_set",
+        },
+        "condition_term": {
+            "condition_set_id": condition_set_id,
+            "or_group": "g1",
+            "term_order": "1",
+            "term_type": "selected",
+            "left_ref": row.get("target_resolved_option_id", "") or row.get("target_option_id", ""),
+            "operator": "is_true",
+            "right_value": "",
+            "negate": "false",
+            "registry_reference_id": "",
+        },
+    }
+
+
+def proposed_rule_id(row: dict[str, Any]) -> str:
+    rule_prefix = "req" if row.get("oracle_behavior") == "rule:requires" else "excl"
+    source = selector_slug(endpoint_token(row, "source"))
+    target = selector_slug(endpoint_token(row, "target"))
+    return f"dep_{rule_prefix}_{source}_{target}"
+
+
+def representation_bucket(row: dict[str, Any]) -> str:
+    role = row.get("reference_role", "")
+    if role == "both":
+        return "both_subject_and_target_reference"
+    if role == "source":
+        return "subject_reference"
+    if role == "target":
+        return "target_reference_condition"
+    return "ambiguous"
+
+
+def design_risk_notes(row: dict[str, Any], subject: dict[str, str], condition: dict[str, Any]) -> str:
+    notes: list[str] = []
+    if subject["selector_type"] == "non_selectable_reference":
+        notes.append("requires validator/compiler support for non_selectable_reference subjects")
+    if condition["condition_term"]["term_type"] == "reference_selected":
+        notes.append("requires validator/compiler support for reference_selected condition terms")
+    if row.get("target_rpo", "") in Z51_PACKAGE_RPOS:
+        notes.append("target is package-adjacent and would still need scope approval before migration")
+    if not row.get("oracle_message", ""):
+        notes.append("production message must be re-read during migration implementation")
+    return "; ".join(notes) if notes else "no additional ambiguity under Option A"
+
+
+def build_non_selectable_reference_selector_design_report(args: argparse.Namespace) -> dict[str, Any]:
+    preflight = build_registered_reference_selector_preflight_report(args)
+    registry = registry_indexes(load_non_selectable_references(Path(args.non_selectable_references)))
+    candidates = [
+        row
+        for row in preflight["rows"]
+        if row.get("bucket") == "reference_selector_candidate"
+        and set(row.get("registered_reference_involved", [])) <= REFERENCE_SELECTOR_TARGET_RPOS
+    ]
+    design_rows: list[dict[str, Any]] = []
+    for row in candidates:
+        subject = proposed_reference_or_selectable_selector(row, "source", registry)
+        condition = proposed_condition_for_target(row, registry)
+        oracle_rule_type = row.get("oracle_behavior", "").replace("rule:", "")
+        dependency_rule = {
+            "rule_id": proposed_rule_id(row),
+            "rule_type": oracle_rule_type,
+            "subject_selector_type": subject["selector_type"],
+            "subject_selector_id": subject["selector_id"],
+            "subject_must_be_selected": "true",
+            "applies_when_condition_set_id": "",
+            "target_condition_set_id": condition["condition_set"]["condition_set_id"],
+            "violation_behavior": "disable_and_block",
+            "message": row.get("oracle_message", ""),
+            "priority": "<migration_priority>",
+            "active": "true",
+        }
+        bucket = representation_bucket(row)
+        design_rows.append(
+            {
+                "manifest_row_id": row["manifest_row_id"],
+                "record_type": row["record_type"],
+                "source_rpo": row["source_rpo"],
+                "source_option_id": row["source_option_id"],
+                "target_rpo": row["target_rpo"],
+                "target_option_id": row["target_option_id"],
+                "current_preserved_row": {
+                    "manifest_row_id": row["manifest_row_id"],
+                    "record_type": row["record_type"],
+                    "source": endpoint_token(row, "source"),
+                    "source_option_id": row["source_resolved_option_id"],
+                    "target": endpoint_token(row, "target"),
+                    "target_option_id": row["target_resolved_option_id"],
+                    "reason": row["current_preserved_reason"],
+                },
+                "oracle_behavior": row["oracle_behavior"],
+                "oracle_message": row.get("oracle_message", ""),
+                "registered_reference_involved": row["registered_reference_involved"],
+                "reference_role": row["reference_role"],
+                "representation_bucket": bucket,
+                "proposed_dependency_rule": dependency_rule,
+                "proposed_condition_set": condition["condition_set"],
+                "proposed_condition_term": condition["condition_term"],
+                "compiler_support_needed": True,
+                "validator_support_needed": True,
+                "risk_notes": design_risk_notes(row, subject, condition),
+            }
+        )
+
+    design_rows.sort(
+        key=lambda row: (
+            row["representation_bucket"],
+            row["source_rpo"] or row["source_option_id"] or row["current_preserved_row"]["source"],
+            row["target_rpo"] or row["target_option_id"] or row["current_preserved_row"]["target"],
+            row["manifest_row_id"],
+        )
+    )
+    representation_counts = Counter(row["representation_bucket"] for row in design_rows)
+    ambiguous_count = representation_counts.get("ambiguous", 0)
+    return {
+        "schema_version": 1,
+        "status": "allowed",
+        "proposed_selector_model": REFERENCE_SELECTOR_MODEL_NAME,
+        "model_decision": "Use dependency_rules.csv with subject_selector_type=non_selectable_reference and condition term_type=reference_selected.",
+        "option_a_preferred": True,
+        "option_b_rejected": "Do not reuse selector_type=selectable for registered non-selectable references; it would blur catalog and production-only references.",
+        "option_c_rejected": "A separate reference dependency table is not needed for these 25 rows because dependency_rules.csv can carry rule_type, subject selector, target condition, message, priority, and active state.",
+        "candidate_row_count": len(candidates),
+        "covered_row_count": len(design_rows),
+        "ambiguous_row_count": ambiguous_count,
+        "representation_summary": {
+            "subject_reference_count": representation_counts.get("subject_reference", 0)
+            + representation_counts.get("both_subject_and_target_reference", 0),
+            "target_reference_condition_count": representation_counts.get("target_reference_condition", 0)
+            + representation_counts.get("both_subject_and_target_reference", 0),
+            "both_subject_and_target_reference_count": representation_counts.get("both_subject_and_target_reference", 0),
+            "ambiguous_count": ambiguous_count,
+        },
+        "compiler_support_needed": True,
+        "validator_support_needed": True,
+        "data_migration_performed": False,
+        "future_implementation_files": REFERENCE_SELECTOR_FUTURE_IMPLEMENTATION_FILES,
+        "safety_rules": REFERENCE_SELECTOR_SAFETY_RULES,
+        "rows": design_rows,
+    }
 
 
 def recommend_registered_reference_next_pass(
@@ -1021,6 +1279,36 @@ def print_registered_reference_selector_preflight_text(report: dict[str, Any]) -
         )
 
 
+def print_non_selectable_reference_selector_design_text(report: dict[str, Any]) -> None:
+    print(f"Non-selectable reference selector design candidates: {report['candidate_row_count']}")
+    print(f"Proposed selector model: {report['proposed_selector_model']}")
+    print(f"Covered rows: {report['covered_row_count']}")
+    print(f"Ambiguous rows: {report['ambiguous_row_count']}")
+    print()
+    print("Representation summary:")
+    for key, value in report["representation_summary"].items():
+        print(f"{key}: {value}")
+    print()
+    print("Safety rules:")
+    for index, rule in enumerate(report["safety_rules"], start=1):
+        print(f"{index}. {rule}")
+    print()
+    print("Future implementation files:")
+    for path in report["future_implementation_files"]:
+        print(path)
+    print()
+    print("record_type source target rule_id subject_selector target_condition risk notes")
+    for row in report["rows"]:
+        preserved = row["current_preserved_row"]
+        dependency = row["proposed_dependency_rule"]
+        subject = f"{dependency['subject_selector_type']}:{dependency['subject_selector_id']}"
+        print(
+            f"{row['record_type']} {preserved['source']} {preserved['target']} "
+            f"{dependency['rule_id']} {subject} {dependency['target_condition_set_id']} "
+            f"{row['risk_notes']}"
+        )
+
+
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json", action="store_true", help="Write the full report as JSON to stdout.")
@@ -1044,6 +1332,16 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         action="store_true",
         help="Write the Pass 159 registered-reference selector preflight as JSON.",
     )
+    parser.add_argument(
+        "--non-selectable-reference-selector-design",
+        action="store_true",
+        help="Write the Pass 160 non-selectable reference selector design report as text.",
+    )
+    parser.add_argument(
+        "--non-selectable-reference-selector-design-json",
+        action="store_true",
+        help="Write the Pass 160 non-selectable reference selector design report as JSON.",
+    )
     parser.add_argument("--package", default=str(DEFAULT_PACKAGE), help="Stingray CSV package directory.")
     parser.add_argument("--production-data", default=str(DEFAULT_PRODUCTION_DATA), help="Production form-app/data.js oracle path.")
     parser.add_argument("--ownership-manifest", default=str(DEFAULT_OWNERSHIP_MANIFEST), help="Projected slice ownership manifest path.")
@@ -1058,7 +1356,9 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 def main(argv: list[str]) -> int:
     args = parse_args(argv)
     try:
-        if args.registered_reference_selector_preflight or args.registered_reference_selector_preflight_json:
+        if args.non_selectable_reference_selector_design or args.non_selectable_reference_selector_design_json:
+            report = build_non_selectable_reference_selector_design_report(args)
+        elif args.registered_reference_selector_preflight or args.registered_reference_selector_preflight_json:
             report = build_registered_reference_selector_preflight_report(args)
         elif args.legacy_nonselectable_design or args.legacy_nonselectable_design_json:
             report = build_legacy_nonselectable_design_report(args)
@@ -1067,7 +1367,11 @@ def main(argv: list[str]) -> int:
     except QueueError as error:
         print(str(error), file=sys.stderr)
         return 1
-    if args.registered_reference_selector_preflight_json:
+    if args.non_selectable_reference_selector_design_json:
+        print(json.dumps(report, indent=2, sort_keys=True))
+    elif args.non_selectable_reference_selector_design:
+        print_non_selectable_reference_selector_design_text(report)
+    elif args.registered_reference_selector_preflight_json:
         print(json.dumps(report, indent=2, sort_keys=True))
     elif args.registered_reference_selector_preflight:
         print_registered_reference_selector_preflight_text(report)

@@ -1,49 +1,76 @@
 # Chat Pickup
 
-We were working on the 27vette Stingray CSV/shadow migration, specifically trying to understand the current migration state and whether the new CSV-owned data has actually captured the old/generated relationships.
+We are continuing the **27vette `schema_refactor` CSV/shadow migration** on `https://github.com/seanzmc/27vette/tree/schema_refactor`.
 
-Key decisions/clarifications:
+Workflow rules for next chat:
 
-- Production/generated behavior remains the oracle.
-- No source switch, runtime cutover, manifest edits, workbook/generator/app/generated artifact changes, or migration was performed.
-- The recent Pass 103–125 work built a control-plane/reporting/review system, not the actual migration.
-- The “manifest” is a migration safety checklist, not runtime app logic.
-- “Projected/CSV-owned” means the shadow CSV migration currently owns/emits that option row.
-- “Production-owned/not-projected” means the option row still comes from old generated data.
-- The decision ledger is not for deciding whether valid legacy relationships should be deleted. The safer default is essentially protect_until_migrated until both sides and the relationship itself are represented in CSV and tested.
-- Current ledger terms like preserve / migrate_later are not ideal and may need replacement.
+- Use disciplined pass workflow.
+- Spec first.
+- Provide Codex prompts with recommended reasoning level.
+- Report-only vs migration scope must be explicit.
+- Production/generated `form-app/data.js` remains the oracle.
+- No runtime cutover unless explicitly approved.
+- No generated app/workbook edits unless explicitly approved.
+- Keep migration lanes explicit.
+- Challenge bad assumptions.
 
-Where we landed:
+What we were working on:
+We accelerated the Stingray CSV migration by grouping safe rows into behavior lanes instead of one-row passes. We migrated many proven `excludes`, `requires`, and package include/`included_zero` behaviors into CSV-owned tables while maintaining shadow parity.
 
-- The uploaded migration-status-report.md is useful for option-row status:
-  - 68 CSV-owned/projected RPO rows
-  - 147 production-owned/not-projected RPO rows
-  - 122 preserved cross-boundary manifest rows
-  - 43 current guarded dependencies
-  - 83 manifest-only preservation rows / 78 groups
-  - 0 invalid preserved rows
-- But it does not answer the critical question: whether each old relationship itself is already represented in the new CSV/rules/package data.
+Key decisions:
 
-Direction heading next:
+- Safe migration lanes are now:
+  - Plain excludes → `dependency_rules.csv`
+  - Simple requires → `dependency_rules.csv`
+  - Includes + priceRule 0 → `auto_adds.csv` with `target_price_policy_id=included_zero`
+  - Catalog unlocks → catalog/display/base-price/ownership only
+  - Legacy/non-selectable references → registry + selector support, not normal selectables
 
-- Pause manual ledger review.
-- Build Pass 127: relationship coverage map.
-- Goal: compare preserved relationships against actual data/stingray/ CSV/rules/package files and report whether each relationship is covered, partially covered, missing, or needs mapping.
-- Needed output should include:
-  - relationship-coverage-report.md
-  - relationship-coverage-by-group.csv
-  - data-stingray-file-inventory.csv
-  - relationship-file-inventory.csv
+- `5VM`, `5W8`, and `5ZW` must **not** be projected into `selectables.csv`; they are registered non-selectable references.
+- `CF8` and `RYQ` remain runtime-owned structured references.
+- `CFX` is a non-selectable auto-add target needing separate design later.
 
-Open questions/next steps:
+Current status:
 
-- Which data/stingray/ files are real rule/package/relationship files vs placeholders/control-plane files?
-- Which files are actually consumed by scripts/tests/runtime?
-- For each preserved relationship, what type is it: include, requires, conflict, auto-add, price rule, choice group, availability, etc.?
-- Where, if anywhere, is that relationship already represented in the new CSV schema?
+- Last completed pass: **Pass 161**.
+- Pass 161 implemented compiler/validator support for `subject_selector_type=non_selectable_reference` and `term_type=reference_selected`, using `non_selectable_references.csv`.
+- No real data migration happened in Pass 161.
+- Counts after Pass 161:
+  - `dependency_rules.csv`: 101 rows total
+  - `requires`: 3
+  - `excludes`: 98
+  - `auto_adds.csv`: 19 active rows
+  - `condition_sets.csv`: 42
+  - `condition_terms.csv`: 44
+  - `selectables.csv`: 97
+  - active `preserved_cross_boundary`: 83
+  - `non_selectable_references.csv`: 6 active references
 
-Important context:
+- Full ladder after Pass 161: **445/445 passing**.
+- Remaining queue before Pass 162:
+  - 25 `5VM/5W8/5ZW` registered-reference candidate rows
+  - 14 `CF8/RYQ` keep-preserved runtime-owned rows
+  - 1 `CFX` non-selectable auto-add-target design row
+  - 23 color-support-needed rows
+  - 20 Z51/package-adjacent rows
 
-- I’m Sean, Corvette specialist at Stingray Chevrolet in Plant City, building structured Corvette order/configuration systems.
-- I am frustrated by the slow migration and need plain-English status maps, not abstract control-plane language.
-- I need the tooling to prove what is migrated instead of asking me to infer it manually.
+Direction:
+Next we are moving from support into migration for the `5VM/5W8/5ZW` registered-reference dependency rows. This should use the new Pass 161 support without projecting those references as customer-selectable options.
+
+Next pass:
+**Pass 162 — migrate all safe `5VM/5W8/5ZW` registered-reference dependency rows only.**
+
+Pass 162 scope:
+
+- Migration scope, not report-only.
+- Migrate up to 25 oracle-confirmed rows involving registered references `5VM`, `5W8`, and `5ZW`.
+- Use:
+  - `subject_selector_type=non_selectable_reference`
+  - `subject_selector_id=ref_5vm/ref_5w8/ref_5zw`
+  - target conditions using `term_type=reference_selected` where needed.
+
+- Add condition sets/terms only for reference targets actually used.
+- Remove only the matching migrated preserved rows.
+- Do not touch `selectables.csv`, catalog/display/base-price, `auto_adds.csv`, price rules, runtime, generated output, workbook, or `form-app/data.js`.
+- `CF8`, `RYQ`, and `CFX` rows remain preserved.
+- Recommended Codex reasoning level: **High**.
