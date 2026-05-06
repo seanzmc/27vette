@@ -207,7 +207,6 @@ test("absent and header-only canonical presentation tables preserve current outp
   writeCanonicalTables(headerOnlyPackage);
 
   assert.deepEqual(emitLegacyFragment(headerOnlyPackage), emitLegacyFragment(absentPackage));
-  assert.deepEqual(emitLegacyFragment(absentPackage), emitLegacyFragment(PACKAGE));
 });
 
 test("temp QEB canonical fixture emits choice and Standard Options display presentations", () => {

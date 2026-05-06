@@ -1116,7 +1116,7 @@ test("pass 141 projects only PCX and PDV package source catalog rows", () => {
   assert.equal(basePrices.length, 104);
   assert.equal(
     ownershipRows.filter((row) => row.record_type === "selectable" && row.ownership === "projected_owned" && row.active === "true").length,
-    106
+    107
   );
 
   const expected = [

@@ -83,8 +83,8 @@ test("projection inventory report emits all artifacts and current summary counts
   const summary = JSON.parse(fs.readFileSync(path.join(outDir, "projection_summary.json"), "utf8"));
   assert.equal(summary.schema_version, 1);
   assert.equal(summary.production_selectables.customer_facing_count, 153);
-  assert.equal(summary.production_selectables.csv_projected_customer_facing_count, 106);
-  assert.equal(summary.production_selectables.customer_facing_missing_count, 47);
+  assert.equal(summary.production_selectables.csv_projected_customer_facing_count, 107);
+  assert.equal(summary.production_selectables.customer_facing_missing_count, 46);
   assert.equal(summary.production_relationships.rules.total, 238);
   assert.deepEqual(summary.production_relationships.rules.by_rule_type, { excludes: 158, includes: 64, requires: 16 });
   assert.deepEqual(summary.production_relationships.rules.by_runtime_action, { active: 235, replace: 3 });

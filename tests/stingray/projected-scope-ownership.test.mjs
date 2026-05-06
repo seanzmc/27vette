@@ -69,6 +69,7 @@ const EXPECTED_OWNED_RPOS = [
   "PDV",
   "PDY",
   "PEF",
+  "QEB",
   "R88",
   "R8C",
   "RIA",

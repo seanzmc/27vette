@@ -207,3 +207,4 @@ selectable,,,,,,GPH,projected_owned,Paint section projected slice,true
 selectable,,,,,,G4Z,projected_owned,Paint section projected slice,true
 selectable,,,,,,G26,projected_owned,Paint section projected slice,true
 selectable,,,,,,GKZ,projected_owned,Paint section projected slice,true
+selectable,,,,,,QEB,projected_owned,QEB canonical presentation pilot; emits Wheels choice and Standard Options display duplicate,true
