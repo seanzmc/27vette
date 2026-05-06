@@ -29,6 +29,7 @@ const PASS178_PAINT_EXCLUDES = [
   ["dep_excl_dzx_gkz", "DZX", "GKZ", "cs_selected_gkz"],
   ["dep_excl_dzx_gph", "DZX", "GPH", "cs_selected_gph"],
 ];
+const PASS196_FLAT_PAINT_EXCLUDES = PASS178_PAINT_EXCLUDES.filter(([ruleId]) => ruleId !== "dep_excl_efy_gba");
 const PRESERVED_PAINT_BOUNDARIES = [["ZYC", "GBA"]];
 
 function parseCsv(source) {
@@ -179,10 +180,12 @@ test("Paint projection owns all Paint choices and retires only the stale GBA gua
 
 test("Pass 178 migrates only approved paint compatibility rules", () => {
   const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
+  const simpleRules = parseCsv(fs.readFileSync("data/stingray/logic/simple_dependency_rules.csv", "utf8"));
   const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
 
-  assert.equal(rules.length, 130);
+  assert.equal(rules.length, 112);
+  assert.equal(simpleRules.length, 19);
   assert.equal(conditionSets.length, 51);
   assert.equal(conditionTerms.length, 53);
 
@@ -190,18 +193,25 @@ test("Pass 178 migrates only approved paint compatibility rules", () => {
     assert.ok(conditionSets.find((row) => row.condition_set_id === conditionSetId && row.active === "true"), `${conditionSetId} should exist`);
   }
 
-  for (const [ruleId, sourceRpo, targetRpo, conditionSetId] of PASS178_PAINT_EXCLUDES) {
+  for (const [ruleId, sourceRpo, targetRpo, conditionSetId] of PASS196_FLAT_PAINT_EXCLUDES) {
     const rule = rules.find((row) => row.rule_id === ruleId);
-    assert.ok(rule, `${ruleId} should exist`);
-    assert.equal(rule.rule_type, "excludes");
-    assert.equal(rule.subject_selector_type, "selectable");
-    assert.equal(rule.subject_selector_id, optionIdForRpo(sourceRpo));
-    assert.equal(rule.subject_must_be_selected, "true");
-    assert.equal(rule.target_condition_set_id, conditionSetId);
-    assert.equal(rule.violation_behavior, "disable_and_block");
-    assert.equal(rule.active, "true");
+    const simpleRule = simpleRules.find((row) => row.rule_id === ruleId);
+    assert.equal(rule, undefined, `${ruleId} should no longer be authored in dependency_rules.csv`);
+    assert.ok(simpleRule, `${ruleId} should exist in simple_dependency_rules.csv`);
+    assert.equal(simpleRule.rule_type, "excludes");
+    assert.equal(simpleRule.source_option_id, optionIdForRpo(sourceRpo));
+    assert.equal(simpleRule.target_option_id, optionIdForRpo(targetRpo));
+    assert.equal(simpleRule.violation_behavior, "disable_and_block");
+    assert.equal(simpleRule.active, "true");
     assert.ok(conditionTerms.find((row) => row.condition_set_id === conditionSetId && row.left_ref === optionIdForRpo(targetRpo)));
   }
+
+  const efyRule = rules.find((row) => row.rule_id === "dep_excl_efy_gba");
+  assert.ok(efyRule, "dep_excl_efy_gba should remain normalized");
+  assert.equal(efyRule.rule_type, "excludes");
+  assert.equal(efyRule.subject_selector_id, optionIdForRpo("EFY"));
+  assert.equal(efyRule.target_condition_set_id, "cs_selected_gba");
+  assert.equal(efyRule.active, "true");
 
   for (const [sourceRpo, targetRpo] of PASS178_PAINT_EXCLUDES.map(([, sourceRpo, targetRpo]) => [sourceRpo, targetRpo])) {
     assert.equal(

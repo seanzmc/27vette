@@ -1,2 +1,20 @@
 rule_id,rule_type,source_option_id,target_option_id,violation_behavior,message,priority,active
+dep_excl_d84_gba,excludes,opt_d84_001,opt_gba_001,disable_and_block,Blocked by D84 Convertible top.,400,true
+dep_excl_d86_gba,excludes,opt_d86_001,opt_gba_001,disable_and_block,Blocked by D86 Convertible top.,401,true
+dep_excl_dpb_gtr,excludes,opt_dpb_001,opt_gtr_001,disable_and_block,Blocked by DPB Carbon Flash with Blue accent Full Length Dual Racing Stripes.,402,true
+dep_excl_dpc_gbk,excludes,opt_dpc_001,opt_gbk_001,disable_and_block,Blocked by DPC Carbon Flash with Yellow accent Full Length Dual Racing Stripes.,403,true
+dep_excl_dpg_g26,excludes,opt_dpg_001,opt_g26_001,disable_and_block,Blocked by DPG Carbon Flash with Orange accent Full Length Dual Racing Stripes.,404,true
+dep_excl_dpl_gkz,excludes,opt_dpl_001,opt_gkz_001,disable_and_block,Blocked by DPL Carbon Flash with Red accent Full Length Dual Racing Stripes.,405,true
+dep_excl_dpl_gph,excludes,opt_dpl_001,opt_gph_001,disable_and_block,Blocked by DPL Carbon Flash with Red accent Full Length Dual Racing Stripes.,406,true
+dep_excl_dsy_g26,excludes,opt_dsy_001,opt_g26_001,disable_and_block,Blocked by DSY Edge Orange Full Length Dual Racing Stripes.,407,true
+dep_excl_dsz_gkz,excludes,opt_dsz_001,opt_gkz_001,disable_and_block,Blocked by DSZ Edge Red Full Length Dual Racing Stripes.,408,true
+dep_excl_dsz_gph,excludes,opt_dsz_001,opt_gph_001,disable_and_block,Blocked by DSZ Edge Red Full Length Dual Racing Stripes.,409,true
+dep_excl_dt0_gbk,excludes,opt_dt0_001,opt_gbk_001,disable_and_block,Blocked by DT0 Competition Yellow Full Length Dual Racing Stripes.,410,true
+dep_excl_due_gtr,excludes,opt_due_001,opt_gtr_001,disable_and_block,Blocked by DUE NEW! Asymmetrical Santorini Blue/Carbon Flash Full Length Dual Racing Stripes.,411,true
+dep_excl_duk_gkz,excludes,opt_duk_001,opt_gkz_001,disable_and_block,Blocked by DUK Asymmetrical Edge Red/Carbon Flash Full Length Dual Racing Stripes.,412,true
+dep_excl_duk_gph,excludes,opt_duk_001,opt_gph_001,disable_and_block,Blocked by DUK Asymmetrical Edge Red/Carbon Flash Full Length Dual Racing Stripes.,413,true
+dep_excl_duw_gtr,excludes,opt_duw_001,opt_gtr_001,disable_and_block,Blocked by DUW Edge Blue Full Length Dual Racing Stripes.,414,true
+dep_excl_dzu_gbk,excludes,opt_dzu_001,opt_gbk_001,disable_and_block,Blocked by DZU Carbon Flash/Competition Yellow Stinger Stripe.,415,true
+dep_excl_dzx_gkz,excludes,opt_dzx_001,opt_gkz_001,disable_and_block,Blocked by DZX Carbon Flash/Edge Red Stinger Stripe.,416,true
+dep_excl_dzx_gph,excludes,opt_dzx_001,opt_gph_001,disable_and_block,Blocked by DZX Carbon Flash/Edge Red Stinger Stripe.,417,true
 dep_excl_sht_pdv,excludes,opt_sht_001,opt_pdv_001,disable_and_block,"Blocked by SHT LPO, Jake hood graphic with Tech Bronze accent.",419,true

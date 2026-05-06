@@ -6,9 +6,9 @@ import vm from "node:vm";
 
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
-const EXPECTED_DEPENDENCY_RULE_COUNT = 130;
+const EXPECTED_DEPENDENCY_RULE_COUNT = 112;
 const EXPECTED_DEPENDENCY_REQUIRES_COUNT = 3;
-const EXPECTED_DEPENDENCY_EXCLUDES_COUNT = 127;
+const EXPECTED_DEPENDENCY_EXCLUDES_COUNT = 109;
 const EXPECTED_CONDITION_SET_COUNT = 51;
 const EXPECTED_CONDITION_TERM_COUNT = 53;
 const PASS132_EXCLUDE_PAIRS = [
@@ -1777,18 +1777,20 @@ test("pass 188 dependency_rules CSV migrates only SHT to PDV package conflict", 
   assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
-  assert.deepEqual(simpleRules, [
-    {
-      rule_id: "dep_excl_sht_pdv",
-      rule_type: "excludes",
-      source_option_id: "opt_sht_001",
-      target_option_id: "opt_pdv_001",
-      violation_behavior: "disable_and_block",
-      message: "Blocked by SHT LPO, Jake hood graphic with Tech Bronze accent.",
-      priority: "419",
-      active: "true",
-    },
-  ]);
+  assert.ok(
+    simpleRules.find(
+      (row) =>
+        row.rule_id === "dep_excl_sht_pdv" &&
+        row.rule_type === "excludes" &&
+        row.source_option_id === "opt_sht_001" &&
+        row.target_option_id === "opt_pdv_001" &&
+        row.violation_behavior === "disable_and_block" &&
+        row.message === "Blocked by SHT LPO, Jake hood graphic with Tech Bronze accent." &&
+        row.priority === "419" &&
+        row.active === "true"
+    ),
+    "dep_excl_sht_pdv should be authored in simple_dependency_rules.csv"
+  );
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS188_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);

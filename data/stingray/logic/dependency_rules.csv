@@ -110,22 +110,4 @@ dep_excl_5do_sfe,excludes,selectable,opt_5do_001,true,,cs_selected_sfe,disable_a
 dep_excl_5do_spy,excludes,selectable,opt_5do_001,true,,cs_selected_spy,disable_and_block,"Blocked by 5DO LPO, 15-spoke bright polished aluminum wheels.",359,true
 dep_excl_5do_spz,excludes,selectable,opt_5do_001,true,,cs_selected_spz,disable_and_block,"Blocked by 5DO LPO, 15-spoke bright polished aluminum wheels.",360,true
 dep_excl_bv4_r8c,excludes,selectable,opt_bv4_001,true,,cs_selected_r8c,disable_and_block,"Blocked by BV4 Personalized Plaque.",361,true
-dep_excl_d84_gba,excludes,selectable,opt_d84_001,true,,cs_selected_gba,disable_and_block,Blocked by D84 Convertible top.,400,true
-dep_excl_d86_gba,excludes,selectable,opt_d86_001,true,,cs_selected_gba,disable_and_block,Blocked by D86 Convertible top.,401,true
-dep_excl_dpb_gtr,excludes,selectable,opt_dpb_001,true,,cs_selected_gtr,disable_and_block,Blocked by DPB Carbon Flash with Blue accent Full Length Dual Racing Stripes.,402,true
-dep_excl_dpc_gbk,excludes,selectable,opt_dpc_001,true,,cs_selected_gbk,disable_and_block,Blocked by DPC Carbon Flash with Yellow accent Full Length Dual Racing Stripes.,403,true
-dep_excl_dpg_g26,excludes,selectable,opt_dpg_001,true,,cs_selected_g26,disable_and_block,Blocked by DPG Carbon Flash with Orange accent Full Length Dual Racing Stripes.,404,true
-dep_excl_dpl_gkz,excludes,selectable,opt_dpl_001,true,,cs_selected_gkz,disable_and_block,Blocked by DPL Carbon Flash with Red accent Full Length Dual Racing Stripes.,405,true
-dep_excl_dpl_gph,excludes,selectable,opt_dpl_001,true,,cs_selected_gph,disable_and_block,Blocked by DPL Carbon Flash with Red accent Full Length Dual Racing Stripes.,406,true
-dep_excl_dsy_g26,excludes,selectable,opt_dsy_001,true,,cs_selected_g26,disable_and_block,Blocked by DSY Edge Orange Full Length Dual Racing Stripes.,407,true
-dep_excl_dsz_gkz,excludes,selectable,opt_dsz_001,true,,cs_selected_gkz,disable_and_block,Blocked by DSZ Edge Red Full Length Dual Racing Stripes.,408,true
-dep_excl_dsz_gph,excludes,selectable,opt_dsz_001,true,,cs_selected_gph,disable_and_block,Blocked by DSZ Edge Red Full Length Dual Racing Stripes.,409,true
-dep_excl_dt0_gbk,excludes,selectable,opt_dt0_001,true,,cs_selected_gbk,disable_and_block,Blocked by DT0 Competition Yellow Full Length Dual Racing Stripes.,410,true
-dep_excl_due_gtr,excludes,selectable,opt_due_001,true,,cs_selected_gtr,disable_and_block,Blocked by DUE NEW! Asymmetrical Santorini Blue/Carbon Flash Full Length Dual Racing Stripes.,411,true
-dep_excl_duk_gkz,excludes,selectable,opt_duk_001,true,,cs_selected_gkz,disable_and_block,Blocked by DUK Asymmetrical Edge Red/Carbon Flash Full Length Dual Racing Stripes.,412,true
-dep_excl_duk_gph,excludes,selectable,opt_duk_001,true,,cs_selected_gph,disable_and_block,Blocked by DUK Asymmetrical Edge Red/Carbon Flash Full Length Dual Racing Stripes.,413,true
-dep_excl_duw_gtr,excludes,selectable,opt_duw_001,true,,cs_selected_gtr,disable_and_block,Blocked by DUW Edge Blue Full Length Dual Racing Stripes.,414,true
-dep_excl_dzu_gbk,excludes,selectable,opt_dzu_001,true,,cs_selected_gbk,disable_and_block,Blocked by DZU Carbon Flash/Competition Yellow Stinger Stripe.,415,true
-dep_excl_dzx_gkz,excludes,selectable,opt_dzx_001,true,,cs_selected_gkz,disable_and_block,Blocked by DZX Carbon Flash/Edge Red Stinger Stripe.,416,true
-dep_excl_dzx_gph,excludes,selectable,opt_dzx_001,true,,cs_selected_gph,disable_and_block,Blocked by DZX Carbon Flash/Edge Red Stinger Stripe.,417,true
 dep_excl_efy_gba,excludes,selectable,opt_efy_001,true,,cs_selected_gba,disable_and_block,Blocked by EFY Body-color accents.,418,true
