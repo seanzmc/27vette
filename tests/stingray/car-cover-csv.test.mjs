@@ -86,6 +86,10 @@ function productionRulesTouching(data, rpos) {
   return data.rules.filter((rule) => ids.has(rule.source_id) || ids.has(rule.target_id));
 }
 
+function ruleByEndpoints(data, sourceId, targetId) {
+  return data.rules.find((rule) => rule.source_id === sourceId && rule.target_id === targetId);
+}
+
 function runtimeFor(data, variantId) {
   const runtime = createRuntime(data);
   const variant = data.variants.find((item) => item.variant_id === variantId);
@@ -148,6 +152,27 @@ test("CSV car-cover legacy fragment matches generated choices and exclusive grou
   assert.deepEqual([...carCoverOptionIds(projected)].sort(), [...productionOptionIds].sort());
   assert.deepEqual(normalizeChoices(projected.choices), normalizeChoices(production.choices));
   assert.deepEqual(normalizeExclusiveGroups(projected.exclusiveGroups, productionOptionIds), normalizeExclusiveGroups(production.exclusiveGroups, productionOptionIds));
+});
+
+test("CSV car-cover legacy fragment emits migrated 5ZW reference-target excludes", () => {
+  const projected = emitCsvLegacyFragment();
+
+  assert.deepEqual(projected.validation_errors, []);
+  assert.equal(projected.choices.some((choice) => choice.rpo === "5ZW" || choice.option_id === "opt_5zw_001"), false);
+
+  for (const [sourceId, expectedReason] of [
+    ["opt_rnx_001", "Blocked by RNX LPO, Premium outdoor car cover."],
+    ["opt_wkq_001", "Blocked by WKQ LPO, Premium indoor car cover."],
+  ]) {
+    const rule = ruleByEndpoints(projected, sourceId, "opt_5zw_001");
+    assert.ok(rule, `${sourceId} should exclude opt_5zw_001`);
+    assert.equal(rule.rule_type, "excludes");
+    assert.equal(rule.target_section, "sec_spoi_001");
+    assert.equal(rule.target_selection_mode, "multi_select_opt");
+    assert.equal(rule.disabled_reason, expectedReason);
+    assert.equal(rule.auto_add, "False");
+    assert.equal(rule.runtime_action, "active");
+  }
 });
 
 test("shadow overlay preserves production-owned car-cover cross-boundary excludes", () => {

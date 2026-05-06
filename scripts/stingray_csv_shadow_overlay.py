@@ -874,6 +874,7 @@ def manifest_structured_lookup_field(record_type: str, field: str) -> str:
 
 def preserved_cross_boundary_contract_report(
     data: dict[str, Any],
+    fragment: dict[str, Any],
     ownership: OwnershipScope,
     namespace_report: dict[str, Any],
     guarded_ids: set[str],
@@ -882,6 +883,7 @@ def preserved_cross_boundary_contract_report(
     choice_ids = production_choice_option_ids(data)
     interior_ids = production_interior_ids(data)
     current_rows_by_side = structured_rows_by_record_side(data)
+    fragment_rows_by_side = structured_rows_by_record_side(fragment)
     current_guarded_rows = [row for row in namespace_report["references"] if row["namespace"] == "production_guarded"]
     current_guarded_keys = {
         (row["ref_id"], row["source_kind"], row["source_id"], row["field"])
@@ -971,6 +973,29 @@ def preserved_cross_boundary_contract_report(
                 destination.append(row)
                 if manifest_status == "matched":
                     matched_guarded_keys.add((row["ref_id"], row["source_kind"], row["source_id"], row["field"]))
+
+    for (record_type, source_id, target_id, ref_id, lookup_field), structured_rows in sorted(current_rows_by_side.items()):
+        if ref_id not in guarded_ids or not fragment_rows_by_side.get((record_type, source_id, target_id, ref_id, lookup_field)):
+            continue
+        for structured_row in structured_rows:
+            key = (ref_id, structured_row["source_kind"], structured_row["source_id"], structured_row["field"])
+            if key in matched_guarded_keys:
+                continue
+            matches.append(
+                {
+                    "ref_id": ref_id,
+                    "manifest_status": "matched",
+                    "namespace": "production_guarded",
+                    "source_kind": structured_row["source_kind"],
+                    "source_id": structured_row["source_id"],
+                    "reference_kind": structured_row["reference_kind"],
+                    "reference_path": structured_row["reference_path"],
+                    "field": structured_row["field"],
+                    "status": "allowed",
+                    "notes": "Production guarded structured reference is emitted by the CSV fragment.",
+                }
+            )
+            matched_guarded_keys.add(key)
 
     unguarded_production_guarded = []
     for row in current_guarded_rows:
@@ -2749,6 +2774,7 @@ def main() -> None:
                 projected_ids = projected_option_ids(production, ownership.owned_rpos)
                 report = preserved_cross_boundary_contract_report(
                     production,
+                    fragment,
                     ownership,
                     namespace_report,
                     guarded_ids,

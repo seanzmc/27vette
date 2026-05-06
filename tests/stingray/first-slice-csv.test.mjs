@@ -6,9 +6,11 @@ import vm from "node:vm";
 
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
-const EXPECTED_DEPENDENCY_RULE_COUNT = 101;
+const EXPECTED_DEPENDENCY_RULE_COUNT = 103;
 const EXPECTED_DEPENDENCY_REQUIRES_COUNT = 3;
-const EXPECTED_DEPENDENCY_EXCLUDES_COUNT = 98;
+const EXPECTED_DEPENDENCY_EXCLUDES_COUNT = 100;
+const EXPECTED_CONDITION_SET_COUNT = 43;
+const EXPECTED_CONDITION_TERM_COUNT = 45;
 const PASS132_EXCLUDE_PAIRS = [
   ["dep_excl_pcu_5v7", "opt_pcu_001", "opt_5v7_001", "cs_selected_5v7"],
   ["dep_excl_r88_eyk", "opt_r88_001", "opt_eyk_001", "cs_selected_eyk"],
@@ -20,6 +22,10 @@ const PASS132_EXCLUDE_PAIRS = [
 const PASS137_EXCLUDE_PAIRS = [
   ["dep_excl_wkq_5zu", "opt_wkq_001", "opt_5zu_001", "cs_selected_5zu"],
   ["dep_excl_rnx_5zu", "opt_rnx_001", "opt_5zu_001", "cs_selected_5zu"],
+];
+const PASS164_EXCLUDE_PAIRS = [
+  ["dep_excl_rnx_5zw", "opt_rnx_001", "ref_5zw", "cs_ref_selected_5zw"],
+  ["dep_excl_wkq_5zw", "opt_wkq_001", "ref_5zw", "cs_ref_selected_5zw"],
 ];
 const PASS138_EXCLUDE_PAIRS = [
   ["dep_excl_sti_5v7", "opt_sti_001", "opt_5v7_001", "cs_selected_5v7"],
@@ -517,8 +523,41 @@ test("pass 137 dependency_rules CSV migrates only WKQ and RNX to 5ZU excludes", 
 
   assert.equal(rules.filter((rule) => rule.rule_id === "dep_excl_wkq_5zz").length, 1);
   assert.equal(rules.filter((rule) => rule.rule_id === "dep_excl_rnx_5zz").length, 1);
-  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_wkq_5zw"), false);
-  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_rnx_5zw"), false);
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_rnx_z51"), false);
+});
+
+test("pass 164 dependency_rules CSV migrates only WKQ and RNX to 5ZW reference-target excludes", () => {
+  const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
+  const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
+  const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
+
+  for (const [ruleId, sourceId, referenceId, conditionSetId] of PASS164_EXCLUDE_PAIRS) {
+    const rule = rules.find((candidate) => candidate.rule_id === ruleId);
+    assert.ok(rule, `${ruleId} should exist`);
+    assert.equal(rule.rule_type, "excludes");
+    assert.equal(rule.subject_selector_type, "selectable");
+    assert.equal(rule.subject_selector_id, sourceId);
+    assert.equal(rule.subject_must_be_selected, "true");
+    assert.equal(rule.target_condition_set_id, conditionSetId);
+    assert.equal(rule.active, "true");
+
+    assert.ok(conditionSets.find((conditionSet) => conditionSet.condition_set_id === conditionSetId), `${conditionSetId} should exist`);
+    assert.ok(
+      conditionTerms.find(
+        (term) =>
+          term.condition_set_id === conditionSetId &&
+          term.term_type === "reference_selected" &&
+          term.left_ref === referenceId &&
+          term.operator === "is_true"
+      ),
+      `${conditionSetId} should select ${referenceId}`
+    );
+  }
+
+  for (const rpo of ["5VM", "5W8"]) {
+    assert.equal(rules.some((rule) => rule.rule_id === `dep_excl_wkq_${rpo.toLowerCase()}`), false);
+    assert.equal(rules.some((rule) => rule.rule_id === `dep_excl_rnx_${rpo.toLowerCase()}`), false);
+  }
   assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_rnx_z51"), false);
 });
 
@@ -1519,8 +1558,8 @@ test("pass 154 projects only safe remaining Pass 149 boundary endpoints", () => 
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
   assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
-  assert.equal(conditionSets.length, 42);
-  assert.equal(conditionTerms.length, 44);
+  assert.equal(conditionSets.length, EXPECTED_CONDITION_SET_COUNT);
+  assert.equal(conditionTerms.length, EXPECTED_CONDITION_TERM_COUNT);
 
   for (const rpo of PASS154_SAFE_ENDPOINT_RPOS) {
     const optionId = `opt_${rpo.toLowerCase()}_001`;
@@ -1650,8 +1689,8 @@ test("pass 150 dependency_rules CSV migrates only newly unblocked PCX plain excl
   assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
-  assert.equal(conditionSets.length, 42);
-  assert.equal(conditionTerms.length, 44);
+  assert.equal(conditionSets.length, EXPECTED_CONDITION_SET_COUNT);
+  assert.equal(conditionTerms.length, EXPECTED_CONDITION_TERM_COUNT);
   assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS150_EXCLUDE_PAIRS) {
@@ -1753,8 +1792,8 @@ test("pass 151 auto_adds CSV migrates only PCX package include for 5DG", () => {
   assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
-  assert.equal(conditionSets.length, 42);
-  assert.equal(conditionTerms.length, 44);
+  assert.equal(conditionSets.length, EXPECTED_CONDITION_SET_COUNT);
+  assert.equal(conditionTerms.length, EXPECTED_CONDITION_TERM_COUNT);
 
   for (const [autoAddId, sourceId, targetId] of PASS151_INCLUDE_PAIRS) {
     const row = autoAdds.find((candidate) => candidate.auto_add_id === autoAddId);
@@ -1856,8 +1895,8 @@ test("pass 152 migrates only safe Pass 149 exposed non-PCX plain excludes", () =
   assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
-  assert.equal(conditionSets.length, 42);
-  assert.equal(conditionTerms.length, 44);
+  assert.equal(conditionSets.length, EXPECTED_CONDITION_SET_COUNT);
+  assert.equal(conditionTerms.length, EXPECTED_CONDITION_TERM_COUNT);
   assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS152_SAFE_EXCLUDE_PAIRS) {
@@ -1986,8 +2025,8 @@ test("pass 153 migrates only SPZ to SPY requirement", () => {
   assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
-  assert.equal(conditionSets.length, 42);
-  assert.equal(conditionTerms.length, 44);
+  assert.equal(conditionSets.length, EXPECTED_CONDITION_SET_COUNT);
+  assert.equal(conditionTerms.length, EXPECTED_CONDITION_TERM_COUNT);
   assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS153_REQUIRE_PAIRS) {
@@ -2111,8 +2150,8 @@ test("pass 155 migrates only newly unblocked 5DO and BV4 plain excludes", () => 
   assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
-  assert.equal(conditionSets.length, 42);
-  assert.equal(conditionTerms.length, 44);
+  assert.equal(conditionSets.length, EXPECTED_CONDITION_SET_COUNT);
+  assert.equal(conditionTerms.length, EXPECTED_CONDITION_TERM_COUNT);
   assert.equal(autoAdds.filter((row) => row.active === "true").length, 19);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS155_EXCLUDE_PAIRS) {

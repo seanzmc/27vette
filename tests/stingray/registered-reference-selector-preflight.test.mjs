@@ -64,7 +64,7 @@ test("registered reference selector preflight inspects all registered preserved 
   assert.equal(report.schema_version, 1);
   assert.equal(report.status, "allowed");
   assert.equal(report.inspected_row_count, registeredQueueRows.length);
-  assert.equal(report.inspected_row_count, 40);
+  assert.equal(report.inspected_row_count, 38);
   assert.equal(report.rows.length, registeredQueueRows.length);
   assert.equal(new Set(report.rows.map((row) => row.manifest_row_id)).size, registeredQueueRows.length);
   assert.equal(
@@ -114,7 +114,7 @@ test("registered reference selector preflight recommends per-reference handling"
 test("registered reference selector preflight prints a compact human summary", () => {
   const result = runScript(["--registered-reference-selector-preflight"]);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /Registered-reference preserved rows inspected: 40/);
+  assert.match(result.stdout, /Registered-reference preserved rows inspected: 38/);
   assert.match(result.stdout, /reference_selector_candidate:/);
   assert.match(result.stdout, /keep_preserved_runtime_owned:/);
   assert.match(result.stdout, /Recommended next pass:/);

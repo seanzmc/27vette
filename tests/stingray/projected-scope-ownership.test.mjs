@@ -355,8 +355,6 @@ test("projected ownership manifest declares the current multi-slice control scop
     { record_type: "rule", group_id: "", source_rpo: "STI", source_option_id: "", target_rpo: "", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_5w8_001", target_rpo: "STI", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "STI", source_option_id: "", target_rpo: "", target_option_id: "opt_5w8_001", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", group_id: "", source_rpo: "WKQ", source_option_id: "", target_rpo: "", target_option_id: "opt_5zw_001", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", group_id: "", source_rpo: "RNX", source_option_id: "", target_rpo: "", target_option_id: "opt_5zw_001", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "TVS", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "5ZZ", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "5ZU", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },

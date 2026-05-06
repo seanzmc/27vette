@@ -147,14 +147,14 @@ function writeManifest(rows) {
   );
 }
 
-function writeFragment(production, choices) {
+function writeFragment(production, choices, rules = []) {
   return tempFile(
     "fragment.json",
     JSON.stringify(
       {
         variants: production.variants,
         choices,
-        rules: [],
+        rules,
         priceRules: [],
         ruleGroups: [],
         exclusiveGroups: [],
@@ -163,6 +163,15 @@ function writeFragment(production, choices) {
       null,
       2
     )
+  );
+}
+
+function pass164ProductionGuardedCsvRules(production) {
+  return production.rules.filter(
+    (row) =>
+      row.rule_type === "excludes" &&
+      row.target_id === "opt_5zw_001" &&
+      (row.source_id === "opt_rnx_001" || row.source_id === "opt_wkq_001")
   );
 }
 
@@ -259,7 +268,7 @@ test("overlay accepts projected duplicate-RPO EYT only when every production cho
   const production = loadGeneratedData();
   const manifest = writeManifest(eytProjectionManifestRows());
   const eytChoices = production.choices.filter((choice) => choice.rpo === "EYT");
-  const fragment = writeFragment(production, eytChoices);
+  const fragment = writeFragment(production, eytChoices, pass164ProductionGuardedCsvRules(production));
 
   const result = runOverlay(manifest, fragment);
 

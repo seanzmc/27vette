@@ -114,8 +114,8 @@ rule,,DUW,,GTR,,,preserved_cross_boundary,Pass 134 Stripe paint availability bou
 rule,,DZU,,GBK,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DZX,,GKZ,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
 rule,,DZX,,GPH,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,WKQ,,,opt_5zw_001,,preserved_cross_boundary,Car-cover 5ZW rule-only exclude remains production-owned in Pass 15,true
-rule,,RNX,,,opt_5zw_001,,preserved_cross_boundary,Car-cover 5ZW rule-only exclude remains production-owned in Pass 15,true
+rule,,WKQ,,,opt_5zw_001,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 164 using 5ZW non-selectable reference target condition,false
+rule,,RNX,,,opt_5zw_001,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 164 using 5ZW non-selectable reference target condition,false
 rule,,RNX,,Z51,,,preserved_cross_boundary,Car-cover Z51 exclude remains production-owned in Pass 15,true
 rule,,RWJ,,Z51,,,preserved_cross_boundary,Car-cover Z51 exclude remains production-owned in Pass 15,true
 guardedOption,,,,,,5V7,production_guarded,Spoiler-adjacent ground-effects guarded production option in Pass 17,false
