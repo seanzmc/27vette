@@ -25,20 +25,20 @@ test("non-selectable reference selector design covers all 5VM/5W8/5ZW candidates
   assert.equal(report.schema_version, 1);
   assert.equal(report.status, "allowed");
   assert.equal(report.proposed_selector_model, "Option A - non_selectable_reference selector");
-  assert.equal(report.candidate_row_count, 19);
-  assert.equal(report.covered_row_count, 19);
+  assert.equal(report.candidate_row_count, 17);
+  assert.equal(report.covered_row_count, 17);
   assert.equal(report.ambiguous_row_count, 0);
   assert.equal(report.compiler_support_needed, true);
   assert.equal(report.validator_support_needed, true);
   assert.equal(report.data_migration_performed, false);
 
-  assert.equal(report.representation_summary.subject_reference_count, 17);
+  assert.equal(report.representation_summary.subject_reference_count, 15);
   assert.equal(report.representation_summary.target_reference_condition_count, 6);
   assert.equal(report.representation_summary.both_subject_and_target_reference_count, 4);
   assert.equal(report.representation_summary.ambiguous_count, 0);
 
-  assert.equal(report.rows.length, 19);
-  assert.equal(new Set(report.rows.map((row) => row.manifest_row_id)).size, 19);
+  assert.equal(report.rows.length, 17);
+  assert.equal(new Set(report.rows.map((row) => row.manifest_row_id)).size, 17);
   for (const row of report.rows) {
     assert.ok(row.current_preserved_row, `${row.manifest_row_id} missing preserved row`);
     assert.ok(row.oracle_behavior, `${row.manifest_row_id} missing oracle behavior`);
@@ -85,7 +85,7 @@ test("non-selectable reference selector design states safety rules and future im
 test("non-selectable reference selector design prints a compact human summary", () => {
   const result = runScript(["--non-selectable-reference-selector-design"]);
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /Non-selectable reference selector design candidates: 19/);
+  assert.match(result.stdout, /Non-selectable reference selector design candidates: 17/);
   assert.match(result.stdout, /Proposed selector model: Option A - non_selectable_reference selector/);
   assert.match(result.stdout, /Ambiguous rows: 0/);
   assert.match(result.stdout, /Safety rules:/);

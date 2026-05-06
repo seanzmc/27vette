@@ -6,6 +6,8 @@ dep_excl_5v7_tvs,excludes,selectable,opt_5v7_001,true,,cs_selected_tvs,disable_a
 dep_excl_sti_5v7,excludes,selectable,opt_sti_001,true,,cs_selected_5v7,disable_and_block,"Blocked by STI LPO, Composite rocker extensions.",102,true
 dep_excl_sti_5vm,excludes,selectable,opt_sti_001,true,,cs_ref_selected_5vm,disable_and_block,"Blocked by STI LPO, Composite rocker extensions.",103,true
 dep_excl_sti_5w8,excludes,selectable,opt_sti_001,true,,cs_ref_selected_5w8,disable_and_block,"Blocked by STI LPO, Composite rocker extensions.",104,true
+dep_excl_5vm_sti,excludes,non_selectable_reference,ref_5vm,true,,cs_selected_sti,disable_and_block,"Blocked by 5VM LPO, Visible Carbon Fiber Ground Effects.",105,true
+dep_excl_5w8_sti,excludes,non_selectable_reference,ref_5w8,true,,cs_selected_sti,disable_and_block,"Blocked by 5W8 LPO, Carbon Fiber Ground Effects.",106,true
 dep_excl_pcu_5v7,excludes,selectable,opt_pcu_001,true,,cs_selected_5v7,disable_and_block,"Blocked by PCU LPO, Stingray Protection Package.",122,true
 dep_excl_pcu_5vm,excludes,selectable,opt_pcu_001,true,,cs_ref_selected_5vm,disable_and_block,"Blocked by PCU LPO, Stingray Protection Package.",123,true
 dep_excl_pcu_5w8,excludes,selectable,opt_pcu_001,true,,cs_ref_selected_5w8,disable_and_block,"Blocked by PCU LPO, Stingray Protection Package.",124,true

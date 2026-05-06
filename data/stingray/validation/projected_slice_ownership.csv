@@ -184,9 +184,9 @@ rule,,,opt_cf8_001,DUE,,,preserved_cross_boundary,CF8 non-choice roof-to-stripe 
 rule,,,opt_cf8_001,DUK,,,preserved_cross_boundary,CF8 non-choice roof-to-stripe exclude remains production-owned in Pass 100,true
 rule,,,opt_cf8_001,DUW,,,preserved_cross_boundary,CF8 non-choice roof-to-stripe exclude remains production-owned in Pass 100,true
 rule,,,opt_ryq_001,EFY,,,preserved_cross_boundary,RYQ non-choice exterior accent exclude remains production-owned in Pass 100,true
-rule,,,opt_5vm_001,STI,,,preserved_cross_boundary,Ground-effects rule-only legacy-ID exclude remains production-owned for STI in Pass 93,true
+rule,,,opt_5vm_001,STI,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 169 using 5VM non-selectable reference source selector,false
 rule,,STI,,,opt_5vm_001,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 167 using 5VM non-selectable reference target condition,false
-rule,,,opt_5w8_001,STI,,,preserved_cross_boundary,Ground-effects rule-only legacy-ID exclude remains production-owned for STI in Pass 93,true
+rule,,,opt_5w8_001,STI,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 169 using 5W8 non-selectable reference source selector,false
 rule,,STI,,,opt_5w8_001,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 167 using 5W8 non-selectable reference target condition,false
 ruleGroup,,5V7,,5ZU,,,preserved_cross_boundary,5V7 spoiler requires-any group member remains production-owned in Pass 17,false
 ruleGroup,,5V7,,5ZZ,,,preserved_cross_boundary,5V7 spoiler requires-any group member remains production-owned in Pass 17,false
