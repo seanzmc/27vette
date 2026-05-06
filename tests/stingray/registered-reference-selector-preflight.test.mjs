@@ -7,6 +7,7 @@ const SCRIPT = "scripts/stingray_preserved_boundary_migration_queue.py";
 
 const BUCKETS = new Set([
   "reference_selector_candidate",
+  "hidden_rule_only_preserved",
   "keep_preserved_runtime_owned",
   "normal_catalog_projection_candidate",
   "needs_schema_design",
@@ -15,6 +16,7 @@ const BUCKETS = new Set([
 
 const DECISIONS = new Set([
   "yes_reference_selector",
+  "freeze_preserve_for_now",
   "no_keep_preserved",
   "manual_review",
   "normal_catalog_projection_needed",
@@ -36,6 +38,10 @@ const REQUIRED_ROW_FIELDS = [
   "candidate_selector_model",
   "recommended_handling",
   "bucket",
+  "customer_facing_impact",
+  "cutover_blocking",
+  "preserved_classification",
+  "freeze_status",
 ];
 
 function runScript(args = []) {
@@ -82,8 +88,8 @@ test("registered reference selector preflight inspects all registered preserved 
     assert.notEqual(row.bucket, "normal_catalog_projection_candidate");
   }
 
-  assert.match(report.recommended_next_pass, /^LANE F:/);
-  assert.equal(report.can_any_reference_migrate_without_customer_selectable_projection, true);
+  assert.match(report.recommended_next_pass, /^No registered-reference migration recommended/);
+  assert.equal(report.can_any_reference_migrate_without_customer_selectable_projection, false);
   assert.equal(report.compiler_schema_support_required, true);
 });
 
@@ -96,9 +102,12 @@ test("registered reference selector preflight recommends per-reference handling"
   }
 
   for (const reference of ["5VM", "5W8", "5ZW"]) {
-    assert.equal(report.reference_summary[reference].recommended_handling, "yes_reference_selector");
-    assert.equal(report.reference_summary[reference].candidate_selector_model, "non_selectable_reference_selector");
-    assert.equal(rowsFor(report, reference).every((row) => row.bucket === "reference_selector_candidate"), true);
+    assert.equal(report.reference_summary[reference].recommended_handling, "freeze_preserve_for_now");
+    assert.equal(report.reference_summary[reference].candidate_selector_model, "preserve_hidden_rule_only_reference");
+    assert.equal(rowsFor(report, reference).every((row) => row.bucket === "hidden_rule_only_preserved"), true);
+    assert.deepEqual(report.reference_summary[reference].customer_facing_impact, ["none"]);
+    assert.deepEqual(report.reference_summary[reference].freeze_status, ["frozen_preserve_for_now"]);
+    assert.equal(report.reference_summary[reference].compiler_schema_support_required, false);
   }
 
   for (const reference of ["CF8", "RYQ"]) {
@@ -115,9 +124,12 @@ test("registered reference selector preflight prints a compact human summary", (
   const result = runScript(["--registered-reference-selector-preflight"]);
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /Registered-reference preserved rows inspected: 30/);
-  assert.match(result.stdout, /reference_selector_candidate:/);
+  assert.match(result.stdout, /reference_selector_candidate: 0/);
+  assert.match(result.stdout, /hidden_rule_only_preserved: 15/);
   assert.match(result.stdout, /keep_preserved_runtime_owned:/);
-  assert.match(result.stdout, /Recommended next pass:/);
-  assert.match(result.stdout, /reference\s+rows\s+decision\s+candidate selector model/);
-  assert.match(result.stdout, /record_type\s+source\s+target\s+reference\s+role\s+bucket\s+candidate selector model/);
+  assert.match(result.stdout, /Recommended next pass: No registered-reference migration recommended/);
+  assert.match(result.stdout, /reference\s+rows\s+decision\s+classification\s+freeze status/);
+  assert.match(result.stdout, /record_type\s+source\s+target\s+reference\s+role\s+bucket\s+classification\s+freeze status/);
+  assert.match(result.stdout, /5VM\s+8\s+freeze_preserve_for_now/);
+  assert.match(result.stdout, /frozen_preserve_for_now/);
 });

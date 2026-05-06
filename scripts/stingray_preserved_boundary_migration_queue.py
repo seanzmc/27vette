@@ -93,6 +93,7 @@ PASS_157_SURFACE_GROUPS = {
 }
 REGISTERED_REFERENCE_PREFLIGHT_BUCKETS = [
     "reference_selector_candidate",
+    "hidden_rule_only_preserved",
     "keep_preserved_runtime_owned",
     "normal_catalog_projection_candidate",
     "needs_schema_design",
@@ -100,6 +101,7 @@ REGISTERED_REFERENCE_PREFLIGHT_BUCKETS = [
 ]
 REGISTERED_REFERENCE_DECISIONS = [
     "yes_reference_selector",
+    "freeze_preserve_for_now",
     "no_keep_preserved",
     "manual_review",
     "normal_catalog_projection_needed",
@@ -123,6 +125,21 @@ REFERENCE_SELECTOR_FUTURE_IMPLEMENTATION_FILES = [
     "tests/stingray/first-slice-csv.test.mjs",
     "tests/stingray/first-slice-shadow-data.test.mjs",
 ]
+
+HIDDEN_REFERENCE_CONTROL_PLANE_TARGETS = {
+    "5V7",
+    "5ZU",
+    "5ZZ",
+    "T0A",
+    "TVS",
+    "Z51",
+    "opt_5v7_001",
+    "opt_5zu_001",
+    "opt_5zz_001",
+    "opt_t0a_001",
+    "opt_tvs_001",
+    "opt_z51_001",
+}
 
 
 class QueueError(ValueError):
@@ -755,20 +772,26 @@ def selector_preflight_decision(row: dict[str, Any]) -> dict[str, Any]:
     role = row.get("reference_role", "")
 
     if "legacy_option_id" in reference_types:
-        if role == "both":
-            candidate_model = "non_selectable_reference_selector_and_selected_reference"
-        elif role == "source":
-            candidate_model = "subject_selector_type=non_selectable_reference"
+        source_token = row.get("source_rpo") or row.get("source_option_id") or row.get("source_resolved_option_id")
+        target_token = row.get("target_rpo") or row.get("target_option_id") or row.get("target_resolved_option_id")
+        if source_token in LEGACY_RULE_ONLY_RPOS | LEGACY_RULE_ONLY_OPTION_IDS and target_token in LEGACY_RULE_ONLY_RPOS | LEGACY_RULE_ONLY_OPTION_IDS:
+            impact_classification = "future_schema_completeness_only"
+        elif source_token in HIDDEN_REFERENCE_CONTROL_PLANE_TARGETS or target_token in HIDDEN_REFERENCE_CONTROL_PLANE_TARGETS:
+            impact_classification = "hidden_production_control_plane_only"
         else:
-            candidate_model = "term_type=selected_reference"
+            impact_classification = "future_schema_completeness_only"
         return {
-            "bucket": "reference_selector_candidate",
-            "candidate_selector_model": "non_selectable_reference_selector",
-            "candidate_selector_detail": candidate_model,
-            "recommended_handling": "yes_reference_selector",
-            "can_migrate_without_customer_selectable_projection": True,
-            "compiler_schema_support_required": True,
-            "rationale": "Registered rule-only legacy option id could be emitted with non-selectable reference selector support without catalog projection.",
+            "bucket": "hidden_rule_only_preserved",
+            "candidate_selector_model": "preserve_hidden_rule_only_reference",
+            "candidate_selector_detail": "freeze preserved row; no customer-facing or cutover-blocking migration reason",
+            "recommended_handling": "freeze_preserve_for_now",
+            "can_migrate_without_customer_selectable_projection": False,
+            "compiler_schema_support_required": False,
+            "customer_facing_impact": "none",
+            "cutover_blocking": False,
+            "preserved_classification": impact_classification,
+            "freeze_status": "frozen_preserve_for_now",
+            "rationale": "Remaining registered rule-only legacy option rows are hidden production/control-plane or future schema-completeness rows; active production rule objects alone are not a migration reason.",
         }
 
     if "structured_reference" in reference_types:
@@ -779,6 +802,10 @@ def selector_preflight_decision(row: dict[str, Any]) -> dict[str, Any]:
             "recommended_handling": "no_keep_preserved",
             "can_migrate_without_customer_selectable_projection": False,
             "compiler_schema_support_required": False,
+            "customer_facing_impact": "none",
+            "cutover_blocking": False,
+            "preserved_classification": "runtime_owned_structured_reference",
+            "freeze_status": "preserve_runtime_owned",
             "rationale": "Production structured reference remains runtime/generated-owned until a broader structured-reference model is approved.",
         }
 
@@ -790,6 +817,10 @@ def selector_preflight_decision(row: dict[str, Any]) -> dict[str, Any]:
             "recommended_handling": "manual_review",
             "can_migrate_without_customer_selectable_projection": False,
             "compiler_schema_support_required": True,
+            "customer_facing_impact": "none",
+            "cutover_blocking": False,
+            "preserved_classification": "future_schema_completeness_only",
+            "freeze_status": "preserve_until_approved_cutover_scope",
             "rationale": "Display duplicate include target may need non-selectable auto-add target support before migration.",
         }
 
@@ -801,6 +832,10 @@ def selector_preflight_decision(row: dict[str, Any]) -> dict[str, Any]:
             "recommended_handling": "no_keep_preserved",
             "can_migrate_without_customer_selectable_projection": False,
             "compiler_schema_support_required": False,
+            "customer_facing_impact": "none",
+            "cutover_blocking": False,
+            "preserved_classification": "display_duplicate_runtime_owned",
+            "freeze_status": "preserve_runtime_owned",
             "rationale": "Display duplicate reference should not be treated as a customer-selectable catalog row.",
         }
 
@@ -811,6 +846,10 @@ def selector_preflight_decision(row: dict[str, Any]) -> dict[str, Any]:
         "recommended_handling": "manual_review",
         "can_migrate_without_customer_selectable_projection": False,
         "compiler_schema_support_required": False,
+        "customer_facing_impact": "unknown",
+        "cutover_blocking": False,
+        "preserved_classification": "manual_review",
+        "freeze_status": "preserve_until_reviewed",
         "rationale": "Reference needs manual review before a selector model can be proposed.",
     }
 
@@ -850,6 +889,10 @@ def build_registered_reference_selector_preflight_report(args: argparse.Namespac
                 "rationale": decision["rationale"],
                 "can_migrate_without_customer_selectable_projection": decision["can_migrate_without_customer_selectable_projection"],
                 "compiler_schema_support_required": decision["compiler_schema_support_required"],
+                "customer_facing_impact": decision["customer_facing_impact"],
+                "cutover_blocking": decision["cutover_blocking"],
+                "preserved_classification": decision["preserved_classification"],
+                "freeze_status": decision["freeze_status"],
             }
         )
 
@@ -906,6 +949,9 @@ def build_registered_reference_summary(rows: list[dict[str, Any]]) -> dict[str, 
             "can_migrate_without_customer_selectable_projection": any(
                 row["can_migrate_without_customer_selectable_projection"] for row in matching
             ),
+            "customer_facing_impact": sorted({row["customer_facing_impact"] for row in matching}),
+            "preserved_classification": sorted({row["preserved_classification"] for row in matching}),
+            "freeze_status": sorted({row["freeze_status"] for row in matching}),
         }
     return summary
 
@@ -1051,6 +1097,12 @@ def build_non_selectable_reference_selector_design_report(args: argparse.Namespa
         if row.get("bucket") == "reference_selector_candidate"
         and set(row.get("registered_reference_involved", [])) <= REFERENCE_SELECTOR_TARGET_RPOS
     ]
+    frozen_rows = [
+        row
+        for row in preflight["rows"]
+        if row.get("bucket") == "hidden_rule_only_preserved"
+        and set(row.get("registered_reference_involved", [])) <= REFERENCE_SELECTOR_TARGET_RPOS
+    ]
     design_rows: list[dict[str, Any]] = []
     for row in candidates:
         subject = proposed_reference_or_selectable_selector(row, "source", registry)
@@ -1111,15 +1163,21 @@ def build_non_selectable_reference_selector_design_report(args: argparse.Namespa
     )
     representation_counts = Counter(row["representation_bucket"] for row in design_rows)
     ambiguous_count = representation_counts.get("ambiguous", 0)
+    has_candidates = len(candidates) > 0
     return {
         "schema_version": 1,
         "status": "allowed",
-        "proposed_selector_model": REFERENCE_SELECTOR_MODEL_NAME,
-        "model_decision": "Use dependency_rules.csv with subject_selector_type=non_selectable_reference and condition term_type=reference_selected.",
-        "option_a_preferred": True,
+        "proposed_selector_model": REFERENCE_SELECTOR_MODEL_NAME if has_candidates else "Lane closed - preserve hidden rule-only references",
+        "model_decision": (
+            "Use dependency_rules.csv with subject_selector_type=non_selectable_reference and condition term_type=reference_selected."
+            if has_candidates
+            else "No remaining 5VM/5W8/5ZW rows are customer-facing or cutover-blocking; preserve them as hidden rule-only/control-plane rows."
+        ),
+        "option_a_preferred": has_candidates,
         "option_b_rejected": "Do not reuse selector_type=selectable for registered non-selectable references; it would blur catalog and production-only references.",
-        "option_c_rejected": "A separate reference dependency table is not needed for these 25 rows because dependency_rules.csv can carry rule_type, subject selector, target condition, message, priority, and active state.",
+        "option_c_rejected": "A separate reference dependency table is not needed unless a future cutover scope requires full hidden rule-only schema completeness.",
         "candidate_row_count": len(candidates),
+        "frozen_preserved_row_count": len(frozen_rows),
         "covered_row_count": len(design_rows),
         "ambiguous_row_count": ambiguous_count,
         "representation_summary": {
@@ -1130,11 +1188,23 @@ def build_non_selectable_reference_selector_design_report(args: argparse.Namespa
             "both_subject_and_target_reference_count": representation_counts.get("both_subject_and_target_reference", 0),
             "ambiguous_count": ambiguous_count,
         },
-        "compiler_support_needed": True,
-        "validator_support_needed": True,
+        "compiler_support_needed": has_candidates,
+        "validator_support_needed": has_candidates,
         "data_migration_performed": False,
-        "future_implementation_files": REFERENCE_SELECTOR_FUTURE_IMPLEMENTATION_FILES,
+        "future_implementation_files": REFERENCE_SELECTOR_FUTURE_IMPLEMENTATION_FILES if has_candidates else [],
         "safety_rules": REFERENCE_SELECTOR_SAFETY_RULES,
+        "frozen_rows": [
+            {
+                "manifest_row_id": row["manifest_row_id"],
+                "source": endpoint_token(row, "source"),
+                "target": endpoint_token(row, "target"),
+                "registered_reference_involved": row["registered_reference_involved"],
+                "preserved_classification": row["preserved_classification"],
+                "freeze_status": row["freeze_status"],
+                "rationale": row["rationale"],
+            }
+            for row in frozen_rows
+        ],
         "rows": design_rows,
     }
 
@@ -1149,10 +1219,10 @@ def recommend_registered_reference_next_pass(
         if summary["recommended_handling"] == "yes_reference_selector"
     ]
     if selector_candidates:
-        return f"LANE F: design non-selectable reference selector support for {', '.join(selector_candidates)}"
+        return f"LANE F: customer-facing/cutover-blocking non-selectable reference selector work for {', '.join(selector_candidates)}"
     if bucket_counts.get("needs_schema_design", 0):
-        return "LANE F: design non-selectable auto-add/reference target support"
-    return "LANE E: keep registered references preserved/runtime-owned unless design scope changes"
+        return "No registered-reference migration recommended; schema-design rows need explicit customer-facing or cutover approval"
+    return "No registered-reference migration recommended; keep hidden references preserved/frozen unless cutover scope changes"
     recommended = recommend_legacy_design_next_lane(subtype_counts)
     return {
         "schema_version": 1,
@@ -1261,29 +1331,32 @@ def print_registered_reference_selector_preflight_text(report: dict[str, Any]) -
     print(f"Compiler/schema support required: {str(report['compiler_schema_support_required']).lower()}")
     print(f"Recommended next pass: {report['recommended_next_pass']}")
     print()
-    print("reference rows decision candidate selector model")
+    print("reference rows decision classification freeze status")
     for identifier, summary in report["reference_summary"].items():
         print(
             f"{identifier} {summary['row_count']} {summary['recommended_handling']} "
-            f"{summary['candidate_selector_model']}"
+            f"{'|'.join(summary['preserved_classification'])} "
+            f"{'|'.join(summary['freeze_status'])}"
         )
     print()
-    print("record_type source target reference role bucket candidate selector model")
+    print("record_type source target reference role bucket classification freeze status")
     for row in report["rows"]:
         source = row["source_rpo"] or row["source_option_id"] or row["source_resolved_option_id"]
         target = row["target_rpo"] or row["target_option_id"] or row["target_resolved_option_id"]
         references = "|".join(row["registered_reference_involved"])
         print(
             f"{row['record_type']} {source} {target} {references} {row['reference_role']} "
-            f"{row['bucket']} {row['candidate_selector_model']}"
+            f"{row['bucket']} {row['preserved_classification']} {row['freeze_status']}"
         )
 
 
 def print_non_selectable_reference_selector_design_text(report: dict[str, Any]) -> None:
     print(f"Non-selectable reference selector design candidates: {report['candidate_row_count']}")
+    print(f"Frozen hidden rule-only preserved rows: {report['frozen_preserved_row_count']}")
     print(f"Proposed selector model: {report['proposed_selector_model']}")
     print(f"Covered rows: {report['covered_row_count']}")
     print(f"Ambiguous rows: {report['ambiguous_row_count']}")
+    print(f"Model decision: {report['model_decision']}")
     print()
     print("Representation summary:")
     for key, value in report["representation_summary"].items():
@@ -1294,8 +1367,21 @@ def print_non_selectable_reference_selector_design_text(report: dict[str, Any]) 
         print(f"{index}. {rule}")
     print()
     print("Future implementation files:")
-    for path in report["future_implementation_files"]:
-        print(path)
+    if report["future_implementation_files"]:
+        for path in report["future_implementation_files"]:
+            print(path)
+    else:
+        print("none")
+    print()
+    if report["frozen_rows"]:
+        print("Frozen rows:")
+        print("source target reference classification freeze status")
+        for row in report["frozen_rows"]:
+            references = "|".join(row["registered_reference_involved"])
+            print(
+                f"{row['source']} {row['target']} {references} "
+                f"{row['preserved_classification']} {row['freeze_status']}"
+            )
     print()
     print("record_type source target rule_id subject_selector target_condition risk notes")
     for row in report["rows"]:
