@@ -21,6 +21,44 @@ Legacy production data remains the oracle for facts and parity. It is not the bl
 - Keep runtime/control-plane rows out of customer-selectable catalogs until intentionally modeled.
 - Compile to legacy output for parity; do not optimize authoring tables around `form-app/data.js`.
 
+## Current Support vs Final Schema
+
+The repository already has optional support for several canonical-adjacent CSV files. Those current files are compatibility contracts for the shadow compiler, not approved final schema contracts. Do not treat their current headers as final just because the filenames overlap with this RFC.
+
+Current implemented optional tables:
+
+- `catalog/canonical_options.csv`
+  - Current header: `canonical_option_id,rpo,label,description,canonical_kind,active,notes`
+  - Current enums: `canonical_kind` allows `customer_choice`, `equipment_feature`, `structured_reference`, `review_required`
+  - Final direction: add duplicate-RPO review linkage/classification, support `package`, and keep business identity separate from legacy display aliases.
+  - Status: transitional compatibility contract.
+- `ui/option_presentations.csv`
+  - Current header: `presentation_id,canonical_option_id,legacy_option_id,rpo_override,presentation_role,section_id,section_name,category_id,category_name,step_key,choice_mode,selection_mode,selection_mode_label,display_order,selectable,active,label,description,source_detail_raw,notes`
+  - Current enums: `presentation_role` allows `choice`, `standard_options_display`, `standard_equipment_display`, `included_display`, `package_display`, `legacy_alias`, `display_only`
+  - Final direction: use canonical presentation roles such as `customer_choice`, preserve display-only rows as presentations, and split canonical authoring fields from legacy output compatibility fields.
+  - Status: transitional compatibility contract.
+- `logic/option_status_rules.csv`
+  - Current header: `status_rule_id,canonical_option_id,presentation_id,scope_model_year,scope_body_style,scope_trim_level,scope_variant_id,condition_set_id,status,status_label,priority,active,notes`
+  - Current enums: `status` allows `optional`, `standard_choice`, `standard_fixed`, `included_auto`, `unavailable`
+  - Final direction: status should resolve through reusable `context_scopes.csv` unless direct scope columns are explicitly approved for final authoring.
+  - Status: transitional compatibility contract.
+- `pricing/canonical_base_prices.csv`
+  - Current header: `canonical_base_price_id,price_book_id,canonical_option_id,presentation_id,scope_condition_set_id,amount_usd,priority,active,notes`
+  - Final direction: pricing should target exactly one canonical option or presentation and use final context scoping once that decision is approved.
+  - Status: transitional compatibility contract.
+- `logic/simple_dependency_rules.csv`
+  - Current header: `rule_id,rule_type,source_option_id,target_option_id,violation_behavior,message,priority,active`
+  - Current semantics: unscoped active projected selectable-to-selectable `excludes`/`requires`, generating selected-target condition sets and normalized dependency rows.
+  - Final direction: simple relationships should target final presentation identity unless canonical-target inheritance is explicitly approved.
+  - Status: transitional compatibility contract.
+
+Transition strategy is not approved yet. Two viable paths remain:
+
+1. Replace current files in place later after explicit migration of headers/enums and compiler support.
+2. Add v2 files for final contracts and keep current files as compatibility bridges until old lanes are converted.
+
+No support implementation should proceed against final table contracts until this strategy is approved. Any pass that changes headers, enum values, or target identifiers for the current optional files must be support-only and prove header-only/current-data parity.
+
 ## Final Source-Of-Truth Tables
 
 ### Raw/Staging
@@ -36,6 +74,8 @@ Required columns:
 - `model_year`
 - `model_key`
 - `vehicle_line`
+- `source_vehicle_line`
+- `source_model_line`
 - `source_name`
 - `source_path`
 - `source_checksum`
@@ -60,6 +100,10 @@ Required columns:
 - `source_sheet`
 - `source_row_number`
 - `source_order`
+- `source_section_path`
+- `source_order_path`
+- `source_option_key`
+- `raw_row_hash`
 - `legacy_option_id`
 - `rpo`
 - `raw_label`
@@ -86,6 +130,7 @@ Required columns:
 - `canonical_option_id`
 - `presentation_id`
 - `control_plane_reference_id`
+- `relationship_type`
 - `relationship_id`
 - `review_status`
 - `review_reason`
@@ -113,7 +158,50 @@ Allowed `review_status` values:
 - `reviewed`
 - `blocked`
 
+Rules:
+
+- `relationship_type` is required when `relationship_id` is populated so package, price, rule, replacement/default, and control-plane namespaces cannot collide.
+- `source_row_id` plus `raw_row_hash` must provide stable identity for repeated imports and diffing.
+
 ### Canonical Option Identity
+
+#### `duplicate_rpo_reviews.csv`
+
+One durable RPO-level review row per duplicate-RPO decision. This table records the reviewed decision before canonical options or presentations are emitted.
+
+Required columns:
+
+- `duplicate_rpo_review_id`
+- `rpo`
+- `model_year`
+- `model_key`
+- `source_row_ids`
+- `duplicate_rpo_classification`
+- `decision_reason`
+- `review_status`
+- `reviewed_by`
+- `reviewed_at`
+- `active`
+- `notes`
+
+Allowed `duplicate_rpo_classification` values:
+
+- `display_only_duplicate`
+- `true_separate_selectable_variant`
+- `mixed_display_and_selectable_variants`
+- `ambiguous_requires_review`
+
+Allowed `review_status` values:
+
+- `unreviewed`
+- `reviewed`
+- `blocked`
+
+Rules:
+
+- Duplicate RPOs require an active reviewed row before projection unless the importer can prove the RPO is not duplicated in the active source set.
+- `canonical_options.csv` may repeat the classification for local readability, but the durable RPO-level decision lives here.
+- Complex duplicate RPOs such as `AE4`, `AH2`, `AQ9`, and `UQT` must remain `ambiguous_requires_review` until explicitly approved.
 
 #### `canonical_options.csv`
 
@@ -123,6 +211,7 @@ Required columns:
 
 - `canonical_option_id`
 - `rpo`
+- `duplicate_rpo_review_id`
 - `label`
 - `description`
 - `canonical_kind`
@@ -181,11 +270,10 @@ Allowed `alias_type` values:
 
 One canonical option can appear in multiple surfaces.
 
-Required columns:
+Final canonical authoring columns:
 
 - `presentation_id`
 - `canonical_option_id`
-- `legacy_option_id`
 - `rpo_override`
 - `presentation_role`
 - `choice_group_id`
@@ -194,9 +282,7 @@ Required columns:
 - `category_id`
 - `category_name`
 - `step_key`
-- `choice_mode`
 - `selection_mode`
-- `selection_mode_label`
 - `display_order`
 - `selectable`
 - `active`
@@ -204,6 +290,19 @@ Required columns:
 - `description`
 - `source_detail_raw`
 - `notes`
+
+Compatibility/output columns:
+
+- `legacy_option_id`
+- `choice_mode`
+- `selection_mode_label`
+
+Rules for compatibility/output columns:
+
+- `legacy_option_id` remains required while the compiler must emit legacy-compatible `choices.option_id`, but it is not business identity.
+- `choice_mode` is a legacy output compatibility field unless final choice-group support explicitly adopts it as authoring syntax.
+- `selection_mode_label` is legacy/display output metadata unless a later UI-copy contract explicitly makes it author-authored canonical copy.
+- Final presentation authoring should derive choice behavior from `choice_groups.csv` and membership, not from duplicated legacy mode fields.
 
 Allowed `presentation_role` values:
 
@@ -213,11 +312,13 @@ Allowed `presentation_role` values:
 - `included_display`
 - `package_display`
 - `legacy_alias`
+- `display_only`
 
 Rules:
 
 - Display-only Standard Options and Standard Equipment rows are presentations, not fake customer-selectable options.
-- `display_only` is a selection/presentation behavior, not a business status.
+- Use surface-specific display roles when known. Use `display_only` only when the source row is known to be display-only but the display surface still needs review.
+- `display_only` is a presentation role, not a business status.
 
 ### Context And Status
 
@@ -264,7 +365,10 @@ Allowed `status` values:
 
 Rules:
 
-- Exactly one of `canonical_option_id` or `presentation_id` is preferred. A presentation-specific rule overrides a canonical rule.
+- Exactly one of `canonical_option_id` or `presentation_id` is required for final authoring.
+- Use `canonical_option_id` for inherited baseline status that applies to every active presentation for the canonical option within the same resolved context.
+- Use `presentation_id` for a surface-specific status, such as a Standard Options display row that differs from the customer-choice presentation.
+- A presentation-specific rule overrides a canonical rule.
 - `display_only` must never be emitted as a business status.
 
 ### Choice Groups
@@ -338,6 +442,8 @@ Required columns:
 Rules:
 
 - Exactly one of `canonical_option_id` or `presentation_id` is required.
+- Use `canonical_option_id` for inherited baseline base price that applies to every priced customer-choice presentation for the canonical option within the same resolved context.
+- Use `presentation_id` when one presentation has a different emitted base price or must preserve a legacy price surface independently.
 - Presentation-specific base prices override canonical-option base prices.
 - Existing legacy exact selectable base prices may take precedence during transition, but final authoring should use canonical targets.
 
@@ -356,7 +462,7 @@ Required columns:
 
 #### `simple_dependency_rules.csv`
 
-Narrow authoring table for simple unscoped projected selectable-to-selectable excludes/requires.
+Narrow authoring table for simple unscoped customer choice-to-customer choice excludes/requires.
 
 Required columns:
 
@@ -383,6 +489,9 @@ Allowed `violation_behavior` values:
 Rules:
 
 - Only unscoped simple choice-to-choice rules belong here.
+- Final simple rules target presentations. The current implemented table is transitional and targets legacy option IDs via `source_option_id` and `target_option_id`.
+- During transition, current flat rows compile into normalized `condition_sets.csv`, `condition_terms.csv`, and `dependency_rules.csv` equivalents using the emitted legacy option IDs.
+- A future final compiler may generate selected-target conditions from `source_presentation_id` and `target_presentation_id`; it must preserve the same legacy emitted dependency rule shape for parity.
 - Do not use this table for packages, price rules, replacement/default behavior, non-selectable references, runtime/control-plane rows, or context-scoped rules.
 
 ### Requires-Any Groups
@@ -565,6 +674,16 @@ Output contracts:
 - Price output must distinguish base price from price overrides.
 - Runtime/control-plane references must not appear as customer-selectable choices unless explicitly modeled as presentations.
 
+Compiler ownership expectations:
+
+- `canonical_options.csv`, `duplicate_rpo_reviews.csv`, `canonical_option_aliases.csv`, `option_presentations.csv`, `choice_groups.csv`, `choice_group_presentations.csv`, and `option_status_rules.csv` generate legacy-shaped choice/display rows.
+- `canonical_base_prices.csv` and `price_books.csv` generate legacy-shaped base price fragments; final `price_rules.csv` generates legacy price rule fragments.
+- Final `simple_dependency_rules.csv` and `requires_any_groups.csv` generate normalized `condition_sets.csv`, `condition_terms.csv`, `dependency_rules.csv`, and legacy rule/ruleGroup fragments as needed for parity.
+- `package_includes.csv` generates legacy include/auto-add fragments only after package include behavior is intentionally modeled.
+- `replacement_default_rules.csv` generates replacement/default legacy fragments only after runtime selection behavior is intentionally modeled.
+- `control_plane_references.csv` generates validation/control-plane references, not customer choice rows, unless another final table intentionally presents them.
+- Transitional `selectables.csv`, `selectable_display.csv`, `base_prices.csv`, `dependency_rules.csv`, `condition_sets.csv`, `condition_terms.csv`, `auto_adds.csv`, `rule_groups.csv`, `rule_group_members.csv`, `exclusive_groups.csv`, and item-set tables remain hand-authored only for lanes not yet converted.
+
 ## Validation/Audit-Only Tables
 
 These remain validation and audit surfaces, not final business source-of-truth:
@@ -579,14 +698,21 @@ These remain validation and audit surfaces, not final business source-of-truth:
 - production inventory report artifacts
 - preserved-boundary/census artifacts
 
+Ownership expectations:
+
+- Current `projected_slice_ownership.csv` remains a transitional shadow-overlay and census contract.
+- Final ownership must be explicitly scoped before cutover: either canonical-option scoped, presentation/legacy-option scoped, relationship scoped, or validation-only.
+- Preserved boundary checks must avoid RPO-scoped false failures when one RPO has multiple reviewed presentations or aliases.
+- No final ownership migration is approved by this RFC until the table transition strategy is approved.
+
 ## Context/Status Cascade
 
 Status and pricing scopes resolve from broad to specific:
 
 1. model/year default
-2. variant override
-3. body override
-4. trim override
+2. body override
+3. trim override
+4. variant override
 5. explicit option or presentation override
 
 Precedence sort:
@@ -595,6 +721,12 @@ Precedence sort:
 2. higher scope specificity
 3. higher priority
 4. deterministic row ID tie-break
+
+Scope rules:
+
+- `variant_id` is more specific than separate body/trim fields because a variant already encodes a concrete body and trim combination.
+- A `context_scope_id` may point to a reusable condition expression, but final authoring must decide whether direct scope columns remain allowed or whether all shared scope logic must go through `context_scopes.csv`.
+- Rules and relationships apply after the status cascade has removed or marked unavailable options.
 
 Rules apply after context/status resolution:
 
@@ -632,6 +764,11 @@ Importer/staging work must:
 - emit package, price, replacement/default, and runtime/control-plane relationships into their own tables
 - fail closed on ambiguous duplicate RPOs
 - never create fake selectable rows for Standard Options or Standard Equipment display-only duplicates
+- preserve source vehicle/model line
+- preserve raw section/order path
+- preserve source option key when present
+- compute and persist `raw_row_hash`
+- provide stable source row identity for repeated imports and source diffing
 
 ## Relationship Taxonomy
 
@@ -639,6 +776,7 @@ Relationship classes:
 
 - `simple_excludes`: unscoped customer choice excludes customer choice.
 - `simple_requires`: unscoped customer choice requires customer choice.
+- `scoped_dependency`: context-scoped customer choice excludes/requires customer choice.
 - `requires_any`: source requires one member from a target member set.
 - `choice_group_exclusivity`: required/single/multi choice behavior.
 - `package_include`: package source includes or auto-adds target.
@@ -649,6 +787,7 @@ Relationship classes:
 Relationship authoring rules:
 
 - Use flat simple authoring only for unscoped projected choice-to-choice excludes/requires.
+- Keep scoped/context dependency rules in transitional normalized condition tables until a final scoped dependency table is approved.
 - Use package tables for includes and auto-adds.
 - Use price tables for price behavior.
 - Use replacement/default tables for runtime selection behavior.
@@ -661,11 +800,12 @@ Current old-style projected rows remain valid transitional source. The project s
 Recommended migration pattern:
 
 1. Freeze final schema contracts.
-2. Add optional loaders and validation for final tables with header-only parity.
-3. Add compiler support using temp fixtures.
-4. Pick one small canonical-first lane.
-5. Prove emitted legacy parity and shadow overlay parity.
-6. Leave already migrated old-style lanes alone until their entire lane can move cleanly.
+2. Decide whether final contracts replace current optional files in place or land as v2 files.
+3. Add optional loaders and validation for final tables with header-only parity.
+4. Add compiler support using temp fixtures.
+5. Pick one small canonical-first lane.
+6. Prove emitted legacy parity and shadow overlay parity.
+7. Leave already migrated old-style lanes alone until their entire lane can move cleanly.
 
 Do not run tactical option-lane migrations until the relevant canonical table support exists and the lane can be represented without fake duplicate selectables.
 
@@ -693,16 +833,17 @@ Do not run tactical option-lane migrations until the relevant canonical table su
 
 ## Open Questions Requiring Human Approval
 
-1. Should `context_scopes.csv` support one row with multiple fields only, or also explicit boolean expression references beyond `condition_set_id`?
-2. Should final simple dependency rules target `presentation_id` only, or allow canonical-option targets when all active presentations should inherit the rule?
-3. Should package includes target presentations or canonical options by default?
-4. Should `standard_choice` be allowed on non-selectable presentations, or should non-selectable standard rows always use `standard_fixed`?
-5. Should display order live only in `choice_group_presentations.csv`, or also remain denormalized in `option_presentations.csv` for easier authoring?
-6. Should `canonical_base_prices.csv` use `context_scope_id` only, or keep direct scope columns for authoring simplicity?
-7. What is the first canonical-first lane after support contracts are approved: Calipers, a small duplicate-free lane, or a staging-only importer pilot?
-8. When should transitional old-style lanes be converted: opportunistically by lane, or only after a full model-wide compiler can emit all legacy rows?
-9. Should ownership move from RPO-based rows to canonical/presentation scoped rows before or after the first canonical-first lane?
+1. Do final contracts replace current optional files in place, or land as v2 tables while current files remain compatibility bridges?
+2. Should `context_scopes.csv` support one row with multiple fields only, or also explicit boolean expression references beyond `condition_set_id`?
+3. Should final simple dependency rules target `presentation_id` only, or allow canonical-option targets when all active presentations should inherit the rule?
+4. Should package includes target presentations or canonical options by default?
+5. Should `standard_choice` be allowed on non-selectable presentations, or should non-selectable standard rows always use `standard_fixed`?
+6. Should display order live only in `choice_group_presentations.csv`, or also remain denormalized in `option_presentations.csv` for easier authoring?
+7. Should `canonical_base_prices.csv` use `context_scope_id` only, keep direct scope columns for authoring simplicity, or keep current `scope_condition_set_id` as a compatibility bridge only?
+8. What is the first canonical-first lane after support contracts are approved: Calipers, a small duplicate-free lane, or a staging-only importer pilot?
+9. When should transitional old-style lanes be converted: opportunistically by lane, or only after a full model-wide compiler can emit all legacy rows?
+10. Should ownership move from RPO-based rows to canonical/presentation scoped rows before or after the first canonical-first lane?
 
 ## Next Pass Recommendation
 
-Pass 211 should be report-only approval/editing of this RFC if needed, or support-only raw/staging and duplicate-classification loaders if the RFC is accepted as written. It should not migrate rows or project a tactical option lane.
+Pass 213 should be report-only RFC approval focused on the table transition strategy and ownership scope. If those are approved, the following support-only pass can add raw/staging plus duplicate-RPO review loaders. It should not migrate rows or project a tactical option lane.
