@@ -154,7 +154,11 @@ test("non-selectable references compile as dependency subjects targets and both"
     assert.equal(subject5w8Rule.rule_type, "excludes");
     assert.equal(subject5w8Rule.disabled_reason, "Blocked by 5W8 test reference.");
 
-    const target5vmRule = fragment.rules.find((rule) => rule.rule_id === "rule_opt_5v7_001_excludes_opt_5vm_001");
+    const target5vmRule = fragment.rules.find(
+      (rule) =>
+        rule.rule_id === "rule_opt_5v7_001_excludes_opt_5vm_001" &&
+        rule.disabled_reason === "Blocked by 5V7 test reference."
+    );
     assert.ok(target5vmRule, "missing 5VM non-selectable target rule");
     assert.equal(target5vmRule.source_id, "opt_5v7_001");
     assert.equal(target5vmRule.target_id, "opt_5vm_001");
@@ -162,7 +166,11 @@ test("non-selectable references compile as dependency subjects targets and both"
     assert.equal(target5vmRule.target_selection_mode, "multi_select_opt");
     assert.equal(target5vmRule.disabled_reason, "Blocked by 5V7 test reference.");
 
-    const target5w8Rule = fragment.rules.find((rule) => rule.rule_id === "rule_opt_5v7_001_excludes_opt_5w8_001");
+    const target5w8Rule = fragment.rules.find(
+      (rule) =>
+        rule.rule_id === "rule_opt_5v7_001_excludes_opt_5w8_001" &&
+        rule.disabled_reason === "Blocked by 5V7 test reference."
+    );
     assert.ok(target5w8Rule, "missing 5W8 non-selectable target rule");
     assert.equal(target5w8Rule.source_id, "opt_5v7_001");
     assert.equal(target5w8Rule.target_id, "opt_5w8_001");

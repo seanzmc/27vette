@@ -247,8 +247,8 @@ test("ownership manifest projects 5V7 and keeps only unmigrated 5V7-touching pro
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_rpo: "TVS", ownership: "preserved_cross_boundary" }), false);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_rpo: "Z51", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_rpo: "STI", ownership: "preserved_cross_boundary" }), false);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_option_id: "opt_5w8_001", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" }), false);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "5V7", target_option_id: "opt_5w8_001", ownership: "preserved_cross_boundary" }), false);
   assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5vm_001", target_rpo: "5V7", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_option_id: "opt_5w8_001", target_rpo: "5V7", ownership: "preserved_cross_boundary" }), true);
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCU", target_rpo: "5V7", ownership: "preserved_cross_boundary" }), false);

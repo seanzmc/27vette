@@ -172,7 +172,7 @@ function registeredReferenceCsvRules(production) {
       row.rule_type === "excludes" &&
       ((row.target_id === "opt_5zw_001" && (row.source_id === "opt_rnx_001" || row.source_id === "opt_wkq_001")) ||
         ((row.target_id === "opt_5vm_001" || row.target_id === "opt_5w8_001") &&
-          (row.source_id === "opt_sti_001" || row.source_id === "opt_pcu_001")) ||
+          (row.source_id === "opt_sti_001" || row.source_id === "opt_pcu_001" || row.source_id === "opt_5v7_001")) ||
         ((row.source_id === "opt_5vm_001" || row.source_id === "opt_5w8_001") && row.target_id === "opt_sti_001"))
   );
 }

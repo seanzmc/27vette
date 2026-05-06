@@ -14,6 +14,8 @@ const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.c
 const RULE_ONLY_IDS = ["opt_5vm_001", "opt_5w8_001"];
 const RULE_ONLY_RPOS = ["5VM", "5W8"];
 const CSV_OWNED_RULE_ONLY_KEYS = new Set([
+  "5V7->opt_5vm_001:excludes:False:active",
+  "5V7->opt_5w8_001:excludes:False:active",
   "PCU->opt_5vm_001:excludes:False:active",
   "PCU->opt_5w8_001:excludes:False:active",
   "opt_5vm_001->STI:excludes:False:active",

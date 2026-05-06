@@ -6,9 +6,9 @@ import vm from "node:vm";
 
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
-const EXPECTED_DEPENDENCY_RULE_COUNT = 109;
+const EXPECTED_DEPENDENCY_RULE_COUNT = 111;
 const EXPECTED_DEPENDENCY_REQUIRES_COUNT = 3;
-const EXPECTED_DEPENDENCY_EXCLUDES_COUNT = 106;
+const EXPECTED_DEPENDENCY_EXCLUDES_COUNT = 108;
 const EXPECTED_CONDITION_SET_COUNT = 45;
 const EXPECTED_CONDITION_TERM_COUNT = 47;
 const PASS132_EXCLUDE_PAIRS = [
@@ -41,6 +41,10 @@ const PASS168_EXCLUDE_PAIRS = [
 const PASS169_EXCLUDE_PAIRS = [
   ["dep_excl_5vm_sti", "ref_5vm", "opt_5vm_001", "cs_selected_sti", "Blocked by 5VM LPO, Visible Carbon Fiber Ground Effects."],
   ["dep_excl_5w8_sti", "ref_5w8", "opt_5w8_001", "cs_selected_sti", "Blocked by 5W8 LPO, Carbon Fiber Ground Effects."],
+];
+const PASS171_EXCLUDE_PAIRS = [
+  ["dep_excl_5v7_5vm", "opt_5v7_001", "ref_5vm", "cs_ref_selected_5vm"],
+  ["dep_excl_5v7_5w8", "opt_5v7_001", "ref_5w8", "cs_ref_selected_5w8"],
 ];
 const PASS140_EXCLUDE_PAIRS = [
   ["dep_excl_sbt_cc3", "opt_sbt_001", "opt_cc3_001", "cs_selected_cc3"],
@@ -713,6 +717,43 @@ test("pass 169 dependency_rules CSV migrates only 5VM and 5W8 reference-source e
   assert.equal(rules.some((rule) => rule.rule_id === "dep_req_5w8_5zw"), false);
 });
 
+test("pass 171 dependency_rules CSV migrates only 5V7 to 5VM and 5W8 reference-target excludes", () => {
+  const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
+  const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
+  const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
+
+  for (const [ruleId, sourceId, referenceId, conditionSetId] of PASS171_EXCLUDE_PAIRS) {
+    const rule = rules.find((candidate) => candidate.rule_id === ruleId);
+    assert.ok(rule, `${ruleId} should exist`);
+    assert.equal(rule.rule_type, "excludes");
+    assert.equal(rule.subject_selector_type, "selectable");
+    assert.equal(rule.subject_selector_id, sourceId);
+    assert.equal(rule.subject_must_be_selected, "true");
+    assert.equal(rule.target_condition_set_id, conditionSetId);
+    assert.equal(rule.violation_behavior, "disable_and_block");
+    assert.equal(rule.message, "Blocked by 5V7 LPO, Black Ground Effects.");
+    assert.equal(rule.active, "true");
+
+    assert.ok(conditionSets.find((conditionSet) => conditionSet.condition_set_id === conditionSetId), `${conditionSetId} should exist`);
+    assert.ok(
+      conditionTerms.find(
+        (term) =>
+          term.condition_set_id === conditionSetId &&
+          term.term_type === "reference_selected" &&
+          term.left_ref === referenceId &&
+          term.operator === "is_true"
+      ),
+      `${conditionSetId} should select ${referenceId}`
+    );
+  }
+
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_5vm_5v7"), false);
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_5w8_5v7"), false);
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_5vm_5w8"), false);
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_5w8_5vm"), false);
+  assert.equal(rules.some((rule) => rule.rule_id === "dep_excl_5v7_z51"), false);
+});
+
 test("pass 138 migrated STI to 5V7 exclude emits production-shaped legacy rule", () => {
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
@@ -864,6 +905,47 @@ test("pass 169 migrated 5VM and 5W8 reference-source excludes to STI emit produc
 
     assert.ok(productionRule, `production should include ${sourceId} -> opt_sti_001`);
     assert.ok(projectedRule, `projected CSV fragment should include ${sourceId} -> opt_sti_001`);
+    assert.deepEqual(
+      Object.fromEntries(fields.map((field) => [field, projectedRule[field]])),
+      Object.fromEntries(fields.map((field) => [field, productionRule[field]]))
+    );
+  }
+
+  assert.equal(projected.choices.some((choice) => choice.option_id === "opt_5vm_001" || choice.option_id === "opt_5w8_001"), false);
+});
+
+test("pass 171 migrated 5V7 to 5VM and 5W8 reference-target excludes emit production-shaped legacy rules", () => {
+  const production = loadGeneratedData();
+  const projected = emitCsvLegacyFragment();
+  const fields = [
+    "source_id",
+    "rule_type",
+    "target_id",
+    "target_type",
+    "source_type",
+    "source_section",
+    "target_section",
+    "source_selection_mode",
+    "target_selection_mode",
+    "body_style_scope",
+    "disabled_reason",
+    "auto_add",
+    "active",
+    "runtime_action",
+    "review_flag",
+  ];
+
+  for (const [, sourceId, referenceId] of PASS171_EXCLUDE_PAIRS) {
+    const targetId = referenceId === "ref_5vm" ? "opt_5vm_001" : "opt_5w8_001";
+    const productionRule = production.rules.find(
+      (rule) => rule.source_id === sourceId && rule.target_id === targetId && rule.rule_type === "excludes"
+    );
+    const projectedRule = projected.rules.find(
+      (rule) => rule.source_id === sourceId && rule.target_id === targetId && rule.rule_type === "excludes"
+    );
+
+    assert.ok(productionRule, `production should include ${sourceId} -> ${targetId}`);
+    assert.ok(projectedRule, `projected CSV fragment should include ${sourceId} -> ${targetId}`);
     assert.deepEqual(
       Object.fromEntries(fields.map((field) => [field, projectedRule[field]])),
       Object.fromEntries(fields.map((field) => [field, productionRule[field]]))

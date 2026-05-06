@@ -130,8 +130,8 @@ guardedOption,,,,,opt_ryq_001,,production_guarded,RYQ non-choice LPO Exterior st
 exclusiveGroup,grp_spoiler_high_wing,,,,,,projected_owned,Spoiler exclusive group projected after all members became projected-owned,true
 ruleGroup,grp_5v7_spoiler_requirement,,,,,,projected_owned,5V7 spoiler requires-any group projected after source and targets became projected-owned,true
 ruleGroup,grp_5zu_paint_requirement,,,,,,production_guarded,5ZU paint requires-any group remains production-owned in Pass 19,true
-rule,,5V7,,,opt_5vm_001,,preserved_cross_boundary,Spoiler control-plane adjacent legacy-ID exclude remains production-owned in Pass 17,true
-rule,,5V7,,,opt_5w8_001,,preserved_cross_boundary,Spoiler control-plane adjacent legacy-ID exclude remains production-owned in Pass 17,true
+rule,,5V7,,,opt_5vm_001,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 171 using 5VM non-selectable reference target condition,false
+rule,,5V7,,,opt_5w8_001,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 171 using 5W8 non-selectable reference target condition,false
 rule,,5V7,,Z51,,,preserved_cross_boundary,Spoiler control-plane adjacent exclude remains production-owned in Pass 17,true
 rule,,,opt_5vm_001,5V7,,,preserved_cross_boundary,Spoiler control-plane adjacent legacy-ID exclude remains production-owned in Pass 17,true
 rule,,,opt_5vm_001,TVS,,,preserved_cross_boundary,Spoiler control-plane adjacent legacy-ID exclude remains production-owned in Pass 17,true
