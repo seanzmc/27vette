@@ -8,28 +8,27 @@ const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const PAINT_RPOS = ["G8G", "GBA", "GKA", "GBK", "GTR", "GEC", "GPH", "G4Z", "G26", "GKZ"];
-const PAINT_COMPATIBILITY_RULES = [
-  ["D84", "GBA"],
-  ["D86", "GBA"],
-  ["DPB", "GTR"],
-  ["DPC", "GBK"],
-  ["DPG", "G26"],
-  ["DPL", "GKZ"],
-  ["DPL", "GPH"],
-  ["DSY", "G26"],
-  ["DSZ", "GKZ"],
-  ["DSZ", "GPH"],
-  ["DT0", "GBK"],
-  ["DUE", "GTR"],
-  ["DUK", "GKZ"],
-  ["DUK", "GPH"],
-  ["DUW", "GTR"],
-  ["DZU", "GBK"],
-  ["DZX", "GKZ"],
-  ["DZX", "GPH"],
-  ["EFY", "GBA"],
-  ["ZYC", "GBA"],
+const PASS178_PAINT_EXCLUDES = [
+  ["dep_excl_d84_gba", "D84", "GBA", "cs_selected_gba"],
+  ["dep_excl_d86_gba", "D86", "GBA", "cs_selected_gba"],
+  ["dep_excl_dpb_gtr", "DPB", "GTR", "cs_selected_gtr"],
+  ["dep_excl_dpc_gbk", "DPC", "GBK", "cs_selected_gbk"],
+  ["dep_excl_dpg_g26", "DPG", "G26", "cs_selected_g26"],
+  ["dep_excl_dpl_gkz", "DPL", "GKZ", "cs_selected_gkz"],
+  ["dep_excl_dpl_gph", "DPL", "GPH", "cs_selected_gph"],
+  ["dep_excl_dsy_g26", "DSY", "G26", "cs_selected_g26"],
+  ["dep_excl_dsz_gkz", "DSZ", "GKZ", "cs_selected_gkz"],
+  ["dep_excl_dsz_gph", "DSZ", "GPH", "cs_selected_gph"],
+  ["dep_excl_dt0_gbk", "DT0", "GBK", "cs_selected_gbk"],
+  ["dep_excl_due_gtr", "DUE", "GTR", "cs_selected_gtr"],
+  ["dep_excl_duk_gkz", "DUK", "GKZ", "cs_selected_gkz"],
+  ["dep_excl_duk_gph", "DUK", "GPH", "cs_selected_gph"],
+  ["dep_excl_duw_gtr", "DUW", "GTR", "cs_selected_gtr"],
+  ["dep_excl_dzu_gbk", "DZU", "GBK", "cs_selected_gbk"],
+  ["dep_excl_dzx_gkz", "DZX", "GKZ", "cs_selected_gkz"],
+  ["dep_excl_dzx_gph", "DZX", "GPH", "cs_selected_gph"],
 ];
+const PRESERVED_PAINT_BOUNDARIES = [["EFY", "GBA"], ["ZYC", "GBA"]];
 
 function parseCsv(source) {
   const rows = [];
@@ -80,6 +79,14 @@ function emitCsvLegacyFragment() {
   return JSON.parse(output);
 }
 
+function evaluate(variantId, selectedIds) {
+  const output = execFileSync(PYTHON, [SCRIPT, "--scenario-json", JSON.stringify({ variant_id: variantId, selected_ids: selectedIds })], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+  });
+  return JSON.parse(output);
+}
+
 function normalizePaintChoices(rows) {
   return rows
     .filter((choice) => choice.section_id === "sec_pain_001")
@@ -123,6 +130,19 @@ function plain(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+function optionIdForRpo(rpo) {
+  return `opt_${rpo.toLowerCase()}_001`;
+}
+
+function legacyRule(rows, sourceRpo, targetRpo) {
+  return rows.find(
+    (rule) =>
+      rule.source_id === optionIdForRpo(sourceRpo) &&
+      rule.target_id === optionIdForRpo(targetRpo) &&
+      rule.rule_type === "excludes"
+  );
+}
+
 test("CSV Paint section emits all production sec_pain_001 choices", () => {
   const production = loadProduction();
   const projected = emitCsvLegacyFragment();
@@ -156,22 +176,101 @@ test("Paint projection owns all Paint choices and retires only the stale GBA gua
   );
 });
 
-test("Paint projection does not migrate preserved paint compatibility rules", () => {
+test("Pass 178 migrates only approved paint compatibility rules", () => {
   const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
   const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
 
-  assert.equal(rules.length, 111);
-  assert.equal(conditionSets.length, 45);
-  assert.equal(conditionTerms.length, 47);
-  assert.equal(conditionSets.some((row) => row.condition_set_id === "cs_selected_gba"), false);
-  assert.equal(conditionTerms.some((row) => PAINT_RPOS.some((rpo) => row.left_ref === `opt_${rpo.toLowerCase()}_001`)), false);
+  assert.equal(rules.length, 129);
+  assert.equal(conditionSets.length, 51);
+  assert.equal(conditionTerms.length, 53);
 
-  for (const [sourceRpo, targetRpo] of PAINT_COMPATIBILITY_RULES) {
+  for (const conditionSetId of ["cs_selected_gba", "cs_selected_gtr", "cs_selected_gbk", "cs_selected_g26", "cs_selected_gkz", "cs_selected_gph"]) {
+    assert.ok(conditionSets.find((row) => row.condition_set_id === conditionSetId && row.active === "true"), `${conditionSetId} should exist`);
+  }
+
+  for (const [ruleId, sourceRpo, targetRpo, conditionSetId] of PASS178_PAINT_EXCLUDES) {
+    const rule = rules.find((row) => row.rule_id === ruleId);
+    assert.ok(rule, `${ruleId} should exist`);
+    assert.equal(rule.rule_type, "excludes");
+    assert.equal(rule.subject_selector_type, "selectable");
+    assert.equal(rule.subject_selector_id, optionIdForRpo(sourceRpo));
+    assert.equal(rule.subject_must_be_selected, "true");
+    assert.equal(rule.target_condition_set_id, conditionSetId);
+    assert.equal(rule.violation_behavior, "disable_and_block");
+    assert.equal(rule.active, "true");
+    assert.ok(conditionTerms.find((row) => row.condition_set_id === conditionSetId && row.left_ref === optionIdForRpo(targetRpo)));
+  }
+
+  for (const [sourceRpo, targetRpo] of PASS178_PAINT_EXCLUDES.map(([, sourceRpo, targetRpo]) => [sourceRpo, targetRpo])) {
+    assert.equal(
+      manifestHas({ record_type: "rule", source_rpo: sourceRpo, target_rpo: targetRpo, ownership: "preserved_cross_boundary" }),
+      false,
+      `${sourceRpo} -> ${targetRpo} should not remain preserved`
+    );
+  }
+
+  for (const [sourceRpo, targetRpo] of PRESERVED_PAINT_BOUNDARIES) {
     assert.equal(
       manifestHas({ record_type: "rule", source_rpo: sourceRpo, target_rpo: targetRpo, ownership: "preserved_cross_boundary" }),
       true,
       `${sourceRpo} -> ${targetRpo} should remain preserved`
     );
+  }
+  assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5ZU", target_rpo: "G8G", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5ZU", target_rpo: "GBA", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5ZU", target_rpo: "GKZ", ownership: "preserved_cross_boundary" }), true);
+});
+
+test("Pass 178 paint compatibility excludes emit production-shaped legacy rules", () => {
+  const production = loadProduction();
+  const projected = emitCsvLegacyFragment();
+  const fields = [
+    "source_id",
+    "rule_type",
+    "target_id",
+    "target_type",
+    "source_type",
+    "source_section",
+    "target_section",
+    "source_selection_mode",
+    "target_selection_mode",
+    "body_style_scope",
+    "disabled_reason",
+    "auto_add",
+    "active",
+    "runtime_action",
+    "review_flag",
+  ];
+
+  assert.deepEqual(projected.validation_errors, []);
+  for (const [, sourceRpo, targetRpo] of PASS178_PAINT_EXCLUDES) {
+    const productionRule = legacyRule(production.rules, sourceRpo, targetRpo);
+    const projectedRule = legacyRule(projected.rules, sourceRpo, targetRpo);
+    assert.ok(productionRule, `production should include ${sourceRpo} -> ${targetRpo}`);
+    assert.ok(projectedRule, `projected CSV should include ${sourceRpo} -> ${targetRpo}`);
+    assert.deepEqual(
+      Object.fromEntries(fields.map((field) => [field, projectedRule[field]])),
+      Object.fromEntries(fields.map((field) => [field, productionRule[field]]))
+    );
+  }
+});
+
+test("Pass 178 paint compatibility excludes report dependency conflicts", () => {
+  const production = loadProduction();
+
+  for (const [ruleId, sourceRpo, targetRpo, conditionSetId] of PASS178_PAINT_EXCLUDES) {
+    const sourceId = optionIdForRpo(sourceRpo);
+    const targetId = optionIdForRpo(targetRpo);
+    const variantId = ["D84", "D86"].includes(sourceRpo) ? "1lt_c67" : "1lt_c07";
+    const result = evaluate(variantId, [sourceId, targetId]);
+    const conflict = result.conflicts.find((item) => item.rule_id === ruleId);
+    const productionRule = legacyRule(production.rules, sourceRpo, targetRpo);
+
+    assert.deepEqual(result.validation_errors, []);
+    assert.equal(conflict?.conflict_source, "dependency_rule");
+    assert.equal(conflict?.target_condition_set_id, conditionSetId);
+    assert.equal(conflict?.target_selectable_id, targetId);
+    assert.equal(conflict?.message, productionRule.disabled_reason);
   }
 });

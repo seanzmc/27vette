@@ -98,22 +98,22 @@ guardedOption,,,,,opt_eyt_001,,production_guarded,Required Badges Carbon Flash d
 guardedOption,,,,,opt_eyt_002,,production_guarded,Standard Options EYT display-only duplicate remained production-owned before Pass 71,false
 rule,,SHT,,PDV,,,preserved_cross_boundary,SHT to PDV package exclude remains production-owned in Pass 61,true
 rule,,R8C,,CFX,,,preserved_cross_boundary,Pass 149 newly projected target boundary remains production-owned,true
-rule,,DPB,,GTR,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,DPC,,GBK,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,DPG,,G26,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,DPL,,GKZ,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,DPL,,GPH,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,DSY,,G26,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,DSZ,,GKZ,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,DSZ,,GPH,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,DT0,,GBK,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,DUE,,GTR,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,DUK,,GKZ,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,DUK,,GPH,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,DUW,,GTR,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,DZU,,GBK,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,DZX,,GKZ,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
-rule,,DZX,,GPH,,,preserved_cross_boundary,Pass 134 Stripe paint availability boundary remains production-owned,true
+rule,,DPB,,GTR,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,DPC,,GBK,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,DPG,,G26,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,DPL,,GKZ,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,DPL,,GPH,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,DSY,,G26,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,DSZ,,GKZ,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,DSZ,,GPH,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,DT0,,GBK,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,DUE,,GTR,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,DUK,,GKZ,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,DUK,,GPH,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,DUW,,GTR,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,DZU,,GBK,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,DZX,,GKZ,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,DZX,,GPH,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
 rule,,WKQ,,,opt_5zw_001,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 164 using 5ZW non-selectable reference target condition,false
 rule,,RNX,,,opt_5zw_001,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 164 using 5ZW non-selectable reference target condition,false
 rule,,RNX,,Z51,,,preserved_cross_boundary,Car-cover Z51 exclude remains production-owned in Pass 15,true
@@ -148,8 +148,8 @@ rule,,,opt_5w8_001,Z51,,,preserved_cross_boundary,Spoiler control-plane adjacent
 rule,,5ZU,,T0A,,,preserved_cross_boundary,Spoiler replace rule remains production-owned in Pass 17,true
 rule,,,opt_5zw_001,T0A,,,preserved_cross_boundary,Spoiler rule-only asymmetric T0A exclude remains production-owned in Pass 17,true
 rule,,5ZZ,,T0A,,,preserved_cross_boundary,Spoiler replace rule remains production-owned in Pass 17,true
-rule,,D84,,GBA,,,preserved_cross_boundary,Spoiler-adjacent paint exclude remains production-owned in Pass 17,true
-rule,,D86,,GBA,,,preserved_cross_boundary,Spoiler-adjacent paint exclude remains production-owned in Pass 17,true
+rule,,D84,,GBA,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
+rule,,D86,,GBA,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
 rule,,EFY,,GBA,,,preserved_cross_boundary,Spoiler-adjacent paint exclude remains production-owned in Pass 17,true
 rule,,FE2,,Z51,,,preserved_cross_boundary,Spoiler-adjacent suspension exclude remains production-owned in Pass 17,true
 rule,,FE4,,Z51,,,preserved_cross_boundary,Spoiler-adjacent suspension requirement remains production-owned in Pass 17,true

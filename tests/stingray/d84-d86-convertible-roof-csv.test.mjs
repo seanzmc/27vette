@@ -243,8 +243,8 @@ test("D84 and D86 projection preserves paint and Roof model boundaries", () => {
     assert.equal(owned.has(rpo), false, `${rpo} should remain outside the D84/D86 slice`);
   }
   assert.equal(activeManifestRows().some((row) => row.record_type === "section" || row.group_id === "sec_roof_001" || row.group_id === "sec_stan_002"), false);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "D84", target_rpo: "GBA", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "D86", target_rpo: "GBA", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "D84", target_rpo: "GBA", ownership: "preserved_cross_boundary" }), false);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "D86", target_rpo: "GBA", ownership: "preserved_cross_boundary" }), false);
 });
 
 test("production has only classified GBA excludes touching D84 and D86", () => {
@@ -260,7 +260,7 @@ test("production has only classified GBA excludes touching D84 and D86", () => {
   }
 });
 
-test("shadow overlay preserves D84 and D86 paint excludes and does not emit owned paint rules", () => {
+test("shadow overlay emits CSV-owned D84 and D86 paint excludes", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
   const fragment = emitCsvLegacyFragment();
@@ -269,7 +269,13 @@ test("shadow overlay preserves D84 and D86 paint excludes and does not emit owne
 
   assert.deepEqual(plain(rule(shadow, "D84", "GBA", "excludes")), plain(rule(production, "D84", "GBA", "excludes")));
   assert.deepEqual(plain(rule(shadow, "D86", "GBA", "excludes")), plain(rule(production, "D86", "GBA", "excludes")));
-  assert.equal(fragment.rules.some((item) => [d84Id, d86Id].includes(item.source_id) || [d84Id, d86Id].includes(item.target_id)), false);
+  assert.deepEqual(
+    fragment.rules
+      .filter((item) => [d84Id, d86Id].includes(item.source_id) && item.target_id === optionIdByRpo(production, "GBA"))
+      .map((item) => `${item.source_id}->${item.target_id}`)
+      .sort(),
+    [`${d84Id}->opt_gba_001`, `${d86Id}->opt_gba_001`]
+  );
   assert.equal(fragment.priceRules.some((item) => [d84Id, d86Id].includes(item.condition_option_id) || [d84Id, d86Id].includes(item.target_option_id)), false);
 });
 

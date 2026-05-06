@@ -6,11 +6,11 @@ import vm from "node:vm";
 
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
-const EXPECTED_DEPENDENCY_RULE_COUNT = 111;
+const EXPECTED_DEPENDENCY_RULE_COUNT = 129;
 const EXPECTED_DEPENDENCY_REQUIRES_COUNT = 3;
-const EXPECTED_DEPENDENCY_EXCLUDES_COUNT = 108;
-const EXPECTED_CONDITION_SET_COUNT = 45;
-const EXPECTED_CONDITION_TERM_COUNT = 47;
+const EXPECTED_DEPENDENCY_EXCLUDES_COUNT = 126;
+const EXPECTED_CONDITION_SET_COUNT = 51;
+const EXPECTED_CONDITION_TERM_COUNT = 53;
 const PASS132_EXCLUDE_PAIRS = [
   ["dep_excl_pcu_5v7", "opt_pcu_001", "opt_5v7_001", "cs_selected_5v7"],
   ["dep_excl_r88_eyk", "opt_r88_001", "opt_eyk_001", "cs_selected_eyk"],
@@ -45,6 +45,26 @@ const PASS169_EXCLUDE_PAIRS = [
 const PASS171_EXCLUDE_PAIRS = [
   ["dep_excl_5v7_5vm", "opt_5v7_001", "ref_5vm", "cs_ref_selected_5vm"],
   ["dep_excl_5v7_5w8", "opt_5v7_001", "ref_5w8", "cs_ref_selected_5w8"],
+];
+const PASS178_EXCLUDE_PAIRS = [
+  ["dep_excl_d84_gba", "opt_d84_001", "opt_gba_001", "cs_selected_gba"],
+  ["dep_excl_d86_gba", "opt_d86_001", "opt_gba_001", "cs_selected_gba"],
+  ["dep_excl_dpb_gtr", "opt_dpb_001", "opt_gtr_001", "cs_selected_gtr"],
+  ["dep_excl_dpc_gbk", "opt_dpc_001", "opt_gbk_001", "cs_selected_gbk"],
+  ["dep_excl_dpg_g26", "opt_dpg_001", "opt_g26_001", "cs_selected_g26"],
+  ["dep_excl_dpl_gkz", "opt_dpl_001", "opt_gkz_001", "cs_selected_gkz"],
+  ["dep_excl_dpl_gph", "opt_dpl_001", "opt_gph_001", "cs_selected_gph"],
+  ["dep_excl_dsy_g26", "opt_dsy_001", "opt_g26_001", "cs_selected_g26"],
+  ["dep_excl_dsz_gkz", "opt_dsz_001", "opt_gkz_001", "cs_selected_gkz"],
+  ["dep_excl_dsz_gph", "opt_dsz_001", "opt_gph_001", "cs_selected_gph"],
+  ["dep_excl_dt0_gbk", "opt_dt0_001", "opt_gbk_001", "cs_selected_gbk"],
+  ["dep_excl_due_gtr", "opt_due_001", "opt_gtr_001", "cs_selected_gtr"],
+  ["dep_excl_duk_gkz", "opt_duk_001", "opt_gkz_001", "cs_selected_gkz"],
+  ["dep_excl_duk_gph", "opt_duk_001", "opt_gph_001", "cs_selected_gph"],
+  ["dep_excl_duw_gtr", "opt_duw_001", "opt_gtr_001", "cs_selected_gtr"],
+  ["dep_excl_dzu_gbk", "opt_dzu_001", "opt_gbk_001", "cs_selected_gbk"],
+  ["dep_excl_dzx_gkz", "opt_dzx_001", "opt_gkz_001", "cs_selected_gkz"],
+  ["dep_excl_dzx_gph", "opt_dzx_001", "opt_gph_001", "cs_selected_gph"],
 ];
 const PASS140_EXCLUDE_PAIRS = [
   ["dep_excl_sbt_cc3", "opt_sbt_001", "opt_cc3_001", "cs_selected_cc3"],
@@ -2767,13 +2787,14 @@ test("pass 134 Stripes catalog slice emits production-equivalent choices", () =>
   }
 });
 
-test("pass 134 and 135 Stripes projection keeps package paint and stinger-stripe boundaries production-owned", () => {
+test("pass 134/135 and 178 Stripes projection emits approved stripe paint boundaries only", () => {
   const projected = emitCsvLegacyFragment();
   const migratedKeys = new Set(
     [
       ...PASS135_EXCLUDE_PAIRS,
       ...PASS143_EXCLUDE_PAIRS.filter(([, , targetId]) => PASS134_STRIPE_OPTION_IDS.includes(targetId)),
       ...PASS144_EXCLUDE_PAIRS,
+      ...PASS178_EXCLUDE_PAIRS.filter(([, sourceId]) => PASS134_STRIPE_OPTION_IDS.includes(sourceId)),
     ].map(([, sourceId, targetId]) => `${sourceId}->${targetId}`)
   );
   const stripeIds = new Set(PASS134_STRIPE_OPTION_IDS);
