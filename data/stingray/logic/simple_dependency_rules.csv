@@ -1,0 +1,2 @@
+rule_id,rule_type,source_option_id,target_option_id,violation_behavior,message,priority,active
+dep_excl_sht_pdv,excludes,opt_sht_001,opt_pdv_001,disable_and_block,"Blocked by SHT LPO, Jake hood graphic with Tech Bronze accent.",419,true

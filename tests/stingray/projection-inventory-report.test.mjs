@@ -17,6 +17,7 @@ const SOURCE_CSVS = [
   "data/stingray/catalog/selectables.csv",
   "data/stingray/ui/selectable_display.csv",
   "data/stingray/pricing/base_prices.csv",
+  "data/stingray/logic/simple_dependency_rules.csv",
   "data/stingray/logic/dependency_rules.csv",
   "data/stingray/logic/condition_sets.csv",
   "data/stingray/logic/condition_terms.csv",

@@ -37,6 +37,21 @@ TABLES = {
     "non_selectable_references": "validation/non_selectable_references.csv",
 }
 
+OPTIONAL_TABLES = {
+    "simple_dependency_rules": "logic/simple_dependency_rules.csv",
+}
+
+SIMPLE_DEPENDENCY_RULE_FIELDS = [
+    "rule_id",
+    "rule_type",
+    "source_option_id",
+    "target_option_id",
+    "violation_behavior",
+    "message",
+    "priority",
+    "active",
+]
+
 
 ID_FIELDS = {
     "variants": "variant_id",
@@ -61,6 +76,14 @@ def load_csv(path: Path) -> list[dict[str, str]]:
         return [dict(row) for row in csv.DictReader(handle)]
 
 
+def load_optional_csv(path: Path) -> tuple[list[str], list[dict[str, str]]]:
+    if not path.exists():
+        return [], []
+    with path.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        return list(reader.fieldnames or []), [dict(row) for row in reader]
+
+
 def is_active(row: dict[str, str]) -> bool:
     return row.get("active", "").lower() == "true"
 
@@ -79,8 +102,15 @@ class CsvSlice:
     def __init__(self, package_dir: Path) -> None:
         self.package_dir = package_dir
         self.tables = {name: load_csv(package_dir / relative_path) for name, relative_path in TABLES.items()}
+        self.optional_table_fields: dict[str, list[str]] = {}
+        for name, relative_path in OPTIONAL_TABLES.items():
+            fields, rows = load_optional_csv(package_dir / relative_path)
+            self.optional_table_fields[name] = fields
+            self.tables[name] = rows
+        self.ownership_rows = self._load_ownership_rows()
         self.variants = {row["variant_id"]: row for row in self.tables["variants"] if is_active(row)}
         self.selectables = {row["selectable_id"]: row for row in self.tables["selectables"] if is_active(row)}
+        self.projected_owned_selectable_ids = self._build_projected_owned_selectable_ids()
         self.item_sets = {row["set_id"]: row for row in self.tables["item_sets"] if is_active(row)}
         self.condition_sets = {row["condition_set_id"]: row for row in self.tables["condition_sets"] if is_active(row)}
         self.selectable_display = {row["selectable_id"]: row for row in self.tables["selectable_display"]}
@@ -91,10 +121,39 @@ class CsvSlice:
         }
         self.non_selectable_reference_selectors = self._build_non_selectable_reference_selectors()
         self.item_set_members = self._build_item_set_members()
+        self.simple_dependency_rule_errors: list[str] = []
+        self._merge_simple_dependency_rules()
         self.condition_terms = self._build_condition_terms()
         self.rule_group_members = self._build_rule_group_members()
         self.exclusive_members = self._build_exclusive_members()
         self.exclusive_groups_by_member = self._build_exclusive_groups_by_member()
+
+    def _load_ownership_rows(self) -> list[dict[str, str]]:
+        path = self.package_dir / "validation" / "projected_slice_ownership.csv"
+        return load_csv(path) if path.exists() else []
+
+    def _build_projected_owned_selectable_ids(self) -> set[str]:
+        projected_rpos = {
+            row.get("rpo", "")
+            for row in self.ownership_rows
+            if row.get("record_type", "") == "selectable"
+            and row.get("ownership", "") == "projected_owned"
+            and is_active(row)
+            and row.get("rpo", "")
+        }
+        projected_option_ids = {
+            row.get("source_option_id") or row.get("target_option_id") or row.get("rpo", "")
+            for row in self.ownership_rows
+            if row.get("record_type", "") == "selectable"
+            and row.get("ownership", "") == "projected_owned"
+            and is_active(row)
+            and (row.get("source_option_id") or row.get("target_option_id"))
+        }
+        return {
+            selectable_id
+            for selectable_id, row in self.selectables.items()
+            if row.get("rpo", "") in projected_rpos or selectable_id in projected_option_ids
+        }
 
     def _build_item_set_members(self) -> dict[str, list[str]]:
         members: dict[str, list[str]] = defaultdict(list)
@@ -145,8 +204,165 @@ class CsvSlice:
                     selectors[selector_id] = row
         return selectors
 
+    def _merge_simple_dependency_rules(self) -> None:
+        fields = self.optional_table_fields.get("simple_dependency_rules", [])
+        if fields and fields != SIMPLE_DEPENDENCY_RULE_FIELDS:
+            unexpected = [field for field in fields if field not in SIMPLE_DEPENDENCY_RULE_FIELDS]
+            missing = [field for field in SIMPLE_DEPENDENCY_RULE_FIELDS if field not in fields]
+            details = []
+            if unexpected:
+                details.append(f"unsupported columns: {', '.join(unexpected)}")
+            if missing:
+                details.append(f"missing columns: {', '.join(missing)}")
+            self.simple_dependency_rule_errors.append(f"simple_dependency_rules.csv uses {'; '.join(details)}.")
+            return
+
+        rows = self.tables.get("simple_dependency_rules", [])
+        if not rows:
+            return
+
+        active_dependency_rule_ids = {
+            row["rule_id"]
+            for row in self.tables["dependency_rules"]
+            if is_active(row)
+        }
+        seen_active_rule_ids: set[str] = set()
+        for row in rows:
+            row_id = row.get("rule_id", "")
+            if row.get("active", "").lower() not in {"true", "false"}:
+                self.simple_dependency_rule_errors.append(
+                    f"simple_dependency_rules {row_id or '<missing>'} uses unsupported active value: {row.get('active', '')}."
+                )
+                continue
+            if not is_active(row):
+                continue
+            row_errors = self._validate_simple_dependency_rule_row(row, active_dependency_rule_ids, seen_active_rule_ids)
+            if row_errors:
+                self.simple_dependency_rule_errors.extend(row_errors)
+                continue
+            seen_active_rule_ids.add(row_id)
+            self._append_simple_dependency_rule(row)
+
+    def _validate_simple_dependency_rule_row(
+        self,
+        row: dict[str, str],
+        active_dependency_rule_ids: set[str],
+        seen_active_rule_ids: set[str],
+    ) -> list[str]:
+        errors: list[str] = []
+        row_id = row.get("rule_id", "")
+        if not row_id:
+            errors.append("simple_dependency_rules has a row missing rule_id.")
+        elif row_id in seen_active_rule_ids:
+            errors.append(f"simple_dependency_rules has duplicate active rule_id: {row_id}.")
+        elif row_id in active_dependency_rule_ids:
+            errors.append(f"simple_dependency_rules {row_id} collides with active dependency_rules row.")
+
+        rule_type = row.get("rule_type", "")
+        if rule_type not in {"excludes", "requires"}:
+            errors.append(f"simple_dependency_rules {row_id or '<missing>'} uses unsupported rule_type: {rule_type}.")
+
+        for field in ("source_option_id", "target_option_id", "violation_behavior", "message", "priority"):
+            if not row.get(field, ""):
+                errors.append(f"simple_dependency_rules {row_id or '<missing>'} is missing {field}.")
+
+        for field in ("source_option_id", "target_option_id"):
+            selectable_id = row.get(field, "")
+            if selectable_id and selectable_id not in self.projected_owned_selectable_ids:
+                errors.append(
+                    f"simple_dependency_rules {row_id or '<missing>'} {field} is not an active projected-owned selectable: {selectable_id}."
+                )
+
+        try:
+            as_int(row.get("priority", ""))
+        except ValueError:
+            errors.append(f"simple_dependency_rules {row_id or '<missing>'} has unsupported priority: {row.get('priority', '')}.")
+
+        if row.get("target_option_id", "") and row.get("target_option_id", "") in self.selectables:
+            condition_error = self._simple_dependency_condition_collision_error(row)
+            if condition_error:
+                errors.append(condition_error)
+
+        return errors
+
+    def _simple_dependency_condition_id(self, target_selectable_id: str) -> str:
+        target = self.selectables[target_selectable_id]
+        return f"cs_selected_{target['rpo'].lower()}"
+
+    def _simple_dependency_condition_collision_error(self, row: dict[str, str]) -> str:
+        target_id = row["target_option_id"]
+        condition_set_id = self._simple_dependency_condition_id(target_id)
+        existing_condition_sets = [
+            item for item in self.tables["condition_sets"] if item.get("condition_set_id", "") == condition_set_id
+        ]
+        if not existing_condition_sets:
+            return ""
+        existing_terms = [
+            term for term in self.tables["condition_terms"] if term.get("condition_set_id", "") == condition_set_id
+        ]
+        compatible = (
+            len(existing_condition_sets) == 1
+            and is_active(existing_condition_sets[0])
+            and len(existing_terms) == 1
+            and existing_terms[0].get("or_group", "") == "g1"
+            and existing_terms[0].get("term_order", "") == "1"
+            and existing_terms[0].get("term_type", "") == "selected"
+            and existing_terms[0].get("left_ref", "") == target_id
+            and existing_terms[0].get("operator", "") == "is_true"
+            and existing_terms[0].get("right_value", "") == ""
+            and existing_terms[0].get("negate", "") == "false"
+        )
+        if compatible:
+            return ""
+        return (
+            f"simple_dependency_rules {row['rule_id']} generated condition_set_id {condition_set_id} "
+            f"already exists but does not select {target_id}."
+        )
+
+    def _append_simple_dependency_rule(self, row: dict[str, str]) -> None:
+        target_id = row["target_option_id"]
+        condition_set_id = self._simple_dependency_condition_id(target_id)
+        if not any(item.get("condition_set_id", "") == condition_set_id for item in self.tables["condition_sets"]):
+            target_rpo = self.selectables[target_id]["rpo"]
+            condition_set = {
+                "condition_set_id": condition_set_id,
+                "label": f"{target_rpo} selected",
+                "description": "",
+                "active": "true",
+            }
+            self.tables["condition_sets"].append(condition_set)
+            self.condition_sets[condition_set_id] = condition_set
+            self.tables["condition_terms"].append(
+                {
+                    "condition_set_id": condition_set_id,
+                    "or_group": "g1",
+                    "term_order": "1",
+                    "term_type": "selected",
+                    "left_ref": target_id,
+                    "operator": "is_true",
+                    "right_value": "",
+                    "negate": "false",
+                }
+            )
+        self.tables["dependency_rules"].append(
+            {
+                "rule_id": row["rule_id"],
+                "rule_type": row["rule_type"],
+                "subject_selector_type": "selectable",
+                "subject_selector_id": row["source_option_id"],
+                "subject_must_be_selected": "true",
+                "applies_when_condition_set_id": "",
+                "target_condition_set_id": condition_set_id,
+                "violation_behavior": row["violation_behavior"],
+                "message": row["message"],
+                "priority": row["priority"],
+                "active": row["active"],
+            }
+        )
+
     def validate(self) -> list[str]:
         errors: list[str] = []
+        errors.extend(self.simple_dependency_rule_errors)
         for table_name, id_field in ID_FIELDS.items():
             seen: set[str] = set()
             for row in self.tables[table_name]:

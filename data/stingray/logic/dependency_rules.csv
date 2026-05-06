@@ -129,4 +129,3 @@ dep_excl_dzu_gbk,excludes,selectable,opt_dzu_001,true,,cs_selected_gbk,disable_a
 dep_excl_dzx_gkz,excludes,selectable,opt_dzx_001,true,,cs_selected_gkz,disable_and_block,Blocked by DZX Carbon Flash/Edge Red Stinger Stripe.,416,true
 dep_excl_dzx_gph,excludes,selectable,opt_dzx_001,true,,cs_selected_gph,disable_and_block,Blocked by DZX Carbon Flash/Edge Red Stinger Stripe.,417,true
 dep_excl_efy_gba,excludes,selectable,opt_efy_001,true,,cs_selected_gba,disable_and_block,Blocked by EFY Body-color accents.,418,true
-dep_excl_sht_pdv,excludes,selectable,opt_sht_001,true,,cs_selected_pdv,disable_and_block,"Blocked by SHT LPO, Jake hood graphic with Tech Bronze accent.",419,true

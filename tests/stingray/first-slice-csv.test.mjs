@@ -6,9 +6,9 @@ import vm from "node:vm";
 
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
-const EXPECTED_DEPENDENCY_RULE_COUNT = 131;
+const EXPECTED_DEPENDENCY_RULE_COUNT = 130;
 const EXPECTED_DEPENDENCY_REQUIRES_COUNT = 3;
-const EXPECTED_DEPENDENCY_EXCLUDES_COUNT = 128;
+const EXPECTED_DEPENDENCY_EXCLUDES_COUNT = 127;
 const EXPECTED_CONDITION_SET_COUNT = 51;
 const EXPECTED_CONDITION_TERM_COUNT = 53;
 const PASS132_EXCLUDE_PAIRS = [
@@ -1750,6 +1750,7 @@ test("pass 148 dependency_rules CSV migrates only PCX to PDV package conflict", 
 
 test("pass 188 dependency_rules CSV migrates only SHT to PDV package conflict", () => {
   const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
+  const simpleRules = parseCsv(fs.readFileSync("data/stingray/logic/simple_dependency_rules.csv", "utf8"));
   const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
   const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
@@ -1776,18 +1777,22 @@ test("pass 188 dependency_rules CSV migrates only SHT to PDV package conflict", 
   assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
+  assert.deepEqual(simpleRules, [
+    {
+      rule_id: "dep_excl_sht_pdv",
+      rule_type: "excludes",
+      source_option_id: "opt_sht_001",
+      target_option_id: "opt_pdv_001",
+      violation_behavior: "disable_and_block",
+      message: "Blocked by SHT LPO, Jake hood graphic with Tech Bronze accent.",
+      priority: "419",
+      active: "true",
+    },
+  ]);
 
   for (const [ruleId, sourceId, targetId, conditionSetId] of PASS188_EXCLUDE_PAIRS) {
     const rule = rules.find((candidate) => candidate.rule_id === ruleId);
-    assert.ok(rule, `${ruleId} should exist`);
-    assert.equal(rule.rule_type, "excludes");
-    assert.equal(rule.subject_selector_type, "selectable");
-    assert.equal(rule.subject_selector_id, sourceId);
-    assert.equal(rule.subject_must_be_selected, "true");
-    assert.equal(rule.target_condition_set_id, conditionSetId);
-    assert.equal(rule.violation_behavior, "disable_and_block");
-    assert.equal(rule.message, "Blocked by SHT LPO, Jake hood graphic with Tech Bronze accent.");
-    assert.equal(rule.active, "true");
+    assert.equal(rule, undefined, `${ruleId} should no longer be authored in dependency_rules.csv`);
 
     assert.ok(conditionSets.find((conditionSet) => conditionSet.condition_set_id === conditionSetId), `${conditionSetId} should exist`);
     assert.ok(
