@@ -74,6 +74,7 @@ bp_c2z,pb_2027_stingray,selectable,opt_c2z_001,,2595,10,true,Current C2Z base pr
 bp_cc3,pb_2027_stingray,selectable,opt_cc3_001,,995,10,true,Current CC3 base price.
 bp_d84,pb_2027_stingray,selectable,opt_d84_001,,1295,10,true,Current D84 base price.
 bp_d86,pb_2027_stingray,selectable,opt_d86_001,,1295,10,true,Current D86 base price.
+bp_efy,pb_2027_stingray,selectable,opt_efy_001,,995,10,true,Current EFY base price.
 bp_edu,pb_2027_stingray,selectable,opt_edu_001,,995,10,true,Current EDU base price.
 bp_dpb,pb_2027_stingray,selectable,opt_dpb_001,,1295,10,true,Current DPB base price.
 bp_dpc,pb_2027_stingray,selectable,opt_dpc_001,,1295,10,true,Current DPC base price.

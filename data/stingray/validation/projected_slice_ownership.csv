@@ -93,6 +93,7 @@ selectable,,,,,,RIK,projected_owned,Rear script badge member projected slice,tru
 selectable,,,,,,EYK,projected_owned,Required Badges slice,true
 selectable,,,,,,EYT,projected_owned,Required Badges duplicate-RPO slice,true
 selectable,,,,,,EDU,projected_owned,EDU Exterior Accents standalone projected slice,true
+selectable,,,,,,EFY,projected_owned,EFY Exterior Accents customer-facing projected slice; dependency boundaries remain preserved,true
 guardedOption,,,,,,EYK,production_guarded,Required Badges Chrome badge choice remained production-owned before Pass 71,false
 guardedOption,,,,,opt_eyt_001,,production_guarded,Required Badges Carbon Flash default remained production-owned before Pass 71,false
 guardedOption,,,,,opt_eyt_002,,production_guarded,Standard Options EYT display-only duplicate remained production-owned before Pass 71,false
@@ -152,6 +153,7 @@ rule,,5ZZ,,T0A,,,preserved_cross_boundary,Spoiler replace rule remains productio
 rule,,D84,,GBA,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
 rule,,D86,,GBA,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
 rule,,EFY,,GBA,,,preserved_cross_boundary,Spoiler-adjacent paint exclude remains production-owned in Pass 17,true
+rule,,RZ9,,EFY,,,preserved_cross_boundary,RZ9 to EFY LPO Exterior boundary remains production-owned before EFY dependency migration,true
 rule,,FE2,,Z51,,,preserved_cross_boundary,Spoiler-adjacent suspension exclude remains production-owned in Pass 17,true
 rule,,FE4,,Z51,,,preserved_cross_boundary,Spoiler-adjacent suspension requirement remains production-owned in Pass 17,true
 rule,,Z51,,FE3,,,preserved_cross_boundary,Z51 package include remains production-owned in Pass 17,true
