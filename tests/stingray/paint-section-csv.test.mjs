@@ -11,6 +11,7 @@ const PAINT_RPOS = ["G8G", "GBA", "GKA", "GBK", "GTR", "GEC", "GPH", "G4Z", "G26
 const PASS178_PAINT_EXCLUDES = [
   ["dep_excl_d84_gba", "D84", "GBA", "cs_selected_gba"],
   ["dep_excl_d86_gba", "D86", "GBA", "cs_selected_gba"],
+  ["dep_excl_efy_gba", "EFY", "GBA", "cs_selected_gba"],
   ["dep_excl_dpb_gtr", "DPB", "GTR", "cs_selected_gtr"],
   ["dep_excl_dpc_gbk", "DPC", "GBK", "cs_selected_gbk"],
   ["dep_excl_dpg_g26", "DPG", "G26", "cs_selected_g26"],
@@ -28,7 +29,7 @@ const PASS178_PAINT_EXCLUDES = [
   ["dep_excl_dzx_gkz", "DZX", "GKZ", "cs_selected_gkz"],
   ["dep_excl_dzx_gph", "DZX", "GPH", "cs_selected_gph"],
 ];
-const PRESERVED_PAINT_BOUNDARIES = [["EFY", "GBA"], ["ZYC", "GBA"]];
+const PRESERVED_PAINT_BOUNDARIES = [["ZYC", "GBA"]];
 
 function parseCsv(source) {
   const rows = [];
@@ -181,7 +182,7 @@ test("Pass 178 migrates only approved paint compatibility rules", () => {
   const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
 
-  assert.equal(rules.length, 129);
+  assert.equal(rules.length, 130);
   assert.equal(conditionSets.length, 51);
   assert.equal(conditionTerms.length, 53);
 
@@ -217,6 +218,11 @@ test("Pass 178 migrates only approved paint compatibility rules", () => {
       `${sourceRpo} -> ${targetRpo} should remain preserved`
     );
   }
+  assert.equal(
+    manifestHas({ record_type: "rule", source_rpo: "EFY", target_rpo: "GBA", ownership: "preserved_cross_boundary" }),
+    false,
+    "EFY -> GBA should not remain preserved"
+  );
 	  assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5ZU", target_rpo: "G8G", ownership: "preserved_cross_boundary" }), false);
 	  assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5ZU", target_rpo: "GBA", ownership: "preserved_cross_boundary" }), false);
 	  assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5ZU", target_rpo: "GKZ", ownership: "preserved_cross_boundary" }), false);

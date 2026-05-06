@@ -152,7 +152,7 @@ rule,,,opt_5zw_001,T0A,,,preserved_cross_boundary,Spoiler rule-only asymmetric T
 rule,,5ZZ,,T0A,,,preserved_cross_boundary,Spoiler replace rule remains production-owned in Pass 17,true
 rule,,D84,,GBA,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
 rule,,D86,,GBA,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
-rule,,EFY,,GBA,,,preserved_cross_boundary,Spoiler-adjacent paint exclude remains production-owned in Pass 17,true
+rule,,EFY,,GBA,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 186 EFY paint exclude,false
 rule,,RZ9,,EFY,,,preserved_cross_boundary,RZ9 to EFY LPO Exterior boundary remains production-owned before EFY dependency migration,true
 rule,,FE2,,Z51,,,preserved_cross_boundary,Spoiler-adjacent suspension exclude remains production-owned in Pass 17,true
 rule,,FE4,,Z51,,,preserved_cross_boundary,Spoiler-adjacent suspension requirement remains production-owned in Pass 17,true

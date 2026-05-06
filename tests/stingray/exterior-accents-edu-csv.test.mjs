@@ -258,12 +258,12 @@ test("ownership manifest projects EDU and EFY while preserving EFY dependency bo
     assert.equal(owned.has(rpo), false, `${rpo} should remain outside the EDU standalone Exterior Accents slice`);
   }
   for (const expected of [
-    { record_type: "rule", source_rpo: "EFY", target_rpo: "GBA", ownership: "preserved_cross_boundary" },
     { record_type: "rule", source_rpo: "RZ9", target_rpo: "EFY", ownership: "preserved_cross_boundary" },
     { record_type: "rule", source_rpo: "", source_option_id: "opt_ryq_001", target_rpo: "EFY", ownership: "preserved_cross_boundary" },
   ]) {
     assert.equal(manifestHas(expected), true, `${JSON.stringify(expected)} should remain preserved`);
   }
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "EFY", target_rpo: "GBA", ownership: "preserved_cross_boundary" }), false);
 });
 
 test("shadow runtime preserves required Exterior Accents replacement and EFY paint block", () => {
