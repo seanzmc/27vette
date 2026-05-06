@@ -44,7 +44,7 @@ Current implemented optional tables:
   - Status: transitional compatibility contract.
 - `pricing/canonical_base_prices.csv`
   - Current header: `canonical_base_price_id,price_book_id,canonical_option_id,presentation_id,scope_condition_set_id,amount_usd,priority,active,notes`
-  - Final direction: pricing should target exactly one canonical option or presentation and use final context scoping once that decision is approved.
+  - Final direction: pricing should target exactly one canonical option or presentation and use final `context_scope_id` scoping. Current `scope_condition_set_id` is transitional compatibility only.
   - Status: transitional compatibility contract.
 - `logic/simple_dependency_rules.csv`
   - Current header: `rule_id,rule_type,source_option_id,target_option_id,violation_behavior,message,priority,active`
@@ -544,6 +544,12 @@ Rules:
 - Use `canonical_option_id` for inherited baseline base price that applies to every priced customer-choice presentation for the canonical option within the same resolved context.
 - Use `presentation_id` when one presentation has a different emitted base price or must preserve a legacy price surface independently.
 - Presentation-specific base prices override canonical-option base prices.
+- `context_scope_id` is the final pricing scope field and references `canonical/status/context_scopes.csv`.
+- Blank `context_scope_id` means the row is the price-book default for all active variants covered by `price_book_id`.
+- A populated `context_scope_id` must resolve to active variants compatible with the `price_book_id` model/year.
+- Price rows use the shared context specificity cascade: exact variant, body plus trim, body only or trim only, then model/year default.
+- Same-target, same-effective-context active rows with the same priority and conflicting amounts are validation errors.
+- Final canonical base prices must not reference legacy `condition_sets.csv` or `condition_terms.csv`.
 - Existing legacy exact selectable base prices may take precedence during transition, but final authoring should use canonical targets.
 
 #### `price_books.csv`
@@ -910,6 +916,7 @@ Scope rules:
 - `model_key`, `body_style`, and `trim_level` remain independent reusable predicates over active canonical variants.
 - The GM model/body code is `gm_model_code` in `variants.csv`, not a context-scope field.
 - Final `context_scopes.csv` uses direct vehicle/build dimensions only; it does not reference selected options, packages, rules, arbitrary boolean expressions, `condition_sets.csv`, or `condition_terms.csv`.
+- Final `canonical_base_prices.csv` uses `context_scope_id` for scoped prices; the current `scope_condition_set_id` field exists only on transitional bridge pricing files.
 - Transitional `condition_sets.csv` and `condition_terms.csv` remain compatibility tables for already-authored legacy-shaped rules until their lanes are deliberately converted.
 - Rules and relationships apply after the status cascade has removed or marked unavailable options.
 
@@ -1022,9 +1029,8 @@ Do not run tactical option-lane migrations until the relevant canonical table su
 2. Should package includes target presentations or canonical options by default?
 3. Should `standard_choice` be allowed on non-selectable presentations, or should non-selectable standard rows always use `standard_fixed`?
 4. Should display order live only in `choice_group_presentations.csv`, or also remain denormalized in `option_presentations.csv` for easier authoring?
-5. Should `canonical_base_prices.csv` use `context_scope_id` only, keep direct scope columns for authoring simplicity, or keep current `scope_condition_set_id` as a compatibility bridge only?
-6. What is the first canonical-first lane after support contracts are approved: Calipers, a small duplicate-free lane, or a staging-only importer pilot?
-7. When should transitional old-style lanes be converted: opportunistically by lane, or only after a full model-wide compiler can emit all legacy rows?
+5. What is the first canonical-first lane after support contracts are approved: Calipers, a small duplicate-free lane, or a staging-only importer pilot?
+6. When should transitional old-style lanes be converted: opportunistically by lane, or only after a full model-wide compiler can emit all legacy rows?
 
 ## Next Pass Recommendation
 
