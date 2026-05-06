@@ -26,6 +26,11 @@ bp_pdv,pb_2027_stingray,selectable,opt_pdv_001,,750,10,true,Current PDV base pri
 bp_pcx,pb_2027_stingray,selectable,opt_pcx_001,,4595,10,true,Current PCX base price.
 bp_5do,pb_2027_stingray,selectable,opt_5do_001,,4395,10,true,Current 5DO base price.
 bp_5dg,pb_2027_stingray,selectable,opt_5dg_001,,4395,10,true,Current 5DG base price.
+bp_q9o,pb_2027_stingray,selectable,opt_q9o_001,,995,10,true,Current Q9O base price.
+bp_qe6,pb_2027_stingray,selectable,opt_qe6_001,,1095,10,true,Current QE6 base price.
+bp_q9i,pb_2027_stingray,selectable,opt_q9i_001,,1095,10,true,Current Q9I base price.
+bp_q9a,pb_2027_stingray,selectable,opt_q9a_001,,1495,10,true,Current Q9A base price.
+bp_q99,pb_2027_stingray,selectable,opt_q99_001,,1995,10,true,Current Q99 base price.
 bp_r8c,pb_2027_stingray,selectable,opt_r8c_001,,1695,10,true,Current R8C base price.
 bp_s47,pb_2027_stingray,selectable,opt_s47_001,,275,10,true,Current S47 base price.
 bp_sfe,pb_2027_stingray,selectable,opt_sfe_001,,125,10,true,Current SFE base price.

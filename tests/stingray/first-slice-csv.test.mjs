@@ -1111,12 +1111,12 @@ test("pass 141 projects only PCX and PDV package source catalog rows", () => {
   const basePrices = parseCsv(fs.readFileSync("data/stingray/pricing/base_prices.csv", "utf8"));
   const ownershipRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
 
-  assert.equal(selectables.length, 109);
-  assert.equal(displayRows.length, 109);
-  assert.equal(basePrices.length, 104);
+  assert.equal(selectables.length, 114);
+  assert.equal(displayRows.length, 114);
+  assert.equal(basePrices.length, 109);
   assert.equal(
     ownershipRows.filter((row) => row.record_type === "selectable" && row.ownership === "projected_owned" && row.active === "true").length,
-    107
+    112
   );
 
   const expected = [
@@ -1864,9 +1864,9 @@ test("pass 149 projects only safe missing PCX target catalog rows", () => {
     "display_order",
   ];
 
-  assert.equal(selectables.length, 109);
-  assert.equal(displayRows.length, 109);
-  assert.equal(basePrices.length, 104);
+  assert.equal(selectables.length, 114);
+  assert.equal(displayRows.length, 114);
+  assert.equal(basePrices.length, 109);
   assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
@@ -1984,9 +1984,9 @@ test("pass 154 projects only safe remaining Pass 149 boundary endpoints", () => 
     "display_order",
   ];
 
-  assert.equal(selectables.length, 109);
-  assert.equal(displayRows.length, 109);
-  assert.equal(basePrices.length, 104);
+  assert.equal(selectables.length, 114);
+  assert.equal(displayRows.length, 114);
+  assert.equal(basePrices.length, 109);
   assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
   assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
