@@ -4,7 +4,11 @@ dep_bc7_requires_zz3_convertible,requires,selectable,opt_bc7_001,true,cs_convert
 dep_excl_5v7_sti,excludes,selectable,opt_5v7_001,true,,cs_selected_sti,disable_and_block,"Blocked by 5V7 LPO, Black Ground Effects.",100,true
 dep_excl_5v7_tvs,excludes,selectable,opt_5v7_001,true,,cs_selected_tvs,disable_and_block,"Blocked by 5V7 LPO, Black Ground Effects.",101,true
 dep_excl_sti_5v7,excludes,selectable,opt_sti_001,true,,cs_selected_5v7,disable_and_block,"Blocked by STI LPO, Composite rocker extensions.",102,true
+dep_excl_sti_5vm,excludes,selectable,opt_sti_001,true,,cs_ref_selected_5vm,disable_and_block,"Blocked by STI LPO, Composite rocker extensions.",103,true
+dep_excl_sti_5w8,excludes,selectable,opt_sti_001,true,,cs_ref_selected_5w8,disable_and_block,"Blocked by STI LPO, Composite rocker extensions.",104,true
 dep_excl_pcu_5v7,excludes,selectable,opt_pcu_001,true,,cs_selected_5v7,disable_and_block,"Blocked by PCU LPO, Stingray Protection Package.",122,true
+dep_excl_pcu_5vm,excludes,selectable,opt_pcu_001,true,,cs_ref_selected_5vm,disable_and_block,"Blocked by PCU LPO, Stingray Protection Package.",123,true
+dep_excl_pcu_5w8,excludes,selectable,opt_pcu_001,true,,cs_ref_selected_5w8,disable_and_block,"Blocked by PCU LPO, Stingray Protection Package.",124,true
 dep_excl_r88_eyk,excludes,selectable,opt_r88_001,true,,cs_selected_eyk,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",176,true
 dep_excl_r88_sfz,excludes,selectable,opt_r88_001,true,,cs_selected_sfz,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",177,true
 dep_excl_r88_dpb,excludes,selectable,opt_r88_001,true,,cs_selected_dpb,disable_and_block,"Blocked by R88 LPO, Illuminated crossed flags emblem.",178,true

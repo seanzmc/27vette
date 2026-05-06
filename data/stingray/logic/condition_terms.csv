@@ -16,6 +16,8 @@ cs_selected_eyk,g1,1,selected,opt_eyk_001,is_true,,false
 cs_selected_sfz,g1,1,selected,opt_sfz_001,is_true,,false
 cs_selected_5zz,g1,1,selected,opt_5zz_001,is_true,,false
 cs_selected_5zu,g1,1,selected,opt_5zu_001,is_true,,false
+cs_ref_selected_5vm,g1,1,reference_selected,ref_5vm,is_true,,false
+cs_ref_selected_5w8,g1,1,reference_selected,ref_5w8,is_true,,false
 cs_ref_selected_5zw,g1,1,reference_selected,ref_5zw,is_true,,false
 cs_selected_dpb,g1,1,selected,opt_dpb_001,is_true,,false
 cs_selected_dpc,g1,1,selected,opt_dpc_001,is_true,,false

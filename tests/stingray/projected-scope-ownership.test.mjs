@@ -333,8 +333,6 @@ test("projected ownership manifest declares the current multi-slice control scop
   for (const expected of [
     { record_type: "rule", group_id: "", source_rpo: "SHT", source_option_id: "", target_rpo: "PDV", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "R8C", source_option_id: "", target_rpo: "CFX", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", group_id: "", source_rpo: "PCU", source_option_id: "", target_rpo: "", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", group_id: "", source_rpo: "PCU", source_option_id: "", target_rpo: "", target_option_id: "opt_5w8_001", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_5vm_001", target_rpo: "", target_option_id: "opt_5w8_001", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_5w8_001", target_rpo: "", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_cf8_001", target_rpo: "DPB", target_option_id: "", ownership: "preserved_cross_boundary" },
@@ -352,9 +350,7 @@ test("projected ownership manifest declares the current multi-slice control scop
     { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_cf8_001", target_rpo: "DUW", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_ryq_001", target_rpo: "EFY", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_5vm_001", target_rpo: "STI", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", group_id: "", source_rpo: "STI", source_option_id: "", target_rpo: "", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_5w8_001", target_rpo: "STI", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "rule", group_id: "", source_rpo: "STI", source_option_id: "", target_rpo: "", target_option_id: "opt_5w8_001", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "TVS", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "5ZZ", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "5ZU", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },

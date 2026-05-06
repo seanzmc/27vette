@@ -13,6 +13,12 @@ const OVERLAY_SCRIPT = "scripts/stingray_csv_shadow_overlay.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const RULE_ONLY_IDS = ["opt_5vm_001", "opt_5w8_001"];
 const RULE_ONLY_RPOS = ["5VM", "5W8"];
+const PASS167_CSV_OWNED_RULE_KEYS = new Set([
+  "PCU->opt_5vm_001:excludes:False:active",
+  "PCU->opt_5w8_001:excludes:False:active",
+  "STI->opt_5vm_001:excludes:False:active",
+  "STI->opt_5w8_001:excludes:False:active",
+]);
 
 function parseCsv(source) {
   const rows = [];
@@ -143,7 +149,7 @@ test("production keeps 5VM and 5W8 as guarded rule-only legacy option ids", () =
   }
 });
 
-test("all 5VM and 5W8 production rules are explicit preserved rule-only records", () => {
+test("5VM and 5W8 production rules remain explicit preserved rows except CSV-owned target excludes", () => {
   const production = loadGeneratedData();
 
   const actualRuleKeys = JSON.parse(JSON.stringify(ruleOnlyRules(production).map((rule) => ruleKey(production, rule))));
@@ -173,7 +179,12 @@ test("all 5VM and 5W8 production rules are explicit preserved rule-only records"
     "STI->opt_5w8_001:excludes:False:active",
   ]);
   for (const rule of ruleOnlyRules(production)) {
-    assert.equal(hasPreservedRuleRow(production, rule), true, `${rule.rule_id} should be preserved by explicit RPO or option_id`);
+    const key = ruleKey(production, rule);
+    assert.equal(
+      hasPreservedRuleRow(production, rule),
+      !PASS167_CSV_OWNED_RULE_KEYS.has(key),
+      `${rule.rule_id} should match expected preserved ownership`
+    );
   }
 });
 

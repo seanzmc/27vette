@@ -266,8 +266,8 @@ test("PCU package cluster satisfies projected-owned source and target policy", (
   assert.deepEqual(stalePreservedPcuPackageRows(), [], "PCU package records should not remain preserved cross-boundary rows");
 
   assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCU", target_rpo: "5V7", ownership: "preserved_cross_boundary" }), false);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCU", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCU", target_option_id: "opt_5w8_001", ownership: "preserved_cross_boundary" }), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCU", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" }), false);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "PCU", target_option_id: "opt_5w8_001", ownership: "preserved_cross_boundary" }), false);
 });
 
 test("CSV PCU legacy fragment emits package include rules and included-zero priceRules", () => {
@@ -335,7 +335,7 @@ test("production has only classified records touching the PCU package cluster", 
   });
 });
 
-test("shadow overlay projects PCU package records and preserves external ground-effects boundaries", () => {
+test("shadow overlay projects PCU package records and migrated ground-effects boundaries", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
 
