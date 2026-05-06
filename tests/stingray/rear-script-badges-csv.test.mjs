@@ -278,23 +278,25 @@ test("shadow runtime preserves rear script badge peer blocking", () => {
 
 test("rear script badge dependency rules migrate the six production peer excludes", () => {
   const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
+  const simpleRules = parseCsv(fs.readFileSync("data/stingray/logic/simple_dependency_rules.csv", "utf8"));
   const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
 
-  assert.equal(rules.length, 112);
+  assert.equal(rules.length, 106);
+  assert.equal(simpleRules.length, 25);
   assert.equal(rules.filter((item) => item.rule_type === "requires").length, 3);
-  assert.equal(rules.filter((item) => item.rule_type === "excludes").length, 109);
+  assert.equal(rules.filter((item) => item.rule_type === "excludes").length, 103);
 
   for (const [ruleId, , , sourceId, targetId, conditionSetId] of PASS136_EXCLUDE_PAIRS) {
     const dependencyRule = rules.find((item) => item.rule_id === ruleId);
-    assert.ok(dependencyRule, `${ruleId} should exist`);
-    assert.equal(dependencyRule.rule_type, "excludes");
-    assert.equal(dependencyRule.subject_selector_type, "selectable");
-    assert.equal(dependencyRule.subject_selector_id, sourceId);
-    assert.equal(dependencyRule.subject_must_be_selected, "true");
-    assert.equal(dependencyRule.target_condition_set_id, conditionSetId);
-    assert.equal(dependencyRule.violation_behavior, "disable_and_block");
-    assert.equal(dependencyRule.active, "true");
+    const simpleRule = simpleRules.find((item) => item.rule_id === ruleId);
+    assert.equal(dependencyRule, undefined, `${ruleId} should no longer be authored in dependency_rules.csv`);
+    assert.ok(simpleRule, `${ruleId} should be authored in simple_dependency_rules.csv`);
+    assert.equal(simpleRule.rule_type, "excludes");
+    assert.equal(simpleRule.source_option_id, sourceId);
+    assert.equal(simpleRule.target_option_id, targetId);
+    assert.equal(simpleRule.violation_behavior, "disable_and_block");
+    assert.equal(simpleRule.active, "true");
 
     assert.ok(conditionSets.find((item) => item.condition_set_id === conditionSetId), `${conditionSetId} should exist`);
     assert.ok(

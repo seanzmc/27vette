@@ -45,12 +45,6 @@ dep_excl_sfz_dub,excludes,selectable,opt_sfz_001,true,,cs_selected_dub,disable_a
 dep_excl_sfz_due,excludes,selectable,opt_sfz_001,true,,cs_selected_due,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",211,true
 dep_excl_sfz_duk,excludes,selectable,opt_sfz_001,true,,cs_selected_duk,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",212,true
 dep_excl_sfz_duw,excludes,selectable,opt_sfz_001,true,,cs_selected_duw,disable_and_block,"Blocked by SFZ LPO, Dark Stealth crossed flags emblem.",213,true
-dep_excl_rin_rik,excludes,selectable,opt_rin_001,true,,cs_selected_rik,disable_and_block,"Blocked by RIN LPO, Rear Corvette script badge in Arctic White.",300,true
-dep_excl_rin_sl8,excludes,selectable,opt_rin_001,true,,cs_selected_sl8,disable_and_block,"Blocked by RIN LPO, Rear Corvette script badge in Arctic White.",301,true
-dep_excl_sl8_rin,excludes,selectable,opt_sl8_001,true,,cs_selected_rin,disable_and_block,"Blocked by SL8 LPO, Rear Corvette script badge in Edge Red.",302,true
-dep_excl_sl8_rik,excludes,selectable,opt_sl8_001,true,,cs_selected_rik,disable_and_block,"Blocked by SL8 LPO, Rear Corvette script badge in Edge Red.",303,true
-dep_excl_rik_rin,excludes,selectable,opt_rik_001,true,,cs_selected_rin,disable_and_block,"Blocked by RIK LPO, Rear Corvette script badge in Torch Red.",304,true
-dep_excl_rik_sl8,excludes,selectable,opt_rik_001,true,,cs_selected_sl8,disable_and_block,"Blocked by RIK LPO, Rear Corvette script badge in Torch Red.",305,true
 dep_excl_wkq_5zu,excludes,selectable,opt_wkq_001,true,,cs_selected_5zu,disable_and_block,"Blocked by WKQ LPO, Premium indoor car cover.",207,true
 dep_excl_wkq_5zw,excludes,selectable,opt_wkq_001,true,,cs_ref_selected_5zw,disable_and_block,"Blocked by WKQ LPO, Premium indoor car cover.",208,true
 dep_excl_wkq_5zz,excludes,selectable,opt_wkq_001,true,,cs_selected_5zz,disable_and_block,"Blocked by WKQ LPO, Premium indoor car cover.",208,true

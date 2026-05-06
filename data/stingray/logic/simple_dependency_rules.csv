@@ -17,4 +17,10 @@ dep_excl_duw_gtr,excludes,opt_duw_001,opt_gtr_001,disable_and_block,Blocked by D
 dep_excl_dzu_gbk,excludes,opt_dzu_001,opt_gbk_001,disable_and_block,Blocked by DZU Carbon Flash/Competition Yellow Stinger Stripe.,415,true
 dep_excl_dzx_gkz,excludes,opt_dzx_001,opt_gkz_001,disable_and_block,Blocked by DZX Carbon Flash/Edge Red Stinger Stripe.,416,true
 dep_excl_dzx_gph,excludes,opt_dzx_001,opt_gph_001,disable_and_block,Blocked by DZX Carbon Flash/Edge Red Stinger Stripe.,417,true
+dep_excl_rin_rik,excludes,opt_rin_001,opt_rik_001,disable_and_block,"Blocked by RIN LPO, Rear Corvette script badge in Arctic White.",300,true
+dep_excl_rin_sl8,excludes,opt_rin_001,opt_sl8_001,disable_and_block,"Blocked by RIN LPO, Rear Corvette script badge in Arctic White.",301,true
+dep_excl_sl8_rin,excludes,opt_sl8_001,opt_rin_001,disable_and_block,"Blocked by SL8 LPO, Rear Corvette script badge in Edge Red.",302,true
+dep_excl_sl8_rik,excludes,opt_sl8_001,opt_rik_001,disable_and_block,"Blocked by SL8 LPO, Rear Corvette script badge in Edge Red.",303,true
+dep_excl_rik_rin,excludes,opt_rik_001,opt_rin_001,disable_and_block,"Blocked by RIK LPO, Rear Corvette script badge in Torch Red.",304,true
+dep_excl_rik_sl8,excludes,opt_rik_001,opt_sl8_001,disable_and_block,"Blocked by RIK LPO, Rear Corvette script badge in Torch Red.",305,true
 dep_excl_sht_pdv,excludes,opt_sht_001,opt_pdv_001,disable_and_block,"Blocked by SHT LPO, Jake hood graphic with Tech Bronze accent.",419,true

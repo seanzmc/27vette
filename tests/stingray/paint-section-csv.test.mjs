@@ -184,8 +184,8 @@ test("Pass 178 migrates only approved paint compatibility rules", () => {
   const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
   const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
 
-  assert.equal(rules.length, 112);
-  assert.equal(simpleRules.length, 19);
+  assert.equal(rules.length, 106);
+  assert.equal(simpleRules.length, 25);
   assert.equal(conditionSets.length, 51);
   assert.equal(conditionTerms.length, 53);
 
