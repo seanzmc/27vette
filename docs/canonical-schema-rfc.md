@@ -52,12 +52,44 @@ Current implemented optional tables:
   - Final direction: simple relationships should target final presentation identity unless canonical-target inheritance is explicitly approved.
   - Status: transitional compatibility contract.
 
-Transition strategy is not approved yet. Two viable paths remain:
+Approved transition strategy: introduce a new final canonical namespace under `data/stingray/canonical/` while keeping current optional files as transitional compatibility bridges.
 
-1. Replace current files in place later after explicit migration of headers/enums and compiler support.
-2. Add v2 files for final contracts and keep current files as compatibility bridges until old lanes are converted.
+Final-schema support must not mutate the current optional file headers or enum contracts in place. Any pass that changes current optional file behavior must be support-only and prove header-only/current-data parity. New final-schema loaders and validators should target `data/stingray/canonical/...`, not the current transitional paths.
 
-No support implementation should proceed against final table contracts until this strategy is approved. Any pass that changes headers, enum values, or target identifiers for the current optional files must be support-only and prove header-only/current-data parity.
+Current transitional compatibility bridge paths:
+
+- `data/stingray/catalog/canonical_options.csv`
+- `data/stingray/ui/option_presentations.csv`
+- `data/stingray/logic/option_status_rules.csv`
+- `data/stingray/pricing/canonical_base_prices.csv`
+- `data/stingray/logic/simple_dependency_rules.csv`
+
+## Final Path Convention
+
+Final source-of-truth tables live under `data/stingray/canonical/`:
+
+- `canonical/source/source_documents.csv`
+- `canonical/source/source_rows.csv`
+- `canonical/source/source_row_classifications.csv`
+- `canonical/options/duplicate_rpo_reviews.csv`
+- `canonical/options/canonical_options.csv`
+- `canonical/options/canonical_option_aliases.csv`
+- `canonical/options/control_plane_references.csv`
+- `canonical/presentation/option_presentations.csv`
+- `canonical/presentation/choice_groups.csv`
+- `canonical/presentation/choice_group_presentations.csv`
+- `canonical/status/context_scopes.csv`
+- `canonical/status/option_status_rules.csv`
+- `canonical/pricing/price_books.csv`
+- `canonical/pricing/canonical_base_prices.csv`
+- `canonical/pricing/price_rules.csv`
+- `canonical/relationships/simple_dependency_rules.csv`
+- `canonical/relationships/requires_any_groups.csv`
+- `canonical/relationships/requires_any_group_members.csv`
+- `canonical/relationships/package_includes.csv`
+- `canonical/relationships/replacement_default_rules.csv`
+- `canonical/ownership/projection_ownership.csv`
+- `canonical/ownership/preserved_boundaries.csv`
 
 ## Final Source-Of-Truth Tables
 
@@ -630,6 +662,85 @@ Rules:
 - Control-plane references are not customer-selectable options.
 - They may participate in advanced relationships only after intentionally modeled.
 
+### Ownership
+
+Final ownership is explicit and identity-scoped. It must not be inferred from RPO alone.
+
+#### `projection_ownership.csv`
+
+Records canonical projection ownership for options, presentations, and relationships.
+
+Required columns:
+
+- `projection_ownership_id`
+- `owner_scope`
+- `canonical_option_id`
+- `presentation_id`
+- `relationship_type`
+- `relationship_id`
+- `ownership`
+- `reason`
+- `active`
+- `notes`
+
+Allowed `owner_scope` values:
+
+- `canonical_option`
+- `presentation`
+- `relationship`
+
+Allowed `ownership` values:
+
+- `projected_owned`
+- `production_guarded`
+- `external_owned`
+
+Rules:
+
+- `canonical_option` rows require `canonical_option_id` and must not set `presentation_id` or relationship fields.
+- `presentation` rows require `presentation_id` and may carry `canonical_option_id` for readability, but `presentation_id` is the ownership identity.
+- `relationship` rows require `relationship_type` and `relationship_id`.
+- `legacy_option_id` is compatibility metadata from presentations or aliases; it is not primary ownership identity.
+
+#### `preserved_boundaries.csv`
+
+Records production-owned or preserved boundaries using typed source/target identifiers.
+
+Required columns:
+
+- `preserved_boundary_id`
+- `relationship_type`
+- `source_ref_type`
+- `source_ref_id`
+- `target_ref_type`
+- `target_ref_id`
+- `ownership`
+- `reason`
+- `active`
+- `notes`
+
+Allowed `source_ref_type` and `target_ref_type` values:
+
+- `canonical_option`
+- `presentation`
+- `legacy_option`
+- `control_plane_reference`
+- `relationship`
+- `choice_group`
+- `rpo_reference`
+
+Allowed `ownership` values:
+
+- `preserved_cross_boundary`
+- `production_guarded`
+- `production_owned`
+
+Rules:
+
+- Use `legacy_option` only when the production boundary is truly legacy-option-specific.
+- Use `rpo_reference` only as a reviewed fallback when no canonical, presentation, legacy option, control-plane, relationship, or choice-group identity exists yet.
+- Preserved boundary classification must avoid RPO-scoped false failures for duplicate-RPO cases.
+
 ## Transitional Legacy-Shaped Tables
 
 These tables remain valid during transition because they already hold migrated lanes. They should not be the default path for new customer-facing sections.
@@ -676,13 +787,16 @@ Output contracts:
 
 Compiler ownership expectations:
 
-- `canonical_options.csv`, `duplicate_rpo_reviews.csv`, `canonical_option_aliases.csv`, `option_presentations.csv`, `choice_groups.csv`, `choice_group_presentations.csv`, and `option_status_rules.csv` generate legacy-shaped choice/display rows.
-- `canonical_base_prices.csv` and `price_books.csv` generate legacy-shaped base price fragments; final `price_rules.csv` generates legacy price rule fragments.
-- Final `simple_dependency_rules.csv` and `requires_any_groups.csv` generate normalized `condition_sets.csv`, `condition_terms.csv`, `dependency_rules.csv`, and legacy rule/ruleGroup fragments as needed for parity.
-- `package_includes.csv` generates legacy include/auto-add fragments only after package include behavior is intentionally modeled.
-- `replacement_default_rules.csv` generates replacement/default legacy fragments only after runtime selection behavior is intentionally modeled.
-- `control_plane_references.csv` generates validation/control-plane references, not customer choice rows, unless another final table intentionally presents them.
-- Transitional `selectables.csv`, `selectable_display.csv`, `base_prices.csv`, `dependency_rules.csv`, `condition_sets.csv`, `condition_terms.csv`, `auto_adds.csv`, `rule_groups.csv`, `rule_group_members.csv`, `exclusive_groups.csv`, and item-set tables remain hand-authored only for lanes not yet converted.
+- Final canonical inputs under `data/stingray/canonical/` compile to generated legacy-compatible outputs.
+- Transitional bridge inputs outside `data/stingray/canonical/` remain supported until their lanes are deliberately converted.
+- `canonical/options/canonical_options.csv`, `canonical/options/duplicate_rpo_reviews.csv`, `canonical/options/canonical_option_aliases.csv`, `canonical/presentation/option_presentations.csv`, `canonical/presentation/choice_groups.csv`, `canonical/presentation/choice_group_presentations.csv`, and `canonical/status/option_status_rules.csv` generate legacy-shaped choice/display rows.
+- `canonical/pricing/canonical_base_prices.csv` and `canonical/pricing/price_books.csv` generate legacy-shaped base price fragments; `canonical/pricing/price_rules.csv` generates legacy price rule fragments.
+- `canonical/relationships/simple_dependency_rules.csv` and `canonical/relationships/requires_any_groups.csv` generate normalized `condition_sets.csv`, `condition_terms.csv`, `dependency_rules.csv`, and legacy rule/ruleGroup fragments as needed for parity.
+- `canonical/relationships/package_includes.csv` generates legacy include/auto-add fragments only after package include behavior is intentionally modeled.
+- `canonical/relationships/replacement_default_rules.csv` generates replacement/default legacy fragments only after runtime selection behavior is intentionally modeled.
+- `canonical/options/control_plane_references.csv` generates validation/control-plane references, not customer choice rows, unless another final table intentionally presents them.
+- `canonical/ownership/projection_ownership.csv` and `canonical/ownership/preserved_boundaries.csv` generate ownership and preserved-boundary validation surfaces.
+- Transitional `selectables.csv`, `selectable_display.csv`, `base_prices.csv`, `dependency_rules.csv`, `condition_sets.csv`, `condition_terms.csv`, `auto_adds.csv`, `rule_groups.csv`, `rule_group_members.csv`, `exclusive_groups.csv`, item-set tables, and current optional compatibility bridge tables remain hand-authored only for lanes not yet converted.
 
 ## Validation/Audit-Only Tables
 
@@ -701,9 +815,10 @@ These remain validation and audit surfaces, not final business source-of-truth:
 Ownership expectations:
 
 - Current `projected_slice_ownership.csv` remains a transitional shadow-overlay and census contract.
-- Final ownership must be explicitly scoped before cutover: either canonical-option scoped, presentation/legacy-option scoped, relationship scoped, or validation-only.
+- Final ownership lives in `canonical/ownership/projection_ownership.csv` and `canonical/ownership/preserved_boundaries.csv`.
+- Final ownership is canonical-option scoped, presentation scoped, or relationship scoped. `legacy_option_id` is compatibility metadata, not primary ownership identity.
 - Preserved boundary checks must avoid RPO-scoped false failures when one RPO has multiple reviewed presentations or aliases.
-- No final ownership migration is approved by this RFC until the table transition strategy is approved.
+- `validation/projected_slice_ownership.csv` must not become the final ownership model.
 
 ## Context/Status Cascade
 
@@ -800,8 +915,8 @@ Current old-style projected rows remain valid transitional source. The project s
 Recommended migration pattern:
 
 1. Freeze final schema contracts.
-2. Decide whether final contracts replace current optional files in place or land as v2 files.
-3. Add optional loaders and validation for final tables with header-only parity.
+2. Keep current optional files as transitional compatibility bridges.
+3. Add optional loaders and validation for final tables under `data/stingray/canonical/` with header-only parity.
 4. Add compiler support using temp fixtures.
 5. Pick one small canonical-first lane.
 6. Prove emitted legacy parity and shadow overlay parity.
@@ -833,17 +948,15 @@ Do not run tactical option-lane migrations until the relevant canonical table su
 
 ## Open Questions Requiring Human Approval
 
-1. Do final contracts replace current optional files in place, or land as v2 tables while current files remain compatibility bridges?
-2. Should `context_scopes.csv` support one row with multiple fields only, or also explicit boolean expression references beyond `condition_set_id`?
-3. Should final simple dependency rules target `presentation_id` only, or allow canonical-option targets when all active presentations should inherit the rule?
-4. Should package includes target presentations or canonical options by default?
-5. Should `standard_choice` be allowed on non-selectable presentations, or should non-selectable standard rows always use `standard_fixed`?
-6. Should display order live only in `choice_group_presentations.csv`, or also remain denormalized in `option_presentations.csv` for easier authoring?
-7. Should `canonical_base_prices.csv` use `context_scope_id` only, keep direct scope columns for authoring simplicity, or keep current `scope_condition_set_id` as a compatibility bridge only?
-8. What is the first canonical-first lane after support contracts are approved: Calipers, a small duplicate-free lane, or a staging-only importer pilot?
-9. When should transitional old-style lanes be converted: opportunistically by lane, or only after a full model-wide compiler can emit all legacy rows?
-10. Should ownership move from RPO-based rows to canonical/presentation scoped rows before or after the first canonical-first lane?
+1. Should `context_scopes.csv` support one row with multiple fields only, or also explicit boolean expression references beyond `condition_set_id`?
+2. Should final simple dependency rules target `presentation_id` only, or allow canonical-option targets when all active presentations should inherit the rule?
+3. Should package includes target presentations or canonical options by default?
+4. Should `standard_choice` be allowed on non-selectable presentations, or should non-selectable standard rows always use `standard_fixed`?
+5. Should display order live only in `choice_group_presentations.csv`, or also remain denormalized in `option_presentations.csv` for easier authoring?
+6. Should `canonical_base_prices.csv` use `context_scope_id` only, keep direct scope columns for authoring simplicity, or keep current `scope_condition_set_id` as a compatibility bridge only?
+7. What is the first canonical-first lane after support contracts are approved: Calipers, a small duplicate-free lane, or a staging-only importer pilot?
+8. When should transitional old-style lanes be converted: opportunistically by lane, or only after a full model-wide compiler can emit all legacy rows?
 
 ## Next Pass Recommendation
 
-Pass 213 should be report-only RFC approval focused on the table transition strategy and ownership scope. If those are approved, the following support-only pass can add raw/staging plus duplicate-RPO review loaders. It should not migrate rows or project a tactical option lane.
+The next implementation pass should be support-only loaders and validators for the new `data/stingray/canonical/` namespace. It should not target the existing optional/transitional file paths for new final-schema support, migrate rows, or project a tactical option lane.
