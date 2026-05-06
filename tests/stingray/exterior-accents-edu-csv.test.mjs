@@ -10,7 +10,7 @@ const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const EDU_RPO = "EDU";
 const EXTERIOR_ACCENTS_PRODUCTION_RPOS = new Set(["EFR", "EFY"]);
-const PAINT_ROOF_AND_CLEANUP_RPOS = new Set(["GBA", "ZYC", "DRG", "RYQ", "RZ9"]);
+const PAINT_ROOF_AND_CLEANUP_RPOS = new Set(["ZYC", "DRG", "RYQ", "RZ9"]);
 
 function parseCsv(source) {
   const rows = [];

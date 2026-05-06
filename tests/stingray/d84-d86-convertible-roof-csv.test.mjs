@@ -238,7 +238,8 @@ test("D84 and D86 projection preserves paint and Roof model boundaries", () => {
   for (const rpo of CONVERTIBLE_ROOF_RPOS) {
     assert.equal(owned.has(rpo), true);
   }
-  for (const rpo of ["GBA", "ZYC"]) {
+  assert.equal(owned.has("GBA"), true, "GBA should now be projected-owned by the Paint section slice");
+  for (const rpo of ["ZYC"]) {
     assert.equal(owned.has(rpo), false, `${rpo} should remain outside the D84/D86 slice`);
   }
   assert.equal(activeManifestRows().some((row) => row.record_type === "section" || row.group_id === "sec_roof_001" || row.group_id === "sec_stan_002"), false);

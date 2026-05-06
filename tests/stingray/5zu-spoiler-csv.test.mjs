@@ -9,7 +9,7 @@ const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const FIVE_ZU_RPOS = new Set(["5ZU"]);
-const NON_5ZU_RPOS = new Set(["Z51", "ZYC", "GBA", "G8G", "GKZ", "5ZW", "5VM", "5W8"]);
+const NON_5ZU_RPOS = new Set(["Z51", "ZYC", "5ZW", "5VM", "5W8"]);
 
 function parseCsv(source) {
   const rows = [];
@@ -259,7 +259,7 @@ test("ownership manifest projects 5ZU and keeps only unmigrated 5ZU-touching pro
   assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5V7", target_rpo: "5ZU", ownership: "preserved_cross_boundary" }), false);
   for (const paintRpo of ["G8G", "GBA", "GKZ"]) {
     assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5ZU", target_rpo: paintRpo, ownership: "preserved_cross_boundary" }), true);
-    assert.equal(manifestHas({ record_type: "selectable", rpo: paintRpo, ownership: "projected_owned" }), false);
+    assert.equal(manifestHas({ record_type: "selectable", rpo: paintRpo, ownership: "projected_owned" }), true);
   }
 
   for (const rpo of NON_5ZU_RPOS) {

@@ -91,3 +91,13 @@ bp_duw,pb_2027_stingray,selectable,opt_duw_001,,1295,10,true,Current DUW base pr
 bp_dzu,pb_2027_stingray,selectable,opt_dzu_001,,595,10,true,Current DZU base price.
 bp_dzv,pb_2027_stingray,selectable,opt_dzv_001,,595,10,true,Current DZV base price.
 bp_dzx,pb_2027_stingray,selectable,opt_dzx_001,,595,10,true,Current DZX base price.
+bp_g8g,pb_2027_stingray,selectable,opt_g8g_001,,0,10,true,Current G8G base price.
+bp_gba,pb_2027_stingray,selectable,opt_gba_001,,0,10,true,Current GBA base price.
+bp_gka,pb_2027_stingray,selectable,opt_gka_001,,0,10,true,Current GKA base price.
+bp_gbk,pb_2027_stingray,selectable,opt_gbk_001,,995,10,true,Current GBK base price.
+bp_gtr,pb_2027_stingray,selectable,opt_gtr_001,,500,10,true,Current GTR base price.
+bp_gec,pb_2027_stingray,selectable,opt_gec_001,,0,10,true,Current GEC base price.
+bp_gph,pb_2027_stingray,selectable,opt_gph_001,,995,10,true,Current GPH base price.
+bp_g4z,pb_2027_stingray,selectable,opt_g4z_001,,500,10,true,Current G4Z base price.
+bp_g26,pb_2027_stingray,selectable,opt_g26_001,,995,10,true,Current G26 base price.
+bp_gkz,pb_2027_stingray,selectable,opt_gkz_001,,0,10,true,Current GKZ base price.

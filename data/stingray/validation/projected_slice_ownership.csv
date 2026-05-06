@@ -121,7 +121,7 @@ rule,,RWJ,,Z51,,,preserved_cross_boundary,Car-cover Z51 exclude remains producti
 guardedOption,,,,,,5V7,production_guarded,Spoiler-adjacent ground-effects guarded production option in Pass 17,false
 guardedOption,,,,,,Z51,production_guarded,Spoiler-adjacent package guarded production option in Pass 17,true
 guardedOption,,,,,,ZYC,production_guarded,Spoiler-adjacent appearance guarded production option in Pass 17,true
-guardedOption,,,,,,GBA,production_guarded,Spoiler-adjacent paint guarded production option in Pass 17,true
+guardedOption,,,,,,GBA,production_guarded,Paint option projected-owned in Pass 177; stale guarded row retained inactive,false
 guardedOption,,,,,opt_5vm_001,,production_guarded,Ground-effects rule-only legacy option id guarded in Pass 97,true
 guardedOption,,,,,opt_5w8_001,,production_guarded,Ground-effects rule-only legacy option id guarded in Pass 97,true
 guardedOption,,,,,opt_5zw_001,,production_guarded,Spoiler rule-only legacy option id guarded in Pass 17,true
@@ -193,3 +193,13 @@ ruleGroup,,5V7,,5ZZ,,,preserved_cross_boundary,5V7 spoiler requires-any group me
 ruleGroup,,5ZU,,G8G,,,preserved_cross_boundary,5ZU paint requires-any group member remains production-owned in Pass 17,true
 ruleGroup,,5ZU,,GBA,,,preserved_cross_boundary,5ZU paint requires-any group member remains production-owned in Pass 17,true
 ruleGroup,,5ZU,,GKZ,,,preserved_cross_boundary,5ZU paint requires-any group member remains production-owned in Pass 17,true
+selectable,,,,,,G8G,projected_owned,Paint section projected slice,true
+selectable,,,,,,GBA,projected_owned,Paint section projected slice,true
+selectable,,,,,,GKA,projected_owned,Paint section projected slice,true
+selectable,,,,,,GBK,projected_owned,Paint section projected slice,true
+selectable,,,,,,GTR,projected_owned,Paint section projected slice,true
+selectable,,,,,,GEC,projected_owned,Paint section projected slice,true
+selectable,,,,,,GPH,projected_owned,Paint section projected slice,true
+selectable,,,,,,G4Z,projected_owned,Paint section projected slice,true
+selectable,,,,,,G26,projected_owned,Paint section projected slice,true
+selectable,,,,,,GKZ,projected_owned,Paint section projected slice,true

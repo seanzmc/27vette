@@ -290,7 +290,7 @@ test("required Badges projection claims only EYK EYT choices, not section metada
   assert.equal(manifestHas({ record_type: "guardedOption", target_option_id: "opt_eyt_001", ownership: "production_guarded" }), false);
   assert.equal(manifestHas({ record_type: "guardedOption", target_option_id: "opt_eyt_002", ownership: "production_guarded" }), false);
 
-  for (const rpo of ["GBA", "ZYC"]) {
+  for (const rpo of ["ZYC"]) {
     assert.equal(owned.has(rpo), false, `${rpo} should remain outside the required Badges slice`);
   }
 });
