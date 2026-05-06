@@ -270,7 +270,7 @@ test("shadow runtime preserves PCX package behavior for Tech Bronze graphics", (
   }
 });
 
-test("Tech Bronze graphics package include boundaries are CSV-owned while SHT to PDV remains preserved", () => {
+test("Tech Bronze graphics package include and SHT to PDV boundaries are CSV-owned", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
   const fragment = emitCsvLegacyFragment();
@@ -298,8 +298,9 @@ test("Tech Bronze graphics package include boundaries are CSV-owned while SHT to
   assert.deepEqual(plain(rule(shadow, "SHT", "PDV", "excludes")), plain(rule(production, "SHT", "PDV", "excludes")));
   const shtId = optionIdByRpo(production, "SHT");
   const pdvId = optionIdByRpo(production, "PDV");
-  assert.equal(fragment.rules.some((item) => item.source_id === shtId && item.target_id === pdvId), false);
-  assert.equal(manifestHas({ record_type: "rule", source_rpo: "SHT", target_rpo: "PDV", ownership: "preserved_cross_boundary" }), true);
+  assert.deepEqual(plain(rule(fragment, "SHT", "PDV", "excludes")), plain(rule(production, "SHT", "PDV", "excludes")));
+  assert.equal(fragment.rules.some((item) => item.source_id === shtId && item.target_id === pdvId), true);
+  assert.equal(manifestHas({ record_type: "rule", source_rpo: "SHT", target_rpo: "PDV", ownership: "preserved_cross_boundary" }), false);
 });
 
 test("Tech Bronze graphics projection does not claim broader graphics, badge, wheel, or package rows", () => {

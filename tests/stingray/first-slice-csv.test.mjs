@@ -6,9 +6,9 @@ import vm from "node:vm";
 
 const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
-const EXPECTED_DEPENDENCY_RULE_COUNT = 130;
+const EXPECTED_DEPENDENCY_RULE_COUNT = 131;
 const EXPECTED_DEPENDENCY_REQUIRES_COUNT = 3;
-const EXPECTED_DEPENDENCY_EXCLUDES_COUNT = 127;
+const EXPECTED_DEPENDENCY_EXCLUDES_COUNT = 128;
 const EXPECTED_CONDITION_SET_COUNT = 51;
 const EXPECTED_CONDITION_TERM_COUNT = 53;
 const PASS132_EXCLUDE_PAIRS = [
@@ -74,6 +74,9 @@ const PASS142_EXCLUDE_PAIRS = [
 ];
 const PASS148_EXCLUDE_PAIRS = [
   ["dep_excl_pcx_pdv", "opt_pcx_001", "opt_pdv_001", "cs_selected_pdv"],
+];
+const PASS188_EXCLUDE_PAIRS = [
+  ["dep_excl_sht_pdv", "opt_sht_001", "opt_pdv_001", "cs_selected_pdv"],
 ];
 const PASS143_SAFE_PCX_EXCLUDE_RPOS = [
   "SB7",
@@ -1213,6 +1216,7 @@ test("pass 141 PCX and PDV legacy choices match production with only approved pa
       ...PASS147_INCLUDE_PAIRS,
       ...PASS151_INCLUDE_PAIRS,
       ...PASS148_EXCLUDE_PAIRS,
+      ...PASS188_EXCLUDE_PAIRS,
       ...PASS150_EXCLUDE_PAIRS,
     ].map(([, sourceId, targetId]) => `${sourceId}->${targetId}`)
   );
@@ -1742,6 +1746,88 @@ test("pass 148 dependency_rules CSV migrates only PCX to PDV package conflict", 
   );
 
   assert.ok(autoAdds.find((row) => row.auto_add_id === "aa_pcx_5dg" && row.target_price_policy_id === "included_zero"));
+});
+
+test("pass 188 dependency_rules CSV migrates only SHT to PDV package conflict", () => {
+  const rules = parseCsv(fs.readFileSync("data/stingray/logic/dependency_rules.csv", "utf8"));
+  const conditionSets = parseCsv(fs.readFileSync("data/stingray/logic/condition_sets.csv", "utf8"));
+  const conditionTerms = parseCsv(fs.readFileSync("data/stingray/logic/condition_terms.csv", "utf8"));
+  const manifestRows = parseCsv(fs.readFileSync("data/stingray/validation/projected_slice_ownership.csv", "utf8"));
+  const production = loadGeneratedData();
+  const projected = emitCsvLegacyFragment();
+  const fields = [
+    "source_id",
+    "rule_type",
+    "target_id",
+    "target_type",
+    "source_type",
+    "source_section",
+    "target_section",
+    "source_selection_mode",
+    "target_selection_mode",
+    "body_style_scope",
+    "disabled_reason",
+    "auto_add",
+    "active",
+    "runtime_action",
+    "review_flag",
+  ];
+
+  assert.equal(rules.length, EXPECTED_DEPENDENCY_RULE_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "requires").length, EXPECTED_DEPENDENCY_REQUIRES_COUNT);
+  assert.equal(rules.filter((rule) => rule.rule_type === "excludes").length, EXPECTED_DEPENDENCY_EXCLUDES_COUNT);
+
+  for (const [ruleId, sourceId, targetId, conditionSetId] of PASS188_EXCLUDE_PAIRS) {
+    const rule = rules.find((candidate) => candidate.rule_id === ruleId);
+    assert.ok(rule, `${ruleId} should exist`);
+    assert.equal(rule.rule_type, "excludes");
+    assert.equal(rule.subject_selector_type, "selectable");
+    assert.equal(rule.subject_selector_id, sourceId);
+    assert.equal(rule.subject_must_be_selected, "true");
+    assert.equal(rule.target_condition_set_id, conditionSetId);
+    assert.equal(rule.violation_behavior, "disable_and_block");
+    assert.equal(rule.message, "Blocked by SHT LPO, Jake hood graphic with Tech Bronze accent.");
+    assert.equal(rule.active, "true");
+
+    assert.ok(conditionSets.find((conditionSet) => conditionSet.condition_set_id === conditionSetId), `${conditionSetId} should exist`);
+    assert.ok(
+      conditionTerms.find(
+        (term) =>
+          term.condition_set_id === conditionSetId &&
+          term.term_type === "selected" &&
+          term.left_ref === targetId &&
+          term.operator === "is_true"
+      ),
+      `${conditionSetId} should select ${targetId}`
+    );
+
+    const productionRule = production.rules.find(
+      (candidate) => candidate.source_id === sourceId && candidate.target_id === targetId && candidate.rule_type === "excludes"
+    );
+    const projectedRule = projected.rules.find(
+      (candidate) => candidate.source_id === sourceId && candidate.target_id === targetId && candidate.rule_type === "excludes"
+    );
+
+    assert.ok(productionRule, `${sourceId} -> ${targetId} exclude should exist in production`);
+    assert.ok(projectedRule, `${sourceId} -> ${targetId} exclude should exist in projected CSV fragment`);
+    assert.deepEqual(
+      Object.fromEntries(fields.map((field) => [field, projectedRule[field]])),
+      Object.fromEntries(fields.map((field) => [field, productionRule[field]]))
+    );
+  }
+
+  assert.equal(
+    manifestRows.some(
+      (row) =>
+        row.active === "true" &&
+        row.record_type === "rule" &&
+        row.source_rpo === "SHT" &&
+        row.target_rpo === "PDV" &&
+        row.ownership === "preserved_cross_boundary"
+    ),
+    false,
+    "SHT -> PDV should not remain preserved"
+  );
 });
 
 test("pass 149 projects only safe missing PCX target catalog rows", () => {

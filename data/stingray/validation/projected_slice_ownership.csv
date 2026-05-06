@@ -97,7 +97,7 @@ selectable,,,,,,EFY,projected_owned,EFY Exterior Accents customer-facing project
 guardedOption,,,,,,EYK,production_guarded,Required Badges Chrome badge choice remained production-owned before Pass 71,false
 guardedOption,,,,,opt_eyt_001,,production_guarded,Required Badges Carbon Flash default remained production-owned before Pass 71,false
 guardedOption,,,,,opt_eyt_002,,production_guarded,Standard Options EYT display-only duplicate remained production-owned before Pass 71,false
-rule,,SHT,,PDV,,,preserved_cross_boundary,SHT to PDV package exclude remains production-owned in Pass 61,true
+rule,,SHT,,PDV,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 188 SHT package conflict,false
 rule,,R8C,,CFX,,,preserved_cross_boundary,Pass 149 newly projected target boundary remains production-owned,true
 rule,,DPB,,GTR,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false
 rule,,DPC,,GBK,,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 178 paint compatibility excludes,false

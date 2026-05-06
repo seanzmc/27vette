@@ -342,7 +342,6 @@ test("projected ownership manifest declares the current multi-slice control scop
 	    },
   ]);
   for (const expected of [
-    { record_type: "rule", group_id: "", source_rpo: "SHT", source_option_id: "", target_rpo: "PDV", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "R8C", source_option_id: "", target_rpo: "CFX", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_5vm_001", target_rpo: "", target_option_id: "opt_5w8_001", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_5w8_001", target_rpo: "", target_option_id: "opt_5vm_001", ownership: "preserved_cross_boundary" },
@@ -436,7 +435,7 @@ test("overlay rejects a manifest that omits a projected fragment RPO", () => {
 });
 
 test("overlay rejects an unclassified cross-boundary production record", () => {
-  const rows = loadManifest().filter((row) => !(row.ownership === "preserved_cross_boundary" && row.source_rpo === "SHT" && row.target_rpo === "PDV"));
+  const rows = loadManifest().filter((row) => !(row.ownership === "preserved_cross_boundary" && row.source_rpo === "RZ9" && row.target_rpo === "EFY"));
   const tempManifest = writeTempManifest(rows);
 
   const result = runOverlay(["--ownership-manifest", tempManifest]);
@@ -464,7 +463,7 @@ const validationCases = [
   ],
   [
     "duplicate active preserved cross-boundary row",
-    (rows) => [...rows, { ...rows.find((row) => row.record_type === "rule" && row.source_rpo === "SHT" && row.target_rpo === "PDV") }],
+    (rows) => [...rows, { ...rows.find((row) => row.record_type === "rule" && row.source_rpo === "RZ9" && row.target_rpo === "EFY") }],
     /duplicate active preserved_cross_boundary row/,
   ],
   [
@@ -489,7 +488,7 @@ const validationCases = [
   ],
   [
     "preserved cross-boundary row missing source",
-    (rows) => rows.map((row) => (row.record_type === "rule" && row.source_rpo === "SHT" && row.target_rpo === "PDV" ? { ...row, source_rpo: "" } : row)),
+    (rows) => rows.map((row) => (row.record_type === "rule" && row.source_rpo === "RZ9" && row.target_rpo === "EFY" ? { ...row, source_rpo: "" } : row)),
     /preserved_cross_boundary row is missing source_rpo\/source_option_id or target_rpo\/target_option_id/,
   ],
   [
