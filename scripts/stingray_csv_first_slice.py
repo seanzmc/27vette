@@ -50,6 +50,10 @@ FINAL_CANONICAL_TABLES = {
     "canonical_source_rows": "canonical/source/source_rows.csv",
     "canonical_source_row_classifications": "canonical/source/source_row_classifications.csv",
     "canonical_duplicate_rpo_reviews": "canonical/options/duplicate_rpo_reviews.csv",
+    "final_canonical_variants": "canonical/status/variants.csv",
+    "final_context_scopes": "canonical/status/context_scopes.csv",
+    "final_price_books": "canonical/pricing/price_books.csv",
+    "final_canonical_base_prices": "canonical/pricing/canonical_base_prices.csv",
 }
 
 SIMPLE_DEPENDENCY_RULE_FIELDS = [
@@ -194,6 +198,50 @@ CANONICAL_DUPLICATE_RPO_REVIEW_FIELDS = [
     "notes",
 ]
 
+FINAL_CANONICAL_VARIANT_FIELDS = [
+    "variant_id",
+    "model_year",
+    "gm_model_code",
+    "model_key",
+    "body_style",
+    "trim_level",
+    "active",
+    "notes",
+]
+
+FINAL_CONTEXT_SCOPE_FIELDS = [
+    "context_scope_id",
+    "model_year",
+    "model_key",
+    "variant_id",
+    "body_style",
+    "trim_level",
+    "priority",
+    "active",
+    "notes",
+]
+
+FINAL_PRICE_BOOK_FIELDS = [
+    "price_book_id",
+    "model_year",
+    "model_key",
+    "currency",
+    "active",
+    "notes",
+]
+
+FINAL_CANONICAL_BASE_PRICE_FIELDS = [
+    "canonical_base_price_id",
+    "price_book_id",
+    "canonical_option_id",
+    "presentation_id",
+    "context_scope_id",
+    "amount_usd",
+    "priority",
+    "active",
+    "notes",
+]
+
 OPTIONAL_TABLE_FIELDS = {
     "simple_dependency_rules": SIMPLE_DEPENDENCY_RULE_FIELDS,
     "canonical_options": CANONICAL_OPTION_FIELDS,
@@ -207,6 +255,10 @@ FINAL_CANONICAL_TABLE_FIELDS = {
     "canonical_source_rows": CANONICAL_SOURCE_ROW_FIELDS,
     "canonical_source_row_classifications": CANONICAL_SOURCE_ROW_CLASSIFICATION_FIELDS,
     "canonical_duplicate_rpo_reviews": CANONICAL_DUPLICATE_RPO_REVIEW_FIELDS,
+    "final_canonical_variants": FINAL_CANONICAL_VARIANT_FIELDS,
+    "final_context_scopes": FINAL_CONTEXT_SCOPE_FIELDS,
+    "final_price_books": FINAL_PRICE_BOOK_FIELDS,
+    "final_canonical_base_prices": FINAL_CANONICAL_BASE_PRICE_FIELDS,
 }
 
 CANONICAL_OPTION_KINDS = {"customer_choice", "equipment_feature", "structured_reference", "review_required"}
@@ -243,6 +295,14 @@ FINAL_CANONICAL_DUPLICATE_RPO_CLASSIFICATIONS = {
     "mixed_display_and_selectable_variants",
     "ambiguous_requires_review",
 }
+GM_MODEL_CODE_MODEL_KEYS = {
+    "C": "stingray",
+    "E": "grand_sport",
+    "H": "z06",
+    "R": "zr1",
+    "S": "zr1x",
+}
+GM_MODEL_CODE_BODY_STYLES = {"07": "coupe", "67": "convertible"}
 
 
 ID_FIELDS = {
@@ -267,6 +327,10 @@ ID_FIELDS = {
     "canonical_source_documents": "source_document_id",
     "canonical_source_rows": "source_row_id",
     "canonical_duplicate_rpo_reviews": "duplicate_rpo_review_id",
+    "final_canonical_variants": "variant_id",
+    "final_context_scopes": "context_scope_id",
+    "final_price_books": "price_book_id",
+    "final_canonical_base_prices": "canonical_base_price_id",
 }
 
 
@@ -312,6 +376,24 @@ class CsvSlice:
             self.tables[name] = rows
         self.ownership_rows = self._load_ownership_rows()
         self.variants = {row["variant_id"]: row for row in self.tables["variants"] if is_active(row)}
+        self.final_canonical_variants = {
+            row.get("variant_id", ""): row
+            for row in self.tables["final_canonical_variants"]
+            if is_active(row) and row.get("variant_id", "")
+        }
+        self.final_context_scopes = {
+            row.get("context_scope_id", ""): row
+            for row in self.tables["final_context_scopes"]
+            if is_active(row) and row.get("context_scope_id", "")
+        }
+        self.final_price_books = {
+            row.get("price_book_id", ""): row
+            for row in self.tables["final_price_books"]
+            if is_active(row) and row.get("price_book_id", "")
+        }
+        self.final_canonical_base_prices = [
+            row for row in self.tables["final_canonical_base_prices"] if is_active(row)
+        ]
         self.canonical_namespace_errors: list[str] = []
         self._validate_canonical_namespace_foundation()
         self.canonical_option_errors: list[str] = []
@@ -326,6 +408,7 @@ class CsvSlice:
             row for row in self.tables["canonical_base_prices"] if is_active(row)
         ]
         self._merge_canonical_presentations()
+        self._validate_final_canonical_pricing()
         self.selectables = {row["selectable_id"]: row for row in self.tables["selectables"] if is_active(row)}
         self.projected_owned_selectable_ids = self._build_projected_owned_selectable_ids()
         self.item_sets = {row["set_id"]: row for row in self.tables["item_sets"] if is_active(row)}
@@ -623,6 +706,14 @@ class CsvSlice:
             self.canonical_namespace_errors.extend(self._final_canonical_table_field_errors(table_name))
         if self.canonical_namespace_errors:
             return
+        self._validate_unique_active_final_ids("final_canonical_variants", "canonical/status/variants", "variant_id")
+        self._validate_unique_active_final_ids("final_context_scopes", "canonical/status/context_scopes", "context_scope_id")
+        self._validate_unique_active_final_ids("final_price_books", "canonical/pricing/price_books", "price_book_id")
+        self._validate_unique_active_final_ids(
+            "final_canonical_base_prices",
+            "canonical/pricing/canonical_base_prices",
+            "canonical_base_price_id",
+        )
 
         for row in self.tables["canonical_source_documents"]:
             row_id = row.get("source_document_id", "")
@@ -690,6 +781,284 @@ class CsvSlice:
                 self.canonical_namespace_errors.append(
                     f"canonical/options/duplicate_rpo_reviews {row_id or '<missing>'} uses unsupported review_status: {review_status}."
                 )
+
+        self._validate_final_canonical_variants()
+        self._validate_final_context_scopes()
+        self._validate_final_price_books()
+
+    def _validate_unique_active_final_ids(self, table_name: str, table_path: str, id_field: str) -> None:
+        seen: set[str] = set()
+        for row in self.tables[table_name]:
+            if not is_active(row):
+                continue
+            row_id = row.get(id_field, "")
+            if not row_id:
+                continue
+            if row_id in seen:
+                self.canonical_namespace_errors.append(f"{table_path} has duplicate active {id_field}: {row_id}.")
+            seen.add(row_id)
+
+    def _validate_final_canonical_variants(self) -> None:
+        for row in self.tables["final_canonical_variants"]:
+            row_id = row.get("variant_id", "")
+            if not self._validate_active_value("canonical/status/variants", row_id, row):
+                continue
+            for field in ("variant_id", "model_year", "gm_model_code", "model_key", "body_style", "trim_level"):
+                if not row.get(field, ""):
+                    self.canonical_namespace_errors.append(
+                        f"canonical/status/variants {row_id or '<missing>'} is missing {field}."
+                    )
+            gm_model_code = row.get("gm_model_code", "")
+            if gm_model_code:
+                model_prefix = gm_model_code[:1]
+                body_suffix = gm_model_code[1:]
+                expected_model_key = GM_MODEL_CODE_MODEL_KEYS.get(model_prefix)
+                expected_body_style = GM_MODEL_CODE_BODY_STYLES.get(body_suffix)
+                if len(gm_model_code) != 3 or not expected_model_key or not expected_body_style:
+                    self.canonical_namespace_errors.append(
+                        f"canonical/status/variants {row_id or '<missing>'} uses unsupported gm_model_code: {gm_model_code}."
+                    )
+                else:
+                    if row.get("model_key", "") != expected_model_key:
+                        self.canonical_namespace_errors.append(
+                            f"canonical/status/variants {row_id or '<missing>'} gm_model_code {gm_model_code} contradicts model_key {row.get('model_key', '')}."
+                        )
+                    if row.get("body_style", "") != expected_body_style:
+                        self.canonical_namespace_errors.append(
+                            f"canonical/status/variants {row_id or '<missing>'} gm_model_code {gm_model_code} contradicts body_style {row.get('body_style', '')}."
+                        )
+                    expected_variant_id = f"{row.get('trim_level', '').lower()}_{gm_model_code.lower()}"
+                    if row_id and row.get("trim_level", "") and row_id != expected_variant_id:
+                        self.canonical_namespace_errors.append(
+                            f"canonical/status/variants {row_id} does not match trim plus gm_model_code convention: {expected_variant_id}."
+                        )
+
+    def _validate_final_context_scopes(self) -> None:
+        for row in self.tables["final_context_scopes"]:
+            row_id = row.get("context_scope_id", "")
+            if not self._validate_active_value("canonical/status/context_scopes", row_id, row):
+                continue
+            if not row_id:
+                self.canonical_namespace_errors.append("canonical/status/context_scopes has a row missing context_scope_id.")
+            for field in ("model_year", "model_key"):
+                if not row.get(field, ""):
+                    self.canonical_namespace_errors.append(
+                        f"canonical/status/context_scopes {row_id or '<missing>'} is missing {field}."
+                    )
+            try:
+                if as_int(row.get("priority", "")) < 0:
+                    raise ValueError
+            except ValueError:
+                self.canonical_namespace_errors.append(
+                    f"canonical/status/context_scopes {row_id or '<missing>'} has unsupported priority: {row.get('priority', '')}."
+                )
+            variant_id = row.get("variant_id", "")
+            if variant_id:
+                variant = self.final_canonical_variants.get(variant_id)
+                if not variant:
+                    self.canonical_namespace_errors.append(
+                        f"canonical/status/context_scopes {row_id or '<missing>'} references missing variant_id: {variant_id}."
+                    )
+                    continue
+                for field in ("model_year", "model_key", "body_style", "trim_level"):
+                    expected = row.get(field, "")
+                    if expected and expected != variant.get(field, ""):
+                        self.canonical_namespace_errors.append(
+                            f"canonical/status/context_scopes {row_id or '<missing>'} {field} contradicts variant {variant_id}."
+                        )
+            elif not self.final_context_scope_variant_ids(row):
+                self.canonical_namespace_errors.append(
+                    f"canonical/status/context_scopes {row_id or '<missing>'} resolves to no active variants."
+                )
+
+    def _validate_final_price_books(self) -> None:
+        for row in self.tables["final_price_books"]:
+            row_id = row.get("price_book_id", "")
+            if not self._validate_active_value("canonical/pricing/price_books", row_id, row):
+                continue
+            for field in ("price_book_id", "model_year", "model_key", "currency"):
+                if not row.get(field, ""):
+                    self.canonical_namespace_errors.append(
+                        f"canonical/pricing/price_books {row_id or '<missing>'} is missing {field}."
+                    )
+            if row.get("model_year", "") and row.get("model_key", "") and not self.final_price_book_variant_ids(row):
+                self.canonical_namespace_errors.append(
+                    f"canonical/pricing/price_books {row_id or '<missing>'} does not align with any active canonical variants."
+                )
+
+    def _validate_final_canonical_pricing(self) -> None:
+        if self.canonical_namespace_errors:
+            return
+        for row in self.tables["final_canonical_base_prices"]:
+            row_id = row.get("canonical_base_price_id", "")
+            if not self._validate_active_value("canonical/pricing/canonical_base_prices", row_id, row):
+                continue
+            canonical_id = row.get("canonical_option_id", "")
+            presentation_id = row.get("presentation_id", "")
+            if not row_id:
+                self.canonical_namespace_errors.append(
+                    "canonical/pricing/canonical_base_prices has a row missing canonical_base_price_id."
+                )
+            if bool(canonical_id) == bool(presentation_id):
+                self.canonical_namespace_errors.append(
+                    f"canonical/pricing/canonical_base_prices {row_id or '<missing>'} must reference exactly one of canonical_option_id or presentation_id."
+                )
+            if canonical_id and canonical_id not in self.canonical_options:
+                self.canonical_namespace_errors.append(
+                    f"canonical/pricing/canonical_base_prices {row_id or '<missing>'} references missing canonical option: {canonical_id}."
+                )
+            if presentation_id and presentation_id not in self.option_presentations:
+                self.canonical_namespace_errors.append(
+                    f"canonical/pricing/canonical_base_prices {row_id or '<missing>'} references missing presentation: {presentation_id}."
+                )
+            price_book_id = row.get("price_book_id", "")
+            price_book = self.final_price_books.get(price_book_id)
+            if not price_book_id:
+                self.canonical_namespace_errors.append(
+                    f"canonical/pricing/canonical_base_prices {row_id or '<missing>'} is missing price_book_id."
+                )
+            elif not price_book:
+                self.canonical_namespace_errors.append(
+                    f"canonical/pricing/canonical_base_prices {row_id or '<missing>'} references missing price book: {price_book_id}."
+                )
+            context_scope_id = row.get("context_scope_id", "")
+            if context_scope_id and context_scope_id not in self.final_context_scopes:
+                self.canonical_namespace_errors.append(
+                    f"canonical/pricing/canonical_base_prices {row_id or '<missing>'} references missing context scope: {context_scope_id}."
+                )
+            if price_book and not self.final_canonical_price_variant_ids(row):
+                self.canonical_namespace_errors.append(
+                    f"canonical/pricing/canonical_base_prices {row_id or '<missing>'} context does not align with price book {price_book_id}."
+                )
+            try:
+                as_int(row.get("amount_usd", ""))
+            except ValueError:
+                self.canonical_namespace_errors.append(
+                    f"canonical/pricing/canonical_base_prices {row_id or '<missing>'} has unsupported amount_usd: {row.get('amount_usd', '')}."
+                )
+            try:
+                if as_int(row.get("priority", "")) < 0:
+                    raise ValueError
+            except ValueError:
+                self.canonical_namespace_errors.append(
+                    f"canonical/pricing/canonical_base_prices {row_id or '<missing>'} has unsupported priority: {row.get('priority', '')}."
+                )
+
+        self._validate_final_canonical_price_conflicts()
+
+    def _validate_final_canonical_price_conflicts(self) -> None:
+        seen: dict[tuple[str, str, str, frozenset[str], int, int], dict[str, str]] = {}
+        for row in self.final_canonical_base_prices:
+            try:
+                priority = as_int(row.get("priority", ""))
+            except ValueError:
+                continue
+            target_type = "presentation" if row.get("presentation_id", "") else "canonical"
+            target_id = row.get("presentation_id", "") or row.get("canonical_option_id", "")
+            variants = frozenset(self.final_canonical_price_variant_ids(row))
+            if not target_id or not variants:
+                continue
+            key = (
+                target_type,
+                target_id,
+                row.get("price_book_id", ""),
+                variants,
+                self.final_canonical_price_scope_specificity(row),
+                priority,
+            )
+            prior = seen.get(key)
+            if prior and prior.get("amount_usd", "") != row.get("amount_usd", ""):
+                self.canonical_namespace_errors.append(
+                    "canonical/pricing/canonical_base_prices "
+                    f"{prior.get('canonical_base_price_id', '')} and {row.get('canonical_base_price_id', '')} "
+                    "have conflicting same-priority prices for the same target and effective context."
+                )
+            else:
+                seen[key] = row
+
+    def final_context_scope_variant_ids(self, scope: dict[str, str]) -> set[str]:
+        variant_id = scope.get("variant_id", "")
+        if variant_id:
+            return {variant_id} if variant_id in self.final_canonical_variants else set()
+        variants = set()
+        for candidate_id, variant in self.final_canonical_variants.items():
+            if scope.get("model_year", "") and variant.get("model_year", "") != scope["model_year"]:
+                continue
+            if scope.get("model_key", "") and variant.get("model_key", "") != scope["model_key"]:
+                continue
+            if scope.get("body_style", "") and variant.get("body_style", "") != scope["body_style"]:
+                continue
+            if scope.get("trim_level", "") and variant.get("trim_level", "") != scope["trim_level"]:
+                continue
+            variants.add(candidate_id)
+        return variants
+
+    def final_price_book_variant_ids(self, price_book: dict[str, str]) -> set[str]:
+        return {
+            variant_id
+            for variant_id, variant in self.final_canonical_variants.items()
+            if variant.get("model_year", "") == price_book.get("model_year", "")
+            and variant.get("model_key", "") == price_book.get("model_key", "")
+        }
+
+    def final_canonical_price_variant_ids(self, row: dict[str, str]) -> set[str]:
+        price_book = self.final_price_books.get(row.get("price_book_id", ""))
+        if not price_book:
+            return set()
+        price_book_variants = self.final_price_book_variant_ids(price_book)
+        context_scope_id = row.get("context_scope_id", "")
+        if not context_scope_id:
+            return price_book_variants
+        scope = self.final_context_scopes.get(context_scope_id)
+        if not scope:
+            return set()
+        return price_book_variants & self.final_context_scope_variant_ids(scope)
+
+    def final_canonical_price_scope_specificity(self, row: dict[str, str]) -> int:
+        context_scope_id = row.get("context_scope_id", "")
+        if not context_scope_id:
+            return 0
+        scope = self.final_context_scopes.get(context_scope_id, {})
+        if scope.get("variant_id", ""):
+            return 4
+        if scope.get("body_style", "") and scope.get("trim_level", ""):
+            return 3
+        if scope.get("body_style", "") or scope.get("trim_level", ""):
+            return 2
+        return 1
+
+    def context_model_key(self, context: dict[str, str]) -> str:
+        if context.get("model_key", ""):
+            return context["model_key"]
+        variant = self.variants.get(context.get("variant_id", ""), {})
+        return variant.get("model_key", "")
+
+    def final_price_book_matches_context(self, price_book_id: str, context: dict[str, str]) -> bool:
+        price_book = self.final_price_books.get(price_book_id, {})
+        if not price_book:
+            return False
+        if context.get("model_year", "") and price_book.get("model_year", "") != context.get("model_year", ""):
+            return False
+        model_key = self.context_model_key(context)
+        return not model_key or price_book.get("model_key", "") == model_key
+
+    def final_context_scope_matches_context(self, context_scope_id: str, context: dict[str, str]) -> bool:
+        if not context_scope_id:
+            return True
+        scope = self.final_context_scopes.get(context_scope_id, {})
+        if not scope:
+            return False
+        if scope.get("variant_id", "") and context.get("variant_id", "") != scope["variant_id"]:
+            return False
+        if scope.get("model_year", "") and context.get("model_year", "") != scope["model_year"]:
+            return False
+        if scope.get("model_key", "") and self.context_model_key(context) != scope["model_key"]:
+            return False
+        if scope.get("body_style", "") and context.get("body_style", "") != scope["body_style"]:
+            return False
+        if scope.get("trim_level", "") and context.get("trim_level", "") != scope["trim_level"]:
+            return False
+        return True
 
     def _merge_canonical_presentations(self) -> None:
         for table_name in ("canonical_options", "option_presentations", "option_status_rules", "canonical_base_prices"):
@@ -1150,6 +1519,7 @@ class CsvSlice:
                 "variant_id": variant["variant_id"],
                 "body_style": variant["body_style"],
                 "trim_level": variant["trim_level"],
+                "model_key": variant["model_key"],
                 "model_year": variant["model_year"],
             }
 
@@ -1423,6 +1793,21 @@ class CsvSlice:
         display = self.display_row(selectable_id)
         presentation_id = display.get("presentation_id", "")
         canonical_id = display.get("canonical_option_id", "")
+        final_presentation_candidates = [
+            row
+            for row in self.final_canonical_base_prices
+            if presentation_id
+            and row.get("presentation_id", "") == presentation_id
+            and self.final_price_book_matches_context(row.get("price_book_id", ""), context)
+            and self.final_context_scope_matches_context(row.get("context_scope_id", ""), context)
+        ]
+        self.sort_final_canonical_price_candidates(final_presentation_candidates)
+        if final_presentation_candidates:
+            return {
+                "base_price_id": final_presentation_candidates[0]["canonical_base_price_id"],
+                "amount_usd": as_int(final_presentation_candidates[0]["amount_usd"]),
+            }
+
         presentation_candidates = [
             row
             for row in self.canonical_base_prices
@@ -1435,6 +1820,21 @@ class CsvSlice:
             return {
                 "base_price_id": presentation_candidates[0]["canonical_base_price_id"],
                 "amount_usd": as_int(presentation_candidates[0]["amount_usd"]),
+            }
+
+        final_canonical_candidates = [
+            row
+            for row in self.final_canonical_base_prices
+            if canonical_id
+            and row.get("canonical_option_id", "") == canonical_id
+            and self.final_price_book_matches_context(row.get("price_book_id", ""), context)
+            and self.final_context_scope_matches_context(row.get("context_scope_id", ""), context)
+        ]
+        self.sort_final_canonical_price_candidates(final_canonical_candidates)
+        if final_canonical_candidates:
+            return {
+                "base_price_id": final_canonical_candidates[0]["canonical_base_price_id"],
+                "amount_usd": as_int(final_canonical_candidates[0]["amount_usd"]),
             }
 
         canonical_candidates = [
@@ -1466,6 +1866,15 @@ class CsvSlice:
             "base_price_id": broader_candidates[0]["base_price_id"],
             "amount_usd": as_int(broader_candidates[0]["amount_usd"]),
         }
+
+    def sort_final_canonical_price_candidates(self, rows: list[dict[str, str]]) -> None:
+        rows.sort(
+            key=lambda row: (
+                -self.final_canonical_price_scope_specificity(row),
+                -as_int(row.get("priority", "")),
+                row.get("canonical_base_price_id", ""),
+            )
+        )
 
     def selector_targets_selectable(self, selector_type: str, selector_id: str, selectable_id: str) -> bool:
         if selector_type == "selectable":
@@ -1542,7 +1951,7 @@ class CsvSlice:
                         "choice_mode": display["choice_mode"],
                         "selection_mode": display["selection_mode"],
                         "selection_mode_label": display["selection_mode_label"],
-                        "base_price": self.legacy_base_price(selectable_id),
+                        "base_price": self.legacy_base_price(selectable_id, context),
                         "display_order": as_int(display["display_order"]),
                         "source_detail_raw": display.get("source_detail_raw", ""),
                     }
@@ -1817,7 +2226,7 @@ class CsvSlice:
             "unavailable": "unavailable",
         }.get(status, status)
 
-    def legacy_base_price(self, selectable_id: str) -> int:
+    def legacy_base_price(self, selectable_id: str, context: dict[str, str] | None = None) -> int:
         exact_selectable_candidates = [
             row
             for row in self.tables["base_prices"]
@@ -1832,6 +2241,19 @@ class CsvSlice:
         display = self.display_row(selectable_id)
         presentation_id = display.get("presentation_id", "")
         canonical_id = display.get("canonical_option_id", "")
+        if context is not None:
+            final_presentation_candidates = [
+                row
+                for row in self.final_canonical_base_prices
+                if presentation_id
+                and row.get("presentation_id", "") == presentation_id
+                and self.final_price_book_matches_context(row.get("price_book_id", ""), context)
+                and self.final_context_scope_matches_context(row.get("context_scope_id", ""), context)
+            ]
+            self.sort_final_canonical_price_candidates(final_presentation_candidates)
+            if final_presentation_candidates:
+                return as_int(final_presentation_candidates[0]["amount_usd"])
+
         presentation_candidates = [
             row
             for row in self.canonical_base_prices
@@ -1840,6 +2262,19 @@ class CsvSlice:
         presentation_candidates.sort(key=lambda row: as_int(row["priority"]), reverse=True)
         if presentation_candidates:
             return as_int(presentation_candidates[0]["amount_usd"])
+
+        if context is not None:
+            final_canonical_candidates = [
+                row
+                for row in self.final_canonical_base_prices
+                if canonical_id
+                and row.get("canonical_option_id", "") == canonical_id
+                and self.final_price_book_matches_context(row.get("price_book_id", ""), context)
+                and self.final_context_scope_matches_context(row.get("context_scope_id", ""), context)
+            ]
+            self.sort_final_canonical_price_candidates(final_canonical_candidates)
+            if final_canonical_candidates:
+                return as_int(final_canonical_candidates[0]["amount_usd"])
 
         canonical_candidates = [
             row
