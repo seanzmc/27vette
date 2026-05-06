@@ -97,8 +97,6 @@ function runFragment(packageDir) {
 }
 
 function addReferenceSupportFixtureRows(packageDir) {
-  setReferenceLegacyMetadata(packageDir, "nsref_5vm", "sec_lpoe_001", "multi_select_opt");
-  setReferenceLegacyMetadata(packageDir, "nsref_5w8", "sec_lpoe_001", "multi_select_opt");
   appendRows(path.join(packageDir, "logic", "condition_sets.csv"), [
     "cs_ref_selected_5vm_test,5VM reference selected,Test-only non-selectable reference condition,true",
     "cs_ref_selected_5w8_test,5W8 reference selected,Test-only non-selectable reference condition,true",
@@ -109,8 +107,10 @@ function addReferenceSupportFixtureRows(packageDir) {
   ]);
   appendRows(path.join(packageDir, "logic", "dependency_rules.csv"), [
     'dep_test_ref_subject_5vm_5v7,excludes,non_selectable_reference,ref_5vm,true,,cs_selected_5v7,disable_and_block,"Blocked by 5VM test reference.",900,true',
-    'dep_test_ref_target_5v7_5vm,excludes,selectable,opt_5v7_001,true,,cs_ref_selected_5vm_test,disable_and_block,"Blocked by 5V7 test reference.",901,true',
-    'dep_test_ref_both_5vm_5w8,excludes,non_selectable_reference,ref_5vm,true,,cs_ref_selected_5w8_test,disable_and_block,"Blocked by both test references.",902,true',
+    'dep_test_ref_subject_5w8_5v7,excludes,non_selectable_reference,ref_5w8,true,,cs_selected_5v7,disable_and_block,"Blocked by 5W8 test reference.",901,true',
+    'dep_test_ref_target_5v7_5vm,excludes,selectable,opt_5v7_001,true,,cs_ref_selected_5vm_test,disable_and_block,"Blocked by 5V7 test reference.",902,true',
+    'dep_test_ref_target_5v7_5w8,excludes,selectable,opt_5v7_001,true,,cs_ref_selected_5w8_test,disable_and_block,"Blocked by 5V7 test reference.",903,true',
+    'dep_test_ref_both_5vm_5w8,excludes,non_selectable_reference,ref_5vm,true,,cs_ref_selected_5w8_test,disable_and_block,"Blocked by both test references.",904,true',
   ]);
 }
 
@@ -137,23 +137,45 @@ test("non-selectable references compile as dependency subjects targets and both"
     const subjectRule = fragment.rules.find((rule) => rule.rule_id === "rule_opt_5vm_001_excludes_opt_5v7_001");
     assert.ok(subjectRule, "missing non-selectable subject rule");
     assert.equal(subjectRule.source_id, "opt_5vm_001");
+    assert.equal(subjectRule.source_section, "sec_lpoe_001");
+    assert.equal(subjectRule.source_selection_mode, "multi_select_opt");
     assert.equal(subjectRule.target_id, "opt_5v7_001");
     assert.equal(subjectRule.rule_type, "excludes");
     assert.equal(subjectRule.disabled_reason, "Blocked by 5VM test reference.");
     assert.equal(subjectRule.auto_add, "False");
     assert.equal(subjectRule.runtime_action, "active");
 
-    const targetRule = fragment.rules.find((rule) => rule.rule_id === "rule_opt_5v7_001_excludes_opt_5vm_001");
-    assert.ok(targetRule, "missing non-selectable target rule");
-    assert.equal(targetRule.source_id, "opt_5v7_001");
-    assert.equal(targetRule.target_id, "opt_5vm_001");
-    assert.equal(targetRule.disabled_reason, "Blocked by 5V7 test reference.");
+    const subject5w8Rule = fragment.rules.find((rule) => rule.rule_id === "rule_opt_5w8_001_excludes_opt_5v7_001");
+    assert.ok(subject5w8Rule, "missing 5W8 non-selectable subject rule");
+    assert.equal(subject5w8Rule.source_id, "opt_5w8_001");
+    assert.equal(subject5w8Rule.source_section, "sec_lpoe_001");
+    assert.equal(subject5w8Rule.source_selection_mode, "multi_select_opt");
+    assert.equal(subject5w8Rule.target_id, "opt_5v7_001");
+    assert.equal(subject5w8Rule.rule_type, "excludes");
+    assert.equal(subject5w8Rule.disabled_reason, "Blocked by 5W8 test reference.");
+
+    const target5vmRule = fragment.rules.find((rule) => rule.rule_id === "rule_opt_5v7_001_excludes_opt_5vm_001");
+    assert.ok(target5vmRule, "missing 5VM non-selectable target rule");
+    assert.equal(target5vmRule.source_id, "opt_5v7_001");
+    assert.equal(target5vmRule.target_id, "opt_5vm_001");
+    assert.equal(target5vmRule.target_section, "sec_lpoe_001");
+    assert.equal(target5vmRule.target_selection_mode, "multi_select_opt");
+    assert.equal(target5vmRule.disabled_reason, "Blocked by 5V7 test reference.");
+
+    const target5w8Rule = fragment.rules.find((rule) => rule.rule_id === "rule_opt_5v7_001_excludes_opt_5w8_001");
+    assert.ok(target5w8Rule, "missing 5W8 non-selectable target rule");
+    assert.equal(target5w8Rule.source_id, "opt_5v7_001");
+    assert.equal(target5w8Rule.target_id, "opt_5w8_001");
+    assert.equal(target5w8Rule.target_section, "sec_lpoe_001");
+    assert.equal(target5w8Rule.target_selection_mode, "multi_select_opt");
+    assert.equal(target5w8Rule.disabled_reason, "Blocked by 5V7 test reference.");
 
     const bothRule = fragment.rules.find((rule) => rule.rule_id === "rule_opt_5vm_001_excludes_opt_5w8_001");
     assert.ok(bothRule, "missing both-reference rule");
     assert.equal(bothRule.source_id, "opt_5vm_001");
     assert.equal(bothRule.target_id, "opt_5w8_001");
     assert.equal(bothRule.disabled_reason, "Blocked by both test references.");
+    assert.equal(fragment.choices.some((choice) => choice.option_id === "opt_5vm_001" || choice.option_id === "opt_5w8_001"), false);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
