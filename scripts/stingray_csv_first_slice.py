@@ -45,6 +45,13 @@ OPTIONAL_TABLES = {
     "canonical_base_prices": "pricing/canonical_base_prices.csv",
 }
 
+FINAL_CANONICAL_TABLES = {
+    "canonical_source_documents": "canonical/source/source_documents.csv",
+    "canonical_source_rows": "canonical/source/source_rows.csv",
+    "canonical_source_row_classifications": "canonical/source/source_row_classifications.csv",
+    "canonical_duplicate_rpo_reviews": "canonical/options/duplicate_rpo_reviews.csv",
+}
+
 SIMPLE_DEPENDENCY_RULE_FIELDS = [
     "rule_id",
     "rule_type",
@@ -117,12 +124,89 @@ CANONICAL_BASE_PRICE_FIELDS = [
     "notes",
 ]
 
+CANONICAL_SOURCE_DOCUMENT_FIELDS = [
+    "source_document_id",
+    "source_type",
+    "model_year",
+    "model_key",
+    "vehicle_line",
+    "source_vehicle_line",
+    "source_model_line",
+    "source_name",
+    "source_path",
+    "source_checksum",
+    "imported_at",
+    "notes",
+]
+
+CANONICAL_SOURCE_ROW_FIELDS = [
+    "source_row_id",
+    "source_document_id",
+    "source_sheet",
+    "source_row_number",
+    "source_order",
+    "source_section_path",
+    "source_order_path",
+    "source_option_key",
+    "raw_row_hash",
+    "legacy_option_id",
+    "rpo",
+    "raw_label",
+    "raw_description",
+    "raw_section",
+    "raw_category",
+    "raw_step",
+    "raw_price",
+    "raw_status",
+    "raw_selectable",
+    "raw_detail",
+    "raw_payload_json",
+    "active",
+    "notes",
+]
+
+CANONICAL_SOURCE_ROW_CLASSIFICATION_FIELDS = [
+    "source_row_id",
+    "classification",
+    "canonical_option_id",
+    "presentation_id",
+    "control_plane_reference_id",
+    "relationship_type",
+    "relationship_id",
+    "review_status",
+    "review_reason",
+    "active",
+    "notes",
+]
+
+CANONICAL_DUPLICATE_RPO_REVIEW_FIELDS = [
+    "duplicate_rpo_review_id",
+    "rpo",
+    "model_year",
+    "model_key",
+    "source_row_ids",
+    "duplicate_rpo_classification",
+    "decision_reason",
+    "review_status",
+    "reviewed_by",
+    "reviewed_at",
+    "active",
+    "notes",
+]
+
 OPTIONAL_TABLE_FIELDS = {
     "simple_dependency_rules": SIMPLE_DEPENDENCY_RULE_FIELDS,
     "canonical_options": CANONICAL_OPTION_FIELDS,
     "option_presentations": OPTION_PRESENTATION_FIELDS,
     "option_status_rules": OPTION_STATUS_RULE_FIELDS,
     "canonical_base_prices": CANONICAL_BASE_PRICE_FIELDS,
+}
+
+FINAL_CANONICAL_TABLE_FIELDS = {
+    "canonical_source_documents": CANONICAL_SOURCE_DOCUMENT_FIELDS,
+    "canonical_source_rows": CANONICAL_SOURCE_ROW_FIELDS,
+    "canonical_source_row_classifications": CANONICAL_SOURCE_ROW_CLASSIFICATION_FIELDS,
+    "canonical_duplicate_rpo_reviews": CANONICAL_DUPLICATE_RPO_REVIEW_FIELDS,
 }
 
 CANONICAL_OPTION_KINDS = {"customer_choice", "equipment_feature", "structured_reference", "review_required"}
@@ -137,6 +221,28 @@ PRESENTATION_ROLES = {
 }
 OPTION_STATUSES = {"optional", "standard_choice", "standard_fixed", "included_auto", "unavailable"}
 REVIEW_REQUIRED_DUPLICATE_RPOS = {"AE4", "AH2", "AQ9", "UQT"}
+FINAL_CANONICAL_SOURCE_TYPES = {"order_guide", "workbook", "manual_review", "production_oracle_export"}
+FINAL_CANONICAL_SOURCE_ROW_CLASSIFICATIONS = {
+    "customer_choice",
+    "display_only_duplicate",
+    "standard_equipment_display",
+    "included_display",
+    "package_display",
+    "package_source",
+    "relationship_source",
+    "price_rule_source",
+    "replacement_default_source",
+    "control_plane_reference",
+    "ambiguous_requires_review",
+    "ignore_not_stingray",
+}
+FINAL_CANONICAL_REVIEW_STATUSES = {"unreviewed", "reviewed", "blocked"}
+FINAL_CANONICAL_DUPLICATE_RPO_CLASSIFICATIONS = {
+    "display_only_duplicate",
+    "true_separate_selectable_variant",
+    "mixed_display_and_selectable_variants",
+    "ambiguous_requires_review",
+}
 
 
 ID_FIELDS = {
@@ -158,6 +264,9 @@ ID_FIELDS = {
     "option_presentations": "presentation_id",
     "option_status_rules": "status_rule_id",
     "canonical_base_prices": "canonical_base_price_id",
+    "canonical_source_documents": "source_document_id",
+    "canonical_source_rows": "source_row_id",
+    "canonical_duplicate_rpo_reviews": "duplicate_rpo_review_id",
 }
 
 
@@ -197,8 +306,14 @@ class CsvSlice:
             fields, rows = load_optional_csv(package_dir / relative_path)
             self.optional_table_fields[name] = fields
             self.tables[name] = rows
+        for name, relative_path in FINAL_CANONICAL_TABLES.items():
+            fields, rows = load_optional_csv(package_dir / relative_path)
+            self.optional_table_fields[name] = fields
+            self.tables[name] = rows
         self.ownership_rows = self._load_ownership_rows()
         self.variants = {row["variant_id"]: row for row in self.tables["variants"] if is_active(row)}
+        self.canonical_namespace_errors: list[str] = []
+        self._validate_canonical_namespace_foundation()
         self.canonical_option_errors: list[str] = []
         self.canonical_options = {row["canonical_option_id"]: row for row in self.tables["canonical_options"] if is_active(row)}
         self.option_presentations = {
@@ -478,6 +593,104 @@ class CsvSlice:
             details.append(f"missing columns: {', '.join(missing)}")
         return [f"{table_name}.csv uses {'; '.join(details)}."]
 
+    def _final_canonical_table_field_errors(self, table_name: str) -> list[str]:
+        fields = self.optional_table_fields.get(table_name, [])
+        if not fields:
+            return []
+        expected = FINAL_CANONICAL_TABLE_FIELDS[table_name]
+        if fields == expected:
+            return []
+        unexpected = [field for field in fields if field not in expected]
+        missing = [field for field in expected if field not in fields]
+        details = []
+        if unexpected:
+            details.append(f"unsupported columns: {', '.join(unexpected)}")
+        if missing:
+            details.append(f"missing columns: {', '.join(missing)}")
+        return [f"{FINAL_CANONICAL_TABLES[table_name]} uses {'; '.join(details)}."]
+
+    def _validate_active_value(self, table_path: str, row_id: str, row: dict[str, str]) -> bool:
+        active = row.get("active", "")
+        if active not in {"true", "false"}:
+            self.canonical_namespace_errors.append(
+                f"{table_path} {row_id or '<missing>'} uses unsupported active value: {active}."
+            )
+            return False
+        return active == "true"
+
+    def _validate_canonical_namespace_foundation(self) -> None:
+        for table_name in FINAL_CANONICAL_TABLES:
+            self.canonical_namespace_errors.extend(self._final_canonical_table_field_errors(table_name))
+        if self.canonical_namespace_errors:
+            return
+
+        for row in self.tables["canonical_source_documents"]:
+            row_id = row.get("source_document_id", "")
+            if not row_id:
+                self.canonical_namespace_errors.append("canonical/source/source_documents has a row missing source_document_id.")
+            source_type = row.get("source_type", "")
+            if source_type not in FINAL_CANONICAL_SOURCE_TYPES:
+                self.canonical_namespace_errors.append(
+                    f"canonical/source/source_documents {row_id or '<missing>'} uses unsupported source_type: {source_type}."
+                )
+
+        for row in self.tables["canonical_source_rows"]:
+            row_id = row.get("source_row_id", "")
+            if not self._validate_active_value("canonical/source/source_rows", row_id, row):
+                continue
+            if not row_id:
+                self.canonical_namespace_errors.append("canonical/source/source_rows has a row missing source_row_id.")
+            if not row.get("source_document_id", ""):
+                self.canonical_namespace_errors.append(
+                    f"canonical/source/source_rows {row_id or '<missing>'} is missing source_document_id."
+                )
+            if not row.get("raw_row_hash", ""):
+                self.canonical_namespace_errors.append(
+                    f"canonical/source/source_rows {row_id or '<missing>'} is missing raw_row_hash."
+                )
+
+        for row in self.tables["canonical_source_row_classifications"]:
+            row_id = row.get("source_row_id", "")
+            if not self._validate_active_value("canonical/source/source_row_classifications", row_id, row):
+                continue
+            if not row_id:
+                self.canonical_namespace_errors.append(
+                    "canonical/source/source_row_classifications has a row missing source_row_id."
+                )
+            classification = row.get("classification", "")
+            if classification not in FINAL_CANONICAL_SOURCE_ROW_CLASSIFICATIONS:
+                self.canonical_namespace_errors.append(
+                    f"canonical/source/source_row_classifications {row_id or '<missing>'} uses unsupported classification: {classification}."
+                )
+            review_status = row.get("review_status", "")
+            if review_status not in FINAL_CANONICAL_REVIEW_STATUSES:
+                self.canonical_namespace_errors.append(
+                    f"canonical/source/source_row_classifications {row_id or '<missing>'} uses unsupported review_status: {review_status}."
+                )
+
+        for row in self.tables["canonical_duplicate_rpo_reviews"]:
+            row_id = row.get("duplicate_rpo_review_id", "")
+            if not self._validate_active_value("canonical/options/duplicate_rpo_reviews", row_id, row):
+                continue
+            if not row_id:
+                self.canonical_namespace_errors.append(
+                    "canonical/options/duplicate_rpo_reviews has a row missing duplicate_rpo_review_id."
+                )
+            if not row.get("rpo", ""):
+                self.canonical_namespace_errors.append(
+                    f"canonical/options/duplicate_rpo_reviews {row_id or '<missing>'} is missing rpo."
+                )
+            classification = row.get("duplicate_rpo_classification", "")
+            if classification not in FINAL_CANONICAL_DUPLICATE_RPO_CLASSIFICATIONS:
+                self.canonical_namespace_errors.append(
+                    f"canonical/options/duplicate_rpo_reviews {row_id or '<missing>'} uses unsupported duplicate_rpo_classification: {classification}."
+                )
+            review_status = row.get("review_status", "")
+            if review_status not in FINAL_CANONICAL_REVIEW_STATUSES:
+                self.canonical_namespace_errors.append(
+                    f"canonical/options/duplicate_rpo_reviews {row_id or '<missing>'} uses unsupported review_status: {review_status}."
+                )
+
     def _merge_canonical_presentations(self) -> None:
         for table_name in ("canonical_options", "option_presentations", "option_status_rules", "canonical_base_prices"):
             self.canonical_option_errors.extend(self._optional_table_field_errors(table_name))
@@ -737,6 +950,7 @@ class CsvSlice:
 
     def validate(self) -> list[str]:
         errors: list[str] = []
+        errors.extend(self.canonical_namespace_errors)
         errors.extend(self.canonical_option_errors)
         errors.extend(self.simple_dependency_rule_errors)
         for table_name, id_field in ID_FIELDS.items():
