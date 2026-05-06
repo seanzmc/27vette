@@ -78,6 +78,7 @@ Final source-of-truth tables live under `data/stingray/canonical/`:
 - `canonical/presentation/option_presentations.csv`
 - `canonical/presentation/choice_groups.csv`
 - `canonical/presentation/choice_group_presentations.csv`
+- `canonical/status/variants.csv`
 - `canonical/status/context_scopes.csv`
 - `canonical/status/option_status_rules.csv`
 - `canonical/pricing/price_books.csv`
@@ -354,9 +355,51 @@ Rules:
 
 ### Context And Status
 
+#### `variants.csv`
+
+Canonical registry of supported Corvette build contexts.
+
+Final path: `data/stingray/canonical/status/variants.csv`
+
+Required columns:
+
+- `variant_id`
+- `model_year`
+- `gm_model_code`
+- `model_key`
+- `body_style`
+- `trim_level`
+- `active`
+- `notes`
+
+Rules:
+
+- `variant_id` is the atomic build context.
+- `variant_id` is intentionally constructed as `<trim>_<model/body-code>`, for example `2lt_c67`, `1lz_h07`, and `3lz_s67`.
+- `variant_id` determines `model_key`, `body_style`, and `trim_level` through this registry.
+- `gm_model_code` is the GM Corvette model/body code:
+  - `C07` / `C67`: Stingray coupe / convertible
+  - `E07` / `E67`: Grand Sport coupe / convertible
+  - `H07` / `H67`: Z06 coupe / convertible
+  - `R07` / `R67`: ZR1 coupe / convertible
+  - `S07` / `S67`: ZR1X coupe / convertible
+- Trim conventions:
+  - Stingray and Grand Sport use `1LT`, `2LT`, `3LT`.
+  - Z06 uses `1LZ`, `2LZ`, `3LZ`.
+  - ZR1 and ZR1X use `1LZ`, `3LZ`.
+
+Validation:
+
+- Unknown or malformed `gm_model_code` values fail.
+- Malformed `variant_id` values fail if they do not match the trim plus GM model/body-code convention.
+- `variant_id` values whose trim or model/body-code component contradicts `trim_level` or `gm_model_code` fail.
+- Duplicate active `variant_id` values fail.
+
 #### `context_scopes.csv`
 
-Reusable predicates for status, availability, pricing, and relationships.
+Reusable vehicle/build predicates for status, availability, pricing, and relationships.
+
+Final path: `data/stingray/canonical/status/context_scopes.csv`
 
 Required columns:
 
@@ -366,10 +409,34 @@ Required columns:
 - `variant_id`
 - `body_style`
 - `trim_level`
-- `condition_set_id`
 - `priority`
 - `active`
 - `notes`
+
+Rules:
+
+- Empty context fields mean "all" within the enclosing table target.
+- `model_year` and `model_key` are required for active production rows once multi-model data exists.
+- `variant_id` is the atomic exact build context.
+- `model_key`, `body_style`, and `trim_level` are reusable predicates resolved against the canonical variant registry.
+- If `variant_id` is set, any provided `model_key`, `body_style`, or `trim_level` must match the registry-derived values for that variant exactly.
+- `body_code` is not a context-scope field; it lives in `variants.csv` as `gm_model_code`.
+- `vehicle_line` is not needed for Corvette-only canonical scopes unless a future multi-line GM schema is approved.
+- No selected-option, package, rule, arbitrary condition-set, or boolean-expression predicates belong in this table.
+- Transitional `condition_sets.csv` and `condition_terms.csv` remain separate normalized compatibility tables and are not the final context scope model.
+
+Validation:
+
+- Unknown `model_key` and `model_year` combinations fail.
+- Unknown `variant_id` values fail.
+- Malformed `variant_id` values fail if they do not match the trim plus model/body-code convention.
+- A `variant_id` with contradictory `model_key`, `body_style`, or `trim_level` predicates fails.
+- Unsupported `body_style` or `trim_level` values for the declared model/year fail.
+- Broad `model_key`, `body_style`, or `trim_level` scopes resolve to matching active `variant_id` values.
+- Broad scopes resolving to no active variants fail.
+- Duplicate active `context_scope_id` values fail.
+- Negative or invalid `priority` values fail.
+- Overlapping active scopes with the same effective specificity and same priority fail unless they are identical no-op duplicates.
 
 #### `option_status_rules.csv`
 
@@ -822,13 +889,12 @@ Ownership expectations:
 
 ## Context/Status Cascade
 
-Status and pricing scopes resolve from broad to specific:
+Status and pricing scopes resolve from broad to specific after the consuming table has chosen the matching target. Presentation-targeted rows beat canonical-option-targeted rows.
 
 1. model/year default
-2. body override
-3. trim override
-4. variant override
-5. explicit option or presentation override
+2. body + trim pair
+3. body only or trim only
+4. exact variant
 
 Precedence sort:
 
@@ -836,11 +902,15 @@ Precedence sort:
 2. higher scope specificity
 3. higher priority
 4. deterministic row ID tie-break
+5. duplicate effective winners with conflicting outcomes are validation errors
 
 Scope rules:
 
-- `variant_id` is more specific than separate body/trim fields because a variant already encodes a concrete body and trim combination.
-- A `context_scope_id` may point to a reusable condition expression, but final authoring must decide whether direct scope columns remain allowed or whether all shared scope logic must go through `context_scopes.csv`.
+- `variant_id` is the atomic build context and resolves through `canonical/status/variants.csv`.
+- `model_key`, `body_style`, and `trim_level` remain independent reusable predicates over active canonical variants.
+- The GM model/body code is `gm_model_code` in `variants.csv`, not a context-scope field.
+- Final `context_scopes.csv` uses direct vehicle/build dimensions only; it does not reference selected options, packages, rules, arbitrary boolean expressions, `condition_sets.csv`, or `condition_terms.csv`.
+- Transitional `condition_sets.csv` and `condition_terms.csv` remain compatibility tables for already-authored legacy-shaped rules until their lanes are deliberately converted.
 - Rules and relationships apply after the status cascade has removed or marked unavailable options.
 
 Rules apply after context/status resolution:
@@ -948,14 +1018,13 @@ Do not run tactical option-lane migrations until the relevant canonical table su
 
 ## Open Questions Requiring Human Approval
 
-1. Should `context_scopes.csv` support one row with multiple fields only, or also explicit boolean expression references beyond `condition_set_id`?
-2. Should final simple dependency rules target `presentation_id` only, or allow canonical-option targets when all active presentations should inherit the rule?
-3. Should package includes target presentations or canonical options by default?
-4. Should `standard_choice` be allowed on non-selectable presentations, or should non-selectable standard rows always use `standard_fixed`?
-5. Should display order live only in `choice_group_presentations.csv`, or also remain denormalized in `option_presentations.csv` for easier authoring?
-6. Should `canonical_base_prices.csv` use `context_scope_id` only, keep direct scope columns for authoring simplicity, or keep current `scope_condition_set_id` as a compatibility bridge only?
-7. What is the first canonical-first lane after support contracts are approved: Calipers, a small duplicate-free lane, or a staging-only importer pilot?
-8. When should transitional old-style lanes be converted: opportunistically by lane, or only after a full model-wide compiler can emit all legacy rows?
+1. Should final simple dependency rules target `presentation_id` only, or allow canonical-option targets when all active presentations should inherit the rule?
+2. Should package includes target presentations or canonical options by default?
+3. Should `standard_choice` be allowed on non-selectable presentations, or should non-selectable standard rows always use `standard_fixed`?
+4. Should display order live only in `choice_group_presentations.csv`, or also remain denormalized in `option_presentations.csv` for easier authoring?
+5. Should `canonical_base_prices.csv` use `context_scope_id` only, keep direct scope columns for authoring simplicity, or keep current `scope_condition_set_id` as a compatibility bridge only?
+6. What is the first canonical-first lane after support contracts are approved: Calipers, a small duplicate-free lane, or a staging-only importer pilot?
+7. When should transitional old-style lanes be converted: opportunistically by lane, or only after a full model-wide compiler can emit all legacy rows?
 
 ## Next Pass Recommendation
 
