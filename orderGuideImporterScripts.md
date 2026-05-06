@@ -1056,3 +1056,131 @@ Color and Trim = model-global matrix, not variant-scoped option sheet.
 That should be baked into the import map and staging schemas from the beginning.
 
 You still need the canonical CSV schema to settle before writing proposal/app-facing scripts, but you can safely begin with profiler and staging extraction scripts now. Those scripts preserve raw evidence, classify source roles, and make sure nothing slips through the cracks while the final schema finishes hardening.
+
+# Design requirement
+
+Yes. The importer absolutely needs to follow this practice, or it will recreate the same mess at higher speed.
+
+The importer should **not** treat every repeated RPO row as a new real option. It should treat order-guide rows as raw evidence, then compile them into:
+
+```text
+canonical option identity
++ context-specific status
++ display placement
++ relationship rules
++ source provenance
+```
+
+## Importer rule
+
+```text
+Never resolve option identity from RPO alone.
+RPO is a code, not always a unique option record.
+```
+
+The importer needs to distinguish:
+
+```text
+same RPO, same real option, repeated for display
+same RPO, different production option_id because of context
+same RPO, display-only Standard Equipment duplicate
+same RPO, package/included duplicate
+same RPO, ambiguous and requiring review
+```
+
+## The importer pipeline should be staged
+
+Instead of:
+
+```text
+Order guide row -> selectables.csv
+```
+
+it should be:
+
+```text
+raw order guide rows
+    ↓
+staging rows with sheet/range/source provenance
+    ↓
+duplicate-RPO classification
+    ↓
+canonical option identity resolution
+    ↓
+status/availability cascade
+    ↓
+relationship/rule extraction
+    ↓
+human review report
+    ↓
+approved canonical CSV output
+```
+
+That prevents the importer from blindly creating fake duplicate options.
+
+## Status model the importer should emit
+
+For each option/context, it should be able to assign statuses like:
+
+```text
+optional
+standard_choice
+standard_fixed
+included_auto
+unavailable
+display_only
+requires_review
+```
+
+That is where your cascade comes in:
+
+```text
+model/year -> body -> trim -> variant -> option override
+```
+
+So if B6P is optional on one model but standard fixed on ZR1 coupe, that is not two random B6P options. It is one canonical option with different status rules.
+
+## Relationship extraction must use resolved identity
+
+When the importer finds something like:
+
+```text
+RPO A not available with RPO B
+```
+
+it should not immediately write:
+
+```text
+A excludes B
+```
+
+It should first resolve:
+
+```text
+Which A?
+Which B?
+In what section?
+Customer-facing or display-only?
+Context-specific?
+Is this a true option relationship, package include, default behavior, or display note?
+```
+
+If it cannot answer that deterministically, it should output:
+
+```text
+requires_review
+```
+
+not invent a rule.
+
+## This should become an importer design requirement
+
+I would put this in the importer plan/spec, not necessarily `AGENTS.md`:
+
+```text
+Importer must preserve raw source rows and classify duplicate RPOs before generating canonical option/rule CSVs. It must not create canonical options or relationships from RPO-only matching when multiple production/source rows share the same RPO. Ambiguous duplicates must be staged for review.
+```
+
+That principle will matter more as soon as you move beyond Stingray into Z06, ZR1, ZR1X, Grand Sport, or other Chevy models. Otherwise the importer will just mass-produce the exact duplicate/display artifact problem we are now catching manually.
+
+Importer must preserve raw source rows and classify duplicate RPOs before generating canonical option/rule CSVs. It must not create canonical options or relationships from RPO-only matching when multiple production/source rows share the same RPO. Ambiguous duplicates must be staged for review.
