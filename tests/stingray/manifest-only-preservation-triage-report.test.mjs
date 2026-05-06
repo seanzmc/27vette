@@ -229,24 +229,24 @@ const DIRECTION_ROLLUP_FIELDS = {
 };
 
 const EXPECTED_OWNERSHIP_DIRECTION_COUNTS = [
-  ["production_owned->production_owned", 10, 10, 10],
+  ["production_owned->production_owned", 1, 1, 1],
   ["production_owned->projected_owned", 4, 4, 4],
-  ["projected_owned->production_owned", 5, 5, 5],
-	  ["projected_owned->projected_owned", 3, 3, 3],
+  ["projected_owned->production_owned", 8, 8, 8],
+	  ["projected_owned->projected_owned", 9, 9, 9],
 ];
 
 const EXPECTED_PROJECTION_DIRECTION_COUNTS = [
-  ["not_projected->not_projected", 10, 10, 10],
+  ["not_projected->not_projected", 1, 1, 1],
   ["not_projected->projected_owned", 4, 4, 4],
-  ["projected_owned->not_projected", 5, 5, 5],
-	  ["projected_owned->projected_owned", 3, 3, 3],
+  ["projected_owned->not_projected", 8, 8, 8],
+	  ["projected_owned->projected_owned", 9, 9, 9],
 ];
 
 const EXPECTED_OWNERSHIP_PROJECTION_DIRECTION_COUNTS = [
-  ["production_owned/not_projected->production_owned/not_projected", 10, 10, 10],
+  ["production_owned/not_projected->production_owned/not_projected", 1, 1, 1],
   ["production_owned/not_projected->projected_owned/projected_owned", 4, 4, 4],
-  ["projected_owned/projected_owned->production_owned/not_projected", 5, 5, 5],
-	  ["projected_owned/projected_owned->projected_owned/projected_owned", 3, 3, 3],
+  ["projected_owned/projected_owned->production_owned/not_projected", 8, 8, 8],
+	  ["projected_owned/projected_owned->projected_owned/projected_owned", 9, 9, 9],
 ];
 
 const SLICE_ROLLUP_FIELDS = {
@@ -1419,10 +1419,10 @@ test("manifest-only preservation triage writes a blank decision ledger template"
   assert.deepEqual(
     [...groupDirectionCounts.entries()].sort(([left], [right]) => left.localeCompare(right)),
     [
-      ["production_owned/not_projected->production_owned/not_projected", 10],
+      ["production_owned/not_projected->production_owned/not_projected", 1],
       ["production_owned/not_projected->projected_owned/projected_owned", 4],
-      ["projected_owned/projected_owned->production_owned/not_projected", 5],
-	      ["projected_owned/projected_owned->projected_owned/projected_owned", 3],
+      ["projected_owned/projected_owned->production_owned/not_projected", 8],
+	      ["projected_owned/projected_owned->projected_owned/projected_owned", 9],
     ]
   );
   assert.equal(actualRows.some((row) => row.manifest_row_ids.includes(" | ")), false);

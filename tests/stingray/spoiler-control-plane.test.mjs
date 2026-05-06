@@ -11,7 +11,7 @@ const PYTHON = ".venv/bin/python";
 const OVERLAY_SCRIPT = "scripts/stingray_csv_shadow_overlay.py";
 const FRAGMENT_SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
-const SPOILER_GUARDED_RPOS = ["Z51", "ZYC"];
+const SPOILER_GUARDED_RPOS = ["ZYC"];
 const SPOILER_NOT_PROJECTED_RPOS = new Set([...SPOILER_GUARDED_RPOS, "5ZW"]);
 
 function parseCsv(source) {
@@ -146,7 +146,7 @@ function emitFragment() {
   }));
 }
 
-test("Pass 29 projects TVS T0A 5ZZ and 5ZU while other spoiler-adjacent options stay guarded", () => {
+test("spoiler control-plane projects Z51 while other guarded spoiler-adjacent options stay guarded", () => {
   const production = loadGeneratedData();
   const rows = activeManifestRows();
   const projectedRpos = rows.filter((row) => row.ownership === "projected_owned").map((row) => row.rpo);
@@ -162,6 +162,7 @@ test("Pass 29 projects TVS T0A 5ZZ and 5ZU while other spoiler-adjacent options 
   assert.equal(projectedRpos.includes("5ZZ"), true);
   assert.equal(projectedRpos.includes("5ZU"), true);
   assert.equal(projectedRpos.includes("5V7"), true);
+  assert.equal(projectedRpos.includes("Z51"), true);
   for (const rpo of SPOILER_NOT_PROJECTED_RPOS) {
     assert.equal(projectedRpos.includes(rpo), false, `${rpo} should not be projected-owned in Pass 29`);
   }
@@ -308,7 +309,7 @@ test("overlay rejects missing preserved 5ZW rule-only asymmetry record", () => {
   const result = runOverlay(["--ownership-manifest", writeTempManifest(rows)]);
 
   assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /unclassified cross-boundary records/);
+  assert.match(result.stderr, /unclassified cross-boundary records|unreplaced migrated-slice-owned records/);
   assert.match(result.stderr, /opt_5zw_001/);
 });
 
@@ -389,6 +390,6 @@ test("overlay rejects missing preserved spoiler priceRule classifications", () =
   const result = runOverlay(["--ownership-manifest", writeTempManifest(rows)]);
 
   assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /unclassified cross-boundary records/);
+  assert.match(result.stderr, /unclassified cross-boundary records|unreplaced migrated-slice-owned records/);
   assert.match(result.stderr, /opt_z51_001/);
 });

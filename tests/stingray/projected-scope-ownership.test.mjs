@@ -116,6 +116,7 @@ const EXPECTED_OWNED_RPOS = [
   "W2D",
   "WKQ",
   "WKR",
+  "Z51",
   "ZZ3",
 ];
 
@@ -317,7 +318,7 @@ test("projected ownership manifest declares the current multi-slice control scop
       target_option_id: "opt_ryq_001",
       ownership: "production_guarded",
     },
-    ...["Z51", "ZYC"].map((rpo) => ({
+    ...["ZYC"].map((rpo) => ({
       record_type: "guardedOption",
       rpo,
       target_option_id: "",

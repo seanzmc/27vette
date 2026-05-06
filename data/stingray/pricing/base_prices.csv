@@ -53,6 +53,7 @@ bp_s08,pb_2027_stingray,selectable,opt_s08_001,,150,10,true,Current S08 base pri
 bp_sbt,pb_2027_stingray,selectable,opt_sbt_001,,2525,10,true,Current SBT base price.
 bp_sc7,pb_2027_stingray,selectable,opt_sc7_001,,195,10,true,Current SC7 base price.
 bp_eri,pb_2027_stingray,selectable,opt_eri_001,,100,10,true,Current ERI base price.
+bp_z51,pb_2027_stingray,selectable,opt_z51_001,,5395,10,true,Current Z51 base price.
 bp_shq,pb_2027_stingray,selectable,opt_shq_001,,295,10,true,Current SHQ base price.
 bp_shw,pb_2027_stingray,selectable,opt_shw_001,,295,10,true,Current SHW base price.
 bp_sb7,pb_2027_stingray,selectable,opt_sb7_001,,595,10,true,Current SB7 base price.

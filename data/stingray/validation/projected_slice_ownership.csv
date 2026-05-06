@@ -54,6 +54,7 @@ selectable,,,,,,CC3,projected_owned,Transparent Roof panel projected slice,true
 selectable,,,,,,D84,projected_owned,Convertible Roof panel projected slice,true
 selectable,,,,,,D86,projected_owned,Convertible Roof panel projected slice,true
 selectable,,,,,,ERI,projected_owned,Battery Protection standalone mechanical accessory projected slice,true
+selectable,,,,,,Z51,projected_owned,Z51 Performance Package customer-facing selectable projected in Pass 190; package includes price rules and spoiler/default boundaries remain preserved,true
 selectable,,,,,,SHQ,projected_owned,Fender hash stripe pair projected slice,true
 selectable,,,,,,SHW,projected_owned,Fender hash stripe pair projected slice,true
 selectable,,,,,,SB7,projected_owned,SB7 Stingray R graphics projected slice,true
@@ -120,7 +121,7 @@ rule,,RNX,,,opt_5zw_001,,preserved_cross_boundary,Migrated to dependency_rules.c
 rule,,RNX,,Z51,,,preserved_cross_boundary,Car-cover Z51 exclude remains production-owned in Pass 15,true
 rule,,RWJ,,Z51,,,preserved_cross_boundary,Car-cover Z51 exclude remains production-owned in Pass 15,true
 guardedOption,,,,,,5V7,production_guarded,Spoiler-adjacent ground-effects guarded production option in Pass 17,false
-guardedOption,,,,,,Z51,production_guarded,Spoiler-adjacent package guarded production option in Pass 17,true
+guardedOption,,,,,,Z51,production_guarded,Z51 projected as customer-facing selectable in Pass 190,false
 guardedOption,,,,,,ZYC,production_guarded,Spoiler-adjacent appearance guarded production option in Pass 17,true
 guardedOption,,,,,,GBA,production_guarded,Paint option projected-owned in Pass 177; stale guarded row retained inactive,false
 guardedOption,,,,,opt_5vm_001,,production_guarded,Ground-effects rule-only legacy option id guarded in Pass 97,true

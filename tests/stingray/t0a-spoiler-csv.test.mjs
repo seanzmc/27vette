@@ -9,7 +9,7 @@ const PYTHON = ".venv/bin/python";
 const SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OWNERSHIP_MANIFEST = "data/stingray/validation/projected_slice_ownership.csv";
 const T0A_RPOS = new Set(["T0A"]);
-const NON_T0A_SPOILER_RPOS = new Set(["Z51", "ZYC", "5ZW"]);
+const NON_T0A_SPOILER_RPOS = new Set(["ZYC", "5ZW"]);
 const Z51_INCLUDE_TARGETS = new Set(["FE3", "G0K", "G96", "J55", "M1N", "QTU", "V08"]);
 
 function parseCsv(source) {
