@@ -42,6 +42,7 @@ OPTIONAL_TABLES = {
     "canonical_options": "catalog/canonical_options.csv",
     "option_presentations": "ui/option_presentations.csv",
     "option_status_rules": "logic/option_status_rules.csv",
+    "canonical_base_prices": "pricing/canonical_base_prices.csv",
 }
 
 SIMPLE_DEPENDENCY_RULE_FIELDS = [
@@ -104,11 +105,24 @@ OPTION_STATUS_RULE_FIELDS = [
     "notes",
 ]
 
+CANONICAL_BASE_PRICE_FIELDS = [
+    "canonical_base_price_id",
+    "price_book_id",
+    "canonical_option_id",
+    "presentation_id",
+    "scope_condition_set_id",
+    "amount_usd",
+    "priority",
+    "active",
+    "notes",
+]
+
 OPTIONAL_TABLE_FIELDS = {
     "simple_dependency_rules": SIMPLE_DEPENDENCY_RULE_FIELDS,
     "canonical_options": CANONICAL_OPTION_FIELDS,
     "option_presentations": OPTION_PRESENTATION_FIELDS,
     "option_status_rules": OPTION_STATUS_RULE_FIELDS,
+    "canonical_base_prices": CANONICAL_BASE_PRICE_FIELDS,
 }
 
 CANONICAL_OPTION_KINDS = {"customer_choice", "equipment_feature", "structured_reference", "review_required"}
@@ -143,6 +157,7 @@ ID_FIELDS = {
     "canonical_options": "canonical_option_id",
     "option_presentations": "presentation_id",
     "option_status_rules": "status_rule_id",
+    "canonical_base_prices": "canonical_base_price_id",
 }
 
 
@@ -191,6 +206,9 @@ class CsvSlice:
         }
         self.option_status_rules = [
             row for row in self.tables["option_status_rules"] if is_active(row)
+        ]
+        self.canonical_base_prices = [
+            row for row in self.tables["canonical_base_prices"] if is_active(row)
         ]
         self._merge_canonical_presentations()
         self.selectables = {row["selectable_id"]: row for row in self.tables["selectables"] if is_active(row)}
@@ -461,16 +479,19 @@ class CsvSlice:
         return [f"{table_name}.csv uses {'; '.join(details)}."]
 
     def _merge_canonical_presentations(self) -> None:
-        for table_name in ("canonical_options", "option_presentations", "option_status_rules"):
+        for table_name in ("canonical_options", "option_presentations", "option_status_rules", "canonical_base_prices"):
             self.canonical_option_errors.extend(self._optional_table_field_errors(table_name))
         if self.canonical_option_errors:
             return
-        if not (self.canonical_options or self.option_presentations or self.option_status_rules):
+        if not (self.canonical_options or self.option_presentations or self.option_status_rules or self.canonical_base_prices):
             return
 
         existing_selectable_ids = {row.get("selectable_id", "") for row in self.tables["selectables"] if is_active(row)}
         existing_condition_set_ids = {
             row.get("condition_set_id", "") for row in self.tables["condition_sets"] if is_active(row)
+        }
+        existing_price_book_ids = {
+            row.get("price_book_id", "") for row in self.tables["price_books"] if is_active(row)
         }
         presentation_ids_by_canonical: dict[str, list[str]] = defaultdict(list)
         legacy_ids: dict[str, str] = {}
@@ -617,6 +638,54 @@ class CsvSlice:
             except ValueError:
                 self.canonical_option_errors.append(
                     f"option_status_rules {row_id or '<missing>'} has unsupported priority: {row.get('priority', '')}."
+                )
+
+        for row in self.tables["canonical_base_prices"]:
+            row_id = row.get("canonical_base_price_id", "")
+            if row.get("active", "").lower() not in {"true", "false"}:
+                self.canonical_option_errors.append(
+                    f"canonical_base_prices {row_id or '<missing>'} uses unsupported active value: {row.get('active', '')}."
+                )
+                continue
+            if not is_active(row):
+                continue
+            canonical_id = row.get("canonical_option_id", "")
+            presentation_id = row.get("presentation_id", "")
+            if not row_id:
+                self.canonical_option_errors.append("canonical_base_prices has a row missing canonical_base_price_id.")
+            if bool(canonical_id) == bool(presentation_id):
+                self.canonical_option_errors.append(
+                    f"canonical_base_prices {row_id or '<missing>'} must reference exactly one of canonical_option_id or presentation_id."
+                )
+            if canonical_id and canonical_id not in self.canonical_options:
+                self.canonical_option_errors.append(
+                    f"canonical_base_prices {row_id or '<missing>'} references missing canonical option: {canonical_id}."
+                )
+            if presentation_id and presentation_id not in self.option_presentations:
+                self.canonical_option_errors.append(
+                    f"canonical_base_prices {row_id or '<missing>'} references missing presentation: {presentation_id}."
+                )
+            price_book_id = row.get("price_book_id", "")
+            if price_book_id and price_book_id not in existing_price_book_ids:
+                self.canonical_option_errors.append(
+                    f"canonical_base_prices {row_id or '<missing>'} references missing price book: {price_book_id}."
+                )
+            condition_set_id = row.get("scope_condition_set_id", "")
+            if condition_set_id and condition_set_id not in existing_condition_set_ids:
+                self.canonical_option_errors.append(
+                    f"canonical_base_prices {row_id or '<missing>'} references missing condition set: {condition_set_id}."
+                )
+            try:
+                as_int(row.get("amount_usd", ""))
+            except ValueError:
+                self.canonical_option_errors.append(
+                    f"canonical_base_prices {row_id or '<missing>'} has unsupported amount_usd: {row.get('amount_usd', '')}."
+                )
+            try:
+                as_int(row.get("priority", ""))
+            except ValueError:
+                self.canonical_option_errors.append(
+                    f"canonical_base_prices {row_id or '<missing>'} has unsupported priority: {row.get('priority', '')}."
                 )
 
         if self.canonical_option_errors:
@@ -1122,25 +1191,66 @@ class CsvSlice:
         )
 
     def base_price(self, selectable_id: str, context: dict[str, str], selected: set[str]) -> dict[str, Any]:
-        candidates = [
+        exact_selectable_candidates = [
             row
             for row in self.tables["base_prices"]
             if is_active(row)
+            and row["target_selector_type"] == "selectable"
             and self.selector_targets_selectable(row["target_selector_type"], row["target_selector_id"], selectable_id)
             and (not row["scope_condition_set_id"] or self.condition_matches(row["scope_condition_set_id"], context, selected))
         ]
-        candidates.sort(
-            key=lambda row: (
-                as_int(row["priority"]),
-                2 if row["target_selector_type"] == "selectable" else 1,
-            ),
-            reverse=True,
-        )
-        if not candidates:
+        exact_selectable_candidates.sort(key=lambda row: as_int(row["priority"]), reverse=True)
+        if exact_selectable_candidates:
+            return {
+                "base_price_id": exact_selectable_candidates[0]["base_price_id"],
+                "amount_usd": as_int(exact_selectable_candidates[0]["amount_usd"]),
+            }
+
+        display = self.display_row(selectable_id)
+        presentation_id = display.get("presentation_id", "")
+        canonical_id = display.get("canonical_option_id", "")
+        presentation_candidates = [
+            row
+            for row in self.canonical_base_prices
+            if presentation_id
+            and row.get("presentation_id", "") == presentation_id
+            and (not row["scope_condition_set_id"] or self.condition_matches(row["scope_condition_set_id"], context, selected))
+        ]
+        presentation_candidates.sort(key=lambda row: as_int(row["priority"]), reverse=True)
+        if presentation_candidates:
+            return {
+                "base_price_id": presentation_candidates[0]["canonical_base_price_id"],
+                "amount_usd": as_int(presentation_candidates[0]["amount_usd"]),
+            }
+
+        canonical_candidates = [
+            row
+            for row in self.canonical_base_prices
+            if canonical_id
+            and row.get("canonical_option_id", "") == canonical_id
+            and (not row["scope_condition_set_id"] or self.condition_matches(row["scope_condition_set_id"], context, selected))
+        ]
+        canonical_candidates.sort(key=lambda row: as_int(row["priority"]), reverse=True)
+        if canonical_candidates:
+            return {
+                "base_price_id": canonical_candidates[0]["canonical_base_price_id"],
+                "amount_usd": as_int(canonical_candidates[0]["amount_usd"]),
+            }
+
+        broader_candidates = [
+            row
+            for row in self.tables["base_prices"]
+            if is_active(row)
+            and row["target_selector_type"] != "selectable"
+            and self.selector_targets_selectable(row["target_selector_type"], row["target_selector_id"], selectable_id)
+            and (not row["scope_condition_set_id"] or self.condition_matches(row["scope_condition_set_id"], context, selected))
+        ]
+        broader_candidates.sort(key=lambda row: as_int(row["priority"]), reverse=True)
+        if not broader_candidates:
             return {"base_price_id": None, "amount_usd": 0}
         return {
-            "base_price_id": candidates[0]["base_price_id"],
-            "amount_usd": as_int(candidates[0]["amount_usd"]),
+            "base_price_id": broader_candidates[0]["base_price_id"],
+            "amount_usd": as_int(broader_candidates[0]["amount_usd"]),
         }
 
     def selector_targets_selectable(self, selector_type: str, selector_id: str, selectable_id: str) -> bool:
@@ -1494,13 +1604,47 @@ class CsvSlice:
         }.get(status, status)
 
     def legacy_base_price(self, selectable_id: str) -> int:
-        candidates = [
+        exact_selectable_candidates = [
             row
             for row in self.tables["base_prices"]
-            if is_active(row) and self.selector_targets_selectable(row["target_selector_type"], row["target_selector_id"], selectable_id)
+            if is_active(row)
+            and row["target_selector_type"] == "selectable"
+            and self.selector_targets_selectable(row["target_selector_type"], row["target_selector_id"], selectable_id)
         ]
-        candidates.sort(key=lambda row: (as_int(row["priority"]), 2 if row["target_selector_type"] == "selectable" else 1), reverse=True)
-        return as_int(candidates[0]["amount_usd"]) if candidates else 0
+        exact_selectable_candidates.sort(key=lambda row: as_int(row["priority"]), reverse=True)
+        if exact_selectable_candidates:
+            return as_int(exact_selectable_candidates[0]["amount_usd"])
+
+        display = self.display_row(selectable_id)
+        presentation_id = display.get("presentation_id", "")
+        canonical_id = display.get("canonical_option_id", "")
+        presentation_candidates = [
+            row
+            for row in self.canonical_base_prices
+            if presentation_id and row.get("presentation_id", "") == presentation_id
+        ]
+        presentation_candidates.sort(key=lambda row: as_int(row["priority"]), reverse=True)
+        if presentation_candidates:
+            return as_int(presentation_candidates[0]["amount_usd"])
+
+        canonical_candidates = [
+            row
+            for row in self.canonical_base_prices
+            if canonical_id and row.get("canonical_option_id", "") == canonical_id
+        ]
+        canonical_candidates.sort(key=lambda row: as_int(row["priority"]), reverse=True)
+        if canonical_candidates:
+            return as_int(canonical_candidates[0]["amount_usd"])
+
+        broader_candidates = [
+            row
+            for row in self.tables["base_prices"]
+            if is_active(row)
+            and row["target_selector_type"] != "selectable"
+            and self.selector_targets_selectable(row["target_selector_type"], row["target_selector_id"], selectable_id)
+        ]
+        broader_candidates.sort(key=lambda row: as_int(row["priority"]), reverse=True)
+        return as_int(broader_candidates[0]["amount_usd"]) if broader_candidates else 0
 
     def display_row(self, selectable_id: str) -> dict[str, str]:
         return self.selectable_display.get(selectable_id, {})

@@ -54,6 +54,17 @@ const STATUS_FIELDS = [
   "active",
   "notes",
 ];
+const CANONICAL_BASE_PRICE_FIELDS = [
+  "canonical_base_price_id",
+  "price_book_id",
+  "canonical_option_id",
+  "presentation_id",
+  "scope_condition_set_id",
+  "amount_usd",
+  "priority",
+  "active",
+  "notes",
+];
 
 function tempPackage() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "stingray-canonical-presentations-"));
@@ -97,10 +108,11 @@ function validationErrors(result) {
   return JSON.parse(result.stdout).validation_errors.join("\n");
 }
 
-function writeCanonicalTables(packageDir, { canonicalRows = [], presentationRows = [], statusRows = [] } = {}) {
+function writeCanonicalTables(packageDir, { canonicalRows = [], presentationRows = [], statusRows = [], canonicalBasePriceRows = [] } = {}) {
   writeCsv(path.join(packageDir, "catalog", "canonical_options.csv"), CANONICAL_FIELDS, canonicalRows);
   writeCsv(path.join(packageDir, "ui", "option_presentations.csv"), PRESENTATION_FIELDS, presentationRows);
   writeCsv(path.join(packageDir, "logic", "option_status_rules.csv"), STATUS_FIELDS, statusRows);
+  writeCsv(path.join(packageDir, "pricing", "canonical_base_prices.csv"), CANONICAL_BASE_PRICE_FIELDS, canonicalBasePriceRows);
 }
 
 function qebCanonicalRows() {
@@ -202,11 +214,23 @@ test("absent and header-only canonical presentation tables preserve current outp
   fs.rmSync(path.join(absentPackage, "catalog", "canonical_options.csv"), { force: true });
   fs.rmSync(path.join(absentPackage, "ui", "option_presentations.csv"), { force: true });
   fs.rmSync(path.join(absentPackage, "logic", "option_status_rules.csv"), { force: true });
+  fs.rmSync(path.join(absentPackage, "pricing", "canonical_base_prices.csv"), { force: true });
 
   const headerOnlyPackage = tempPackage();
   writeCanonicalTables(headerOnlyPackage);
 
   assert.deepEqual(emitLegacyFragment(headerOnlyPackage), emitLegacyFragment(absentPackage));
+});
+
+test("absent and header-only canonical base price table preserve current repo output", () => {
+  const absentPackage = tempPackage();
+  fs.rmSync(path.join(absentPackage, "pricing", "canonical_base_prices.csv"), { force: true });
+
+  const headerOnlyPackage = tempPackage();
+  writeCsv(path.join(headerOnlyPackage, "pricing", "canonical_base_prices.csv"), CANONICAL_BASE_PRICE_FIELDS, []);
+
+  assert.deepEqual(emitLegacyFragment(headerOnlyPackage), emitLegacyFragment(absentPackage));
+  assert.deepEqual(emitLegacyFragment(headerOnlyPackage), emitLegacyFragment(PACKAGE));
 });
 
 test("temp QEB canonical fixture emits choice and Standard Options display presentations", () => {
@@ -238,6 +262,102 @@ test("temp QEB canonical fixture emits choice and Standard Options display prese
     && row.status === "standard"
     && row.status_label === "Standard"
   ));
+});
+
+test("canonical base price emits nonzero price for a canonical presentation choice", () => {
+  const packageDir = tempPackage();
+  const fixture = qebCanonicalRows();
+  fixture.canonicalBasePriceRows = [
+    {
+      canonical_base_price_id: "cbp_qeb",
+      price_book_id: "pb_2027_stingray",
+      canonical_option_id: "canonical_qeb",
+      presentation_id: "",
+      scope_condition_set_id: "",
+      amount_usd: "1234",
+      priority: "10",
+      active: "true",
+      notes: "Temp canonical price.",
+    },
+  ];
+  writeCanonicalTables(packageDir, fixture);
+
+  const fragment = emitLegacyFragment(packageDir);
+  assert.equal(fragment.validation_errors.length, 0);
+  assert.ok(fragment.choices
+    .filter((row) => row.option_id === "opt_qeb_001")
+    .every((row) => row.base_price === 1234));
+});
+
+test("presentation-specific canonical base price overrides canonical option price", () => {
+  const packageDir = tempPackage();
+  const fixture = qebCanonicalRows();
+  fixture.canonicalBasePriceRows = [
+    {
+      canonical_base_price_id: "cbp_qeb_canonical",
+      price_book_id: "pb_2027_stingray",
+      canonical_option_id: "canonical_qeb",
+      presentation_id: "",
+      scope_condition_set_id: "",
+      amount_usd: "1234",
+      priority: "99",
+      active: "true",
+      notes: "Temp canonical fallback price.",
+    },
+    {
+      canonical_base_price_id: "cbp_qeb_presentation",
+      price_book_id: "pb_2027_stingray",
+      canonical_option_id: "",
+      presentation_id: "pres_qeb_wheels_choice",
+      scope_condition_set_id: "",
+      amount_usd: "2222",
+      priority: "1",
+      active: "true",
+      notes: "Temp presentation-specific price.",
+    },
+  ];
+  writeCanonicalTables(packageDir, fixture);
+
+  const fragment = emitLegacyFragment(packageDir);
+  assert.equal(fragment.validation_errors.length, 0);
+  assert.ok(fragment.choices
+    .filter((row) => row.option_id === "opt_qeb_001")
+    .every((row) => row.base_price === 2222));
+  assert.ok(fragment.choices
+    .filter((row) => row.option_id === "opt_qeb_002")
+    .every((row) => row.base_price === 1234));
+});
+
+test("existing exact selectable base price keeps precedence over canonical base price", () => {
+  const packageDir = tempPackage();
+  const fixture = qebCanonicalRows();
+  fixture.canonicalBasePriceRows = [
+    {
+      canonical_base_price_id: "cbp_qeb",
+      price_book_id: "pb_2027_stingray",
+      canonical_option_id: "canonical_qeb",
+      presentation_id: "",
+      scope_condition_set_id: "",
+      amount_usd: "1234",
+      priority: "99",
+      active: "true",
+      notes: "Temp canonical price.",
+    },
+  ];
+  writeCanonicalTables(packageDir, fixture);
+  const basePricePath = path.join(packageDir, "pricing", "base_prices.csv");
+  const basePriceRows = fs.readFileSync(basePricePath, "utf8").trimEnd().split("\n");
+  basePriceRows.push("bp_qeb_temp,pb_2027_stingray,selectable,opt_qeb_001,,42,1,true,Temp exact selectable bridge price.");
+  fs.writeFileSync(basePricePath, `${basePriceRows.join("\n")}\n`);
+
+  const fragment = emitLegacyFragment(packageDir);
+  assert.equal(fragment.validation_errors.length, 0);
+  assert.ok(fragment.choices
+    .filter((row) => row.option_id === "opt_qeb_001")
+    .every((row) => row.base_price === 42));
+  assert.ok(fragment.choices
+    .filter((row) => row.option_id === "opt_qeb_002")
+    .every((row) => row.base_price === 1234));
 });
 
 test("presentation-specific status rules resolve by specificity and priority", () => {
@@ -324,6 +444,94 @@ test("missing canonical option and missing status references fail clearly", () =
   const missingStatusResult = runLegacyFragment(missingStatusPackage);
   assert.notEqual(missingStatusResult.status, 0);
   assert.match(validationErrors(missingStatusResult), /option_status_rules status_qeb_choice references missing presentation: pres_missing/);
+});
+
+test("invalid canonical base price references fail clearly", () => {
+  const missingCanonicalPackage = tempPackage();
+  const missingCanonicalFixture = qebCanonicalRows();
+  missingCanonicalFixture.canonicalBasePriceRows = [
+    {
+      canonical_base_price_id: "cbp_missing_canonical",
+      price_book_id: "pb_2027_stingray",
+      canonical_option_id: "canonical_missing",
+      presentation_id: "",
+      scope_condition_set_id: "",
+      amount_usd: "123",
+      priority: "10",
+      active: "true",
+      notes: "Temp missing canonical check.",
+    },
+  ];
+  writeCanonicalTables(missingCanonicalPackage, missingCanonicalFixture);
+
+  const missingCanonicalResult = runLegacyFragment(missingCanonicalPackage);
+  assert.notEqual(missingCanonicalResult.status, 0);
+  assert.match(validationErrors(missingCanonicalResult), /canonical_base_prices cbp_missing_canonical references missing canonical option: canonical_missing/);
+
+  const missingPresentationPackage = tempPackage();
+  const missingPresentationFixture = qebCanonicalRows();
+  missingPresentationFixture.canonicalBasePriceRows = [
+    {
+      canonical_base_price_id: "cbp_missing_presentation",
+      price_book_id: "pb_2027_stingray",
+      canonical_option_id: "",
+      presentation_id: "pres_missing",
+      scope_condition_set_id: "",
+      amount_usd: "123",
+      priority: "10",
+      active: "true",
+      notes: "Temp missing presentation check.",
+    },
+  ];
+  writeCanonicalTables(missingPresentationPackage, missingPresentationFixture);
+
+  const missingPresentationResult = runLegacyFragment(missingPresentationPackage);
+  assert.notEqual(missingPresentationResult.status, 0);
+  assert.match(validationErrors(missingPresentationResult), /canonical_base_prices cbp_missing_presentation references missing presentation: pres_missing/);
+});
+
+test("canonical base price rows must target exactly one canonical option or presentation", () => {
+  const bothPackage = tempPackage();
+  const bothFixture = qebCanonicalRows();
+  bothFixture.canonicalBasePriceRows = [
+    {
+      canonical_base_price_id: "cbp_both",
+      price_book_id: "pb_2027_stingray",
+      canonical_option_id: "canonical_qeb",
+      presentation_id: "pres_qeb_wheels_choice",
+      scope_condition_set_id: "",
+      amount_usd: "123",
+      priority: "10",
+      active: "true",
+      notes: "Temp both-targets check.",
+    },
+  ];
+  writeCanonicalTables(bothPackage, bothFixture);
+
+  const bothResult = runLegacyFragment(bothPackage);
+  assert.notEqual(bothResult.status, 0);
+  assert.match(validationErrors(bothResult), /canonical_base_prices cbp_both must reference exactly one of canonical_option_id or presentation_id/);
+
+  const neitherPackage = tempPackage();
+  const neitherFixture = qebCanonicalRows();
+  neitherFixture.canonicalBasePriceRows = [
+    {
+      canonical_base_price_id: "cbp_neither",
+      price_book_id: "pb_2027_stingray",
+      canonical_option_id: "",
+      presentation_id: "",
+      scope_condition_set_id: "",
+      amount_usd: "123",
+      priority: "10",
+      active: "true",
+      notes: "Temp neither-target check.",
+    },
+  ];
+  writeCanonicalTables(neitherPackage, neitherFixture);
+
+  const neitherResult = runLegacyFragment(neitherPackage);
+  assert.notEqual(neitherResult.status, 0);
+  assert.match(validationErrors(neitherResult), /canonical_base_prices cbp_neither must reference exactly one of canonical_option_id or presentation_id/);
 });
 
 test("display_only is rejected as a canonical business status", () => {
