@@ -39,6 +39,9 @@ TABLES = {
 
 OPTIONAL_TABLES = {
     "simple_dependency_rules": "logic/simple_dependency_rules.csv",
+    "canonical_options": "catalog/canonical_options.csv",
+    "option_presentations": "ui/option_presentations.csv",
+    "option_status_rules": "logic/option_status_rules.csv",
 }
 
 SIMPLE_DEPENDENCY_RULE_FIELDS = [
@@ -51,6 +54,75 @@ SIMPLE_DEPENDENCY_RULE_FIELDS = [
     "priority",
     "active",
 ]
+
+CANONICAL_OPTION_FIELDS = [
+    "canonical_option_id",
+    "rpo",
+    "label",
+    "description",
+    "canonical_kind",
+    "active",
+    "notes",
+]
+
+OPTION_PRESENTATION_FIELDS = [
+    "presentation_id",
+    "canonical_option_id",
+    "legacy_option_id",
+    "rpo_override",
+    "presentation_role",
+    "section_id",
+    "section_name",
+    "category_id",
+    "category_name",
+    "step_key",
+    "choice_mode",
+    "selection_mode",
+    "selection_mode_label",
+    "display_order",
+    "selectable",
+    "active",
+    "label",
+    "description",
+    "source_detail_raw",
+    "notes",
+]
+
+OPTION_STATUS_RULE_FIELDS = [
+    "status_rule_id",
+    "canonical_option_id",
+    "presentation_id",
+    "scope_model_year",
+    "scope_body_style",
+    "scope_trim_level",
+    "scope_variant_id",
+    "condition_set_id",
+    "status",
+    "status_label",
+    "priority",
+    "active",
+    "notes",
+]
+
+OPTIONAL_TABLE_FIELDS = {
+    "simple_dependency_rules": SIMPLE_DEPENDENCY_RULE_FIELDS,
+    "canonical_options": CANONICAL_OPTION_FIELDS,
+    "option_presentations": OPTION_PRESENTATION_FIELDS,
+    "option_status_rules": OPTION_STATUS_RULE_FIELDS,
+}
+
+CANONICAL_OPTION_KINDS = {"customer_choice", "equipment_feature", "structured_reference", "review_required"}
+PRESENTATION_ROLES = {
+    "choice",
+    "standard_options_display",
+    "standard_equipment_display",
+    "included_display",
+    "package_display",
+    "legacy_alias",
+    "display_only",
+}
+OPTION_STATUSES = {"optional", "standard_choice", "standard_fixed", "included_auto", "unavailable"}
+REVIEW_REQUIRED_DUPLICATE_RPOS = {"AE4", "AH2", "AQ9", "UQT"}
 
 
 ID_FIELDS = {
@@ -68,6 +140,9 @@ ID_FIELDS = {
     "price_policies": "price_policy_id",
     "price_rules": "price_rule_id",
     "non_selectable_references": "reference_id",
+    "canonical_options": "canonical_option_id",
+    "option_presentations": "presentation_id",
+    "option_status_rules": "status_rule_id",
 }
 
 
@@ -109,6 +184,15 @@ class CsvSlice:
             self.tables[name] = rows
         self.ownership_rows = self._load_ownership_rows()
         self.variants = {row["variant_id"]: row for row in self.tables["variants"] if is_active(row)}
+        self.canonical_option_errors: list[str] = []
+        self.canonical_options = {row["canonical_option_id"]: row for row in self.tables["canonical_options"] if is_active(row)}
+        self.option_presentations = {
+            row["presentation_id"]: row for row in self.tables["option_presentations"] if is_active(row)
+        }
+        self.option_status_rules = [
+            row for row in self.tables["option_status_rules"] if is_active(row)
+        ]
+        self._merge_canonical_presentations()
         self.selectables = {row["selectable_id"]: row for row in self.tables["selectables"] if is_active(row)}
         self.projected_owned_selectable_ids = self._build_projected_owned_selectable_ids()
         self.item_sets = {row["set_id"]: row for row in self.tables["item_sets"] if is_active(row)}
@@ -360,8 +444,231 @@ class CsvSlice:
             }
         )
 
+    def _optional_table_field_errors(self, table_name: str) -> list[str]:
+        fields = self.optional_table_fields.get(table_name, [])
+        if not fields:
+            return []
+        expected = OPTIONAL_TABLE_FIELDS[table_name]
+        if fields == expected:
+            return []
+        unexpected = [field for field in fields if field not in expected]
+        missing = [field for field in expected if field not in fields]
+        details = []
+        if unexpected:
+            details.append(f"unsupported columns: {', '.join(unexpected)}")
+        if missing:
+            details.append(f"missing columns: {', '.join(missing)}")
+        return [f"{table_name}.csv uses {'; '.join(details)}."]
+
+    def _merge_canonical_presentations(self) -> None:
+        for table_name in ("canonical_options", "option_presentations", "option_status_rules"):
+            self.canonical_option_errors.extend(self._optional_table_field_errors(table_name))
+        if self.canonical_option_errors:
+            return
+        if not (self.canonical_options or self.option_presentations or self.option_status_rules):
+            return
+
+        existing_selectable_ids = {row.get("selectable_id", "") for row in self.tables["selectables"] if is_active(row)}
+        existing_condition_set_ids = {
+            row.get("condition_set_id", "") for row in self.tables["condition_sets"] if is_active(row)
+        }
+        presentation_ids_by_canonical: dict[str, list[str]] = defaultdict(list)
+        legacy_ids: dict[str, str] = {}
+
+        for row in self.tables["canonical_options"]:
+            row_id = row.get("canonical_option_id", "")
+            if row.get("active", "").lower() not in {"true", "false"}:
+                self.canonical_option_errors.append(
+                    f"canonical_options {row_id or '<missing>'} uses unsupported active value: {row.get('active', '')}."
+                )
+                continue
+            if not is_active(row):
+                continue
+            if not row_id:
+                self.canonical_option_errors.append("canonical_options has a row missing canonical_option_id.")
+            if not row.get("rpo", ""):
+                self.canonical_option_errors.append(f"canonical_options {row_id or '<missing>'} is missing rpo.")
+            if row.get("canonical_kind", "") not in CANONICAL_OPTION_KINDS:
+                self.canonical_option_errors.append(
+                    f"canonical_options {row_id or '<missing>'} uses unsupported canonical_kind: {row.get('canonical_kind', '')}."
+                )
+            if row.get("canonical_kind", "") == "display_only":
+                self.canonical_option_errors.append(
+                    f"canonical_options {row_id or '<missing>'} cannot use display_only as a canonical business status."
+                )
+            if row.get("rpo", "") in REVIEW_REQUIRED_DUPLICATE_RPOS:
+                self.canonical_option_errors.append(
+                    f"canonical_options {row_id or '<missing>'} uses duplicate RPO {row.get('rpo', '')}, "
+                    "which requires explicit review and cannot be auto-collapsed."
+                )
+
+        for row in self.tables["option_presentations"]:
+            row_id = row.get("presentation_id", "")
+            if row.get("active", "").lower() not in {"true", "false"}:
+                self.canonical_option_errors.append(
+                    f"option_presentations {row_id or '<missing>'} uses unsupported active value: {row.get('active', '')}."
+                )
+                continue
+            if not is_active(row):
+                continue
+            canonical_id = row.get("canonical_option_id", "")
+            legacy_id = row.get("legacy_option_id", "")
+            presentation_role = row.get("presentation_role", "")
+            if not row_id:
+                self.canonical_option_errors.append("option_presentations has a row missing presentation_id.")
+            if canonical_id not in self.canonical_options:
+                self.canonical_option_errors.append(
+                    f"option_presentations {row_id or '<missing>'} references missing canonical option: {canonical_id}."
+                )
+            if not legacy_id:
+                self.canonical_option_errors.append(f"option_presentations {row_id or '<missing>'} is missing legacy_option_id.")
+            elif legacy_id in existing_selectable_ids:
+                self.canonical_option_errors.append(
+                    f"option_presentations {row_id or '<missing>'} legacy_option_id collides with active selectables.csv row: {legacy_id}."
+                )
+            elif legacy_id in legacy_ids:
+                self.canonical_option_errors.append(
+                    f"option_presentations {row_id or '<missing>'} duplicate legacy_option_id {legacy_id} also used by {legacy_ids[legacy_id]}."
+                )
+            else:
+                legacy_ids[legacy_id] = row_id
+            if presentation_role not in PRESENTATION_ROLES:
+                self.canonical_option_errors.append(
+                    f"option_presentations {row_id or '<missing>'} uses unsupported presentation_role: {presentation_role}."
+                )
+            if presentation_role == "choice" and row.get("selection_mode", "") == "display_only":
+                self.canonical_option_errors.append(
+                    f"option_presentations {row_id or '<missing>'} cannot use display_only selection_mode for a choice presentation."
+                )
+            if presentation_role != "choice" and row.get("selectable", "") == "True":
+                self.canonical_option_errors.append(
+                    f"option_presentations {row_id or '<missing>'} display presentation must not be selectable."
+                )
+            try:
+                as_int(row.get("display_order", ""))
+            except ValueError:
+                self.canonical_option_errors.append(
+                    f"option_presentations {row_id or '<missing>'} has unsupported display_order: {row.get('display_order', '')}."
+                )
+            if canonical_id:
+                presentation_ids_by_canonical[canonical_id].append(row_id)
+
+        for canonical_id, presentation_ids in presentation_ids_by_canonical.items():
+            choice_presentations = [
+                self.option_presentations[presentation_id]
+                for presentation_id in presentation_ids
+                if self.option_presentations[presentation_id].get("presentation_role", "") == "choice"
+                and self.option_presentations[presentation_id].get("selectable", "") == "True"
+            ]
+            if len(choice_presentations) > 1:
+                canonical = self.canonical_options.get(canonical_id, {})
+                ids = ", ".join(row["presentation_id"] for row in choice_presentations)
+                self.canonical_option_errors.append(
+                    f"canonical_options {canonical_id} would auto-collapse multiple selectable choices for RPO {canonical.get('rpo', '')}: {ids}."
+                )
+
+        for row in self.tables["option_status_rules"]:
+            row_id = row.get("status_rule_id", "")
+            if row.get("active", "").lower() not in {"true", "false"}:
+                self.canonical_option_errors.append(
+                    f"option_status_rules {row_id or '<missing>'} uses unsupported active value: {row.get('active', '')}."
+                )
+                continue
+            if not is_active(row):
+                continue
+            canonical_id = row.get("canonical_option_id", "")
+            presentation_id = row.get("presentation_id", "")
+            if not row_id:
+                self.canonical_option_errors.append("option_status_rules has a row missing status_rule_id.")
+            if not (canonical_id or presentation_id):
+                self.canonical_option_errors.append(
+                    f"option_status_rules {row_id or '<missing>'} must reference canonical_option_id or presentation_id."
+                )
+            if canonical_id and canonical_id not in self.canonical_options:
+                self.canonical_option_errors.append(
+                    f"option_status_rules {row_id or '<missing>'} references missing canonical option: {canonical_id}."
+                )
+            if presentation_id and presentation_id not in self.option_presentations:
+                self.canonical_option_errors.append(
+                    f"option_status_rules {row_id or '<missing>'} references missing presentation: {presentation_id}."
+                )
+            if canonical_id and presentation_id:
+                presentation = self.option_presentations.get(presentation_id, {})
+                if presentation and presentation.get("canonical_option_id", "") != canonical_id:
+                    self.canonical_option_errors.append(
+                        f"option_status_rules {row_id or '<missing>'} canonical_option_id does not match presentation {presentation_id}."
+                    )
+            status = row.get("status", "")
+            if status not in OPTION_STATUSES:
+                self.canonical_option_errors.append(
+                    f"option_status_rules {row_id or '<missing>'} uses unsupported status: {status}."
+                )
+            if status == "display_only":
+                self.canonical_option_errors.append(
+                    f"option_status_rules {row_id or '<missing>'} cannot use display_only as a business status."
+                )
+            condition_set_id = row.get("condition_set_id", "")
+            if condition_set_id and condition_set_id not in existing_condition_set_ids:
+                self.canonical_option_errors.append(
+                    f"option_status_rules {row_id or '<missing>'} references missing condition set: {condition_set_id}."
+                )
+            try:
+                as_int(row.get("priority", ""))
+            except ValueError:
+                self.canonical_option_errors.append(
+                    f"option_status_rules {row_id or '<missing>'} has unsupported priority: {row.get('priority', '')}."
+                )
+
+        if self.canonical_option_errors:
+            return
+
+        for row in sorted(self.option_presentations.values(), key=lambda item: item["presentation_id"]):
+            canonical = self.canonical_options[row["canonical_option_id"]]
+            legacy_id = row["legacy_option_id"]
+            self.tables["selectables"].append(
+                {
+                    "selectable_id": legacy_id,
+                    "selectable_type": "option",
+                    "rpo": row.get("rpo_override", "") or canonical["rpo"],
+                    "label": row.get("label", "") or canonical["label"],
+                    "description": row.get("description", "") or canonical["description"],
+                    "active": row["active"],
+                    "availability_condition_set_id": "",
+                    "notes": row.get("notes", "") or f"Canonical presentation {row['presentation_id']}.",
+                }
+            )
+            self.tables["selectable_display"].append(
+                {
+                    "selectable_id": legacy_id,
+                    "legacy_option_id": legacy_id,
+                    "section_id": row["section_id"],
+                    "section_name": row["section_name"],
+                    "category_id": row["category_id"],
+                    "category_name": row["category_name"],
+                    "step_key": row["step_key"],
+                    "choice_mode": row["choice_mode"],
+                    "selection_mode": row["selection_mode"],
+                    "selection_mode_label": row["selection_mode_label"],
+                    "display_order": row["display_order"],
+                    "selectable": row["selectable"],
+                    "active": row["active"],
+                    "status_condition_set_id": "",
+                    "status_when_matched": "optional",
+                    "status_label_when_matched": "Available",
+                    "status_when_unmatched": "optional",
+                    "status_label_when_unmatched": "Available",
+                    "label": row.get("label", "") or canonical["label"],
+                    "description": row.get("description", "") or canonical["description"],
+                    "source_detail_raw": row.get("source_detail_raw", ""),
+                    "canonical_option_id": row["canonical_option_id"],
+                    "presentation_id": row["presentation_id"],
+                    "presentation_role": row["presentation_role"],
+                }
+            )
+
     def validate(self) -> list[str]:
         errors: list[str] = []
+        errors.extend(self.canonical_option_errors)
         errors.extend(self.simple_dependency_rule_errors)
         for table_name, id_field in ID_FIELDS.items():
             seen: set[str] = set()
@@ -1107,11 +1414,84 @@ class CsvSlice:
         return body_terms[0] if len(set(body_terms)) == 1 else ""
 
     def legacy_status(self, display: dict[str, str], context: dict[str, str]) -> tuple[str, str]:
+        if display.get("presentation_id", ""):
+            return self.canonical_presentation_status(display, context)
         condition_set_id = display.get("status_condition_set_id", "")
         matched = True if not condition_set_id else self.condition_matches(condition_set_id, context, set())
         if matched:
             return display["status_when_matched"], display["status_label_when_matched"]
         return display["status_when_unmatched"], display["status_label_when_unmatched"]
+
+    def canonical_presentation_status(self, display: dict[str, str], context: dict[str, str]) -> tuple[str, str]:
+        canonical_id = display.get("canonical_option_id", "")
+        presentation_id = display.get("presentation_id", "")
+        candidates = [
+            row
+            for row in self.option_status_rules
+            if self.option_status_rule_targets(row, canonical_id, presentation_id)
+            and self.option_status_rule_matches_context(row, context)
+        ]
+        candidates.sort(
+            key=lambda row: (
+                self.option_status_rule_specificity(row),
+                as_int(row.get("priority", "")),
+                row.get("status_rule_id", ""),
+            ),
+            reverse=True,
+        )
+        if candidates:
+            row = candidates[0]
+            status = row["status"]
+            return self.legacy_status_value(status), row.get("status_label", "") or self.default_status_label(status)
+        return display["status_when_matched"], display["status_label_when_matched"]
+
+    def option_status_rule_targets(self, row: dict[str, str], canonical_id: str, presentation_id: str) -> bool:
+        if row.get("presentation_id", ""):
+            return row["presentation_id"] == presentation_id
+        return row.get("canonical_option_id", "") == canonical_id
+
+    def option_status_rule_matches_context(self, row: dict[str, str], context: dict[str, str]) -> bool:
+        scoped_fields = {
+            "scope_model_year": "model_year",
+            "scope_body_style": "body_style",
+            "scope_trim_level": "trim_level",
+            "scope_variant_id": "variant_id",
+        }
+        for rule_field, context_field in scoped_fields.items():
+            expected = row.get(rule_field, "")
+            if expected and context.get(context_field, "") != expected:
+                return False
+        condition_set_id = row.get("condition_set_id", "")
+        if condition_set_id and not self.condition_matches(condition_set_id, context, set()):
+            return False
+        return True
+
+    def option_status_rule_specificity(self, row: dict[str, str]) -> int:
+        scoped_count = sum(
+            1
+            for field in ("scope_model_year", "scope_body_style", "scope_trim_level", "scope_variant_id", "condition_set_id")
+            if row.get(field, "")
+        )
+        presentation_bonus = 10 if row.get("presentation_id", "") else 0
+        return presentation_bonus + scoped_count
+
+    def default_status_label(self, status: str) -> str:
+        return {
+            "optional": "Available",
+            "standard_choice": "Standard",
+            "standard_fixed": "Standard",
+            "included_auto": "Included",
+            "unavailable": "Not Available",
+        }.get(status, status)
+
+    def legacy_status_value(self, status: str) -> str:
+        return {
+            "optional": "available",
+            "standard_choice": "standard",
+            "standard_fixed": "standard",
+            "included_auto": "available",
+            "unavailable": "unavailable",
+        }.get(status, status)
 
     def legacy_base_price(self, selectable_id: str) -> int:
         candidates = [
