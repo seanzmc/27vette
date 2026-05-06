@@ -209,6 +209,7 @@ class CsvSlice:
             self._validate_selector(errors, "dependency_rules", row["subject_selector_type"], row["subject_selector_id"])
             self._validate_condition_ref(errors, "dependency_rules", row.get("applies_when_condition_set_id", ""))
             self._validate_condition_ref(errors, "dependency_rules", row.get("target_condition_set_id", ""))
+            self._validate_dependency_reference_legacy_metadata(errors, row)
 
         for row in self.tables["rule_groups"]:
             if not is_active(row):
@@ -300,6 +301,29 @@ class CsvSlice:
     def _validate_non_selectable_reference_ref(self, errors: list[str], table_name: str, reference_selector_id: str) -> None:
         if reference_selector_id not in self.non_selectable_reference_selectors:
             errors.append(f"{table_name} references unknown non-selectable reference: {reference_selector_id}.")
+
+    def _validate_dependency_reference_legacy_metadata(self, errors: list[str], row: dict[str, str]) -> None:
+        target_id = self.condition_selected_selectable(row.get("target_condition_set_id", ""))
+        if not target_id:
+            return
+        source_ids = self.selector_selectable_ids(row["subject_selector_type"], row["subject_selector_id"])
+        if not source_ids:
+            return
+        for option_id in source_ids + [target_id]:
+            reference = self.reference_for_option_id(option_id)
+            if not reference:
+                continue
+            missing_fields = [
+                field
+                for field in ("legacy_section_id", "legacy_selection_mode")
+                if not reference.get(field, "")
+            ]
+            if missing_fields:
+                missing_description = " and ".join(f"missing {field}" for field in missing_fields)
+                errors.append(
+                    f"dependency_rules {row['rule_id']} uses non-selectable reference {option_id} "
+                    f"{missing_description}."
+                )
 
     def supports_condition_term(self, term_type: str, operator: str) -> bool:
         return (term_type, operator) in {
@@ -892,8 +916,8 @@ class CsvSlice:
         reference = self.reference_for_option_id(selectable_or_reference_option_id)
         if reference:
             return {
-                "section_id": "",
-                "selection_mode": "",
+                "section_id": reference.get("legacy_section_id", ""),
+                "selection_mode": reference.get("legacy_selection_mode", ""),
                 "source_detail_raw": reference.get("notes", ""),
             }
         return {}

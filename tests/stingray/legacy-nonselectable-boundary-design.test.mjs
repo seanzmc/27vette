@@ -53,6 +53,8 @@ const EXPECTED_REGISTRY_HEADERS = [
   "production_role",
   "projection_policy",
   "compiler_policy",
+  "legacy_section_id",
+  "legacy_selection_mode",
   "notes",
   "active",
 ];
