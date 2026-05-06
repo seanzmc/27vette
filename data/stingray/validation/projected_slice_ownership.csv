@@ -129,7 +129,8 @@ guardedOption,,,,,opt_cf8_001,,production_guarded,CF8 non-Stingray Roof structur
 guardedOption,,,,,opt_ryq_001,,production_guarded,RYQ non-choice LPO Exterior structured option reference guarded in Pass 100,true
 exclusiveGroup,grp_spoiler_high_wing,,,,,,projected_owned,Spoiler exclusive group projected after all members became projected-owned,true
 ruleGroup,grp_5v7_spoiler_requirement,,,,,,projected_owned,5V7 spoiler requires-any group projected after source and targets became projected-owned,true
-ruleGroup,grp_5zu_paint_requirement,,,,,,production_guarded,5ZU paint requires-any group remains production-owned in Pass 19,true
+ruleGroup,grp_5zu_paint_requirement,,,,,,production_guarded,5ZU paint requires-any group migrated to rule_groups.csv in Pass 181,false
+ruleGroup,grp_5zu_paint_requirement,,,,,,projected_owned,5ZU paint requires-any group projected after source and targets became projected-owned,true
 rule,,5V7,,,opt_5vm_001,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 171 using 5VM non-selectable reference target condition,false
 rule,,5V7,,,opt_5w8_001,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 171 using 5W8 non-selectable reference target condition,false
 rule,,5V7,,Z51,,,preserved_cross_boundary,Spoiler control-plane adjacent exclude remains production-owned in Pass 17,true
@@ -190,9 +191,9 @@ rule,,,opt_5w8_001,STI,,,preserved_cross_boundary,Migrated to dependency_rules.c
 rule,,STI,,,opt_5w8_001,,preserved_cross_boundary,Migrated to dependency_rules.csv in Pass 167 using 5W8 non-selectable reference target condition,false
 ruleGroup,,5V7,,5ZU,,,preserved_cross_boundary,5V7 spoiler requires-any group member remains production-owned in Pass 17,false
 ruleGroup,,5V7,,5ZZ,,,preserved_cross_boundary,5V7 spoiler requires-any group member remains production-owned in Pass 17,false
-ruleGroup,,5ZU,,G8G,,,preserved_cross_boundary,5ZU paint requires-any group member remains production-owned in Pass 17,true
-ruleGroup,,5ZU,,GBA,,,preserved_cross_boundary,5ZU paint requires-any group member remains production-owned in Pass 17,true
-ruleGroup,,5ZU,,GKZ,,,preserved_cross_boundary,5ZU paint requires-any group member remains production-owned in Pass 17,true
+ruleGroup,,5ZU,,G8G,,,preserved_cross_boundary,5ZU paint requires-any group member migrated to rule_groups.csv in Pass 181,false
+ruleGroup,,5ZU,,GBA,,,preserved_cross_boundary,5ZU paint requires-any group member migrated to rule_groups.csv in Pass 181,false
+ruleGroup,,5ZU,,GKZ,,,preserved_cross_boundary,5ZU paint requires-any group member migrated to rule_groups.csv in Pass 181,false
 selectable,,,,,,G8G,projected_owned,Paint section projected slice,true
 selectable,,,,,,GBA,projected_owned,Paint section projected slice,true
 selectable,,,,,,GKA,projected_owned,Paint section projected slice,true

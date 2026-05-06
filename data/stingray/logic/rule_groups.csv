@@ -1,2 +1,3 @@
 rule_group_id,group_type,source_selectable_id,body_style_scope,trim_level_scope,variant_scope,disabled_reason,active,legacy_group_id,legacy_notes
 grp_5v7_spoiler_requirement,requires_any,opt_5v7_001,,,,"Requires 5ZU Body-Color High Wing Spoiler or 5ZZ Carbon Flash High Wing Spoiler.",true,,5V7 is available when either approved high wing spoiler is selected.
+grp_5zu_paint_requirement,requires_any,opt_5zu_001,,,,"Requires Arctic White, Black, or Torch Red exterior paint.",true,,5ZU body-color spoiler requires one approved body color.

@@ -169,7 +169,7 @@ test("Pass 29 projects TVS T0A 5ZZ and 5ZU while other spoiler-adjacent options 
   assert.equal(production.choices.some((choice) => choice.rpo === "5ZW" || choice.option_id === "opt_5zw_001"), false);
 });
 
-test("Pass 37 projects 5V7 ruleGroup while paint ruleGroup stays guarded", () => {
+test("Pass 181 projects spoiler requires_any ruleGroups", () => {
   assert.deepEqual(groupRows(), [
     {
       record_type: "exclusiveGroup",
@@ -181,15 +181,15 @@ test("Pass 37 projects 5V7 ruleGroup while paint ruleGroup stays guarded", () =>
       group_id: "grp_5v7_spoiler_requirement",
       ownership: "projected_owned",
     },
-    {
-      record_type: "ruleGroup",
-      group_id: "grp_5zu_paint_requirement",
-      ownership: "production_guarded",
-    },
-  ]);
-});
+	    {
+	      record_type: "ruleGroup",
+	      group_id: "grp_5zu_paint_requirement",
+	      ownership: "projected_owned",
+	    },
+	  ]);
+	});
 
-test("spoiler requires_any ruleGroups match production with only 5ZU paint group guarded", () => {
+test("spoiler requires_any ruleGroups match production with CSV-owned groups", () => {
   const production = loadGeneratedData();
   const shadow = loadShadowData();
   const rows = activeManifestRows();
@@ -208,11 +208,14 @@ test("spoiler requires_any ruleGroups match production with only 5ZU paint group
   assert.equal(preservedRowExists(rows, { record_type: "ruleGroup", source_rpo: "5V7", target_rpo: "5ZU" }), false);
   assert.equal(preservedRowExists(rows, { record_type: "ruleGroup", source_rpo: "5V7", target_rpo: "5ZZ" }), false);
 
-  const fiveZuGroup = shadow.ruleGroups.find((group) => group.group_id === "grp_5zu_paint_requirement");
-  assert.equal(fiveZuGroup.group_type, "requires_any");
-  assert.equal(fiveZuGroup.source_id, fiveZU);
-  assert.deepEqual([...fiveZuGroup.target_ids].sort(), fiveZuPaintTargets);
-});
+	  const fiveZuGroup = shadow.ruleGroups.find((group) => group.group_id === "grp_5zu_paint_requirement");
+	  assert.equal(fiveZuGroup.group_type, "requires_any");
+	  assert.equal(fiveZuGroup.source_id, fiveZU);
+	  assert.deepEqual([...fiveZuGroup.target_ids].sort(), fiveZuPaintTargets);
+	  for (const paintRpo of ["G8G", "GBA", "GKZ"]) {
+	    assert.equal(preservedRowExists(rows, { record_type: "ruleGroup", source_rpo: "5ZU", target_rpo: paintRpo }), false);
+	  }
+	});
 
 test("spoiler exclusive group is CSV-projected with production-equivalent member order", () => {
   const production = loadGeneratedData();
@@ -309,15 +312,13 @@ test("overlay rejects missing preserved 5ZW rule-only asymmetry record", () => {
   assert.match(result.stderr, /opt_5zw_001/);
 });
 
-test("overlay rejects missing preserved spoiler ruleGroup classifications", () => {
-  const rows = loadManifest().filter(
-    (row) =>
-      !(row.record_type === "ruleGroup" && row.group_id === "grp_5zu_paint_requirement" && row.ownership === "production_guarded")
-  );
-  const result = runOverlay(["--ownership-manifest", writeTempManifest(rows)]);
+test("overlay rejects missing projected 5ZU paint ruleGroup fragment", () => {
+  const fragment = emitFragment();
+  fragment.ruleGroups = fragment.ruleGroups.filter((item) => item.group_id !== "grp_5zu_paint_requirement");
+  const result = runOverlay(["--fragment-json", writeTempJson(fragment)]);
 
   assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /unclassified cross-boundary groups/);
+  assert.match(result.stderr, /ruleGroups projected group is missing from fragment/);
   assert.match(result.stderr, /grp_5zu_paint_requirement/);
 });
 
@@ -352,11 +353,12 @@ test("overlay rejects projected ruleGroup ownership when the fragment does not p
 });
 
 test("overlay rejects projected 5V7 ruleGroup while source remains production-owned", () => {
-  const production = loadGeneratedData();
-  const fragment = emitFragment();
-  const group = production.ruleGroups.find((item) => item.group_id === "grp_5v7_spoiler_requirement");
-  fragment.choices = fragment.choices.filter((choice) => choice.rpo !== "5V7");
-  fragment.ruleGroups = [group];
+	  const production = loadGeneratedData();
+	  const fragment = emitFragment();
+	  const group = production.ruleGroups.find((item) => item.group_id === "grp_5v7_spoiler_requirement");
+	  const fiveZuGroup = production.ruleGroups.find((item) => item.group_id === "grp_5zu_paint_requirement");
+	  fragment.choices = fragment.choices.filter((choice) => choice.rpo !== "5V7");
+	  fragment.ruleGroups = [group, fiveZuGroup];
   const rows = loadManifest()
     .filter((row) => row.group_id !== "grp_5v7_spoiler_requirement" && !(row.record_type === "selectable" && row.rpo === "5V7"))
     .concat({
@@ -377,31 +379,6 @@ test("overlay rejects projected 5V7 ruleGroup while source remains production-ow
   assert.match(result.stderr, /projected ruleGroup source is not projected-owned/);
   assert.match(result.stderr, /grp_5v7_spoiler_requirement/);
   assert.match(result.stderr, /opt_5v7_001/);
-});
-
-test("overlay rejects projected 5ZU paint ruleGroup when the fragment does not provide it", () => {
-  const production = loadGeneratedData();
-  const fragment = emitFragment();
-  const rows = loadManifest()
-    .filter((row) => row.group_id !== "grp_5zu_paint_requirement")
-    .concat({
-      record_type: "ruleGroup",
-      group_id: "grp_5zu_paint_requirement",
-      source_rpo: "",
-      source_option_id: "",
-      target_rpo: "",
-      target_option_id: "",
-      rpo: "",
-      ownership: "projected_owned",
-      reason: "Controlled test fragment projects paint ruleGroup identity",
-      active: "true",
-    });
-  const result = runOverlay(["--ownership-manifest", writeTempManifest(rows), "--fragment-json", writeTempJson(fragment)]);
-
-  assert.notEqual(result.status, 0);
-  assert.equal(production.ruleGroups.some((item) => item.group_id === "grp_5zu_paint_requirement"), true);
-  assert.match(result.stderr, /ruleGroups projected group is missing from fragment/);
-  assert.match(result.stderr, /grp_5zu_paint_requirement/);
 });
 
 test("overlay rejects missing preserved spoiler priceRule classifications", () => {

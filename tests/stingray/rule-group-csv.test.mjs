@@ -66,28 +66,40 @@ function fixturePackage() {
   return packageDir;
 }
 
-test("production ruleGroup CSV schema emits the projected 5V7 requires_any ruleGroup", () => {
+test("production ruleGroup CSV schema emits the projected spoiler requires_any ruleGroups", () => {
   assert.equal(fs.existsSync(path.join(PACKAGE, RULE_GROUPS)), true);
   assert.equal(fs.existsSync(path.join(PACKAGE, RULE_GROUP_MEMBERS)), true);
 
   const fragment = emitFragment();
 
   assert.deepEqual(fragment.validation_errors, []);
-  assert.deepEqual(fragment.ruleGroups, [
-    {
-      group_id: "grp_5v7_spoiler_requirement",
-      group_type: "requires_any",
-      source_id: "opt_5v7_001",
+	  assert.deepEqual(fragment.ruleGroups, [
+	    {
+	      group_id: "grp_5v7_spoiler_requirement",
+	      group_type: "requires_any",
+	      source_id: "opt_5v7_001",
       target_ids: ["opt_5zu_001", "opt_5zz_001"],
       body_style_scope: "",
       trim_level_scope: "",
       variant_scope: "",
       disabled_reason: "Requires 5ZU Body-Color High Wing Spoiler or 5ZZ Carbon Flash High Wing Spoiler.",
-      active: "True",
-      notes: "5V7 is available when either approved high wing spoiler is selected.",
-    },
-  ]);
-});
+	      active: "True",
+	      notes: "5V7 is available when either approved high wing spoiler is selected.",
+	    },
+	    {
+	      group_id: "grp_5zu_paint_requirement",
+	      group_type: "requires_any",
+	      source_id: "opt_5zu_001",
+	      target_ids: ["opt_g8g_001", "opt_gba_001", "opt_gkz_001"],
+	      body_style_scope: "",
+	      trim_level_scope: "",
+	      variant_scope: "",
+	      disabled_reason: "Requires Arctic White, Black, or Torch Red exterior paint.",
+	      active: "True",
+	      notes: "5ZU body-color spoiler requires one approved body color.",
+	    },
+	  ]);
+	});
 
 test("CSV ruleGroups emit the exact legacy requires_any runtime shape with deterministic member order", () => {
   const fragment = emitFragment(fixturePackage());

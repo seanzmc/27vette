@@ -1,3 +1,6 @@
 rule_group_id,target_selectable_id,member_order,active
 grp_5v7_spoiler_requirement,opt_5zu_001,10,true
 grp_5v7_spoiler_requirement,opt_5zz_001,20,true
+grp_5zu_paint_requirement,opt_g8g_001,10,true
+grp_5zu_paint_requirement,opt_gba_001,20,true
+grp_5zu_paint_requirement,opt_gkz_001,30,true

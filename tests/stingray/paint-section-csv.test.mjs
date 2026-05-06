@@ -217,10 +217,10 @@ test("Pass 178 migrates only approved paint compatibility rules", () => {
       `${sourceRpo} -> ${targetRpo} should remain preserved`
     );
   }
-  assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5ZU", target_rpo: "G8G", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5ZU", target_rpo: "GBA", ownership: "preserved_cross_boundary" }), true);
-  assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5ZU", target_rpo: "GKZ", ownership: "preserved_cross_boundary" }), true);
-});
+	  assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5ZU", target_rpo: "G8G", ownership: "preserved_cross_boundary" }), false);
+	  assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5ZU", target_rpo: "GBA", ownership: "preserved_cross_boundary" }), false);
+	  assert.equal(manifestHas({ record_type: "ruleGroup", source_rpo: "5ZU", target_rpo: "GKZ", ownership: "preserved_cross_boundary" }), false);
+	});
 
 test("Pass 178 paint compatibility excludes emit production-shaped legacy rules", () => {
   const production = loadProduction();

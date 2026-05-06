@@ -203,7 +203,7 @@ test("CSV evaluator prices direct 5ZZ selection", () => {
   assert.deepEqual(result.validation_errors, []);
 });
 
-test("CSV 5ZZ legacy fragment matches generated 5ZZ choices and projected spoiler group", () => {
+test("CSV 5ZZ legacy fragment matches generated 5ZZ choices and projected spoiler ruleGroups", () => {
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
   const projectedGroup = projected.exclusiveGroups.find((group) => group.group_id === "grp_spoiler_high_wing");
@@ -213,7 +213,10 @@ test("CSV 5ZZ legacy fragment matches generated 5ZZ choices and projected spoile
   assert.deepEqual([...fiveZzOptionIds(projected)].sort(), ["opt_5zz_001"]);
   assert.deepEqual(normalizeChoices(projected.choices), normalizeChoices(production.choices));
   assert.deepEqual(plain(projectedGroup), plain(productionGroup));
-  assert.deepEqual(projected.ruleGroups.map((group) => group.group_id), ["grp_5v7_spoiler_requirement"]);
+	  assert.deepEqual(projected.ruleGroups.map((group) => group.group_id), [
+	    "grp_5v7_spoiler_requirement",
+	    "grp_5zu_paint_requirement",
+	  ]);
   for (const rpo of NON_5ZZ_SPOILER_RPOS) {
     assert.equal(projected.choices.some((choice) => choice.rpo === rpo || choice.option_id === `opt_${rpo.toLowerCase()}_001`), false);
   }

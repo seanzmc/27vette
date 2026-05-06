@@ -197,7 +197,7 @@ test("CSV evaluator prices direct TVS selection", () => {
   assert.deepEqual(result.conflicts, []);
 });
 
-test("CSV TVS legacy fragment matches generated TVS choices and projected spoiler group", () => {
+test("CSV TVS legacy fragment matches generated TVS choices and projected spoiler ruleGroups", () => {
   const production = loadGeneratedData();
   const projected = emitCsvLegacyFragment();
   const projectedGroup = projected.exclusiveGroups.find((group) => group.group_id === "grp_spoiler_high_wing");
@@ -207,7 +207,10 @@ test("CSV TVS legacy fragment matches generated TVS choices and projected spoile
   assert.deepEqual([...tvsOptionIds(projected)].sort(), ["opt_tvs_001"]);
   assert.deepEqual(normalizeChoices(projected.choices), normalizeChoices(production.choices));
   assert.deepEqual(plain(projectedGroup), plain(productionGroup));
-  assert.deepEqual(projected.ruleGroups.map((group) => group.group_id), ["grp_5v7_spoiler_requirement"]);
+	  assert.deepEqual(projected.ruleGroups.map((group) => group.group_id), [
+	    "grp_5v7_spoiler_requirement",
+	    "grp_5zu_paint_requirement",
+	  ]);
   for (const rpo of NON_TVS_SPOILER_RPOS) {
     assert.equal(projected.choices.some((choice) => choice.rpo === rpo || choice.option_id === `opt_${rpo.toLowerCase()}_001`), false);
   }

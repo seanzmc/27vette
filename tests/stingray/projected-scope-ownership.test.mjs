@@ -334,11 +334,11 @@ test("projected ownership manifest declares the current multi-slice control scop
       group_id: "grp_5v7_spoiler_requirement",
       ownership: "projected_owned",
     },
-    {
-      record_type: "ruleGroup",
-      group_id: "grp_5zu_paint_requirement",
-      ownership: "production_guarded",
-    },
+	    {
+	      record_type: "ruleGroup",
+	      group_id: "grp_5zu_paint_requirement",
+	      ownership: "projected_owned",
+	    },
   ]);
   for (const expected of [
     { record_type: "rule", group_id: "", source_rpo: "SHT", source_option_id: "", target_rpo: "PDV", target_option_id: "", ownership: "preserved_cross_boundary" },
@@ -364,8 +364,7 @@ test("projected ownership manifest declares the current multi-slice control scop
     { record_type: "rule", group_id: "", source_rpo: "5ZU", source_option_id: "", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "rule", group_id: "", source_rpo: "", source_option_id: "opt_5zw_001", target_rpo: "T0A", target_option_id: "", ownership: "preserved_cross_boundary" },
     { record_type: "priceRule", group_id: "", source_rpo: "Z51", source_option_id: "", target_rpo: "TVS", target_option_id: "", ownership: "preserved_cross_boundary" },
-    { record_type: "ruleGroup", group_id: "", source_rpo: "5ZU", source_option_id: "", target_rpo: "GBA", target_option_id: "", ownership: "preserved_cross_boundary" },
-  ]) {
+	  ]) {
     assert.equal(hasPreservedRow(preserved, expected), true, `missing preserved row ${JSON.stringify(expected)}`);
   }
 });
@@ -506,16 +505,16 @@ const validationCases = [
     (rows) => [...rows, { ...rows.find((row) => row.record_type === "exclusiveGroup" && row.group_id === "grp_spoiler_high_wing") }],
     /duplicate active group ownership row/,
   ],
-  [
-    "guarded group_id missing from production",
-    (rows) =>
-      rows.map((row) =>
-        row.record_type === "ruleGroup" && row.group_id === "grp_5zu_paint_requirement"
-          ? { ...row, group_id: "grp_missing_spoiler" }
-          : row
-      ),
-    /Preserved or guarded production groups do not exist/,
-  ],
+	  [
+	    "projected group_id missing from fragment",
+	    (rows) =>
+	      rows.map((row) =>
+	        row.record_type === "ruleGroup" && row.group_id === "grp_5zu_paint_requirement"
+	          ? { ...row, group_id: "grp_missing_spoiler" }
+	          : row
+	      ),
+	    /ruleGroups projected group is missing from fragment/,
+	  ],
 ];
 
 for (const [name, mutateRows, messagePattern] of validationCases) {
