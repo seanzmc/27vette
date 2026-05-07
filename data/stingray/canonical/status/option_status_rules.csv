@@ -5,3 +5,5 @@ status_j6f_caliper_choice,,pres_j6f_caliper_choice,ctx_2027_stingray,optional,Av
 status_j6e_caliper_choice,,pres_j6e_caliper_choice,ctx_2027_stingray,optional,Available,10,true,Final canonical Caliper Color status.
 status_j6n_caliper_choice,,pres_j6n_caliper_choice,ctx_2027_stingray,optional,Available,10,true,Final canonical Caliper Color status.
 status_j6b_caliper_choice,,pres_j6b_caliper_choice,ctx_2027_stingray,optional,Available,10,true,Final canonical Caliper Color status.
+status_pin_custom_delivery,,pres_pin_custom_delivery,ctx_2027_stingray,optional,Available,10,true,Final canonical Custom Delivery status.
+status_vk3_custom_delivery,,pres_vk3_custom_delivery,ctx_2027_stingray,optional,Available,10,true,Final canonical Custom Delivery status.

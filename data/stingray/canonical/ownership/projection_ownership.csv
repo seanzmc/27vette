@@ -5,3 +5,5 @@ own_pres_j6f_caliper_choice,presentation,pres_j6f_caliper_choice,projected_owned
 own_pres_j6e_caliper_choice,presentation,pres_j6e_caliper_choice,projected_owned,J6E,opt_j6e_001,Final canonical Caliper Color customer choice ownership.,true
 own_pres_j6n_caliper_choice,presentation,pres_j6n_caliper_choice,projected_owned,J6N,opt_j6n_001,Final canonical Caliper Color customer choice ownership.,true
 own_pres_j6b_caliper_choice,presentation,pres_j6b_caliper_choice,projected_owned,J6B,opt_j6b_001,Final canonical Caliper Color customer choice ownership.,true
+own_pres_pin_custom_delivery,presentation,pres_pin_custom_delivery,projected_owned,PIN,opt_pin_001,Final canonical Custom Delivery customer choice ownership.,true
+own_pres_vk3_custom_delivery,presentation,pres_vk3_custom_delivery,projected_owned,VK3,opt_vk3_001,Final canonical Custom Delivery customer choice ownership.,true

@@ -4,3 +4,5 @@ canonical_j6f,J6F,Bright Red-painted calipers,,customer_choice,none,true,Final c
 canonical_j6e,J6E,Velocity Yellow-painted calipers,,customer_choice,none,true,Final canonical Caliper Color choice.
 canonical_j6n,J6N,Edge Red-painted calipers,,customer_choice,none,true,Final canonical Caliper Color choice.
 canonical_j6b,J6B,Blue-painted calipers,,customer_choice,none,true,Final canonical Caliper Color choice.
+canonical_pin,PIN,Customer VIN ending reservation,1. This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only.,customer_choice,none,true,Final canonical Custom Delivery choice.
+canonical_vk3,VK3,Front License plate bracket,,customer_choice,none,true,Final canonical Custom Delivery choice.

@@ -7,15 +7,11 @@ const PYTHON = ".venv/bin/python";
 const FIRST_SLICE_SCRIPT = "scripts/stingray_csv_first_slice.py";
 const OVERLAY_SCRIPT = "scripts/stingray_csv_shadow_overlay.py";
 const PRODUCTION_DATA = "form-app/data.js";
-const CALIPER_OPTION_IDS = [
-  "opt_j6a_001",
-  "opt_j6a_002",
-  "opt_j6f_001",
-  "opt_j6e_001",
-  "opt_j6n_001",
-  "opt_j6b_001",
+const CUSTOM_DELIVERY_OPTION_IDS = [
+  "opt_pin_001",
+  "opt_vk3_001",
 ];
-const CALIPER_RPOS = new Set(["J6A", "J6F", "J6E", "J6N", "J6B"]);
+const CUSTOM_DELIVERY_RPOS = new Set(["PIN", "VK3"]);
 
 function parseCsv(text) {
   const lines = text.trim().split(/\r?\n/);
@@ -69,9 +65,9 @@ function shadowOverlay() {
   return JSON.parse(output);
 }
 
-function caliperChoices(data) {
+function customDeliveryChoices(data) {
   return data.choices
-    .filter((row) => CALIPER_OPTION_IDS.includes(row.option_id))
+    .filter((row) => CUSTOM_DELIVERY_OPTION_IDS.includes(row.option_id))
     .map((row) => ({
       choice_id: row.choice_id,
       option_id: row.option_id,
@@ -100,66 +96,68 @@ function caliperChoices(data) {
     .sort((left, right) => left.choice_id.localeCompare(right.choice_id));
 }
 
-test("final canonical Calipers projection emits production-equivalent legacy presentations", () => {
+test("final canonical Custom Delivery projection emits production-equivalent legacy choices", () => {
   const fragment = legacyFragment();
   assert.deepEqual(fragment.validation_errors, []);
 
-  const projected = caliperChoices(fragment);
-  const production = caliperChoices(productionData());
+  const projected = customDeliveryChoices(fragment);
+  const production = customDeliveryChoices(productionData());
   assert.deepEqual(projected, production);
-  assert.equal(projected.length, 36);
-  assert.equal(projected.filter((row) => row.section_id === "sec_cali_001" && row.selectable === "True").length, 30);
-  assert.equal(projected.filter((row) => row.option_id === "opt_j6a_002" && row.selection_mode === "display_only").length, 6);
+  assert.equal(projected.length, 12);
 
   const expected = new Map([
-    ["opt_j6a_001", ["J6A", 10, 0, "standard", "Standard", "Caliper Color", "single_select_req", "True"]],
-    ["opt_j6a_002", ["J6A", 1, 0, "standard", "Standard", "Standard Options", "display_only", "False"]],
-    ["opt_j6f_001", ["J6F", 20, 795, "available", "Available", "Caliper Color", "single_select_req", "True"]],
-    ["opt_j6e_001", ["J6E", 30, 795, "available", "Available", "Caliper Color", "single_select_req", "True"]],
-    ["opt_j6n_001", ["J6N", 40, 795, "available", "Available", "Caliper Color", "single_select_req", "True"]],
-    ["opt_j6b_001", ["J6B", 50, 795, "available", "Available", "Caliper Color", "single_select_req", "True"]],
+    ["opt_pin_001", ["PIN", 20, 5495, "Customer VIN ending reservation", "available", "Available"]],
+    ["opt_vk3_001", ["VK3", 30, 40, "Front License plate bracket", "available", "Available"]],
   ]);
-  for (const [optionId, [rpo, order, price, status, statusLabel, section, mode, selectable]] of expected) {
+  for (const [optionId, [rpo, order, price, label, status, statusLabel]] of expected) {
     const rows = projected.filter((row) => row.option_id === optionId);
     assert.equal(rows.length, 6);
     assert.ok(rows.every((row) =>
       row.rpo === rpo
       && row.display_order === order
       && row.base_price === price
+      && row.label === label
       && row.status === status
       && row.status_label === statusLabel
-      && row.section_name === section
-      && row.selection_mode === mode
-      && row.selectable === selectable
+      && row.section_id === "sec_cust_001"
+      && row.section_name === "Custom Delivery"
+      && row.category_id === "cat_mech_001"
+      && row.category_name === "Mechanical"
+      && row.step_key === "delivery"
+      && row.choice_mode === "multi"
+      && row.selection_mode === "multi_select_opt"
+      && row.selection_mode_label === "Optional multiple choice"
+      && row.selectable === "True"
+      && row.active === "True"
     ));
   }
 });
 
-test("Calipers are authored only through final canonical tables", () => {
+test("Custom Delivery is authored only through final canonical tables", () => {
   const oldSelectables = parseCsv(fs.readFileSync("data/stingray/catalog/selectables.csv", "utf8"));
   const oldDisplay = parseCsv(fs.readFileSync("data/stingray/ui/selectable_display.csv", "utf8"));
   const oldBasePrices = parseCsv(fs.readFileSync("data/stingray/pricing/base_prices.csv", "utf8"));
-  assert.equal(oldSelectables.some((row) => CALIPER_RPOS.has(row.rpo) || CALIPER_OPTION_IDS.includes(row.selectable_id)), false);
-  assert.equal(oldDisplay.some((row) => CALIPER_OPTION_IDS.includes(row.selectable_id)), false);
-  assert.equal(oldBasePrices.some((row) => CALIPER_OPTION_IDS.includes(row.target_selector_id)), false);
+  assert.equal(oldSelectables.some((row) => CUSTOM_DELIVERY_RPOS.has(row.rpo) || CUSTOM_DELIVERY_OPTION_IDS.includes(row.selectable_id)), false);
+  assert.equal(oldDisplay.some((row) => CUSTOM_DELIVERY_OPTION_IDS.includes(row.selectable_id)), false);
+  assert.equal(oldBasePrices.some((row) => CUSTOM_DELIVERY_OPTION_IDS.includes(row.target_selector_id)), false);
 
   const canonicalOptions = parseCsv(fs.readFileSync("data/stingray/canonical/options/canonical_options.csv", "utf8"));
   const presentations = parseCsv(fs.readFileSync("data/stingray/canonical/presentation/option_presentations.csv", "utf8"));
   const prices = parseCsv(fs.readFileSync("data/stingray/canonical/pricing/canonical_base_prices.csv", "utf8"));
   const ownership = parseCsv(fs.readFileSync("data/stingray/canonical/ownership/projection_ownership.csv", "utf8"));
-  assert.equal(canonicalOptions.filter((row) => CALIPER_RPOS.has(row.rpo)).length, 5);
+  assert.equal(canonicalOptions.filter((row) => CUSTOM_DELIVERY_RPOS.has(row.rpo)).length, 2);
   assert.deepEqual(
-    presentations.filter((row) => CALIPER_OPTION_IDS.includes(row.legacy_option_id)).map((row) => row.legacy_option_id).sort(),
-    [...CALIPER_OPTION_IDS].sort()
+    presentations.filter((row) => CUSTOM_DELIVERY_OPTION_IDS.includes(row.legacy_option_id)).map((row) => row.legacy_option_id).sort(),
+    [...CUSTOM_DELIVERY_OPTION_IDS].sort()
   );
-  assert.equal(prices.filter((row) => row.canonical_option_id.startsWith("canonical_j6")).length, 5);
+  assert.equal(prices.filter((row) => ["canonical_pin", "canonical_vk3"].includes(row.canonical_option_id)).length, 2);
   assert.deepEqual(
-    ownership.filter((row) => CALIPER_OPTION_IDS.includes(row.legacy_option_id)).map((row) => row.legacy_option_id).sort(),
-    [...CALIPER_OPTION_IDS].sort()
+    ownership.filter((row) => CUSTOM_DELIVERY_OPTION_IDS.includes(row.legacy_option_id)).map((row) => row.legacy_option_id).sort(),
+    [...CUSTOM_DELIVERY_OPTION_IDS].sort()
   );
 });
 
-test("Calipers have no migrated relationship rows and shadow overlay preserves parity", () => {
+test("Custom Delivery has no migrated relationship rows and shadow overlay preserves parity", () => {
   const relationshipFiles = [
     "data/stingray/logic/dependency_rules.csv",
     "data/stingray/logic/simple_dependency_rules.csv",
@@ -170,8 +168,9 @@ test("Calipers have no migrated relationship rows and shadow overlay preserves p
   ];
   for (const file of relationshipFiles) {
     const rows = parseCsv(fs.readFileSync(file, "utf8"));
-    assert.equal(JSON.stringify(rows).includes("opt_j6"), false, `${file} should not reference Calipers`);
+    assert.equal(JSON.stringify(rows).includes("opt_pin"), false, `${file} should not reference PIN`);
+    assert.equal(JSON.stringify(rows).includes("opt_vk3"), false, `${file} should not reference VK3`);
   }
 
-  assert.deepEqual(caliperChoices(shadowOverlay()), caliperChoices(productionData()));
+  assert.deepEqual(customDeliveryChoices(shadowOverlay()), customDeliveryChoices(productionData()));
 });
