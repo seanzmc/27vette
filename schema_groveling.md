@@ -34,6 +34,16 @@ The high-level build steps.
 step_key,dataset_id,step_label,display_order,active
 ```
 
+```code
+steps:{
+  step_key: string;
+  step_label: string;
+  runtime_order: number;
+  source: string;
+  section_ids: string;
+  }
+```
+
 Example:
 
 ```csv
@@ -46,6 +56,24 @@ Where options display.
 
 ```csv
 section_id,dataset_id,step_key,section_name,category_id,category_name,display_order,active
+```
+
+```json
+"sections": [
+          {
+            "section_id": "sec_context_body_style",
+            "section_name": "Body Style",
+            "category_id": "cat_context_001",
+            "category_name": "Vehicle Context",
+            "selection_mode": "single_select_req",
+            "selection_mode_label": "Required single choice",
+            "choice_mode": "single",
+            "is_required": "True",
+            "standard_behavior": "user_selected",
+            "section_display_order": 1,
+            "step_key": "body_style",
+            "step_label": "Body Style"
+          }
 ```
 
 Example:
@@ -76,6 +104,23 @@ One row per real option.
 
 ```csv
 option_id,rpo,label,description,option_type,active
+```
+
+```json
+{
+  "section_id": "sec_spec_001",
+  "section_name": "Special Edition",
+  "category_id": "cat_mech_001",
+  "category_name": "Mechanical",
+  "selection_mode": "single_select_opt",
+  "selection_mode_label": "Optional single choice",
+  "choice_mode": "single",
+  "is_required": "False",
+  "standard_behavior": "locked_included",
+  "section_display_order": 110,
+  "step_key": "packages_performance",
+  "step_label": "Packages & Performance"
+}
 ```
 
 Example:
@@ -399,10 +444,4 @@ display comes from groups
 rules link source and target
 legacy IDs are aliases
 raw weirdness stays in source rows
-```
-
-That is the structure I would freeze.
-
-```
-
 ```
