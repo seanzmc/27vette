@@ -1,0 +1,7 @@
+status_rule_id,canonical_option_id,presentation_id,context_scope_id,status,status_label,priority,active,notes
+status_j6a_caliper_choice,,pres_j6a_caliper_choice,ctx_2027_stingray,standard_choice,Standard,10,true,Final canonical Caliper Color status.
+status_j6a_standard_options,,pres_j6a_standard_options,ctx_2027_stingray,standard_fixed,Standard,10,true,Final canonical Standard Options display status.
+status_j6f_caliper_choice,,pres_j6f_caliper_choice,ctx_2027_stingray,optional,Available,10,true,Final canonical Caliper Color status.
+status_j6e_caliper_choice,,pres_j6e_caliper_choice,ctx_2027_stingray,optional,Available,10,true,Final canonical Caliper Color status.
+status_j6n_caliper_choice,,pres_j6n_caliper_choice,ctx_2027_stingray,optional,Available,10,true,Final canonical Caliper Color status.
+status_j6b_caliper_choice,,pres_j6b_caliper_choice,ctx_2027_stingray,optional,Available,10,true,Final canonical Caliper Color status.

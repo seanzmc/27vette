@@ -1,0 +1,7 @@
+ownership_id,entity_type,entity_id,ownership_status,legacy_rpo,legacy_option_id,notes,active
+own_pres_j6a_caliper_choice,presentation,pres_j6a_caliper_choice,projected_owned,J6A,opt_j6a_001,Final canonical Caliper Color customer choice ownership.,true
+own_pres_j6a_standard_options,presentation,pres_j6a_standard_options,generated_display_owned,J6A,opt_j6a_002,Final canonical Standard Options display ownership.,true
+own_pres_j6f_caliper_choice,presentation,pres_j6f_caliper_choice,projected_owned,J6F,opt_j6f_001,Final canonical Caliper Color customer choice ownership.,true
+own_pres_j6e_caliper_choice,presentation,pres_j6e_caliper_choice,projected_owned,J6E,opt_j6e_001,Final canonical Caliper Color customer choice ownership.,true
+own_pres_j6n_caliper_choice,presentation,pres_j6n_caliper_choice,projected_owned,J6N,opt_j6n_001,Final canonical Caliper Color customer choice ownership.,true
+own_pres_j6b_caliper_choice,presentation,pres_j6b_caliper_choice,projected_owned,J6B,opt_j6b_001,Final canonical Caliper Color customer choice ownership.,true

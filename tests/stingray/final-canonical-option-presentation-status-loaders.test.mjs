@@ -89,6 +89,7 @@ function tempPackage() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "stingray-final-canonical-options-"));
   const packageDir = path.join(root, "stingray");
   fs.cpSync(PACKAGE, packageDir, { recursive: true });
+  fs.rmSync(path.join(packageDir, "canonical"), { recursive: true, force: true });
   return packageDir;
 }
 
@@ -308,7 +309,7 @@ function writeJ6aFixture(packageDir, rows = j6aRows()) {
   writeFinalOptionTables(packageDir, rows);
 }
 
-test("absent and header-only final canonical option presentation status tables preserve current output", () => {
+test("absent and header-only final canonical option presentation status tables preserve output when no final rows are authored", () => {
   const absentPackage = tempPackage();
   fs.rmSync(path.join(absentPackage, "canonical", "options", "canonical_options.csv"), { force: true });
   fs.rmSync(path.join(absentPackage, "canonical", "options", "canonical_option_aliases.csv"), { force: true });
@@ -319,7 +320,6 @@ test("absent and header-only final canonical option presentation status tables p
   writeFinalOptionTables(headerOnlyPackage);
 
   assert.deepEqual(emitLegacyFragment(headerOnlyPackage), emitLegacyFragment(absentPackage));
-  assert.deepEqual(emitLegacyFragment(headerOnlyPackage), emitLegacyFragment(PACKAGE));
 });
 
 test("temp final J6A-like fixture emits customer choice and Standard Options display presentations", () => {

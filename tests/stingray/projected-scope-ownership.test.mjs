@@ -197,6 +197,43 @@ function projectedOwnedRpos(rows = activeManifestRows()) {
   return rows.filter((row) => row.record_type === "selectable" && row.ownership === "projected_owned").map((row) => row.rpo).sort();
 }
 
+function finalCanonicalProjectedRpos() {
+  const ownershipPath = "data/stingray/canonical/ownership/projection_ownership.csv";
+  const presentationsPath = "data/stingray/canonical/presentation/option_presentations.csv";
+  const canonicalOptionsPath = "data/stingray/canonical/options/canonical_options.csv";
+  if (!fs.existsSync(ownershipPath)) return [];
+  const ownership = parseCsv(fs.readFileSync(ownershipPath, "utf8")).filter((row) => row.active === "true");
+  const presentations = new Map(
+    fs.existsSync(presentationsPath)
+      ? parseCsv(fs.readFileSync(presentationsPath, "utf8")).filter((row) => row.active === "true").map((row) => [row.presentation_id, row])
+      : []
+  );
+  const canonicals = new Map(
+    fs.existsSync(canonicalOptionsPath)
+      ? parseCsv(fs.readFileSync(canonicalOptionsPath, "utf8")).filter((row) => row.active === "true").map((row) => [row.canonical_option_id, row])
+      : []
+  );
+  const rpos = new Set();
+  for (const row of ownership) {
+    if (row.entity_type === "presentation") {
+      const presentation = presentations.get(row.entity_id);
+      const canonical = canonicals.get(presentation?.canonical_option_id);
+      const rpo = row.legacy_rpo || presentation?.rpo_override || canonical?.rpo || "";
+      if (rpo) rpos.add(rpo);
+    }
+    if (row.entity_type === "canonical_option") {
+      const canonical = canonicals.get(row.entity_id);
+      const rpo = row.legacy_rpo || canonical?.rpo || "";
+      if (rpo) rpos.add(rpo);
+    }
+  }
+  return [...rpos].sort();
+}
+
+function projectedFragmentRpos() {
+  return [...new Set([...projectedOwnedRpos(), ...finalCanonicalProjectedRpos()])].sort();
+}
+
 function preservedRows(rows = activeManifestRows()) {
   return rows
     .filter((row) => row.ownership === "preserved_cross_boundary")
@@ -385,7 +422,7 @@ test("legacy fragment projected RPO scope equals the ownership manifest", () => 
   const vwd = optionIdByRpo(production, "VWD");
 
   assert.deepEqual(fragment.validation_errors, []);
-  assert.deepEqual(fragmentRpos, projectedOwnedRpos());
+  assert.deepEqual(fragmentRpos, projectedFragmentRpos());
   assert.equal(fragmentRpos.includes("PCX"), true);
   assert.equal(fragmentRpos.includes("PDV"), true);
   assert.equal(fragmentRpos.includes("5ZW"), false);

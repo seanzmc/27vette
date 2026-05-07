@@ -1,0 +1,7 @@
+variant_id,model_year,gm_model_code,model_key,body_style,trim_level,active,notes
+1lt_c07,2027,C07,stingray,coupe,1LT,true,Final canonical Stingray variant registry for canonical projection lanes.
+2lt_c07,2027,C07,stingray,coupe,2LT,true,Final canonical Stingray variant registry for canonical projection lanes.
+3lt_c07,2027,C07,stingray,coupe,3LT,true,Final canonical Stingray variant registry for canonical projection lanes.
+1lt_c67,2027,C67,stingray,convertible,1LT,true,Final canonical Stingray variant registry for canonical projection lanes.
+2lt_c67,2027,C67,stingray,convertible,2LT,true,Final canonical Stingray variant registry for canonical projection lanes.
+3lt_c67,2027,C67,stingray,convertible,3LT,true,Final canonical Stingray variant registry for canonical projection lanes.

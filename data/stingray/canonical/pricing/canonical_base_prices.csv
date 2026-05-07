@@ -1,0 +1,6 @@
+canonical_base_price_id,price_book_id,canonical_option_id,presentation_id,context_scope_id,amount_usd,priority,active,notes
+cbp_j6a,cpb_2027_stingray,canonical_j6a,,ctx_2027_stingray,0,10,true,Final canonical Caliper Color base price.
+cbp_j6f,cpb_2027_stingray,canonical_j6f,,ctx_2027_stingray,795,10,true,Final canonical Caliper Color base price.
+cbp_j6e,cpb_2027_stingray,canonical_j6e,,ctx_2027_stingray,795,10,true,Final canonical Caliper Color base price.
+cbp_j6n,cpb_2027_stingray,canonical_j6n,,ctx_2027_stingray,795,10,true,Final canonical Caliper Color base price.
+cbp_j6b,cpb_2027_stingray,canonical_j6b,,ctx_2027_stingray,795,10,true,Final canonical Caliper Color base price.

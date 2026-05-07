@@ -1,0 +1,6 @@
+canonical_option_id,rpo,label,description,canonical_kind,duplicate_rpo_classification,active,notes
+canonical_j6a,J6A,Black painted calipers,,customer_choice,display_only_duplicate,true,Final canonical Caliper Color standard choice with Standard Options display presentation.
+canonical_j6f,J6F,Bright Red-painted calipers,,customer_choice,none,true,Final canonical Caliper Color choice.
+canonical_j6e,J6E,Velocity Yellow-painted calipers,,customer_choice,none,true,Final canonical Caliper Color choice.
+canonical_j6n,J6N,Edge Red-painted calipers,,customer_choice,none,true,Final canonical Caliper Color choice.
+canonical_j6b,J6B,Blue-painted calipers,,customer_choice,none,true,Final canonical Caliper Color choice.

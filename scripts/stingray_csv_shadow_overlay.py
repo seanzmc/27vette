@@ -299,7 +299,14 @@ def load_ownership_scope(path: Path) -> OwnershipScope:
     )
 
 
-def load_combined_ownership_scope(path: Path, package_dir: Path, csv_slice: CsvSlice, production: dict[str, Any]) -> OwnershipScope:
+def load_combined_ownership_scope(
+    path: Path,
+    package_dir: Path,
+    csv_slice: CsvSlice,
+    production: dict[str, Any],
+    fragment: dict[str, Any],
+    require_all_final_owned_options: bool = True,
+) -> OwnershipScope:
     scope = load_ownership_scope(path)
     final_projection_path = package_dir / FINAL_PROJECTION_OWNERSHIP_RELATIVE_PATH
     final_preserved_path = package_dir / FINAL_PRESERVED_BOUNDARIES_RELATIVE_PATH
@@ -311,6 +318,9 @@ def load_combined_ownership_scope(path: Path, package_dir: Path, csv_slice: CsvS
         raise OverlayError(f"Final ownership validation failed: {final_errors}.")
 
     final_owned_option_ids = final_projected_legacy_option_ids(csv_slice)
+    if not require_all_final_owned_options:
+        fragment_option_ids = {row.get("option_id", "") for row in fragment.get("choices", [])}
+        final_owned_option_ids &= fragment_option_ids
     transitional_option_ids = projected_option_ids(production, scope.owned_rpos)
     conflicting_option_ids = sorted(final_owned_option_ids & transitional_option_ids)
     if conflicting_option_ids:
@@ -2957,7 +2967,14 @@ def main() -> None:
         package_dir = Path(args.package)
         csv_slice = CsvSlice(package_dir)
         fragment = json.loads(Path(args.fragment_json).read_text(encoding="utf-8")) if args.fragment_json else csv_slice.legacy_fragment()
-        ownership = load_combined_ownership_scope(Path(args.ownership_manifest), package_dir, csv_slice, production)
+        ownership = load_combined_ownership_scope(
+            Path(args.ownership_manifest),
+            package_dir,
+            csv_slice,
+            production,
+            fragment,
+            require_all_final_owned_options=not bool(args.fragment_json),
+        )
         if report_mode_count:
             assert_guarded_option_refs_are_not_interiors(production, ownership)
             guarded_ids = guarded_option_ids(production, ownership)

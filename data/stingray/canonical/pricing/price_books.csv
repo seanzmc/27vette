@@ -1,0 +1,2 @@
+price_book_id,model_year,model_key,currency,active,notes
+cpb_2027_stingray,2027,stingray,USD,true,Final canonical 2027 Stingray price book.

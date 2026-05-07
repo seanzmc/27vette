@@ -103,6 +103,7 @@ function tempPackage() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "stingray-final-canonical-ownership-"));
   const packageDir = path.join(root, "stingray");
   fs.cpSync(PACKAGE, packageDir, { recursive: true });
+  fs.rmSync(path.join(packageDir, "canonical"), { recursive: true, force: true });
   return packageDir;
 }
 
@@ -279,7 +280,7 @@ function j6aChoiceOwnership() {
   };
 }
 
-test("absent and header-only final ownership tables preserve current output and overlay behavior", () => {
+test("absent and header-only final ownership tables preserve output and overlay behavior when no final rows are authored", () => {
   const absentPackage = tempPackage();
   fs.rmSync(path.join(absentPackage, "canonical", "ownership"), { recursive: true, force: true });
 
@@ -289,7 +290,6 @@ test("absent and header-only final ownership tables preserve current output and 
 
   assert.deepEqual(emitLegacyFragment(headerOnlyPackage), emitLegacyFragment(absentPackage));
   assert.deepEqual(overlayData(headerOnlyPackage), overlayData(absentPackage));
-  assert.deepEqual(overlayData(headerOnlyPackage), overlayData(PACKAGE));
 });
 
 test("temp canonical presentation with final presentation ownership passes projected coverage", () => {

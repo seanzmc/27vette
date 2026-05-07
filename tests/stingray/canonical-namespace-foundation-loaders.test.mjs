@@ -80,6 +80,7 @@ function tempPackage() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "stingray-canonical-namespace-"));
   const packageDir = path.join(root, "stingray");
   fs.cpSync(PACKAGE, packageDir, { recursive: true });
+  fs.rmSync(path.join(packageDir, "canonical"), { recursive: true, force: true });
   return packageDir;
 }
 
@@ -213,7 +214,7 @@ function validFoundationRows() {
   };
 }
 
-test("absent and header-only canonical namespace foundation tables preserve current output", () => {
+test("absent and header-only canonical namespace foundation tables preserve output when no final rows are authored", () => {
   const absentPackage = tempPackage();
   fs.rmSync(path.join(absentPackage, "canonical"), { recursive: true, force: true });
 
@@ -221,16 +222,18 @@ test("absent and header-only canonical namespace foundation tables preserve curr
   writeFoundationTables(headerOnlyPackage);
 
   assert.deepEqual(emitLegacyFragment(headerOnlyPackage), emitLegacyFragment(absentPackage));
-  assert.deepEqual(emitLegacyFragment(headerOnlyPackage), emitLegacyFragment(PACKAGE));
 });
 
 test("valid canonical namespace foundation rows validate without changing legacy output", () => {
+  const absentPackage = tempPackage();
+  fs.rmSync(path.join(absentPackage, "canonical"), { recursive: true, force: true });
+
   const packageDir = tempPackage();
   writeFoundationTables(packageDir, validFoundationRows());
 
   const fragment = emitLegacyFragment(packageDir);
   assert.equal(fragment.validation_errors.length, 0);
-  assert.deepEqual(fragment, emitLegacyFragment(PACKAGE));
+  assert.deepEqual(fragment, emitLegacyFragment(absentPackage));
 });
 
 test("canonical namespace foundation tables reject missing required headers", () => {

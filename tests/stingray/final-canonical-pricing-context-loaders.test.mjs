@@ -111,6 +111,7 @@ function tempPackage() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "stingray-final-canonical-pricing-"));
   const packageDir = path.join(root, "stingray");
   fs.cpSync(PACKAGE, packageDir, { recursive: true });
+  fs.rmSync(path.join(packageDir, "canonical"), { recursive: true, force: true });
   return packageDir;
 }
 
@@ -316,7 +317,7 @@ function setupQebPackage() {
   return packageDir;
 }
 
-test("absent and header-only final canonical pricing/context tables preserve current output", () => {
+test("absent and header-only final canonical pricing/context tables preserve output when no final rows are authored", () => {
   const absentPackage = tempPackage();
   fs.rmSync(path.join(absentPackage, "canonical", "status"), { recursive: true, force: true });
   fs.rmSync(path.join(absentPackage, "canonical", "pricing"), { recursive: true, force: true });
@@ -330,7 +331,6 @@ test("absent and header-only final canonical pricing/context tables preserve cur
   });
 
   assert.deepEqual(emitLegacyFragment(headerOnlyPackage), emitLegacyFragment(absentPackage));
-  assert.deepEqual(emitLegacyFragment(headerOnlyPackage), emitLegacyFragment(PACKAGE));
 });
 
 test("temp final namespace canonical base price emits nonzero price", () => {
