@@ -58,6 +58,8 @@ FINAL_CANONICAL_TABLES = {
     "final_option_status_rules": "canonical/status/option_status_rules.csv",
     "final_price_books": "canonical/pricing/price_books.csv",
     "final_canonical_base_prices": "canonical/pricing/canonical_base_prices.csv",
+    "final_projection_ownership": "canonical/ownership/projection_ownership.csv",
+    "final_preserved_boundaries": "canonical/ownership/preserved_boundaries.csv",
 }
 
 SIMPLE_DEPENDENCY_RULE_FIELDS = [
@@ -304,6 +306,30 @@ FINAL_OPTION_STATUS_RULE_FIELDS = [
     "notes",
 ]
 
+FINAL_PROJECTION_OWNERSHIP_FIELDS = [
+    "ownership_id",
+    "entity_type",
+    "entity_id",
+    "ownership_status",
+    "legacy_rpo",
+    "legacy_option_id",
+    "notes",
+    "active",
+]
+
+FINAL_PRESERVED_BOUNDARY_FIELDS = [
+    "boundary_id",
+    "relationship_type",
+    "source_type",
+    "source_id",
+    "target_type",
+    "target_id",
+    "legacy_source_option_id",
+    "legacy_target_option_id",
+    "reason",
+    "active",
+]
+
 OPTIONAL_TABLE_FIELDS = {
     "simple_dependency_rules": SIMPLE_DEPENDENCY_RULE_FIELDS,
     "canonical_options": CANONICAL_OPTION_FIELDS,
@@ -325,6 +351,8 @@ FINAL_CANONICAL_TABLE_FIELDS = {
     "final_option_status_rules": FINAL_OPTION_STATUS_RULE_FIELDS,
     "final_price_books": FINAL_PRICE_BOOK_FIELDS,
     "final_canonical_base_prices": FINAL_CANONICAL_BASE_PRICE_FIELDS,
+    "final_projection_ownership": FINAL_PROJECTION_OWNERSHIP_FIELDS,
+    "final_preserved_boundaries": FINAL_PRESERVED_BOUNDARY_FIELDS,
 }
 
 CANONICAL_OPTION_KINDS = {"customer_choice", "equipment_feature", "structured_reference", "review_required"}
@@ -385,6 +413,19 @@ FINAL_CANONICAL_DUPLICATE_RPO_CLASSIFICATIONS = {
     "mixed_display_and_selectable_variants",
     "ambiguous_requires_review",
 }
+FINAL_PROJECTION_OWNERSHIP_ENTITY_TYPES = {"canonical_option", "presentation", "relationship"}
+FINAL_PROJECTION_OWNERSHIP_STATUSES = {
+    "projected_owned",
+    "generated_display_owned",
+    "transitional_bridge_owned",
+}
+FINAL_PRESERVED_BOUNDARY_ENDPOINT_TYPES = {
+    "canonical_option",
+    "presentation",
+    "legacy_option",
+    "relationship",
+    "control_plane_reference",
+}
 GM_MODEL_CODE_MODEL_KEYS = {
     "C": "stingray",
     "E": "grand_sport",
@@ -425,6 +466,8 @@ ID_FIELDS = {
     "final_option_status_rules": "status_rule_id",
     "final_price_books": "price_book_id",
     "final_canonical_base_prices": "canonical_base_price_id",
+    "final_projection_ownership": "ownership_id",
+    "final_preserved_boundaries": "boundary_id",
 }
 
 
@@ -501,6 +544,12 @@ class CsvSlice:
         self.final_option_status_rules = [
             row for row in self.tables["final_option_status_rules"] if is_active(row)
         ]
+        self.final_projection_ownership_rows = [
+            row for row in self.tables["final_projection_ownership"] if is_active(row)
+        ]
+        self.final_preserved_boundary_rows = [
+            row for row in self.tables["final_preserved_boundaries"] if is_active(row)
+        ]
         self.canonical_namespace_errors: list[str] = []
         self._validate_canonical_namespace_foundation()
         self.canonical_option_errors: list[str] = []
@@ -517,6 +566,7 @@ class CsvSlice:
         self._merge_canonical_presentations()
         self._merge_final_canonical_presentations()
         self._validate_final_canonical_pricing()
+        self._validate_final_canonical_ownership()
         self.selectables = {row["selectable_id"]: row for row in self.tables["selectables"] if is_active(row)}
         self.projected_owned_selectable_ids = self._build_projected_owned_selectable_ids()
         self.item_sets = {row["set_id"]: row for row in self.tables["item_sets"] if is_active(row)}
@@ -842,6 +892,16 @@ class CsvSlice:
             "canonical/pricing/canonical_base_prices",
             "canonical_base_price_id",
         )
+        self._validate_unique_active_final_ids(
+            "final_projection_ownership",
+            "canonical/ownership/projection_ownership",
+            "ownership_id",
+        )
+        self._validate_unique_active_final_ids(
+            "final_preserved_boundaries",
+            "canonical/ownership/preserved_boundaries",
+            "boundary_id",
+        )
 
         for row in self.tables["canonical_source_documents"]:
             row_id = row.get("source_document_id", "")
@@ -1103,6 +1163,127 @@ class CsvSlice:
                 )
             else:
                 seen[key] = row
+
+    def _validate_final_canonical_ownership(self) -> None:
+        if self.canonical_namespace_errors:
+            return
+        seen_entities: dict[tuple[str, str], str] = {}
+        for row in self.tables["final_projection_ownership"]:
+            row_id = row.get("ownership_id", "")
+            if not self._validate_active_value("canonical/ownership/projection_ownership", row_id, row):
+                continue
+            if not row_id:
+                self.canonical_namespace_errors.append(
+                    "canonical/ownership/projection_ownership has a row missing ownership_id."
+                )
+            entity_type = row.get("entity_type", "")
+            entity_id = row.get("entity_id", "")
+            ownership_status = row.get("ownership_status", "")
+            if entity_type not in FINAL_PROJECTION_OWNERSHIP_ENTITY_TYPES:
+                self.canonical_namespace_errors.append(
+                    f"canonical/ownership/projection_ownership {row_id or '<missing>'} uses unsupported entity_type: {entity_type}."
+                )
+            if ownership_status not in FINAL_PROJECTION_OWNERSHIP_STATUSES:
+                self.canonical_namespace_errors.append(
+                    f"canonical/ownership/projection_ownership {row_id or '<missing>'} uses unsupported ownership_status: {ownership_status}."
+                )
+            if not entity_id:
+                self.canonical_namespace_errors.append(
+                    f"canonical/ownership/projection_ownership {row_id or '<missing>'} is missing entity_id."
+                )
+            elif entity_type == "canonical_option" and entity_id not in self.final_canonical_options:
+                self.canonical_namespace_errors.append(
+                    f"canonical/ownership/projection_ownership {row_id or '<missing>'} references missing canonical option: {entity_id}."
+                )
+            elif entity_type == "presentation":
+                presentation = self.final_option_presentations.get(entity_id)
+                if not presentation:
+                    self.canonical_namespace_errors.append(
+                        f"canonical/ownership/projection_ownership {row_id or '<missing>'} references missing presentation: {entity_id}."
+                    )
+                elif row.get("legacy_option_id", "") and row.get("legacy_option_id", "") != presentation.get("legacy_option_id", ""):
+                    self.canonical_namespace_errors.append(
+                        f"canonical/ownership/projection_ownership {row_id or '<missing>'} legacy_option_id does not match presentation {entity_id}."
+                    )
+            elif entity_type == "relationship" and entity_id not in self.projectable_relationship_ids():
+                self.canonical_namespace_errors.append(
+                    f"canonical/ownership/projection_ownership {row_id or '<missing>'} references missing relationship: {entity_id}."
+                )
+
+            entity_key = (entity_type, entity_id)
+            prior_status = seen_entities.get(entity_key)
+            if prior_status and prior_status != ownership_status:
+                self.canonical_namespace_errors.append(
+                    f"canonical/ownership/projection_ownership has conflicting active ownership for {entity_type} {entity_id}."
+                )
+            elif entity_id:
+                seen_entities[entity_key] = ownership_status
+
+        seen_boundaries: set[tuple[str, str, str, str, str]] = set()
+        for row in self.tables["final_preserved_boundaries"]:
+            row_id = row.get("boundary_id", "")
+            if not self._validate_active_value("canonical/ownership/preserved_boundaries", row_id, row):
+                continue
+            if not row_id:
+                self.canonical_namespace_errors.append(
+                    "canonical/ownership/preserved_boundaries has a row missing boundary_id."
+                )
+            source_type = row.get("source_type", "")
+            target_type = row.get("target_type", "")
+            source_id = row.get("source_id", "")
+            target_id = row.get("target_id", "")
+            if source_type not in FINAL_PRESERVED_BOUNDARY_ENDPOINT_TYPES:
+                self.canonical_namespace_errors.append(
+                    f"canonical/ownership/preserved_boundaries {row_id or '<missing>'} uses unsupported source_type: {source_type}."
+                )
+            if target_type not in FINAL_PRESERVED_BOUNDARY_ENDPOINT_TYPES:
+                self.canonical_namespace_errors.append(
+                    f"canonical/ownership/preserved_boundaries {row_id or '<missing>'} uses unsupported target_type: {target_type}."
+                )
+            self._validate_final_preserved_boundary_endpoint(row_id, "source", source_type, source_id)
+            self._validate_final_preserved_boundary_endpoint(row_id, "target", target_type, target_id)
+            if not row.get("relationship_type", ""):
+                self.canonical_namespace_errors.append(
+                    f"canonical/ownership/preserved_boundaries {row_id or '<missing>'} is missing relationship_type."
+                )
+            key = (row.get("relationship_type", ""), source_type, source_id, target_type, target_id)
+            if key in seen_boundaries:
+                self.canonical_namespace_errors.append(
+                    f"canonical/ownership/preserved_boundaries has duplicate active typed boundary {key}."
+                )
+            seen_boundaries.add(key)
+
+    def _validate_final_preserved_boundary_endpoint(self, row_id: str, side: str, endpoint_type: str, endpoint_id: str) -> None:
+        if not endpoint_id:
+            self.canonical_namespace_errors.append(
+                f"canonical/ownership/preserved_boundaries {row_id or '<missing>'} is missing {side}_id."
+            )
+            return
+        if endpoint_type == "canonical_option" and endpoint_id not in self.final_canonical_options:
+            self.canonical_namespace_errors.append(
+                f"canonical/ownership/preserved_boundaries {row_id or '<missing>'} references missing {side} canonical option: {endpoint_id}."
+            )
+        elif endpoint_type == "presentation" and endpoint_id not in self.final_option_presentations:
+            self.canonical_namespace_errors.append(
+                f"canonical/ownership/preserved_boundaries {row_id or '<missing>'} references missing {side} presentation: {endpoint_id}."
+            )
+        elif endpoint_type == "relationship" and endpoint_id not in self.projectable_relationship_ids():
+            self.canonical_namespace_errors.append(
+                f"canonical/ownership/preserved_boundaries {row_id or '<missing>'} references missing {side} relationship: {endpoint_id}."
+            )
+        elif endpoint_type in {"legacy_option", "relationship", "control_plane_reference"}:
+            return
+
+    def projectable_relationship_ids(self) -> set[str]:
+        ids: set[str] = set()
+        ids.update(row.get("rule_id", "") for row in self.tables["dependency_rules"] if is_active(row))
+        ids.update(row.get("rule_id", "") for row in self.tables["simple_dependency_rules"] if is_active(row))
+        ids.update(row.get("auto_add_id", "") for row in self.tables["auto_adds"] if is_active(row))
+        ids.update(row.get("rule_group_id", "") for row in self.tables["rule_groups"] if is_active(row))
+        ids.update(row.get("exclusive_group_id", "") for row in self.tables["exclusive_groups"] if is_active(row))
+        ids.update(row.get("price_rule_id", "") for row in self.tables["price_rules"] if is_active(row))
+        ids.discard("")
+        return ids
 
     def final_context_scope_variant_ids(self, scope: dict[str, str]) -> set[str]:
         variant_id = scope.get("variant_id", "")
@@ -1369,7 +1550,7 @@ class CsvSlice:
                     "rpo": row.get("rpo_override", "") or canonical["rpo"],
                     "label": row.get("label", "") or canonical["label"],
                     "description": row.get("description", "") or canonical["description"],
-                    "active": row["active"],
+                    "active": "True" if is_active(row) else "False",
                     "availability_condition_set_id": "",
                     "notes": row.get("notes", "") or f"Final canonical presentation {row['presentation_id']}.",
                 }
@@ -1393,7 +1574,7 @@ class CsvSlice:
                     "status_when_unmatched": "unavailable",
                     "status_label_when_unmatched": "Not Available",
                     "selectable": row["selectable"],
-                    "active": row["active"],
+                    "active": "True" if is_active(row) else "False",
                     "label": row.get("label", "") or canonical["label"],
                     "description": row.get("description", "") or canonical["description"],
                     "source_detail_raw": row.get("source_detail_raw", ""),

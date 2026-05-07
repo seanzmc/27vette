@@ -17,7 +17,18 @@ from stingray_csv_first_slice import DEFAULT_PACKAGE, CsvSlice
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_PRODUCTION_DATA = ROOT / "form-app" / "data.js"
 DEFAULT_OWNERSHIP_MANIFEST = DEFAULT_PACKAGE / "validation" / "projected_slice_ownership.csv"
+FINAL_PROJECTION_OWNERSHIP_RELATIVE_PATH = Path("canonical/ownership/projection_ownership.csv")
+FINAL_PRESERVED_BOUNDARIES_RELATIVE_PATH = Path("canonical/ownership/preserved_boundaries.csv")
 SUPPORTED_OWNERSHIP_VALUES = {"projected_owned", "preserved_cross_boundary", "production_guarded"}
+FINAL_PROJECTION_OWNERSHIP_STATUSES = {"projected_owned", "generated_display_owned", "transitional_bridge_owned"}
+FINAL_PROJECTION_OWNERSHIP_ENTITY_TYPES = {"canonical_option", "presentation", "relationship"}
+FINAL_PRESERVED_BOUNDARY_ENDPOINT_TYPES = {
+    "canonical_option",
+    "presentation",
+    "legacy_option",
+    "relationship",
+    "control_plane_reference",
+}
 GROUP_RECORD_TYPES = {"exclusiveGroup", "ruleGroup"}
 SUPPORTED_RECORD_TYPES = {"selectable", "guardedOption", "rule", "priceRule", "ruleGroup", "exclusiveGroup"}
 STRUCTURED_REF_NAMESPACE_ORDER = {
@@ -112,11 +123,15 @@ class OwnershipScope:
         guarded_group_ids: dict[str, set[str]],
         preserved_group_ids: dict[str, set[str]],
         projected_group_ids: dict[str, set[str]],
+        owned_option_ids: set[str] | None = None,
+        final_preserved_boundary_rows: list[dict[str, str]] | None = None,
     ) -> None:
         self.owned_rpos = owned_rpos
+        self.owned_option_ids = owned_option_ids or set()
         self.guarded_option_refs = guarded_option_refs
         self.preserved_cross_boundary_records = preserved_cross_boundary_records
         self.preserved_cross_boundary_rows = preserved_cross_boundary_rows
+        self.final_preserved_boundary_rows = final_preserved_boundary_rows or []
         self.guarded_group_ids = guarded_group_ids
         self.preserved_group_ids = preserved_group_ids
         self.projected_group_ids = projected_group_ids
@@ -284,6 +299,145 @@ def load_ownership_scope(path: Path) -> OwnershipScope:
     )
 
 
+def load_combined_ownership_scope(path: Path, package_dir: Path, csv_slice: CsvSlice, production: dict[str, Any]) -> OwnershipScope:
+    scope = load_ownership_scope(path)
+    final_projection_path = package_dir / FINAL_PROJECTION_OWNERSHIP_RELATIVE_PATH
+    final_preserved_path = package_dir / FINAL_PRESERVED_BOUNDARIES_RELATIVE_PATH
+    if not final_projection_path.exists() and not final_preserved_path.exists():
+        return scope
+
+    final_errors = [error for error in csv_slice.validate() if "canonical/ownership/" in error]
+    if final_errors:
+        raise OverlayError(f"Final ownership validation failed: {final_errors}.")
+
+    final_owned_option_ids = final_projected_legacy_option_ids(csv_slice)
+    transitional_option_ids = projected_option_ids(production, scope.owned_rpos)
+    conflicting_option_ids = sorted(final_owned_option_ids & transitional_option_ids)
+    if conflicting_option_ids:
+        raise OverlayError(
+            "Final canonical ownership conflicts with transitional projected_slice_ownership.csv "
+            f"for legacy option_ids: {conflicting_option_ids}."
+        )
+    final_owned_rpos = final_projected_legacy_rpos(csv_slice)
+    conflicting_rpos = sorted(final_owned_rpos & scope.owned_rpos)
+    if conflicting_rpos:
+        raise OverlayError(
+            "Final canonical ownership conflicts with transitional projected_slice_ownership.csv "
+            f"for RPOs: {conflicting_rpos}."
+        )
+
+    final_preserved_records, final_preserved_rows = final_preserved_boundary_records(csv_slice)
+    return OwnershipScope(
+        owned_rpos=set(scope.owned_rpos),
+        owned_option_ids=final_owned_option_ids,
+        guarded_option_refs=set(scope.guarded_option_refs),
+        preserved_cross_boundary_records=set(scope.preserved_cross_boundary_records) | final_preserved_records,
+        preserved_cross_boundary_rows=list(scope.preserved_cross_boundary_rows) + final_preserved_rows,
+        final_preserved_boundary_rows=final_preserved_rows,
+        guarded_group_ids={surface: set(ids) for surface, ids in scope.guarded_group_ids.items()},
+        preserved_group_ids={surface: set(ids) for surface, ids in scope.preserved_group_ids.items()},
+        projected_group_ids={surface: set(ids) for surface, ids in scope.projected_group_ids.items()},
+    )
+
+
+def final_projected_legacy_option_ids(csv_slice: CsvSlice) -> set[str]:
+    owned_option_ids: set[str] = set()
+    for row in csv_slice.final_projection_ownership_rows:
+        if row.get("ownership_status", "") not in FINAL_PROJECTION_OWNERSHIP_STATUSES:
+            continue
+        entity_type = row.get("entity_type", "")
+        entity_id = row.get("entity_id", "")
+        if entity_type == "presentation":
+            presentation = csv_slice.final_option_presentations.get(entity_id)
+            if presentation and presentation.get("legacy_option_id", ""):
+                owned_option_ids.add(presentation["legacy_option_id"])
+        elif entity_type == "canonical_option":
+            for presentation in csv_slice.final_option_presentations.values():
+                if presentation.get("canonical_option_id", "") == entity_id and presentation.get("legacy_option_id", ""):
+                    owned_option_ids.add(presentation["legacy_option_id"])
+    return owned_option_ids
+
+
+def final_projected_legacy_rpos(csv_slice: CsvSlice) -> set[str]:
+    rpos: set[str] = set()
+    for row in csv_slice.final_projection_ownership_rows:
+        rpo = row.get("legacy_rpo", "")
+        if rpo:
+            rpos.add(rpo)
+            continue
+        entity_type = row.get("entity_type", "")
+        entity_id = row.get("entity_id", "")
+        if entity_type == "canonical_option":
+            canonical = csv_slice.final_canonical_options.get(entity_id)
+            if canonical and canonical.get("rpo", ""):
+                rpos.add(canonical["rpo"])
+        elif entity_type == "presentation":
+            presentation = csv_slice.final_option_presentations.get(entity_id)
+            if not presentation:
+                continue
+            canonical = csv_slice.final_canonical_options.get(presentation.get("canonical_option_id", ""))
+            rpo = presentation.get("rpo_override", "") or (canonical or {}).get("rpo", "")
+            if rpo:
+                rpos.add(rpo)
+    return rpos
+
+
+def final_preserved_boundary_records(csv_slice: CsvSlice) -> tuple[set[tuple[str, str, str, str, str]], list[dict[str, str]]]:
+    records: set[tuple[str, str, str, str, str]] = set()
+    rows: list[dict[str, str]] = []
+    for row in csv_slice.final_preserved_boundary_rows:
+        record_type = final_preserved_boundary_record_type(row.get("relationship_type", ""))
+        if not record_type:
+            continue
+        source_ids = final_boundary_legacy_option_ids(csv_slice, row, "source")
+        target_ids = final_boundary_legacy_option_ids(csv_slice, row, "target")
+        for source_id in source_ids:
+            for target_id in target_ids:
+                key = (record_type, "", source_id, "", target_id)
+                records.add(key)
+                rows.append(
+                    {
+                        "manifest_row_id": row.get("boundary_id", ""),
+                        "record_type": record_type,
+                        "source_rpo": "",
+                        "source_option_id": source_id,
+                        "target_rpo": "",
+                        "target_option_id": target_id,
+                    }
+                )
+    return records, rows
+
+
+def final_preserved_boundary_record_type(relationship_type: str) -> str:
+    if relationship_type in {"rule", "excludes", "requires", "includes"}:
+        return "rule"
+    if relationship_type in {"priceRule", "price_override"}:
+        return "priceRule"
+    if relationship_type in {"ruleGroup", "requires_any"}:
+        return "ruleGroup"
+    return ""
+
+
+def final_boundary_legacy_option_ids(csv_slice: CsvSlice, row: dict[str, str], side: str) -> set[str]:
+    explicit_legacy_id = row.get(f"legacy_{side}_option_id", "")
+    endpoint_type = row.get(f"{side}_type", "")
+    endpoint_id = row.get(f"{side}_id", "")
+    if explicit_legacy_id:
+        return {explicit_legacy_id}
+    if endpoint_type == "legacy_option":
+        return {endpoint_id} if endpoint_id else set()
+    if endpoint_type == "presentation":
+        presentation = csv_slice.final_option_presentations.get(endpoint_id, {})
+        return {presentation.get("legacy_option_id", "")} if presentation.get("legacy_option_id", "") else set()
+    if endpoint_type == "canonical_option":
+        return {
+            presentation.get("legacy_option_id", "")
+            for presentation in csv_slice.final_option_presentations.values()
+            if presentation.get("canonical_option_id", "") == endpoint_id and presentation.get("legacy_option_id", "")
+        }
+    return set()
+
+
 def normalized_json(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
@@ -428,17 +582,49 @@ def normalize_exclusive_groups(rows: list[dict[str, Any]]) -> list[dict[str, Any
 
 
 def projected_rpos(fragment: dict[str, Any], ownership: OwnershipScope) -> set[str]:
-    rpos = {row["rpo"] for row in fragment.get("choices", []) if row.get("rpo")}
+    owned_final_rpos = {
+        row.get("rpo", "")
+        for row in fragment.get("choices", [])
+        if row.get("option_id", "") in ownership.owned_option_ids and row.get("rpo", "")
+    }
+    unowned_choice_ids = sorted(
+        {
+            row.get("option_id", "")
+            for row in fragment.get("choices", [])
+            if row.get("rpo") not in ownership.owned_rpos
+            and row.get("option_id", "") not in ownership.owned_option_ids
+            and row.get("rpo", "") in owned_final_rpos
+        }
+    )
+    if unowned_choice_ids:
+        raise OverlayError(f"Projected fragment includes choices without ownership: {unowned_choice_ids}.")
+    rpos = {
+        row["rpo"]
+        for row in fragment.get("choices", [])
+        if row.get("rpo") and row.get("option_id", "") not in ownership.owned_option_ids
+    }
     if rpos != ownership.owned_rpos:
         raise OverlayError(
             "Projected fragment RPO scope changed: "
             f"expected {sorted(ownership.owned_rpos)}, got {sorted(rpos)}."
         )
+    fragment_owned_option_ids = {
+        row.get("option_id", "")
+        for row in fragment.get("choices", [])
+        if row.get("option_id", "") in ownership.owned_option_ids
+    }
+    if fragment_owned_option_ids != ownership.owned_option_ids:
+        raise OverlayError(
+            "Projected fragment final presentation scope changed: "
+            f"expected {sorted(ownership.owned_option_ids)}, got {sorted(fragment_owned_option_ids)}."
+        )
     return rpos
 
 
-def projected_option_ids(data: dict[str, Any], rpos: set[str]) -> set[str]:
-    return {row["option_id"] for row in data.get("choices", []) if row.get("rpo") in rpos}
+def projected_option_ids(data: dict[str, Any], rpos: set[str], owned_option_ids: set[str] | None = None) -> set[str]:
+    option_ids = set(owned_option_ids or set())
+    option_ids.update(row["option_id"] for row in data.get("choices", []) if row.get("rpo") in rpos)
+    return option_ids
 
 
 def assert_projected_choice_option_id_coverage(production: dict[str, Any], fragment: dict[str, Any], rpos: set[str]) -> None:
@@ -1973,7 +2159,13 @@ def replace_by_key(
 
 def non_projected_slices(data: dict[str, Any], rpos: set[str], projected_ids: set[str]) -> dict[str, Any]:
     return {
-        "choices": normalize_choices([row for row in data.get("choices", []) if row.get("rpo") not in rpos]),
+        "choices": normalize_choices(
+            [
+                row
+                for row in data.get("choices", [])
+                if row.get("rpo") not in rpos and row.get("option_id", "") not in projected_ids
+            ]
+        ),
         "rules": normalize_rules(
             [
                 row
@@ -2013,8 +2205,8 @@ def overlay_shadow_data(production: dict[str, Any], fragment: dict[str, Any], ow
 
     rpos = projected_rpos(fragment, ownership)
     assert_projected_choice_option_id_coverage(production, fragment, rpos)
-    production_ids = projected_option_ids(production, rpos)
-    fragment_ids = projected_option_ids(fragment, rpos)
+    production_ids = projected_option_ids(production, rpos, ownership.owned_option_ids)
+    fragment_ids = projected_option_ids(fragment, rpos, ownership.owned_option_ids)
     if production_ids != fragment_ids:
         raise OverlayError(f"Fragment legacy option IDs do not match production: {sorted(production_ids)} != {sorted(fragment_ids)}.")
     preserved_keys_by_surface = preserved_record_id_keys(production, ownership)
@@ -2027,7 +2219,11 @@ def overlay_shadow_data(production: dict[str, Any], fragment: dict[str, Any], ow
     assert_projected_rule_group_ownership(fragment, ownership, fragment_ids)
     assert_projected_package_record_ownership(fragment, fragment_ids)
 
-    removed_choices = [row for row in production.get("choices", []) if row.get("rpo") in rpos]
+    removed_choices = [
+        row
+        for row in production.get("choices", [])
+        if row.get("rpo") in rpos or row.get("option_id", "") in production_ids
+    ]
     fragment_rule_keys = {
         (row.get("source_id"), row.get("rule_type"), row.get("target_id"), row.get("body_style_scope", ""))
         for row in fragment.get("rules", [])
@@ -2189,7 +2385,7 @@ def overlay_shadow_data(production: dict[str, Any], fragment: dict[str, Any], ow
     shadow["choices"] = replace_by_key(
         production.get("choices", []),
         fragment.get("choices", []),
-        lambda row: row.get("rpo") in rpos,
+        lambda row: row.get("rpo") in rpos or row.get("option_id", "") in production_ids,
         lambda row: (row.get("choice_id"),),
         "choices",
     )
@@ -2758,8 +2954,10 @@ def main() -> None:
         if args.manual_review_readiness_checkpoint_out and not args.validate_decision_ledger_csv:
             raise OverlayError("--manual-review-readiness-checkpoint-out requires --validate-decision-ledger-csv.")
         production = load_production_data(Path(args.production_data))
-        fragment = load_fragment(args)
-        ownership = load_ownership_scope(Path(args.ownership_manifest))
+        package_dir = Path(args.package)
+        csv_slice = CsvSlice(package_dir)
+        fragment = json.loads(Path(args.fragment_json).read_text(encoding="utf-8")) if args.fragment_json else csv_slice.legacy_fragment()
+        ownership = load_combined_ownership_scope(Path(args.ownership_manifest), package_dir, csv_slice, production)
         if report_mode_count:
             assert_guarded_option_refs_are_not_interiors(production, ownership)
             guarded_ids = guarded_option_ids(production, ownership)
@@ -2771,7 +2969,7 @@ def main() -> None:
                     preserved_guarded_option_ids(production, ownership, guarded_ids),
                 )
             if args.preserved_cross_boundary_contract_report:
-                projected_ids = projected_option_ids(production, ownership.owned_rpos)
+                projected_ids = projected_option_ids(production, ownership.owned_rpos, ownership.owned_option_ids)
                 report = preserved_cross_boundary_contract_report(
                     production,
                     fragment,
@@ -2781,7 +2979,7 @@ def main() -> None:
                     projected_ids,
                 )
             if args.preserved_cross_boundary_manifest_census:
-                projected_ids = projected_option_ids(production, ownership.owned_rpos)
+                projected_ids = projected_option_ids(production, ownership.owned_rpos, ownership.owned_option_ids)
                 report = preserved_cross_boundary_manifest_census_report(
                     production,
                     ownership,
@@ -2790,7 +2988,7 @@ def main() -> None:
                     projected_ids,
                 )
             if args.manifest_only_preservation_triage:
-                projected_ids = projected_option_ids(production, ownership.owned_rpos)
+                projected_ids = projected_option_ids(production, ownership.owned_rpos, ownership.owned_option_ids)
                 census_report = preserved_cross_boundary_manifest_census_report(
                     production,
                     ownership,
