@@ -20,7 +20,7 @@ Handle only these workbook sources:
 3. Mechanical sheets
 4. Standard Equipment sheets
 5. price schedule sheet(s)
-6. interior color / trim sheet(s), handled separately
+6. Color and Trim sheet(s)
 
 Ignore all other sheet types unless Sean explicitly asks for them.
 
@@ -35,8 +35,6 @@ Create only these generated sheets:
 5. ZR1X Ingest (combined row-based output for Interior, Exterior, Mechanical, and Standard Equipment content)
 6. `Corvette Interiors`
 
-Do not create separate availability, pricing, base price, equipment-group, or package-membership sheets.
-
 ## Variant Output
 
 Create one sheet with all variant base prices together, using the same variant names as the output sheets for easy reference.
@@ -44,10 +42,11 @@ Create one sheet with all variant base prices together, using the same variant n
 Source: price schedule sheet(s) only.
 
 Output columns:
-| Variant | List Price | DFC Price |
-|---|---|---|
 
-Ex. | Corvette Stingray Coupe 1LT |	$71,000.00 | $2,495.00 |
+| Variant | List Price | DFC Price |
+| ------- | ---------- | --------- |
+
+Ex. | Corvette Stingray Coupe 1LT | $71,000.00 | $2,495.00 |
 
 ## Main Output: `#Variant Ingest`
 
@@ -65,7 +64,7 @@ Note: ZR1 and ZR1X content is mixed together in the source sheets and must be se
 Headers must be exactly:
 
 | RPO | Price | Option Name | Description | Detail | Category | 1LT Coupe | 2LT Coupe | 3LT Coupe | 1LT Convertible | 2LT Convertible | 3LT Convertible |
-|---|---|---|---|---|---|---|---|---|---|---|
+| --- | ----- | ----------- | ----------- | ------ | -------- | --------- | --------- | --------- | --------------- | --------------- | --------------- |
 
 ### Row rules
 
@@ -73,6 +72,7 @@ Headers must be exactly:
 - Standard Equipment observations belong in this same sheet.
 - If a Standard Equipment row has no published RPO, leave `RPO` blank. Never invent a code.
 - If the workbook repeats an item on separate rows or sheets, keep separate rows unless the duplication is obviously identical and safe to collapse.
+- Preserve the Source sheet, row, and ref only / orderable RPO column.
 
 ### Column rules
 
@@ -180,7 +180,7 @@ Do not force interior combinations into the other Ingest sheets.
 Use a simple row-based output with these headers:
 
 | Trim | Seat | Interior Code | Interior Name | Material | Detail from Disclosure | Color Overrides |
-|---|---|---|---|---|---|---|
+| ---- | ---- | ------------- | ------------- | -------- | ---------------------- | --------------- |
 
 ### Interior rules
 
@@ -189,8 +189,8 @@ Use a simple row-based output with these headers:
 - Keep coded notes for override or special-combination logic when the workbook provides them.
 - Keep the structure literal and workbook-facing.
 - Color Overrides should list the RPO codes of any exterior colors that the workbook says are incompatible with that interior, identified by a -- in the sheets lower color matrix. If no incompatibilities are listed, leave blank.
-Move a copy of the 10 exterior colors with their RPO codes into each variant sheet in the "Exterior" category, matching the price for the premium colors and listing the rest as $0.
-Do not build a treatment-to-RPO abstraction unless the workbook already makes that mapping explicit and it is required to list the combinations correctly.
+  Move a copy of the 10 exterior colors with their RPO codes into each variant sheet in the "Exterior" category, matching the price for the premium colors and listing the rest as $0.
+  Do not build a treatment-to-RPO abstraction unless the workbook already makes that mapping explicit and it is required to list the combinations correctly.
 
 ## Validation And Failure Handling
 
