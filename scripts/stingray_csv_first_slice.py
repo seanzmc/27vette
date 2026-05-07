@@ -50,8 +50,12 @@ FINAL_CANONICAL_TABLES = {
     "canonical_source_rows": "canonical/source/source_rows.csv",
     "canonical_source_row_classifications": "canonical/source/source_row_classifications.csv",
     "canonical_duplicate_rpo_reviews": "canonical/options/duplicate_rpo_reviews.csv",
+    "final_canonical_options": "canonical/options/canonical_options.csv",
+    "final_canonical_option_aliases": "canonical/options/canonical_option_aliases.csv",
+    "final_option_presentations": "canonical/presentation/option_presentations.csv",
     "final_canonical_variants": "canonical/status/variants.csv",
     "final_context_scopes": "canonical/status/context_scopes.csv",
+    "final_option_status_rules": "canonical/status/option_status_rules.csv",
     "final_price_books": "canonical/pricing/price_books.csv",
     "final_canonical_base_prices": "canonical/pricing/canonical_base_prices.csv",
 }
@@ -242,6 +246,64 @@ FINAL_CANONICAL_BASE_PRICE_FIELDS = [
     "notes",
 ]
 
+FINAL_CANONICAL_OPTION_FIELDS = [
+    "canonical_option_id",
+    "rpo",
+    "label",
+    "description",
+    "canonical_kind",
+    "duplicate_rpo_classification",
+    "active",
+    "notes",
+]
+
+FINAL_CANONICAL_OPTION_ALIAS_FIELDS = [
+    "alias_id",
+    "canonical_option_id",
+    "source_row_id",
+    "alias_type",
+    "alias_value",
+    "legacy_option_id",
+    "active",
+    "notes",
+]
+
+FINAL_OPTION_PRESENTATION_FIELDS = [
+    "presentation_id",
+    "canonical_option_id",
+    "rpo_override",
+    "presentation_role",
+    "choice_group_id",
+    "section_id",
+    "section_name",
+    "category_id",
+    "category_name",
+    "step_key",
+    "selection_mode",
+    "display_order",
+    "selectable",
+    "active",
+    "label",
+    "description",
+    "source_detail_raw",
+    "notes",
+    "legacy_option_id",
+    "choice_mode",
+    "selection_mode_label",
+]
+
+FINAL_OPTION_STATUS_RULE_FIELDS = [
+    "status_rule_id",
+    "canonical_option_id",
+    "presentation_id",
+    "context_scope_id",
+    "status",
+    "status_label",
+    "priority",
+    "active",
+    "notes",
+]
+
 OPTIONAL_TABLE_FIELDS = {
     "simple_dependency_rules": SIMPLE_DEPENDENCY_RULE_FIELDS,
     "canonical_options": CANONICAL_OPTION_FIELDS,
@@ -255,13 +317,31 @@ FINAL_CANONICAL_TABLE_FIELDS = {
     "canonical_source_rows": CANONICAL_SOURCE_ROW_FIELDS,
     "canonical_source_row_classifications": CANONICAL_SOURCE_ROW_CLASSIFICATION_FIELDS,
     "canonical_duplicate_rpo_reviews": CANONICAL_DUPLICATE_RPO_REVIEW_FIELDS,
+    "final_canonical_options": FINAL_CANONICAL_OPTION_FIELDS,
+    "final_canonical_option_aliases": FINAL_CANONICAL_OPTION_ALIAS_FIELDS,
+    "final_option_presentations": FINAL_OPTION_PRESENTATION_FIELDS,
     "final_canonical_variants": FINAL_CANONICAL_VARIANT_FIELDS,
     "final_context_scopes": FINAL_CONTEXT_SCOPE_FIELDS,
+    "final_option_status_rules": FINAL_OPTION_STATUS_RULE_FIELDS,
     "final_price_books": FINAL_PRICE_BOOK_FIELDS,
     "final_canonical_base_prices": FINAL_CANONICAL_BASE_PRICE_FIELDS,
 }
 
 CANONICAL_OPTION_KINDS = {"customer_choice", "equipment_feature", "structured_reference", "review_required"}
+FINAL_CANONICAL_OPTION_KINDS = {
+    "customer_choice",
+    "equipment_feature",
+    "package",
+    "structured_reference",
+    "review_required",
+}
+FINAL_CANONICAL_DUPLICATE_RPO_CLASSIFICATIONS_WITH_NONE = {
+    "none",
+    "display_only_duplicate",
+    "true_separate_selectable_variant",
+    "mixed_display_and_selectable_variants",
+    "ambiguous_requires_review",
+}
 PRESENTATION_ROLES = {
     "choice",
     "standard_options_display",
@@ -271,7 +351,17 @@ PRESENTATION_ROLES = {
     "legacy_alias",
     "display_only",
 }
+FINAL_PRESENTATION_ROLES = {
+    "customer_choice",
+    "standard_options_display",
+    "standard_equipment_display",
+    "included_display",
+    "package_display",
+    "legacy_alias",
+    "display_only",
+}
 OPTION_STATUSES = {"optional", "standard_choice", "standard_fixed", "included_auto", "unavailable"}
+FINAL_CANONICAL_OPTION_ALIAS_TYPES = {"legacy_option_id", "source_option_id", "rpo", "marketing_label", "workbook_row_key"}
 REVIEW_REQUIRED_DUPLICATE_RPOS = {"AE4", "AH2", "AQ9", "UQT"}
 FINAL_CANONICAL_SOURCE_TYPES = {"order_guide", "workbook", "manual_review", "production_oracle_export"}
 FINAL_CANONICAL_SOURCE_ROW_CLASSIFICATIONS = {
@@ -327,8 +417,12 @@ ID_FIELDS = {
     "canonical_source_documents": "source_document_id",
     "canonical_source_rows": "source_row_id",
     "canonical_duplicate_rpo_reviews": "duplicate_rpo_review_id",
+    "final_canonical_options": "canonical_option_id",
+    "final_canonical_option_aliases": "alias_id",
+    "final_option_presentations": "presentation_id",
     "final_canonical_variants": "variant_id",
     "final_context_scopes": "context_scope_id",
+    "final_option_status_rules": "status_rule_id",
     "final_price_books": "price_book_id",
     "final_canonical_base_prices": "canonical_base_price_id",
 }
@@ -376,6 +470,16 @@ class CsvSlice:
             self.tables[name] = rows
         self.ownership_rows = self._load_ownership_rows()
         self.variants = {row["variant_id"]: row for row in self.tables["variants"] if is_active(row)}
+        self.final_canonical_options = {
+            row.get("canonical_option_id", ""): row
+            for row in self.tables["final_canonical_options"]
+            if is_active(row) and row.get("canonical_option_id", "")
+        }
+        self.final_option_presentations = {
+            row.get("presentation_id", ""): row
+            for row in self.tables["final_option_presentations"]
+            if is_active(row) and row.get("presentation_id", "")
+        }
         self.final_canonical_variants = {
             row.get("variant_id", ""): row
             for row in self.tables["final_canonical_variants"]
@@ -394,6 +498,9 @@ class CsvSlice:
         self.final_canonical_base_prices = [
             row for row in self.tables["final_canonical_base_prices"] if is_active(row)
         ]
+        self.final_option_status_rules = [
+            row for row in self.tables["final_option_status_rules"] if is_active(row)
+        ]
         self.canonical_namespace_errors: list[str] = []
         self._validate_canonical_namespace_foundation()
         self.canonical_option_errors: list[str] = []
@@ -408,6 +515,7 @@ class CsvSlice:
             row for row in self.tables["canonical_base_prices"] if is_active(row)
         ]
         self._merge_canonical_presentations()
+        self._merge_final_canonical_presentations()
         self._validate_final_canonical_pricing()
         self.selectables = {row["selectable_id"]: row for row in self.tables["selectables"] if is_active(row)}
         self.projected_owned_selectable_ids = self._build_projected_owned_selectable_ids()
@@ -709,6 +817,26 @@ class CsvSlice:
         self._validate_unique_active_final_ids("final_canonical_variants", "canonical/status/variants", "variant_id")
         self._validate_unique_active_final_ids("final_context_scopes", "canonical/status/context_scopes", "context_scope_id")
         self._validate_unique_active_final_ids("final_price_books", "canonical/pricing/price_books", "price_book_id")
+        self._validate_unique_active_final_ids(
+            "final_canonical_options",
+            "canonical/options/canonical_options",
+            "canonical_option_id",
+        )
+        self._validate_unique_active_final_ids(
+            "final_canonical_option_aliases",
+            "canonical/options/canonical_option_aliases",
+            "alias_id",
+        )
+        self._validate_unique_active_final_ids(
+            "final_option_presentations",
+            "canonical/presentation/option_presentations",
+            "presentation_id",
+        )
+        self._validate_unique_active_final_ids(
+            "final_option_status_rules",
+            "canonical/status/option_status_rules",
+            "status_rule_id",
+        )
         self._validate_unique_active_final_ids(
             "final_canonical_base_prices",
             "canonical/pricing/canonical_base_prices",
@@ -1059,6 +1187,319 @@ class CsvSlice:
         if scope.get("trim_level", "") and context.get("trim_level", "") != scope["trim_level"]:
             return False
         return True
+
+    def _merge_final_canonical_presentations(self) -> None:
+        if self.canonical_namespace_errors:
+            return
+        if not (
+            self.final_canonical_options
+            or self.tables["final_canonical_option_aliases"]
+            or self.final_option_presentations
+            or self.final_option_status_rules
+        ):
+            return
+
+        existing_selectable_ids = {row.get("selectable_id", "") for row in self.tables["selectables"] if is_active(row)}
+        final_option_rows: dict[str, dict[str, str]] = {}
+        final_presentation_rows: dict[str, dict[str, str]] = {}
+        presentation_ids_by_canonical: dict[str, list[str]] = defaultdict(list)
+        legacy_ids: dict[str, str] = {}
+
+        for row in self.tables["final_canonical_options"]:
+            row_id = row.get("canonical_option_id", "")
+            if not self._validate_active_value("canonical/options/canonical_options", row_id, row):
+                continue
+            if not row_id:
+                self.canonical_namespace_errors.append("canonical/options/canonical_options has a row missing canonical_option_id.")
+            if row_id in self.canonical_options:
+                self.canonical_namespace_errors.append(
+                    f"canonical/options/canonical_options {row_id or '<missing>'} collides with transitional canonical option."
+                )
+            if not row.get("rpo", ""):
+                self.canonical_namespace_errors.append(f"canonical/options/canonical_options {row_id or '<missing>'} is missing rpo.")
+            if row.get("canonical_kind", "") not in FINAL_CANONICAL_OPTION_KINDS:
+                self.canonical_namespace_errors.append(
+                    f"canonical/options/canonical_options {row_id or '<missing>'} uses unsupported canonical_kind: {row.get('canonical_kind', '')}."
+                )
+            if row.get("canonical_kind", "") == "display_only":
+                self.canonical_namespace_errors.append(
+                    f"canonical/options/canonical_options {row_id or '<missing>'} cannot use display_only as a canonical business status."
+                )
+            duplicate_classification = row.get("duplicate_rpo_classification", "")
+            if duplicate_classification not in FINAL_CANONICAL_DUPLICATE_RPO_CLASSIFICATIONS_WITH_NONE:
+                self.canonical_namespace_errors.append(
+                    f"canonical/options/canonical_options {row_id or '<missing>'} uses unsupported duplicate_rpo_classification: {duplicate_classification}."
+                )
+            if row.get("rpo", "") in REVIEW_REQUIRED_DUPLICATE_RPOS:
+                self.canonical_namespace_errors.append(
+                    f"canonical/options/canonical_options {row_id or '<missing>'} uses duplicate RPO {row.get('rpo', '')}, "
+                    "which requires explicit review and cannot be auto-collapsed."
+                )
+            if row_id:
+                final_option_rows[row_id] = row
+
+        for row in self.tables["final_canonical_option_aliases"]:
+            row_id = row.get("alias_id", "")
+            if not self._validate_active_value("canonical/options/canonical_option_aliases", row_id, row):
+                continue
+            if not row_id:
+                self.canonical_namespace_errors.append("canonical/options/canonical_option_aliases has a row missing alias_id.")
+            canonical_id = row.get("canonical_option_id", "")
+            if canonical_id not in final_option_rows:
+                self.canonical_namespace_errors.append(
+                    f"canonical/options/canonical_option_aliases {row_id or '<missing>'} references missing canonical option: {canonical_id}."
+                )
+            alias_type = row.get("alias_type", "")
+            if alias_type not in FINAL_CANONICAL_OPTION_ALIAS_TYPES:
+                self.canonical_namespace_errors.append(
+                    f"canonical/options/canonical_option_aliases {row_id or '<missing>'} uses unsupported alias_type: {alias_type}."
+                )
+            if not row.get("alias_value", "") and not row.get("legacy_option_id", ""):
+                self.canonical_namespace_errors.append(
+                    f"canonical/options/canonical_option_aliases {row_id or '<missing>'} is missing alias_value or legacy_option_id."
+                )
+
+        if self.canonical_namespace_errors:
+            return
+
+        self.canonical_options.update(final_option_rows)
+
+        for row in self.tables["final_option_presentations"]:
+            row_id = row.get("presentation_id", "")
+            if not self._validate_active_value("canonical/presentation/option_presentations", row_id, row):
+                continue
+            canonical_id = row.get("canonical_option_id", "")
+            legacy_id = row.get("legacy_option_id", "")
+            presentation_role = row.get("presentation_role", "")
+            if not row_id:
+                self.canonical_namespace_errors.append(
+                    "canonical/presentation/option_presentations has a row missing presentation_id."
+                )
+            if row_id in self.option_presentations:
+                self.canonical_namespace_errors.append(
+                    f"canonical/presentation/option_presentations {row_id or '<missing>'} collides with transitional presentation."
+                )
+            if canonical_id not in self.canonical_options:
+                self.canonical_namespace_errors.append(
+                    f"canonical/presentation/option_presentations {row_id or '<missing>'} references missing canonical option: {canonical_id}."
+                )
+            if not legacy_id:
+                self.canonical_namespace_errors.append(
+                    f"canonical/presentation/option_presentations {row_id or '<missing>'} is missing legacy_option_id."
+                )
+            elif legacy_id in existing_selectable_ids:
+                self.canonical_namespace_errors.append(
+                    f"canonical/presentation/option_presentations {row_id or '<missing>'} legacy_option_id collides with existing legacy output: {legacy_id}."
+                )
+            elif legacy_id in legacy_ids:
+                self.canonical_namespace_errors.append(
+                    f"canonical/presentation/option_presentations {row_id or '<missing>'} duplicate legacy_option_id {legacy_id} also used by {legacy_ids[legacy_id]}."
+                )
+            else:
+                legacy_ids[legacy_id] = row_id
+            if presentation_role not in FINAL_PRESENTATION_ROLES:
+                self.canonical_namespace_errors.append(
+                    f"canonical/presentation/option_presentations {row_id or '<missing>'} uses unsupported presentation_role: {presentation_role}."
+                )
+            if row.get("selectable", "") not in {"True", "False"}:
+                self.canonical_namespace_errors.append(
+                    f"canonical/presentation/option_presentations {row_id or '<missing>'} uses unsupported selectable value: {row.get('selectable', '')}."
+                )
+            if presentation_role == "customer_choice" and row.get("selectable", "") != "True":
+                self.canonical_namespace_errors.append(
+                    f"canonical/presentation/option_presentations {row_id or '<missing>'} customer_choice presentation must be selectable."
+                )
+            if presentation_role == "customer_choice" and row.get("selection_mode", "") == "display_only":
+                self.canonical_namespace_errors.append(
+                    f"canonical/presentation/option_presentations {row_id or '<missing>'} cannot use display_only selection_mode for a customer_choice presentation."
+                )
+            if presentation_role != "customer_choice" and row.get("selectable", "") == "True":
+                self.canonical_namespace_errors.append(
+                    f"canonical/presentation/option_presentations {row_id or '<missing>'} display presentation must not be selectable."
+                )
+            try:
+                as_int(row.get("display_order", ""))
+            except ValueError:
+                self.canonical_namespace_errors.append(
+                    f"canonical/presentation/option_presentations {row_id or '<missing>'} has unsupported display_order: {row.get('display_order', '')}."
+                )
+            if canonical_id:
+                presentation_ids_by_canonical[canonical_id].append(row_id)
+            if row_id:
+                final_presentation_rows[row_id] = row
+
+        for canonical_id, presentation_ids in presentation_ids_by_canonical.items():
+            choice_presentations = [
+                final_presentation_rows[presentation_id]
+                for presentation_id in presentation_ids
+                if final_presentation_rows[presentation_id].get("presentation_role", "") == "customer_choice"
+                and final_presentation_rows[presentation_id].get("selectable", "") == "True"
+            ]
+            if len(choice_presentations) > 1:
+                canonical = self.canonical_options.get(canonical_id, {})
+                ids = ", ".join(row["presentation_id"] for row in choice_presentations)
+                self.canonical_namespace_errors.append(
+                    f"canonical/options/canonical_options {canonical_id} would auto-collapse multiple selectable choices for RPO {canonical.get('rpo', '')}: {ids}."
+                )
+            canonical = self.canonical_options.get(canonical_id, {})
+            has_display_presentation = any(
+                final_presentation_rows[presentation_id].get("presentation_role", "") != "customer_choice"
+                for presentation_id in presentation_ids
+            )
+            if has_display_presentation and canonical.get("duplicate_rpo_classification", "") == "none":
+                self.canonical_namespace_errors.append(
+                    f"canonical/options/canonical_options {canonical_id} has display presentations but duplicate_rpo_classification is none."
+                )
+
+        if self.canonical_namespace_errors:
+            return
+
+        self.option_presentations.update(final_presentation_rows)
+        self._validate_final_option_status_rules()
+        if self.canonical_namespace_errors:
+            return
+
+        for row in sorted(final_presentation_rows.values(), key=lambda item: item["presentation_id"]):
+            canonical = self.canonical_options[row["canonical_option_id"]]
+            legacy_id = row["legacy_option_id"]
+            self.tables["selectables"].append(
+                {
+                    "selectable_id": legacy_id,
+                    "selectable_type": "option",
+                    "rpo": row.get("rpo_override", "") or canonical["rpo"],
+                    "label": row.get("label", "") or canonical["label"],
+                    "description": row.get("description", "") or canonical["description"],
+                    "active": row["active"],
+                    "availability_condition_set_id": "",
+                    "notes": row.get("notes", "") or f"Final canonical presentation {row['presentation_id']}.",
+                }
+            )
+            self.tables["selectable_display"].append(
+                {
+                    "selectable_id": legacy_id,
+                    "legacy_option_id": legacy_id,
+                    "section_id": row["section_id"],
+                    "section_name": row["section_name"],
+                    "category_id": row["category_id"],
+                    "category_name": row["category_name"],
+                    "step_key": row["step_key"],
+                    "choice_mode": row["choice_mode"],
+                    "selection_mode": row["selection_mode"],
+                    "selection_mode_label": row["selection_mode_label"],
+                    "display_order": row["display_order"],
+                    "status_condition_set_id": "",
+                    "status_when_matched": "available",
+                    "status_label_when_matched": "Available",
+                    "status_when_unmatched": "unavailable",
+                    "status_label_when_unmatched": "Not Available",
+                    "selectable": row["selectable"],
+                    "active": row["active"],
+                    "label": row.get("label", "") or canonical["label"],
+                    "description": row.get("description", "") or canonical["description"],
+                    "source_detail_raw": row.get("source_detail_raw", ""),
+                    "presentation_id": row["presentation_id"],
+                    "canonical_option_id": row["canonical_option_id"],
+                }
+            )
+
+    def _validate_final_option_status_rules(self) -> None:
+        for row in self.tables["final_option_status_rules"]:
+            row_id = row.get("status_rule_id", "")
+            if not self._validate_active_value("canonical/status/option_status_rules", row_id, row):
+                continue
+            canonical_id = row.get("canonical_option_id", "")
+            presentation_id = row.get("presentation_id", "")
+            if not row_id:
+                self.canonical_namespace_errors.append("canonical/status/option_status_rules has a row missing status_rule_id.")
+            if bool(canonical_id) == bool(presentation_id):
+                self.canonical_namespace_errors.append(
+                    f"canonical/status/option_status_rules {row_id or '<missing>'} must reference exactly one of canonical_option_id or presentation_id."
+                )
+            if canonical_id and canonical_id not in self.canonical_options:
+                self.canonical_namespace_errors.append(
+                    f"canonical/status/option_status_rules {row_id or '<missing>'} references missing canonical option: {canonical_id}."
+                )
+            if presentation_id and presentation_id not in self.option_presentations:
+                self.canonical_namespace_errors.append(
+                    f"canonical/status/option_status_rules {row_id or '<missing>'} references missing presentation: {presentation_id}."
+                )
+            status = row.get("status", "")
+            if status not in OPTION_STATUSES:
+                self.canonical_namespace_errors.append(
+                    f"canonical/status/option_status_rules {row_id or '<missing>'} uses unsupported status: {status}."
+                )
+            if status == "display_only":
+                self.canonical_namespace_errors.append(
+                    f"canonical/status/option_status_rules {row_id or '<missing>'} cannot use display_only as a business status."
+                )
+            context_scope_id = row.get("context_scope_id", "")
+            if context_scope_id and context_scope_id not in self.final_context_scopes:
+                self.canonical_namespace_errors.append(
+                    f"canonical/status/option_status_rules {row_id or '<missing>'} references missing context scope: {context_scope_id}."
+                )
+            try:
+                if as_int(row.get("priority", "")) < 0:
+                    raise ValueError
+            except ValueError:
+                self.canonical_namespace_errors.append(
+                    f"canonical/status/option_status_rules {row_id or '<missing>'} has unsupported priority: {row.get('priority', '')}."
+                )
+
+        self._validate_final_option_status_rule_conflicts()
+
+    def _validate_final_option_status_rule_conflicts(self) -> None:
+        seen: dict[tuple[str, str, frozenset[str], int, int], dict[str, str]] = {}
+        for row in self.final_option_status_rules:
+            try:
+                priority = as_int(row.get("priority", ""))
+            except ValueError:
+                continue
+            target_type = "presentation" if row.get("presentation_id", "") else "canonical"
+            target_id = row.get("presentation_id", "") or row.get("canonical_option_id", "")
+            variants = frozenset(self.final_status_rule_variant_ids(row))
+            if not target_id or not variants:
+                continue
+            key = (
+                target_type,
+                target_id,
+                variants,
+                self.final_status_rule_context_specificity(row),
+                priority,
+            )
+            prior = seen.get(key)
+            if prior and (
+                prior.get("status", "") != row.get("status", "")
+                or prior.get("status_label", "") != row.get("status_label", "")
+            ):
+                self.canonical_namespace_errors.append(
+                    "canonical/status/option_status_rules "
+                    f"{prior.get('status_rule_id', '')} and {row.get('status_rule_id', '')} "
+                    "have conflicting same-priority statuses for the same target and effective context."
+                )
+            else:
+                seen[key] = row
+
+    def final_status_rule_variant_ids(self, row: dict[str, str]) -> set[str]:
+        context_scope_id = row.get("context_scope_id", "")
+        if not context_scope_id:
+            return set(self.final_canonical_variants)
+        scope = self.final_context_scopes.get(context_scope_id)
+        if not scope:
+            return set()
+        return self.final_context_scope_variant_ids(scope)
+
+    def final_status_rule_context_specificity(self, row: dict[str, str]) -> int:
+        context_scope_id = row.get("context_scope_id", "")
+        if not context_scope_id:
+            return 0
+        scope = self.final_context_scopes.get(context_scope_id, {})
+        if scope.get("variant_id", ""):
+            return 4
+        if scope.get("body_style", "") and scope.get("trim_level", ""):
+            return 3
+        if scope.get("body_style", "") or scope.get("trim_level", ""):
+            return 2
+        return 1
 
     def _merge_canonical_presentations(self) -> None:
         for table_name in ("canonical_options", "option_presentations", "option_status_rules", "canonical_base_prices"):
@@ -2158,6 +2599,18 @@ class CsvSlice:
     def canonical_presentation_status(self, display: dict[str, str], context: dict[str, str]) -> tuple[str, str]:
         canonical_id = display.get("canonical_option_id", "")
         presentation_id = display.get("presentation_id", "")
+        final_candidates = [
+            row
+            for row in self.final_option_status_rules
+            if self.final_option_status_rule_targets(row, canonical_id, presentation_id)
+            and self.final_context_scope_matches_context(row.get("context_scope_id", ""), context)
+        ]
+        self.sort_final_option_status_rule_candidates(final_candidates)
+        if final_candidates:
+            row = final_candidates[0]
+            status = row["status"]
+            return self.legacy_status_value(status), row.get("status_label", "") or self.default_status_label(status)
+
         candidates = [
             row
             for row in self.option_status_rules
@@ -2177,6 +2630,24 @@ class CsvSlice:
             status = row["status"]
             return self.legacy_status_value(status), row.get("status_label", "") or self.default_status_label(status)
         return display["status_when_matched"], display["status_label_when_matched"]
+
+    def final_option_status_rule_targets(self, row: dict[str, str], canonical_id: str, presentation_id: str) -> bool:
+        if row.get("presentation_id", ""):
+            return row["presentation_id"] == presentation_id
+        return row.get("canonical_option_id", "") == canonical_id
+
+    def sort_final_option_status_rule_candidates(self, rows: list[dict[str, str]]) -> None:
+        rows.sort(
+            key=lambda row: (
+                -self.final_option_status_rule_target_specificity(row),
+                -self.final_status_rule_context_specificity(row),
+                -as_int(row.get("priority", "")),
+                row.get("status_rule_id", ""),
+            )
+        )
+
+    def final_option_status_rule_target_specificity(self, row: dict[str, str]) -> int:
+        return 1 if row.get("presentation_id", "") else 0
 
     def option_status_rule_targets(self, row: dict[str, str], canonical_id: str, presentation_id: str) -> bool:
         if row.get("presentation_id", ""):
