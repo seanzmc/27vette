@@ -1,15 +1,40 @@
 BEGIN;
 
+DROP VIEW IF EXISTS app_packages_resolved;
+DROP VIEW IF EXISTS app_rules_resolved;
+DROP VIEW IF EXISTS app_standard_equipment;
+DROP VIEW IF EXISTS app_ui_render;
+DROP VIEW IF EXISTS app_variants;
+
+DROP TABLE IF EXISTS _releases;
+DROP TABLE IF EXISTS variant_group_validation;
+DROP TABLE IF EXISTS _validation_lists;
+DROP TABLE IF EXISTS _integrity;
+DROP TABLE IF EXISTS _manifest;
 DROP TABLE IF EXISTS source_rows;
+DROP TABLE IF EXISTS package_validation;
+DROP TABLE IF EXISTS package_members;
+DROP TABLE IF EXISTS packages;
 DROP TABLE IF EXISTS rule_members;
+DROP TABLE IF EXISTS rule_actions;
+DROP TABLE IF EXISTS rule_conditions;
 DROP TABLE IF EXISTS rules;
-DROP TABLE IF EXISTS standard_equipment;
-DROP TABLE IF EXISTS option_status;
+DROP TABLE IF EXISTS option_status_resolved;
+DROP TABLE IF EXISTS option_availability;
 DROP TABLE IF EXISTS choice_group_options;
 DROP TABLE IF EXISTS choice_groups;
 DROP TABLE IF EXISTS sections;
 DROP TABLE IF EXISTS steps;
+DROP TABLE IF EXISTS option_versions;
 DROP TABLE IF EXISTS options;
+DROP TABLE IF EXISTS scope_variants;
+DROP TABLE IF EXISTS variant_scopes;
 DROP TABLE IF EXISTS variants;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS trims;
+DROP TABLE IF EXISTS body_styles;
+DROP TABLE IF EXISTS models;
+DROP TABLE IF EXISTS model_years;
+DROP TABLE IF EXISTS datasets;
 
 COMMIT;

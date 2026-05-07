@@ -1,471 +1,333 @@
 # schemaData
 
-Base CSV and SQL structure for the single-spine schema described in `newSchemaFinal.md`.
+CSV and SQL scaffold for the hard schema plan in `hardSchemaPlan.md`.
 
-This folder is a shadow schema scaffold. It does not migrate production data, modify runtime behavior, or create workbook/generator coupling.
+This folder is a shadow schema scaffold. It does not migrate production data, modify runtime behavior, or create workbook/generator coupling. Production behavior remains the oracle until a separate cutover is explicitly approved.
+
+## Design Contract
+
+- Author broadly, resolve concretely.
+- `variants + option_status_resolved + options` is the resolved availability spine.
+- `option_availability` is the editable scope-aware authoring table.
+- Missing resolved availability means unavailable by default.
+- `choice_group_options` is global placement; app rendering must use resolved app-facing views.
+- `standard_equipment` is not an editable source table. Standard equipment is derived into `app_standard_equipment`.
+- Rules use typed condition/action references instead of editable polymorphic `source_type/source_id` and `target_type/target_id`.
+- Source rows are staging evidence only. The app must not consume `source_rows`.
 
 ## Folder Map
 
 ```text
 schemaData/
+├── app/
+│   ├── app_packages_resolved.csv
+│   ├── app_rules_resolved.csv
+│   ├── app_standard_equipment.csv
+│   ├── app_ui_render.csv
+│   └── app_variants.csv
 ├── core/
-│   ├── variants.csv
-│   └── options.csv
-├── presentation/
-│   ├── steps.csv
-│   ├── sections.csv
-│   ├── choice_groups.csv
-│   └── choice_group_options.csv
-├── state/
-│   ├── option_status.csv
-│   └── standard_equipment.csv
+│   ├── option_versions.csv
+│   ├── options.csv
+│   ├── scope_variants.csv
+│   ├── variant_scopes.csv
+│   └── variants.csv
 ├── logic/
-│   ├── rules.csv
-│   └── rule_members.csv
+│   ├── rule_actions.csv
+│   ├── rule_conditions.csv
+│   ├── rule_members.csv
+│   └── rules.csv
+├── lookup/
+│   ├── body_styles.csv
+│   ├── categories.csv
+│   ├── datasets.csv
+│   ├── model_years.csv
+│   ├── models.csv
+│   └── trims.csv
+├── packages/
+│   ├── package_members.csv
+│   ├── package_validation.csv
+│   └── packages.csv
+├── presentation/
+│   ├── choice_group_options.csv
+│   ├── choice_groups.csv
+│   ├── sections.csv
+│   └── steps.csv
+├── releases/
+│   └── _releases.csv
 ├── source/
 │   └── source_rows.csv
-└── sql/
-    ├── 001_create_schema.sql
-    └── 001_rollback_schema.sql
+├── sql/
+│   ├── 001_create_schema.sql
+│   └── 001_rollback_schema.sql
+├── state/
+│   ├── option_availability.csv
+│   └── option_status_resolved.csv
+└── validation/
+    ├── _integrity.csv
+    ├── _manifest.csv
+    ├── _validation_lists.csv
+    └── variant_group_validation.csv
 ```
 
 ## Stable Spine
 
 ```text
-variant_id ─ build context
-option_id  ─ real option key
+dataset_id ─ dataset namespace
+variant_id ─ concrete build context
+scope_id   ─ broad authoring context
+option_id  ─ canonical option key
 group_id   ─ display/choice grouping key
-rule_id    ─ conditional logic key
+rule_id    ─ dependency/pricing rule key
+package_id ─ package/bundle key
+release_id ─ published data snapshot key
 ```
 
 ```mermaid
 erDiagram
-  variants ||--o{ option_status : resolves
-  options ||--o{ option_status : has
+  datasets ||--o{ variants : contains
+  model_years ||--o{ variants : validates
+  models ||--o{ variants : validates
+  body_styles ||--o{ variants : validates
+  trims ||--o{ variants : validates
+  datasets ||--o{ steps : contains
+  categories ||--o{ sections : classifies
   steps ||--o{ sections : contains
   sections ||--o{ choice_groups : contains
   choice_groups ||--o{ choice_group_options : places
   options ||--o{ choice_group_options : appears_in
-  variants ||--o{ standard_equipment : exports
-  options ||--o{ standard_equipment : exports
-  sections ||--o{ standard_equipment : exports
-  variants ||--o{ rules : scopes
-  rules ||--o{ rule_members : expands
-  variants ||--o{ source_rows : evidences
+  variant_scopes ||--o{ scope_variants : expands
+  variants ||--o{ scope_variants : resolves
+  variant_scopes ||--o{ option_availability : authors
+  variants ||--o{ option_availability : overrides
+  option_availability ||--o{ option_status_resolved : resolves
+  variants ||--o{ option_status_resolved : has
+  options ||--o{ option_status_resolved : has
+  rules ||--o{ rule_conditions : applies_when
+  rules ||--o{ rule_actions : performs
+  rules ||--o{ rule_members : lists
+  packages ||--o{ package_members : contains
+  options ||--o{ packages : selectable_package
 ```
 
 ## CSV Headers
 
-| Folder         | File                       | Header                                                                                                                                 |
-| -------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `core`         | `variants.csv`             | `variant_id,model_year,model_key,body_style,trim_level,active`                                                                         |
-| `core`         | `options.csv`              | `option_id,rpo,label,description,option_type,active`                                                                                   |
-| `presentation` | `steps.csv`                | `step_key,dataset_id,step_label,display_order,active`                                                                                  |
-| `presentation` | `sections.csv`             | `section_id,dataset_id,step_key,section_name,category_id,category_name,display_order,active`                                           |
-| `presentation` | `choice_groups.csv`        | `group_id,label,section_id,section_name,category_id,category_name,step_key,selection_mode,required,active`                             |
-| `presentation` | `choice_group_options.csv` | `group_id,option_id,display_order,active`                                                                                              |
-| `state`        | `option_status.csv`        | `option_id,variant_id,status,price,active`                                                                                             |
-| `state`        | `standard_equipment.csv`   | `standard_equipment_id,dataset_id,variant_id,option_id,section_id,display_order,label_override,description_override,notes,active`      |
-| `logic`        | `rules.csv`                | `rule_id,rule_type,source_type,source_id,target_type,target_id,variant_id,message,active`                                              |
-| `logic`        | `rule_members.csv`         | `rule_id,member_type,member_id,member_order,active`                                                                                    |
-| `source`       | `source_rows.csv`          | `source_row_id,variant_id,raw_section,raw_rpo,raw_label,raw_description,raw_status,raw_price,raw_notes,row_hash,classification,active` |
+| Folder | File | Header |
+| --- | --- | --- |
+| `lookup` | `datasets.csv` | `dataset_id,dataset_name,model_family,schema_version,active` |
+| `lookup` | `model_years.csv` | `model_year,active` |
+| `lookup` | `models.csv` | `model_key,model_name,active` |
+| `lookup` | `body_styles.csv` | `body_style,body_style_label,active` |
+| `lookup` | `trims.csv` | `trim_level,trim_label,active` |
+| `lookup` | `categories.csv` | `category_id,category_name,display_order,active` |
+| `core` | `variants.csv` | `variant_id,dataset_id,model_year,model_key,body_style,trim_level,display_name,active` |
+| `core` | `variant_scopes.csv` | `scope_id,scope_name,dataset_id,year_min,year_max,model_key,body_style,trim_level,active` |
+| `core` | `scope_variants.csv` | `scope_variant_key,scope_id,variant_id` |
+| `core` | `options.csv` | `option_id,rpo_code,option_label,option_description,option_type,option_family,active` |
+| `core` | `option_versions.csv` | `option_version_id,option_id,rpo_code,model_year,model_key,option_label,option_description,active` |
+| `presentation` | `steps.csv` | `step_id,dataset_id,step_key,step_label,display_order,active` |
+| `presentation` | `sections.csv` | `section_id,step_id,category_id,section_label,display_order,active` |
+| `presentation` | `choice_groups.csv` | `group_id,section_id,group_label,selection_mode,required,min_select,max_select,display_order,active` |
+| `presentation` | `choice_group_options.csv` | `group_option_key,group_id,option_id,display_order,active` |
+| `state` | `option_availability.csv` | `availability_id,scope_id,variant_id,option_id,status,base_price,default_flag,locked_flag,notes,active` |
+| `state` | `option_status_resolved.csv` | `variant_option_key,variant_id,option_id,resolved_status,resolved_price,default_flag,locked_flag,source_availability_id,active` |
+| `logic` | `rules.csv` | `rule_id,rule_name,rule_type,scope_id,variant_id,priority,message,active` |
+| `logic` | `rule_conditions.csv` | `rule_condition_id,rule_id,condition_group,condition_order,source_option_id,source_group_id,source_variant_id,operator,expected_value,active` |
+| `logic` | `rule_actions.csv` | `rule_action_id,rule_id,action_type,target_option_id,target_group_id,target_variant_id,price_mode,rule_action_value,currency,active` |
+| `logic` | `rule_members.csv` | `rule_member_id,rule_id,member_option_id,member_group_id,display_order,active` |
+| `packages` | `packages.csv` | `package_id,package_option_id,package_label,active` |
+| `packages` | `package_members.csv` | `package_member_id,package_id,member_option_id,member_status,member_price_mode,member_price_value,required,locked,active` |
+| `packages` | `package_validation.csv` | `package_validation_id,package_id,variant_id,validation_status,message,active` |
+| `source` | `source_rows.csv` | `source_row_id,dataset_id,variant_id,raw_section,raw_rpo,raw_label,raw_description,raw_status,raw_price,raw_notes,row_hash,classification,active` |
+| `app` | `app_variants.csv` | `variant_id,display_name,model_year,model_key,body_style,trim_level,active` |
+| `app` | `app_ui_render.csv` | `dataset_id,variant_id,step_id,step_label,step_order,section_id,section_label,section_order,group_id,group_label,group_order,selection_mode,required,min_select,max_select,option_id,rpo_code,option_label,option_description,status,price,default_flag,locked_flag,display_order` |
+| `app` | `app_standard_equipment.csv` | `variant_id,option_id,rpo_code,label,description,status,notes` |
+| `app` | `app_rules_resolved.csv` | `rule_id,variant_id,rule_type,priority,source_type,source_id,target_type,target_id,action_type,price_mode,rule_action_value,message` |
+| `app` | `app_packages_resolved.csv` | `variant_id,package_option_id,member_option_id,member_status,member_price_mode,member_price_value,required,locked` |
+| `validation` | `_manifest.csv` | `sheet_name,primary_key_column,named_range,description,source_type,editable,published` |
+| `validation` | `_integrity.csv` | `check_id,check_name,severity,error_count,publish_blocker,notes` |
+| `validation` | `_validation_lists.csv` | `list_name,value,display_order,active` |
+| `validation` | `variant_group_validation.csv` | `variant_id,group_id,available_option_count,default_option_count,standard_fixed_count,required,selection_mode,validation_status` |
+| `releases` | `_releases.csv` | `release_id,schema_version,data_version,status,created_at,published_at,published_by,checksum,rollback_to_release_id,notes` |
 
-## Table Definitions
+## Authoring Tables
 
-### `variants`
+Lookup tables normalize variant context and presentation categories:
 
-| Column       |      Type | Constraints           | Notes                     |
-| ------------ | --------: | --------------------- | ------------------------- |
-| `variant_id` |    `text` | PK                    | Stable build context key. |
-| `model_year` | `integer` | NOT NULL              | Query/display helper.     |
-| `model_key`  |    `text` | NOT NULL              | Query/display helper.     |
-| `body_style` |    `text` | NOT NULL              | Query/display helper.     |
-| `trim_level` |    `text` | NOT NULL              | Query/display helper.     |
-| `active`     | `boolean` | NOT NULL DEFAULT true | Soft activation.          |
-
-```sql
-CREATE TABLE variants (
-  variant_id text PRIMARY KEY,
-  model_year integer NOT NULL,
-  model_key text NOT NULL,
-  body_style text NOT NULL,
-  trim_level text NOT NULL,
-  active boolean NOT NULL DEFAULT true
-);
+```text
+datasets
+model_years
+models
+body_styles
+trims
+categories
 ```
 
-### `options`
+Canonical editable tables:
 
-| Column        |      Type | Constraints           | Notes                                       |
-| ------------- | --------: | --------------------- | ------------------------------------------- |
-| `option_id`   |    `text` | PK                    | Canonical option key.                       |
-| `rpo`         |    `text` | NOT NULL              | RPO property, not the key.                  |
-| `label`       |    `text` | NOT NULL              | Customer facing label.                      |
-| `description` |    `text` | nullable              | Optional descriptive copy.                  |
-| `option_type` |    `text` | NOT NULL              | Value set is not fully specified in source. |
-| `active`      | `boolean` | NOT NULL DEFAULT true | Soft activation.                            |
-
-```sql
-CREATE TABLE options (
-  option_id text PRIMARY KEY,
-  rpo text NOT NULL,
-  label text NOT NULL,
-  description text,
-  option_type text NOT NULL,
-  active boolean NOT NULL DEFAULT true
-);
+```text
+variants
+variant_scopes
+options
+option_versions
+steps
+sections
+choice_groups
+choice_group_options
+option_availability
+rules
+rule_conditions
+rule_actions
+rule_members
+packages
+package_members
+source_rows
 ```
 
-### `steps`
+`scope_variants`, `option_status_resolved`, app tables, package validation, and validation tables are generated or publish-time outputs unless a later workflow explicitly marks them editable.
 
-| Column          |      Type | Constraints           | Notes                             |
-| --------------- | --------: | --------------------- | --------------------------------- |
-| `step_key`      |    `text` | PK part               | Step identifier inside a dataset. |
-| `dataset_id`    |    `text` | PK part               | Dataset namespace.                |
-| `step_label`    |    `text` | NOT NULL              | Display label.                    |
-| `display_order` | `integer` | NOT NULL              | Sort order.                       |
-| `active`        | `boolean` | NOT NULL DEFAULT true | Soft activation.                  |
+## Availability Resolution
 
-```sql
-CREATE TABLE steps (
-  step_key text NOT NULL,
-  dataset_id text NOT NULL,
-  step_label text NOT NULL,
-  display_order integer NOT NULL,
-  active boolean NOT NULL DEFAULT true,
-  PRIMARY KEY (dataset_id, step_key)
-);
+Use `option_availability` for human authoring:
+
+- `scope_id` means broad availability.
+- `variant_id` means exact variant override.
+- Populate exactly one of `scope_id` or `variant_id`.
+- Exact `variant_id` overrides win over broad `scope_id` rows.
+- `status = optional` requires a concrete price; a free option uses `0`, not blank.
+
+Generate `option_status_resolved` as concrete `variant_id + option_id` rows:
+
+```text
+variant_option_key = variant_id + "|" + option_id
 ```
 
-### `sections`
+The configurator should treat any missing `variant_id + option_id` row as unavailable.
 
-| Column          |      Type | Constraints              | Notes              |
-| --------------- | --------: | ------------------------ | ------------------ |
-| `section_id`    |    `text` | PK                       | Section key.       |
-| `dataset_id`    |    `text` | FK to `steps.dataset_id` | Dataset namespace. |
-| `step_key`      |    `text` | FK to `steps.step_key`   | Parent step.       |
-| `section_name`  |    `text` | NOT NULL                 | Display name.      |
-| `category_id`   |    `text` | NOT NULL                 | Category key.      |
-| `category_name` |    `text` | NOT NULL                 | Category label.    |
-| `display_order` | `integer` | NOT NULL                 | Sort order.        |
-| `active`        | `boolean` | NOT NULL DEFAULT true    | Soft activation.   |
+## Presentation Resolution
 
-```sql
-CREATE TABLE sections (
-  section_id text PRIMARY KEY,
-  dataset_id text NOT NULL,
-  step_key text NOT NULL,
-  section_name text NOT NULL,
-  category_id text NOT NULL,
-  category_name text NOT NULL,
-  display_order integer NOT NULL,
-  active boolean NOT NULL DEFAULT true,
-  FOREIGN KEY (dataset_id, step_key) REFERENCES steps (dataset_id, step_key)
-);
+Presentation stays normalized:
+
+```text
+steps -> sections -> choice_groups -> choice_group_options -> options
 ```
 
-### `choice_groups`
+Do not render `choice_group_options` directly. The app-facing `app_ui_render` view joins presentation placement to `option_status_resolved` and filters inactive or unavailable rows.
 
-| Column           |      Type | Constraints                 | Notes                                                  |
-| ---------------- | --------: | --------------------------- | ------------------------------------------------------ |
-| `group_id`       |    `text` | PK                          | Stable choice group key.                               |
-| `label`          |    `text` | NOT NULL                    | Group display label.                                   |
-| `section_id`     |    `text` | FK to `sections.section_id` | Parent section.                                        |
-| `section_name`   |    `text` | NOT NULL                    | Denormalized display helper from source header.        |
-| `category_id`    |    `text` | NOT NULL                    | Denormalized display helper from source header.        |
-| `category_name`  |    `text` | NOT NULL                    | Denormalized display helper from source header.        |
-| `step_key`       |    `text` | NOT NULL                    | Denormalized display helper from source header.        |
-| `selection_mode` |    `text` | CHECK                       | `single`, `single_select_req`, or `single_select_opt`. |
-| `required`       | `boolean` | NOT NULL                    | Required behavior remains semantically open in source. |
-| `active`         | `boolean` | NOT NULL DEFAULT true       | Soft activation.                                       |
+`choice_groups` intentionally does not duplicate:
 
-```sql
-CREATE TABLE choice_groups (
-  group_id text PRIMARY KEY,
-  label text NOT NULL,
-  section_id text NOT NULL REFERENCES sections (section_id),
-  section_name text NOT NULL,
-  category_id text NOT NULL,
-  category_name text NOT NULL,
-  step_key text NOT NULL,
-  selection_mode text NOT NULL CHECK (selection_mode IN ('single', 'single_select_req', 'single_select_opt')),
-  required boolean NOT NULL,
-  active boolean NOT NULL DEFAULT true
-);
+```text
+section_name
+category_id
+category_name
+step_key
 ```
 
-### `choice_group_options`
+Resolve those display fields through joins.
 
-| Column          |      Type | Constraints           | Notes                    |
-| --------------- | --------: | --------------------- | ------------------------ |
-| `group_id`      |    `text` | PK part, FK           | Choice group.            |
-| `option_id`     |    `text` | PK part, FK           | Universal option.        |
-| `display_order` | `integer` | NOT NULL              | Sort order within group. |
-| `active`        | `boolean` | NOT NULL DEFAULT true | Soft activation.         |
+## Rules
 
-```sql
-CREATE TABLE choice_group_options (
-  group_id text NOT NULL REFERENCES choice_groups (group_id),
-  option_id text NOT NULL REFERENCES options (option_id),
-  display_order integer NOT NULL,
-  active boolean NOT NULL DEFAULT true,
-  PRIMARY KEY (group_id, option_id)
-);
+Rules are split into metadata, conditions, actions, and optional member lists:
+
+```text
+rules
+rule_conditions
+rule_actions
+rule_members
 ```
 
-### `option_status`
+Typed reference columns replace editable polymorphic ID pairs. Generated app views may emit `source_type/source_id` and `target_type/target_id`, but those are derived for app consumption.
 
-| Column       |            Type | Constraints           | Notes                                                                       |
-| ------------ | --------------: | --------------------- | --------------------------------------------------------------------------- |
-| `option_id`  |          `text` | PK part, FK           | Universal option.                                                           |
-| `variant_id` |          `text` | PK part, FK           | Resolved variant context.                                                   |
-| `status`     |          `text` | CHECK                 | `optional`, `standard_choice`, `standard_fixed`, `included`, `unavailable`. |
-| `price`      | `numeric(12,2)` | NOT NULL DEFAULT 0    | Base variant price before rule overrides.                                   |
-| `active`     |       `boolean` | NOT NULL DEFAULT true | Soft activation.                                                            |
+Pricing rules must use structured fields:
 
-```sql
-CREATE TABLE option_status (
-  option_id text NOT NULL REFERENCES options (option_id),
-  variant_id text NOT NULL REFERENCES variants (variant_id),
-  status text NOT NULL CHECK (status IN ('optional', 'standard_choice', 'standard_fixed', 'included', 'unavailable')),
-  price numeric(12, 2) NOT NULL DEFAULT 0,
-  active boolean NOT NULL DEFAULT true,
-  PRIMARY KEY (option_id, variant_id)
-);
+```text
+priority
+price_mode
+rule_action_value
+currency
 ```
 
-### `standard_equipment`
+Do not store price logic only in `message`.
 
-| Column                  |      Type | Constraints                                          | Notes                     |
-| ----------------------- | --------: | ---------------------------------------------------- | ------------------------- |
-| `standard_equipment_id` |    `text` | PK                                                   | Export row key.           |
-| `dataset_id`            |    `text` | NOT NULL                                             | Dataset namespace.        |
-| `variant_id`            |    `text` | FK to `variants` and composite FK to `option_status` | Variant context.          |
-| `option_id`             |    `text` | FK to `options` and composite FK to `option_status`  | Same canonical option_id. |
-| `section_id`            |    `text` | FK                                                   | Display section.          |
-| `display_order`         | `integer` | NOT NULL                                             | Export sort order.        |
-| `label_override`        |    `text` | nullable                                             | Export override only.     |
-| `description_override`  |    `text` | nullable                                             | Export override only.     |
-| `notes`                 |    `text` | nullable                                             | Export notes.             |
-| `active`                | `boolean` | NOT NULL DEFAULT true                                | Soft activation.          |
+## Packages
 
-```sql
-CREATE TABLE standard_equipment (
-  standard_equipment_id text PRIMARY KEY,
-  dataset_id text NOT NULL,
-  variant_id text NOT NULL REFERENCES variants (variant_id),
-  option_id text NOT NULL REFERENCES options (option_id),
-  section_id text NOT NULL REFERENCES sections (section_id),
-  display_order integer NOT NULL,
-  label_override text,
-  description_override text,
-  notes text,
-  active boolean NOT NULL DEFAULT true,
-  FOREIGN KEY (option_id, variant_id) REFERENCES option_status (option_id, variant_id)
-);
+Packages are modeled as selectable options where `options.option_type = package`, then expanded through:
+
+```text
+packages
+package_members
+app_packages_resolved
 ```
 
-### `rules`
+Package members should resolve to concrete variant-level effects before publishing.
 
-| Column        |      Type | Constraints           | Notes                                                                                     |
-| ------------- | --------: | --------------------- | ----------------------------------------------------------------------------------------- |
-| `rule_id`     |    `text` | PK                    | Stable rule key.                                                                          |
-| `rule_type`   |    `text` | CHECK                 | `excludes`, `requires`, `includes`, `requires_any`, `price_override`, `replaces_default`. |
-| `source_type` |    `text` | CHECK                 | `option`, `group`, or `variant`.                                                          |
-| `source_id`   |    `text` | NOT NULL              | Polymorphic reference.                                                                    |
-| `target_type` |    `text` | CHECK                 | `option`, `group`, or `variant`.                                                          |
-| `target_id`   |    `text` | NOT NULL              | Polymorphic reference.                                                                    |
-| `variant_id`  |    `text` | FK nullable           | Null means wherever source and target exist.                                              |
-| `message`     |    `text` | nullable              | User/admin explanation.                                                                   |
-| `active`      | `boolean` | NOT NULL DEFAULT true | Soft activation.                                                                          |
+## App-Facing Views
 
-```sql
-CREATE TABLE rules (
-  rule_id text PRIMARY KEY,
-  rule_type text NOT NULL CHECK (rule_type IN ('excludes', 'requires', 'includes', 'requires_any', 'price_override', 'replaces_default')),
-  source_type text NOT NULL CHECK (source_type IN ('option', 'group', 'variant')),
-  source_id text NOT NULL,
-  target_type text NOT NULL CHECK (target_type IN ('option', 'group', 'variant')),
-  target_id text NOT NULL,
-  variant_id text REFERENCES variants (variant_id),
-  message text,
-  active boolean NOT NULL DEFAULT true
-);
+The app should consume only resolved, published views:
+
+```text
+app_variants
+app_ui_render
+app_standard_equipment
+app_rules_resolved
+app_packages_resolved
 ```
 
-### `rule_members`
+Editable authoring CSVs are not the runtime contract.
 
-| Column         |      Type | Constraints           | Notes                            |
-| -------------- | --------: | --------------------- | -------------------------------- |
-| `rule_id`      |    `text` | PK part, FK           | Parent rule.                     |
-| `member_type`  |    `text` | PK part, CHECK        | `option`, `group`, or `variant`. |
-| `member_id`    |    `text` | PK part               | Polymorphic member reference.    |
-| `member_order` | `integer` | NOT NULL              | Member ordering.                 |
-| `active`       | `boolean` | NOT NULL DEFAULT true | Soft activation.                 |
+## Validation And Publishing
 
-```sql
-CREATE TABLE rule_members (
-  rule_id text NOT NULL REFERENCES rules (rule_id),
-  member_type text NOT NULL CHECK (member_type IN ('option', 'group', 'variant')),
-  member_id text NOT NULL,
-  member_order integer NOT NULL,
-  active boolean NOT NULL DEFAULT true,
-  PRIMARY KEY (rule_id, member_type, member_id)
-);
+Use validation files to mirror the workbook hardening plan:
+
+```text
+_manifest
+_integrity
+_validation_lists
+variant_group_validation
 ```
 
-### `source_rows`
+Publishing should be blocked when critical integrity counts are non-zero.
 
-| Column            |      Type | Constraints           | Notes                                |
-| ----------------- | --------: | --------------------- | ------------------------------------ |
-| `source_row_id`   |    `text` | PK                    | Raw evidence row key.                |
-| `variant_id`      |    `text` | FK nullable           | Variant if resolved at staging time. |
-| `raw_section`     |    `text` | nullable              | Raw source section.                  |
-| `raw_rpo`         |    `text` | nullable              | Raw source RPO.                      |
-| `raw_label`       |    `text` | nullable              | Raw label.                           |
-| `raw_description` |    `text` | nullable              | Raw description.                     |
-| `raw_status`      |    `text` | nullable              | Raw status.                          |
-| `raw_price`       |    `text` | nullable              | Raw price kept as text for evidence. |
-| `raw_notes`       |    `text` | nullable              | Raw notes/details.                   |
-| `row_hash`        |    `text` | NOT NULL              | Staging dedupe/audit hash.           |
-| `classification`  |    `text` | nullable              | Importer classification.             |
-| `active`          | `boolean` | NOT NULL DEFAULT true | Soft activation.                     |
+Use `_releases` for draft, validated, published, archived, and rolled-back data snapshots. The app should consume only the latest published release, and cache invalidation should key off `release_id`.
+
+## SQL
+
+Create the schema:
 
 ```sql
-CREATE TABLE source_rows (
-  source_row_id text PRIMARY KEY,
-  variant_id text REFERENCES variants (variant_id),
-  raw_section text,
-  raw_rpo text,
-  raw_label text,
-  raw_description text,
-  raw_status text,
-  raw_price text,
-  raw_notes text,
-  row_hash text NOT NULL,
-  classification text,
-  active boolean NOT NULL DEFAULT true
-);
-```
-
-## Index Plan
-
-| Index                                          | Query Pattern                                                  | Why It Exists                                                                   |
-| ---------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `idx_variants_active_lookup`                   | Find active variants by `model_key/body_style/trim_level`.     | Variant selection is the entrypoint for resolution.                             |
-| `idx_options_rpo`                              | Lookup options from imported RPOs.                             | RPO is not the key, but migration/reconciliation will repeatedly search by RPO. |
-| `idx_options_active_type`                      | Filter active options by `option_type`.                        | Supports catalog/admin browsing without scanning inactive rows.                 |
-| `idx_steps_dataset_order`                      | Render steps for a dataset.                                    | Keeps UI ordering cheap.                                                        |
-| `idx_sections_dataset_step_order`              | Render sections under each step.                               | Matches presentation resolution flow.                                           |
-| `idx_choice_groups_section_order`              | Load groups for a section.                                     | Supports section-to-choice rendering.                                           |
-| `idx_choice_group_options_option`              | Find every placement for an option.                            | Useful for duplicate RPO audits and migration checks.                           |
-| `idx_choice_group_options_group_order`         | Render options within a group.                                 | Core customer-facing read path.                                                 |
-| `idx_option_status_variant_status`             | Load all option states for a variant, excluding unavailable.   | This is the main application read path.                                         |
-| `idx_option_status_option`                     | Audit every variant status for an option.                      | Supports migration parity and admin review.                                     |
-| `idx_standard_equipment_variant_section_order` | Render materialized standard equipment by variant and section. | Export-only read path.                                                          |
-| `idx_rules_source`                             | Apply rules triggered by selected/present source.              | Core rule engine lookup.                                                        |
-| `idx_rules_target`                             | Audit reverse dependencies and impacts.                        | Supports admin/debug tooling.                                                   |
-| `idx_rules_variant_type`                       | Load scoped rules for a variant.                               | Variant-specific rule resolution.                                               |
-| `idx_rule_members_rule_order`                  | Resolve `requires_any` member lists.                           | Rule members are authoritative for any-of satisfaction.                         |
-| `idx_source_rows_hash`                         | Dedupe raw imports.                                            | Prevents repeated source evidence.                                              |
-| `idx_source_rows_variant_rpo`                  | Reconcile raw rows by variant and RPO.                         | Supports importer migration from existing schema.                               |
-
-## Read Path
-
-```sql
-SELECT
-  cg.group_id,
-  cg.label AS group_label,
-  cgo.option_id,
-  o.rpo,
-  o.label AS option_label,
-  os.status,
-  os.price
-FROM option_status os
-JOIN options o ON o.option_id = os.option_id
-JOIN choice_group_options cgo ON cgo.option_id = os.option_id
-JOIN choice_groups cg ON cg.group_id = cgo.group_id
-WHERE os.variant_id = :variant_id
-  AND os.active = true
-  AND o.active = true
-  AND cgo.active = true
-  AND cg.active = true
-  AND os.status <> 'unavailable'
-ORDER BY cg.group_id, cgo.display_order;
-```
-
-```sql
-SELECT *
-FROM rules
-WHERE active = true
-  AND source_type = 'option'
-  AND source_id = :selected_option_id
-  AND (variant_id = :variant_id OR variant_id IS NULL);
-```
-
-## Write And Migration Pattern
-
-```mermaid
-flowchart TD
-  A["Existing source/order-guide rows"] --> B["source_rows"]
-  B --> C["Classify duplicate RPOs"]
-  C --> D["options"]
-  C --> E["variants"]
-  D --> F["option_status"]
-  E --> F
-  D --> G["choice_group_options"]
-  H["steps"] --> I["sections"]
-  I --> J["choice_groups"]
-  J --> G
-  F --> K["standard_equipment export"]
-  D --> L["rules"]
-  F --> L
-  L --> M["rule_members"]
-```
-
-```sql
--- Up migration
 \i schemaData/sql/001_create_schema.sql
-
--- Load order for CSV data
--- 1. variants
--- 2. options
--- 3. steps
--- 4. sections
--- 5. choice_groups
--- 6. choice_group_options
--- 7. option_status
--- 8. standard_equipment
--- 9. rules
--- 10. rule_members
--- 11. source_rows
 ```
 
+Rollback the scaffold:
+
 ```sql
--- Rollback
 \i schemaData/sql/001_rollback_schema.sql
 ```
 
-## Normalization Notes
+Suggested load order for authoring CSVs:
 
-| Concern              | Decision                                                                                                                                        |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| RPO identity         | `rpo` stays on `options`; `option_id` remains the key.                                                                                          |
-| Variant availability | `option_status` resolves all broad source logic into `option_id + variant_id`.                                                                  |
-| Display placement    | `choice_group_options` places options; options are not duplicated for display.                                                                  |
-| Standard equipment   | Derived/export-only from `option_status` statuses `standard_choice`, `standard_fixed`, and `included`.                                          |
-| Interiors            | Use regular `options`, `choice_groups`, `option_status`, and `rules` first. Dedicated interior tables are intentionally absent.                 |
-| Color overrides      | Represent through `rules` with `requires` or `includes`.                                                                                        |
-| Price overrides      | Represent structurally through `rules.rule_type = price_override`; value/action metadata remains unresolved and is not inferred from `message`. |
-| Raw source weirdness | Kept in `source_rows`; canonical tables do not absorb raw-only columns.                                                                         |
+1. `lookup/datasets.csv`
+2. `lookup/model_years.csv`
+3. `lookup/models.csv`
+4. `lookup/body_styles.csv`
+5. `lookup/trims.csv`
+6. `lookup/categories.csv`
+7. `core/variants.csv`
+8. `core/variant_scopes.csv`
+9. `core/scope_variants.csv`
+10. `core/options.csv`
+11. `core/option_versions.csv`
+12. `presentation/steps.csv`
+13. `presentation/sections.csv`
+14. `presentation/choice_groups.csv`
+15. `presentation/choice_group_options.csv`
+16. `state/option_availability.csv`
+17. `state/option_status_resolved.csv`
+18. `logic/rules.csv`
+19. `logic/rule_conditions.csv`
+20. `logic/rule_actions.csv`
+21. `logic/rule_members.csv`
+22. `packages/packages.csv`
+23. `packages/package_members.csv`
+24. `source/source_rows.csv`
 
-## Open Schema Decisions Preserved
-
-| Area                                                           | Current Treatment                                                                         |
-| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `steps.display_order` vs runtime `runtime_order`               | CSV header keeps `display_order`; runtime shape remains export-only until canonicalized.  |
-| Enriched section UI fields                                     | Not added because base CSV header does not include them.                                  |
-| `selection_mode` semantics                                     | Values are constrained to observed values; behavior semantics remain open.                |
-| `rules.source_id`, `rules.target_id`, `rule_members.member_id` | Polymorphic IDs need importer/application validation or future trigger-based enforcement. |
-| Multi-condition rules                                          | Not represented beyond current source schema.                                             |
-| Price metadata                                                 | Not added because it is listed as possible future metadata.                               |
+App, validation, package-validation, and release CSVs are generated or operational outputs unless a later workflow explicitly says otherwise.

@@ -1,1 +1,1 @@
-group_id,label,section_id,section_name,category_id,category_name,step_key,selection_mode,required,active
+group_id,section_id,group_label,selection_mode,required,min_select,max_select,display_order,active
