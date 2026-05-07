@@ -56,32 +56,32 @@ erDiagram
 
 ## CSV Headers
 
-| Folder | File | Header |
-|---|---|---|
-| `core` | `variants.csv` | `variant_id,model_year,model_key,body_style,trim_level,active` |
-| `core` | `options.csv` | `option_id,rpo,label,description,option_type,active` |
-| `presentation` | `steps.csv` | `step_key,dataset_id,step_label,display_order,active` |
-| `presentation` | `sections.csv` | `section_id,dataset_id,step_key,section_name,category_id,category_name,display_order,active` |
-| `presentation` | `choice_groups.csv` | `group_id,label,section_id,section_name,category_id,category_name,step_key,selection_mode,required,active` |
-| `presentation` | `choice_group_options.csv` | `group_id,option_id,display_order,active` |
-| `state` | `option_status.csv` | `option_id,variant_id,status,price,active` |
-| `state` | `standard_equipment.csv` | `standard_equipment_id,dataset_id,variant_id,option_id,section_id,display_order,label_override,description_override,notes,active` |
-| `logic` | `rules.csv` | `rule_id,rule_type,source_type,source_id,target_type,target_id,variant_id,message,active` |
-| `logic` | `rule_members.csv` | `rule_id,member_type,member_id,member_order,active` |
-| `source` | `source_rows.csv` | `source_row_id,variant_id,raw_section,raw_rpo,raw_label,raw_description,raw_status,raw_price,raw_notes,row_hash,classification,active` |
+| Folder         | File                       | Header                                                                                                                                 |
+| -------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `core`         | `variants.csv`             | `variant_id,model_year,model_key,body_style,trim_level,active`                                                                         |
+| `core`         | `options.csv`              | `option_id,rpo,label,description,option_type,active`                                                                                   |
+| `presentation` | `steps.csv`                | `step_key,dataset_id,step_label,display_order,active`                                                                                  |
+| `presentation` | `sections.csv`             | `section_id,dataset_id,step_key,section_name,category_id,category_name,display_order,active`                                           |
+| `presentation` | `choice_groups.csv`        | `group_id,label,section_id,section_name,category_id,category_name,step_key,selection_mode,required,active`                             |
+| `presentation` | `choice_group_options.csv` | `group_id,option_id,display_order,active`                                                                                              |
+| `state`        | `option_status.csv`        | `option_id,variant_id,status,price,active`                                                                                             |
+| `state`        | `standard_equipment.csv`   | `standard_equipment_id,dataset_id,variant_id,option_id,section_id,display_order,label_override,description_override,notes,active`      |
+| `logic`        | `rules.csv`                | `rule_id,rule_type,source_type,source_id,target_type,target_id,variant_id,message,active`                                              |
+| `logic`        | `rule_members.csv`         | `rule_id,member_type,member_id,member_order,active`                                                                                    |
+| `source`       | `source_rows.csv`          | `source_row_id,variant_id,raw_section,raw_rpo,raw_label,raw_description,raw_status,raw_price,raw_notes,row_hash,classification,active` |
 
 ## Table Definitions
 
 ### `variants`
 
-| Column | Type | Constraints | Notes |
-|---|---:|---|---|
-| `variant_id` | `text` | PK | Stable build context key. |
-| `model_year` | `integer` | NOT NULL | Query/display helper. |
-| `model_key` | `text` | NOT NULL | Query/display helper. |
-| `body_style` | `text` | NOT NULL | Query/display helper. |
-| `trim_level` | `text` | NOT NULL | Query/display helper. |
-| `active` | `boolean` | NOT NULL DEFAULT true | Soft activation. |
+| Column       |      Type | Constraints           | Notes                     |
+| ------------ | --------: | --------------------- | ------------------------- |
+| `variant_id` |    `text` | PK                    | Stable build context key. |
+| `model_year` | `integer` | NOT NULL              | Query/display helper.     |
+| `model_key`  |    `text` | NOT NULL              | Query/display helper.     |
+| `body_style` |    `text` | NOT NULL              | Query/display helper.     |
+| `trim_level` |    `text` | NOT NULL              | Query/display helper.     |
+| `active`     | `boolean` | NOT NULL DEFAULT true | Soft activation.          |
 
 ```sql
 CREATE TABLE variants (
@@ -96,14 +96,14 @@ CREATE TABLE variants (
 
 ### `options`
 
-| Column | Type | Constraints | Notes |
-|---|---:|---|---|
-| `option_id` | `text` | PK | Canonical option key. |
-| `rpo` | `text` | NOT NULL | RPO property, not the key. |
-| `label` | `text` | NOT NULL | Customer/admin label. |
-| `description` | `text` | nullable | Optional descriptive copy. |
-| `option_type` | `text` | NOT NULL | Value set is not fully specified in source. |
-| `active` | `boolean` | NOT NULL DEFAULT true | Soft activation. |
+| Column        |      Type | Constraints           | Notes                                       |
+| ------------- | --------: | --------------------- | ------------------------------------------- |
+| `option_id`   |    `text` | PK                    | Canonical option key.                       |
+| `rpo`         |    `text` | NOT NULL              | RPO property, not the key.                  |
+| `label`       |    `text` | NOT NULL              | Customer facing label.                      |
+| `description` |    `text` | nullable              | Optional descriptive copy.                  |
+| `option_type` |    `text` | NOT NULL              | Value set is not fully specified in source. |
+| `active`      | `boolean` | NOT NULL DEFAULT true | Soft activation.                            |
 
 ```sql
 CREATE TABLE options (
@@ -118,13 +118,13 @@ CREATE TABLE options (
 
 ### `steps`
 
-| Column | Type | Constraints | Notes |
-|---|---:|---|---|
-| `step_key` | `text` | PK part | Step identifier inside a dataset. |
-| `dataset_id` | `text` | PK part | Dataset namespace. |
-| `step_label` | `text` | NOT NULL | Display label. |
-| `display_order` | `integer` | NOT NULL | Sort order. |
-| `active` | `boolean` | NOT NULL DEFAULT true | Soft activation. |
+| Column          |      Type | Constraints           | Notes                             |
+| --------------- | --------: | --------------------- | --------------------------------- |
+| `step_key`      |    `text` | PK part               | Step identifier inside a dataset. |
+| `dataset_id`    |    `text` | PK part               | Dataset namespace.                |
+| `step_label`    |    `text` | NOT NULL              | Display label.                    |
+| `display_order` | `integer` | NOT NULL              | Sort order.                       |
+| `active`        | `boolean` | NOT NULL DEFAULT true | Soft activation.                  |
 
 ```sql
 CREATE TABLE steps (
@@ -139,16 +139,16 @@ CREATE TABLE steps (
 
 ### `sections`
 
-| Column | Type | Constraints | Notes |
-|---|---:|---|---|
-| `section_id` | `text` | PK | Section key. |
-| `dataset_id` | `text` | FK to `steps.dataset_id` | Dataset namespace. |
-| `step_key` | `text` | FK to `steps.step_key` | Parent step. |
-| `section_name` | `text` | NOT NULL | Display name. |
-| `category_id` | `text` | NOT NULL | Category key. |
-| `category_name` | `text` | NOT NULL | Category label. |
-| `display_order` | `integer` | NOT NULL | Sort order. |
-| `active` | `boolean` | NOT NULL DEFAULT true | Soft activation. |
+| Column          |      Type | Constraints              | Notes              |
+| --------------- | --------: | ------------------------ | ------------------ |
+| `section_id`    |    `text` | PK                       | Section key.       |
+| `dataset_id`    |    `text` | FK to `steps.dataset_id` | Dataset namespace. |
+| `step_key`      |    `text` | FK to `steps.step_key`   | Parent step.       |
+| `section_name`  |    `text` | NOT NULL                 | Display name.      |
+| `category_id`   |    `text` | NOT NULL                 | Category key.      |
+| `category_name` |    `text` | NOT NULL                 | Category label.    |
+| `display_order` | `integer` | NOT NULL                 | Sort order.        |
+| `active`        | `boolean` | NOT NULL DEFAULT true    | Soft activation.   |
 
 ```sql
 CREATE TABLE sections (
@@ -166,18 +166,18 @@ CREATE TABLE sections (
 
 ### `choice_groups`
 
-| Column | Type | Constraints | Notes |
-|---|---:|---|---|
-| `group_id` | `text` | PK | Stable choice group key. |
-| `label` | `text` | NOT NULL | Group display label. |
-| `section_id` | `text` | FK to `sections.section_id` | Parent section. |
-| `section_name` | `text` | NOT NULL | Denormalized display helper from source header. |
-| `category_id` | `text` | NOT NULL | Denormalized display helper from source header. |
-| `category_name` | `text` | NOT NULL | Denormalized display helper from source header. |
-| `step_key` | `text` | NOT NULL | Denormalized display helper from source header. |
-| `selection_mode` | `text` | CHECK | `single`, `single_select_req`, or `single_select_opt`. |
-| `required` | `boolean` | NOT NULL | Required behavior remains semantically open in source. |
-| `active` | `boolean` | NOT NULL DEFAULT true | Soft activation. |
+| Column           |      Type | Constraints                 | Notes                                                  |
+| ---------------- | --------: | --------------------------- | ------------------------------------------------------ |
+| `group_id`       |    `text` | PK                          | Stable choice group key.                               |
+| `label`          |    `text` | NOT NULL                    | Group display label.                                   |
+| `section_id`     |    `text` | FK to `sections.section_id` | Parent section.                                        |
+| `section_name`   |    `text` | NOT NULL                    | Denormalized display helper from source header.        |
+| `category_id`    |    `text` | NOT NULL                    | Denormalized display helper from source header.        |
+| `category_name`  |    `text` | NOT NULL                    | Denormalized display helper from source header.        |
+| `step_key`       |    `text` | NOT NULL                    | Denormalized display helper from source header.        |
+| `selection_mode` |    `text` | CHECK                       | `single`, `single_select_req`, or `single_select_opt`. |
+| `required`       | `boolean` | NOT NULL                    | Required behavior remains semantically open in source. |
+| `active`         | `boolean` | NOT NULL DEFAULT true       | Soft activation.                                       |
 
 ```sql
 CREATE TABLE choice_groups (
@@ -196,12 +196,12 @@ CREATE TABLE choice_groups (
 
 ### `choice_group_options`
 
-| Column | Type | Constraints | Notes |
-|---|---:|---|---|
-| `group_id` | `text` | PK part, FK | Choice group. |
-| `option_id` | `text` | PK part, FK | Universal option. |
-| `display_order` | `integer` | NOT NULL | Sort order within group. |
-| `active` | `boolean` | NOT NULL DEFAULT true | Soft activation. |
+| Column          |      Type | Constraints           | Notes                    |
+| --------------- | --------: | --------------------- | ------------------------ |
+| `group_id`      |    `text` | PK part, FK           | Choice group.            |
+| `option_id`     |    `text` | PK part, FK           | Universal option.        |
+| `display_order` | `integer` | NOT NULL              | Sort order within group. |
+| `active`        | `boolean` | NOT NULL DEFAULT true | Soft activation.         |
 
 ```sql
 CREATE TABLE choice_group_options (
@@ -215,13 +215,13 @@ CREATE TABLE choice_group_options (
 
 ### `option_status`
 
-| Column | Type | Constraints | Notes |
-|---|---:|---|---|
-| `option_id` | `text` | PK part, FK | Universal option. |
-| `variant_id` | `text` | PK part, FK | Resolved variant context. |
-| `status` | `text` | CHECK | `optional`, `standard_choice`, `standard_fixed`, `included`, `unavailable`. |
-| `price` | `numeric(12,2)` | NOT NULL DEFAULT 0 | Base variant price before rule overrides. |
-| `active` | `boolean` | NOT NULL DEFAULT true | Soft activation. |
+| Column       |            Type | Constraints           | Notes                                                                       |
+| ------------ | --------------: | --------------------- | --------------------------------------------------------------------------- |
+| `option_id`  |          `text` | PK part, FK           | Universal option.                                                           |
+| `variant_id` |          `text` | PK part, FK           | Resolved variant context.                                                   |
+| `status`     |          `text` | CHECK                 | `optional`, `standard_choice`, `standard_fixed`, `included`, `unavailable`. |
+| `price`      | `numeric(12,2)` | NOT NULL DEFAULT 0    | Base variant price before rule overrides.                                   |
+| `active`     |       `boolean` | NOT NULL DEFAULT true | Soft activation.                                                            |
 
 ```sql
 CREATE TABLE option_status (
@@ -236,18 +236,18 @@ CREATE TABLE option_status (
 
 ### `standard_equipment`
 
-| Column | Type | Constraints | Notes |
-|---|---:|---|---|
-| `standard_equipment_id` | `text` | PK | Export row key. |
-| `dataset_id` | `text` | NOT NULL | Dataset namespace. |
-| `variant_id` | `text` | FK to `variants` and composite FK to `option_status` | Variant context. |
-| `option_id` | `text` | FK to `options` and composite FK to `option_status` | Same canonical option_id. |
-| `section_id` | `text` | FK | Display section. |
-| `display_order` | `integer` | NOT NULL | Export sort order. |
-| `label_override` | `text` | nullable | Export override only. |
-| `description_override` | `text` | nullable | Export override only. |
-| `notes` | `text` | nullable | Export notes. |
-| `active` | `boolean` | NOT NULL DEFAULT true | Soft activation. |
+| Column                  |      Type | Constraints                                          | Notes                     |
+| ----------------------- | --------: | ---------------------------------------------------- | ------------------------- |
+| `standard_equipment_id` |    `text` | PK                                                   | Export row key.           |
+| `dataset_id`            |    `text` | NOT NULL                                             | Dataset namespace.        |
+| `variant_id`            |    `text` | FK to `variants` and composite FK to `option_status` | Variant context.          |
+| `option_id`             |    `text` | FK to `options` and composite FK to `option_status`  | Same canonical option_id. |
+| `section_id`            |    `text` | FK                                                   | Display section.          |
+| `display_order`         | `integer` | NOT NULL                                             | Export sort order.        |
+| `label_override`        |    `text` | nullable                                             | Export override only.     |
+| `description_override`  |    `text` | nullable                                             | Export override only.     |
+| `notes`                 |    `text` | nullable                                             | Export notes.             |
+| `active`                | `boolean` | NOT NULL DEFAULT true                                | Soft activation.          |
 
 ```sql
 CREATE TABLE standard_equipment (
@@ -267,17 +267,17 @@ CREATE TABLE standard_equipment (
 
 ### `rules`
 
-| Column | Type | Constraints | Notes |
-|---|---:|---|---|
-| `rule_id` | `text` | PK | Stable rule key. |
-| `rule_type` | `text` | CHECK | `excludes`, `requires`, `includes`, `requires_any`, `price_override`, `replaces_default`. |
-| `source_type` | `text` | CHECK | `option`, `group`, or `variant`. |
-| `source_id` | `text` | NOT NULL | Polymorphic reference. |
-| `target_type` | `text` | CHECK | `option`, `group`, or `variant`. |
-| `target_id` | `text` | NOT NULL | Polymorphic reference. |
-| `variant_id` | `text` | FK nullable | Null means wherever source and target exist. |
-| `message` | `text` | nullable | User/admin explanation. |
-| `active` | `boolean` | NOT NULL DEFAULT true | Soft activation. |
+| Column        |      Type | Constraints           | Notes                                                                                     |
+| ------------- | --------: | --------------------- | ----------------------------------------------------------------------------------------- |
+| `rule_id`     |    `text` | PK                    | Stable rule key.                                                                          |
+| `rule_type`   |    `text` | CHECK                 | `excludes`, `requires`, `includes`, `requires_any`, `price_override`, `replaces_default`. |
+| `source_type` |    `text` | CHECK                 | `option`, `group`, or `variant`.                                                          |
+| `source_id`   |    `text` | NOT NULL              | Polymorphic reference.                                                                    |
+| `target_type` |    `text` | CHECK                 | `option`, `group`, or `variant`.                                                          |
+| `target_id`   |    `text` | NOT NULL              | Polymorphic reference.                                                                    |
+| `variant_id`  |    `text` | FK nullable           | Null means wherever source and target exist.                                              |
+| `message`     |    `text` | nullable              | User/admin explanation.                                                                   |
+| `active`      | `boolean` | NOT NULL DEFAULT true | Soft activation.                                                                          |
 
 ```sql
 CREATE TABLE rules (
@@ -295,13 +295,13 @@ CREATE TABLE rules (
 
 ### `rule_members`
 
-| Column | Type | Constraints | Notes |
-|---|---:|---|---|
-| `rule_id` | `text` | PK part, FK | Parent rule. |
-| `member_type` | `text` | PK part, CHECK | `option`, `group`, or `variant`. |
-| `member_id` | `text` | PK part | Polymorphic member reference. |
-| `member_order` | `integer` | NOT NULL | Member ordering. |
-| `active` | `boolean` | NOT NULL DEFAULT true | Soft activation. |
+| Column         |      Type | Constraints           | Notes                            |
+| -------------- | --------: | --------------------- | -------------------------------- |
+| `rule_id`      |    `text` | PK part, FK           | Parent rule.                     |
+| `member_type`  |    `text` | PK part, CHECK        | `option`, `group`, or `variant`. |
+| `member_id`    |    `text` | PK part               | Polymorphic member reference.    |
+| `member_order` | `integer` | NOT NULL              | Member ordering.                 |
+| `active`       | `boolean` | NOT NULL DEFAULT true | Soft activation.                 |
 
 ```sql
 CREATE TABLE rule_members (
@@ -316,20 +316,20 @@ CREATE TABLE rule_members (
 
 ### `source_rows`
 
-| Column | Type | Constraints | Notes |
-|---|---:|---|---|
-| `source_row_id` | `text` | PK | Raw evidence row key. |
-| `variant_id` | `text` | FK nullable | Variant if resolved at staging time. |
-| `raw_section` | `text` | nullable | Raw source section. |
-| `raw_rpo` | `text` | nullable | Raw source RPO. |
-| `raw_label` | `text` | nullable | Raw label. |
-| `raw_description` | `text` | nullable | Raw description. |
-| `raw_status` | `text` | nullable | Raw status. |
-| `raw_price` | `text` | nullable | Raw price kept as text for evidence. |
-| `raw_notes` | `text` | nullable | Raw notes/details. |
-| `row_hash` | `text` | NOT NULL | Staging dedupe/audit hash. |
-| `classification` | `text` | nullable | Importer classification. |
-| `active` | `boolean` | NOT NULL DEFAULT true | Soft activation. |
+| Column            |      Type | Constraints           | Notes                                |
+| ----------------- | --------: | --------------------- | ------------------------------------ |
+| `source_row_id`   |    `text` | PK                    | Raw evidence row key.                |
+| `variant_id`      |    `text` | FK nullable           | Variant if resolved at staging time. |
+| `raw_section`     |    `text` | nullable              | Raw source section.                  |
+| `raw_rpo`         |    `text` | nullable              | Raw source RPO.                      |
+| `raw_label`       |    `text` | nullable              | Raw label.                           |
+| `raw_description` |    `text` | nullable              | Raw description.                     |
+| `raw_status`      |    `text` | nullable              | Raw status.                          |
+| `raw_price`       |    `text` | nullable              | Raw price kept as text for evidence. |
+| `raw_notes`       |    `text` | nullable              | Raw notes/details.                   |
+| `row_hash`        |    `text` | NOT NULL              | Staging dedupe/audit hash.           |
+| `classification`  |    `text` | nullable              | Importer classification.             |
+| `active`          | `boolean` | NOT NULL DEFAULT true | Soft activation.                     |
 
 ```sql
 CREATE TABLE source_rows (
@@ -350,25 +350,25 @@ CREATE TABLE source_rows (
 
 ## Index Plan
 
-| Index | Query Pattern | Why It Exists |
-|---|---|---|
-| `idx_variants_active_lookup` | Find active variants by `model_key/body_style/trim_level`. | Variant selection is the entrypoint for resolution. |
-| `idx_options_rpo` | Lookup options from imported RPOs. | RPO is not the key, but migration/reconciliation will repeatedly search by RPO. |
-| `idx_options_active_type` | Filter active options by `option_type`. | Supports catalog/admin browsing without scanning inactive rows. |
-| `idx_steps_dataset_order` | Render steps for a dataset. | Keeps UI ordering cheap. |
-| `idx_sections_dataset_step_order` | Render sections under each step. | Matches presentation resolution flow. |
-| `idx_choice_groups_section_order` | Load groups for a section. | Supports section-to-choice rendering. |
-| `idx_choice_group_options_option` | Find every placement for an option. | Useful for duplicate RPO audits and migration checks. |
-| `idx_choice_group_options_group_order` | Render options within a group. | Core customer-facing read path. |
-| `idx_option_status_variant_status` | Load all option states for a variant, excluding unavailable. | This is the main application read path. |
-| `idx_option_status_option` | Audit every variant status for an option. | Supports migration parity and admin review. |
-| `idx_standard_equipment_variant_section_order` | Render materialized standard equipment by variant and section. | Export-only read path. |
-| `idx_rules_source` | Apply rules triggered by selected/present source. | Core rule engine lookup. |
-| `idx_rules_target` | Audit reverse dependencies and impacts. | Supports admin/debug tooling. |
-| `idx_rules_variant_type` | Load scoped rules for a variant. | Variant-specific rule resolution. |
-| `idx_rule_members_rule_order` | Resolve `requires_any` member lists. | Rule members are authoritative for any-of satisfaction. |
-| `idx_source_rows_hash` | Dedupe raw imports. | Prevents repeated source evidence. |
-| `idx_source_rows_variant_rpo` | Reconcile raw rows by variant and RPO. | Supports importer migration from existing schema. |
+| Index                                          | Query Pattern                                                  | Why It Exists                                                                   |
+| ---------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `idx_variants_active_lookup`                   | Find active variants by `model_key/body_style/trim_level`.     | Variant selection is the entrypoint for resolution.                             |
+| `idx_options_rpo`                              | Lookup options from imported RPOs.                             | RPO is not the key, but migration/reconciliation will repeatedly search by RPO. |
+| `idx_options_active_type`                      | Filter active options by `option_type`.                        | Supports catalog/admin browsing without scanning inactive rows.                 |
+| `idx_steps_dataset_order`                      | Render steps for a dataset.                                    | Keeps UI ordering cheap.                                                        |
+| `idx_sections_dataset_step_order`              | Render sections under each step.                               | Matches presentation resolution flow.                                           |
+| `idx_choice_groups_section_order`              | Load groups for a section.                                     | Supports section-to-choice rendering.                                           |
+| `idx_choice_group_options_option`              | Find every placement for an option.                            | Useful for duplicate RPO audits and migration checks.                           |
+| `idx_choice_group_options_group_order`         | Render options within a group.                                 | Core customer-facing read path.                                                 |
+| `idx_option_status_variant_status`             | Load all option states for a variant, excluding unavailable.   | This is the main application read path.                                         |
+| `idx_option_status_option`                     | Audit every variant status for an option.                      | Supports migration parity and admin review.                                     |
+| `idx_standard_equipment_variant_section_order` | Render materialized standard equipment by variant and section. | Export-only read path.                                                          |
+| `idx_rules_source`                             | Apply rules triggered by selected/present source.              | Core rule engine lookup.                                                        |
+| `idx_rules_target`                             | Audit reverse dependencies and impacts.                        | Supports admin/debug tooling.                                                   |
+| `idx_rules_variant_type`                       | Load scoped rules for a variant.                               | Variant-specific rule resolution.                                               |
+| `idx_rule_members_rule_order`                  | Resolve `requires_any` member lists.                           | Rule members are authoritative for any-of satisfaction.                         |
+| `idx_source_rows_hash`                         | Dedupe raw imports.                                            | Prevents repeated source evidence.                                              |
+| `idx_source_rows_variant_rpo`                  | Reconcile raw rows by variant and RPO.                         | Supports importer migration from existing schema.                               |
 
 ## Read Path
 
@@ -448,24 +448,24 @@ flowchart TD
 
 ## Normalization Notes
 
-| Concern | Decision |
-|---|---|
-| RPO identity | `rpo` stays on `options`; `option_id` remains the key. |
-| Variant availability | `option_status` resolves all broad source logic into `option_id + variant_id`. |
-| Display placement | `choice_group_options` places options; options are not duplicated for display. |
-| Standard equipment | Derived/export-only from `option_status` statuses `standard_choice`, `standard_fixed`, and `included`. |
-| Interiors | Use regular `options`, `choice_groups`, `option_status`, and `rules` first. Dedicated interior tables are intentionally absent. |
-| Color overrides | Represent through `rules` with `requires` or `includes`. |
-| Price overrides | Represent structurally through `rules.rule_type = price_override`; value/action metadata remains unresolved and is not inferred from `message`. |
-| Raw source weirdness | Kept in `source_rows`; canonical tables do not absorb raw-only columns. |
+| Concern              | Decision                                                                                                                                        |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| RPO identity         | `rpo` stays on `options`; `option_id` remains the key.                                                                                          |
+| Variant availability | `option_status` resolves all broad source logic into `option_id + variant_id`.                                                                  |
+| Display placement    | `choice_group_options` places options; options are not duplicated for display.                                                                  |
+| Standard equipment   | Derived/export-only from `option_status` statuses `standard_choice`, `standard_fixed`, and `included`.                                          |
+| Interiors            | Use regular `options`, `choice_groups`, `option_status`, and `rules` first. Dedicated interior tables are intentionally absent.                 |
+| Color overrides      | Represent through `rules` with `requires` or `includes`.                                                                                        |
+| Price overrides      | Represent structurally through `rules.rule_type = price_override`; value/action metadata remains unresolved and is not inferred from `message`. |
+| Raw source weirdness | Kept in `source_rows`; canonical tables do not absorb raw-only columns.                                                                         |
 
 ## Open Schema Decisions Preserved
 
-| Area | Current Treatment |
-|---|---|
-| `steps.display_order` vs runtime `runtime_order` | CSV header keeps `display_order`; runtime shape remains export-only until canonicalized. |
-| Enriched section UI fields | Not added because base CSV header does not include them. |
-| `selection_mode` semantics | Values are constrained to observed values; behavior semantics remain open. |
+| Area                                                           | Current Treatment                                                                         |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `steps.display_order` vs runtime `runtime_order`               | CSV header keeps `display_order`; runtime shape remains export-only until canonicalized.  |
+| Enriched section UI fields                                     | Not added because base CSV header does not include them.                                  |
+| `selection_mode` semantics                                     | Values are constrained to observed values; behavior semantics remain open.                |
 | `rules.source_id`, `rules.target_id`, `rule_members.member_id` | Polymorphic IDs need importer/application validation or future trigger-based enforcement. |
-| Multi-condition rules | Not represented beyond current source schema. |
-| Price metadata | Not added because it is listed as possible future metadata. |
+| Multi-condition rules                                          | Not represented beyond current source schema.                                             |
+| Price metadata                                                 | Not added because it is listed as possible future metadata.                               |
