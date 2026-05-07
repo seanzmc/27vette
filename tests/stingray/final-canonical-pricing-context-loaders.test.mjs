@@ -66,6 +66,50 @@ const TRANSITIONAL_BASE_PRICE_FIELDS = [
   "active",
   "notes",
 ];
+const FINAL_CANONICAL_OPTION_FIELDS = [
+  "canonical_option_id",
+  "rpo",
+  "label",
+  "description",
+  "canonical_kind",
+  "duplicate_rpo_classification",
+  "active",
+  "notes",
+];
+const FINAL_OPTION_PRESENTATION_FIELDS = [
+  "presentation_id",
+  "canonical_option_id",
+  "rpo_override",
+  "presentation_role",
+  "choice_group_id",
+  "section_id",
+  "section_name",
+  "category_id",
+  "category_name",
+  "step_key",
+  "selection_mode",
+  "display_order",
+  "selectable",
+  "active",
+  "label",
+  "description",
+  "source_detail_raw",
+  "notes",
+  "legacy_option_id",
+  "choice_mode",
+  "selection_mode_label",
+];
+const FINAL_OPTION_STATUS_RULE_FIELDS = [
+  "status_rule_id",
+  "canonical_option_id",
+  "presentation_id",
+  "context_scope_id",
+  "status",
+  "status_label",
+  "priority",
+  "active",
+  "notes",
+];
 const FINAL_VARIANT_FIELDS = [
   "variant_id",
   "model_year",
@@ -155,6 +199,12 @@ function writeCanonicalPresentationTables(packageDir, { canonicalRows = [], pres
   writeCsv(path.join(packageDir, "ui", "option_presentations.csv"), PRESENTATION_FIELDS, presentationRows);
   writeCsv(path.join(packageDir, "logic", "option_status_rules.csv"), STATUS_FIELDS, statusRows);
   writeCsv(path.join(packageDir, "pricing", "canonical_base_prices.csv"), TRANSITIONAL_BASE_PRICE_FIELDS, transitionalBasePriceRows);
+}
+
+function writeFinalOptionTables(packageDir, { canonicalRows = [], presentationRows = [], statusRows = [] } = {}) {
+  writeCsv(path.join(packageDir, "canonical", "options", "canonical_options.csv"), FINAL_CANONICAL_OPTION_FIELDS, canonicalRows);
+  writeCsv(path.join(packageDir, "canonical", "presentation", "option_presentations.csv"), FINAL_OPTION_PRESENTATION_FIELDS, presentationRows);
+  writeCsv(path.join(packageDir, "canonical", "status", "option_status_rules.csv"), FINAL_OPTION_STATUS_RULE_FIELDS, statusRows);
 }
 
 function writeFinalPricingTables(packageDir, {
@@ -264,6 +314,95 @@ function qebCanonicalRows() {
   };
 }
 
+function qebFinalCanonicalRows() {
+  return {
+    canonicalRows: [
+      {
+        canonical_option_id: "canonical_final_qeb",
+        rpo: "QEB",
+        label: "5-split-spoke Pearl Nickel forged aluminum wheels",
+        description: '19" x 8.5" (48.3 cm x 21.6 cm) front and 20" x 11" (50.8 cm x 27.9 cm) rear',
+        canonical_kind: "customer_choice",
+        duplicate_rpo_classification: "display_only_duplicate",
+        active: "true",
+        notes: "Temp final canonical QEB fixture.",
+      },
+    ],
+    presentationRows: [
+      {
+        presentation_id: "pres_final_qeb_wheels_choice",
+        canonical_option_id: "canonical_final_qeb",
+        rpo_override: "",
+        presentation_role: "customer_choice",
+        choice_group_id: "cg_wheels",
+        section_id: "sec_whee_002",
+        section_name: "Wheels",
+        category_id: "cat_exte_001",
+        category_name: "Exterior",
+        step_key: "wheels",
+        selection_mode: "single_select_req",
+        display_order: "10",
+        selectable: "True",
+        active: "true",
+        label: "",
+        description: "",
+        source_detail_raw: "",
+        notes: "Temp final QEB customer choice.",
+        legacy_option_id: "opt_qeb_temp_choice",
+        choice_mode: "single",
+        selection_mode_label: "Required single choice",
+      },
+      {
+        presentation_id: "pres_final_qeb_standard_options",
+        canonical_option_id: "canonical_final_qeb",
+        rpo_override: "",
+        presentation_role: "standard_options_display",
+        choice_group_id: "",
+        section_id: "sec_stan_002",
+        section_name: "Standard Options",
+        category_id: "cat_stan_001",
+        category_name: "Standard Equipment",
+        step_key: "standard_equipment",
+        selection_mode: "display_only",
+        display_order: "10",
+        selectable: "False",
+        active: "true",
+        label: "Wheels",
+        description: '19" x 8.5" (48.3 cm x 21.6 cm) front and 20" x 11" (50.8 cm x 27.9 cm) rear 5-split-spoke Pearl Nickel forged aluminum',
+        source_detail_raw: "",
+        notes: "Temp final QEB Standard Options display presentation.",
+        legacy_option_id: "opt_qeb_temp_display",
+        choice_mode: "display",
+        selection_mode_label: "Display only",
+      },
+    ],
+    statusRows: [
+      {
+        status_rule_id: "status_qeb_choice_final",
+        canonical_option_id: "",
+        presentation_id: "pres_final_qeb_wheels_choice",
+        context_scope_id: "",
+        status: "standard_choice",
+        status_label: "Standard",
+        priority: "10",
+        active: "true",
+        notes: "Temp final QEB choice status.",
+      },
+      {
+        status_rule_id: "status_qeb_standard_options_final",
+        canonical_option_id: "",
+        presentation_id: "pres_final_qeb_standard_options",
+        context_scope_id: "",
+        status: "standard_fixed",
+        status_label: "Standard",
+        priority: "10",
+        active: "true",
+        notes: "Temp final QEB display status.",
+      },
+    ],
+  };
+}
+
 function finalVariantRows() {
   return [
     ["1lt_c07", "C07", "coupe", "1LT"],
@@ -301,7 +440,7 @@ function finalCanonicalPrice(row) {
   return {
     canonical_base_price_id: row.canonical_base_price_id,
     price_book_id: row.price_book_id ?? "cpb_2027_stingray",
-    canonical_option_id: row.canonical_option_id ?? "canonical_qeb",
+    canonical_option_id: row.canonical_option_id ?? "canonical_final_qeb",
     presentation_id: row.presentation_id ?? "",
     context_scope_id: row.context_scope_id ?? "",
     amount_usd: row.amount_usd,
@@ -313,7 +452,7 @@ function finalCanonicalPrice(row) {
 
 function setupQebPackage() {
   const packageDir = tempPackage();
-  writeCanonicalPresentationTables(packageDir, qebCanonicalRows());
+  writeFinalOptionTables(packageDir, qebFinalCanonicalRows());
   return packageDir;
 }
 
@@ -344,7 +483,7 @@ test("temp final namespace canonical base price emits nonzero price", () => {
   const fragment = emitLegacyFragment(packageDir);
   assert.equal(fragment.validation_errors.length, 0);
   assert.ok(fragment.choices
-    .filter((row) => row.option_id === "opt_qeb_001")
+    .filter((row) => row.option_id === "opt_qeb_temp_choice")
     .every((row) => row.base_price === 1357));
 });
 
@@ -356,7 +495,7 @@ test("final presentation price overrides final canonical option price", () => {
       finalCanonicalPrice({
         canonical_base_price_id: "fcbp_qeb_presentation",
         canonical_option_id: "",
-        presentation_id: "pres_qeb_wheels_choice",
+        presentation_id: "pres_final_qeb_wheels_choice",
         amount_usd: "2222",
         priority: "1",
       }),
@@ -366,10 +505,10 @@ test("final presentation price overrides final canonical option price", () => {
   const fragment = emitLegacyFragment(packageDir);
   assert.equal(fragment.validation_errors.length, 0);
   assert.ok(fragment.choices
-    .filter((row) => row.option_id === "opt_qeb_001")
+    .filter((row) => row.option_id === "opt_qeb_temp_choice")
     .every((row) => row.base_price === 2222));
   assert.ok(fragment.choices
-    .filter((row) => row.option_id === "opt_qeb_002")
+    .filter((row) => row.option_id === "opt_qeb_temp_display")
     .every((row) => row.base_price === 1234));
 });
 
@@ -402,8 +541,8 @@ test("variant-specific final context price overrides model default", () => {
 
   const fragment = emitLegacyFragment(packageDir);
   assert.equal(fragment.validation_errors.length, 0);
-  assert.equal(fragment.choices.find((row) => row.choice_id === "1lt_c07__opt_qeb_001").base_price, 2000);
-  assert.equal(fragment.choices.find((row) => row.choice_id === "2lt_c07__opt_qeb_001").base_price, 1000);
+  assert.equal(fragment.choices.find((row) => row.choice_id === "1lt_c07__opt_qeb_temp_choice").base_price, 2000);
+  assert.equal(fragment.choices.find((row) => row.choice_id === "2lt_c07__opt_qeb_temp_choice").base_price, 1000);
 });
 
 test("legacy exact selectable price still wins over final canonical price", () => {
@@ -415,16 +554,16 @@ test("legacy exact selectable price still wins over final canonical price", () =
   });
   const basePricePath = path.join(packageDir, "pricing", "base_prices.csv");
   const basePriceRows = fs.readFileSync(basePricePath, "utf8").trimEnd().split("\n");
-  basePriceRows.push("bp_qeb_temp,pb_2027_stingray,selectable,opt_qeb_001,,42,1,true,Temp exact selectable bridge price.");
+  basePriceRows.push("bp_qeb_temp,pb_2027_stingray,selectable,opt_qeb_temp_choice,,42,1,true,Temp exact selectable bridge price.");
   fs.writeFileSync(basePricePath, `${basePriceRows.join("\n")}\n`);
 
   const fragment = emitLegacyFragment(packageDir);
   assert.equal(fragment.validation_errors.length, 0);
   assert.ok(fragment.choices
-    .filter((row) => row.option_id === "opt_qeb_001")
+    .filter((row) => row.option_id === "opt_qeb_temp_choice")
     .every((row) => row.base_price === 42));
   assert.ok(fragment.choices
-    .filter((row) => row.option_id === "opt_qeb_002")
+    .filter((row) => row.option_id === "opt_qeb_temp_display")
     .every((row) => row.base_price === 1234));
 });
 
@@ -498,8 +637,60 @@ test("same-priority final canonical price conflicts fail clearly", () => {
   );
 });
 
-test("current transitional canonical base price behavior remains unchanged", () => {
+test("final canonical base price rows cannot reference transitional canonical or presentation IDs", () => {
+  const packageDir = tempPackage();
+  writeCanonicalPresentationTables(packageDir, qebCanonicalRows());
+  writeFinalPricingTables(packageDir, {
+    canonicalBasePriceRows: [
+      finalCanonicalPrice({
+        canonical_base_price_id: "fcbp_transitional_canonical",
+        canonical_option_id: "canonical_qeb",
+        amount_usd: "1234",
+      }),
+      finalCanonicalPrice({
+        canonical_base_price_id: "fcbp_transitional_presentation",
+        canonical_option_id: "",
+        presentation_id: "pres_qeb_wheels_choice",
+        amount_usd: "1234",
+      }),
+    ],
+  });
+
+  const result = runLegacyFragment(packageDir);
+  assert.notEqual(result.status, 0);
+  assert.match(validationErrors(result), /fcbp_transitional_canonical references missing final canonical option: canonical_qeb/);
+  assert.match(validationErrors(result), /fcbp_transitional_presentation references missing final presentation: pres_qeb_wheels_choice/);
+});
+
+test("final active variants must align with legacy active variants before context-dependent rows use them", () => {
   const packageDir = setupQebPackage();
+  writeFinalPricingTables(packageDir, {
+    variantRows: finalVariantRows().filter((row) => row.variant_id !== "3lt_c67"),
+    contextScopeRows: [
+      {
+        context_scope_id: "ctx_2027_stingray",
+        model_year: "2027",
+        model_key: "stingray",
+        variant_id: "",
+        body_style: "",
+        trim_level: "",
+        priority: "1",
+        active: "true",
+        notes: "Temp model default scope.",
+      },
+    ],
+    canonicalBasePriceRows: [
+      finalCanonicalPrice({ canonical_base_price_id: "fcbp_qeb_default", amount_usd: "1234" }),
+    ],
+  });
+
+  const result = runLegacyFragment(packageDir);
+  assert.notEqual(result.status, 0);
+  assert.match(validationErrors(result), /model_year 2027 omits legacy active variants: \['3lt_c67'\]/);
+});
+
+test("current transitional canonical base price behavior remains unchanged", () => {
+  const packageDir = tempPackage();
   const fixture = qebCanonicalRows();
   fixture.transitionalBasePriceRows = [
     {

@@ -859,6 +859,40 @@ class CsvSlice:
             return False
         return active == "true"
 
+    def _validate_nonnegative_priority(self, table_path: str, row_id: str, row: dict[str, str]) -> None:
+        try:
+            if as_int(row.get("priority", "")) < 0:
+                raise ValueError
+        except ValueError:
+            self.canonical_namespace_errors.append(
+                f"{table_path} {row_id or '<missing>'} has unsupported priority: {row.get('priority', '')}."
+            )
+
+    def _validate_exactly_one_target(
+        self,
+        table_path: str,
+        row_id: str,
+        row: dict[str, str],
+        left_field: str = "canonical_option_id",
+        right_field: str = "presentation_id",
+    ) -> None:
+        if bool(row.get(left_field, "")) == bool(row.get(right_field, "")):
+            self.canonical_namespace_errors.append(
+                f"{table_path} {row_id or '<missing>'} must reference exactly one of {left_field} or {right_field}."
+            )
+
+    def _validate_final_target_refs(self, table_path: str, row_id: str, row: dict[str, str]) -> None:
+        canonical_id = row.get("canonical_option_id", "")
+        presentation_id = row.get("presentation_id", "")
+        if canonical_id and canonical_id not in self.final_canonical_options:
+            self.canonical_namespace_errors.append(
+                f"{table_path} {row_id or '<missing>'} references missing final canonical option: {canonical_id}."
+            )
+        if presentation_id and presentation_id not in self.final_option_presentations:
+            self.canonical_namespace_errors.append(
+                f"{table_path} {row_id or '<missing>'} references missing final presentation: {presentation_id}."
+            )
+
     def _validate_canonical_namespace_foundation(self) -> None:
         for table_name in FINAL_CANONICAL_TABLES:
             self.canonical_namespace_errors.extend(self._final_canonical_table_field_errors(table_name))
@@ -971,6 +1005,7 @@ class CsvSlice:
                 )
 
         self._validate_final_canonical_variants()
+        self._validate_final_variants_align_with_legacy_when_used()
         self._validate_final_context_scopes()
         self._validate_final_price_books()
 
@@ -1021,6 +1056,49 @@ class CsvSlice:
                             f"canonical/status/variants {row_id} does not match trim plus gm_model_code convention: {expected_variant_id}."
                         )
 
+    def _validate_final_variants_align_with_legacy_when_used(self) -> None:
+        uses_final_context = any(
+            is_active(row)
+            for table_name in (
+                "final_context_scopes",
+                "final_option_status_rules",
+                "final_price_books",
+                "final_canonical_base_prices",
+            )
+            for row in self.tables[table_name]
+        )
+        if not uses_final_context or not self.final_canonical_variants:
+            return
+
+        legacy_by_year: dict[str, dict[str, dict[str, str]]] = defaultdict(dict)
+        for variant_id, row in self.variants.items():
+            legacy_by_year[str(row.get("model_year", ""))][variant_id] = row
+
+        final_by_year: dict[str, dict[str, dict[str, str]]] = defaultdict(dict)
+        for variant_id, row in self.final_canonical_variants.items():
+            final_by_year[str(row.get("model_year", ""))][variant_id] = row
+
+        for model_year, final_variants in sorted(final_by_year.items()):
+            legacy_variants = legacy_by_year.get(model_year, {})
+            missing = sorted(set(final_variants) - set(legacy_variants))
+            if missing:
+                self.canonical_namespace_errors.append(
+                    f"canonical/status/variants model_year {model_year} has final variants missing from legacy variants.csv: {missing}."
+                )
+            extra = sorted(set(legacy_variants) - set(final_variants))
+            if extra:
+                self.canonical_namespace_errors.append(
+                    f"canonical/status/variants model_year {model_year} omits legacy active variants: {extra}."
+                )
+            for variant_id in sorted(set(final_variants) & set(legacy_variants)):
+                final_variant = final_variants[variant_id]
+                legacy_variant = legacy_variants[variant_id]
+                for field in ("body_style", "trim_level"):
+                    if final_variant.get(field, "") != legacy_variant.get(field, ""):
+                        self.canonical_namespace_errors.append(
+                            f"canonical/status/variants {variant_id} {field} does not align with legacy variants.csv."
+                        )
+
     def _validate_final_context_scopes(self) -> None:
         for row in self.tables["final_context_scopes"]:
             row_id = row.get("context_scope_id", "")
@@ -1033,13 +1111,7 @@ class CsvSlice:
                     self.canonical_namespace_errors.append(
                         f"canonical/status/context_scopes {row_id or '<missing>'} is missing {field}."
                     )
-            try:
-                if as_int(row.get("priority", "")) < 0:
-                    raise ValueError
-            except ValueError:
-                self.canonical_namespace_errors.append(
-                    f"canonical/status/context_scopes {row_id or '<missing>'} has unsupported priority: {row.get('priority', '')}."
-                )
+            self._validate_nonnegative_priority("canonical/status/context_scopes", row_id, row)
             variant_id = row.get("variant_id", "")
             if variant_id:
                 variant = self.final_canonical_variants.get(variant_id)
@@ -1087,18 +1159,8 @@ class CsvSlice:
                 self.canonical_namespace_errors.append(
                     "canonical/pricing/canonical_base_prices has a row missing canonical_base_price_id."
                 )
-            if bool(canonical_id) == bool(presentation_id):
-                self.canonical_namespace_errors.append(
-                    f"canonical/pricing/canonical_base_prices {row_id or '<missing>'} must reference exactly one of canonical_option_id or presentation_id."
-                )
-            if canonical_id and canonical_id not in self.canonical_options:
-                self.canonical_namespace_errors.append(
-                    f"canonical/pricing/canonical_base_prices {row_id or '<missing>'} references missing canonical option: {canonical_id}."
-                )
-            if presentation_id and presentation_id not in self.option_presentations:
-                self.canonical_namespace_errors.append(
-                    f"canonical/pricing/canonical_base_prices {row_id or '<missing>'} references missing presentation: {presentation_id}."
-                )
+            self._validate_exactly_one_target("canonical/pricing/canonical_base_prices", row_id, row)
+            self._validate_final_target_refs("canonical/pricing/canonical_base_prices", row_id, row)
             price_book_id = row.get("price_book_id", "")
             price_book = self.final_price_books.get(price_book_id)
             if not price_book_id:
@@ -1124,13 +1186,7 @@ class CsvSlice:
                 self.canonical_namespace_errors.append(
                     f"canonical/pricing/canonical_base_prices {row_id or '<missing>'} has unsupported amount_usd: {row.get('amount_usd', '')}."
                 )
-            try:
-                if as_int(row.get("priority", "")) < 0:
-                    raise ValueError
-            except ValueError:
-                self.canonical_namespace_errors.append(
-                    f"canonical/pricing/canonical_base_prices {row_id or '<missing>'} has unsupported priority: {row.get('priority', '')}."
-                )
+            self._validate_nonnegative_priority("canonical/pricing/canonical_base_prices", row_id, row)
 
         self._validate_final_canonical_price_conflicts()
 
@@ -1592,18 +1648,8 @@ class CsvSlice:
             presentation_id = row.get("presentation_id", "")
             if not row_id:
                 self.canonical_namespace_errors.append("canonical/status/option_status_rules has a row missing status_rule_id.")
-            if bool(canonical_id) == bool(presentation_id):
-                self.canonical_namespace_errors.append(
-                    f"canonical/status/option_status_rules {row_id or '<missing>'} must reference exactly one of canonical_option_id or presentation_id."
-                )
-            if canonical_id and canonical_id not in self.canonical_options:
-                self.canonical_namespace_errors.append(
-                    f"canonical/status/option_status_rules {row_id or '<missing>'} references missing canonical option: {canonical_id}."
-                )
-            if presentation_id and presentation_id not in self.option_presentations:
-                self.canonical_namespace_errors.append(
-                    f"canonical/status/option_status_rules {row_id or '<missing>'} references missing presentation: {presentation_id}."
-                )
+            self._validate_exactly_one_target("canonical/status/option_status_rules", row_id, row)
+            self._validate_final_target_refs("canonical/status/option_status_rules", row_id, row)
             status = row.get("status", "")
             if status not in OPTION_STATUSES:
                 self.canonical_namespace_errors.append(
@@ -1618,13 +1664,7 @@ class CsvSlice:
                 self.canonical_namespace_errors.append(
                     f"canonical/status/option_status_rules {row_id or '<missing>'} references missing context scope: {context_scope_id}."
                 )
-            try:
-                if as_int(row.get("priority", "")) < 0:
-                    raise ValueError
-            except ValueError:
-                self.canonical_namespace_errors.append(
-                    f"canonical/status/option_status_rules {row_id or '<missing>'} has unsupported priority: {row.get('priority', '')}."
-                )
+            self._validate_nonnegative_priority("canonical/status/option_status_rules", row_id, row)
 
         self._validate_final_option_status_rule_conflicts()
 

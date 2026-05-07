@@ -138,6 +138,45 @@ function runOverlay(args = []) {
   });
 }
 
+function runStrictOverlayWithFragment(packageDir, fragmentPath) {
+  const code = `
+import json
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path("scripts").resolve()))
+from stingray_csv_first_slice import CsvSlice
+from stingray_csv_shadow_overlay import (
+    OverlayError,
+    load_combined_ownership_scope,
+    load_production_data,
+    overlay_shadow_data,
+)
+
+package_dir = Path(${JSON.stringify(packageDir)})
+fragment = json.loads(Path(${JSON.stringify(fragmentPath)}).read_text(encoding="utf-8"))
+production = load_production_data(Path("form-app/data.js"))
+csv_slice = CsvSlice(package_dir)
+try:
+    ownership = load_combined_ownership_scope(
+        Path(${JSON.stringify(OWNERSHIP_MANIFEST)}),
+        package_dir,
+        csv_slice,
+        production,
+        fragment,
+        require_complete_final_owned_option_coverage=True,
+    )
+    overlay_shadow_data(production, fragment, ownership)
+except OverlayError as error:
+    print(str(error))
+    raise SystemExit(1)
+`;
+  return spawnSync(PYTHON, ["-c", code], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+    maxBuffer: 32 * 1024 * 1024,
+  });
+}
+
 function overlayData(packageDir = PACKAGE, extraArgs = []) {
   const output = execFileSync(PYTHON, [OVERLAY_SCRIPT, "--package", packageDir, ...extraArgs], {
     cwd: process.cwd(),
@@ -280,6 +319,19 @@ function j6aChoiceOwnership() {
   };
 }
 
+function j6aDisplayOwnership() {
+  return {
+    ownership_id: "own_pres_j6a_standard_options",
+    entity_type: "presentation",
+    entity_id: "pres_j6a_standard_options",
+    ownership_status: "generated_display_owned",
+    legacy_rpo: "J6A",
+    legacy_option_id: "opt_j6a_002",
+    notes: "Temp final display presentation ownership.",
+    active: "true",
+  };
+}
+
 test("absent and header-only final ownership tables preserve output and overlay behavior when no final rows are authored", () => {
   const absentPackage = tempPackage();
   fs.rmSync(path.join(absentPackage, "canonical", "ownership"), { recursive: true, force: true });
@@ -309,16 +361,7 @@ test("duplicate-RPO canonical option passes when both emitted presentations are 
   writeJ6aCanonical(packageDir, { includeDisplayPresentation: true });
   writeProjectionOwnership(packageDir, [
     j6aChoiceOwnership(),
-    {
-      ownership_id: "own_pres_j6a_standard_options",
-      entity_type: "presentation",
-      entity_id: "pres_j6a_standard_options",
-      ownership_status: "generated_display_owned",
-      legacy_rpo: "J6A",
-      legacy_option_id: "opt_j6a_002",
-      notes: "Temp final display presentation ownership.",
-      active: "true",
-    },
+    j6aDisplayOwnership(),
   ]);
 
   const result = runOverlay(["--package", packageDir]);
@@ -336,6 +379,44 @@ test("missing final presentation ownership fails clearly", () => {
   const result = runOverlay(["--package", packageDir]);
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /Projected fragment includes choices without ownership: \['opt_j6a_002'\]/);
+});
+
+test("default final ownership coverage rejects custom fragments that omit owned presentations", () => {
+  const packageDir = tempPackage();
+  writeJ6aCanonical(packageDir, { includeDisplayPresentation: true });
+  writeProjectionOwnership(packageDir, [
+    j6aChoiceOwnership(),
+    j6aDisplayOwnership(),
+  ]);
+  const fragment = emitLegacyFragment(packageDir);
+  fragment.choices = fragment.choices.filter((row) => row.option_id !== "opt_j6a_002");
+  const fragmentPath = path.join(path.dirname(packageDir), "missing-final-owned-presentation.json");
+  fs.writeFileSync(fragmentPath, JSON.stringify(fragment));
+
+  const result = runStrictOverlayWithFragment(packageDir, fragmentPath);
+  assert.notEqual(result.status, 0);
+  const output = `${result.stdout}\n${result.stderr}`;
+  assert.match(output, /Projected fragment final presentation scope changed/);
+  assert.match(output, /opt_j6a_002/);
+});
+
+test("custom fragment-json filtering is limited to explicit custom-fragment overlay tests", () => {
+  const packageDir = tempPackage();
+  writeJ6aCanonical(packageDir, { includeDisplayPresentation: true });
+  writeProjectionOwnership(packageDir, [
+    j6aChoiceOwnership(),
+    j6aDisplayOwnership(),
+  ]);
+  const fragment = emitLegacyFragment(packageDir);
+  fragment.choices = fragment.choices.filter((row) => row.option_id !== "opt_j6a_002");
+  const fragmentPath = path.join(path.dirname(packageDir), "custom-fragment-missing-final-owned-presentation.json");
+  fs.writeFileSync(fragmentPath, JSON.stringify(fragment));
+
+  const result = runOverlay(["--package", packageDir, "--fragment-json", fragmentPath]);
+  assert.equal(result.status, 0, result.stderr);
+  const shadow = JSON.parse(result.stdout);
+  assert.equal(shadow.choices.filter((row) => row.option_id === "opt_j6a_001").length, 6);
+  assert.equal(shadow.choices.filter((row) => row.option_id === "opt_j6a_002").length, 6);
 });
 
 test("invalid final ownership entity refs fail clearly", () => {

@@ -383,7 +383,7 @@ test("final canonical status rules reject missing presentation refs and invalid 
   writeJ6aFixture(missingPresentationPackage, missingPresentationRows);
   const missingPresentationResult = runLegacyFragment(missingPresentationPackage);
   assert.notEqual(missingPresentationResult.status, 0);
-  assert.match(validationErrors(missingPresentationResult), /option_status_rules status_j6a_choice_default references missing presentation: pres_missing/);
+  assert.match(validationErrors(missingPresentationResult), /option_status_rules status_j6a_choice_default references missing final presentation: pres_missing/);
 
   const invalidContextPackage = tempPackage();
   const invalidContextRows = j6aRows();
@@ -392,6 +392,42 @@ test("final canonical status rules reject missing presentation refs and invalid 
   const invalidContextResult = runLegacyFragment(invalidContextPackage);
   assert.notEqual(invalidContextResult.status, 0);
   assert.match(validationErrors(invalidContextResult), /option_status_rules status_j6a_choice_default references missing context scope: ctx_missing/);
+});
+
+test("final canonical status rows cannot reference transitional canonical or presentation IDs", () => {
+  const packageDir = tempPackage();
+  writeFinalContextTables(packageDir);
+  writeFinalOptionTables(packageDir, {
+    statusRows: [
+      {
+        status_rule_id: "status_transitional_canonical",
+        canonical_option_id: "canonical_qeb",
+        presentation_id: "",
+        context_scope_id: "ctx_2027_stingray",
+        status: "standard_choice",
+        status_label: "Standard",
+        priority: "10",
+        active: "true",
+        notes: "Temp invalid final status target.",
+      },
+      {
+        status_rule_id: "status_transitional_presentation",
+        canonical_option_id: "",
+        presentation_id: "pres_qeb_wheels_choice",
+        context_scope_id: "ctx_2027_stingray",
+        status: "standard_choice",
+        status_label: "Standard",
+        priority: "10",
+        active: "true",
+        notes: "Temp invalid final status target.",
+      },
+    ],
+  });
+
+  const result = runLegacyFragment(packageDir);
+  assert.notEqual(result.status, 0);
+  assert.match(validationErrors(result), /status_transitional_canonical references missing final canonical option: canonical_qeb/);
+  assert.match(validationErrors(result), /status_transitional_presentation references missing final presentation: pres_qeb_wheels_choice/);
 });
 
 test("final canonical status rejects display_only as business status and conflicting same-priority winners", () => {

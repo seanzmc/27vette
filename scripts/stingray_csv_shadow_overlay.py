@@ -305,7 +305,7 @@ def load_combined_ownership_scope(
     csv_slice: CsvSlice,
     production: dict[str, Any],
     fragment: dict[str, Any],
-    require_all_final_owned_options: bool = True,
+    require_complete_final_owned_option_coverage: bool = True,
 ) -> OwnershipScope:
     scope = load_ownership_scope(path)
     final_projection_path = package_dir / FINAL_PROJECTION_OWNERSHIP_RELATIVE_PATH
@@ -318,7 +318,10 @@ def load_combined_ownership_scope(
         raise OverlayError(f"Final ownership validation failed: {final_errors}.")
 
     final_owned_option_ids = final_projected_legacy_option_ids(csv_slice)
-    if not require_all_final_owned_options:
+    if not require_complete_final_owned_option_coverage:
+        # Custom --fragment-json tests can intentionally exercise a narrow fragment
+        # that predates unrelated final-canonical lanes. Default overlay keeps the
+        # full final-owned presentation set and therefore still catches omissions.
         fragment_option_ids = {row.get("option_id", "") for row in fragment.get("choices", [])}
         final_owned_option_ids &= fragment_option_ids
     transitional_option_ids = projected_option_ids(production, scope.owned_rpos)
@@ -2973,7 +2976,7 @@ def main() -> None:
             csv_slice,
             production,
             fragment,
-            require_all_final_owned_options=not bool(args.fragment_json),
+            require_complete_final_owned_option_coverage=not bool(args.fragment_json),
         )
         if report_mode_count:
             assert_guarded_option_refs_are_not_interiors(production, ownership)
