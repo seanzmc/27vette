@@ -1,0 +1,811 @@
+- ## **Identified Holes / Missing Constraints**
+
+  - ### Preflight validation and workbook-shape checks
+
+  - **No mandatory workbook manifest check before processing.**  
+  -   
+    - The instructions should require an upfront validation that the expected source sheets exist:  
+      - `Price Schedule`  
+      - `Interior 1–4`  
+      - `Exterior 1–4`  
+      - `Mechanical 1–4`  
+      - `Standard Equipment 1–4`  
+      - `Equipment Groups 1–4`  
+      - `Color and Trim 1–2`  
+    - The expected export shape appears to be 23 source sheets, but the skill does not require checking that count or confirming that each required sheet is present before extraction begins.  
+  -   
+  - **No rule for missing, extra, duplicated, renamed, hidden, or copied sheets.**  
+  -   
+    - The skill should define whether processing stops on:  
+      - Missing required sheets.  
+      - Duplicate source sheets.  
+      - Hidden sheets.  
+      - Unexpected extra sheets.  
+      - Sheets with suffixes outside the expected `1–4` pattern.  
+      - Renamed sheets such as `Interior1`, `Interior - 1`, `Color & Trim 1`, or variant-specific names.  
+    - Without this, the extension may silently skip required data or process the wrong sheet.  
+  -   
+  - **No explicit sheet-name normalization or alias policy.**  
+  -   
+    - The instructions should specify whether sheet names are matched exactly or normalized for case, leading/trailing spaces, ampersand versus `and`, and spacing.  
+    - This matters especially for `Color and Trim` versus `Color & Trim`.  
+  -   
+  - **No structural validation of the expected row/column layout.**  
+  -   
+    - The workbook shape says matrix sheets use:  
+      - Row 1 as banner/model-family identifier.  
+      - Row 2 as legend.  
+      - Row 3 as headers.  
+      - Columns A–C as RPO/reference/description fields.  
+      - Columns D onward as trim/body availability columns.  
+    - The skill does not require confirming those rows and columns before extraction.  
+  -   
+  - **No validation that row 1 banner agrees with the sheet suffix.**  
+  -   
+    - The instructions mention that model/variant identity may be readable from row 1 and inferable from sheet suffixes, but they do not require checking that both signals agree.  
+    - Example risk: `Interior 3` could be mislabeled but contain a row-1 banner for another model family.  
+  -   
+  - **No validation of row 2 legend before applying symbol mappings.**  
+  -   
+    - Since the workbook itself provides legend meanings, the skill should require reading row 2 and validating the symbol inventory against the configured map before processing data rows.  
+  -   
+  - **No validation of row 3 headers.**  
+  -   
+    - The skill should require checking that row 3 contains the expected trim/body headers and that columns A–C have the expected meanings.  
+    - There is no rule for shifted headers, extra title rows, blank rows above the table, or malformed exports.  
+  -   
+  - **No explicit instruction to skip banner, legend, and header rows.**  
+  -   
+    - The skill should say that rows 1–3 are structural rows and must not be extracted as data.  
+  -   
+  - **No rule for blank separator rows, section headers, note rows, or visual category bars.**  
+  -   
+    - Matrix sheets, Price Schedule, Equipment Groups, and Color & Trim sheets likely contain section breaks.  
+    - The skill needs a minimum-row-validity rule, such as requiring a real RPO/name/description or recognized row type before extraction.  
+  -   
+  - **No handling policy for hidden rows, hidden columns, filters, or grouped outline levels.**  
+  -   
+    - The Excel and Google Sheets extensions may expose or hide these differently.  
+    - The skill should define whether hidden rows/columns are ignored, processed, or treated as validation failures.  
+  -   
+  - **No all-or-nothing preflight sequence.**  
+  -   
+    - The skill should require a validation pass before writing output sheets:  
+    1. Validate manifest.  
+    2. Validate sheet structure.  
+    3. Validate headers.  
+    4. Inventory symbols.  
+    5. Validate price columns.  
+    6. Validate Color & Trim matrices.  
+    7. Only then generate output.  
+  - Without this, the extension could create partial outputs before discovering fatal shape problems.  
+  -   
+  - ---
+
+  - ### Variant and availability-column mapping gaps
+
+- **The fixed six output availability columns conflict with the actual source shape.**  
+  -   
+  - The output headers appear to be hardcoded as:  
+    - `1LT Coupe`  
+    - `2LT Coupe`  
+    - `3LT Coupe`  
+    - `1LT Convertible`  
+    - `2LT Convertible`  
+    - `3LT Convertible`  
+  - But Z06, ZR1, and ZR1X sheets may use `1LZ`, `2LZ`, `3LZ` labels or wider layouts.  
+  -   
+- **ZR1/ZR1X sheets appear to require eight source availability columns, not six.**  
+  -   
+  - The workbook shape indicates some `... 4` sheets run through column K, implying columns D–K, or eight availability columns.  
+  - The skill says not to add more variant columns, but also says ZR1 and ZR1X content must be separated.  
+  - Those requirements are incompatible unless the skill defines an explicit source-column-to-output mapping.  
+  -   
+- **No explicit source-column mapping by model family.**  
+  -   
+  - The skill should define, for each source family, which columns correspond to:  
+    - Stingray  
+    - Grand Sport  
+    - Z06  
+    - ZR1  
+    - ZR1X  
+    - Trim level  
+    - Body style  
+  - It should not rely only on generic “six variant columns.”  
+  -   
+- **No clear position on source-facing versus database-facing headers.**  
+  -   
+  - The instructions conflict by requiring fixed headers while also saying to retain source identifiers such as `1LZ`.  
+  - A database load needs stable schema. The cleanest solution would be a normalized vertical table with fields such as:  
+    - `model_family`  
+    - `variant`  
+    - `trim_code`  
+    - `body_style`  
+    - `source_column_header`  
+    - `availability_raw`  
+    - `availability_normalized`  
+  - If the output remains matrix-shaped, the skill must define fixed database-facing columns and separate source-label metadata.  
+  -   
+- **No validation for variant identity conflicts.**  
+  -   
+  - There should be a fatal error if sheet suffix, row-1 banner, and column headers imply different model families or variant families.  
+  -   
+- **No policy for sheets with fewer or more availability columns than expected.**  
+  -   
+  - The skill should say whether to stop, warn, or map dynamically when a sheet has coupe-only columns, convertible-only columns, or extra columns.  
+  -   
+- **No deterministic handling of mixed ZR1/ZR1X content.**  
+  -   
+  - If ZR1 and ZR1X share a source sheet, the skill needs exact boundaries, for example columns D–G belong to one family and H–K to another, or whatever the workbook actually indicates.  
+  - “Separate by variant-specific columns” is not operational enough.  
+  -   
+  - ---
+
+  - ### Availability-symbol and special-character handling gaps
+
+- **The symbol map does not cover the workbook legend.**  
+  -   
+  - The workbook legend reportedly includes symbols such as:  
+    - `S`  
+    - `A`  
+    - `--`  
+    - `D`  
+    - `■`  
+    - `□`  
+    - `*`  
+  - The skill only accounts for a subset, such as `S`, `A`, `A/D`, square, and dash/hyphen.  
+  - Missing mappings for `D`, `*`, `■`, and `□` will cause valid workbook cells to be treated as unmapped.  
+  -   
+- **Filled and empty squares are not distinguished.**  
+  -   
+  - The workbook shape distinguishes `■` and `□`, but the skill collapses them into “Square.”  
+  - If the legend gives them different meanings, this will corrupt availability data.  
+  -   
+- **Dash handling is underspecified and must be context-aware.**  
+  -   
+  - Matrix cells may contain:  
+    - `-`  
+    - `--`  
+    - `–`  
+    - `—`  
+    - `−`  
+  - These may mean “not available” only when they are exact availability-cell values.  
+  - The skill should not globally normalize hyphens in descriptions, option names, colors, or notes, because that could corrupt legitimate text.  
+  -   
+- **Color & Trim `--` needs its own scoped meaning.**  
+  -   
+  - In Color & Trim matrices, `--` may mean an exterior/interior incompatibility.  
+  - That should be handled separately from availability-matrix “not available” symbols.  
+  -   
+- **No policy for blank availability cells.**  
+  -   
+  - The skill should define whether blank cells mean:  
+    - Unknown/null  
+    - Not available  
+    - Inherited from merged cell  
+    - Structural blank  
+    - Validation error  
+  - For database ingestion, blank and `Not Available` should not be conflated unless the source explicitly supports that.  
+  -   
+- **No robust handling of footnoted symbols.**  
+  -   
+  - The skill mentions examples like `S1`, `A1`, or `A/D1`, but it does not fully define parsing for:  
+    - `--1`  
+    - `D1`  
+    - `*1`  
+    - `□1`  
+    - `■1`  
+    - Superscript footnotes such as `S¹`  
+    - Multiple markers such as `A1,2`  
+  - It should strip or capture the marker only after confirming that the base symbol is valid.  
+  -   
+- **No rule for cells containing multiple symbols or explanatory text.**  
+  -   
+  - The skill should define whether cells such as `A/D1`, `A or D`, `S*`, or `A - see note` are valid, how they map, and when they require manual review.  
+  -   
+- **No inventory pass for unique matrix symbols.**  
+  -   
+  - The instructions should require collecting all unique availability symbols before extraction and reporting all unmapped symbols at once.  
+  - Stopping at the first unknown symbol makes troubleshooting raw exports inefficient.  
+  -   
+- **No global Unicode normalization strategy.**  
+  -   
+  - The skill should address:  
+    - Nonbreaking spaces.  
+    - Thin spaces.  
+    - Zero-width spaces.  
+    - Tabs.  
+    - Soft hyphens.  
+    - Smart quotes.  
+    - Curly apostrophes.  
+    - Trademark and registered symbols.  
+    - Degree symbols.  
+    - Bullets.  
+    - Multiplication signs.  
+    - Superscript digits.  
+    - En/em dashes.  
+  - Some characters should be preserved; others should be normalized. The current skill does not define which.  
+  -   
+- **No clear raw-value versus display-value policy.**  
+  -   
+  - The extension may expose raw values, formatted display values, or formula results differently.  
+  - The skill should specify when to use the displayed cell value, formula value, or raw value, especially for symbols, prices, and footnotes.  
+  -   
+  - ---
+
+  - ### Footnote, disclosure, and marker-handling gaps
+
+- **Digit-stripping rules are too broad and can corrupt valid data.**  
+  -   
+  - The rule that any name or description ending directly in a digit may contain a footnote can damage valid automotive terms such as:  
+    - `Z06`  
+    - `ZR1`  
+    - `1LT`  
+    - `2LT`  
+    - `3LT`  
+    - `1LZ`  
+    - `2LZ`  
+    - `3LZ`  
+    - `GT1`  
+    - `GT2`  
+    - `Z51`  
+    - Wheel sizes or package names ending in numbers  
+  - The skill should only remove a trailing digit when it matches a known footnote marker found on the sheet or in the same cell context.  
+  -   
+- **RPO length assumptions are too rigid.**  
+  -   
+  - The skill appears to assume RPO codes are exactly three characters.  
+  - Many order-guide codes may be three characters, but the instructions should not blindly truncate or reject longer regulatory, dealer, package, or reference codes.  
+  - The better rule is:  
+    - Preserve the raw code.  
+    - Normalize a separate `rpo_normalized` field when the token matches a known valid pattern.  
+    - Flag unexpected lengths for review instead of destructively editing them.  
+  -   
+- **No allowed-character or validation pattern for RPOs.**  
+  -   
+  - If three-character RPOs are expected, the skill should define the allowed character set, such as uppercase letters/digits, rather than relying only on length.  
+  -   
+- **No rule for multiple RPOs in one cell.**  
+  -   
+  - The skill should define handling for:  
+    - Slash-separated RPOs.  
+    - Comma-separated RPOs.  
+    - Parenthetical RPOs.  
+    - “Requires/includes” RPO references.  
+    - Orderable RPO plus reference-only RPOs in the same row.  
+  - Without this, composite cells can generate phantom codes or lose relationships.  
+  -   
+- **No handling for multi-digit, lettered, or symbolic footnote markers.**  
+  -   
+  - The skill should define whether markers can be:  
+    - `10`  
+    - `11`  
+    - `a`  
+    - `A`  
+    - `*`  
+    - `†`  
+    - Superscript digits  
+    - Parenthetical notes like `(1)`  
+  - It also needs rules for adjacent markers, such as whether `12` means footnote twelve or footnotes one and two.  
+  -   
+- **In-cell disclosure parsing is too narrow.**  
+  -   
+  - The skill assumes disclosures begin after a line break with `1.` .  
+  - It should also handle:  
+    - `1)`  
+    - `1 -`  
+    - `1–`  
+    - No-space numbering.  
+    - Bullet lists.  
+    - Wrapped text where line breaks are lost.  
+    - More than two disclosures.  
+    - CR, LF, and CRLF line endings.  
+  -   
+- **No rule for associating markers with disclosure bodies.**  
+  -   
+  - If a cell has marker `1`, the skill should confirm whether disclosure `1` exists and attach the resolved text.  
+  - If the body is missing, that should be logged as a warning or error.  
+  -   
+- **Footnote output is not database-safe.**  
+  -   
+  - A single `Footnote location` field is not enough.  
+  - The output should capture:  
+    - `footnote_marker`  
+    - `footnote_text`  
+    - `footnote_scope`  
+    - `source_sheet`  
+    - `source_row`  
+    - `source_column`  
+    - `source_cell`  
+    - `raw_marked_value`  
+  - This is especially important when different trim/body cells on the same row have different markers.  
+  -   
+- **No rule for sheet-level footnotes or bottom-note rows.**  
+  -   
+  - Color & Trim and other sheets may have note rows outside the main data cells.  
+  - The skill does not say how to capture, associate, or skip them.  
+  -   
+  - ---
+
+  - ### Price Schedule parsing gaps
+
+- **No clear Price Schedule column mapping.**  
+  -   
+  - The workbook may contain multiple price-related columns, such as List Price, MSRP, Dealer Invoice, Dealer Price, Employee Price, and DFC.  
+  - The skill does not define which source column populates each output price field.  
+  -   
+- **No separation between base-model pricing and option pricing.**  
+  -   
+  - The Price Schedule appears to include base model rows and an option-pricing table starting later in the sheet.  
+  - The skill should define how to locate each section and which rows belong to each output.  
+  -   
+- **No rule for section headers, category labels, notes, disclaimers, subtotal rows, or tax rows.**  
+  -   
+  - Price Schedule rows that are not actual price records could be accidentally extracted as options.  
+  -   
+- **No handling for special price rows.**  
+  -   
+  - The skill should define destinations or skip rules for:  
+    - Gas-guzzler tax.  
+    - DFC.  
+    - Dealer-installed options.  
+    - Regulatory fees.  
+    - Credits.  
+    - Taxes.  
+    - Regional fees.  
+    - Package context rows.  
+  -   
+- **No currency and numeric normalization rules.**  
+  -   
+  - The skill should define parsing for:  
+    - `$1,295`  
+    - `1295`  
+    - `$0`  
+    - `N/C`  
+    - `Included`  
+    - `INC`  
+    - `TBD`  
+    - Blank  
+    - Dash  
+    - Parentheses for negative credits  
+    - Footnoted prices  
+  - For database mapping, prices should become typed fields such as:  
+    - `price_amount`  
+    - `price_currency`  
+    - `price_type`  
+    - `price_raw`  
+    - `price_status`  
+  -   
+- **No locale-aware parsing policy.**  
+  -   
+  - The instructions assume U.S.-style `$` and comma formatting but do not explicitly state locale.  
+  - If the extension or workbook locale changes decimal or thousands separators, price parsing may break.  
+  -   
+- **Price matching by RPO alone is insufficient.**  
+  -   
+  - The same RPO may have different prices by model, trim, body style, package, order type, or context.  
+  - The skill should define a composite matching key and a fallback/manual-review process.  
+  -   
+- **Duplicate or conflicting prices lack a concrete reporting mechanism.**  
+  -   
+  - The skill says to flag duplicates, but not where or how.  
+  - Ambiguous prices should not simply result in blank prices; the output should include an explicit ambiguity flag or validation record.  
+  -   
+- **No distinction between true zero, no charge, included, unknown, and suppressed ambiguous price.**  
+  -   
+  - These have different database meanings and should not all become blank or `$0`.  
+  -   
+- **No DFC mapping logic.**  
+  -   
+  - If DFC is a fee rather than a per-variant option price, the skill needs to specify how it should be joined to variant/base-price rows.  
+  -   
+  - ---
+
+  - ### Color & Trim gaps
+
+- **Merged-cell handling is missing.**  
+  -   
+  - Color & Trim sheets reportedly use merged headers and matrix sections.  
+  - The skill should require logical unmerge/fill-down/fill-right behavior before parsing, because Excel and Google Sheets often expose merged values only in the top-left cell.  
+  -   
+- **No operational definition of the two Color & Trim sheets.**  
+  -   
+  - The instructions should distinguish `Color and Trim 1` and `Color and Trim 2`, such as recommended versus custom interiors if that is the workbook’s structure.  
+  - It should define whether they are merged into one output or kept separately.  
+  -   
+- **No rule for locating matrix boundaries.**  
+  -   
+  - The skill does not define how to identify where the upper interior-combination matrix ends and the lower exterior-compatibility matrix begins.  
+  -   
+- **No clear mapping from source rows/columns to output fields.**  
+  -   
+  - The output fields `Trim`, `Seat`, `Interior Code`, `Interior Name`, and `Material` need explicit source mappings.  
+  -   
+- **No model/variant foreign key in interior outputs.**  
+  -   
+  - A `Corvette Interiors` sheet without `model_family`, `variant`, or source context can orphan rows.  
+  - Identical trim codes can have different meanings or compatibilities across Stingray, Z06, ZR1, etc.  
+  -   
+- **No source traceability for interior rows.**  
+  -   
+  - Interior outputs should include source sheet, source row, source column, raw value, and normalized value.  
+  -   
+- **Hardcoded “10 exterior colors” is brittle.**  
+  -   
+  - The skill should not assume there are exactly 10 exterior colors.  
+  - It should derive the count from the source and validate against expected ranges if needed.  
+  -   
+- **No clear extraction rule for exterior color RPO codes.**  
+  -   
+  - The skill should define how to parse exterior color names and RPOs from merged headers or matrix labels.  
+  - It should also define what happens when the name exists but the RPO is missing.  
+  -   
+- **Premium-color identification is undefined.**  
+  -   
+  - The instruction to price premium colors and set others to `$0` lacks a source rule.  
+  - Premium status should likely be determined from the Price Schedule or explicit color data, not inferred.  
+  -   
+- **Color override logic is underdefined.**  
+  -   
+  - The skill says Color Overrides should be based on `--` in the lower color matrix, but does not define:  
+    - Which cells are scanned.  
+    - How footnoted `--` values are handled.  
+    - Whether blank means compatible, unknown, or not applicable.  
+    - How the exterior color code is associated with the interior row.  
+  -   
+- **Copying exterior colors into every variant sheet can create unsupported inferred availability.**  
+  -   
+  - If the source matrix does not confirm a color’s availability for a model family, duplicating it into every variant sheet may violate the rule not to infer compatibility.  
+  - Exterior colors should probably be represented in a separate normalized color table or compatibility table rather than injected as synthetic option rows.  
+  -   
+- **Slash-splitting rules for interiors/colors are too vague.**  
+  -   
+  - Slashes may indicate combinations, but they may also appear in legitimate names or materials.  
+  - The skill should specify which fields are splittable and how paired values remain aligned across fields.  
+  -   
+  - ---
+
+  - ### Equipment Groups gaps
+
+- **Equipment Groups handling is contradictory.**  
+  -   
+  - The sheets are part of the expected export shape, but the skill apparently describes them as “reference only” while also saying never to process them.  
+  - The skill must take one clear position.  
+  -   
+- **No operational definition of “reference only.”**  
+  -   
+  - If Equipment Groups are used as reference, the skill should define whether they are used to:  
+    - Validate RPO existence.  
+    - Validate option names.  
+    - Resolve `ref/select`.  
+    - Capture package membership.  
+    - Capture additional options.  
+    - Capture regulatory options.  
+  - If they are ignored, the skill should still require existence checks and explicitly log that they were skipped.  
+  -   
+- **Risk of omitting data that appears only in Equipment Groups.**  
+  -   
+  - If Equipment Groups contain Equipment Groups, Additional Options, or Regulatory Options sections, completely skipping them could drop data needed for database completeness.  
+  -   
+- **Merged section bars and note rows are not handled.**  
+  -   
+  - Equipment Groups may contain merged gray section headers and multi-section layouts.  
+  - The skill does not define how to read, skip, or preserve those sections.  
+  -   
+  - ---
+
+  - ### Output schema and database-mapping gaps
+
+- **The outputs are matrix-shaped rather than database-normalized.**  
+  -   
+  - Availability is spread across variant columns instead of represented as one row per option/variant/trim/body availability observation.  
+  - That makes database loading, deduplication, and auditing harder.  
+  -   
+- **No stable primary key or natural key is defined.**  
+  -   
+  - The skill should define a deterministic key using fields such as:  
+    - `model_year`  
+    - `make`  
+    - `model_family`  
+    - `trim_code`  
+    - `body_style`  
+    - `source_sheet`  
+    - `source_row`  
+    - `source_column`  
+    - `rpo_raw`  
+    - `rpo_normalized`  
+    - `option_name`  
+  - Rows without RPOs, especially Standard Equipment rows, need a fallback key.  
+  -   
+- **No run metadata.**  
+  -   
+  - For database-bound loads, outputs should include or be accompanied by:  
+    - Source filename.  
+    - Source workbook identifier.  
+    - Model year.  
+    - Processing timestamp.  
+    - Skill/version identifier.  
+    - Run ID.  
+  - Without this, repeat loads and audits are difficult.  
+  -   
+- **No null convention.**  
+  -   
+  - The skill should distinguish:  
+    - Blank string.  
+    - True null.  
+    - Not available.  
+    - Unknown.  
+    - Not applicable.  
+    - Included/no charge.  
+  - These should not be collapsed casually.  
+  -   
+- **No data-type specification.**  
+  -   
+  - The instructions should define expected types for:  
+    - RPO/code fields as text.  
+    - Price fields as numeric decimals plus currency/status.  
+    - Availability as enum.  
+    - Source row/column as integer/text.  
+    - Boolean flags.  
+    - Footnote markers as text.  
+  -   
+- **No source traceability columns in the main output.**  
+  -   
+  - The instructions mention preserving source sheet, row, and RPO column, but the required headers do not include enough fields.  
+  - At minimum, generated rows should include:  
+    - `source_sheet`  
+    - `source_row`  
+    - `source_column`  
+    - `source_cell`  
+    - `source_section`  
+    - `raw_value`  
+  -   
+- **`ref/select` is ambiguous.**  
+  -   
+  - The skill should define whether this means:  
+    - Source column B.  
+    - A reference-only indicator.  
+    - The column where the RPO was found.  
+    - An orderability/selectability flag.  
+  - The current label is not database-safe.  
+  -   
+- **No category or row-type model.**  
+  -   
+  - Interior, Exterior, Mechanical, Standard Equipment, copied exterior colors, price-derived rows, and package rows need explicit row types or categories.  
+  - Relying only on `source_sheet` is fragile.  
+  -   
+- **Standard Equipment rows lack a safe database identity.**  
+  -   
+  - These rows may not have RPOs.  
+  - The skill should define a fallback identifier and preserve section/category labels.  
+  -   
+- **No preservation of section names.**  
+  -   
+  - Source sections such as wheels, brakes, seats, suspension, regulatory options, and equipment groups may be meaningful for the database.  
+  - The skill should capture them rather than discard them or accidentally ingest them as option rows.  
+  -   
+- **No deterministic output ordering rule.**  
+  -   
+  - The skill should specify whether rows are ordered by source workbook order, source sheet order, row number, RPO, category, or another deterministic key.  
+  - Reproducible ordering is important for database diffs and review.  
+  -   
+- **The instruction to “stay close to the workbook” conflicts with database ingestion needs.**  
+  -   
+  - Literal workbook fidelity is useful, but database loading requires typed, normalized, stable fields.  
+  - The skill should preserve both raw workbook values and normalized database-ready values rather than choosing one.  
+  -   
+  - ---
+
+  - ### Output-sheet naming and generation gaps
+
+- **Output sheet names are inconsistent or incomplete.**  
+  -   
+  - The skill appears to refer to names such as `#Variant Ingest`, variant-specific ingest sheets, and `Corvette Ingest`.  
+  - If these are not exactly defined, the Excel/Sheets extension may create unexpected sheets or omit required ones.  
+  -   
+- **The base-price or variant-price output sheet is not clearly named.**  
+  -   
+  - The instructions call for a combined variant/base-price output but do not provide a stable sheet name.  
+  -   
+- **No rule for generated-sheet lifecycle on reruns.**  
+  -   
+  - The skill should define idempotent behavior:  
+    - Delete and recreate generated sheets.  
+    - Clear and replace generated sheets.  
+    - Version generated sheets with run IDs.  
+    - Refuse to run if prior generated sheets exist.  
+  - Without this, reruns may append duplicates or mix stale and current outputs.  
+  -   
+- **No protection against modifying source sheets.**  
+  -   
+  - The skill should explicitly state that source sheets must be preserved unchanged and outputs written only to generated sheets.  
+  -   
+- **No all-or-nothing write behavior.**  
+  -   
+  - If a fatal validation error occurs after some output has been written, the skill should specify whether to roll back, delete partial outputs, or mark the run as failed.  
+  - This is especially important in Excel/Google Sheets extensions where true transactions may not be available.  
+  -   
+- **No post-generation validation.**  
+  -   
+  - The skill should require checking that:  
+    - All generated sheets exist.  
+    - Headers exactly match the required schema.  
+    - Availability fields contain only allowed normalized values.  
+    - Prices are typed correctly.  
+    - Required source traceability fields are populated.  
+    - Every processed source row was either output or logged as skipped.  
+    - No phantom RPOs were created.  
+  -   
+  - ---
+
+  - ### Manual-review, warnings, and error-reporting gaps
+
+- **No structured validation report format.**  
+  -   
+  - The skill says to stop, flag, or report some conditions, but does not define how.  
+  - It should require a validation/report sheet with columns such as:  
+    - `severity`  
+    - `error_code`  
+    - `message`  
+    - `source_sheet`  
+    - `source_row`  
+    - `source_column`  
+    - `source_cell`  
+    - `raw_value`  
+    - `normalized_value`  
+    - `recommended_action`  
+  -   
+- **No severity model.**  
+  -   
+  - The skill should distinguish:  
+    - Fatal errors.  
+    - Warnings.  
+    - Informational notices.  
+    - Manual-review items.  
+  -   
+- **No reporting for missing prices.**  
+  -   
+  - Price-not-found cases should be logged, not silently blanked.  
+  -   
+- **No reporting for unresolved footnotes.**  
+  -   
+  - If a marker cannot be associated with disclosure text, it should appear in the validation report.  
+  -   
+- **No reporting for skipped sheets or skipped sections.**  
+  -   
+  - If Equipment Groups are ignored, or if certain Price Schedule sections are skipped, that should be documented.  
+  -   
+- **No reporting for ambiguous prices.**  
+  -   
+  - Suppressed ambiguous prices should have an explicit flag or validation record so they are distinguishable from legitimately blank prices.  
+  -   
+- **No aggregate validation summary.**  
+  -   
+  - The skill should produce a summary of:  
+    - Sheets found.  
+    - Sheets missing.  
+    - Rows processed.  
+    - Rows skipped.  
+    - Errors.  
+    - Warnings.  
+    - Unmapped symbols.  
+    - Duplicate RPOs.  
+    - Price-match failures.  
+  -   
+  - ---
+
+  - ### Formatting, normalization, and text-processing gaps
+
+- **No global whitespace normalization rule.**  
+  -   
+  - The skill should define trimming leading/trailing whitespace, collapsing repeated spaces, and preserving meaningful line breaks where needed.  
+  -   
+- **No line-break normalization rule.**  
+  -   
+  - Excel/Sheets cells may contain CR, LF, or CRLF.  
+  - The skill should normalize them before disclosure parsing.  
+  -   
+- **No rule for preserving code-like values as text.**  
+  -   
+  - RPOs, color codes, trim codes, and other identifiers should not be converted to numbers.  
+  - Any leading zeros must be preserved.  
+  -   
+- **No case-normalization policy.**  
+  -   
+  - The skill should specify whether RPOs and codes are uppercased while names/descriptions preserve source casing.  
+  -   
+- **No formula-handling policy.**  
+  -   
+  - For cells containing formulas, the skill should define whether to use:  
+    - The formula text.  
+    - The calculated value.  
+    - The displayed value.  
+  - Price and symbol extraction likely require displayed or calculated values, not formula strings.  
+  -   
+- **No formatting requirements for generated sheets.**  
+  -   
+  - The skill should specify whether headers are frozen, fields are formatted as text/currency/number, and whether generated columns should be consistently ordered.  
+  -   
+- **Text-splitting rules are brittle.**  
+  -   
+  - “Option Name \= text before first comma” will misparse names that legitimately contain commas.  
+  - The skill should define safer parsing rules and preserve raw descriptions.  
+  -   
+- **No rule for continuation rows.**  
+  -   
+  - Blank RPO/name rows may be continuations of prior descriptions or notes.  
+  - The skill should define whether to merge, skip, or flag them.  
+  -   
+- **No maximum-length or truncation policy.**  
+  -   
+  - Database ingestion may require limits for names, descriptions, notes, and footnotes.  
+  - If truncation is necessary, it should be explicit and logged.  
+  -   
+  - ---
+
+  - ### ChatGPT Excel / Google Sheets extension constraints
+
+- **No consideration of metadata availability differences between Excel and Google Sheets.**  
+  -   
+  - The extensions may differ in access to:  
+    - Merged-cell ranges.  
+    - Hidden rows/columns.  
+    - Display values versus raw values.  
+    - Cell formatting.  
+    - Comments/notes.  
+    - Formula results.  
+  - The skill should avoid relying on formatting-only cues unless the extension can access them reliably.  
+  -   
+- **No defined way to surface validation failures in the extension environment.**  
+  -   
+  - The skill should specify whether failures are returned as a chat message, written to a validation sheet, or both.  
+  -   
+- **No fallback if formatting is lost in a raw export.**  
+  -   
+  - If superscript formatting, merged ranges, fill colors, or bold section headers are unavailable, the skill needs text-based fallback rules.  
+  -   
+- **No explicit instruction not to rely on visual styling.**  
+  -   
+  - Since raw exports may flatten styles, the skill should prioritize cell values, sheet names, coordinates, and explicit text markers over bolding, fill colors, or superscript formatting.  
+  -   
+  - ---
+
+  - ### Acceptance testing and fixture gaps
+
+- **No acceptance tests are defined.**  
+  -   
+  - The skill should include expected behavior for known edge cases, such as:  
+    - Missing required sheet.  
+    - Extra copied sheet.  
+    - Shifted header row.  
+    - Unknown availability symbol.  
+    - ZR1/ZR1X eight-column layout.  
+    - Footnoted symbols.  
+    - Valid code ending in digit.  
+    - Blank availability cell.  
+    - Duplicate RPO price.  
+    - `N/C` or `TBD` price.  
+    - Merged Color & Trim headers.  
+    - Hardcoded exterior-color count mismatch.  
+  -   
+- **No fixture-based expected outputs.**  
+  -   
+  - For deterministic processing, the skill should define small sample input ranges and expected output rows.  
+  - This would make the imported skill easier to verify in both Excel and Google Sheets.  
+  -   
+  - ---
+
+  - ### Highest-impact missing constraints to add first
+
+- **Require a preflight manifest and structure check** before any output is written.  
+- **Define exact sheet-name, suffix, row, column, and header validation rules.**  
+- **Resolve the six-column output conflict with Z06/ZR1/ZR1X source layouts.**  
+- **Create a complete symbol map from the workbook legend, including `D`, `*`, `■`, `□`, blank cells, and dash variants.**  
+- **Use context-aware special-character normalization instead of global destructive cleanup.**  
+- **Replace destructive RPO/footnote stripping with raw-plus-normalized fields and validation flags.**  
+- **Define Price Schedule parsing, price-type normalization, and ambiguous-price reporting.**  
+- **Define merged-cell handling for Color & Trim and Equipment Groups.**  
+- **Clarify whether Equipment Groups are ignored, validated, or used as reference data.**  
+- **Make outputs database-ready with stable keys, model/variant fields, source traceability, typed fields, null conventions, and run metadata.**  
+- **Add a structured validation report and idempotent rerun behavior.**  
+  

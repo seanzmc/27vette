@@ -21,8 +21,7 @@ Handle only these workbook sources:
 4. Standard Equipment sheets
 5. price schedule sheet(s)
 6. Color and Trim sheet(s)
-
-Ignore all other sheet types unless Sean explicitly asks for them.
+7. Equipment Groups sheets to be used as reference only.
 
 ## Output Sheets
 
@@ -63,8 +62,8 @@ Note: ZR1 and ZR1X content is mixed together in the source sheets and must be se
 
 Headers must be exactly:
 
-| RPO | Price | Option Name | Description | Detail | Category | 1LT Coupe | 2LT Coupe | 3LT Coupe | 1LT Convertible | 2LT Convertible | 3LT Convertible |
-| --- | ----- | ----------- | ----------- | ------ | -------- | --------- | --------- | --------- | --------------- | --------------- | --------------- |
+| RPO | Price | Option Name | Description | Detail | ref/select | source sheet | Footnote location | 1LT Coupe | 2LT Coupe | 3LT Coupe | 1LT Convertible | 2LT Convertible | 3LT Convertible |
+| --- | ----- | ----------- | ----------- | ------ | ---------- | ------------ | ----------------- | --------- | --------- | --------- | --------------- | --------------- | --------------- |
 
 ### Row rules
 
@@ -77,12 +76,14 @@ Headers must be exactly:
 ### Column rules
 
 - `RPO`: published option code exactly as shown, or blank if none is published
-- `Price`: matched from the price schedule by `RPO` when a clear match exists; otherwise blank
+- `Price`: matched from the price schedule by `RPO` when a clear match exists; otherwise blank. If a duplicate RPO is in the price schedule, flag for manual review
 - `Option Name`: option name from the workbook
 - `Description`: base descriptive text from the workbook
-- `Detail`: extra trailing detail text if clearly separable; otherwise blank
-- `Category`: category information from the workbook, such as `Interior`, `Exterior`, `Mechanical`, or `Standard Equipment`
-- variant columns: only `Standard`, `Available`, or `Not Available`
+- `Detail`: extra trailing detail text if clearly separable; otherwise blank (In the main variant sheets, disclosures will be found in the same column as name and description, separated by a line break and the marker will be located in the variant matrix- explained in ## Footnote Markers. In Color & Trim sheets, all disclosures are found together in one cell at the bottom of the sheet and the markers can be found in any kind of cell in that sheet.)
+- `ref/select`: the column in which the RPO was found in the source.
+- `source sheet`: original name of the sheet the row was extracted from.
+- `Footnote location`: List the column header for the location(s) of the footnotes.
+- `variant matrix columns`: only `Standard`, `Available`, or `Not Available`
 
 ## Variant Columns
 
@@ -127,16 +128,19 @@ Extract `Option Name`, `Description`, and `Detail` as literally as possible. The
 Use this rule set:
 
 - If the source gives one combined descriptive field, split conservatively:
-  - Name = the leading text up to the first comma.
+  - `Name` = the leading text up to the first comma.
   - `Description` = base descriptive text, after the name, but before any clearly separable trailing detail.
   - `Detail` = detail is described in "In-cell disclosures" below. Move the entire text of the detail to the Detail column, including the leading number.
 - If no clean split is visible, keep the full main text in `Description` and leave `Detail` blank.
 
 ## Footnote Markers
 
-GM's source documents use superscripted digit markers to tie cell content to sheet-level disclosure footnotes (e.g. `HU7²` where `²` points at footnote 2 on the same sheet). The `.xlsx` export flattens superscript formatting, so these markers arrive in the data as ordinary trailing digits appended to the preceding token with no space. The markers look like part of the RPO or name unless actively un-mangled.
+GM's source documents use superscripted digit markers to tie cell content to sheet-level disclosure footnotes. The export flattens superscript formatting, so these markers arrive in the data as ordinary trailing digits appended to the preceding token with no space. In the main variant option sheets, (Interior, Exterior, Mechanical, and Standard Equipment) the footnote marker will be within the variant matrix cells (ex. S1, A1, A/D1) It is important to preserve the original location of the footnote marker because it is relevant for applying the rules properly
 
-**The rule.** RPO codes are always exactly three characters. Any RPO-like token longer than three characters that ends in a digit has a footnote marker fused to it — the real RPO is the first three characters, the trailing digits are the marker. Similarly, any name or description that ends directly in a digit with no space has a footnote marker fused to it — the real name is everything up to the trailing digit run, the trailing digits are the marker.
+In the Color & Trim sheets, the markers look like part of the RPO or name unless actively un-mangled. (e.g. `HU7²` where `²` points at footnote 2 on the same sheet)
+
+**The rule.** RPO codes are always exactly three characters. Any RPO-like token longer than three characters that ends in a digit has a footnote marker fused to it — the real RPO is the first three characters, the trailing digits are the marker. Similarly, any name or description that ends directly in a digit with no space has a footnote marker fused to it — the real name is everything up to the trailing digit run, the trailing digits are the marker. (ex. `Color & Trim`!F4= "Sky Cool Gray1")
+Use caution with non RPO 3 digit codes such as GT2, GT1. These particular strings do not contain footnotes.
 
 Color and Trim sheets are the only sheets where disclosures can be whole-sheet, page-specific disclosures. On every other sheet, disclosures apply only to the row where the marker occurs unless the source explicitly says otherwise.
 
