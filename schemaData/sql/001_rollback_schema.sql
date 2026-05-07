@@ -1,0 +1,15 @@
+BEGIN;
+
+DROP TABLE IF EXISTS source_rows;
+DROP TABLE IF EXISTS rule_members;
+DROP TABLE IF EXISTS rules;
+DROP TABLE IF EXISTS standard_equipment;
+DROP TABLE IF EXISTS option_status;
+DROP TABLE IF EXISTS choice_group_options;
+DROP TABLE IF EXISTS choice_groups;
+DROP TABLE IF EXISTS sections;
+DROP TABLE IF EXISTS steps;
+DROP TABLE IF EXISTS options;
+DROP TABLE IF EXISTS variants;
+
+COMMIT;
