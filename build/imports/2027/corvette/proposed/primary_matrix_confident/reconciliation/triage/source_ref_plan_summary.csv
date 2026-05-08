@@ -1,7 +1,0 @@
-proposed_target_table,target_status,model_key,model_key_confidence,planned_member_count,source_ref_count,recommended_action,triage_status,notes
-catalog/selectables.csv,matched_canonical_target,stingray,inferred_from_proposal_id,288,288,preserve_as_plan_only,advisory,source_ref_member_plan remains plan-only; no canonical source-ref rows generated.
-catalog/selectables.csv,preview_target,grand_sport,inferred_from_proposal_id,888,888,preserve_as_plan_only,blocked,source_ref_member_plan remains plan-only; no canonical source-ref rows generated.
-catalog/selectables.csv,preview_target,stingray,inferred_from_proposal_id,600,600,preserve_as_plan_only,blocked,source_ref_member_plan remains plan-only; no canonical source-ref rows generated.
-catalog/selectables.csv,preview_target,z06,inferred_from_proposal_id,906,906,preserve_as_plan_only,blocked,source_ref_member_plan remains plan-only; no canonical source-ref rows generated.
-catalog/selectables.csv,preview_target,zr1,inferred_from_proposal_id,424,424,preserve_as_plan_only,blocked,source_ref_member_plan remains plan-only; no canonical source-ref rows generated.
-catalog/selectables.csv,preview_target,zr1x,inferred_from_proposal_id,424,424,preserve_as_plan_only,blocked,source_ref_member_plan remains plan-only; no canonical source-ref rows generated.

@@ -1,7 +1,0 @@
-blocker_id,blocker_type,severity,affected_domain,affected_count,required_decision_or_action,notes
-canonical_apply_ready_false_by_design,apply_blocker,apply_blocker,all,,Run a separate approved apply pass only after blockers are resolved.,This reconciliation report does not authorize apply.
-canonical_selectable_id_policy_not_applied,apply_blocker,apply_blocker,selectables,,Apply the approved selectable_id_model_rpo policy in a future apply pass.,Candidate IDs are preview_only in this report.
-missing_canonical_availability_schema,schema_context_missing,apply_blocker,availability,,Create/approve canonical availability target schema.,Availability rows are reported as target_schema_missing.
-missing_canonical_source_ref_member_schema,schema_context_missing,apply_blocker,source_refs,,Create/approve normalized source-ref member table schema.,source_ref_member_plan.csv is plan-only.
-missing_section_family_import_map,mapping_needed,apply_blocker,ui,657,Create explicit section_family -> section_id/step_id/category_id map.,Pass 17 reports mapping needs only.
-non_stingray_model_context_unavailable,schema_context_missing,apply_blocker,model_context,509,Provide canonical context for non-covered models or exclude them from apply.,Do not pretend data/stingray covers other Corvette models.

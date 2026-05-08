@@ -1,9 +1,0 @@
-blocker_key,blocker_type,affected_table,severity,notes
-color_trim_excluded_from_first_apply,advisory,support/color_trim,advisory,Color/Trim remains accepted_review_only and outside this first apply boundary.
-price_evidence_excluded_from_confident_subset,advisory,pricing,advisory,Raw price evidence was intentionally excluded from the confident subset.
-rules_packages_dependencies_excluded,advisory,logic,advisory,"Rule, package, auto-add, dependency, and exclusivity inference remain out of scope."
-canonical_apply_ready_false_by_design,apply_blocker,all,apply_blocker,Pass 15 reports alignment only; it does not imply canonical apply readiness.
-missing_canonical_availability_schema,schema_decision_needed,ui/availability.csv,schema_decision_needed,Canonical availability target is missing in current schema context; this is distinct from excluded first-apply items.
-missing_canonical_source_refs_schema,schema_decision_needed,meta/source_refs.csv,schema_decision_needed,"Canonical source_refs target is missing; this is a canonical schema-context gap, not an importer failure."
-no_final_canonical_selectable_id_policy,schema_decision_needed,catalog/selectables.csv,apply_blocker,proposal_selectable_id is review-only and must not be copied as final selectable_id.
-section_family_not_final_section_id,transformation_needed,ui/selectable_display.csv,schema_decision_needed,section_family is a broad importer family and needs UI section/category mapping.

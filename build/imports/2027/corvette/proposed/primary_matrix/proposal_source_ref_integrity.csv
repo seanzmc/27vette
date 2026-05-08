@@ -1,5 +1,0 @@
-check_name,status,count,sample_ids,notes
-unresolved_referenced_source_refs,pass,0,,Every referenced source_ref_id should exist in meta/source_refs.csv.
-unused_source_refs,pass,10,staging_audit_rpo_role_overlaps.csv:AH2:29b8e328|staging_audit_rpo_role_overlaps.csv:B6P:86283361|staging_audit_rpo_role_overlaps.csv:C2Z:a07c8bc2|staging_audit_rpo_role_overlaps.csv:CFV:8d7b7914|staging_audit_rpo_role_overlaps.csv:D3V:66e2b9e8|staging_audit_rpo_role_overlaps.csv:DY0:9a57579b|staging_audit_rpo_role_overlaps.csv:SL9:f6d8ce8a|staging_audit_rpo_role_overlaps.csv:UQT:4d73d40a|staging_audit_rpo_role_overlaps.csv:WUB:ebfeffc2|staging_audit_rpo_role_overlaps.csv:ZZ3:167be9a4,Unused source refs are advisory; they may support review-only evidence.
-proposal_rows_missing_source_refs,pass,0,,Proposal rows should carry source_ref_id/source_ref_ids.
-source_refs_missing_traceability,pass,0,,"Source refs should include source_sheet, source_row, and raw_value or source_detail_raw."
