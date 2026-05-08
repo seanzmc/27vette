@@ -64,6 +64,12 @@ def normalized_option_row(row: dict[str, str], config: ModelConfig) -> dict[str,
     option_id = clean(row.get("option_id", ""))
     original_section_id = clean(row.get("Section", ""))
     resolved_section_id = original_section_id or config.blank_section_overrides.get(option_id, "")
+    source_category_id = (
+        clean(row.get("Category", ""))
+        or config.source_category_overrides.get(option_id, "")
+        or config.option_category_overrides.get(option_id, "")
+        or config.section_category_overrides.get(resolved_section_id, "")
+    )
     return {
         "option_id": option_id,
         "rpo": clean(row.get("RPO", "")),
@@ -71,13 +77,35 @@ def normalized_option_row(row: dict[str, str], config: ModelConfig) -> dict[str,
         "option_name": clean(row.get("Option Name", "")),
         "description": clean(row.get("Description", "")),
         "detail_raw": clean(row.get("Detail", "")),
-        "category_id": clean(row.get("Category", "")),
+        "category_id": source_category_id,
         "selectable": normalize_selectable(row.get("Selectable", "")),
         "original_section_id": original_section_id,
         "section_id": resolved_section_id,
         "section_override_applied": bool(not original_section_id and resolved_section_id),
         "statuses": {variant_id: normalize_status(row.get(variant_id, "")) for variant_id in config.variant_ids},
     }
+
+
+def status_lookup_from_sheet(wb, config: ModelConfig) -> dict[tuple[str, str], str]:
+    if config.status_sheet not in wb.sheetnames:
+        return {}
+    statuses: dict[tuple[str, str], str] = {}
+    for row in rows_from_sheet(wb, config.status_sheet):
+        option_id = clean(row.get("option_id", ""))
+        variant_id = clean(row.get("variant_id", ""))
+        if option_id and variant_id:
+            statuses[(option_id, variant_id)] = normalize_status(row.get("status", ""))
+    return statuses
+
+
+def apply_status_lookup(rows: list[dict[str, Any]], status_lookup: dict[tuple[str, str], str], config: ModelConfig) -> None:
+    if not status_lookup:
+        return
+    for row in rows:
+        row["statuses"] = {
+            variant_id: status_lookup.get((row["option_id"], variant_id), "")
+            for variant_id in config.variant_ids
+        }
 
 
 def cleanup_display_text(value: str, config: ModelConfig) -> tuple[str, list[str]]:
@@ -470,6 +498,8 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
     categories = {row["category_id"]: row for row in rows_from_sheet(wb, "category_master")}
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
     rows = [normalized_option_row(row, config) for row in raw_rows]
+    status_lookup = status_lookup_from_sheet(wb, config)
+    apply_status_lookup(rows, status_lookup, config)
 
     variant_rows = [row for row in variants_raw if row.get("variant_id", "") in config.variant_ids]
     active_variant_ids = {row["variant_id"] for row in variant_rows if row.get("active") == "True"}
@@ -630,6 +660,7 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
             "model_label": config.model_label,
             "model_year": config.model_year,
             "source_option_sheet": config.source_option_sheet,
+            "status_sheet": config.status_sheet,
             "variant_ids": list(config.variant_ids),
             "expected_variant_count": config.expected_variant_count,
             "blank_section_overrides": dict(config.blank_section_overrides),
@@ -646,6 +677,7 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
             "option_rows": len(rows),
             "unique_rpos": len(unique_rpos),
             "variant_status_cells": len(rows) * len(config.variant_ids),
+            "status_source_rows": len(status_lookup),
             "candidate_choice_rows_available_or_standard": len(candidate_choices),
             "candidate_standard_equipment_cells": len(candidate_standard_equipment),
             "candidate_standard_option_rows": len(standard_rows),
@@ -689,6 +721,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     categories = {row["category_id"]: row for row in rows_from_sheet(wb, "category_master")}
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
     rows = [normalized_option_row(row, config) for row in raw_rows]
+    apply_status_lookup(rows, status_lookup_from_sheet(wb, config), config)
 
     variant_source_rows = {row["variant_id"]: row for row in variants_raw if row.get("variant_id", "") in config.variant_ids}
     variants: list[dict[str, Any]] = []

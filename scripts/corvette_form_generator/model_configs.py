@@ -157,6 +157,29 @@ GRAND_SPORT_OPTION_CATEGORY_OVERRIDES = {
     "opt_r8c_001": "cat_exte_001",
 }
 
+GRAND_SPORT_SOURCE_CATEGORY_OVERRIDES = {
+    "opt_cfl_001": "cat_exte_001",
+    "opt_cfv_001": "cat_exte_001",
+    "opt_cfx_001": "cat_inte_001",
+    "opt_cfz_001": "cat_exte_001",
+    "opt_drg_001": "cat_exte_001",
+    "opt_e60_001": "cat_exte_001",
+    "opt_j56_001": "cat_mech_001",
+    "opt_j6a_001": "cat_mech_001",
+    "opt_j6b_001": "cat_mech_001",
+    "opt_j6d_001": "cat_mech_001",
+    "opt_j6e_001": "cat_mech_001",
+    "opt_j6f_001": "cat_mech_001",
+    "opt_j6l_001": "cat_mech_001",
+    "opt_j6n_001": "cat_mech_001",
+    "opt_t0e_002": "cat_exte_001",
+    "opt_t0f_001": "cat_exte_001",
+    "opt_tr7_001": "cat_exte_001",
+    "opt_xfr_001": "cat_exte_001",
+    "opt_xfs_001": "cat_exte_001",
+    "opt_z25_001": "cat_exte_001",
+}
+
 GRAND_SPORT_SECTION_LABEL_OVERRIDES = {
     "sec_gsce_001": "Grand Sport Center Stripes",
     "sec_gsha_001": "Grand Sport Heritage Hash Marks",
@@ -216,6 +239,7 @@ STINGRAY_MODEL = ModelConfig(
     model_year="2027",
     dataset_name="2027 Corvette Stingray operational form",
     source_option_sheet="stingray_master",
+    status_sheet="option_variant_status",
     variant_ids=("1lt_c07", "2lt_c07", "3lt_c07", "1lt_c67", "2lt_c67", "3lt_c67"),
     expected_variant_count=6,
     root=ROOT,
@@ -239,6 +263,7 @@ GRAND_SPORT_MODEL = ModelConfig(
     model_year="2027",
     dataset_name="2027 Corvette Grand Sport operational form",
     source_option_sheet="grandSport",
+    status_sheet="gs_option_variant_status",
     variant_ids=("1lt_e07", "2lt_e07", "3lt_e07", "1lt_e67", "2lt_e67", "3lt_e67"),
     expected_variant_count=6,
     root=ROOT,
@@ -266,6 +291,7 @@ GRAND_SPORT_MODEL = ModelConfig(
     },
     section_category_overrides=GRAND_SPORT_SECTION_CATEGORY_OVERRIDES,
     option_category_overrides=GRAND_SPORT_OPTION_CATEGORY_OVERRIDES,
+    source_category_overrides=GRAND_SPORT_SOURCE_CATEGORY_OVERRIDES,
     section_label_overrides=GRAND_SPORT_SECTION_LABEL_OVERRIDES,
     preview_artifact_prefix="grand-sport-contract-preview",
     draft_artifact_prefix="grand-sport-form-data-draft",

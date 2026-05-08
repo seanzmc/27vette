@@ -14,6 +14,7 @@ class ModelConfig:
     model_year: str
     dataset_name: str
     source_option_sheet: str
+    status_sheet: str
     variant_ids: tuple[str, ...]
     expected_variant_count: int
     root: Path
@@ -32,6 +33,7 @@ class ModelConfig:
     blank_section_overrides: Mapping[str, str] = field(default_factory=dict)
     section_category_overrides: Mapping[str, str] = field(default_factory=dict)
     option_category_overrides: Mapping[str, str] = field(default_factory=dict)
+    source_category_overrides: Mapping[str, str] = field(default_factory=dict)
     section_label_overrides: Mapping[str, str] = field(default_factory=dict)
     preview_artifact_prefix: str = ""
     draft_artifact_prefix: str = ""

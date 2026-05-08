@@ -1,0 +1,53 @@
+source_file,source_field,target_table,target_field,alignment_status,transformation_needed,notes
+catalog/selectables.csv,has_orderable_rpo,data/stingray/catalog/selectables.csv,,excluded_from_first_apply,no,Generated QA metadata.
+catalog/selectables.csv,has_ref_rpo,data/stingray/catalog/selectables.csv,,excluded_from_first_apply,no,Generated QA metadata.
+catalog/selectables.csv,model_key,data/stingray/catalog/selectables.csv,model_key,target_schema_missing,yes,"Model scope likely belongs to variant/scope relation, not selectable identity alone."
+catalog/selectables.csv,notes,data/stingray/catalog/selectables.csv,notes,review_required,yes,Proposal warnings should not be copied blindly.
+catalog/selectables.csv,proposal_filter_status,data/stingray/catalog/selectables.csv,,excluded_from_first_apply,no,Generated confident-subset marker.
+catalog/selectables.csv,proposal_scope,data/stingray/catalog/selectables.csv,,excluded_from_first_apply,no,Proposal boundary metadata should not become canonical selectable data.
+catalog/selectables.csv,proposal_selectable_id,data/stingray/catalog/selectables.csv,selectable_id,transform_required,yes,canonical selectable_id policy required; proposal ID remains review-only.
+catalog/selectables.csv,proposal_status,data/stingray/catalog/selectables.csv,,excluded_from_first_apply,no,Proposal-only warning/status metadata.
+catalog/selectables.csv,ref_rpo,data/stingray/catalog/selectables.csv,,review_required,yes,Ref-only evidence must remain separate from orderable selectable identity.
+catalog/selectables.csv,review_status,data/stingray/catalog/selectables.csv,,excluded_from_first_apply,no,"Review workflow metadata, not canonical data."
+catalog/selectables.csv,section_family,data/stingray/catalog/selectables.csv,section_id,target_schema_missing,yes,section_family is a broad importer family and is not final section_id.
+catalog/selectables.csv,selectable_source,data/stingray/catalog/selectables.csv,,excluded_from_first_apply,no,Importer provenance metadata.
+catalog/selectables.csv,source_ref_ids,data/stingray/catalog/selectables.csv,source_refs,review_required,yes,May require normalized source-ref membership rather than pipe-delimited IDs.
+catalog/selectables.csv,source_sheet,data/stingray/catalog/selectables.csv,source_refs,review_required,yes,Workbook source identity belongs in traceability/governance evidence.
+meta/source_refs.csv,orderable_rpo,data/stingray/meta/source_refs.csv,orderable_rpo,review_required,yes,"Orderable RPO source evidence. Missing canonical source_refs schema is a schema-context gap, not an importer failure."
+meta/source_refs.csv,raw_status,data/stingray/meta/source_refs.csv,raw_status,review_required,yes,"Raw status evidence. Missing canonical source_refs schema is a schema-context gap, not an importer failure."
+meta/source_refs.csv,raw_value,data/stingray/meta/source_refs.csv,raw_value,review_required,yes,"Raw workbook evidence. Missing canonical source_refs schema is a schema-context gap, not an importer failure."
+meta/source_refs.csv,ref_rpo,data/stingray/meta/source_refs.csv,ref_rpo,review_required,yes,"Reference-only RPO source evidence. Missing canonical source_refs schema is a schema-context gap, not an importer failure."
+meta/source_refs.csv,source_column_or_cell_range,data/stingray/meta/source_refs.csv,source_column_or_cell_range,review_required,yes,"Workbook cell/column traceability. Missing canonical source_refs schema is a schema-context gap, not an importer failure."
+meta/source_refs.csv,source_detail_raw,data/stingray/meta/source_refs.csv,source_detail_raw,review_required,yes,"Raw detail source evidence. Missing canonical source_refs schema is a schema-context gap, not an importer failure."
+meta/source_refs.csv,source_field,data/stingray/meta/source_refs.csv,source_field,review_required,yes,"Extractor field context. Missing canonical source_refs schema is a schema-context gap, not an importer failure."
+meta/source_refs.csv,source_file,data/stingray/meta/source_refs.csv,source_file,review_required,yes,"Generated staging source filename. Missing canonical source_refs schema is a schema-context gap, not an importer failure."
+meta/source_refs.csv,source_ref_id,data/stingray/meta/source_refs.csv,source_ref_id,review_required,yes,"Source reference ID format should be reviewed before canonical use. Missing canonical source_refs schema is a schema-context gap, not an importer failure."
+meta/source_refs.csv,source_row,data/stingray/meta/source_refs.csv,source_row,review_required,yes,"Workbook row traceability. Missing canonical source_refs schema is a schema-context gap, not an importer failure."
+meta/source_refs.csv,source_sheet,data/stingray/meta/source_refs.csv,source_sheet,review_required,yes,"Workbook sheet traceability. Missing canonical source_refs schema is a schema-context gap, not an importer failure."
+ui/availability.csv,availability_value,data/stingray/ui/availability.csv,status,target_schema_missing,no,"Expected values are available, standard, and not_available."
+ui/availability.csv,body_code,data/stingray/ui/availability.csv,body_code,target_schema_missing,no,Body code is scope evidence if target schema keeps it.
+ui/availability.csv,body_style,data/stingray/ui/availability.csv,body_style,target_schema_missing,no,Body style is scope evidence if target schema keeps it.
+ui/availability.csv,canonical_status,data/stingray/ui/availability.csv,status,target_schema_missing,no,Normalized status values are already available/standard/not_available.
+ui/availability.csv,footnote_refs,data/stingray/ui/availability.csv,,review_required,yes,Footnotes require an approved source-evidence or footnote schema.
+ui/availability.csv,model_key,data/stingray/ui/availability.csv,model_key,target_schema_missing,yes,Variant/model scope must match final availability schema.
+ui/availability.csv,notes,data/stingray/ui/availability.csv,notes,target_schema_missing,yes,Proposal warning notes should not be copied blindly.
+ui/availability.csv,orderable_rpo,data/stingray/ui/availability.csv,rpo,target_schema_missing,yes,"Selectable identity should come through canonical selectable_id, not standalone RPO only."
+ui/availability.csv,proposal_filter_status,data/stingray/ui/availability.csv,,excluded_from_first_apply,no,Generated confident-subset marker.
+ui/availability.csv,proposal_selectable_id,data/stingray/ui/availability.csv,selectable_id,target_schema_missing,yes,Depends on future canonical selectable_id policy.
+ui/availability.csv,proposal_status,data/stingray/ui/availability.csv,,excluded_from_first_apply,no,Proposal-only metadata.
+ui/availability.csv,raw_status,data/stingray/ui/availability.csv,,review_required,yes,Raw status is source evidence; canonical availability should use normalized status.
+ui/availability.csv,ref_rpo,data/stingray/ui/availability.csv,,review_required,yes,Ref-only evidence remains separate.
+ui/availability.csv,review_status,data/stingray/ui/availability.csv,,excluded_from_first_apply,no,Review workflow metadata.
+ui/availability.csv,source_ref_id,data/stingray/ui/availability.csv,source_ref_id,target_schema_missing,yes,Traceability target schema is not confirmed in current checkout.
+ui/availability.csv,status_symbol,data/stingray/ui/availability.csv,,review_required,yes,Status symbol is source evidence.
+ui/availability.csv,trim_level,data/stingray/ui/availability.csv,trim_level,target_schema_missing,no,Trim level is scope evidence if target schema keeps it.
+ui/availability.csv,variant_id,data/stingray/ui/availability.csv,variant_id,target_schema_missing,no,Confident subset availability is already variant-scoped.
+ui/selectable_display.csv,model_key,data/stingray/ui/selectable_display.csv,,review_required,yes,UI display may need model/variant scoping outside this table.
+ui/selectable_display.csv,proposal_filter_status,data/stingray/ui/selectable_display.csv,,excluded_from_first_apply,no,Generated confident-subset marker.
+ui/selectable_display.csv,proposal_selectable_id,data/stingray/ui/selectable_display.csv,selectable_id,transform_required,yes,Depends on future canonical selectable_id policy.
+ui/selectable_display.csv,proposal_status,data/stingray/ui/selectable_display.csv,,excluded_from_first_apply,no,Proposal-only metadata.
+ui/selectable_display.csv,review_status,data/stingray/ui/selectable_display.csv,,excluded_from_first_apply,no,Review workflow metadata.
+ui/selectable_display.csv,section_family,data/stingray/ui/selectable_display.csv,section_id,transform_required,yes,section_family is too broad to be a final section_id.
+ui/selectable_display.csv,source_description_raw,data/stingray/ui/selectable_display.csv,source_detail_raw,review_required,yes,Raw source text should remain evidence unless explicitly promoted.
+ui/selectable_display.csv,source_detail_raw,data/stingray/ui/selectable_display.csv,source_detail_raw,review_required,yes,Raw source detail is traceability/display evidence.
+ui/selectable_display.csv,source_ref_ids,data/stingray/ui/selectable_display.csv,,review_required,yes,May need normalized traceability relation.

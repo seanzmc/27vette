@@ -1,0 +1,96 @@
+{
+  "blocking_review_buckets_used": [
+    "boundary_exclusion_summary",
+    "missing_rpo_non_standard_equipment",
+    "missing_rpo_standard_equipment",
+    "ref_only_evidence",
+    "unsupported_status"
+  ],
+  "broad_counts": {
+    "broad_availability": 8348,
+    "broad_price_evidence_count": 293,
+    "broad_review_queue": 5134,
+    "broad_selectable_display": 1592,
+    "broad_selectables": 1592,
+    "broad_source_refs": 8651
+  },
+  "confident_subset_counts": {
+    "excluded_availability_rows": 4818,
+    "excluded_review_rows": 6069,
+    "excluded_selectables": 935,
+    "retained_availability": 3530,
+    "retained_selectable_display": 657,
+    "retained_selectables": 657,
+    "retained_source_refs": 3530
+  },
+  "excluded_counts_by_reason": {
+    "blocking_review_bucket": 9,
+    "boundary_excluded": 0,
+    "missing_model_key": 0,
+    "missing_variant_id": 0,
+    "no_rpo": 0,
+    "other": 0,
+    "price_evidence_excluded": 293,
+    "ref_only": 0,
+    "review_only": 926,
+    "selectable_excluded": 4818,
+    "unresolved_source_ref": 0,
+    "unsupported_status": 0
+  },
+  "forbidden_outputs_verified_absent": [
+    "pricing/raw_price_evidence.csv",
+    "pricing/base_prices.csv",
+    "pricing/price_rules.csv",
+    "logic/dependency_rules.csv",
+    "logic/auto_adds.csv",
+    "logic/exclusive_groups.csv",
+    "logic/exclusive_group_members.csv",
+    "support/color_trim*.csv",
+    "data/stingray/**/*.csv",
+    "form-app/data.js",
+    "form-output/*"
+  ],
+  "input_summary": {
+    "broad_proposal_path": "provided --proposal",
+    "optional_input_presence": {
+      "proposal_review_queue_summary.csv": true,
+      "proposal_source_ref_integrity.csv": true,
+      "proposal_suspicious_rows.csv": true
+    },
+    "required_input_presence": {
+      "catalog/selectables.csv": true,
+      "meta/source_refs.csv": true,
+      "proposal_audit_report.json": true,
+      "proposal_report.json": true,
+      "review_queue.csv": true,
+      "ui/availability.csv": true,
+      "ui/selectable_display.csv": true
+    },
+    "subset_output_path": "provided --out"
+  },
+  "nonblocking_review_buckets_observed": [
+    "expected_review_only"
+  ],
+  "readiness": {
+    "canonical_apply_ready": false,
+    "confident_subset_ready": true,
+    "reasons": [],
+    "source_refs_ready": true
+  },
+  "recommended_next_step": "Review the confident subset row counts and decide whether to generate a human-readable confident-subset review packet or compare against existing canonical CSV after the CSV refactor is fully migrated.",
+  "review_rows_without_selectable_id_count": 12,
+  "source_audit_summary": {
+    "canonical_apply_ready": false,
+    "review_queue_ready": false,
+    "source_refs_ready": true
+  },
+  "source_ref_integrity": {
+    "retained_referenced_source_refs": 3530,
+    "retained_source_refs_count": 3530,
+    "source_refs_ready": true,
+    "unresolved_retained_refs": [],
+    "unresolved_retained_refs_count": 0,
+    "unused_retained_source_refs_count": 0
+  },
+  "warning": "Generated confident subset files are still proposal artifacts only. canonical_apply_ready is false."
+}

@@ -102,82 +102,6 @@ AERO_EXHAUST_ACCESSORIES_SECTION_ORDER = {
     "sec_lpow_001": 50,
 }
 
-FIVE_V7_OR_REQUIREMENT_TARGET_IDS = {"opt_5zu_001", "opt_5zz_001", "opt_5zw_001"}
-FIVE_ZU_OR_REQUIREMENT_TARGET_IDS = {"opt_g8g_001", "opt_gba_001", "opt_gkz_001"}
-T0A_REPLACEMENT_OPTION_IDS = {"opt_tvs_001", "opt_5zz_001", "opt_5zu_001"}
-
-RULE_GROUPS = [
-    {
-        "group_id": "grp_5v7_spoiler_requirement",
-        "group_type": "requires_any",
-        "source_id": "opt_5v7_001",
-        "target_ids": ["opt_5zu_001", "opt_5zz_001"],
-        "body_style_scope": "",
-        "trim_level_scope": "",
-        "variant_scope": "",
-        "disabled_reason": "Requires 5ZU Body-Color High Wing Spoiler or 5ZZ Carbon Flash High Wing Spoiler.",
-        "active": "True",
-        "notes": "5V7 is available when either approved high wing spoiler is selected.",
-    },
-    {
-        "group_id": "grp_5zu_paint_requirement",
-        "group_type": "requires_any",
-        "source_id": "opt_5zu_001",
-        "target_ids": ["opt_g8g_001", "opt_gba_001", "opt_gkz_001"],
-        "body_style_scope": "",
-        "trim_level_scope": "",
-        "variant_scope": "",
-        "disabled_reason": "Requires Arctic White, Black, or Torch Red exterior paint.",
-        "active": "True",
-        "notes": "5ZU body-color spoiler requires one approved body color.",
-    },
-]
-
-EXCLUSIVE_GROUPS = [
-    {
-        "group_id": "grp_ls6_engine_covers",
-        "option_ids": ["opt_bc7_001", "opt_bcp_001", "opt_bcs_001", "opt_bc4_001"],
-        "selection_mode": "single_within_group",
-        "active": "True",
-        "notes": "LS6 engine cover choices are mutually exclusive within the Engine Appearance section.",
-    },
-    {
-        "group_id": "grp_spoiler_high_wing",
-        "option_ids": ["opt_t0a_001", "opt_tvs_001", "opt_5zz_001", "opt_5zu_001"],
-        "selection_mode": "single_within_group",
-        "active": "True",
-        "notes": "Spoiler choices are mutually exclusive within the Spoiler section.",
-    },
-    {
-        "group_id": "excl_center_caps",
-        "option_ids": ["opt_rxj_001", "opt_vwd_001", "opt_5zd_001", "opt_5zc_001", "opt_rxh_001"],
-        "selection_mode": "single_within_group",
-        "active": "True",
-        "notes": "Center cap choices are mutually exclusive within the Wheels section.",
-    },
-    {
-        "group_id": "excl_indoor_car_covers",
-        "option_ids": ["opt_rwh_001", "opt_sl1_001", "opt_wkr_001", "opt_wkq_001"],
-        "selection_mode": "single_within_group",
-        "active": "True",
-        "notes": "Indoor car cover choices are mutually exclusive within the Aero, Exhaust, Stripes & Accessories section.",
-    },
-    {
-        "group_id": "excl_outdoor_car_covers",
-        "option_ids": ["opt_rnx_001", "opt_rwj_001"],
-        "selection_mode": "single_within_group",
-        "active": "True",
-        "notes": "Outdoor car cover choices are mutually exclusive within the Aero, Exhaust, Stripes & Accessories section.",
-    },
-    {
-        "group_id": "excl_suede_trunk_liner",
-        "option_ids": ["opt_sxb_001", "opt_sxr_001", "opt_sxt_001"],
-        "selection_mode": "single_within_group",
-        "active": "True",
-        "notes": "Suede trunk liner choices are mutually exclusive within the Interior Trim section.",
-    },
-]
-
 def step_for_section(section_id: str, section_name: str, category_id: str) -> str:
     return shared_step_for_section(
         section_id,
@@ -199,13 +123,78 @@ def workbook_bool(row: dict[str, str], field: str, fallback: bool) -> bool:
     return fallback
 
 
-def rule_body_style_scope(rule: dict[str, str], source_id: str, target_id: str) -> str:
-    note = clean(rule.get("original_detail_raw", ""))
-    if target_id == "opt_zz3_001" or "Convertible Engine Appearance Package" in note:
-        return "convertible"
-    if target_id == "opt_b6p_001" or "on Coupe" in note or "Coupe Engine Appearance Package" in note:
-        return "coupe"
-    return ""
+def active_source_row(row: dict[str, str]) -> bool:
+    return clean(row.get("active", "True")) == "True"
+
+
+def rows_from_optional_sheet(wb, sheet_name: str) -> list[dict[str, str]]:
+    if sheet_name not in wb.sheetnames:
+        return []
+    return rows_from_sheet(wb, sheet_name)
+
+
+def load_rule_groups(wb) -> list[dict[str, Any]]:
+    members_by_group: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for row in rows_from_optional_sheet(wb, "rule_group_members"):
+        if active_source_row(row):
+            members_by_group[row.get("group_id", "")].append(row)
+
+    rule_groups: list[dict[str, Any]] = []
+    for row in rows_from_optional_sheet(wb, "rule_groups"):
+        if not active_source_row(row):
+            continue
+        group_id = row.get("group_id", "")
+        members = sorted(members_by_group.get(group_id, []), key=lambda member: intish(member.get("display_order")))
+        rule_groups.append(
+            {
+                "group_id": group_id,
+                "group_type": row.get("group_type", ""),
+                "source_id": row.get("source_id", ""),
+                "target_ids": [member.get("target_id", "") for member in members if member.get("target_id", "")],
+                "body_style_scope": row.get("body_style_scope", ""),
+                "trim_level_scope": row.get("trim_level_scope", ""),
+                "variant_scope": row.get("variant_scope", ""),
+                "disabled_reason": row.get("disabled_reason", ""),
+                "active": row.get("active", ""),
+                "notes": row.get("notes", ""),
+            }
+        )
+    return rule_groups
+
+
+def load_exclusive_groups(wb) -> list[dict[str, Any]]:
+    members_by_group: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for row in rows_from_optional_sheet(wb, "exclusive_group_members"):
+        if active_source_row(row):
+            members_by_group[row.get("group_id", "")].append(row)
+
+    exclusive_groups: list[dict[str, Any]] = []
+    for row in rows_from_optional_sheet(wb, "exclusive_groups"):
+        if not active_source_row(row):
+            continue
+        group_id = row.get("group_id", "")
+        members = sorted(members_by_group.get(group_id, []), key=lambda member: intish(member.get("display_order")))
+        exclusive_groups.append(
+            {
+                "group_id": group_id,
+                "option_ids": [member.get("option_id", "") for member in members if member.get("option_id", "")],
+                "selection_mode": row.get("selection_mode", ""),
+                "active": row.get("active", ""),
+                "notes": row.get("notes", ""),
+            }
+        )
+    return exclusive_groups
+
+
+def grouped_requirement_pairs(rule_groups: list[dict[str, Any]]) -> set[tuple[str, str]]:
+    pairs: set[tuple[str, str]] = set()
+    for group in rule_groups:
+        if group.get("active") != "True" or group.get("group_type") != "requires_any":
+            continue
+        source_id = group.get("source_id", "")
+        for target_id in group.get("target_ids", []):
+            pairs.add((source_id, target_id))
+    return pairs
 
 
 def option_key(option: dict[str, str]) -> str:
@@ -468,6 +457,9 @@ def main() -> None:
     price_ref = price_ref_prices(price_ref_rows)
     interior_component_price_ref = price_ref_component_prices(price_ref_rows)
     color_overrides_raw = rows_from_sheet(wb, "color_overrides")
+    rule_groups = load_rule_groups(wb)
+    exclusive_groups = load_exclusive_groups(wb)
+    grouped_requires = grouped_requirement_pairs(rule_groups)
     interior_reference_by_id, interior_reference_rows = read_interior_reference()
 
     display_behavior_by_option_id = {
@@ -817,9 +809,9 @@ def main() -> None:
         rule_type = rule.get("rule_type", "").lower()
         source_id = rule.get("source_id", "")
         target_id = rule.get("target_id", "")
-        if source_id == "opt_5v7_001" and rule_type == "requires" and target_id in FIVE_V7_OR_REQUIREMENT_TARGET_IDS:
+        if rule.get("generation_action", "") == "omit_grouped_requirement":
             continue
-        if source_id == "opt_5zu_001" and rule_type == "requires" and target_id in FIVE_ZU_OR_REQUIREMENT_TARGET_IDS:
+        if rule_type == "requires" and (source_id, target_id) in grouped_requires:
             continue
         if source_id in hidden_option_ids or target_id in hidden_option_ids:
             continue
@@ -827,8 +819,8 @@ def main() -> None:
         target_section = rule.get("target_section", "")
         source_mode = sections.get(source_section, {}).get("selection_mode") or rule.get("source_selection_mode", "")
         target_mode = sections.get(target_section, {}).get("selection_mode") or rule.get("target_selection_mode", "")
-        body_style_scope = rule_body_style_scope(rule, source_id, target_id)
-        replaces_t0a = rule_type == "excludes" and target_id == "opt_t0a_001" and source_id in T0A_REPLACEMENT_OPTION_IDS
+        body_style_scope = rule.get("body_style_scope", "")
+        replaces_t0a = rule.get("runtime_action", "") == "replace"
         redundant = (
             rule_type == "excludes"
             and source_section
@@ -852,8 +844,10 @@ def main() -> None:
         auto_add = "False"
         source_label = label_for(source_id, options_by_id, interiors_by_id)
         target_label = label_for(target_id, options_by_id, interiors_by_id)
-        if replaces_t0a:
-            disabled_reason = "Removes T0A when Z51 is selected."
+        if rule.get("disabled_reason", ""):
+            disabled_reason = rule.get("disabled_reason", "")
+        elif replaces_t0a:
+            disabled_reason = f"{source_label} removes this default."
         elif rule_type == "excludes":
             disabled_reason = f"Blocked by {source_label}."
         elif rule_type == "requires":
@@ -1099,13 +1093,13 @@ def main() -> None:
             "active",
             "notes",
         ],
-        [{**row, "target_ids": "|".join(row["target_ids"])} for row in RULE_GROUPS],
+        [{**row, "target_ids": "|".join(row["target_ids"])} for row in rule_groups],
     )
     write_sheet(
         wb,
         "form_exclusive_groups",
         ["group_id", "option_ids", "selection_mode", "active", "notes"],
-        [{**row, "option_ids": "|".join(row["option_ids"])} for row in EXCLUSIVE_GROUPS],
+        [{**row, "option_ids": "|".join(row["option_ids"])} for row in exclusive_groups],
     )
     write_sheet(
         wb,
@@ -1213,8 +1207,8 @@ def main() -> None:
         "contextChoices": context_choices,
         "choices": choices,
         "standardEquipment": standard_equipment,
-        "ruleGroups": RULE_GROUPS,
-        "exclusiveGroups": EXCLUSIVE_GROUPS,
+        "ruleGroups": rule_groups,
+        "exclusiveGroups": exclusive_groups,
         "rules": [row for row in raw_rules if row["active"] == "True"],
         "priceRules": price_rules,
         "interiors": [row for row in interiors if row["active_for_stingray"]],

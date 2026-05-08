@@ -1,0 +1,131 @@
+source_sheet,model_key,variant_label,body_code,body_style,trim_level,inferred_variant_id,source_cell_range,confidence,notes
+Standard Equipment 1,corvette,Coupe 1YC07 1LT,1YC07,coupe,1LT,1lt_c07,D,medium,Detected from variant header.
+Standard Equipment 1,corvette,Coupe 1YC07 2LT,1YC07,coupe,2LT,2lt_c07,E,medium,Detected from variant header.
+Standard Equipment 1,corvette,Coupe 1YC07 3LT,1YC07,coupe,3LT,3lt_c07,F,medium,Detected from variant header.
+Standard Equipment 1,corvette,Convertible 1YC67 1LT,1YC67,convertible,1LT,1lt_c67,G,medium,Detected from variant header.
+Standard Equipment 1,corvette,Convertible 1YC67 2LT,1YC67,convertible,2LT,2lt_c67,H,medium,Detected from variant header.
+Standard Equipment 1,corvette,Convertible 1YC67 3LT,1YC67,convertible,3LT,3lt_c67,I,medium,Detected from variant header.
+Standard Equipment 2,corvette,Grand Sport Coupe 1YE07 1LT,1YE07,coupe,1LT,1lt_e07,D,medium,Detected from variant header.
+Standard Equipment 2,corvette,Grand Sport Coupe 1YE07 2LT,1YE07,coupe,2LT,2lt_e07,E,medium,Detected from variant header.
+Standard Equipment 2,corvette,Grand Sport Coupe 1YE07 3LT,1YE07,coupe,3LT,3lt_e07,F,medium,Detected from variant header.
+Standard Equipment 2,corvette,Grand Sport Convertible 1YE67 1LT,1YE67,convertible,1LT,1lt_e67,G,medium,Detected from variant header.
+Standard Equipment 2,corvette,Grand Sport Convertible 1YE67 2LT,1YE67,convertible,2LT,2lt_e67,H,medium,Detected from variant header.
+Standard Equipment 2,corvette,Grand Sport Convertible 1YE67 3LT,1YE67,convertible,3LT,3lt_e67,I,medium,Detected from variant header.
+Standard Equipment 3,corvette,Z06 Coupe 1YH07 1LZ,1YH07,coupe,1LZ,1lz_h07,D,medium,Detected from variant header.
+Standard Equipment 3,corvette,Z06 Coupe 1YH07 2LZ,1YH07,coupe,2LZ,2lz_h07,E,medium,Detected from variant header.
+Standard Equipment 3,corvette,Z06 Coupe 1YH07 3LZ,1YH07,coupe,3LZ,3lz_h07,F,medium,Detected from variant header.
+Standard Equipment 3,corvette,Z06 Convertible 1YH67 1LZ,1YH67,convertible,1LZ,1lz_h67,G,medium,Detected from variant header.
+Standard Equipment 3,corvette,Z06 Convertible 1YH67 2LZ,1YH67,convertible,2LZ,2lz_h67,H,medium,Detected from variant header.
+Standard Equipment 3,corvette,Z06 Convertible 1YH67 3LZ,1YH67,convertible,3LZ,3lz_h67,I,medium,Detected from variant header.
+Standard Equipment 4,corvette,ZR1 Coupe 1YR07 1LZ,1YR07,coupe,1LZ,1lz_r07,D,medium,Detected from variant header.
+Standard Equipment 4,corvette,ZR1 Coupe 1YR07 3LZ,1YR07,coupe,3LZ,3lz_r07,E,medium,Detected from variant header.
+Standard Equipment 4,corvette,ZR1 Convertible 1YR67 1LZ,1YR67,convertible,1LZ,1lz_r67,F,medium,Detected from variant header.
+Standard Equipment 4,corvette,ZR1 Convertible 1YR67 3LZ,1YR67,convertible,3LZ,3lz_r67,G,medium,Detected from variant header.
+Standard Equipment 4,corvette,ZR1X Coupe 1YS07 1LZ,1YS07,coupe,1LZ,1lz_s07,H,medium,Detected from variant header.
+Standard Equipment 4,corvette,ZR1X Coupe 1YS07 3LZ,1YS07,coupe,3LZ,3lz_s07,I,medium,Detected from variant header.
+Standard Equipment 4,corvette,ZR1X Convertible 1YS67 1LZ,1YS67,convertible,1LZ,1lz_s67,J,medium,Detected from variant header.
+Standard Equipment 4,corvette,ZR1X Convertible 1YS67 3LZ,1YS67,convertible,3LZ,3lz_s67,K,medium,Detected from variant header.
+Equipment Groups 1,corvette,Coupe 1YC07 1LT,1YC07,coupe,1LT,1lt_c07,D,medium,Detected from variant header.
+Equipment Groups 1,corvette,Coupe 1YC07 2LT,1YC07,coupe,2LT,2lt_c07,E,medium,Detected from variant header.
+Equipment Groups 1,corvette,Coupe 1YC07 3LT,1YC07,coupe,3LT,3lt_c07,F,medium,Detected from variant header.
+Equipment Groups 1,corvette,Convertible 1YC67 1LT,1YC67,convertible,1LT,1lt_c67,G,medium,Detected from variant header.
+Equipment Groups 1,corvette,Convertible 1YC67 2LT,1YC67,convertible,2LT,2lt_c67,H,medium,Detected from variant header.
+Equipment Groups 1,corvette,Convertible 1YC67 3LT,1YC67,convertible,3LT,3lt_c67,I,medium,Detected from variant header.
+Equipment Groups 2,corvette,Grand Sport Coupe 1YE07 1LT,1YE07,coupe,1LT,1lt_e07,D,medium,Detected from variant header.
+Equipment Groups 2,corvette,Grand Sport Coupe 1YE07 2LT,1YE07,coupe,2LT,2lt_e07,E,medium,Detected from variant header.
+Equipment Groups 2,corvette,Grand Sport Coupe 1YE07 3LT,1YE07,coupe,3LT,3lt_e07,F,medium,Detected from variant header.
+Equipment Groups 2,corvette,Grand Sport Convertible 1YE67 1LT,1YE67,convertible,1LT,1lt_e67,G,medium,Detected from variant header.
+Equipment Groups 2,corvette,Grand Sport Convertible 1YE67 2LT,1YE67,convertible,2LT,2lt_e67,H,medium,Detected from variant header.
+Equipment Groups 2,corvette,Grand Sport Convertible 1YE67 3LT,1YE67,convertible,3LT,3lt_e67,I,medium,Detected from variant header.
+Equipment Groups 3,corvette,Z06 Coupe 1YH07 1LZ,1YH07,coupe,1LZ,1lz_h07,D,medium,Detected from variant header.
+Equipment Groups 3,corvette,Z06 Coupe 1YH07 2LZ,1YH07,coupe,2LZ,2lz_h07,E,medium,Detected from variant header.
+Equipment Groups 3,corvette,Z06 Coupe 1YH07 3LZ,1YH07,coupe,3LZ,3lz_h07,F,medium,Detected from variant header.
+Equipment Groups 3,corvette,Z06 Convertible 1YH67 1LZ,1YH67,convertible,1LZ,1lz_h67,G,medium,Detected from variant header.
+Equipment Groups 3,corvette,Z06 Convertible 1YH67 2LZ,1YH67,convertible,2LZ,2lz_h67,H,medium,Detected from variant header.
+Equipment Groups 3,corvette,Z06 Convertible 1YH67 3LZ,1YH67,convertible,3LZ,3lz_h67,I,medium,Detected from variant header.
+Equipment Groups 4,corvette,ZR1 Coupe 1YR07 1LZ,1YR07,coupe,1LZ,1lz_r07,D,medium,Detected from variant header.
+Equipment Groups 4,corvette,ZR1 Coupe 1YR07 3LZ,1YR07,coupe,3LZ,3lz_r07,E,medium,Detected from variant header.
+Equipment Groups 4,corvette,ZR1 Convertible 1YR67 1LZ,1YR67,convertible,1LZ,1lz_r67,F,medium,Detected from variant header.
+Equipment Groups 4,corvette,ZR1 Convertible 1YR67 3LZ,1YR67,convertible,3LZ,3lz_r67,G,medium,Detected from variant header.
+Equipment Groups 4,corvette,ZR1X Coupe 1YS07 1LZ,1YS07,coupe,1LZ,1lz_s07,H,medium,Detected from variant header.
+Equipment Groups 4,corvette,ZR1X Coupe 1YS07 3LZ,1YS07,coupe,3LZ,3lz_s07,I,medium,Detected from variant header.
+Equipment Groups 4,corvette,ZR1X Convertible 1YS67 1LZ,1YS67,convertible,1LZ,1lz_s67,J,medium,Detected from variant header.
+Equipment Groups 4,corvette,ZR1X Convertible 1YS67 3LZ,1YS67,convertible,3LZ,3lz_s67,K,medium,Detected from variant header.
+Interior 1,corvette,Coupe 1YC07 1LT,1YC07,coupe,1LT,1lt_c07,D,medium,Detected from variant header.
+Interior 1,corvette,Coupe 1YC07 2LT,1YC07,coupe,2LT,2lt_c07,E,medium,Detected from variant header.
+Interior 1,corvette,Coupe 1YC07 3LT,1YC07,coupe,3LT,3lt_c07,F,medium,Detected from variant header.
+Interior 1,corvette,Convertible 1YC67 1LT,1YC67,convertible,1LT,1lt_c67,G,medium,Detected from variant header.
+Interior 1,corvette,Convertible 1YC67 2LT,1YC67,convertible,2LT,2lt_c67,H,medium,Detected from variant header.
+Interior 1,corvette,Convertible 1YC67 3LT,1YC67,convertible,3LT,3lt_c67,I,medium,Detected from variant header.
+Interior 2,corvette,Grand Sport Coupe 1YE07 1LT,1YE07,coupe,1LT,1lt_e07,D,medium,Detected from variant header.
+Interior 2,corvette,Grand Sport Coupe 1YE07 2LT,1YE07,coupe,2LT,2lt_e07,E,medium,Detected from variant header.
+Interior 2,corvette,Grand Sport Coupe 1YE07 3LT,1YE07,coupe,3LT,3lt_e07,F,medium,Detected from variant header.
+Interior 2,corvette,Grand Sport Convertible 1YE67 1LT,1YE67,convertible,1LT,1lt_e67,G,medium,Detected from variant header.
+Interior 2,corvette,Grand Sport Convertible 1YE67 2LT,1YE67,convertible,2LT,2lt_e67,H,medium,Detected from variant header.
+Interior 2,corvette,Grand Sport Convertible 1YE67 3LT,1YE67,convertible,3LT,3lt_e67,I,medium,Detected from variant header.
+Interior 3,corvette,Z06 Coupe 1YH07 1LZ,1YH07,coupe,1LZ,1lz_h07,D,medium,Detected from variant header.
+Interior 3,corvette,Z06 Coupe 1YH07 2LZ,1YH07,coupe,2LZ,2lz_h07,E,medium,Detected from variant header.
+Interior 3,corvette,Z06 Coupe 1YH07 3LZ,1YH07,coupe,3LZ,3lz_h07,F,medium,Detected from variant header.
+Interior 3,corvette,Z06 Convertible 1YH67 1LZ,1YH67,convertible,1LZ,1lz_h67,G,medium,Detected from variant header.
+Interior 3,corvette,Z06 Convertible 1YH67 2LZ,1YH67,convertible,2LZ,2lz_h67,H,medium,Detected from variant header.
+Interior 3,corvette,Z06 Convertible 1YH67 3LZ,1YH67,convertible,3LZ,3lz_h67,I,medium,Detected from variant header.
+Interior 4,corvette,ZR1 Coupe 1YR07 1LZ,1YR07,coupe,1LZ,1lz_r07,D,medium,Detected from variant header.
+Interior 4,corvette,ZR1 Coupe 1YR07 3LZ,1YR07,coupe,3LZ,3lz_r07,E,medium,Detected from variant header.
+Interior 4,corvette,ZR1 Convertible 1YR67 1LZ,1YR67,convertible,1LZ,1lz_r67,F,medium,Detected from variant header.
+Interior 4,corvette,ZR1 Convertible 1YR67 3LZ,1YR67,convertible,3LZ,3lz_r67,G,medium,Detected from variant header.
+Interior 4,corvette,ZR1X Coupe 1YS07 1LZ,1YS07,coupe,1LZ,1lz_s07,H,medium,Detected from variant header.
+Interior 4,corvette,ZR1X Coupe 1YS07 3LZ,1YS07,coupe,3LZ,3lz_s07,I,medium,Detected from variant header.
+Interior 4,corvette,ZR1X Convertible 1YS67 1LZ,1YS67,convertible,1LZ,1lz_s67,J,medium,Detected from variant header.
+Interior 4,corvette,ZR1X Convertible 1YS67 3LZ,1YS67,convertible,3LZ,3lz_s67,K,medium,Detected from variant header.
+Exterior 1,corvette,Coupe 1YC07 1LT,1YC07,coupe,1LT,1lt_c07,D,medium,Detected from variant header.
+Exterior 1,corvette,Coupe 1YC07 2LT,1YC07,coupe,2LT,2lt_c07,E,medium,Detected from variant header.
+Exterior 1,corvette,Coupe 1YC07 3LT,1YC07,coupe,3LT,3lt_c07,F,medium,Detected from variant header.
+Exterior 1,corvette,Convertible 1YC67 1LT,1YC67,convertible,1LT,1lt_c67,G,medium,Detected from variant header.
+Exterior 1,corvette,Convertible 1YC67 2LT,1YC67,convertible,2LT,2lt_c67,H,medium,Detected from variant header.
+Exterior 1,corvette,Convertible 1YC67 3LT,1YC67,convertible,3LT,3lt_c67,I,medium,Detected from variant header.
+Exterior 2,corvette,Grand Sport Coupe 1YE07 1LT,1YE07,coupe,1LT,1lt_e07,D,medium,Detected from variant header.
+Exterior 2,corvette,Grand Sport Coupe 1YE07 2LT,1YE07,coupe,2LT,2lt_e07,E,medium,Detected from variant header.
+Exterior 2,corvette,Grand Sport Coupe 1YE07 3LT,1YE07,coupe,3LT,3lt_e07,F,medium,Detected from variant header.
+Exterior 2,corvette,Grand Sport Convertible 1YE67 1LT,1YE67,convertible,1LT,1lt_e67,G,medium,Detected from variant header.
+Exterior 2,corvette,Grand Sport Convertible 1YE67 2LT,1YE67,convertible,2LT,2lt_e67,H,medium,Detected from variant header.
+Exterior 2,corvette,Grand Sport Convertible 1YE67 3LT,1YE67,convertible,3LT,3lt_e67,I,medium,Detected from variant header.
+Exterior 3,corvette,Z06 Coupe 1YH07 1LZ,1YH07,coupe,1LZ,1lz_h07,D,medium,Detected from variant header.
+Exterior 3,corvette,Z06 Coupe 1YH07 2LZ,1YH07,coupe,2LZ,2lz_h07,E,medium,Detected from variant header.
+Exterior 3,corvette,Z06 Coupe 1YH07 3LZ,1YH07,coupe,3LZ,3lz_h07,F,medium,Detected from variant header.
+Exterior 3,corvette,Z06 Convertible 1YH67 1LZ,1YH67,convertible,1LZ,1lz_h67,G,medium,Detected from variant header.
+Exterior 3,corvette,Z06 Convertible 1YH67 2LZ,1YH67,convertible,2LZ,2lz_h67,H,medium,Detected from variant header.
+Exterior 3,corvette,Z06 Convertible 1YH67 3LZ,1YH67,convertible,3LZ,3lz_h67,I,medium,Detected from variant header.
+Exterior 4,corvette,ZR1 Coupe 1YR07 1LZ,1YR07,coupe,1LZ,1lz_r07,D,medium,Detected from variant header.
+Exterior 4,corvette,ZR1 Coupe 1YR07 3LZ,1YR07,coupe,3LZ,3lz_r07,E,medium,Detected from variant header.
+Exterior 4,corvette,ZR1 Convertible 1YR67 1LZ,1YR67,convertible,1LZ,1lz_r67,F,medium,Detected from variant header.
+Exterior 4,corvette,ZR1 Convertible 1YR67 3LZ,1YR67,convertible,3LZ,3lz_r67,G,medium,Detected from variant header.
+Exterior 4,corvette,ZR1X Coupe 1YS07 1LZ,1YS07,coupe,1LZ,1lz_s07,H,medium,Detected from variant header.
+Exterior 4,corvette,ZR1X Coupe 1YS07 3LZ,1YS07,coupe,3LZ,3lz_s07,I,medium,Detected from variant header.
+Exterior 4,corvette,ZR1X Convertible 1YS67 1LZ,1YS67,convertible,1LZ,1lz_s67,J,medium,Detected from variant header.
+Exterior 4,corvette,ZR1X Convertible 1YS67 3LZ,1YS67,convertible,3LZ,3lz_s67,K,medium,Detected from variant header.
+Mechanical 1,corvette,Coupe 1YC07 1LT,1YC07,coupe,1LT,1lt_c07,D,medium,Detected from variant header.
+Mechanical 1,corvette,Coupe 1YC07 2LT,1YC07,coupe,2LT,2lt_c07,E,medium,Detected from variant header.
+Mechanical 1,corvette,Coupe 1YC07 3LT,1YC07,coupe,3LT,3lt_c07,F,medium,Detected from variant header.
+Mechanical 1,corvette,Convertible 1YC67 1LT,1YC67,convertible,1LT,1lt_c67,G,medium,Detected from variant header.
+Mechanical 1,corvette,Convertible 1YC67 2LT,1YC67,convertible,2LT,2lt_c67,H,medium,Detected from variant header.
+Mechanical 1,corvette,Convertible 1YC67 3LT,1YC67,convertible,3LT,3lt_c67,I,medium,Detected from variant header.
+Mechanical 2,corvette,Grand Sport Coupe 1YE07 1LT,1YE07,coupe,1LT,1lt_e07,D,medium,Detected from variant header.
+Mechanical 2,corvette,Grand Sport Coupe 1YE07 2LT,1YE07,coupe,2LT,2lt_e07,E,medium,Detected from variant header.
+Mechanical 2,corvette,Grand Sport Coupe 1YE07 3LT,1YE07,coupe,3LT,3lt_e07,F,medium,Detected from variant header.
+Mechanical 2,corvette,Grand Sport Convertible 1YE67 1LT,1YE67,convertible,1LT,1lt_e67,G,medium,Detected from variant header.
+Mechanical 2,corvette,Grand Sport Convertible 1YE67 2LT,1YE67,convertible,2LT,2lt_e67,H,medium,Detected from variant header.
+Mechanical 2,corvette,Grand Sport Convertible 1YE67 3LT,1YE67,convertible,3LT,3lt_e67,I,medium,Detected from variant header.
+Mechanical 3,corvette,Z06 Coupe 1YH07 1LZ,1YH07,coupe,1LZ,1lz_h07,D,medium,Detected from variant header.
+Mechanical 3,corvette,Z06 Coupe 1YH07 2LZ,1YH07,coupe,2LZ,2lz_h07,E,medium,Detected from variant header.
+Mechanical 3,corvette,Z06 Coupe 1YH07 3LZ,1YH07,coupe,3LZ,3lz_h07,F,medium,Detected from variant header.
+Mechanical 3,corvette,Z06 Convertible 1YH67 1LZ,1YH67,convertible,1LZ,1lz_h67,G,medium,Detected from variant header.
+Mechanical 3,corvette,Z06 Convertible 1YH67 2LZ,1YH67,convertible,2LZ,2lz_h67,H,medium,Detected from variant header.
+Mechanical 3,corvette,Z06 Convertible 1YH67 3LZ,1YH67,convertible,3LZ,3lz_h67,I,medium,Detected from variant header.
+Mechanical 4,corvette,ZR1 Coupe 1YR07 1LZ,1YR07,coupe,1LZ,1lz_r07,D,medium,Detected from variant header.
+Mechanical 4,corvette,ZR1 Coupe 1YR07 3LZ,1YR07,coupe,3LZ,3lz_r07,E,medium,Detected from variant header.
+Mechanical 4,corvette,ZR1 Convertible 1YR67 1LZ,1YR67,convertible,1LZ,1lz_r67,F,medium,Detected from variant header.
+Mechanical 4,corvette,ZR1 Convertible 1YR67 3LZ,1YR67,convertible,3LZ,3lz_r67,G,medium,Detected from variant header.
+Mechanical 4,corvette,ZR1X Coupe 1YS07 1LZ,1YS07,coupe,1LZ,1lz_s07,H,medium,Detected from variant header.
+Mechanical 4,corvette,ZR1X Coupe 1YS07 3LZ,1YS07,coupe,3LZ,3lz_s07,I,medium,Detected from variant header.
+Mechanical 4,corvette,ZR1X Convertible 1YS67 1LZ,1YS67,convertible,1LZ,1lz_s67,J,medium,Detected from variant header.
+Mechanical 4,corvette,ZR1X Convertible 1YS67 3LZ,1YS67,convertible,3LZ,3lz_s67,K,medium,Detected from variant header.

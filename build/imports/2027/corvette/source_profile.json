@@ -1,0 +1,1235 @@
+{
+  "detected": {
+    "model_key_confidence_counts": {
+      "high": 130
+    },
+    "model_keys": [],
+    "price_schedule_rows": 295,
+    "rule_phrase_candidate_count": 825,
+    "section_families": [
+      "color_trim",
+      "equipment_groups",
+      "exterior",
+      "interior",
+      "mechanical",
+      "pricing",
+      "standard_equipment"
+    ],
+    "sheet_section_role_counts": {
+      "color_trim_compatibility_matrix": 2,
+      "color_trim_disclosure": 2,
+      "color_trim_interior_matrix": 2,
+      "derived_equipment_summary": 4,
+      "header_or_legend": 20,
+      "price_block": 1,
+      "variant_matrix": 16
+    },
+    "status_parse_rejections": {},
+    "status_symbols": [
+      {
+        "canonical_status": "not_available",
+        "count": 132,
+        "source_sheet": "Equipment Groups 1",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 441,
+        "source_sheet": "Equipment Groups 1",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 349,
+        "source_sheet": "Equipment Groups 1",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "included_equipment_group",
+        "count": 92,
+        "source_sheet": "Equipment Groups 1",
+        "status_context": "variant_availability",
+        "status_symbol": "■"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 128,
+        "source_sheet": "Equipment Groups 2",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 533,
+        "source_sheet": "Equipment Groups 2",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 255,
+        "source_sheet": "Equipment Groups 2",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "included_equipment_group",
+        "count": 92,
+        "source_sheet": "Equipment Groups 2",
+        "status_context": "variant_availability",
+        "status_symbol": "■"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 147,
+        "source_sheet": "Equipment Groups 3",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 487,
+        "source_sheet": "Equipment Groups 3",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 292,
+        "source_sheet": "Equipment Groups 3",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 12,
+        "source_sheet": "Equipment Groups 3",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "included_equipment_group",
+        "count": 88,
+        "source_sheet": "Equipment Groups 3",
+        "status_context": "variant_availability",
+        "status_symbol": "■"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 188,
+        "source_sheet": "Equipment Groups 4",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 476,
+        "source_sheet": "Equipment Groups 4",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 284,
+        "source_sheet": "Equipment Groups 4",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 68,
+        "source_sheet": "Equipment Groups 4",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "included_equipment_group",
+        "count": 88,
+        "source_sheet": "Equipment Groups 4",
+        "status_context": "variant_availability",
+        "status_symbol": "■"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 51,
+        "source_sheet": "Exterior 1",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 220,
+        "source_sheet": "Exterior 1",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 255,
+        "source_sheet": "Exterior 1",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 74,
+        "source_sheet": "Exterior 1",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "included_equipment_group",
+        "count": 12,
+        "source_sheet": "Exterior 1",
+        "status_context": "variant_availability",
+        "status_symbol": "■"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 47,
+        "source_sheet": "Exterior 2",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 306,
+        "source_sheet": "Exterior 2",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 161,
+        "source_sheet": "Exterior 2",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 80,
+        "source_sheet": "Exterior 2",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "included_equipment_group",
+        "count": 12,
+        "source_sheet": "Exterior 2",
+        "status_context": "variant_availability",
+        "status_symbol": "■"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 51,
+        "source_sheet": "Exterior 3",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 268,
+        "source_sheet": "Exterior 3",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 195,
+        "source_sheet": "Exterior 3",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 80,
+        "source_sheet": "Exterior 3",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "included_equipment_group",
+        "count": 12,
+        "source_sheet": "Exterior 3",
+        "status_context": "variant_availability",
+        "status_symbol": "■"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 56,
+        "source_sheet": "Exterior 4",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 216,
+        "source_sheet": "Exterior 4",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 168,
+        "source_sheet": "Exterior 4",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 116,
+        "source_sheet": "Exterior 4",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "included_equipment_group",
+        "count": 12,
+        "source_sheet": "Exterior 4",
+        "status_context": "variant_availability",
+        "status_symbol": "■"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 93,
+        "source_sheet": "Interior 1",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 128,
+        "source_sheet": "Interior 1",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 79,
+        "source_sheet": "Interior 1",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 208,
+        "source_sheet": "Interior 1",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "included_equipment_group",
+        "count": 74,
+        "source_sheet": "Interior 1",
+        "status_context": "variant_availability",
+        "status_symbol": "■"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 93,
+        "source_sheet": "Interior 2",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 128,
+        "source_sheet": "Interior 2",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 79,
+        "source_sheet": "Interior 2",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 208,
+        "source_sheet": "Interior 2",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "included_equipment_group",
+        "count": 74,
+        "source_sheet": "Interior 2",
+        "status_context": "variant_availability",
+        "status_symbol": "■"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 111,
+        "source_sheet": "Interior 3",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 132,
+        "source_sheet": "Interior 3",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 79,
+        "source_sheet": "Interior 3",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 214,
+        "source_sheet": "Interior 3",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "included_equipment_group",
+        "count": 70,
+        "source_sheet": "Interior 3",
+        "status_context": "variant_availability",
+        "status_symbol": "■"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 156,
+        "source_sheet": "Interior 4",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 168,
+        "source_sheet": "Interior 4",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 108,
+        "source_sheet": "Interior 4",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 304,
+        "source_sheet": "Interior 4",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "included_equipment_group",
+        "count": 72,
+        "source_sheet": "Interior 4",
+        "status_context": "variant_availability",
+        "status_symbol": "■"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 18,
+        "source_sheet": "Mechanical 1",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 168,
+        "source_sheet": "Mechanical 1",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 15,
+        "source_sheet": "Mechanical 1",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 99,
+        "source_sheet": "Mechanical 1",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 18,
+        "source_sheet": "Mechanical 2",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 144,
+        "source_sheet": "Mechanical 2",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 15,
+        "source_sheet": "Mechanical 2",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 111,
+        "source_sheet": "Mechanical 2",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 21,
+        "source_sheet": "Mechanical 3",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 123,
+        "source_sheet": "Mechanical 3",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 18,
+        "source_sheet": "Mechanical 3",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 114,
+        "source_sheet": "Mechanical 3",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 52,
+        "source_sheet": "Mechanical 4",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 140,
+        "source_sheet": "Mechanical 4",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 8,
+        "source_sheet": "Mechanical 4",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 176,
+        "source_sheet": "Mechanical 4",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 38,
+        "source_sheet": "Standard Equipment 1",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 41,
+        "source_sheet": "Standard Equipment 1",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 6,
+        "source_sheet": "Standard Equipment 1",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 381,
+        "source_sheet": "Standard Equipment 1",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "included_equipment_group",
+        "count": 8,
+        "source_sheet": "Standard Equipment 1",
+        "status_context": "variant_availability",
+        "status_symbol": "■"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 38,
+        "source_sheet": "Standard Equipment 2",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 41,
+        "source_sheet": "Standard Equipment 2",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 6,
+        "source_sheet": "Standard Equipment 2",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 399,
+        "source_sheet": "Standard Equipment 2",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "included_equipment_group",
+        "count": 8,
+        "source_sheet": "Standard Equipment 2",
+        "status_context": "variant_availability",
+        "status_symbol": "■"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 49,
+        "source_sheet": "Standard Equipment 3",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 25,
+        "source_sheet": "Standard Equipment 3",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "available",
+        "count": 6,
+        "source_sheet": "Standard Equipment 3",
+        "status_context": "variant_availability",
+        "status_symbol": "A/D"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 408,
+        "source_sheet": "Standard Equipment 3",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      },
+      {
+        "canonical_status": "included_equipment_group",
+        "count": 4,
+        "source_sheet": "Standard Equipment 3",
+        "status_context": "variant_availability",
+        "status_symbol": "■"
+      },
+      {
+        "canonical_status": "not_available",
+        "count": 80,
+        "source_sheet": "Standard Equipment 4",
+        "status_context": "variant_availability",
+        "status_symbol": "--"
+      },
+      {
+        "canonical_status": "available",
+        "count": 4,
+        "source_sheet": "Standard Equipment 4",
+        "status_context": "variant_availability",
+        "status_symbol": "A"
+      },
+      {
+        "canonical_status": "standard",
+        "count": 596,
+        "source_sheet": "Standard Equipment 4",
+        "status_context": "variant_availability",
+        "status_symbol": "S"
+      }
+    ],
+    "variant_header_count": 130
+  },
+  "sheet_count": 23,
+  "sheets": [
+    {
+      "creates_canonical_candidates": "false",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [],
+      "likely_variant_headers": [],
+      "max_column": 11,
+      "max_row": 306,
+      "model_group_index": "",
+      "model_key": "",
+      "notes": "Price Schedule extraction is staging evidence only; no final price semantics are inferred.",
+      "scope_type": "model_global",
+      "section_family": "pricing",
+      "sheet_name": "Price Schedule",
+      "sheet_role": "price_source"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "Coupe 1YC07 1LT",
+        "Coupe 1YC07 2LT",
+        "Coupe 1YC07 3LT",
+        "Convertible 1YC67 1LT",
+        "Convertible 1YC67 2LT",
+        "Convertible 1YC67 3LT"
+      ],
+      "max_column": 9,
+      "max_row": 82,
+      "model_group_index": "1",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "standard_equipment",
+      "sheet_name": "Standard Equipment 1",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "Grand Sport Coupe 1YE07 1LT",
+        "Grand Sport Coupe 1YE07 2LT",
+        "Grand Sport Coupe 1YE07 3LT",
+        "Grand Sport Convertible 1YE67 1LT",
+        "Grand Sport Convertible 1YE67 2LT",
+        "Grand Sport Convertible 1YE67 3LT"
+      ],
+      "max_column": 9,
+      "max_row": 85,
+      "model_group_index": "2",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "standard_equipment",
+      "sheet_name": "Standard Equipment 2",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "Z06 Coupe 1YH07 1LZ",
+        "Z06 Coupe 1YH07 2LZ",
+        "Z06 Coupe 1YH07 3LZ",
+        "Z06 Convertible 1YH67 1LZ",
+        "Z06 Convertible 1YH67 2LZ",
+        "Z06 Convertible 1YH67 3LZ"
+      ],
+      "max_column": 9,
+      "max_row": 85,
+      "model_group_index": "3",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "standard_equipment",
+      "sheet_name": "Standard Equipment 3",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "ZR1 Coupe 1YR07 1LZ",
+        "ZR1 Coupe 1YR07 3LZ",
+        "ZR1 Convertible 1YR67 1LZ",
+        "ZR1 Convertible 1YR67 3LZ",
+        "ZR1X Coupe 1YS07 1LZ",
+        "ZR1X Coupe 1YS07 3LZ",
+        "ZR1X Convertible 1YS67 1LZ",
+        "ZR1X Convertible 1YS67 3LZ"
+      ],
+      "max_column": 11,
+      "max_row": 88,
+      "model_group_index": "4",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "standard_equipment",
+      "sheet_name": "Standard Equipment 4",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "false",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "Coupe 1YC07 1LT",
+        "Coupe 1YC07 2LT",
+        "Coupe 1YC07 3LT",
+        "Convertible 1YC67 1LT",
+        "Convertible 1YC67 2LT",
+        "Convertible 1YC67 3LT"
+      ],
+      "max_column": 9,
+      "max_row": 175,
+      "model_group_index": "1",
+      "model_key": "",
+      "notes": "Derived/cross-check sheet; rows unmatched to primary sheets are flagged and never promoted.",
+      "scope_type": "derived_cross_check",
+      "section_family": "equipment_groups",
+      "sheet_name": "Equipment Groups 1",
+      "sheet_role": "derived_equipment_summary"
+    },
+    {
+      "creates_canonical_candidates": "false",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "Grand Sport Coupe 1YE07 1LT",
+        "Grand Sport Coupe 1YE07 2LT",
+        "Grand Sport Coupe 1YE07 3LT",
+        "Grand Sport Convertible 1YE67 1LT",
+        "Grand Sport Convertible 1YE67 2LT",
+        "Grand Sport Convertible 1YE67 3LT"
+      ],
+      "max_column": 9,
+      "max_row": 174,
+      "model_group_index": "2",
+      "model_key": "",
+      "notes": "Derived/cross-check sheet; rows unmatched to primary sheets are flagged and never promoted.",
+      "scope_type": "derived_cross_check",
+      "section_family": "equipment_groups",
+      "sheet_name": "Equipment Groups 2",
+      "sheet_role": "derived_equipment_summary"
+    },
+    {
+      "creates_canonical_candidates": "false",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "Z06 Coupe 1YH07 1LZ",
+        "Z06 Coupe 1YH07 2LZ",
+        "Z06 Coupe 1YH07 3LZ",
+        "Z06 Convertible 1YH67 1LZ",
+        "Z06 Convertible 1YH67 2LZ",
+        "Z06 Convertible 1YH67 3LZ"
+      ],
+      "max_column": 9,
+      "max_row": 177,
+      "model_group_index": "3",
+      "model_key": "",
+      "notes": "Derived/cross-check sheet; rows unmatched to primary sheets are flagged and never promoted.",
+      "scope_type": "derived_cross_check",
+      "section_family": "equipment_groups",
+      "sheet_name": "Equipment Groups 3",
+      "sheet_role": "derived_equipment_summary"
+    },
+    {
+      "creates_canonical_candidates": "false",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "ZR1 Coupe 1YR07 1LZ",
+        "ZR1 Coupe 1YR07 3LZ",
+        "ZR1 Convertible 1YR67 1LZ",
+        "ZR1 Convertible 1YR67 3LZ",
+        "ZR1X Coupe 1YS07 1LZ",
+        "ZR1X Coupe 1YS07 3LZ",
+        "ZR1X Convertible 1YS67 1LZ",
+        "ZR1X Convertible 1YS67 3LZ"
+      ],
+      "max_column": 11,
+      "max_row": 144,
+      "model_group_index": "4",
+      "model_key": "",
+      "notes": "Derived/cross-check sheet; rows unmatched to primary sheets are flagged and never promoted.",
+      "scope_type": "derived_cross_check",
+      "section_family": "equipment_groups",
+      "sheet_name": "Equipment Groups 4",
+      "sheet_role": "derived_equipment_summary"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "Coupe 1YC07 1LT",
+        "Coupe 1YC07 2LT",
+        "Coupe 1YC07 3LT",
+        "Convertible 1YC67 1LT",
+        "Convertible 1YC67 2LT",
+        "Convertible 1YC67 3LT"
+      ],
+      "max_column": 9,
+      "max_row": 100,
+      "model_group_index": "1",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "interior",
+      "sheet_name": "Interior 1",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "Grand Sport Coupe 1YE07 1LT",
+        "Grand Sport Coupe 1YE07 2LT",
+        "Grand Sport Coupe 1YE07 3LT",
+        "Grand Sport Convertible 1YE67 1LT",
+        "Grand Sport Convertible 1YE67 2LT",
+        "Grand Sport Convertible 1YE67 3LT"
+      ],
+      "max_column": 9,
+      "max_row": 100,
+      "model_group_index": "2",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "interior",
+      "sheet_name": "Interior 2",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "Z06 Coupe 1YH07 1LZ",
+        "Z06 Coupe 1YH07 2LZ",
+        "Z06 Coupe 1YH07 3LZ",
+        "Z06 Convertible 1YH67 1LZ",
+        "Z06 Convertible 1YH67 2LZ",
+        "Z06 Convertible 1YH67 3LZ"
+      ],
+      "max_column": 9,
+      "max_row": 104,
+      "model_group_index": "3",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "interior",
+      "sheet_name": "Interior 3",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "ZR1 Coupe 1YR07 1LZ",
+        "ZR1 Coupe 1YR07 3LZ",
+        "ZR1 Convertible 1YR67 1LZ",
+        "ZR1 Convertible 1YR67 3LZ",
+        "ZR1X Coupe 1YS07 1LZ",
+        "ZR1X Coupe 1YS07 3LZ",
+        "ZR1X Convertible 1YS67 1LZ",
+        "ZR1X Convertible 1YS67 3LZ"
+      ],
+      "max_column": 11,
+      "max_row": 104,
+      "model_group_index": "4",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "interior",
+      "sheet_name": "Interior 4",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "Coupe 1YC07 1LT",
+        "Coupe 1YC07 2LT",
+        "Coupe 1YC07 3LT",
+        "Convertible 1YC67 1LT",
+        "Convertible 1YC67 2LT",
+        "Convertible 1YC67 3LT"
+      ],
+      "max_column": 9,
+      "max_row": 105,
+      "model_group_index": "1",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "exterior",
+      "sheet_name": "Exterior 1",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "Grand Sport Coupe 1YE07 1LT",
+        "Grand Sport Coupe 1YE07 2LT",
+        "Grand Sport Coupe 1YE07 3LT",
+        "Grand Sport Convertible 1YE67 1LT",
+        "Grand Sport Convertible 1YE67 2LT",
+        "Grand Sport Convertible 1YE67 3LT"
+      ],
+      "max_column": 9,
+      "max_row": 104,
+      "model_group_index": "2",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "exterior",
+      "sheet_name": "Exterior 2",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "Z06 Coupe 1YH07 1LZ",
+        "Z06 Coupe 1YH07 2LZ",
+        "Z06 Coupe 1YH07 3LZ",
+        "Z06 Convertible 1YH67 1LZ",
+        "Z06 Convertible 1YH67 2LZ",
+        "Z06 Convertible 1YH67 3LZ"
+      ],
+      "max_column": 9,
+      "max_row": 104,
+      "model_group_index": "3",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "exterior",
+      "sheet_name": "Exterior 3",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "ZR1 Coupe 1YR07 1LZ",
+        "ZR1 Coupe 1YR07 3LZ",
+        "ZR1 Convertible 1YR67 1LZ",
+        "ZR1 Convertible 1YR67 3LZ",
+        "ZR1X Coupe 1YS07 1LZ",
+        "ZR1X Coupe 1YS07 3LZ",
+        "ZR1X Convertible 1YS67 1LZ",
+        "ZR1X Convertible 1YS67 3LZ"
+      ],
+      "max_column": 11,
+      "max_row": 74,
+      "model_group_index": "4",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "exterior",
+      "sheet_name": "Exterior 4",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "Coupe 1YC07 1LT",
+        "Coupe 1YC07 2LT",
+        "Coupe 1YC07 3LT",
+        "Convertible 1YC67 1LT",
+        "Convertible 1YC67 2LT",
+        "Convertible 1YC67 3LT"
+      ],
+      "max_column": 9,
+      "max_row": 53,
+      "model_group_index": "1",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "mechanical",
+      "sheet_name": "Mechanical 1",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "Grand Sport Coupe 1YE07 1LT",
+        "Grand Sport Coupe 1YE07 2LT",
+        "Grand Sport Coupe 1YE07 3LT",
+        "Grand Sport Convertible 1YE67 1LT",
+        "Grand Sport Convertible 1YE67 2LT",
+        "Grand Sport Convertible 1YE67 3LT"
+      ],
+      "max_column": 9,
+      "max_row": 51,
+      "model_group_index": "2",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "mechanical",
+      "sheet_name": "Mechanical 2",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "Z06 Coupe 1YH07 1LZ",
+        "Z06 Coupe 1YH07 2LZ",
+        "Z06 Coupe 1YH07 3LZ",
+        "Z06 Convertible 1YH67 1LZ",
+        "Z06 Convertible 1YH67 2LZ",
+        "Z06 Convertible 1YH67 3LZ"
+      ],
+      "max_column": 9,
+      "max_row": 49,
+      "model_group_index": "3",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "mechanical",
+      "sheet_name": "Mechanical 3",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "true",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [
+        "Orderable RPO Code",
+        "Ref. Only RPO Code"
+      ],
+      "likely_variant_headers": [
+        "ZR1 Coupe 1YR07 1LZ",
+        "ZR1 Coupe 1YR07 3LZ",
+        "ZR1 Convertible 1YR67 1LZ",
+        "ZR1 Convertible 1YR67 3LZ",
+        "ZR1X Coupe 1YS07 1LZ",
+        "ZR1X Coupe 1YS07 3LZ",
+        "ZR1X Convertible 1YS67 1LZ",
+        "ZR1X Convertible 1YS67 3LZ"
+      ],
+      "max_column": 11,
+      "max_row": 50,
+      "model_group_index": "4",
+      "model_key": "",
+      "notes": "Primary variant-scoped matrix sheet; model_key comes from variant header body codes.",
+      "scope_type": "variant_scoped",
+      "section_family": "mechanical",
+      "sheet_name": "Mechanical 4",
+      "sheet_role": "primary_variant_matrix"
+    },
+    {
+      "creates_canonical_candidates": "false",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [],
+      "likely_variant_headers": [],
+      "max_column": 17,
+      "max_row": 27,
+      "model_group_index": "",
+      "model_key": "",
+      "notes": "Color and Trim sheets are model-global",
+      "scope_type": "model_global",
+      "section_family": "color_trim",
+      "sheet_name": "Color and Trim 1",
+      "sheet_role": "model_global_matrix"
+    },
+    {
+      "creates_canonical_candidates": "false",
+      "guide_family": "corvette",
+      "likely_rpo_columns": [],
+      "likely_variant_headers": [],
+      "max_column": 8,
+      "max_row": 22,
+      "model_group_index": "",
+      "model_key": "",
+      "notes": "Color and Trim sheets are model-global",
+      "scope_type": "model_global",
+      "section_family": "color_trim",
+      "sheet_name": "Color and Trim 2",
+      "sheet_role": "model_global_matrix"
+    }
+  ],
+  "source_path": "docs/source/2027 Chevrolet Car Corvette Export (1).xlsx"
+}

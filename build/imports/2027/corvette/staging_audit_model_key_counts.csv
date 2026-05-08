@@ -1,0 +1,152 @@
+staging_file,source_sheet,model_key,model_key_confidence,count
+color_trim_compatibility_rows,Color and Trim 1,<blank>,needs_review,130
+color_trim_compatibility_rows,Color and Trim 2,<blank>,needs_review,40
+color_trim_disclosures,Color and Trim 1,<blank>,needs_review,2
+color_trim_disclosures,Color and Trim 2,<blank>,needs_review,1
+color_trim_interior_rows,Color and Trim 1,<blank>,needs_review,40
+color_trim_interior_rows,Color and Trim 2,<blank>,needs_review,9
+equipment_group_rows,Equipment Groups 1,stingray,high,171
+equipment_group_rows,Equipment Groups 2,grand_sport,high,170
+equipment_group_rows,Equipment Groups 3,z06,high,173
+equipment_group_rows,Equipment Groups 4,<blank>,needs_review,140
+ignored_rows,Equipment Groups 1,<blank>,needs_review,3
+ignored_rows,Equipment Groups 1,stingray,high,1
+ignored_rows,Equipment Groups 2,<blank>,needs_review,3
+ignored_rows,Equipment Groups 2,grand_sport,high,1
+ignored_rows,Equipment Groups 3,<blank>,needs_review,3
+ignored_rows,Equipment Groups 3,z06,high,1
+ignored_rows,Equipment Groups 4,<blank>,needs_review,4
+ignored_rows,Exterior 1,<blank>,needs_review,3
+ignored_rows,Exterior 2,<blank>,needs_review,3
+ignored_rows,Exterior 3,<blank>,needs_review,3
+ignored_rows,Exterior 4,<blank>,needs_review,3
+ignored_rows,Interior 1,<blank>,needs_review,3
+ignored_rows,Interior 2,<blank>,needs_review,3
+ignored_rows,Interior 3,<blank>,needs_review,3
+ignored_rows,Interior 4,<blank>,needs_review,3
+ignored_rows,Mechanical 1,<blank>,needs_review,3
+ignored_rows,Mechanical 2,<blank>,needs_review,3
+ignored_rows,Mechanical 3,<blank>,needs_review,3
+ignored_rows,Mechanical 4,<blank>,needs_review,3
+ignored_rows,Price Schedule,<blank>,needs_review,11
+ignored_rows,Standard Equipment 1,<blank>,needs_review,3
+ignored_rows,Standard Equipment 2,<blank>,needs_review,3
+ignored_rows,Standard Equipment 3,<blank>,needs_review,3
+ignored_rows,Standard Equipment 4,<blank>,needs_review,3
+price_rows,Price Schedule,<blank>,<blank>,267
+price_rows,Price Schedule,grand_sport,high,6
+price_rows,Price Schedule,stingray,high,6
+price_rows,Price Schedule,z06,high,6
+price_rows,Price Schedule,zr1,high,4
+price_rows,Price Schedule,zr1x,high,4
+rule_phrase_candidates,Equipment Groups 1,stingray,high,109
+rule_phrase_candidates,Equipment Groups 2,grand_sport,high,99
+rule_phrase_candidates,Equipment Groups 3,z06,high,98
+rule_phrase_candidates,Equipment Groups 4,<blank>,needs_review,60
+rule_phrase_candidates,Exterior 1,stingray,high,78
+rule_phrase_candidates,Exterior 2,grand_sport,high,67
+rule_phrase_candidates,Exterior 3,z06,high,64
+rule_phrase_candidates,Exterior 4,<blank>,needs_review,32
+rule_phrase_candidates,Interior 1,stingray,high,29
+rule_phrase_candidates,Interior 2,grand_sport,high,29
+rule_phrase_candidates,Interior 3,z06,high,31
+rule_phrase_candidates,Interior 4,<blank>,needs_review,31
+rule_phrase_candidates,Mechanical 1,stingray,high,18
+rule_phrase_candidates,Mechanical 2,grand_sport,high,14
+rule_phrase_candidates,Mechanical 3,z06,high,12
+rule_phrase_candidates,Mechanical 4,<blank>,needs_review,7
+rule_phrase_candidates,Standard Equipment 1,stingray,high,8
+rule_phrase_candidates,Standard Equipment 2,grand_sport,high,8
+rule_phrase_candidates,Standard Equipment 3,z06,high,5
+rule_phrase_candidates,Standard Equipment 4,<blank>,needs_review,3
+sheet_sections,Color and Trim 1,<blank>,<blank>,3
+sheet_sections,Color and Trim 2,<blank>,<blank>,3
+sheet_sections,Equipment Groups 1,<blank>,<blank>,2
+sheet_sections,Equipment Groups 2,<blank>,<blank>,2
+sheet_sections,Equipment Groups 3,<blank>,<blank>,2
+sheet_sections,Equipment Groups 4,<blank>,<blank>,2
+sheet_sections,Exterior 1,<blank>,<blank>,2
+sheet_sections,Exterior 2,<blank>,<blank>,2
+sheet_sections,Exterior 3,<blank>,<blank>,2
+sheet_sections,Exterior 4,<blank>,<blank>,2
+sheet_sections,Interior 1,<blank>,<blank>,2
+sheet_sections,Interior 2,<blank>,<blank>,2
+sheet_sections,Interior 3,<blank>,<blank>,2
+sheet_sections,Interior 4,<blank>,<blank>,2
+sheet_sections,Mechanical 1,<blank>,<blank>,2
+sheet_sections,Mechanical 2,<blank>,<blank>,2
+sheet_sections,Mechanical 3,<blank>,<blank>,2
+sheet_sections,Mechanical 4,<blank>,<blank>,2
+sheet_sections,Price Schedule,<blank>,<blank>,1
+sheet_sections,Standard Equipment 1,<blank>,<blank>,2
+sheet_sections,Standard Equipment 2,<blank>,<blank>,2
+sheet_sections,Standard Equipment 3,<blank>,<blank>,2
+sheet_sections,Standard Equipment 4,<blank>,<blank>,2
+sheets,Color and Trim 1,<blank>,<blank>,1
+sheets,Color and Trim 2,<blank>,<blank>,1
+sheets,Equipment Groups 1,<blank>,<blank>,1
+sheets,Equipment Groups 2,<blank>,<blank>,1
+sheets,Equipment Groups 3,<blank>,<blank>,1
+sheets,Equipment Groups 4,<blank>,<blank>,1
+sheets,Exterior 1,<blank>,<blank>,1
+sheets,Exterior 2,<blank>,<blank>,1
+sheets,Exterior 3,<blank>,<blank>,1
+sheets,Exterior 4,<blank>,<blank>,1
+sheets,Interior 1,<blank>,<blank>,1
+sheets,Interior 2,<blank>,<blank>,1
+sheets,Interior 3,<blank>,<blank>,1
+sheets,Interior 4,<blank>,<blank>,1
+sheets,Mechanical 1,<blank>,<blank>,1
+sheets,Mechanical 2,<blank>,<blank>,1
+sheets,Mechanical 3,<blank>,<blank>,1
+sheets,Mechanical 4,<blank>,<blank>,1
+sheets,Price Schedule,<blank>,<blank>,1
+sheets,Standard Equipment 1,<blank>,<blank>,1
+sheets,Standard Equipment 2,<blank>,<blank>,1
+sheets,Standard Equipment 3,<blank>,<blank>,1
+sheets,Standard Equipment 4,<blank>,<blank>,1
+variant_matrix_rows,Exterior 1,stingray,high,612
+variant_matrix_rows,Exterior 2,grand_sport,high,606
+variant_matrix_rows,Exterior 3,z06,high,606
+variant_matrix_rows,Exterior 4,zr1,high,284
+variant_matrix_rows,Exterior 4,zr1x,high,284
+variant_matrix_rows,Interior 1,stingray,high,582
+variant_matrix_rows,Interior 2,grand_sport,high,582
+variant_matrix_rows,Interior 3,z06,high,606
+variant_matrix_rows,Interior 4,zr1,high,404
+variant_matrix_rows,Interior 4,zr1x,high,404
+variant_matrix_rows,Mechanical 1,stingray,high,300
+variant_matrix_rows,Mechanical 2,grand_sport,high,288
+variant_matrix_rows,Mechanical 3,z06,high,276
+variant_matrix_rows,Mechanical 4,zr1,high,188
+variant_matrix_rows,Mechanical 4,zr1x,high,188
+variant_matrix_rows,Standard Equipment 1,stingray,high,474
+variant_matrix_rows,Standard Equipment 2,grand_sport,high,492
+variant_matrix_rows,Standard Equipment 3,z06,high,492
+variant_matrix_rows,Standard Equipment 4,zr1,high,340
+variant_matrix_rows,Standard Equipment 4,zr1x,high,340
+variants,Equipment Groups 1,stingray,<blank>,6
+variants,Equipment Groups 2,grand_sport,<blank>,6
+variants,Equipment Groups 3,z06,<blank>,6
+variants,Equipment Groups 4,zr1,<blank>,4
+variants,Equipment Groups 4,zr1x,<blank>,4
+variants,Exterior 1,stingray,<blank>,6
+variants,Exterior 2,grand_sport,<blank>,6
+variants,Exterior 3,z06,<blank>,6
+variants,Exterior 4,zr1,<blank>,4
+variants,Exterior 4,zr1x,<blank>,4
+variants,Interior 1,stingray,<blank>,6
+variants,Interior 2,grand_sport,<blank>,6
+variants,Interior 3,z06,<blank>,6
+variants,Interior 4,zr1,<blank>,4
+variants,Interior 4,zr1x,<blank>,4
+variants,Mechanical 1,stingray,<blank>,6
+variants,Mechanical 2,grand_sport,<blank>,6
+variants,Mechanical 3,z06,<blank>,6
+variants,Mechanical 4,zr1,<blank>,4
+variants,Mechanical 4,zr1x,<blank>,4
+variants,Standard Equipment 1,stingray,<blank>,6
+variants,Standard Equipment 2,grand_sport,<blank>,6
+variants,Standard Equipment 3,z06,<blank>,6
+variants,Standard Equipment 4,zr1,<blank>,4
+variants,Standard Equipment 4,zr1x,<blank>,4

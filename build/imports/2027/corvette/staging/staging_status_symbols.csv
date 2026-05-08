@@ -1,0 +1,60 @@
+source_sheet,status_symbol,raw_status_examples,count,canonical_status
+Exterior 1,--,--,51,not_available
+Exterior 1,A,A|A/D|A/D1|A/D2|A1|A2,475,available
+Exterior 1,S,S|S1,74,standard
+Exterior 1,■,■,12,included_equipment_group
+Exterior 2,--,--,47,not_available
+Exterior 2,A,A|A/D|A/D1|A1|A2,467,available
+Exterior 2,S,S|S1|S2,80,standard
+Exterior 2,■,■,12,included_equipment_group
+Exterior 3,--,--,51,not_available
+Exterior 3,A,A|A/D|A/D1|A1|A2,463,available
+Exterior 3,S,S|S1|S2,80,standard
+Exterior 3,■,■,12,included_equipment_group
+Exterior 4,--,--,56,not_available
+Exterior 4,A,A|A/D|A/D1|A/D2|A1,384,available
+Exterior 4,S,S|S1,116,standard
+Exterior 4,■,■,12,included_equipment_group
+Interior 1,--,--,93,not_available
+Interior 1,A,A|A/D|A/D1|A1|A2|A3,207,available
+Interior 1,S,S|S1,208,standard
+Interior 1,■,■|■1,74,included_equipment_group
+Interior 2,--,--,93,not_available
+Interior 2,A,A|A/D|A/D1|A1|A2|A3,207,available
+Interior 2,S,S|S1,208,standard
+Interior 2,■,■|■1,74,included_equipment_group
+Interior 3,--,--,111,not_available
+Interior 3,A,A|A/D|A/D1|A1|A2|A3,211,available
+Interior 3,S,S|S1,214,standard
+Interior 3,■,■|■1,70,included_equipment_group
+Interior 4,--,--,156,not_available
+Interior 4,A,A|A/D|A/D1|A1|A2,276,available
+Interior 4,S,S|S1,304,standard
+Interior 4,■,■|■1,72,included_equipment_group
+Mechanical 1,--,--,18,not_available
+Mechanical 1,A,A|A/D|A/D1|A1|A2,183,available
+Mechanical 1,S,S,99,standard
+Mechanical 2,--,--,18,not_available
+Mechanical 2,A,A|A/D|A/D1|A1|A2,159,available
+Mechanical 2,S,S,111,standard
+Mechanical 3,--,--,21,not_available
+Mechanical 3,A,A|A/D|A/D1|A1|A2,141,available
+Mechanical 3,S,S,114,standard
+Mechanical 4,--,--,52,not_available
+Mechanical 4,A,A|A/D|A1|A2,148,available
+Mechanical 4,S,S|S1,176,standard
+Standard Equipment 1,--,--,38,not_available
+Standard Equipment 1,A,A|A/D1|A1,47,available
+Standard Equipment 1,S,S|S1,381,standard
+Standard Equipment 1,■,■,8,included_equipment_group
+Standard Equipment 2,--,--,38,not_available
+Standard Equipment 2,A,A|A/D1|A1,47,available
+Standard Equipment 2,S,S|S1|S2,399,standard
+Standard Equipment 2,■,■,8,included_equipment_group
+Standard Equipment 3,--,--,49,not_available
+Standard Equipment 3,A,A|A/D1|A1,31,available
+Standard Equipment 3,S,S|S1|S2,408,standard
+Standard Equipment 3,■,■,4,included_equipment_group
+Standard Equipment 4,--,--,80,not_available
+Standard Equipment 4,A,A1,4,available
+Standard Equipment 4,S,S|S1,596,standard

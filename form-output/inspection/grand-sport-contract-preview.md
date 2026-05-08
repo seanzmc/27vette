@@ -1,6 +1,6 @@
 # Grand Sport Contract Preview
 
-Generated: `2026-04-30T19:37:21+00:00`
+Generated: `2026-05-08T00:45:48+00:00`
 Status: `read_only_preview`
 Source sheet: `grandSport`
 
@@ -34,7 +34,7 @@ Source sheet: `grandSport`
 
 ## Section/Category Resolution
 
-- Resolved mismatch rows: 55
+- Resolved mismatch rows: 61
 - Unresolved issues: 0
 
 ## Text Cleanup

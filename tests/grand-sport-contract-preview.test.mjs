@@ -48,7 +48,7 @@ test("all Grand Sport preview choices resolve section, category, step, and raw d
   }
   assert.equal(preview.normalization.unresolvedIssues.length, 0);
   assert.equal(preview.validation.length, 0);
-  assert.equal(preview.normalization.sectionCategoryResolutions.length, 55);
+  assert.equal(preview.normalization.sectionCategoryResolutions.length, 61);
 });
 
 test("PCQ, PDY, and PEF are handled only through explicit blank-section config", () => {
@@ -84,4 +84,3 @@ test("rule/detail hot spot buckets are preserved for later phases", () => {
   assert.equal(preview.ruleDetailHotSpots.counts.except, 2);
   assert.equal(preview.ruleDetailHotSpots.counts.special_package_review, 26);
 });
-

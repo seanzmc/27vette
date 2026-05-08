@@ -1,0 +1,57 @@
+{
+  "availability_triage_counts": {
+    "model_context_unavailable": 8,
+    "target_schema_missing": 2
+  },
+  "blocker_bucket_counts": {
+    "canonical_context_unavailable": 1,
+    "design_boundary": 1,
+    "mapping_needed": 1,
+    "policy_not_applied": 1,
+    "schema_context_missing": 2
+  },
+  "canonical_apply_ready": false,
+  "conflict_bucket_counts": {
+    "label_and_description_conflict": 82,
+    "label_only_conflict": 3
+  },
+  "input_summary": {
+    "out_path": "provided --out",
+    "reconciliation_path": "provided --reconciliation"
+  },
+  "matched_bucket_counts": {
+    "label_review_needed": 44,
+    "matched_but_section_mapping_needed": 4
+  },
+  "new_candidate_bucket_counts": {
+    "clean_new_candidate": 100
+  },
+  "optional_input_presence": {
+    "report_md": true,
+    "schema_decisions_csv": true
+  },
+  "reasons": [
+    "section_mapping_requirements_unresolved",
+    "missing_availability_or_source_ref_schema",
+    "conflicts_require_review"
+  ],
+  "recommended_next_step": "Review conflict buckets and create approved section/source/availability schemas before an apply-plan generator.",
+  "reconciliation_counts": {
+    "conflicting_selectables": 85,
+    "matched_selectables": 48,
+    "new_selectable_candidates": 100,
+    "unavailable_canonical_context_rows": 4
+  },
+  "section_mapping_requirement_counts": {
+    "exterior": 5,
+    "interior": 5,
+    "mechanical": 5,
+    "standard_equipment": 3
+  },
+  "source_ref_plan_summary": {
+    "matched_canonical_target": 1,
+    "preview_target": 5
+  },
+  "triage_ready_for_apply_plan": false,
+  "warning": "Generated reconciliation triage only, not apply. canonical_apply_ready=false."
+}

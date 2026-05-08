@@ -1,0 +1,58 @@
+{
+  "forbidden_outputs_verified_absent": [
+    "logic/dependency_rules.csv",
+    "logic/auto_adds.csv",
+    "logic/exclusive_groups.csv",
+    "logic/exclusive_group_members.csv",
+    "pricing/base_prices.csv",
+    "pricing/price_rules.csv",
+    "support/color_trim*.csv",
+    "data/stingray/**/*.csv",
+    "form-app/data.js",
+    "form-output/*"
+  ],
+  "input_readiness": {
+    "canonical_proposal_ready": false,
+    "narrow_first_proposal_scope_ready": true,
+    "readiness_reasons": [
+      "color_trim_scope_deferred_from_canonical_import",
+      "suspicious_review_rows_present"
+    ],
+    "ready_for_proposal_generation": false
+  },
+  "non_goals_confirmed": [
+    "no canonical data/stingray CSVs written",
+    "no app data generated",
+    "no production form-output artifacts written",
+    "no Color/Trim canonical import",
+    "no Equipment Groups selectable source",
+    "no dependency, auto-add, exclusive-group, package, or final price rules emitted",
+    "accepted RPO overlaps kept as separate evidence"
+  ],
+  "proposal_only": true,
+  "review_queue_by_reason": {
+    "accepted_rpo_overlap_kept_separate": 10,
+    "blank_rpo_non_standard_equipment": 676,
+    "excluded_color_trim_source": 1,
+    "excluded_equipment_group_source": 1,
+    "ref_only_only_evidence": 3438,
+    "standard_equipment_without_rpo": 650,
+    "unsupported_status": 358
+  },
+  "row_counts": {
+    "catalog_selectables": 1592,
+    "meta_rpo_role_overlap_evidence": 10,
+    "pricing_raw_price_evidence": 293,
+    "review_queue": 5134,
+    "ui_availability": 8348,
+    "ui_selectable_display": 1592
+  },
+  "source_audit_summary": {
+    "color_trim_ready": true,
+    "equipment_groups_ready": true,
+    "pricing_ready": true,
+    "primary_variant_matrix_ready": true,
+    "rpo_role_overlaps_ready": true
+  },
+  "warning": "Generated proposal files are review artifacts only and must not be copied blindly into data/stingray. They are not canonical source data."
+}

@@ -1,0 +1,157 @@
+source_sheet,sheet_family,status_context,status_symbol,canonical_status,count
+Color and Trim 1,color_trim,color_trim_compatibility,--,not_available,33
+Color and Trim 1,color_trim,color_trim_compatibility,A,available,97
+Color and Trim 1,color_trim,color_trim_compatibility_rows,--,not_available,33
+Color and Trim 1,color_trim,color_trim_compatibility_rows,A,available,97
+Color and Trim 2,color_trim,color_trim_compatibility,--,not_available,4
+Color and Trim 2,color_trim,color_trim_compatibility,A,available,36
+Color and Trim 2,color_trim,color_trim_compatibility_rows,--,not_available,4
+Color and Trim 2,color_trim,color_trim_compatibility_rows,A,available,36
+Exterior 1,exterior,variant_availability,--,not_available,51
+Exterior 1,exterior,variant_availability,A,available,220
+Exterior 1,exterior,variant_availability,A/D,available,255
+Exterior 1,exterior,variant_availability,S,standard,74
+Exterior 1,exterior,variant_availability,■,included_equipment_group,12
+Exterior 1,exterior,variant_matrix_rows,--,not_available,51
+Exterior 1,exterior,variant_matrix_rows,A,available,220
+Exterior 1,exterior,variant_matrix_rows,A/D,available,255
+Exterior 1,exterior,variant_matrix_rows,S,standard,74
+Exterior 1,exterior,variant_matrix_rows,■,included_equipment_group,12
+Exterior 2,exterior,variant_availability,--,not_available,47
+Exterior 2,exterior,variant_availability,A,available,306
+Exterior 2,exterior,variant_availability,A/D,available,161
+Exterior 2,exterior,variant_availability,S,standard,80
+Exterior 2,exterior,variant_availability,■,included_equipment_group,12
+Exterior 2,exterior,variant_matrix_rows,--,not_available,47
+Exterior 2,exterior,variant_matrix_rows,A,available,306
+Exterior 2,exterior,variant_matrix_rows,A/D,available,161
+Exterior 2,exterior,variant_matrix_rows,S,standard,80
+Exterior 2,exterior,variant_matrix_rows,■,included_equipment_group,12
+Exterior 3,exterior,variant_availability,--,not_available,51
+Exterior 3,exterior,variant_availability,A,available,268
+Exterior 3,exterior,variant_availability,A/D,available,195
+Exterior 3,exterior,variant_availability,S,standard,80
+Exterior 3,exterior,variant_availability,■,included_equipment_group,12
+Exterior 3,exterior,variant_matrix_rows,--,not_available,51
+Exterior 3,exterior,variant_matrix_rows,A,available,268
+Exterior 3,exterior,variant_matrix_rows,A/D,available,195
+Exterior 3,exterior,variant_matrix_rows,S,standard,80
+Exterior 3,exterior,variant_matrix_rows,■,included_equipment_group,12
+Exterior 4,exterior,variant_availability,--,not_available,56
+Exterior 4,exterior,variant_availability,A,available,216
+Exterior 4,exterior,variant_availability,A/D,available,168
+Exterior 4,exterior,variant_availability,S,standard,116
+Exterior 4,exterior,variant_availability,■,included_equipment_group,12
+Exterior 4,exterior,variant_matrix_rows,--,not_available,56
+Exterior 4,exterior,variant_matrix_rows,A,available,216
+Exterior 4,exterior,variant_matrix_rows,A/D,available,168
+Exterior 4,exterior,variant_matrix_rows,S,standard,116
+Exterior 4,exterior,variant_matrix_rows,■,included_equipment_group,12
+Interior 1,interior,variant_availability,--,not_available,93
+Interior 1,interior,variant_availability,A,available,128
+Interior 1,interior,variant_availability,A/D,available,79
+Interior 1,interior,variant_availability,S,standard,208
+Interior 1,interior,variant_availability,■,included_equipment_group,74
+Interior 1,interior,variant_matrix_rows,--,not_available,93
+Interior 1,interior,variant_matrix_rows,A,available,128
+Interior 1,interior,variant_matrix_rows,A/D,available,79
+Interior 1,interior,variant_matrix_rows,S,standard,208
+Interior 1,interior,variant_matrix_rows,■,included_equipment_group,74
+Interior 2,interior,variant_availability,--,not_available,93
+Interior 2,interior,variant_availability,A,available,128
+Interior 2,interior,variant_availability,A/D,available,79
+Interior 2,interior,variant_availability,S,standard,208
+Interior 2,interior,variant_availability,■,included_equipment_group,74
+Interior 2,interior,variant_matrix_rows,--,not_available,93
+Interior 2,interior,variant_matrix_rows,A,available,128
+Interior 2,interior,variant_matrix_rows,A/D,available,79
+Interior 2,interior,variant_matrix_rows,S,standard,208
+Interior 2,interior,variant_matrix_rows,■,included_equipment_group,74
+Interior 3,interior,variant_availability,--,not_available,111
+Interior 3,interior,variant_availability,A,available,132
+Interior 3,interior,variant_availability,A/D,available,79
+Interior 3,interior,variant_availability,S,standard,214
+Interior 3,interior,variant_availability,■,included_equipment_group,70
+Interior 3,interior,variant_matrix_rows,--,not_available,111
+Interior 3,interior,variant_matrix_rows,A,available,132
+Interior 3,interior,variant_matrix_rows,A/D,available,79
+Interior 3,interior,variant_matrix_rows,S,standard,214
+Interior 3,interior,variant_matrix_rows,■,included_equipment_group,70
+Interior 4,interior,variant_availability,--,not_available,156
+Interior 4,interior,variant_availability,A,available,168
+Interior 4,interior,variant_availability,A/D,available,108
+Interior 4,interior,variant_availability,S,standard,304
+Interior 4,interior,variant_availability,■,included_equipment_group,72
+Interior 4,interior,variant_matrix_rows,--,not_available,156
+Interior 4,interior,variant_matrix_rows,A,available,168
+Interior 4,interior,variant_matrix_rows,A/D,available,108
+Interior 4,interior,variant_matrix_rows,S,standard,304
+Interior 4,interior,variant_matrix_rows,■,included_equipment_group,72
+Mechanical 1,mechanical,variant_availability,--,not_available,18
+Mechanical 1,mechanical,variant_availability,A,available,168
+Mechanical 1,mechanical,variant_availability,A/D,available,15
+Mechanical 1,mechanical,variant_availability,S,standard,99
+Mechanical 1,mechanical,variant_matrix_rows,--,not_available,18
+Mechanical 1,mechanical,variant_matrix_rows,A,available,168
+Mechanical 1,mechanical,variant_matrix_rows,A/D,available,15
+Mechanical 1,mechanical,variant_matrix_rows,S,standard,99
+Mechanical 2,mechanical,variant_availability,--,not_available,18
+Mechanical 2,mechanical,variant_availability,A,available,144
+Mechanical 2,mechanical,variant_availability,A/D,available,15
+Mechanical 2,mechanical,variant_availability,S,standard,111
+Mechanical 2,mechanical,variant_matrix_rows,--,not_available,18
+Mechanical 2,mechanical,variant_matrix_rows,A,available,144
+Mechanical 2,mechanical,variant_matrix_rows,A/D,available,15
+Mechanical 2,mechanical,variant_matrix_rows,S,standard,111
+Mechanical 3,mechanical,variant_availability,--,not_available,21
+Mechanical 3,mechanical,variant_availability,A,available,123
+Mechanical 3,mechanical,variant_availability,A/D,available,18
+Mechanical 3,mechanical,variant_availability,S,standard,114
+Mechanical 3,mechanical,variant_matrix_rows,--,not_available,21
+Mechanical 3,mechanical,variant_matrix_rows,A,available,123
+Mechanical 3,mechanical,variant_matrix_rows,A/D,available,18
+Mechanical 3,mechanical,variant_matrix_rows,S,standard,114
+Mechanical 4,mechanical,variant_availability,--,not_available,52
+Mechanical 4,mechanical,variant_availability,A,available,140
+Mechanical 4,mechanical,variant_availability,A/D,available,8
+Mechanical 4,mechanical,variant_availability,S,standard,176
+Mechanical 4,mechanical,variant_matrix_rows,--,not_available,52
+Mechanical 4,mechanical,variant_matrix_rows,A,available,140
+Mechanical 4,mechanical,variant_matrix_rows,A/D,available,8
+Mechanical 4,mechanical,variant_matrix_rows,S,standard,176
+Standard Equipment 1,standard_equipment,variant_availability,--,not_available,38
+Standard Equipment 1,standard_equipment,variant_availability,A,available,41
+Standard Equipment 1,standard_equipment,variant_availability,A/D,available,6
+Standard Equipment 1,standard_equipment,variant_availability,S,standard,381
+Standard Equipment 1,standard_equipment,variant_availability,■,included_equipment_group,8
+Standard Equipment 1,standard_equipment,variant_matrix_rows,--,not_available,38
+Standard Equipment 1,standard_equipment,variant_matrix_rows,A,available,41
+Standard Equipment 1,standard_equipment,variant_matrix_rows,A/D,available,6
+Standard Equipment 1,standard_equipment,variant_matrix_rows,S,standard,381
+Standard Equipment 1,standard_equipment,variant_matrix_rows,■,included_equipment_group,8
+Standard Equipment 2,standard_equipment,variant_availability,--,not_available,38
+Standard Equipment 2,standard_equipment,variant_availability,A,available,41
+Standard Equipment 2,standard_equipment,variant_availability,A/D,available,6
+Standard Equipment 2,standard_equipment,variant_availability,S,standard,399
+Standard Equipment 2,standard_equipment,variant_availability,■,included_equipment_group,8
+Standard Equipment 2,standard_equipment,variant_matrix_rows,--,not_available,38
+Standard Equipment 2,standard_equipment,variant_matrix_rows,A,available,41
+Standard Equipment 2,standard_equipment,variant_matrix_rows,A/D,available,6
+Standard Equipment 2,standard_equipment,variant_matrix_rows,S,standard,399
+Standard Equipment 2,standard_equipment,variant_matrix_rows,■,included_equipment_group,8
+Standard Equipment 3,standard_equipment,variant_availability,--,not_available,49
+Standard Equipment 3,standard_equipment,variant_availability,A,available,25
+Standard Equipment 3,standard_equipment,variant_availability,A/D,available,6
+Standard Equipment 3,standard_equipment,variant_availability,S,standard,408
+Standard Equipment 3,standard_equipment,variant_availability,■,included_equipment_group,4
+Standard Equipment 3,standard_equipment,variant_matrix_rows,--,not_available,49
+Standard Equipment 3,standard_equipment,variant_matrix_rows,A,available,25
+Standard Equipment 3,standard_equipment,variant_matrix_rows,A/D,available,6
+Standard Equipment 3,standard_equipment,variant_matrix_rows,S,standard,408
+Standard Equipment 3,standard_equipment,variant_matrix_rows,■,included_equipment_group,4
+Standard Equipment 4,standard_equipment,variant_availability,--,not_available,80
+Standard Equipment 4,standard_equipment,variant_availability,A,available,4
+Standard Equipment 4,standard_equipment,variant_availability,S,standard,596
+Standard Equipment 4,standard_equipment,variant_matrix_rows,--,not_available,80
+Standard Equipment 4,standard_equipment,variant_matrix_rows,A,available,4
+Standard Equipment 4,standard_equipment,variant_matrix_rows,S,standard,596

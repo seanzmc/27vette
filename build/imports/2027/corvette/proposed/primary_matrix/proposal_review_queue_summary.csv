@@ -1,0 +1,8 @@
+review_bucket,original_reason,count,severity,recommended_action,notes
+boundary_exclusion_summary,excluded_color_trim_source,1,info,exclude_from_primary_matrix_proposal,Expected review-only or boundary evidence; advisory unless it blocks a narrower scope.
+boundary_exclusion_summary,excluded_equipment_group_source,1,info,exclude_from_selectable_proposal,Expected review-only or boundary evidence; advisory unless it blocks a narrower scope.
+expected_review_only,accepted_rpo_overlap_kept_separate,10,info,keep_overlap_as_separate_evidence; do_not_merge,Expected review-only or boundary evidence; advisory unless it blocks a narrower scope.
+missing_rpo_non_standard_equipment,blank_rpo_non_standard_equipment,676,review,review_non_standard_row_without_rpo,Likely blocker for future narrowing until reviewed or excluded.
+missing_rpo_standard_equipment,standard_equipment_without_rpo,650,review,keep_as_review_evidence; do_not_treat_as_confirmed_selectable,Expected review-only or boundary evidence; advisory unless it blocks a narrower scope.
+ref_only_evidence,ref_only_only_evidence,3438,review,review_reference_only_usage_before_accepting_selectable,Expected review-only or boundary evidence; advisory unless it blocks a narrower scope.
+unsupported_status,unsupported_status,358,review,review_status_mapping_before_accepting_proposal,Likely blocker for future narrowing until reviewed or excluded.

@@ -1,0 +1,32 @@
+source_sheet,source_row,source_cell_range,guide_family,model_key,model_key_confidence,raw_text,extracted_rpos,phrase_type,applies_to_section_role,confidence,review_status
+Color and Trim 1,27,A27,corvette,,needs_review,"• NOTE: Deviations from these recommended combinations require option code (D30) Color Combination Override at an additional charge.
+
+1. (AH2) GT2 seats are available with (TU7) two-tone seats option.  Seats are Jet Black when (AE4) Competition seats are ordered.
+2. (AH2) GT2 seats are available with (TU7) two-tone seats option.
+3. Full color interior (instrument panel, doors and carpet).
+4. Full color interior (instrument panel, doors and carpet). This interior features light color throughout and may require extra care to avoid soiling. Certain lighting conditions may cause a noticeable reflection on the inside of the windshield.
+5. Requires (N26) sueded microfiber-wrapped steering wheel.
+6. (AH2) GT2 bucket seats require (TU7) two-tone seats.
+7. Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models; Requires (N2Z) carbon fiber and sueded microfiber-wrapped steering wheel on Z06, ZR1 and ZR1X models.
+8. Included and only available with (Z25) Grand Sport Launch Edition.
+9. Additional charge - premium tintcoat color.
+10. Additional charge - premium color.",AE4|AH2|D30|GT2|N26|N2Z|TU7|Z06|Z25|ZR1,requires,color_trim,high,needs_review
+Color and Trim 1,27,A27,corvette,,needs_review,"• NOTE: Deviations from these recommended combinations require option code (D30) Color Combination Override at an additional charge.
+
+1. (AH2) GT2 seats are available with (TU7) two-tone seats option.  Seats are Jet Black when (AE4) Competition seats are ordered.
+2. (AH2) GT2 seats are available with (TU7) two-tone seats option.
+3. Full color interior (instrument panel, doors and carpet).
+4. Full color interior (instrument panel, doors and carpet). This interior features light color throughout and may require extra care to avoid soiling. Certain lighting conditions may cause a noticeable reflection on the inside of the windshield.
+5. Requires (N26) sueded microfiber-wrapped steering wheel.
+6. (AH2) GT2 bucket seats require (TU7) two-tone seats.
+7. Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models; Requires (N2Z) carbon fiber and sueded microfiber-wrapped steering wheel on Z06, ZR1 and ZR1X models.
+8. Included and only available with (Z25) Grand Sport Launch Edition.
+9. Additional charge - premium tintcoat color.
+10. Additional charge - premium color.",AE4|AH2|D30|GT2|N26|N2Z|TU7|Z06|Z25|ZR1,only_available_with,color_trim,high,needs_review
+Color and Trim 2,22,A22,corvette,,needs_review,"• Requires option code (R6X) Custom Interior Trim and Seat Combination at an additional charge. If option (D30) Color Combination Override is also selected, only one charge will apply.
+
+1. Requires (38S) Adrenaline Red custom leather stitch.
+2. Requires (N26) sueded microfiber-wrapped steering wheel on Stingray and Grand Sport models; Requires (N2Z) carbon fiber and sueded microfiber-wrapped steering wheel on Z06, ZR1 and ZR1X models.
+3. Requires (38S) Adrenaline Red custom leather stitch. (AH2) GT2 bucket seats require (TU7) two-tone seats.
+4. Additional charge - premium tintcoat color.
+5. Additional charge - premium color.",38S|AH2|D30|GT2|N26|N2Z|R6X|TU7|Z06|ZR1,requires,color_trim,high,needs_review

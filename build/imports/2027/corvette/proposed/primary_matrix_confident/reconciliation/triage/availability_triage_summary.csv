@@ -1,0 +1,11 @@
+model_key,reconciliation_status,availability_value,affected_row_count,recommended_action,triage_status,notes
+grand_sport,model_context_unavailable,available,804,provide_model_context_or_exclude_from_apply,blocked,Availability remains report-only; no canonical rows generated.
+grand_sport,model_context_unavailable,not_available,84,provide_model_context_or_exclude_from_apply,blocked,Availability remains report-only; no canonical rows generated.
+stingray,target_schema_missing,available,800,create_canonical_availability_schema,blocked,Availability remains report-only; no canonical rows generated.
+stingray,target_schema_missing,not_available,88,create_canonical_availability_schema,blocked,Availability remains report-only; no canonical rows generated.
+z06,model_context_unavailable,available,794,provide_model_context_or_exclude_from_apply,blocked,Availability remains report-only; no canonical rows generated.
+z06,model_context_unavailable,not_available,112,provide_model_context_or_exclude_from_apply,blocked,Availability remains report-only; no canonical rows generated.
+zr1,model_context_unavailable,available,380,provide_model_context_or_exclude_from_apply,blocked,Availability remains report-only; no canonical rows generated.
+zr1,model_context_unavailable,not_available,44,provide_model_context_or_exclude_from_apply,blocked,Availability remains report-only; no canonical rows generated.
+zr1x,model_context_unavailable,available,380,provide_model_context_or_exclude_from_apply,blocked,Availability remains report-only; no canonical rows generated.
+zr1x,model_context_unavailable,not_available,44,provide_model_context_or_exclude_from_apply,blocked,Availability remains report-only; no canonical rows generated.

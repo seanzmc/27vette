@@ -1,6 +1,6 @@
 # Grand Sport Inspection
 
-Generated: `2026-04-30T19:37:20+00:00`
+Generated: `2026-05-08T00:45:48+00:00`
 Source sheet: `grandSport`
 Status: `inspection_generated`
 
@@ -31,7 +31,7 @@ Status: `inspection_generated`
 - Rows still missing resolved sections: 0
 - Unknown section ids: none
 - Unknown category ids: none
-- Section/category mismatches: 55
+- Section/category mismatches: 61
 
 ## Blank-Section Overrides
 
@@ -46,25 +46,19 @@ Status: `inspection_generated`
 
 | RPO | Option | Section | Matched Terms | Special Mentions |
 | --- | --- | --- | --- | --- |
-| `379` | Seat belt color | `sec_seat_001` | included_with, not_recommended | EL9 |
-| `719` | Seat belt color | `sec_seat_001` |  | EL9 |
-| `719` | Seat belt color | `sec_stan_002` |  | EL9 |
-| `17A` | Blade Silver Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
-| `20A` | Admiral Blue Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
+| `AQA` | Memory Driver and Passenger Convenience Package | `sec_2lte_001` | includes |  |
+| `UG1` | Universal Home Remote | `sec_2lte_001` | includes |  |
+| `IWE` | Sueded Microfiber-Wrapped Upper Interior Trim Package | `sec_3lte_001` | includes |  |
+| `J6D` | Calipers | `sec_cali_001` | only |  |
+| `J6L` | Calipers | `sec_cali_001` | requires |  |
+| `D30` | Color Combination Override | `sec_colo_001` | only |  |
+| `R6X` | Custom Interior Trim and Seat Combination | `sec_colo_001` | requires, only |  |
+| `BV4` | Plaque | `sec_cust_001` | only |  |
+| `PIN` | Customer VIN ending reservation | `sec_cust_001` | not_available, only |  |
+| `R8C` | Corvette Museum Delivery | `sec_cust_001` | not_available, includes, only |  |
 | `36S` | Competition Yellow custom leather stitch | `sec_cust_002` | requires, includes |  |
 | `37S` | Santorini Blue custom leather stitch | `sec_cust_002` | requires, includes |  |
 | `38S` | Adrenaline Red custom leather stitch | `sec_cust_002` | requires, includes |  |
-| `3A9` | Seat belt color | `sec_seat_001` | included_with, not_recommended |  |
-| `3F9` | Seat belt color | `sec_seat_001` | included_with, not_recommended | EL9, Z25 |
-| `3M9` | Seat belt color | `sec_seat_001` | not_recommended | EL9 |
-| `3N9` | Seat belt color | `sec_seat_001` | included_with |  |
-| `55A` | Competition Yellow Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
-| `5JR` | LPO, Outside mirror covers in visible Carbon Fiber | `sec_lpoe_001` | includes |  |
-| `5ZV` | LPO, Three-Stanchion high wing spoiler | `sec_spoi_001` | not_available | FEY |
-| `75A` | Torch Red Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
-| `97A` | Carbon Flash Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires | Z15 |
-| `AQA` | Memory Driver and Passenger Convenience Package | `sec_2lte_001` | includes |  |
-| `AUP` | Seats | `sec_seat_002` | requires |  |
 | `B6P` | Coupe Engine Appearance Package | `sec_engi_001` | includes |  |
 | `BC4` | NEW! Blue LS6 engine cover | `sec_engi_001` | requires, includes |  |
 | `BC4` | NEW! Blue LS6 engine cover | `sec_engi_001` | includes |  |
@@ -73,22 +67,28 @@ Status: `inspection_generated`
 | `BCP` | Edge Red LS6 engine cover | `sec_engi_001` | includes |  |
 | `BCS` | Sterling Silver LS6 engine cover | `sec_engi_001` | requires, includes |  |
 | `BCS` | Sterling Silver LS6 engine cover | `sec_engi_001` | includes |  |
-| `BV4` | Plaque | `sec_cust_001` | only |  |
-| `CAV` | LPO, Contoured cargo area liners with Jake logo | `sec_lpoi_001` | included_with |  |
-| `CF8` | Roof panel | `sec_roof_001` | not_available |  |
-| `CFL` | NEW!  Ground effects | `sec_perf_001` | not_available |  |
-| `CFV` | Ground effects | `sec_perf_001` | not_available |  |
-| `CFX` | Plaque | `sec_incl_001` | only |  |
-| `CFZ` | Ground effects | `sec_perf_001` | included_with |  |
-| `CM9` | Convertible top | `sec_roof_001` | includes, only |  |
-| `CM9` | Convertible top | `sec_stan_002` | includes, only |  |
-| `D30` | Color Combination Override | `sec_colo_001` | only |  |
 | `D3V` | Engine lighting | `sec_engi_001` | included_with |  |
-| `D84` | Convertible top | `sec_roof_001` | not_available |  |
-| `D86` | Convertible top | `sec_roof_001` | not_available |  |
+| `SL9` | LPO, Engine specification plaque | `sec_engi_001` | included_with |  |
+| `ZZ3` | Convertible Engine Appearance Package | `sec_engi_001` | includes |  |
+| `NWI` | NEW!  Exhaust tips | `sec_exha_001` | requires |  |
+| `WUB` | NEW!  Exhaust | `sec_exha_001` | included_with | FEY |
+| `EFR` | Exterior accents | `sec_exte_001` | includes |  |
+| `DMU` | Carbon Flash Grand Sport Heritage Center Stripe | `sec_gsce_001` | requires, includes | Z15 |
+| `DMV` | Blade Silver Grand Sport Heritage Center Stripe | `sec_gsce_001` | requires, not_available, includes | Z15 |
+| `DMW` | Arctic White Grand Sport Heritage Center Stripe | `sec_gsce_001` | requires, not_available, includes | Z15 |
+| `DMX` | Admiral Blue Grand Sport Heritage Center Stripe | `sec_gsce_001` | requires, not_available, includes | Z15 |
+| `DMY` | Red Mist Grand Sport Heritage Center Stripe | `sec_gsce_001` | requires, not_available, includes | Z15 |
+| `17A` | Blade Silver Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
+| `20A` | Admiral Blue Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
+| `55A` | Competition Yellow Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
+| `75A` | Torch Red Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
+| `97A` | Carbon Flash Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires | Z15 |
+| `DX4` | Red Mist Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
+| `CFX` | Plaque | `sec_incl_001` | only |  |
+| `DRG` | Mirrors | `sec_incl_001` | only |  |
 | ... | 83 additional rows in JSON artifact |  |  |  |
 
 ## Warnings
 
 - Configured Grand Sport variants are present but inactive in variant_master, preserving the live Stingray-only generator path: 1lt_e07, 1lt_e67, 2lt_e07, 2lt_e67, 3lt_e07, 3lt_e67.
-- Section/category mismatches: 55.
+- Section/category mismatches: 61.

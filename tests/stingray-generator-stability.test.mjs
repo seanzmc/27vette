@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
@@ -21,6 +22,25 @@ function loadAppData() {
 
 const jsonData = JSON.parse(fs.readFileSync("form-output/stingray-form-data.json", "utf8"));
 const appData = loadAppData();
+const generatorSource = fs.readFileSync("scripts/generate_stingray_form.py", "utf8");
+
+function workbookHeaders(sheetName) {
+  const output = execFileSync(
+    ".venv/bin/python",
+    [
+      "-c",
+      [
+        "import json",
+        "from openpyxl import load_workbook",
+        "wb = load_workbook('stingray_master.xlsx', read_only=True, data_only=True)",
+        `ws = wb['${sheetName}']`,
+        "print(json.dumps([ws.cell(1, col).value for col in range(1, ws.max_column + 1) if ws.cell(1, col).value]))",
+      ].join("; "),
+    ],
+    { encoding: "utf8" }
+  );
+  return JSON.parse(output);
+}
 
 test("generated JSON and static app data stay synchronized apart from timestamp", () => {
   assert.deepEqual(withoutGeneratedAt(appData), withoutGeneratedAt(jsonData));
@@ -40,4 +60,27 @@ test("Stingray generated contract keeps the closed-out shape", () => {
   assert.equal(jsonData.priceRules.length, 43);
   assert.equal(jsonData.interiors.length, 130);
   assert.equal(jsonData.validation.filter((row) => row.severity === "error").length, 0);
+});
+
+test("generator-owned compatibility groups are authored in workbook source sheets", () => {
+  assert.deepEqual(workbookHeaders("rule_groups"), [
+    "group_id",
+    "group_type",
+    "source_id",
+    "body_style_scope",
+    "trim_level_scope",
+    "variant_scope",
+    "disabled_reason",
+    "active",
+    "notes",
+  ]);
+  assert.deepEqual(workbookHeaders("rule_group_members"), ["group_id", "target_id", "display_order", "active"]);
+  assert.deepEqual(workbookHeaders("exclusive_groups"), ["group_id", "selection_mode", "active", "notes"]);
+  assert.deepEqual(workbookHeaders("exclusive_group_members"), ["group_id", "option_id", "display_order", "active"]);
+  assert.doesNotMatch(generatorSource, /^RULE_GROUPS = \[/m);
+  assert.doesNotMatch(generatorSource, /^EXCLUSIVE_GROUPS = \[/m);
+  assert.doesNotMatch(generatorSource, /^FIVE_V7_OR_REQUIREMENT_TARGET_IDS = /m);
+  assert.doesNotMatch(generatorSource, /^FIVE_ZU_OR_REQUIREMENT_TARGET_IDS = /m);
+  assert.doesNotMatch(generatorSource, /^T0A_REPLACEMENT_OPTION_IDS = /m);
+  assert.doesNotMatch(generatorSource, /^def rule_body_style_scope\(/m);
 });

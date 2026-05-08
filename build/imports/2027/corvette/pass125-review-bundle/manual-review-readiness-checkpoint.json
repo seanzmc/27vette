@@ -1,0 +1,19 @@
+{
+  "counts": {
+    "current_group_count": 78,
+    "error_count": 0,
+    "group_count": 78,
+    "invalid_preserved_count": 0,
+    "ledger_row_count": 78,
+    "manifest_only_preservation_row_count": 83,
+    "matched_group_count": 78
+  },
+  "inputs": {
+    "manifest_only_report_status": "allowed",
+    "validation_report_status": "allowed"
+  },
+  "not_migration_ready": true,
+  "required_next_step": "manual_review",
+  "schema_version": 1,
+  "status": "ready_for_manual_review"
+}

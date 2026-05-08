@@ -1,0 +1,5 @@
+model_key,reason,affected_row_count,notes
+grand_sport,model_not_covered_by_canonical_root,148,Canonical root is treated as covering only its observed model context.
+z06,model_not_covered_by_canonical_root,151,Canonical root is treated as covering only its observed model context.
+zr1,model_not_covered_by_canonical_root,105,Canonical root is treated as covering only its observed model context.
+zr1x,model_not_covered_by_canonical_root,105,Canonical root is treated as covering only its observed model context.
