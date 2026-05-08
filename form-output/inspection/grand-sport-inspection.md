@@ -1,7 +1,7 @@
 # Grand Sport Inspection
 
-Generated: `2026-05-08T00:45:48+00:00`
-Source sheet: `grandSport`
+Generated: `2026-05-08T02:43:41+00:00`
+Source sheet: `grandSport_options`
 Status: `inspection_generated`
 
 ## Variant Validation
@@ -31,13 +31,10 @@ Status: `inspection_generated`
 - Rows still missing resolved sections: 0
 - Unknown section ids: none
 - Unknown category ids: none
-- Section/category mismatches: 61
+- Section/category mismatches: 62
 
 ## Blank-Section Overrides
 
-- `PCQ` / `opt_pcq_001`: blank source section -> `sec_lpoe_001` (configured `sec_lpoe_001`, handled by config: yes)
-- `PDY` / `opt_pdy_001`: blank source section -> `sec_lpoi_001` (configured `sec_lpoi_001`, handled by config: yes)
-- `PEF` / `opt_pef_001`: blank source section -> `sec_lpoi_001` (configured `sec_lpoi_001`, handled by config: yes)
 
 ## Rule/Detail Hot Spots
 
@@ -91,4 +88,4 @@ Status: `inspection_generated`
 ## Warnings
 
 - Configured Grand Sport variants are present but inactive in variant_master, preserving the live Stingray-only generator path: 1lt_e07, 1lt_e67, 2lt_e07, 2lt_e67, 3lt_e07, 3lt_e67.
-- Section/category mismatches: 61.
+- Section/category mismatches: 62.

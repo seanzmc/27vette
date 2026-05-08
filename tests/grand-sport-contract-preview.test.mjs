@@ -48,17 +48,15 @@ test("all Grand Sport preview choices resolve section, category, step, and raw d
   }
   assert.equal(preview.normalization.unresolvedIssues.length, 0);
   assert.equal(preview.validation.length, 0);
-  assert.equal(preview.normalization.sectionCategoryResolutions.length, 61);
+  assert.equal(preview.normalization.sectionCategoryResolutions.length, 62);
 });
 
-test("PCQ, PDY, and PEF are handled only through explicit blank-section config", () => {
-  const overridesByRpo = new Map(preview.normalization.blankSectionOverrides.map((row) => [row.rpo, row]));
-  assert.equal(overridesByRpo.get("PCQ")?.handled_by_explicit_config, true);
-  assert.equal(overridesByRpo.get("PDY")?.handled_by_explicit_config, true);
-  assert.equal(overridesByRpo.get("PEF")?.handled_by_explicit_config, true);
-  assert.equal(overridesByRpo.get("PCQ")?.resolved_section_id, "sec_lpoe_001");
-  assert.equal(overridesByRpo.get("PDY")?.resolved_section_id, "sec_lpoi_001");
-  assert.equal(overridesByRpo.get("PEF")?.resolved_section_id, "sec_lpoi_001");
+test("filled Grand Sport source sections do not require blank-section config", () => {
+  assert.deepEqual(preview.normalization.blankSectionOverrides, []);
+  const choicesByRpo = new Map(preview.choices.map((choice) => [choice.rpo, choice]));
+  assert.equal(choicesByRpo.get("PCQ")?.resolved_section_id, "sec_lpoe_001");
+  assert.equal(choicesByRpo.get("PDY")?.resolved_section_id, "sec_lpoe_001");
+  assert.equal(choicesByRpo.get("PEF")?.resolved_section_id, "sec_lpoi_001");
 });
 
 test("customer-facing text is cleaned while raw source fields stay intact", () => {

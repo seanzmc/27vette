@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-08T00:45:48+00:00",
+  "generated_at": "2026-05-08T02:43:41+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
     "model_label": "Grand Sport",
     "model_year": "2027",
-    "source_option_sheet": "grandSport",
-    "status_sheet": "gs_option_variant_status",
+    "source_option_sheet": "grandSport_options",
+    "status_sheet": "grandSport_ovs",
     "variant_ids": [
       "1lt_e07",
       "2lt_e07",
@@ -16,14 +16,10 @@
       "3lt_e67"
     ],
     "expected_variant_count": 6,
-    "blank_section_overrides": {
-      "opt_pcq_001": "sec_lpoe_001",
-      "opt_pdy_001": "sec_lpoi_001",
-      "opt_pef_001": "sec_lpoi_001"
-    },
+    "blank_section_overrides": {},
     "notes": [
       "Read-only inspection only: Grand Sport generation is not activated by the Stingray entrypoint.",
-      "PCQ, PDY, and PEF blank-section normalization must remain explicit config or validation output."
+      "Grand Sport option rows are read from the normalized grandSport_options sheet."
     ]
   },
   "variants": {
@@ -1852,6 +1848,34 @@
       }
     },
     {
+      "option_id": "opt_pcq_001",
+      "rpo": "PCQ",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
+    },
+    {
+      "option_id": "opt_pdy_001",
+      "rpo": "PDY",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
+    },
+    {
       "option_id": "opt_cav_001",
       "rpo": "CAV",
       "effective_status": "available",
@@ -2031,6 +2055,20 @@
         "1lt_e67": "available",
         "2lt_e67": "unavailable",
         "3lt_e67": "unavailable"
+      }
+    },
+    {
+      "option_id": "opt_pef_001",
+      "rpo": "PEF",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
       }
     },
     {
@@ -4104,48 +4142,6 @@
         "2lt_e67": "available",
         "3lt_e67": "available"
       }
-    },
-    {
-      "option_id": "opt_pcq_001",
-      "rpo": "PCQ",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_pdy_001",
-      "rpo": "PDY",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_pef_001",
-      "rpo": "PEF",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
     }
   ],
   "section_mappings": {
@@ -5096,6 +5092,24 @@
         "step_key": "aero_exhaust_stripes_accessories"
       },
       {
+        "option_id": "opt_pcq_001",
+        "rpo": "PCQ",
+        "category_id": "cat_exte_001",
+        "section_id": "sec_lpoe_001",
+        "original_section_id": "sec_lpoe_001",
+        "section_override_applied": false,
+        "step_key": "aero_exhaust_stripes_accessories"
+      },
+      {
+        "option_id": "opt_pdy_001",
+        "rpo": "PDY",
+        "category_id": "cat_exte_001",
+        "section_id": "sec_lpoe_001",
+        "original_section_id": "sec_lpoe_001",
+        "section_override_applied": false,
+        "step_key": "aero_exhaust_stripes_accessories"
+      },
+      {
         "option_id": "opt_cav_001",
         "rpo": "CAV",
         "category_id": "",
@@ -5206,6 +5220,15 @@
       {
         "option_id": "opt_w2d_001",
         "rpo": "W2D",
+        "category_id": "",
+        "section_id": "sec_lpoi_001",
+        "original_section_id": "sec_lpoi_001",
+        "section_override_applied": false,
+        "step_key": "interior_trim"
+      },
+      {
+        "option_id": "opt_pef_001",
+        "rpo": "PEF",
         "category_id": "",
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
@@ -6543,33 +6566,6 @@
         "original_section_id": "sec_whee_002",
         "section_override_applied": false,
         "step_key": "wheels"
-      },
-      {
-        "option_id": "opt_pcq_001",
-        "rpo": "PCQ",
-        "category_id": "cat_exte_001",
-        "section_id": "sec_lpoe_001",
-        "original_section_id": "",
-        "section_override_applied": true,
-        "step_key": "aero_exhaust_stripes_accessories"
-      },
-      {
-        "option_id": "opt_pdy_001",
-        "rpo": "PDY",
-        "category_id": "",
-        "section_id": "sec_lpoi_001",
-        "original_section_id": "",
-        "section_override_applied": true,
-        "step_key": "interior_trim"
-      },
-      {
-        "option_id": "opt_pef_001",
-        "rpo": "PEF",
-        "category_id": "",
-        "section_id": "sec_lpoi_001",
-        "original_section_id": "",
-        "section_override_applied": true,
-        "step_key": "interior_trim"
       }
     ],
     "missing_sections": {},
@@ -6815,6 +6811,20 @@
         "section_category_id": "cat_mech_001"
       },
       {
+        "option_id": "opt_pcq_001",
+        "rpo": "PCQ",
+        "section_id": "sec_lpoe_001",
+        "row_category_id": "cat_exte_001",
+        "section_category_id": "cat_mech_001"
+      },
+      {
+        "option_id": "opt_pdy_001",
+        "rpo": "PDY",
+        "section_id": "sec_lpoe_001",
+        "row_category_id": "cat_exte_001",
+        "section_category_id": "cat_mech_001"
+      },
+      {
         "option_id": "opt_prb_001",
         "rpo": "PRB",
         "section_id": "sec_onst_001",
@@ -6995,42 +7005,10 @@
         "section_id": "sec_whee_001",
         "row_category_id": "cat_exte_001",
         "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_pcq_001",
-        "rpo": "PCQ",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
       }
     ]
   },
-  "blank_section_overrides": [
-    {
-      "option_id": "opt_pcq_001",
-      "rpo": "PCQ",
-      "source_section_blank": true,
-      "configured_section_id": "sec_lpoe_001",
-      "resolved_section_id": "sec_lpoe_001",
-      "handled_by_explicit_config": true
-    },
-    {
-      "option_id": "opt_pdy_001",
-      "rpo": "PDY",
-      "source_section_blank": true,
-      "configured_section_id": "sec_lpoi_001",
-      "resolved_section_id": "sec_lpoi_001",
-      "handled_by_explicit_config": true
-    },
-    {
-      "option_id": "opt_pef_001",
-      "rpo": "PEF",
-      "source_section_blank": true,
-      "configured_section_id": "sec_lpoi_001",
-      "resolved_section_id": "sec_lpoi_001",
-      "handled_by_explicit_config": true
-    }
-  ],
+  "blank_section_overrides": [],
   "candidate_standard_equipment": [
     {
       "option_id": "opt_aq9_004",
@@ -12440,6 +12418,28 @@
         "detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
       },
       {
+        "option_id": "opt_pcq_001",
+        "rpo": "PCQ",
+        "option_name": "LPO, Grille Screen Protection Package",
+        "section_id": "sec_lpoe_001",
+        "matched_terms": [
+          "includes"
+        ],
+        "special_mentions": [],
+        "detail_raw": ""
+      },
+      {
+        "option_id": "opt_pdy_001",
+        "rpo": "PDY",
+        "option_name": "LPO, Roadside Safety Package",
+        "section_id": "sec_lpoe_001",
+        "matched_terms": [
+          "includes"
+        ],
+        "special_mentions": [],
+        "detail_raw": ""
+      },
+      {
         "option_id": "opt_cav_001",
         "rpo": "CAV",
         "option_name": "LPO, Contoured cargo area liners with Jake logo",
@@ -12504,6 +12504,17 @@
         ],
         "special_mentions": [],
         "detail_raw": "1. Not available at this time."
+      },
+      {
+        "option_id": "opt_pef_001",
+        "rpo": "PEF",
+        "option_name": "LPO, Contoured Liner Protection Package",
+        "section_id": "sec_lpoi_001",
+        "matched_terms": [
+          "includes"
+        ],
+        "special_mentions": [],
+        "detail_raw": ""
       },
       {
         "option_id": "opt_prb_001",
@@ -13172,39 +13183,6 @@
         ],
         "special_mentions": [],
         "detail_raw": "1. Requires (J57) carbon ceramic brakes."
-      },
-      {
-        "option_id": "opt_pcq_001",
-        "rpo": "PCQ",
-        "option_name": "LPO, Grille Screen Protection Package",
-        "section_id": "sec_lpoe_001",
-        "matched_terms": [
-          "includes"
-        ],
-        "special_mentions": [],
-        "detail_raw": ""
-      },
-      {
-        "option_id": "opt_pdy_001",
-        "rpo": "PDY",
-        "option_name": "LPO, Roadside Safety Package",
-        "section_id": "sec_lpoi_001",
-        "matched_terms": [
-          "includes"
-        ],
-        "special_mentions": [],
-        "detail_raw": ""
-      },
-      {
-        "option_id": "opt_pef_001",
-        "rpo": "PEF",
-        "option_name": "LPO, Contoured Liner Protection Package",
-        "section_id": "sec_lpoi_001",
-        "matched_terms": [
-          "includes"
-        ],
-        "special_mentions": [],
-        "detail_raw": ""
       }
     ],
     "special_mentions": {
@@ -13352,6 +13330,6 @@
   "unknown_status_cells": [],
   "warnings": [
     "Configured Grand Sport variants are present but inactive in variant_master, preserving the live Stingray-only generator path: 1lt_e07, 1lt_e67, 2lt_e07, 2lt_e67, 3lt_e07, 3lt_e67.",
-    "Section/category mismatches: 61."
+    "Section/category mismatches: 62."
   ]
 }

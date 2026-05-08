@@ -182,6 +182,7 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
   assert.equal(registry.models.stingray.modelName, "Corvette Stingray");
   assert.equal(registry.models.grandSport.label, "Grand Sport");
   assert.equal(registry.models.grandSport.modelName, "Corvette Grand Sport");
+  assert.equal(registry.models.grandSport.data.dataset.source_sheet, "grandSport_options");
   assert.deepEqual(dataWindow.STINGRAY_FORM_DATA, registry.models.stingray.data);
   assert.deepEqual(
     JSON.parse(JSON.stringify(registry.models.grandSport.data.variants.map((variant) => variant.variant_id))),

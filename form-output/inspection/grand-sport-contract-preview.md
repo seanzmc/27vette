@@ -1,8 +1,8 @@
 # Grand Sport Contract Preview
 
-Generated: `2026-05-08T00:45:48+00:00`
+Generated: `2026-05-08T02:43:41+00:00`
 Status: `read_only_preview`
-Source sheet: `grandSport`
+Source sheet: `grandSport_options`
 
 ## Summary
 
@@ -28,13 +28,10 @@ Source sheet: `grandSport`
 
 ## Blank-Section Overrides
 
-- `PCQ` / `opt_pcq_001`: `sec_lpoe_001` (handled by explicit config: yes)
-- `PDY` / `opt_pdy_001`: `sec_lpoi_001` (handled by explicit config: yes)
-- `PEF` / `opt_pef_001`: `sec_lpoi_001` (handled by explicit config: yes)
 
 ## Section/Category Resolution
 
-- Resolved mismatch rows: 61
+- Resolved mismatch rows: 62
 - Unresolved issues: 0
 
 ## Text Cleanup

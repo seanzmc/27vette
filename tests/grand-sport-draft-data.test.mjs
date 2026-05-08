@@ -151,7 +151,7 @@ test("Grand Sport draft preserves rule hot spots and normalization metadata for 
   assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1614);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 123);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 26);
-  assert.equal(draft.draftMetadata.normalization.sectionCategoryResolutions.length, 61);
+  assert.equal(draft.draftMetadata.normalization.sectionCategoryResolutions.length, 62);
   assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);
   assert.deepEqual(draft.draftMetadata.deferredSurfaces, [
     "ruleGroups",

@@ -57,6 +57,9 @@ def model_registry_entry(model_key: str, model_label: str, data: dict[str, Any])
 
 
 def load_grand_sport_registry_data() -> dict[str, Any] | None:
+    draft_path = OUTPUT_DIR / "inspection" / f"{GRAND_SPORT_MODEL.draft_artifact_prefix}.json"
+    if draft_path.exists():
+        return json.loads(draft_path.read_text(encoding="utf-8"))
     app_data_path = APP_DIR / "data.js"
     if app_data_path.exists():
         app_data = app_data_path.read_text(encoding="utf-8")
@@ -68,10 +71,7 @@ def load_grand_sport_registry_data() -> dict[str, Any] | None:
             return json.loads(registry_json).get("models", {}).get("grandSport", {}).get("data")
         except (IndexError, json.JSONDecodeError):
             pass
-    draft_path = OUTPUT_DIR / "inspection" / f"{GRAND_SPORT_MODEL.draft_artifact_prefix}.json"
-    if not draft_path.exists():
-        return None
-    return json.loads(draft_path.read_text(encoding="utf-8"))
+    return None
 
 
 def refresh_grand_sport_registry_source() -> None:
@@ -446,7 +446,7 @@ def main() -> None:
     categories = {row["category_id"]: row for row in rows_from_sheet(wb, "category_master")}
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
     options_raw = rows_from_sheet(wb, MODEL_CONFIG.source_option_sheet)
-    statuses_raw = rows_from_sheet(wb, "option_variant_status")
+    statuses_raw = rows_from_sheet(wb, MODEL_CONFIG.status_sheet)
     rules_raw = rows_from_sheet(wb, "rule_mapping")
     price_rules_raw = rows_from_sheet(wb, "price_rules")
     d30_r6x_price_rules_raw = [row for row in price_rules_raw if row.get("price_rule_id") == "pr_d30_r6x_001"]
@@ -928,7 +928,7 @@ def main() -> None:
                 "severity": "error",
                 "entity_type": "availability",
                 "entity_id": "",
-                "message": f"Expected {expected_status_rows} canonical option_variant_status rows; found {canonical_status_rows}.",
+                "message": f"Expected {expected_status_rows} canonical {MODEL_CONFIG.status_sheet} rows; found {canonical_status_rows}.",
             }
         )
     valid_ids = set(options_by_id) | set(interiors_by_id)
