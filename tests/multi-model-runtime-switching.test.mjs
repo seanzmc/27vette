@@ -222,6 +222,12 @@ test("Grand Sport exclusive group selections remove peer options without runtime
     runtime.resetDefaults();
     runtime.reconcileSelections();
 
+    if (expected.groupId === "gs_excl_ls6_engine_covers") {
+      const coupeEngineAppearance = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_b6p_001");
+      assert.ok(coupeEngineAppearance, "B6P should be active before testing Grand Sport coupe LS6 engine covers");
+      runtime.handleChoice(coupeEngineAppearance);
+    }
+
     const [firstId, secondId] = expected.optionIds;
     const firstChoice = runtime.activeChoiceRows().find((choice) => choice.option_id === firstId);
     const secondChoice = runtime.activeChoiceRows().find((choice) => choice.option_id === secondId);

@@ -84,14 +84,13 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
 });
 
 test("Grand Sport draft defers non-normalized surfaces with explicit validation warnings", () => {
-  assert.deepEqual(draft.ruleGroups, []);
-  assert.deepEqual(draft.rules, []);
+  assert.equal(draft.rules.length > 0, true, "Grand Sport draft should include normalized compatibility rules");
   assert.deepEqual(draft.priceRules, []);
   assert.deepEqual(draft.colorOverrides, []);
   const warnings = new Set(draft.validation.filter((row) => row.severity === "warning").map((row) => row.check_id));
   assert.ok(warnings.has("grand_sport_draft_status"));
-  assert.ok(warnings.has("rules_deferred"));
   assert.ok(warnings.has("pricing_deferred"));
+  assert.equal(warnings.has("rules_deferred"), false);
 });
 
 test("Grand Sport draft emits the approved model-scoped exclusive groups", () => {
@@ -109,6 +108,36 @@ test("Grand Sport draft emits the approved model-scoped exclusive groups", () =>
       assert.equal(choiceOptionIds.has(optionId), true, `${optionId} should exist in Grand Sport choices`);
     }
   }
+});
+
+test("Grand Sport draft emits deterministic option rules from copied Stingray rows and raw detail", () => {
+  const ruleKeys = new Set(
+    draft.rules.map((rule) => [
+      rule.source_id,
+      rule.rule_type,
+      rule.target_id,
+      rule.body_style_scope || "",
+      rule.runtime_action || "",
+    ].join("::"))
+  );
+
+  for (const key of [
+    "opt_5jr_001::includes::opt_drg_001::::active",
+    "opt_cfl_001::excludes::opt_cfz_001::::active",
+    "opt_j6l_001::requires::opt_j57_001::::active",
+    "opt_j57_001::includes::opt_j6d_001::::active",
+    "opt_t0f_001::requires::opt_j57_001::::active",
+    "opt_fey_001::includes::opt_t0f_001::::active",
+    "opt_t0f_001::includes::opt_cfz_001::::active",
+    "opt_bc4_001::requires::opt_b6p_001::coupe::active",
+    "opt_bc4_001::requires::opt_zz3_001::convertible::active",
+  ]) {
+    assert.ok(ruleKeys.has(key), `${key} should be generated`);
+  }
+
+  const cflRule = draft.rules.find((rule) => rule.source_id === "opt_cfl_001" && rule.target_id === "opt_cfz_001");
+  assert.match(cflRule.source_note, /Not available with/);
+  assert.equal(cflRule.active, "True");
 });
 
 test("Grand Sport draft includes model-scoped LT interiors with EL9 launch edition metadata", () => {
@@ -154,8 +183,6 @@ test("Grand Sport draft preserves rule hot spots and normalization metadata for 
   assert.equal(draft.draftMetadata.normalization.sectionCategoryResolutions.length, 62);
   assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);
   assert.deepEqual(draft.draftMetadata.deferredSurfaces, [
-    "ruleGroups",
-    "rules",
     "priceRules",
     "colorOverrides",
   ]);

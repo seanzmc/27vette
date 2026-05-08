@@ -135,12 +135,12 @@ def rows_from_optional_sheet(wb, sheet_name: str) -> list[dict[str, str]]:
 
 def load_rule_groups(wb) -> list[dict[str, Any]]:
     members_by_group: dict[str, list[dict[str, str]]] = defaultdict(list)
-    for row in rows_from_optional_sheet(wb, "rule_group_members"):
+    for row in rows_from_optional_sheet(wb, MODEL_CONFIG.rule_group_members_sheet):
         if active_source_row(row):
             members_by_group[row.get("group_id", "")].append(row)
 
     rule_groups: list[dict[str, Any]] = []
-    for row in rows_from_optional_sheet(wb, "rule_groups"):
+    for row in rows_from_optional_sheet(wb, MODEL_CONFIG.rule_groups_sheet):
         if not active_source_row(row):
             continue
         group_id = row.get("group_id", "")
@@ -164,12 +164,12 @@ def load_rule_groups(wb) -> list[dict[str, Any]]:
 
 def load_exclusive_groups(wb) -> list[dict[str, Any]]:
     members_by_group: dict[str, list[dict[str, str]]] = defaultdict(list)
-    for row in rows_from_optional_sheet(wb, "exclusive_group_members"):
+    for row in rows_from_optional_sheet(wb, MODEL_CONFIG.exclusive_group_members_sheet):
         if active_source_row(row):
             members_by_group[row.get("group_id", "")].append(row)
 
     exclusive_groups: list[dict[str, Any]] = []
-    for row in rows_from_optional_sheet(wb, "exclusive_groups"):
+    for row in rows_from_optional_sheet(wb, MODEL_CONFIG.exclusive_groups_sheet):
         if not active_source_row(row):
             continue
         group_id = row.get("group_id", "")
@@ -447,7 +447,7 @@ def main() -> None:
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
     options_raw = rows_from_sheet(wb, MODEL_CONFIG.source_option_sheet)
     statuses_raw = rows_from_sheet(wb, MODEL_CONFIG.status_sheet)
-    rules_raw = rows_from_sheet(wb, "rule_mapping")
+    rules_raw = rows_from_sheet(wb, MODEL_CONFIG.rule_mapping_sheet)
     price_rules_raw = rows_from_sheet(wb, "price_rules")
     d30_r6x_price_rules_raw = [row for row in price_rules_raw if row.get("price_rule_id") == "pr_d30_r6x_001"]
     price_rules_raw = [row for row in price_rules_raw if row.get("price_rule_id") != "pr_d30_r6x_001"]

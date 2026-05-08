@@ -62,23 +62,23 @@ def normalize_selectable(value: Any) -> str:
 
 def normalized_option_row(row: dict[str, str], config: ModelConfig) -> dict[str, Any]:
     option_id = clean(row.get("option_id", ""))
-    original_section_id = clean(row.get("Section", ""))
+    original_section_id = clean(row.get("section_id", ""))
     resolved_section_id = original_section_id or config.blank_section_overrides.get(option_id, "")
     source_category_id = (
-        clean(row.get("Category", ""))
+        clean(row.get("category_id", ""))
         or config.source_category_overrides.get(option_id, "")
         or config.option_category_overrides.get(option_id, "")
         or config.section_category_overrides.get(resolved_section_id, "")
     )
     return {
         "option_id": option_id,
-        "rpo": clean(row.get("RPO", "")),
-        "price": money(row.get("Price")),
-        "option_name": clean(row.get("Option Name", "")),
-        "description": clean(row.get("Description", "")),
-        "detail_raw": clean(row.get("Detail", "")),
+        "rpo": clean(row.get("rpo", "")),
+        "price": money(row.get("price")),
+        "option_name": clean(row.get("option_name", "")),
+        "description": clean(row.get("description", "")),
+        "detail_raw": clean(row.get("detail_raw", "")),
         "category_id": source_category_id,
-        "selectable": normalize_selectable(row.get("Selectable", "")),
+        "selectable": normalize_selectable(row.get("selectable", "")),
         "original_section_id": original_section_id,
         "section_id": resolved_section_id,
         "section_override_applied": bool(not original_section_id and resolved_section_id),
@@ -489,6 +489,186 @@ def classify_rule_hot_spots(
         "rows": rule_hot_spots,
         "special_mentions": {rpo: rows for rpo, rows in sorted(special_mentions.items())},
     }
+
+
+def rows_from_optional_sheet(wb, sheet_name: str) -> list[dict[str, str]]:
+    if sheet_name not in wb.sheetnames:
+        return []
+    return rows_from_sheet(wb, sheet_name)
+
+
+def active_source_row(row: dict[str, str]) -> bool:
+    return clean(row.get("active", "True")) == "True"
+
+
+def load_rule_groups(wb, config: ModelConfig) -> list[dict[str, Any]]:
+    members_by_group: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for row in rows_from_optional_sheet(wb, config.rule_group_members_sheet):
+        if active_source_row(row):
+            members_by_group[row.get("group_id", "")].append(row)
+
+    rule_groups: list[dict[str, Any]] = []
+    for row in rows_from_optional_sheet(wb, config.rule_groups_sheet):
+        if not active_source_row(row):
+            continue
+        group_id = row.get("group_id", "")
+        members = sorted(members_by_group.get(group_id, []), key=lambda member: intish(member.get("display_order")))
+        rule_groups.append(
+            {
+                "group_id": group_id,
+                "group_type": row.get("group_type", ""),
+                "source_id": row.get("source_id", ""),
+                "target_ids": [member.get("target_id", "") for member in members if member.get("target_id", "")],
+                "body_style_scope": row.get("body_style_scope", ""),
+                "trim_level_scope": row.get("trim_level_scope", ""),
+                "variant_scope": row.get("variant_scope", ""),
+                "disabled_reason": row.get("disabled_reason", ""),
+                "active": row.get("active", ""),
+                "notes": row.get("notes", ""),
+            }
+        )
+    return rule_groups
+
+
+def load_exclusive_groups(wb, config: ModelConfig) -> list[dict[str, Any]]:
+    members_by_group: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for row in rows_from_optional_sheet(wb, config.exclusive_group_members_sheet):
+        if active_source_row(row):
+            members_by_group[row.get("group_id", "")].append(row)
+
+    exclusive_groups: list[dict[str, Any]] = []
+    for row in rows_from_optional_sheet(wb, config.exclusive_groups_sheet):
+        if not active_source_row(row):
+            continue
+        group_id = row.get("group_id", "")
+        members = sorted(members_by_group.get(group_id, []), key=lambda member: intish(member.get("display_order")))
+        exclusive_groups.append(
+            {
+                "group_id": group_id,
+                "option_ids": [member.get("option_id", "") for member in members if member.get("option_id", "")],
+                "selection_mode": row.get("selection_mode", ""),
+                "active": row.get("active", ""),
+                "notes": row.get("notes", ""),
+            }
+        )
+    return exclusive_groups
+
+
+def grouped_requirement_pairs(rule_groups: list[dict[str, Any]]) -> set[tuple[str, str]]:
+    pairs: set[tuple[str, str]] = set()
+    for group in rule_groups:
+        if group.get("active") != "True" or group.get("group_type") != "requires_any":
+            continue
+        source_id = group.get("source_id", "")
+        for target_id in group.get("target_ids", []):
+            pairs.add((source_id, target_id))
+    return pairs
+
+
+def exclusive_group_pairs(exclusive_groups: list[dict[str, Any]]) -> set[tuple[str, str]]:
+    pairs: set[tuple[str, str]] = set()
+    for group in exclusive_groups:
+        if group.get("active") != "True":
+            continue
+        option_ids = [option_id for option_id in group.get("option_ids", []) if option_id]
+        for source_id in option_ids:
+            for target_id in option_ids:
+                if source_id != target_id:
+                    pairs.add((source_id, target_id))
+    return pairs
+
+
+def truncate_reason(text: str, limit: int = 180) -> str:
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(text) <= limit:
+        return text
+    return text[: limit - 1].rstrip() + "..."
+
+
+def draft_label_for(entity_id: str, option_rows: dict[str, dict[str, Any]], interiors_by_id: dict[str, dict[str, Any]]) -> str:
+    if entity_id in option_rows:
+        option = option_rows[entity_id]
+        return f"{option.get('rpo')} {option.get('label')}".strip()
+    if entity_id in interiors_by_id:
+        interior = interiors_by_id[entity_id]
+        return f"{interior.get('interior_id')} {interior.get('interior_name')}".strip()
+    return entity_id
+
+
+def build_draft_rules(
+    wb,
+    config: ModelConfig,
+    option_rows: dict[str, dict[str, Any]],
+    sections_by_id: dict[str, dict[str, Any]],
+    interiors: list[dict[str, Any]],
+    grouped_requires: set[tuple[str, str]],
+    grouped_excludes: set[tuple[str, str]],
+) -> list[dict[str, Any]]:
+    interiors_by_id = {row["interior_id"]: row for row in interiors if row.get("interior_id")}
+    valid_ids = set(option_rows) | set(interiors_by_id)
+    raw_rules: list[dict[str, Any]] = []
+    for rule in rows_from_optional_sheet(wb, config.rule_mapping_sheet):
+        rule_type = rule.get("rule_type", "").lower()
+        source_id = rule.get("source_id", "")
+        target_id = rule.get("target_id", "")
+        if not rule_type or source_id not in valid_ids or target_id not in valid_ids:
+            continue
+        if rule.get("generation_action", "") == "omit_grouped_requirement":
+            continue
+        if rule_type == "requires" and (source_id, target_id) in grouped_requires:
+            continue
+        if rule_type == "excludes" and (source_id, target_id) in grouped_excludes:
+            continue
+        source_section = rule.get("source_section", "")
+        target_section = rule.get("target_section", "")
+        source_mode = sections_by_id.get(source_section, {}).get("selection_mode") or rule.get("source_selection_mode", "")
+        target_mode = sections_by_id.get(target_section, {}).get("selection_mode") or rule.get("target_selection_mode", "")
+        replaces_default = rule.get("runtime_action", "") == "replace"
+        redundant = (
+            rule_type == "excludes"
+            and source_section
+            and source_section == target_section
+            and source_mode.startswith("single")
+            and target_mode.startswith("single")
+            and not replaces_default
+        )
+        source_label = draft_label_for(source_id, option_rows, interiors_by_id)
+        target_label = draft_label_for(target_id, option_rows, interiors_by_id)
+        disabled_reason = rule.get("disabled_reason", "")
+        auto_add = "False"
+        if not disabled_reason and replaces_default:
+            disabled_reason = f"{source_label} removes this default."
+        elif not disabled_reason and rule_type == "excludes":
+            disabled_reason = f"Blocked by {source_label}."
+        elif not disabled_reason and rule_type == "requires":
+            disabled_reason = f"Requires {target_label}."
+        elif not disabled_reason and rule_type == "includes":
+            disabled_reason = f"Included with {source_label}."
+            auto_add = "True"
+        elif rule_type == "includes":
+            auto_add = "True"
+        raw_rules.append(
+            {
+                "rule_id": rule.get("rule_id", ""),
+                "source_id": source_id,
+                "rule_type": rule_type,
+                "target_id": target_id,
+                "target_type": rule.get("target_type", ""),
+                "source_type": rule.get("source_type", ""),
+                "source_section": source_section,
+                "target_section": target_section,
+                "source_selection_mode": source_mode,
+                "target_selection_mode": target_mode,
+                "body_style_scope": rule.get("body_style_scope", ""),
+                "disabled_reason": disabled_reason,
+                "auto_add": auto_add,
+                "active": "False" if redundant else "True",
+                "runtime_action": "replace" if replaces_default else "omit_redundant_same_section_exclude" if redundant else "active",
+                "source_note": truncate_reason(rule.get("original_detail_raw", ""), 500),
+                "review_flag": rule.get("review_flag", ""),
+            }
+        )
+    return raw_rules
 
 
 def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
@@ -907,8 +1087,20 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             if status == "standard":
                 candidate_standard_equipment.append(choice)
 
+    step_order_index = {step_key: index for index, step_key in enumerate(config.step_order)}
+
+    def section_sort_key(section_id: str) -> tuple[int, int, str]:
+        section = sections.get(section_id, {})
+        category_id = section.get("category_id", "")
+        step_key = resolved_step_key(section_id, sections, category_id, config)
+        return (
+            intish(section.get("display_order"), 9999),
+            step_order_index.get(step_key, 9999),
+            section_id,
+        )
+
     section_rows: list[dict[str, Any]] = [dict(section) for section in config.context_sections]
-    for section_id in sorted(section_ids_with_choices, key=lambda value: intish(sections.get(value, {}).get("display_order"), 9999)):
+    for section_id in sorted(section_ids_with_choices, key=section_sort_key):
         section = sections.get(section_id, {})
         resolved_categories = sorted(
             {
@@ -1016,16 +1208,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
     variants_by_id = {row["variant_id"]: row for row in preview["variants"]}
     sections_by_id = {row["section_id"]: row for row in preview["sections"]}
     interiors = build_grand_sport_interiors(config)
-    exclusive_groups = [
-        {
-            **group,
-            "option_ids": list(group["option_ids"]),
-        }
-        for group in config.exclusive_groups
-    ]
-    deferred_surfaces = ["ruleGroups", "rules", "priceRules", "colorOverrides"]
-    if not exclusive_groups:
-        deferred_surfaces.insert(1, "exclusiveGroups")
+    deferred_surfaces = ["priceRules", "colorOverrides"]
     option_rows: dict[str, dict[str, Any]] = {}
     statuses_by_option: defaultdict[str, dict[str, str]] = defaultdict(dict)
     order_by_option: dict[str, int] = {}
@@ -1116,6 +1299,19 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
         if choice["status"] == "standard"
     ]
 
+    wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
+    rule_groups = load_rule_groups(wb, config)
+    exclusive_groups = load_exclusive_groups(wb, config)
+    rules = build_draft_rules(
+        wb,
+        config,
+        option_rows,
+        sections_by_id,
+        interiors,
+        grouped_requirement_pairs(rule_groups),
+        exclusive_group_pairs(exclusive_groups),
+    )
+
     validation = [
         {
             "check_id": "grand_sport_draft_status",
@@ -1139,11 +1335,11 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
             "message": f"{len(draft_choices)} draft choice rows exported from the Grand Sport variant matrix.",
         },
         {
-            "check_id": "rules_deferred",
-            "severity": "warning",
+            "check_id": "rules",
+            "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "Final Grand Sport compatibility rules are deferred; rule/detail evidence is preserved in draftMetadata.ruleDetailHotSpots.",
+            "message": f"{len(rules)} active compatibility rules exported from {config.rule_mapping_sheet}.",
         },
         {
             "check_id": "interior_contract",
@@ -1177,9 +1373,9 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
         "contextChoices": preview["contextChoices"],
         "choices": draft_choices,
         "standardEquipment": standard_equipment,
-        "ruleGroups": [],
+        "ruleGroups": rule_groups,
         "exclusiveGroups": exclusive_groups,
-        "rules": [],
+        "rules": rules,
         "priceRules": [],
         "interiors": interiors,
         "colorOverrides": [],
@@ -1397,9 +1593,9 @@ def render_form_data_draft_markdown(draft: dict[str, Any]) -> str:
         f"- Sections: {len(draft['sections'])}",
         f"- Choices: {len(draft['choices'])}",
         f"- Standard equipment rows: {len(draft['standardEquipment'])}",
-        f"- Rule groups: {len(draft['ruleGroups'])} (deferred)",
-        f"- Exclusive groups: {len(draft['exclusiveGroups'])} ({'model-scoped' if draft['exclusiveGroups'] else 'deferred'})",
-        f"- Rules: {len(draft['rules'])} (deferred)",
+        f"- Rule groups: {len(draft['ruleGroups'])} (workbook-backed)",
+        f"- Exclusive groups: {len(draft['exclusiveGroups'])} (workbook-backed)",
+        f"- Rules: {len(draft['rules'])} (workbook-backed)",
         f"- Price rules: {len(draft['priceRules'])} (deferred)",
         f"- Interiors: {len(draft['interiors'])} (model-scoped)",
         f"- Color overrides: {len(draft['colorOverrides'])} (deferred)",

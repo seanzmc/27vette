@@ -187,52 +187,6 @@ GRAND_SPORT_SECTION_LABEL_OVERRIDES = {
     "sec_colo_001": "Color Combination Override",
 }
 
-GRAND_SPORT_EXCLUSIVE_GROUPS = (
-    {
-        "group_id": "gs_excl_ls6_engine_covers",
-        "option_ids": (
-            "opt_bc7_001",
-            "opt_bc4_001",
-            "opt_bc4_002",
-            "opt_bcp_001",
-            "opt_bcp_002",
-            "opt_bcs_001",
-            "opt_bcs_002",
-        ),
-        "selection_mode": "single_within_group",
-        "active": "True",
-        "notes": "Grand Sport LS6 engine cover choices are mutually exclusive; duplicate generated option rows are preserved for a later cleanup pass.",
-    },
-    {
-        "group_id": "gs_excl_center_caps",
-        "option_ids": ("opt_5zb_001", "opt_5zc_001", "opt_5zd_001"),
-        "selection_mode": "single_within_group",
-        "active": "True",
-        "notes": "Grand Sport wheel center cap choices are mutually exclusive within the Wheel Accessory section.",
-    },
-    {
-        "group_id": "gs_excl_indoor_car_covers",
-        "option_ids": ("opt_rwh_001", "opt_wkr_001"),
-        "selection_mode": "single_within_group",
-        "active": "True",
-        "notes": "Grand Sport indoor car cover choices are mutually exclusive within the LPO Exterior section.",
-    },
-    {
-        "group_id": "gs_excl_rear_script_badges",
-        "option_ids": ("opt_rik_001", "opt_rin_001", "opt_sl8_001"),
-        "selection_mode": "single_within_group",
-        "active": "True",
-        "notes": "Rear Corvette script badge color choices are mutually exclusive within the LPO Exterior section.",
-    },
-    {
-        "group_id": "gs_excl_suede_compartment_liners",
-        "option_ids": ("opt_sxb_001", "opt_sxr_001", "opt_sxt_001"),
-        "selection_mode": "single_within_group",
-        "active": "True",
-        "notes": "Grand Sport suede frunk/trunk compartment liner choices are mutually exclusive within the LPO Interior section.",
-    },
-)
-
 STINGRAY_MODEL = ModelConfig(
     model_key="stingray",
     model_label="Stingray",
@@ -290,7 +244,11 @@ GRAND_SPORT_MODEL = ModelConfig(
     section_label_overrides=GRAND_SPORT_SECTION_LABEL_OVERRIDES,
     preview_artifact_prefix="grand-sport-contract-preview",
     draft_artifact_prefix="grand-sport-form-data-draft",
-    exclusive_groups=GRAND_SPORT_EXCLUSIVE_GROUPS,
+    rule_mapping_sheet="grandSport_rule_mapping",
+    rule_groups_sheet="grandSport_rule_groups",
+    rule_group_members_sheet="grandSport_rule_group_members",
+    exclusive_groups_sheet="grandSport_exclusive_groups",
+    exclusive_group_members_sheet="grandSport_exclusive_members",
     text_cleanup={
         "enabled": True,
         "normalize_new_prefix": True,

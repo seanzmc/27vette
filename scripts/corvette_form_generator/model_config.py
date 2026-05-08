@@ -37,6 +37,11 @@ class ModelConfig:
     section_label_overrides: Mapping[str, str] = field(default_factory=dict)
     preview_artifact_prefix: str = ""
     draft_artifact_prefix: str = ""
+    rule_mapping_sheet: str = "rule_mapping"
+    rule_groups_sheet: str = "rule_groups"
+    rule_group_members_sheet: str = "rule_group_members"
+    exclusive_groups_sheet: str = "exclusive_groups"
+    exclusive_group_members_sheet: str = "exclusive_group_members"
     exclusive_groups: tuple[Mapping[str, Any], ...] = ()
     text_cleanup: Mapping[str, Any] = field(default_factory=dict)
     special_rule_review_rpos: tuple[str, ...] = ()

@@ -23,6 +23,41 @@ function loadAppData() {
 const jsonData = JSON.parse(fs.readFileSync("form-output/stingray-form-data.json", "utf8"));
 const appData = loadAppData();
 const generatorSource = fs.readFileSync("scripts/generate_stingray_form.py", "utf8");
+const stingrayVariantIds = ["1lt_c07", "2lt_c07", "3lt_c07", "1lt_c67", "2lt_c67", "3lt_c67"];
+const grandSportVariantIds = ["1lt_e07", "2lt_e07", "3lt_e07", "1lt_e67", "2lt_e67", "3lt_e67"];
+const optionSourceHeaders = [
+  "option_id",
+  "rpo",
+  "price",
+  "option_name",
+  "description",
+  "detail_raw",
+  "section_id",
+  "selectable",
+  "display_order",
+  "active",
+  "display_behavior",
+];
+const optionVariantStatusHeaders = ["option_id", "variant_id", "status"];
+const optionVariantStatuses = new Set(["available", "standard", "unavailable"]);
+const ruleMappingHeaders = [
+  "rule_id",
+  "source_id",
+  "rule_type",
+  "target_id",
+  "target_type",
+  "original_detail_raw",
+  "review_flag",
+  "source_type",
+  "target_selection_mode",
+  "source_selection_mode",
+  "target_section",
+  "source_section",
+  "generation_action",
+  "body_style_scope",
+  "runtime_action",
+  "disabled_reason",
+];
 
 function workbookHeaders(sheetName) {
   const output = execFileSync(
@@ -40,6 +75,42 @@ function workbookHeaders(sheetName) {
     { encoding: "utf8" }
   );
   return JSON.parse(output);
+}
+
+function workbookRows(sheetName) {
+  const output = execFileSync(
+    ".venv/bin/python",
+    [
+      "-c",
+      [
+        "import json",
+        "from openpyxl import load_workbook",
+        "wb = load_workbook('stingray_master.xlsx', read_only=True, data_only=True)",
+        `ws = wb['${sheetName}']`,
+        "headers = [ws.cell(1, col).value for col in range(1, ws.max_column + 1)]",
+        "rows = [{header: value for header, value in zip(headers, raw) if header and value is not None} for raw in ws.iter_rows(min_row=2, values_only=True)]",
+        "print(json.dumps(rows))",
+      ].join("; "),
+    ],
+    { encoding: "utf8" }
+  );
+  return JSON.parse(output);
+}
+
+function assertOptionVariantStatusCoverage(optionSheetName, statusSheetName, variantIds) {
+  const optionIds = workbookRows(optionSheetName).map((row) => row.option_id).filter(Boolean);
+  const statusRows = workbookRows(statusSheetName);
+  const expectedPairs = new Set(optionIds.flatMap((optionId) => variantIds.map((variantId) => `${optionId}::${variantId}`)));
+  const actualPairs = new Set(statusRows.map((row) => `${row.option_id}::${row.variant_id}`));
+
+  assert.equal(actualPairs.size, statusRows.length, `${statusSheetName} should not contain duplicate option/variant rows`);
+  assert.equal(actualPairs.size, expectedPairs.size, `${statusSheetName} should have one row per option/variant pair`);
+  for (const pair of expectedPairs) {
+    assert.ok(actualPairs.has(pair), `${statusSheetName} missing ${pair}`);
+  }
+  for (const row of statusRows) {
+    assert.ok(optionVariantStatuses.has(String(row.status).toLowerCase()), `${statusSheetName} has invalid status ${row.status}`);
+  }
 }
 
 test("generated JSON and static app data stay synchronized apart from timestamp", () => {
@@ -60,6 +131,35 @@ test("Stingray generated contract keeps the closed-out shape", () => {
   assert.equal(jsonData.priceRules.length, 43);
   assert.equal(jsonData.interiors.length, 130);
   assert.equal(jsonData.validation.filter((row) => row.severity === "error").length, 0);
+});
+
+test("model option source sheets use the same normalized contract", () => {
+  assert.deepEqual(workbookHeaders("stingray_options"), optionSourceHeaders);
+  assert.deepEqual(workbookHeaders("grandSport_options"), optionSourceHeaders);
+  assert.deepEqual(workbookHeaders("stingray_ovs"), optionVariantStatusHeaders);
+  assert.deepEqual(workbookHeaders("grandSport_ovs"), optionVariantStatusHeaders);
+  assertOptionVariantStatusCoverage("stingray_options", "stingray_ovs", stingrayVariantIds);
+  assertOptionVariantStatusCoverage("grandSport_options", "grandSport_ovs", grandSportVariantIds);
+});
+
+test("Grand Sport draft rule source sheets use workbook-backed contracts", () => {
+  assert.deepEqual(workbookHeaders("grandSport_rule_mapping"), ruleMappingHeaders);
+  assert.deepEqual(workbookHeaders("grandSport_rule_groups"), [
+    "group_id",
+    "group_type",
+    "source_id",
+    "body_style_scope",
+    "trim_level_scope",
+    "variant_scope",
+    "disabled_reason",
+    "active",
+    "notes",
+  ]);
+  assert.deepEqual(workbookHeaders("grandSport_rule_group_members"), ["group_id", "target_id", "display_order", "active"]);
+  assert.deepEqual(workbookHeaders("grandSport_exclusive_groups"), ["group_id", "selection_mode", "active", "notes"]);
+  assert.deepEqual(workbookHeaders("grandSport_exclusive_members"), ["group_id", "option_id", "display_order", "active"]);
+  assert.ok(workbookRows("grandSport_rule_mapping").length > 0);
+  assert.ok(workbookRows("grandSport_exclusive_groups").length > 0);
 });
 
 test("generator-owned compatibility groups are authored in workbook source sheets", () => {
