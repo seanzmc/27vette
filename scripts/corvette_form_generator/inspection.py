@@ -79,6 +79,8 @@ def normalized_option_row(row: dict[str, str], config: ModelConfig) -> dict[str,
         "detail_raw": clean(row.get("detail_raw", "")),
         "category_id": source_category_id,
         "selectable": normalize_selectable(row.get("selectable", "")),
+        "active": normalize_selectable(row.get("active", "True")),
+        "display_behavior": clean(row.get("display_behavior", "")),
         "original_section_id": original_section_id,
         "section_id": resolved_section_id,
         "section_override_applied": bool(not original_section_id and resolved_section_id),
@@ -501,6 +503,47 @@ def active_source_row(row: dict[str, str]) -> bool:
     return clean(row.get("active", "True")) == "True"
 
 
+def display_behavior_status(
+    status: str,
+    selectable: str,
+    active: str,
+    display_behavior: str,
+) -> tuple[str, str, str]:
+    if display_behavior == "auto_only":
+        return "unavailable", "False", "False"
+    if display_behavior == "display_only":
+        return "available", "False", "True"
+    return status, selectable, active
+
+
+def build_color_overrides(
+    wb,
+    config: ModelConfig,
+    interiors: list[dict[str, Any]],
+    option_rows: dict[str, dict[str, Any]],
+) -> list[dict[str, Any]]:
+    interior_ids = {row["interior_id"] for row in interiors if row.get("interior_id")}
+    valid_option_ids = set(option_rows)
+    rows: list[dict[str, Any]] = []
+    for source in rows_from_optional_sheet(wb, config.color_overrides_sheet):
+        interior_id = source.get("interior_id", "")
+        option_id = source.get("option_id", "")
+        adds_rpo = source.get("adds_rpo", "")
+        if interior_id not in interior_ids or option_id not in valid_option_ids or adds_rpo not in valid_option_ids:
+            continue
+        rows.append(
+            {
+                "override_id": f"co_{len(rows) + 1:03d}",
+                "interior_id": interior_id,
+                "option_id": option_id,
+                "rule_type": source.get("rule_type", "").lower(),
+                "adds_rpo": adds_rpo,
+                "notes": "Exterior/interior pairing requires the listed override RPO.",
+            }
+        )
+    return rows
+
+
 def load_rule_groups(wb, config: ModelConfig) -> list[dict[str, Any]]:
     members_by_group: dict[str, list[dict[str, str]]] = defaultdict(list)
     for row in rows_from_optional_sheet(wb, config.rule_group_members_sheet):
@@ -694,6 +737,7 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
     candidate_standard_equipment: list[dict[str, Any]] = []
 
     for row in rows:
+        row_active = row["active"] == "True"
         normalized_statuses = [status for status in row["statuses"].values() if status]
         effective_status = best_status(*normalized_statuses)
         matrix_rows.append(
@@ -720,19 +764,26 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
                         "status": status,
                     }
                 )
-            if status in {"available", "standard"}:
+            candidate_status, candidate_selectable, candidate_active = display_behavior_status(
+                status,
+                row["selectable"],
+                row["active"],
+                row["display_behavior"],
+            )
+            if row_active and candidate_status in {"available", "standard", "unavailable"}:
                 candidate_choices.append(
                     {
                         "choice_id": f"{variant_id}__{row['option_id']}",
                         "option_id": row["option_id"],
                         "rpo": row["rpo"],
                         "variant_id": variant_id,
-                        "status": status,
-                        "selectable": row["selectable"],
+                        "status": candidate_status,
+                        "selectable": candidate_selectable,
+                        "active": candidate_active,
                         "section_id": row["section_id"],
                     }
                 )
-            if status == "standard":
+            if row_active and candidate_status == "standard":
                 candidate_standard_equipment.append(
                     {
                         "option_id": row["option_id"],
@@ -744,8 +795,18 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
                 )
 
     selectable_counts = Counter(row["selectable"] or "<blank>" for row in rows)
-    active_rows = [row for row in rows if any(status in {"available", "standard"} for status in row["statuses"].values())]
-    standard_rows = [row for row in rows if any(status == "standard" for status in row["statuses"].values())]
+    active_rows = [
+        row
+        for row in rows
+        if row["active"] == "True"
+        and any(display_behavior_status(status, row["selectable"], row["active"], row["display_behavior"])[0] in {"available", "standard"} for status in row["statuses"].values())
+    ]
+    standard_rows = [
+        row
+        for row in rows
+        if row["active"] == "True"
+        and any(display_behavior_status(status, row["selectable"], row["active"], row["display_behavior"])[0] == "standard" for status in row["statuses"].values())
+    ]
     unique_rpos = sorted({row["rpo"] for row in rows if row["rpo"]})
 
     section_mapping_rows: list[dict[str, Any]] = []
@@ -754,6 +815,8 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
     unknown_categories: Counter[str] = Counter()
     section_category_mismatches: list[dict[str, Any]] = []
     for row in rows:
+        if row["active"] != "True":
+            continue
         section_id = row["section_id"]
         category_id = row["category_id"]
         if not section_id:
@@ -975,6 +1038,8 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     section_ids_with_choices: set[str] = set()
 
     for row in rows:
+        if row["active"] != "True":
+            continue
         section_id = row["section_id"]
         source_category_id = row["category_id"]
         section_category_id = sections.get(section_id, {}).get("category_id", "")
@@ -1064,13 +1129,21 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             "category_name": category.get("category_name", ""),
             "step_key": step_key,
             "selectable": row["selectable"],
+            "active": row["active"],
+            "display_behavior": row["display_behavior"],
             "base_price": row["price"],
             "text_cleanup_notes": text_cleanup_notes,
         }
         section_ids_with_choices.add(section_id)
 
         for variant_id, status in row["statuses"].items():
-            if status not in {"available", "standard"}:
+            status, selectable, active = display_behavior_status(
+                status,
+                row["selectable"],
+                row["active"],
+                row["display_behavior"],
+            )
+            if status not in {"available", "standard"} and row["display_behavior"] != "auto_only":
                 continue
             variant = variants_by_id[variant_id]
             choice = {
@@ -1081,7 +1154,8 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
                 "trim_level": variant["trim_level"],
                 "status": status,
                 "status_label": status_to_label(status),
-                "active": "True",
+                "selectable": selectable,
+                "active": active,
             }
             choices.append(choice)
             if status == "standard":
@@ -1208,7 +1282,6 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
     variants_by_id = {row["variant_id"]: row for row in preview["variants"]}
     sections_by_id = {row["section_id"]: row for row in preview["sections"]}
     interiors = build_grand_sport_interiors(config)
-    deferred_surfaces = ["priceRules", "colorOverrides"]
     option_rows: dict[str, dict[str, Any]] = {}
     statuses_by_option: defaultdict[str, dict[str, str]] = defaultdict(dict)
     order_by_option: dict[str, int] = {}
@@ -1236,6 +1309,8 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
                     "category_name",
                     "step_key",
                     "selectable",
+                    "active",
+                    "display_behavior",
                     "base_price",
                     "text_cleanup_notes",
                 )
@@ -1247,7 +1322,12 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
         for variant_id in config.variant_ids:
             variant = variants_by_id[variant_id]
             status = statuses_by_option[option_id].get(variant_id, "unavailable")
-            active = "True" if status in {"available", "standard"} else "False"
+            status, selectable, active = display_behavior_status(
+                status,
+                option["selectable"],
+                option.get("active", "True"),
+                option.get("display_behavior", ""),
+            )
             draft_choices.append(
                 {
                     "choice_id": f"{variant_id}__{option_id}",
@@ -1265,7 +1345,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
                     "trim_level": variant["trim_level"],
                     "status": status,
                     "status_label": status_to_label(status),
-                    "selectable": option["selectable"],
+                    "selectable": selectable,
                     "active": active,
                     "choice_mode": section.get("choice_mode", ""),
                     "selection_mode": section.get("selection_mode", ""),
@@ -1302,6 +1382,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
     wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
     rule_groups = load_rule_groups(wb, config)
     exclusive_groups = load_exclusive_groups(wb, config)
+    color_overrides = build_color_overrides(wb, config, interiors, option_rows)
     rules = build_draft_rules(
         wb,
         config,
@@ -1356,6 +1437,16 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
             "message": "Final Grand Sport price rules are deferred unless directly represented in normalized option prices.",
         },
     ]
+    if color_overrides:
+        validation.append(
+            {
+                "check_id": "color_overrides",
+                "severity": "pass",
+                "entity_type": "color_override",
+                "entity_id": "",
+                "message": f"{len(color_overrides)} color override rows exported from {config.color_overrides_sheet}.",
+            }
+        )
 
     return {
         "dataset": {
@@ -1378,7 +1469,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
         "rules": rules,
         "priceRules": [],
         "interiors": interiors,
-        "colorOverrides": [],
+        "colorOverrides": color_overrides,
         "validation": validation,
         "draftMetadata": {
             "sourcePreviewStatus": preview["dataset"]["status"],
@@ -1386,7 +1477,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
             "fullVariantMatrixChoices": len(draft_choices),
             "ruleDetailHotSpots": preview["ruleDetailHotSpots"],
             "normalization": preview["normalization"],
-            "deferredSurfaces": deferred_surfaces,
+            "deferredSurfaces": ["priceRules"],
         },
     }
 
@@ -1598,7 +1689,7 @@ def render_form_data_draft_markdown(draft: dict[str, Any]) -> str:
         f"- Rules: {len(draft['rules'])} (workbook-backed)",
         f"- Price rules: {len(draft['priceRules'])} (deferred)",
         f"- Interiors: {len(draft['interiors'])} (model-scoped)",
-        f"- Color overrides: {len(draft['colorOverrides'])} (deferred)",
+        f"- Color overrides: {len(draft['colorOverrides'])}",
         "",
         "## Draft Notes",
         "",

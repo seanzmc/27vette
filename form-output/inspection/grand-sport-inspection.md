@@ -1,6 +1,6 @@
 # Grand Sport Inspection
 
-Generated: `2026-05-08T04:09:51+00:00`
+Generated: `2026-05-08T13:54:29+00:00`
 Source sheet: `grandSport_options`
 Status: `inspection_generated`
 
@@ -16,12 +16,12 @@ Status: `inspection_generated`
 - Option rows: 269
 - Unique RPOs: 223
 - Variant status cells: 1614
-- Candidate choice rows with available/standard status: 1418
-- Candidate standard equipment cells: 545
-- Candidate standard option rows: 109
-- Active option rows with available/standard status: 269
-- Inactive option rows all unavailable/blank: 0
-- Selectable counts: `{"False": 102, "True": 167}`
+- Candidate choice rows with available/standard status: 1530
+- Candidate standard equipment cells: 539
+- Candidate standard option rows: 108
+- Active option rows with available/standard status: 254
+- Inactive option rows all unavailable/blank: 15
+- Selectable counts: `{"False": 103, "True": 166}`
 - Status counts: `{"available": 873, "standard": 545, "unavailable": 196}`
 - Missing status cells: 0
 - Unknown status cells: 0
@@ -31,7 +31,7 @@ Status: `inspection_generated`
 - Rows still missing resolved sections: 0
 - Unknown section ids: none
 - Unknown category ids: none
-- Section/category mismatches: 62
+- Section/category mismatches: 55
 
 ## Blank-Section Overrides
 
@@ -88,4 +88,4 @@ Status: `inspection_generated`
 ## Warnings
 
 - Configured Grand Sport variants are present but inactive in variant_master, preserving the live Stingray-only generator path: 1lt_e07, 1lt_e67, 2lt_e07, 2lt_e67, 3lt_e07, 3lt_e67.
-- Section/category mismatches: 62.
+- Section/category mismatches: 55.

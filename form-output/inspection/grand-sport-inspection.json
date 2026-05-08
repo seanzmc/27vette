@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T04:09:51+00:00",
+  "generated_at": "2026-05-08T13:54:29+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -102,15 +102,15 @@
     "unique_rpos": 223,
     "variant_status_cells": 1614,
     "status_source_rows": 1614,
-    "candidate_choice_rows_available_or_standard": 1418,
-    "candidate_standard_equipment_cells": 545,
-    "candidate_standard_option_rows": 109,
+    "candidate_choice_rows_available_or_standard": 1530,
+    "candidate_standard_equipment_cells": 539,
+    "candidate_standard_option_rows": 108,
     "selectable_counts": {
-      "False": 102,
-      "True": 167
+      "False": 103,
+      "True": 166
     },
-    "active_option_rows_available_or_standard": 269,
-    "inactive_option_rows_all_unavailable_or_blank": 0,
+    "active_option_rows_available_or_standard": 254,
+    "inactive_option_rows_all_unavailable_or_blank": 15,
     "status_counts": {
       "available": 873,
       "standard": 545,
@@ -4534,33 +4534,6 @@
         "step_key": "delivery"
       },
       {
-        "option_id": "opt_36s_001",
-        "rpo": "36S",
-        "category_id": "",
-        "section_id": "sec_cust_002",
-        "original_section_id": "sec_cust_002",
-        "section_override_applied": false,
-        "step_key": "interior_trim"
-      },
-      {
-        "option_id": "opt_37s_001",
-        "rpo": "37S",
-        "category_id": "",
-        "section_id": "sec_cust_002",
-        "original_section_id": "sec_cust_002",
-        "section_override_applied": false,
-        "step_key": "interior_trim"
-      },
-      {
-        "option_id": "opt_38s_001",
-        "rpo": "38S",
-        "category_id": "",
-        "section_id": "sec_cust_002",
-        "original_section_id": "sec_cust_002",
-        "section_override_applied": false,
-        "step_key": "interior_trim"
-      },
-      {
         "option_id": "opt_b6p_001",
         "rpo": "B6P",
         "category_id": "",
@@ -4912,24 +4885,6 @@
         "step_key": "interior_trim"
       },
       {
-        "option_id": "opt_n26_001",
-        "rpo": "N26",
-        "category_id": "",
-        "section_id": "sec_inte_001",
-        "original_section_id": "sec_inte_001",
-        "section_override_applied": false,
-        "step_key": "interior_trim"
-      },
-      {
-        "option_id": "opt_tu7_001",
-        "rpo": "TU7",
-        "category_id": "",
-        "section_id": "sec_inte_001",
-        "original_section_id": "sec_inte_001",
-        "section_override_applied": false,
-        "step_key": "interior_trim"
-      },
-      {
         "option_id": "opt_uqt_001",
         "rpo": "UQT",
         "category_id": "",
@@ -4986,15 +4941,6 @@
       {
         "option_id": "opt_rwj_001",
         "rpo": "RWJ",
-        "category_id": "cat_exte_001",
-        "section_id": "sec_lpoe_001",
-        "original_section_id": "sec_lpoe_001",
-        "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
-      },
-      {
-        "option_id": "opt_rz9_001",
-        "rpo": "RZ9",
         "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
@@ -5200,15 +5146,6 @@
         "step_key": "interior_trim"
       },
       {
-        "option_id": "opt_v8x_001",
-        "rpo": "V8X",
-        "category_id": "",
-        "section_id": "sec_lpoi_001",
-        "original_section_id": "sec_lpoi_001",
-        "section_override_applied": false,
-        "step_key": "interior_trim"
-      },
-      {
         "option_id": "opt_vyw_001",
         "rpo": "VYW",
         "category_id": "",
@@ -5245,53 +5182,8 @@
         "step_key": "interior_trim"
       },
       {
-        "option_id": "opt_r6p_001",
-        "rpo": "R6P",
-        "category_id": "cat_stan_001",
-        "section_id": "sec_onst_001",
-        "original_section_id": "sec_onst_001",
-        "section_override_applied": false,
-        "step_key": "interior_trim"
-      },
-      {
         "option_id": "opt_r9l_001",
         "rpo": "R9L",
-        "category_id": "cat_stan_001",
-        "section_id": "sec_onst_001",
-        "original_section_id": "sec_onst_001",
-        "section_override_applied": false,
-        "step_key": "interior_trim"
-      },
-      {
-        "option_id": "opt_r9v_001",
-        "rpo": "R9V",
-        "category_id": "cat_stan_001",
-        "section_id": "sec_onst_001",
-        "original_section_id": "sec_onst_001",
-        "section_override_applied": false,
-        "step_key": "interior_trim"
-      },
-      {
-        "option_id": "opt_r9w_001",
-        "rpo": "R9W",
-        "category_id": "cat_stan_001",
-        "section_id": "sec_onst_001",
-        "original_section_id": "sec_onst_001",
-        "section_override_applied": false,
-        "step_key": "interior_trim"
-      },
-      {
-        "option_id": "opt_r9y_001",
-        "rpo": "R9Y",
-        "category_id": "cat_stan_001",
-        "section_id": "sec_onst_001",
-        "original_section_id": "sec_onst_001",
-        "section_override_applied": false,
-        "step_key": "interior_trim"
-      },
-      {
-        "option_id": "opt_u2k_001",
-        "rpo": "U2K",
         "category_id": "cat_stan_001",
         "section_id": "sec_onst_001",
         "original_section_id": "sec_onst_001",
@@ -5427,15 +5319,6 @@
       {
         "option_id": "opt_cfl_001",
         "rpo": "CFL",
-        "category_id": "cat_exte_001",
-        "section_id": "sec_perf_001",
-        "original_section_id": "sec_perf_001",
-        "section_override_applied": false,
-        "step_key": "packages_performance"
-      },
-      {
-        "option_id": "opt_cfv_001",
-        "rpo": "CFV",
         "category_id": "cat_exte_001",
         "section_id": "sec_perf_001",
         "original_section_id": "sec_perf_001",
@@ -5796,15 +5679,6 @@
       {
         "option_id": "opt_aq9_002",
         "rpo": "AQ9",
-        "category_id": "",
-        "section_id": "sec_seat_002",
-        "original_section_id": "sec_seat_002",
-        "section_override_applied": false,
-        "step_key": "seat"
-      },
-      {
-        "option_id": "opt_aup_001",
-        "rpo": "AUP",
         "category_id": "",
         "section_id": "sec_seat_002",
         "original_section_id": "sec_seat_002",
@@ -6734,13 +6608,6 @@
         "section_category_id": "cat_mech_001"
       },
       {
-        "option_id": "opt_rz9_001",
-        "rpo": "RZ9",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
         "option_id": "opt_sbt_001",
         "rpo": "SBT",
         "section_id": "sec_lpoe_001",
@@ -6832,43 +6699,8 @@
         "section_category_id": "cat_inte_001"
       },
       {
-        "option_id": "opt_r6p_001",
-        "rpo": "R6P",
-        "section_id": "sec_onst_001",
-        "row_category_id": "cat_stan_001",
-        "section_category_id": "cat_inte_001"
-      },
-      {
         "option_id": "opt_r9l_001",
         "rpo": "R9L",
-        "section_id": "sec_onst_001",
-        "row_category_id": "cat_stan_001",
-        "section_category_id": "cat_inte_001"
-      },
-      {
-        "option_id": "opt_r9v_001",
-        "rpo": "R9V",
-        "section_id": "sec_onst_001",
-        "row_category_id": "cat_stan_001",
-        "section_category_id": "cat_inte_001"
-      },
-      {
-        "option_id": "opt_r9w_001",
-        "rpo": "R9W",
-        "section_id": "sec_onst_001",
-        "row_category_id": "cat_stan_001",
-        "section_category_id": "cat_inte_001"
-      },
-      {
-        "option_id": "opt_r9y_001",
-        "rpo": "R9Y",
-        "section_id": "sec_onst_001",
-        "row_category_id": "cat_stan_001",
-        "section_category_id": "cat_inte_001"
-      },
-      {
-        "option_id": "opt_u2k_001",
-        "rpo": "U2K",
         "section_id": "sec_onst_001",
         "row_category_id": "cat_stan_001",
         "section_category_id": "cat_inte_001"
@@ -6904,13 +6736,6 @@
       {
         "option_id": "opt_cfl_001",
         "rpo": "CFL",
-        "section_id": "sec_perf_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_cfv_001",
-        "rpo": "CFV",
         "section_id": "sec_perf_001",
         "row_category_id": "cat_exte_001",
         "section_category_id": "cat_mech_001"
@@ -7968,48 +7793,6 @@
       "variant_id": "3lt_e67",
       "section_id": "sec_inte_001",
       "option_name": "Performance data and video recorder"
-    },
-    {
-      "option_id": "opt_u2k_001",
-      "rpo": "U2K",
-      "variant_id": "1lt_e07",
-      "section_id": "sec_onst_001",
-      "option_name": "SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road."
-    },
-    {
-      "option_id": "opt_u2k_001",
-      "rpo": "U2K",
-      "variant_id": "2lt_e07",
-      "section_id": "sec_onst_001",
-      "option_name": "SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road."
-    },
-    {
-      "option_id": "opt_u2k_001",
-      "rpo": "U2K",
-      "variant_id": "3lt_e07",
-      "section_id": "sec_onst_001",
-      "option_name": "SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road."
-    },
-    {
-      "option_id": "opt_u2k_001",
-      "rpo": "U2K",
-      "variant_id": "1lt_e67",
-      "section_id": "sec_onst_001",
-      "option_name": "SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road."
-    },
-    {
-      "option_id": "opt_u2k_001",
-      "rpo": "U2K",
-      "variant_id": "2lt_e67",
-      "section_id": "sec_onst_001",
-      "option_name": "SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road."
-    },
-    {
-      "option_id": "opt_u2k_001",
-      "rpo": "U2K",
-      "variant_id": "3lt_e67",
-      "section_id": "sec_onst_001",
-      "option_name": "SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road."
     },
     {
       "option_id": "opt_u5g_001",
@@ -10834,6 +10617,7 @@
       "variant_id": "1lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_1lte_001"
     },
     {
@@ -10843,6 +10627,17 @@
       "variant_id": "2lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "3lt_e07__opt_aq9_004",
+      "option_id": "opt_aq9_004",
+      "rpo": "AQ9",
+      "variant_id": "3lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_1lte_001"
     },
     {
@@ -10852,6 +10647,7 @@
       "variant_id": "1lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_1lte_001"
     },
     {
@@ -10861,6 +10657,17 @@
       "variant_id": "2lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "3lt_e67__opt_aq9_004",
+      "option_id": "opt_aq9_004",
+      "rpo": "AQ9",
+      "variant_id": "3lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_1lte_001"
     },
     {
@@ -10870,6 +10677,27 @@
       "variant_id": "1lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "2lt_e07__opt_dwk_001",
+      "option_id": "opt_dwk_001",
+      "rpo": "DWK",
+      "variant_id": "2lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "3lt_e07__opt_dwk_001",
+      "option_id": "opt_dwk_001",
+      "rpo": "DWK",
+      "variant_id": "3lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_1lte_001"
     },
     {
@@ -10879,6 +10707,27 @@
       "variant_id": "1lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "2lt_e67__opt_dwk_001",
+      "option_id": "opt_dwk_001",
+      "rpo": "DWK",
+      "variant_id": "2lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "3lt_e67__opt_dwk_001",
+      "option_id": "opt_dwk_001",
+      "rpo": "DWK",
+      "variant_id": "3lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_1lte_001"
     },
     {
@@ -10888,6 +10737,27 @@
       "variant_id": "1lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "2lt_e07__opt_k7a_001",
+      "option_id": "opt_k7a_001",
+      "rpo": "K7A",
+      "variant_id": "2lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "3lt_e07__opt_k7a_001",
+      "option_id": "opt_k7a_001",
+      "rpo": "K7A",
+      "variant_id": "3lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_1lte_001"
     },
     {
@@ -10897,6 +10767,27 @@
       "variant_id": "1lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "2lt_e67__opt_k7a_001",
+      "option_id": "opt_k7a_001",
+      "rpo": "K7A",
+      "variant_id": "2lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "3lt_e67__opt_k7a_001",
+      "option_id": "opt_k7a_001",
+      "rpo": "K7A",
+      "variant_id": "3lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_1lte_001"
     },
     {
@@ -10906,6 +10797,27 @@
       "variant_id": "1lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "2lt_e07__opt_uqs_001",
+      "option_id": "opt_uqs_001",
+      "rpo": "UQS",
+      "variant_id": "2lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "3lt_e07__opt_uqs_001",
+      "option_id": "opt_uqs_001",
+      "rpo": "UQS",
+      "variant_id": "3lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_1lte_001"
     },
     {
@@ -10915,6 +10827,27 @@
       "variant_id": "1lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "2lt_e67__opt_uqs_001",
+      "option_id": "opt_uqs_001",
+      "rpo": "UQS",
+      "variant_id": "2lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "3lt_e67__opt_uqs_001",
+      "option_id": "opt_uqs_001",
+      "rpo": "UQS",
+      "variant_id": "3lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_1lte_001"
     },
     {
@@ -10924,6 +10857,27 @@
       "variant_id": "1lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "2lt_e07__opt_uvb_001",
+      "option_id": "opt_uvb_001",
+      "rpo": "UVB",
+      "variant_id": "2lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "3lt_e07__opt_uvb_001",
+      "option_id": "opt_uvb_001",
+      "rpo": "UVB",
+      "variant_id": "3lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_1lte_001"
     },
     {
@@ -10933,7 +10887,38 @@
       "variant_id": "1lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "2lt_e67__opt_uvb_001",
+      "option_id": "opt_uvb_001",
+      "rpo": "UVB",
+      "variant_id": "2lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "3lt_e67__opt_uvb_001",
+      "option_id": "opt_uvb_001",
+      "rpo": "UVB",
+      "variant_id": "3lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_1lte_001"
+    },
+    {
+      "choice_id": "1lt_e07__opt_ahe_001",
+      "option_id": "opt_ahe_001",
+      "rpo": "AHE",
+      "variant_id": "1lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
     },
     {
       "choice_id": "2lt_e07__opt_ahe_001",
@@ -10942,6 +10927,7 @@
       "variant_id": "2lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -10951,6 +10937,17 @@
       "variant_id": "3lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e67__opt_ahe_001",
+      "option_id": "opt_ahe_001",
+      "rpo": "AHE",
+      "variant_id": "1lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -10960,6 +10957,7 @@
       "variant_id": "2lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -10969,6 +10967,17 @@
       "variant_id": "3lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e07__opt_ahh_001",
+      "option_id": "opt_ahh_001",
+      "rpo": "AHH",
+      "variant_id": "1lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -10978,6 +10987,7 @@
       "variant_id": "2lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -10987,6 +10997,17 @@
       "variant_id": "3lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e67__opt_ahh_001",
+      "option_id": "opt_ahh_001",
+      "rpo": "AHH",
+      "variant_id": "1lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -10996,6 +11017,7 @@
       "variant_id": "2lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11005,6 +11027,17 @@
       "variant_id": "3lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e07__opt_al9_001",
+      "option_id": "opt_al9_001",
+      "rpo": "AL9",
+      "variant_id": "1lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11014,6 +11047,7 @@
       "variant_id": "2lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11023,6 +11057,17 @@
       "variant_id": "3lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e67__opt_al9_001",
+      "option_id": "opt_al9_001",
+      "rpo": "AL9",
+      "variant_id": "1lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11032,6 +11077,7 @@
       "variant_id": "2lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11041,6 +11087,17 @@
       "variant_id": "3lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e07__opt_ap9_001",
+      "option_id": "opt_ap9_001",
+      "rpo": "AP9",
+      "variant_id": "1lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11050,6 +11107,7 @@
       "variant_id": "2lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11059,6 +11117,17 @@
       "variant_id": "3lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e67__opt_ap9_001",
+      "option_id": "opt_ap9_001",
+      "rpo": "AP9",
+      "variant_id": "1lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11068,6 +11137,7 @@
       "variant_id": "2lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11077,6 +11147,17 @@
       "variant_id": "3lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e07__opt_aq9_003",
+      "option_id": "opt_aq9_003",
+      "rpo": "AQ9",
+      "variant_id": "1lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11086,6 +11167,27 @@
       "variant_id": "2lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "3lt_e07__opt_aq9_003",
+      "option_id": "opt_aq9_003",
+      "rpo": "AQ9",
+      "variant_id": "3lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e67__opt_aq9_003",
+      "option_id": "opt_aq9_003",
+      "rpo": "AQ9",
+      "variant_id": "1lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11095,6 +11197,27 @@
       "variant_id": "2lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "3lt_e67__opt_aq9_003",
+      "option_id": "opt_aq9_003",
+      "rpo": "AQ9",
+      "variant_id": "3lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e07__opt_aqa_001",
+      "option_id": "opt_aqa_001",
+      "rpo": "AQA",
+      "variant_id": "1lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11104,6 +11227,7 @@
       "variant_id": "2lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11113,6 +11237,17 @@
       "variant_id": "3lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e67__opt_aqa_001",
+      "option_id": "opt_aqa_001",
+      "rpo": "AQA",
+      "variant_id": "1lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11122,6 +11257,7 @@
       "variant_id": "2lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11131,6 +11267,17 @@
       "variant_id": "3lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e07__opt_at9_001",
+      "option_id": "opt_at9_001",
+      "rpo": "AT9",
+      "variant_id": "1lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11140,6 +11287,7 @@
       "variant_id": "2lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11149,6 +11297,17 @@
       "variant_id": "3lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e67__opt_at9_001",
+      "option_id": "opt_at9_001",
+      "rpo": "AT9",
+      "variant_id": "1lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11158,6 +11317,7 @@
       "variant_id": "2lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11167,6 +11327,17 @@
       "variant_id": "3lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e07__opt_dyx_001",
+      "option_id": "opt_dyx_001",
+      "rpo": "DYX",
+      "variant_id": "1lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11176,6 +11347,7 @@
       "variant_id": "2lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11185,6 +11357,17 @@
       "variant_id": "3lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e67__opt_dyx_001",
+      "option_id": "opt_dyx_001",
+      "rpo": "DYX",
+      "variant_id": "1lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11194,6 +11377,7 @@
       "variant_id": "2lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11203,6 +11387,17 @@
       "variant_id": "3lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e07__opt_k7b_001",
+      "option_id": "opt_k7b_001",
+      "rpo": "K7B",
+      "variant_id": "1lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11212,6 +11407,7 @@
       "variant_id": "2lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11221,6 +11417,17 @@
       "variant_id": "3lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e67__opt_k7b_001",
+      "option_id": "opt_k7b_001",
+      "rpo": "K7B",
+      "variant_id": "1lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11230,6 +11437,7 @@
       "variant_id": "2lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11239,6 +11447,17 @@
       "variant_id": "3lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e07__opt_ki3_001",
+      "option_id": "opt_ki3_001",
+      "rpo": "KI3",
+      "variant_id": "1lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11248,6 +11467,7 @@
       "variant_id": "2lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11257,6 +11477,17 @@
       "variant_id": "3lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e67__opt_ki3_001",
+      "option_id": "opt_ki3_001",
+      "rpo": "KI3",
+      "variant_id": "1lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11266,6 +11497,7 @@
       "variant_id": "2lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11275,6 +11507,17 @@
       "variant_id": "3lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e07__opt_kqv_001",
+      "option_id": "opt_kqv_001",
+      "rpo": "KQV",
+      "variant_id": "1lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11284,6 +11527,7 @@
       "variant_id": "2lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11293,6 +11537,17 @@
       "variant_id": "3lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e67__opt_kqv_001",
+      "option_id": "opt_kqv_001",
+      "rpo": "KQV",
+      "variant_id": "1lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11302,6 +11557,7 @@
       "variant_id": "2lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11311,6 +11567,17 @@
       "variant_id": "3lt_e67",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e07__opt_ufg_001",
+      "option_id": "opt_ufg_001",
+      "rpo": "UFG",
+      "variant_id": "1lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11320,6 +11587,7 @@
       "variant_id": "2lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
@@ -11329,403 +11597,18 @@
       "variant_id": "3lt_e07",
       "status": "standard",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
     },
     {
-      "choice_id": "2lt_e67__opt_ufg_001",
+      "choice_id": "1lt_e67__opt_ufg_001",
       "option_id": "opt_ufg_001",
       "rpo": "UFG",
-      "variant_id": "2lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e67__opt_ufg_001",
-      "option_id": "opt_ufg_001",
-      "rpo": "UFG",
-      "variant_id": "3lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e07__opt_uft_001",
-      "option_id": "opt_uft_001",
-      "rpo": "UFT",
-      "variant_id": "2lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e07__opt_uft_001",
-      "option_id": "opt_uft_001",
-      "rpo": "UFT",
-      "variant_id": "3lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e67__opt_uft_001",
-      "option_id": "opt_uft_001",
-      "rpo": "UFT",
-      "variant_id": "2lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e67__opt_uft_001",
-      "option_id": "opt_uft_001",
-      "rpo": "UFT",
-      "variant_id": "3lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e07__opt_ug1_001",
-      "option_id": "opt_ug1_001",
-      "rpo": "UG1",
-      "variant_id": "2lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e07__opt_ug1_001",
-      "option_id": "opt_ug1_001",
-      "rpo": "UG1",
-      "variant_id": "3lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e67__opt_ug1_001",
-      "option_id": "opt_ug1_001",
-      "rpo": "UG1",
-      "variant_id": "2lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e67__opt_ug1_001",
-      "option_id": "opt_ug1_001",
-      "rpo": "UG1",
-      "variant_id": "3lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e07__opt_uqh_001",
-      "option_id": "opt_uqh_001",
-      "rpo": "UQH",
-      "variant_id": "2lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e07__opt_uqh_001",
-      "option_id": "opt_uqh_001",
-      "rpo": "UQH",
-      "variant_id": "3lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e67__opt_uqh_001",
-      "option_id": "opt_uqh_001",
-      "rpo": "UQH",
-      "variant_id": "2lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e67__opt_uqh_001",
-      "option_id": "opt_uqh_001",
-      "rpo": "UQH",
-      "variant_id": "3lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "1lt_e07__opt_uqt_002",
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
-      "variant_id": "1lt_e07",
-      "status": "available",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e07__opt_uqt_002",
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
-      "variant_id": "2lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e07__opt_uqt_002",
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
-      "variant_id": "3lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "1lt_e67__opt_uqt_002",
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
       "variant_id": "1lt_e67",
-      "status": "available",
+      "status": "unavailable",
       "selectable": "False",
+      "active": "True",
       "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e67__opt_uqt_002",
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
-      "variant_id": "2lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e67__opt_uqt_002",
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
-      "variant_id": "3lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e07__opt_utj_001",
-      "option_id": "opt_utj_001",
-      "rpo": "UTJ",
-      "variant_id": "2lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e07__opt_utj_001",
-      "option_id": "opt_utj_001",
-      "rpo": "UTJ",
-      "variant_id": "3lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e67__opt_utj_001",
-      "option_id": "opt_utj_001",
-      "rpo": "UTJ",
-      "variant_id": "2lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e67__opt_utj_001",
-      "option_id": "opt_utj_001",
-      "rpo": "UTJ",
-      "variant_id": "3lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e07__opt_utu_001",
-      "option_id": "opt_utu_001",
-      "rpo": "UTU",
-      "variant_id": "2lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e07__opt_utu_001",
-      "option_id": "opt_utu_001",
-      "rpo": "UTU",
-      "variant_id": "3lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e67__opt_utu_001",
-      "option_id": "opt_utu_001",
-      "rpo": "UTU",
-      "variant_id": "2lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e67__opt_utu_001",
-      "option_id": "opt_utu_001",
-      "rpo": "UTU",
-      "variant_id": "3lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e07__opt_utv_001",
-      "option_id": "opt_utv_001",
-      "rpo": "UTV",
-      "variant_id": "2lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e07__opt_utv_001",
-      "option_id": "opt_utv_001",
-      "rpo": "UTV",
-      "variant_id": "3lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e67__opt_utv_001",
-      "option_id": "opt_utv_001",
-      "rpo": "UTV",
-      "variant_id": "2lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e67__opt_utv_001",
-      "option_id": "opt_utv_001",
-      "rpo": "UTV",
-      "variant_id": "3lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e07__opt_uv6_001",
-      "option_id": "opt_uv6_001",
-      "rpo": "UV6",
-      "variant_id": "2lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e07__opt_uv6_001",
-      "option_id": "opt_uv6_001",
-      "rpo": "UV6",
-      "variant_id": "3lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e67__opt_uv6_001",
-      "option_id": "opt_uv6_001",
-      "rpo": "UV6",
-      "variant_id": "2lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e67__opt_uv6_001",
-      "option_id": "opt_uv6_001",
-      "rpo": "UV6",
-      "variant_id": "3lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e07__opt_uva_001",
-      "option_id": "opt_uva_001",
-      "rpo": "UVA",
-      "variant_id": "2lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e07__opt_uva_001",
-      "option_id": "opt_uva_001",
-      "rpo": "UVA",
-      "variant_id": "3lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e67__opt_uva_001",
-      "option_id": "opt_uva_001",
-      "rpo": "UVA",
-      "variant_id": "2lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e67__opt_uva_001",
-      "option_id": "opt_uva_001",
-      "rpo": "UVA",
-      "variant_id": "3lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e07__opt_ah2_003",
-      "option_id": "opt_ah2_003",
-      "rpo": "AH2",
-      "variant_id": "2lt_e07",
-      "status": "available",
-      "selectable": "False",
-      "section_id": "sec_3lte_001"
-    },
-    {
-      "choice_id": "3lt_e07__opt_ah2_003",
-      "option_id": "opt_ah2_003",
-      "rpo": "AH2",
-      "variant_id": "3lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_3lte_001"
-    },
-    {
-      "choice_id": "2lt_e67__opt_ah2_003",
-      "option_id": "opt_ah2_003",
-      "rpo": "AH2",
-      "variant_id": "2lt_e67",
-      "status": "available",
-      "selectable": "False",
-      "section_id": "sec_3lte_001"
-    },
-    {
-      "choice_id": "3lt_e67__opt_ah2_003",
-      "option_id": "opt_ah2_003",
-      "rpo": "AH2",
-      "variant_id": "3lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "section_id": "sec_3lte_001"
     }
   ],
   "rule_detail_hot_spots": {
@@ -13330,6 +13213,6 @@
   "unknown_status_cells": [],
   "warnings": [
     "Configured Grand Sport variants are present but inactive in variant_master, preserving the live Stingray-only generator path: 1lt_e07, 1lt_e67, 2lt_e07, 2lt_e67, 3lt_e07, 3lt_e67.",
-    "Section/category mismatches: 62."
+    "Section/category mismatches: 55."
   ]
 }

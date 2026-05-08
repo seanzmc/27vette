@@ -142,6 +142,10 @@ const expectedGrandSportExclusiveGroups = [
     groupId: "gs_excl_suede_compartment_liners",
     optionIds: ["opt_sxb_001", "opt_sxr_001", "opt_sxt_001"],
   },
+  {
+    groupId: "gs_excl_ground_effects",
+    optionIds: ["opt_cfl_001", "opt_cfz_001"],
+  },
 ];
 
 const expectedStingrayExclusiveGroups = [

@@ -43,6 +43,10 @@ const expectedGrandSportExclusiveGroups = [
     group_id: "gs_excl_suede_compartment_liners",
     option_ids: ["opt_sxb_001", "opt_sxr_001", "opt_sxt_001"],
   },
+  {
+    group_id: "gs_excl_ground_effects",
+    option_ids: ["opt_cfl_001", "opt_cfz_001"],
+  },
 ];
 
 test("Grand Sport draft preserves the live generated-data top-level contract", () => {
@@ -76,21 +80,31 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
   assert.equal(draft.variants.length, 6);
   assert.equal(draft.contextChoices.length, 8);
   assert.equal(draft.steps.length, 14);
-  assert.equal(draft.choices.length, 1614);
-  assert.equal(draft.standardEquipment.length, 545);
-  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 873);
-  assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 545);
-  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 196);
+  assert.equal(draft.choices.length, 1530);
+  assert.equal(draft.standardEquipment.length, 539);
+  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 809);
+  assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 539);
+  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 182);
 });
 
-test("Grand Sport draft defers non-normalized surfaces with explicit validation warnings", () => {
+test("Grand Sport draft emits color overrides while deferring price rules", () => {
   assert.equal(draft.rules.length > 0, true, "Grand Sport draft should include normalized compatibility rules");
   assert.deepEqual(draft.priceRules, []);
-  assert.deepEqual(draft.colorOverrides, []);
+  assert.equal(draft.colorOverrides.length, 245);
+  assert.ok(
+    draft.colorOverrides.some(
+      (override) =>
+        override.interior_id === "3LT_R6X_AH2_HZP_N26" &&
+        override.option_id === "opt_379_001" &&
+        override.adds_rpo === "opt_d30_001"
+    ),
+    "seatbelt color override rows should auto-add D30 like Stingray"
+  );
   const warnings = new Set(draft.validation.filter((row) => row.severity === "warning").map((row) => row.check_id));
   assert.ok(warnings.has("grand_sport_draft_status"));
   assert.ok(warnings.has("pricing_deferred"));
   assert.equal(warnings.has("rules_deferred"), false);
+  assert.equal(warnings.has("color_overrides"), false);
 });
 
 test("Grand Sport draft emits the approved model-scoped exclusive groups", () => {
@@ -123,21 +137,40 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
 
   for (const key of [
     "opt_5jr_001::includes::opt_drg_001::::active",
-    "opt_cfl_001::excludes::opt_cfz_001::::active",
     "opt_j6l_001::requires::opt_j57_001::::active",
     "opt_j57_001::includes::opt_j6d_001::::active",
     "opt_t0f_001::requires::opt_j57_001::::active",
     "opt_fey_001::includes::opt_t0f_001::::active",
     "opt_t0f_001::includes::opt_cfz_001::::active",
+    "opt_bv4_001::excludes::opt_r8c_001::::active",
+    "opt_r88_001::excludes::opt_eyk_001::::active",
+    "opt_sfz_001::excludes::opt_eyk_001::::active",
     "opt_bc4_001::requires::opt_b6p_001::coupe::active",
     "opt_bc4_001::requires::opt_zz3_001::convertible::active",
   ]) {
     assert.ok(ruleKeys.has(key), `${key} should be generated`);
   }
 
-  const cflRule = draft.rules.find((rule) => rule.source_id === "opt_cfl_001" && rule.target_id === "opt_cfz_001");
-  assert.match(cflRule.source_note, /Not available with/);
-  assert.equal(cflRule.active, "True");
+  const groundEffectsGroup = draft.exclusiveGroups.find((group) => group.group_id === "gs_excl_ground_effects");
+  assert.deepEqual(JSON.parse(JSON.stringify(groundEffectsGroup.option_ids)), ["opt_cfl_001", "opt_cfz_001"]);
+});
+
+test("Grand Sport draft suppresses reviewed inactive/deferred option rows without hiding selectable seatbelts", () => {
+  const optionIds = new Set(draft.choices.map((choice) => choice.option_id));
+  for (const optionId of ["opt_36s_001", "opt_37s_001", "opt_38s_001", "opt_aup_001", "opt_r6p_001", "opt_r9v_001", "opt_r9w_001", "opt_r9y_001", "opt_u2k_001", "opt_cfv_001"]) {
+    assert.equal(optionIds.has(optionId), false, `${optionId} should not be emitted as an active Grand Sport option`);
+  }
+  for (const optionId of ["opt_379_001", "opt_3a9_001", "opt_3f9_001", "opt_3m9_001", "opt_3n9_001"]) {
+    assert.equal(optionIds.has(optionId), true, `${optionId} should remain selectable for Grand Sport`);
+  }
+
+  const d30 = draft.choices.find((choice) => choice.option_id === "opt_d30_001");
+  assert.equal(d30.active, "True");
+  assert.equal(d30.selectable, "False");
+
+  const r6xChoices = draft.choices.filter((choice) => choice.option_id === "opt_r6x_001");
+  assert.equal(r6xChoices.length, 6);
+  assert.equal(r6xChoices.every((choice) => choice.active === "False" && choice.selectable === "False"), true);
 });
 
 test("Grand Sport draft includes model-scoped LT interiors with EL9 launch edition metadata", () => {
@@ -176,14 +209,11 @@ test("Grand Sport draft keeps normalized display fields and raw rule evidence", 
 });
 
 test("Grand Sport draft preserves rule hot spots and normalization metadata for later phases", () => {
-  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1418);
-  assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1614);
+  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1354);
+  assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1530);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 123);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 26);
-  assert.equal(draft.draftMetadata.normalization.sectionCategoryResolutions.length, 62);
+  assert.equal(draft.draftMetadata.normalization.sectionCategoryResolutions.length, 55);
   assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);
-  assert.deepEqual(draft.draftMetadata.deferredSurfaces, [
-    "priceRules",
-    "colorOverrides",
-  ]);
+  assert.deepEqual(draft.draftMetadata.deferredSurfaces, ["priceRules"]);
 });

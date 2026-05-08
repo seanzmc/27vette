@@ -18,6 +18,13 @@ from corvette_form_generator.model_configs import GRAND_SPORT_MODEL
 
 def main() -> None:
     config = GRAND_SPORT_MODEL
+    rule_audit_path = config.output_dir / "inspection" / "grand-sport-rule-audit.json"
+    rule_audit_markdown_path = config.output_dir / "inspection" / "grand-sport-rule-audit.md"
+    rule_audit_artifacts = {}
+    if rule_audit_path.exists():
+        rule_audit_artifacts["json"] = str(rule_audit_path)
+    if rule_audit_markdown_path.exists():
+        rule_audit_artifacts["markdown"] = str(rule_audit_markdown_path)
     report = inspect_model_sources(config)
     artifact_paths = write_inspection_artifacts(report, config.output_dir / "inspection")
     preview = build_contract_preview(config)
@@ -64,6 +71,7 @@ def main() -> None:
                     "validation_warnings": sum(1 for row in draft["validation"] if row["severity"] == "warning"),
                 },
                 "draft_artifacts": draft_artifact_paths,
+                "rule_audit_artifacts": rule_audit_artifacts,
                 "notes": list(config.notes),
             },
             indent=2,

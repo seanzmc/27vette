@@ -1,6 +1,6 @@
 # Grand Sport Form Data Draft
 
-Generated: `2026-05-08T04:09:52+00:00`
+Generated: `2026-05-08T13:54:29+00:00`
 Status: `draft_not_runtime_active`
 Source sheet: `grandSport_options`
 
@@ -9,20 +9,20 @@ Source sheet: `grandSport_options`
 - Variants: 6
 - Context choices: 8
 - Steps: 14
-- Sections: 34
-- Choices: 1614
-- Standard equipment rows: 545
+- Sections: 33
+- Choices: 1530
+- Standard equipment rows: 539
 - Rule groups: 0 (workbook-backed)
-- Exclusive groups: 5 (workbook-backed)
-- Rules: 224 (workbook-backed)
+- Exclusive groups: 6 (workbook-backed)
+- Rules: 219 (workbook-backed)
 - Price rules: 0 (deferred)
 - Interiors: 132 (model-scoped)
-- Color overrides: 0 (deferred)
+- Color overrides: 245
 
 ## Draft Notes
 
-- Candidate available/standard choices from preview: 1418
-- Full variant-matrix draft choices: 1614
+- Candidate available/standard choices from preview: 1354
+- Full variant-matrix draft choices: 1530
 - Rule/detail hot spot rows preserved: 123
 - Unresolved normalization issues: 0
 
