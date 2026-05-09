@@ -122,6 +122,8 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
   const workbookOptions = workbookRows("grandSport_options");
   const workbookExclusiveMembers = workbookRows("grandSport_exclusive_members");
   const workbookRules = workbookRows("grandSport_rule_mapping");
+  const workbookRuleGroups = workbookRows("grandSport_rule_groups");
+  const workbookRuleGroupMembers = workbookRows("grandSport_rule_group_members");
   const groundEffectMembers = workbookExclusiveMembers.filter((row) => row.group_id === "gs_excl_ground_effects");
   assert.deepEqual(
     groundEffectMembers.map((row) => row.option_id),
@@ -147,15 +149,35 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
     false,
     "stripe/hash rows should not retain backwards paint-color requires rules"
   );
+  assert.equal(
+    workbookRules.some((row) => row.source_id === "opt_z15_001" && row.rule_type === "requires"),
+    false,
+    "Z15 should not retain separate hard requirements for every heritage hash/stripe option"
+  );
+
+  const z15Group = workbookRuleGroups.find((row) => row.group_id === "gs_grp_z15_hash_mark_requirement");
+  assert.ok(z15Group, "Z15 hash mark requires_any group should be authored in the workbook");
+  assert.equal(z15Group.group_type, "requires_any");
+  assert.equal(z15Group.source_id, "opt_z15_001");
+  assert.deepEqual(
+    workbookRuleGroupMembers
+      .filter((row) => row.group_id === "gs_grp_z15_hash_mark_requirement")
+      .map((row) => row.target_id),
+    ["opt_17a_001", "opt_20a_001", "opt_55a_001", "opt_75a_001", "opt_97a_001", "opt_dx4_001"]
+  );
 
   const draftRuleKeys = new Set(draft.rules.map((rule) => `${rule.source_id}::${rule.rule_type}::${rule.target_id}`));
   for (const key of [
     "opt_bv4_001::excludes::opt_r8c_001",
     "opt_r88_001::excludes::opt_eyk_001",
     "opt_sfz_001::excludes::opt_eyk_001",
+    "opt_fey_001::includes::opt_cfz_001",
   ]) {
     assert.ok(draftRuleKeys.has(key), `${key} should be present`);
   }
+
+  const z52Members = workbookExclusiveMembers.filter((row) => row.group_id === "gs_excl_z52_packages");
+  assert.deepEqual(z52Members.map((row) => row.option_id), ["opt_feb_001", "opt_fey_001"]);
 });
 
 test("Grand Sport rule audit highlights risky duplicate RPO and special package surfaces", () => {

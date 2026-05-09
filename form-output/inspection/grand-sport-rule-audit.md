@@ -1,16 +1,16 @@
 # Grand Sport Rule Audit
 
-Generated: `2026-05-09T02:32:17+00:00`
+Generated: `2026-05-09T03:52:21+00:00`
 Status: `rule_audit_generated`
 
 ## Summary
 
-- Workbook rule rows: 214
-- Expected draft runtime rules: 207
-- Omitted duplicate exclusive-group rules: 7
+- Workbook rule rows: 206
+- Expected draft runtime rules: 197
+- Omitted duplicate exclusive-group rules: 9
 - Raw detail candidate keys: 243
-- Workbook rules matching detail raw: 110
-- Workbook manual/approved/copied rules: 104
+- Workbook rules matching detail raw: 99
+- Workbook manual/approved/copied rules: 107
 - Skipped/review rows: 1
 - Unresolved non-interior RPO mentions: 4
 
@@ -80,7 +80,7 @@ Status: `rule_audit_generated`
 - `gs_rule_opt_cf8_001_excludes_opt_dmy_001`: opt_cf8_001 excludes opt_dmy_001
 - `gs_rule_opt_cfl_001_excludes_opt_cfz_001`: opt_cfl_001 excludes opt_cfz_001
 - `gs_rule_opt_dmu_001_requires_opt_d84_001`: opt_dmu_001 requires opt_d84_001
-- ... 75 more
+- ... 64 more
 
 ## Omitted Duplicate Exclusive Group Rules
 
@@ -91,6 +91,8 @@ Status: `rule_audit_generated`
 - `gs_copy_rule_opt_rin_001_excludes_opt_sl8_001_opt_rin_001_excludes_opt_sl8_001`: opt_rin_001 excludes opt_sl8_001
 - `gs_copy_rule_opt_sl8_001_excludes_opt_rik_001_opt_sl8_001_excludes_opt_rik_001`: opt_sl8_001 excludes opt_rik_001
 - `gs_copy_rule_opt_sl8_001_excludes_opt_rin_001_opt_sl8_001_excludes_opt_rin_001`: opt_sl8_001 excludes opt_rin_001
+- `gs_rule_opt_fey_001_excludes_opt_feb_001`: opt_fey_001 excludes opt_feb_001
+- `gs_rule_opt_feb_001_excludes_opt_fey_001`: opt_feb_001 excludes opt_fey_001
 
 ## Skipped Requires Review
 

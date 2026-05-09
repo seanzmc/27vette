@@ -6,7 +6,7 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-05-09T02:32:17+00:00",
+    "generated_at": "2026-05-09T03:52:21+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
@@ -14,15 +14,15 @@
     "rawDetailRuleCandidates": 243,
     "rawDetailCandidateKeys": 243,
     "dedupedOrSelfReferenceCandidates": 0,
-    "finalWorkbookRuleRows": 214,
-    "expectedDraftRuntimeRules": 207,
-    "omittedDuplicateExclusiveGroup": 7,
+    "finalWorkbookRuleRows": 206,
+    "expectedDraftRuntimeRules": 197,
+    "omittedDuplicateExclusiveGroup": 9,
     "skippedRequiresReview": 1,
     "unresolvedRpoMentions": 4,
-    "exclusiveGroups": 6,
-    "exclusiveGroupMembers": 21,
-    "workbookRulesMatchingDetailRaw": 110,
-    "workbookManualOrApprovedRules": 104
+    "exclusiveGroups": 7,
+    "exclusiveGroupMembers": 23,
+    "workbookRulesMatchingDetailRaw": 99,
+    "workbookManualOrApprovedRules": 107
   },
   "sourceSheets": {
     "optionSheet": "grandSport_options",
@@ -1578,94 +1578,6 @@
       "target_id": "opt_z15_001",
       "body_style_scope": "",
       "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_z15_001_requires_opt_17a_001",
-      "source_id": "opt_z15_001",
-      "rule_type": "requires",
-      "target_id": "opt_17a_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_z15_001_requires_opt_20a_001",
-      "source_id": "opt_z15_001",
-      "rule_type": "requires",
-      "target_id": "opt_20a_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_z15_001_requires_opt_55a_001",
-      "source_id": "opt_z15_001",
-      "rule_type": "requires",
-      "target_id": "opt_55a_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_z15_001_requires_opt_75a_001",
-      "source_id": "opt_z15_001",
-      "rule_type": "requires",
-      "target_id": "opt_75a_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_z15_001_requires_opt_97a_001",
-      "source_id": "opt_z15_001",
-      "rule_type": "requires",
-      "target_id": "opt_97a_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_z15_001_requires_opt_dmu_001",
-      "source_id": "opt_z15_001",
-      "rule_type": "requires",
-      "target_id": "opt_dmu_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_z15_001_requires_opt_dmv_001",
-      "source_id": "opt_z15_001",
-      "rule_type": "requires",
-      "target_id": "opt_dmv_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_z15_001_requires_opt_dmw_001",
-      "source_id": "opt_z15_001",
-      "rule_type": "requires",
-      "target_id": "opt_dmw_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_z15_001_requires_opt_dmx_001",
-      "source_id": "opt_z15_001",
-      "rule_type": "requires",
-      "target_id": "opt_dmx_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_z15_001_requires_opt_dmy_001",
-      "source_id": "opt_z15_001",
-      "rule_type": "requires",
-      "target_id": "opt_dmy_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_z15_001_requires_opt_dx4_001",
-      "source_id": "opt_z15_001",
-      "rule_type": "requires",
-      "target_id": "opt_dx4_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
     }
   ],
   "omittedDeduped": [],
@@ -1802,6 +1714,44 @@
       "runtime_action": "",
       "disabled_reason": "",
       "_audit_origin": "workbook_copied_from_stingray"
+    },
+    {
+      "rule_id": "gs_rule_opt_fey_001_excludes_opt_feb_001",
+      "source_id": "opt_fey_001",
+      "rule_type": "excludes",
+      "target_id": "opt_feb_001",
+      "target_type": "option",
+      "original_detail_raw": "FEY Z52 Track Performance Package and FEB Z52 Sport Performance Package are mutually exclusive.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_perf_001",
+      "source_section": "sec_perf_001",
+      "generation_action": "",
+      "body_style_scope": "",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_manual_or_normalized"
+    },
+    {
+      "rule_id": "gs_rule_opt_feb_001_excludes_opt_fey_001",
+      "source_id": "opt_feb_001",
+      "rule_type": "excludes",
+      "target_id": "opt_fey_001",
+      "target_type": "option",
+      "original_detail_raw": "FEB Z52 Sport Performance Package and FEY Z52 Track Performance Package are mutually exclusive.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_perf_001",
+      "source_section": "sec_perf_001",
+      "generation_action": "",
+      "body_style_scope": "",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_manual_or_normalized"
     }
   ],
   "skippedRequiresReview": [

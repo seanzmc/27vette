@@ -146,6 +146,10 @@ const expectedGrandSportExclusiveGroups = [
     groupId: "gs_excl_ground_effects",
     optionIds: ["opt_cfl_001", "opt_cfz_001"],
   },
+  {
+    groupId: "gs_excl_z52_packages",
+    optionIds: ["opt_feb_001", "opt_fey_001"],
+  },
 ];
 
 const expectedStingrayExclusiveGroups = [

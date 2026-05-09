@@ -47,6 +47,10 @@ const expectedGrandSportExclusiveGroups = [
     group_id: "gs_excl_ground_effects",
     option_ids: ["opt_cfl_001", "opt_cfz_001"],
   },
+  {
+    group_id: "gs_excl_z52_packages",
+    option_ids: ["opt_feb_001", "opt_fey_001"],
+  },
 ];
 
 test("Grand Sport draft preserves the live generated-data top-level contract", () => {
@@ -141,6 +145,7 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
     "opt_j57_001::includes::opt_j6d_001::::active",
     "opt_t0f_001::requires::opt_j57_001::::active",
     "opt_fey_001::includes::opt_t0f_001::::active",
+    "opt_fey_001::includes::opt_cfz_001::::active",
     "opt_t0f_001::includes::opt_cfz_001::::active",
     "opt_bv4_001::excludes::opt_r8c_001::::active",
     "opt_r88_001::excludes::opt_eyk_001::::active",
@@ -153,6 +158,20 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
 
   const groundEffectsGroup = draft.exclusiveGroups.find((group) => group.group_id === "gs_excl_ground_effects");
   assert.deepEqual(JSON.parse(JSON.stringify(groundEffectsGroup.option_ids)), ["opt_cfl_001", "opt_cfz_001"]);
+
+  const z15RuleGroup = draft.ruleGroups.find((group) => group.group_id === "gs_grp_z15_hash_mark_requirement");
+  assert.ok(z15RuleGroup, "Z15 should use the workbook-backed requires_any group");
+  assert.equal(z15RuleGroup.group_type, "requires_any");
+  assert.equal(z15RuleGroup.source_id, "opt_z15_001");
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(z15RuleGroup.target_ids)),
+    ["opt_17a_001", "opt_20a_001", "opt_55a_001", "opt_75a_001", "opt_97a_001", "opt_dx4_001"]
+  );
+  assert.equal(
+    [...ruleKeys].some((key) => key.startsWith("opt_z15_001::requires::")),
+    false,
+    "Z15 should not require every heritage hash/stripe option as separate hard requirements"
+  );
 });
 
 test("Grand Sport draft suppresses reviewed inactive/deferred option rows without hiding selectable seatbelts", () => {
