@@ -6,13 +6,13 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-05-09T19:38:34+00:00",
+    "generated_at": "2026-05-09T20:32:28+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
     "copiedRuleCandidates": 94,
-    "rawDetailRuleCandidates": 233,
-    "rawDetailCandidateKeys": 233,
+    "rawDetailRuleCandidates": 232,
+    "rawDetailCandidateKeys": 232,
     "dedupedOrSelfReferenceCandidates": 0,
     "finalWorkbookRuleRows": 314,
     "expectedDraftRuntimeRules": 288,
@@ -2013,83 +2013,10 @@
   "reviewHotSpots": {
     "duplicateRpos": [
       {
-        "rpo": "719",
-        "option_ids": [
-          "opt_719_001",
-          "opt_719_002"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      },
-      {
-        "rpo": "AH2",
-        "option_ids": [
-          "opt_ah2_003",
-          "opt_ah2_001"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      },
-      {
         "rpo": "AQ9",
         "option_ids": [
-          "opt_aq9_004",
           "opt_aq9_003",
           "opt_aq9_001"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      },
-      {
-        "rpo": "CF7",
-        "option_ids": [
-          "opt_cf7_001",
-          "opt_cf7_002"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      },
-      {
-        "rpo": "CM9",
-        "option_ids": [
-          "opt_cm9_001",
-          "opt_cm9_002"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      },
-      {
-        "rpo": "EFR",
-        "option_ids": [
-          "opt_efr_001",
-          "opt_efr_002"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      },
-      {
-        "rpo": "EYT",
-        "option_ids": [
-          "opt_eyt_001",
-          "opt_eyt_002"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      },
-      {
-        "rpo": "J6A",
-        "option_ids": [
-          "opt_j6a_001",
-          "opt_j6a_002"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      },
-      {
-        "rpo": "NGA",
-        "option_ids": [
-          "opt_nga_001",
-          "opt_nga_002"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      },
-      {
-        "rpo": "SWM",
-        "option_ids": [
-          "opt_swm_002",
-          "opt_swm_001"
         ],
         "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
       },
@@ -2277,14 +2204,6 @@
           "FEY"
         ],
         "detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
-      },
-      {
-        "option_id": "opt_719_002",
-        "rpo": "719",
-        "mentioned_rpos": [
-          "EL9"
-        ],
-        "detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color."
       },
       {
         "option_id": "opt_sht_001",

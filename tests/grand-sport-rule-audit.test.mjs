@@ -199,7 +199,9 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
 test("Grand Sport rule audit highlights risky duplicate RPO and special package surfaces", () => {
   assert.equal(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "BC4"), false);
   assert.equal(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "BCP"), false);
-  assert.ok(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "AH2"));
+  assert.equal(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "AH2"), false);
+  assert.ok(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "AQ9"));
+  assert.ok(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "UQT"));
   assert.ok(audit.reviewHotSpots.specialPackageMentions.some((row) => row.rpo === "FEY"));
   assert.ok(audit.reviewHotSpots.specialPackageMentions.some((row) => row.mentioned_rpos.includes("Z25")));
 

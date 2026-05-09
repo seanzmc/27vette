@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-09T19:38:34+00:00",
+  "generated_at": "2026-05-09T20:32:29+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -102,15 +102,15 @@
     "unique_rpos": 223,
     "variant_status_cells": 1614,
     "status_source_rows": 1614,
-    "candidate_choice_rows_available_or_standard": 1446,
-    "candidate_standard_equipment_cells": 507,
-    "candidate_standard_option_rows": 102,
+    "candidate_choice_rows_available_or_standard": 1386,
+    "candidate_standard_equipment_cells": 459,
+    "candidate_standard_option_rows": 92,
     "selectable_counts": {
       "False": 108,
       "True": 161
     },
-    "active_option_rows_available_or_standard": 241,
-    "inactive_option_rows_all_unavailable_or_blank": 28,
+    "active_option_rows_available_or_standard": 231,
+    "inactive_option_rows_all_unavailable_or_blank": 38,
     "status_counts": {
       "available": 873,
       "standard": 545,
@@ -4147,14 +4147,6 @@
   "section_mappings": {
     "rows": [
       {
-        "option_id": "opt_aq9_004",
-        "rpo": "AQ9",
-        "section_id": "sec_1lte_001",
-        "original_section_id": "sec_1lte_001",
-        "section_override_applied": false,
-        "step_key": "standard_equipment"
-      },
-      {
         "option_id": "opt_uvb_001",
         "rpo": "UVB",
         "section_id": "sec_1lte_001",
@@ -4351,14 +4343,6 @@
         "rpo": "UTU",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
-        "section_override_applied": false,
-        "step_key": "standard_equipment"
-      },
-      {
-        "option_id": "opt_ah2_003",
-        "rpo": "AH2",
-        "section_id": "sec_3lte_001",
-        "original_section_id": "sec_3lte_001",
         "section_override_applied": false,
         "step_key": "standard_equipment"
       },
@@ -5707,62 +5691,6 @@
         "step_key": "standard_equipment"
       },
       {
-        "option_id": "opt_j6a_002",
-        "rpo": "J6A",
-        "section_id": "sec_stan_002",
-        "original_section_id": "sec_stan_002",
-        "section_override_applied": false,
-        "step_key": "standard_equipment"
-      },
-      {
-        "option_id": "opt_eyt_002",
-        "rpo": "EYT",
-        "section_id": "sec_stan_002",
-        "original_section_id": "sec_stan_002",
-        "section_override_applied": false,
-        "step_key": "standard_equipment"
-      },
-      {
-        "option_id": "opt_cm9_002",
-        "rpo": "CM9",
-        "section_id": "sec_stan_002",
-        "original_section_id": "sec_stan_002",
-        "section_override_applied": false,
-        "step_key": "standard_equipment"
-      },
-      {
-        "option_id": "opt_nga_002",
-        "rpo": "NGA",
-        "section_id": "sec_stan_002",
-        "original_section_id": "sec_stan_002",
-        "section_override_applied": false,
-        "step_key": "standard_equipment"
-      },
-      {
-        "option_id": "opt_efr_002",
-        "rpo": "EFR",
-        "section_id": "sec_stan_002",
-        "original_section_id": "sec_stan_002",
-        "section_override_applied": false,
-        "step_key": "standard_equipment"
-      },
-      {
-        "option_id": "opt_cf7_002",
-        "rpo": "CF7",
-        "section_id": "sec_stan_002",
-        "original_section_id": "sec_stan_002",
-        "section_override_applied": false,
-        "step_key": "standard_equipment"
-      },
-      {
-        "option_id": "opt_719_002",
-        "rpo": "719",
-        "section_id": "sec_stan_002",
-        "original_section_id": "sec_stan_002",
-        "section_override_applied": false,
-        "step_key": "standard_equipment"
-      },
-      {
         "option_id": "opt_nk4_001",
         "rpo": "NK4",
         "section_id": "sec_stan_002",
@@ -5773,14 +5701,6 @@
       {
         "option_id": "opt_fea_001",
         "rpo": "FEA",
-        "section_id": "sec_stan_002",
-        "original_section_id": "sec_stan_002",
-        "section_override_applied": false,
-        "step_key": "standard_equipment"
-      },
-      {
-        "option_id": "opt_swm_002",
-        "rpo": "SWM",
         "section_id": "sec_stan_002",
         "original_section_id": "sec_stan_002",
         "section_override_applied": false,
@@ -6081,34 +6001,6 @@
   "blank_section_overrides": [],
   "candidate_standard_equipment": [
     {
-      "option_id": "opt_aq9_004",
-      "rpo": "AQ9",
-      "variant_id": "1lt_e07",
-      "section_id": "sec_1lte_001",
-      "option_name": "GT1 Bucket Seats"
-    },
-    {
-      "option_id": "opt_aq9_004",
-      "rpo": "AQ9",
-      "variant_id": "2lt_e07",
-      "section_id": "sec_1lte_001",
-      "option_name": "GT1 Bucket Seats"
-    },
-    {
-      "option_id": "opt_aq9_004",
-      "rpo": "AQ9",
-      "variant_id": "1lt_e67",
-      "section_id": "sec_1lte_001",
-      "option_name": "GT1 Bucket Seats"
-    },
-    {
-      "option_id": "opt_aq9_004",
-      "rpo": "AQ9",
-      "variant_id": "2lt_e67",
-      "section_id": "sec_1lte_001",
-      "option_name": "GT1 Bucket Seats"
-    },
-    {
       "option_id": "opt_uvb_001",
       "rpo": "UVB",
       "variant_id": "1lt_e07",
@@ -6737,20 +6629,6 @@
       "variant_id": "3lt_e67",
       "section_id": "sec_2lte_001",
       "option_name": "Vehicle Inclination Theft Sensor"
-    },
-    {
-      "option_id": "opt_ah2_003",
-      "rpo": "AH2",
-      "variant_id": "3lt_e07",
-      "section_id": "sec_3lte_001",
-      "option_name": "GT2 Bucket Seats"
-    },
-    {
-      "option_id": "opt_ah2_003",
-      "rpo": "AH2",
-      "variant_id": "3lt_e67",
-      "section_id": "sec_3lte_001",
-      "option_name": "GT2 Bucket Seats"
     },
     {
       "option_id": "opt_iwe_001",
@@ -9084,258 +8962,6 @@
       "option_name": "Front Intermittent Wipers"
     },
     {
-      "option_id": "opt_j6a_002",
-      "rpo": "J6A",
-      "variant_id": "1lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Painted Calipers"
-    },
-    {
-      "option_id": "opt_j6a_002",
-      "rpo": "J6A",
-      "variant_id": "2lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Painted Calipers"
-    },
-    {
-      "option_id": "opt_j6a_002",
-      "rpo": "J6A",
-      "variant_id": "3lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Painted Calipers"
-    },
-    {
-      "option_id": "opt_j6a_002",
-      "rpo": "J6A",
-      "variant_id": "1lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Painted Calipers"
-    },
-    {
-      "option_id": "opt_j6a_002",
-      "rpo": "J6A",
-      "variant_id": "2lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Painted Calipers"
-    },
-    {
-      "option_id": "opt_j6a_002",
-      "rpo": "J6A",
-      "variant_id": "3lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Painted Calipers"
-    },
-    {
-      "option_id": "opt_eyt_002",
-      "rpo": "EYT",
-      "variant_id": "1lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Carbon Flash Exterior Badge Package"
-    },
-    {
-      "option_id": "opt_eyt_002",
-      "rpo": "EYT",
-      "variant_id": "2lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Carbon Flash Exterior Badge Package"
-    },
-    {
-      "option_id": "opt_eyt_002",
-      "rpo": "EYT",
-      "variant_id": "3lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Carbon Flash Exterior Badge Package"
-    },
-    {
-      "option_id": "opt_eyt_002",
-      "rpo": "EYT",
-      "variant_id": "1lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Carbon Flash Exterior Badge Package"
-    },
-    {
-      "option_id": "opt_eyt_002",
-      "rpo": "EYT",
-      "variant_id": "2lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Carbon Flash Exterior Badge Package"
-    },
-    {
-      "option_id": "opt_eyt_002",
-      "rpo": "EYT",
-      "variant_id": "3lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Carbon Flash Exterior Badge Package"
-    },
-    {
-      "option_id": "opt_cm9_002",
-      "rpo": "CM9",
-      "variant_id": "1lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Body-Color Power Convertible Hardtop"
-    },
-    {
-      "option_id": "opt_cm9_002",
-      "rpo": "CM9",
-      "variant_id": "2lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Body-Color Power Convertible Hardtop"
-    },
-    {
-      "option_id": "opt_cm9_002",
-      "rpo": "CM9",
-      "variant_id": "3lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Body-Color Power Convertible Hardtop"
-    },
-    {
-      "option_id": "opt_nga_002",
-      "rpo": "NGA",
-      "variant_id": "1lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Exhaust Tips"
-    },
-    {
-      "option_id": "opt_nga_002",
-      "rpo": "NGA",
-      "variant_id": "2lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Exhaust Tips"
-    },
-    {
-      "option_id": "opt_nga_002",
-      "rpo": "NGA",
-      "variant_id": "3lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Exhaust Tips"
-    },
-    {
-      "option_id": "opt_nga_002",
-      "rpo": "NGA",
-      "variant_id": "1lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Exhaust Tips"
-    },
-    {
-      "option_id": "opt_nga_002",
-      "rpo": "NGA",
-      "variant_id": "2lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Exhaust Tips"
-    },
-    {
-      "option_id": "opt_nga_002",
-      "rpo": "NGA",
-      "variant_id": "3lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Exhaust Tips"
-    },
-    {
-      "option_id": "opt_efr_002",
-      "rpo": "EFR",
-      "variant_id": "1lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Carbon Flash Exterior Accents"
-    },
-    {
-      "option_id": "opt_efr_002",
-      "rpo": "EFR",
-      "variant_id": "2lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Carbon Flash Exterior Accents"
-    },
-    {
-      "option_id": "opt_efr_002",
-      "rpo": "EFR",
-      "variant_id": "3lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Carbon Flash Exterior Accents"
-    },
-    {
-      "option_id": "opt_efr_002",
-      "rpo": "EFR",
-      "variant_id": "1lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Carbon Flash Exterior Accents"
-    },
-    {
-      "option_id": "opt_efr_002",
-      "rpo": "EFR",
-      "variant_id": "2lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Carbon Flash Exterior Accents"
-    },
-    {
-      "option_id": "opt_efr_002",
-      "rpo": "EFR",
-      "variant_id": "3lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Carbon Flash Exterior Accents"
-    },
-    {
-      "option_id": "opt_cf7_002",
-      "rpo": "CF7",
-      "variant_id": "1lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Body-Color Roof Panel"
-    },
-    {
-      "option_id": "opt_cf7_002",
-      "rpo": "CF7",
-      "variant_id": "2lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Body-Color Roof Panel"
-    },
-    {
-      "option_id": "opt_cf7_002",
-      "rpo": "CF7",
-      "variant_id": "3lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Body-Color Roof Panel"
-    },
-    {
-      "option_id": "opt_719_002",
-      "rpo": "719",
-      "variant_id": "1lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Seat Belt Color"
-    },
-    {
-      "option_id": "opt_719_002",
-      "rpo": "719",
-      "variant_id": "2lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Seat Belt Color"
-    },
-    {
-      "option_id": "opt_719_002",
-      "rpo": "719",
-      "variant_id": "3lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Seat Belt Color"
-    },
-    {
-      "option_id": "opt_719_002",
-      "rpo": "719",
-      "variant_id": "1lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Seat Belt Color"
-    },
-    {
-      "option_id": "opt_719_002",
-      "rpo": "719",
-      "variant_id": "2lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Seat Belt Color"
-    },
-    {
-      "option_id": "opt_719_002",
-      "rpo": "719",
-      "variant_id": "3lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Black Seat Belt Color"
-    },
-    {
       "option_id": "opt_nk4_001",
       "rpo": "NK4",
       "variant_id": "1lt_e07",
@@ -9418,48 +9044,6 @@
       "variant_id": "3lt_e67",
       "section_id": "sec_stan_002",
       "option_name": "Touring Magnetic Ride Suspension"
-    },
-    {
-      "option_id": "opt_swm_002",
-      "rpo": "SWM",
-      "variant_id": "1lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels"
-    },
-    {
-      "option_id": "opt_swm_002",
-      "rpo": "SWM",
-      "variant_id": "2lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels"
-    },
-    {
-      "option_id": "opt_swm_002",
-      "rpo": "SWM",
-      "variant_id": "3lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels"
-    },
-    {
-      "option_id": "opt_swm_002",
-      "rpo": "SWM",
-      "variant_id": "1lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels"
-    },
-    {
-      "option_id": "opt_swm_002",
-      "rpo": "SWM",
-      "variant_id": "2lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels"
-    },
-    {
-      "option_id": "opt_swm_002",
-      "rpo": "SWM",
-      "variant_id": "3lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels"
     },
     {
       "option_id": "opt_ive_001",
@@ -9631,66 +9215,6 @@
     }
   ],
   "candidate_choices_sample": [
-    {
-      "choice_id": "1lt_e07__opt_aq9_004",
-      "option_id": "opt_aq9_004",
-      "rpo": "AQ9",
-      "variant_id": "1lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_1lte_001"
-    },
-    {
-      "choice_id": "2lt_e07__opt_aq9_004",
-      "option_id": "opt_aq9_004",
-      "rpo": "AQ9",
-      "variant_id": "2lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_1lte_001"
-    },
-    {
-      "choice_id": "3lt_e07__opt_aq9_004",
-      "option_id": "opt_aq9_004",
-      "rpo": "AQ9",
-      "variant_id": "3lt_e07",
-      "status": "unavailable",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_1lte_001"
-    },
-    {
-      "choice_id": "1lt_e67__opt_aq9_004",
-      "option_id": "opt_aq9_004",
-      "rpo": "AQ9",
-      "variant_id": "1lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_1lte_001"
-    },
-    {
-      "choice_id": "2lt_e67__opt_aq9_004",
-      "option_id": "opt_aq9_004",
-      "rpo": "AQ9",
-      "variant_id": "2lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_1lte_001"
-    },
-    {
-      "choice_id": "3lt_e67__opt_aq9_004",
-      "option_id": "opt_aq9_004",
-      "rpo": "AQ9",
-      "variant_id": "3lt_e67",
-      "status": "unavailable",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_1lte_001"
-    },
     {
       "choice_id": "1lt_e07__opt_uvb_001",
       "option_id": "opt_uvb_001",
@@ -10625,6 +10149,66 @@
       "choice_id": "1lt_e67__opt_at9_001",
       "option_id": "opt_at9_001",
       "rpo": "AT9",
+      "variant_id": "1lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "2lt_e67__opt_at9_001",
+      "option_id": "opt_at9_001",
+      "rpo": "AT9",
+      "variant_id": "2lt_e67",
+      "status": "standard",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "3lt_e67__opt_at9_001",
+      "option_id": "opt_at9_001",
+      "rpo": "AT9",
+      "variant_id": "3lt_e67",
+      "status": "standard",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e07__opt_ahe_001",
+      "option_id": "opt_ahe_001",
+      "rpo": "AHE",
+      "variant_id": "1lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "2lt_e07__opt_ahe_001",
+      "option_id": "opt_ahe_001",
+      "rpo": "AHE",
+      "variant_id": "2lt_e07",
+      "status": "standard",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "3lt_e07__opt_ahe_001",
+      "option_id": "opt_ahe_001",
+      "rpo": "AHE",
+      "variant_id": "3lt_e07",
+      "status": "standard",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e67__opt_ahe_001",
+      "option_id": "opt_ahe_001",
+      "rpo": "AHE",
       "variant_id": "1lt_e67",
       "status": "unavailable",
       "selectable": "False",
