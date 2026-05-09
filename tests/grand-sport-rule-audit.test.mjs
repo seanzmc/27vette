@@ -6,6 +6,13 @@ import test from "node:test";
 const auditPath = "form-output/inspection/grand-sport-rule-audit.json";
 const auditMarkdownPath = "form-output/inspection/grand-sport-rule-audit.md";
 const draftPath = "form-output/inspection/grand-sport-form-data-draft.json";
+const heritageHashOptionIds = ["opt_17a_001", "opt_20a_001", "opt_55a_001", "opt_75a_001", "opt_97a_001", "opt_dx4_001"];
+const heritageCenterStripeOptionIds = ["opt_dmu_001", "opt_dmv_001", "opt_dmw_001", "opt_dmx_001", "opt_dmy_001"];
+const nonCenterStripeOptionIds = [
+  "opt_dpb_001", "opt_dpc_001", "opt_dpg_001", "opt_dpl_001", "opt_dpt_001", "opt_dsy_001", "opt_dsz_001", "opt_dt0_001",
+  "opt_dth_001", "opt_dub_001", "opt_due_001", "opt_duk_001", "opt_duw_001", "opt_dzu_001", "opt_dzv_001", "opt_dzx_001",
+  "opt_sht_001", "opt_vpo_001",
+];
 
 function normalizedBool(value) {
   return String(value).toLowerCase();
@@ -134,6 +141,8 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
   const optionByRpo = new Map(workbookOptions.map((row) => [row.rpo, row]));
   assert.equal(normalizedBool(optionByRpo.get("D30").selectable), "false");
   assert.equal(optionByRpo.get("D30").display_behavior, "display_only");
+  assert.equal(normalizedBool(optionByRpo.get("Z15").selectable), "false");
+  assert.equal(optionByRpo.get("Z15").display_behavior, "display_only");
   assert.equal(optionByRpo.get("R6X").display_behavior, "auto_only");
   for (const rpo of ["R6P", "R9V", "R9W", "R9Y", "U2K"]) {
     assert.equal(normalizedBool(optionByRpo.get(rpo).active), "false", `${rpo} should be inactive in workbook source`);
@@ -155,16 +164,8 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
     "Z15 should not retain separate hard requirements for every heritage hash/stripe option"
   );
 
-  const z15Group = workbookRuleGroups.find((row) => row.group_id === "gs_grp_z15_hash_mark_requirement");
-  assert.ok(z15Group, "Z15 hash mark requires_any group should be authored in the workbook");
-  assert.equal(z15Group.group_type, "requires_any");
-  assert.equal(z15Group.source_id, "opt_z15_001");
-  assert.deepEqual(
-    workbookRuleGroupMembers
-      .filter((row) => row.group_id === "gs_grp_z15_hash_mark_requirement")
-      .map((row) => row.target_id),
-    ["opt_17a_001", "opt_20a_001", "opt_55a_001", "opt_75a_001", "opt_97a_001", "opt_dx4_001"]
-  );
+  assert.equal(workbookRuleGroups.some((row) => row.group_id === "gs_grp_z15_hash_mark_requirement"), false);
+  assert.equal(workbookRuleGroupMembers.some((row) => row.group_id === "gs_grp_z15_hash_mark_requirement"), false);
 
   const draftRuleKeys = new Set(draft.rules.map((rule) => `${rule.source_id}::${rule.rule_type}::${rule.target_id}`));
   for (const key of [
@@ -174,6 +175,16 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
     "opt_fey_001::includes::opt_cfz_001",
   ]) {
     assert.ok(draftRuleKeys.has(key), `${key} should be present`);
+  }
+  for (const hashOptionId of heritageHashOptionIds) {
+    assert.ok(draftRuleKeys.has(`${hashOptionId}::includes::opt_z15_001`), `${hashOptionId} should auto-add Z15`);
+    assert.equal(draftRuleKeys.has(`${hashOptionId}::requires::opt_z15_001`), false, `${hashOptionId} should not require manual Z15`);
+    for (const targetId of nonCenterStripeOptionIds) {
+      assert.ok(draftRuleKeys.has(`${hashOptionId}::excludes::${targetId}`), `${hashOptionId} should block ${targetId}`);
+    }
+    for (const targetId of heritageCenterStripeOptionIds) {
+      assert.equal(draftRuleKeys.has(`${hashOptionId}::excludes::${targetId}`), false, `${hashOptionId} should allow ${targetId}`);
+    }
   }
 
   const z52Members = workbookExclusiveMembers.filter((row) => row.group_id === "gs_excl_z52_packages");

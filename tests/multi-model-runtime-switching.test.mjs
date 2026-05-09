@@ -252,6 +252,35 @@ test("Grand Sport exclusive group selections remove peer options without runtime
   }
 });
 
+test("Grand Sport heritage hash marks auto-add Z15 and leave only center stripes compatible", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const hashMark = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_17a_001");
+  const centerStripe = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_dmu_001");
+  const fullLengthStripe = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_dpb_001");
+  const z15 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_z15_001");
+
+  assert.ok(hashMark, "17A should be active for Grand Sport");
+  assert.ok(centerStripe, "DMU center stripe should be active for Grand Sport");
+  assert.ok(fullLengthStripe, "DPB full length stripe should be active before compatibility filtering");
+  assert.equal(z15.selectable, "False");
+
+  runtime.handleChoice(hashMark);
+  const afterHashOrder = runtime.currentOrder();
+  assert.equal(afterHashOrder.auto_added_options.some((item) => item.rpo === "Z15"), true, "hash mark should auto-add Z15");
+
+  runtime.handleChoice(fullLengthStripe);
+  assert.equal(runtime.state.selected.has("opt_dpb_001"), false, "non-center stripes should be unavailable while a hash mark is selected");
+
+  runtime.handleChoice(centerStripe);
+  assert.equal(runtime.state.selected.has("opt_dmu_001"), true, "center stripes should remain selectable with a hash mark");
+});
+
 test("runtime defaults to Stingray and switches models with a clean build reset", () => {
   const runtime = loadRuntime();
   assert.equal(runtime.activeModelKey, "stingray");

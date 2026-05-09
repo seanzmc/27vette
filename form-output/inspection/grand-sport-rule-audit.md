@@ -1,16 +1,16 @@
 # Grand Sport Rule Audit
 
-Generated: `2026-05-09T03:52:21+00:00`
+Generated: `2026-05-09T05:30:04+00:00`
 Status: `rule_audit_generated`
 
 ## Summary
 
-- Workbook rule rows: 206
-- Expected draft runtime rules: 197
+- Workbook rule rows: 314
+- Expected draft runtime rules: 305
 - Omitted duplicate exclusive-group rules: 9
 - Raw detail candidate keys: 243
-- Workbook rules matching detail raw: 99
-- Workbook manual/approved/copied rules: 107
+- Workbook rules matching detail raw: 93
+- Workbook manual/approved/copied rules: 221
 - Skipped/review rows: 1
 - Unresolved non-interior RPO mentions: 4
 
@@ -47,17 +47,12 @@ Status: `rule_audit_generated`
 
 - `gs_rule_opt_009_requires_opt_ue1_001`: opt_009 requires opt_ue1_001
 - `gs_rule_opt_17a_001_excludes_opt_gka_001`: opt_17a_001 excludes opt_gka_001
-- `gs_rule_opt_17a_001_requires_opt_z15_001`: opt_17a_001 requires opt_z15_001
 - `gs_rule_opt_20a_001_excludes_opt_gtr_001`: opt_20a_001 excludes opt_gtr_001
-- `gs_rule_opt_20a_001_requires_opt_z15_001`: opt_20a_001 requires opt_z15_001
 - `gs_rule_opt_55a_001_excludes_opt_gbk_001`: opt_55a_001 excludes opt_gbk_001
-- `gs_rule_opt_55a_001_requires_opt_z15_001`: opt_55a_001 requires opt_z15_001
 - `gs_rule_opt_5zv_001_excludes_opt_fey_001`: opt_5zv_001 excludes opt_fey_001
 - `gs_rule_opt_5zv_001_excludes_opt_t0f_001`: opt_5zv_001 excludes opt_t0f_001
 - `gs_rule_opt_75a_001_excludes_opt_gkz_001`: opt_75a_001 excludes opt_gkz_001
 - `gs_rule_opt_75a_001_excludes_opt_gph_001`: opt_75a_001 excludes opt_gph_001
-- `gs_rule_opt_75a_001_requires_opt_z15_001`: opt_75a_001 requires opt_z15_001
-- `gs_rule_opt_97a_001_requires_opt_z15_001`: opt_97a_001 requires opt_z15_001
 - `gs_rule_opt_b6p_001_includes_opt_d3v_001`: opt_b6p_001 includes opt_d3v_001
 - `gs_rule_opt_bc4_001_includes_opt_d3v_001`: opt_bc4_001 includes opt_d3v_001
 - `gs_rule_opt_bc4_001_requires_opt_b6p_001_coupe`: opt_bc4_001 requires opt_b6p_001 [coupe]
@@ -80,7 +75,12 @@ Status: `rule_audit_generated`
 - `gs_rule_opt_cf8_001_excludes_opt_dmy_001`: opt_cf8_001 excludes opt_dmy_001
 - `gs_rule_opt_cfl_001_excludes_opt_cfz_001`: opt_cfl_001 excludes opt_cfz_001
 - `gs_rule_opt_dmu_001_requires_opt_d84_001`: opt_dmu_001 requires opt_d84_001
-- ... 64 more
+- `gs_rule_opt_dmu_001_requires_opt_z15_001`: opt_dmu_001 requires opt_z15_001
+- `gs_rule_opt_dmv_001_excludes_opt_d84_001`: opt_dmv_001 excludes opt_d84_001
+- `gs_rule_opt_dmv_001_excludes_opt_gka_001`: opt_dmv_001 excludes opt_gka_001
+- `gs_rule_opt_dmv_001_requires_opt_d84_001`: opt_dmv_001 requires opt_d84_001
+- `gs_rule_opt_dmv_001_requires_opt_z15_001`: opt_dmv_001 requires opt_z15_001
+- ... 58 more
 
 ## Omitted Duplicate Exclusive Group Rules
 

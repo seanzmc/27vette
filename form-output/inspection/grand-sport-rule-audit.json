@@ -6,7 +6,7 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-05-09T03:52:21+00:00",
+    "generated_at": "2026-05-09T05:30:04+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
@@ -14,15 +14,15 @@
     "rawDetailRuleCandidates": 243,
     "rawDetailCandidateKeys": 243,
     "dedupedOrSelfReferenceCandidates": 0,
-    "finalWorkbookRuleRows": 206,
-    "expectedDraftRuntimeRules": 197,
+    "finalWorkbookRuleRows": 314,
+    "expectedDraftRuntimeRules": 305,
     "omittedDuplicateExclusiveGroup": 9,
     "skippedRequiresReview": 1,
     "unresolvedRpoMentions": 4,
     "exclusiveGroups": 7,
     "exclusiveGroupMembers": 23,
-    "workbookRulesMatchingDetailRaw": 99,
-    "workbookManualOrApprovedRules": 107
+    "workbookRulesMatchingDetailRaw": 93,
+    "workbookManualOrApprovedRules": 221
   },
   "sourceSheets": {
     "optionSheet": "grandSport_options",
@@ -804,14 +804,6 @@
       "matched_phrase": "workbook_matches_detail_raw"
     },
     {
-      "rule_id": "gs_rule_opt_17a_001_requires_opt_z15_001",
-      "source_id": "opt_17a_001",
-      "rule_type": "requires",
-      "target_id": "opt_z15_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
       "rule_id": "gs_rule_opt_20a_001_excludes_opt_gtr_001",
       "source_id": "opt_20a_001",
       "rule_type": "excludes",
@@ -820,26 +812,10 @@
       "matched_phrase": "workbook_matches_detail_raw"
     },
     {
-      "rule_id": "gs_rule_opt_20a_001_requires_opt_z15_001",
-      "source_id": "opt_20a_001",
-      "rule_type": "requires",
-      "target_id": "opt_z15_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
       "rule_id": "gs_rule_opt_55a_001_excludes_opt_gbk_001",
       "source_id": "opt_55a_001",
       "rule_type": "excludes",
       "target_id": "opt_gbk_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_55a_001_requires_opt_z15_001",
-      "source_id": "opt_55a_001",
-      "rule_type": "requires",
-      "target_id": "opt_z15_001",
       "body_style_scope": "",
       "matched_phrase": "workbook_matches_detail_raw"
     },
@@ -872,22 +848,6 @@
       "source_id": "opt_75a_001",
       "rule_type": "excludes",
       "target_id": "opt_gph_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_75a_001_requires_opt_z15_001",
-      "source_id": "opt_75a_001",
-      "rule_type": "requires",
-      "target_id": "opt_z15_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_97a_001_requires_opt_z15_001",
-      "source_id": "opt_97a_001",
-      "rule_type": "requires",
-      "target_id": "opt_z15_001",
       "body_style_scope": "",
       "matched_phrase": "workbook_matches_detail_raw"
     },
@@ -1224,14 +1184,6 @@
       "source_id": "opt_dx4_001",
       "rule_type": "excludes",
       "target_id": "opt_gph_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_dx4_001_requires_opt_z15_001",
-      "source_id": "opt_dx4_001",
-      "rule_type": "requires",
-      "target_id": "opt_z15_001",
       "body_style_scope": "",
       "matched_phrase": "workbook_matches_detail_raw"
     },
