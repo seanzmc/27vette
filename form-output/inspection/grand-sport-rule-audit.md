@@ -1,12 +1,12 @@
 # Grand Sport Rule Audit
 
-Generated: `2026-05-09T17:30:15+00:00`
+Generated: `2026-05-09T19:38:34+00:00`
 Status: `rule_audit_generated`
 
 ## Summary
 
 - Workbook rule rows: 314
-- Expected draft runtime rules: 289
+- Expected draft runtime rules: 288
 - Omitted duplicate exclusive-group rules: 9
 - Raw detail candidate keys: 233
 - Workbook rules matching detail raw: 86
@@ -107,5 +107,5 @@ Status: `rule_audit_generated`
 
 ## Review Hot Spots
 
-- Duplicate active RPOs: 12
+- Duplicate active RPOs: 11
 - Special package mention rows: 26

@@ -65,8 +65,6 @@ CONTEXT_SECTIONS = (
     {
         "section_id": "sec_context_body_style",
         "section_name": "Body Style",
-        "category_id": "cat_context_001",
-        "category_name": "Vehicle Context",
         "selection_mode": "single_select_req",
         "selection_mode_label": "Required single choice",
         "choice_mode": "single",
@@ -79,8 +77,6 @@ CONTEXT_SECTIONS = (
     {
         "section_id": "sec_context_trim_level",
         "section_name": "Trim Level",
-        "category_id": "cat_context_001",
-        "category_name": "Vehicle Context",
         "selection_mode": "single_select_req",
         "selection_mode_label": "Required single choice",
         "choice_mode": "single",
@@ -111,7 +107,11 @@ SECTION_STEP_OVERRIDES = {
     "sec_lpoi_001": "interior_trim",
     "sec_whee_001": "wheels",
     "sec_gsce_001": "exterior_appearance",
+    "sec_gsha_001": "exterior_appearance",
+    "sec_colo_001": "interior_trim",
     "sec_onst_001": "interior_trim",
+    "sec_cust_002": "interior_trim",
+    "sec_spec_001": "packages_performance",
     "sec_cust_001": "delivery",
 }
 
@@ -139,46 +139,6 @@ STANDARD_SECTIONS = frozenset(
         "sec_tech_001",
     }
 )
-
-GRAND_SPORT_SECTION_CATEGORY_OVERRIDES = {
-    "sec_lpoe_001": "cat_exte_001",
-    "sec_whee_001": "cat_exte_001",
-    "sec_spoi_001": "cat_exte_001",
-    "sec_perf_001": "cat_mech_001",
-    "sec_incl_001": "cat_stan_001",
-    "sec_cali_001": "cat_exte_001",
-    "sec_onst_001": "cat_stan_001",
-    "sec_spec_001": "cat_mech_001",
-}
-
-GRAND_SPORT_OPTION_CATEGORY_OVERRIDES = {
-    "opt_bv4_001": "cat_inte_001",
-    "opt_pin_001": "cat_exte_001",
-    "opt_r8c_001": "cat_exte_001",
-}
-
-GRAND_SPORT_SOURCE_CATEGORY_OVERRIDES = {
-    "opt_cfl_001": "cat_exte_001",
-    "opt_cfv_001": "cat_exte_001",
-    "opt_cfx_001": "cat_inte_001",
-    "opt_cfz_001": "cat_exte_001",
-    "opt_drg_001": "cat_exte_001",
-    "opt_e60_001": "cat_exte_001",
-    "opt_j56_001": "cat_mech_001",
-    "opt_j6a_001": "cat_mech_001",
-    "opt_j6b_001": "cat_mech_001",
-    "opt_j6d_001": "cat_mech_001",
-    "opt_j6e_001": "cat_mech_001",
-    "opt_j6f_001": "cat_mech_001",
-    "opt_j6l_001": "cat_mech_001",
-    "opt_j6n_001": "cat_mech_001",
-    "opt_t0e_002": "cat_exte_001",
-    "opt_t0f_001": "cat_exte_001",
-    "opt_tr7_001": "cat_exte_001",
-    "opt_xfr_001": "cat_exte_001",
-    "opt_xfs_001": "cat_exte_001",
-    "opt_z25_001": "cat_exte_001",
-}
 
 GRAND_SPORT_SECTION_LABEL_OVERRIDES = {
     "sec_gsce_001": "Grand Sport Center Stripes",
@@ -238,9 +198,6 @@ GRAND_SPORT_MODEL = ModelConfig(
         "sec_spec_001": "packages_performance",
         "sec_colo_001": "interior_trim",
     },
-    section_category_overrides=GRAND_SPORT_SECTION_CATEGORY_OVERRIDES,
-    option_category_overrides=GRAND_SPORT_OPTION_CATEGORY_OVERRIDES,
-    source_category_overrides=GRAND_SPORT_SOURCE_CATEGORY_OVERRIDES,
     section_label_overrides=GRAND_SPORT_SECTION_LABEL_OVERRIDES,
     preview_artifact_prefix="grand-sport-contract-preview",
     draft_artifact_prefix="grand-sport-form-data-draft",

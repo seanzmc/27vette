@@ -43,7 +43,6 @@ def selection_mode_label(selection_mode: str, labels: Mapping[str, str]) -> str:
 def step_for_section(
     section_id: str,
     section_name: str,
-    category_id: str,
     *,
     standard_sections: set[str] | frozenset[str],
     section_step_overrides: Mapping[str, str],
@@ -55,10 +54,4 @@ def step_for_section(
     name = section_name.lower()
     if "stripe" in name or "spoiler" in name or "lpo" in name or "exhaust" in name or "wheel accessory" in name:
         return "aero_exhaust_stripes_accessories"
-    if category_id == "cat_exte_001":
-        return "exterior_appearance"
-    if category_id == "cat_inte_001":
-        return "interior_trim"
-    if category_id == "cat_mech_001":
-        return "packages_performance"
     return "standard_equipment"

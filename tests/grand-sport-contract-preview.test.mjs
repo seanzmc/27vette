@@ -33,14 +33,13 @@ test("Grand Sport contract preview has the expected read-only contract shape", (
   assert.equal(preview.variants.every((variant) => variant.source_active === "False"), true);
   assert.equal(preview.contextChoices.length, 8);
   assert.equal(preview.steps.length, 14);
-  assert.equal(preview.choices.length, 1294);
-  assert.equal(preview.candidateStandardEquipment.length, 513);
+  assert.equal(preview.choices.length, 1286);
+  assert.equal(preview.candidateStandardEquipment.length, 507);
 });
 
-test("all Grand Sport preview choices resolve section, category, step, and raw detail fields", () => {
+test("all Grand Sport preview choices resolve section, step, and raw detail fields", () => {
   for (const choice of preview.choices) {
     assert.ok(choice.resolved_section_id, `${choice.choice_id} missing resolved_section_id`);
-    assert.ok(choice.resolved_category_id, `${choice.choice_id} missing resolved_category_id`);
     assert.ok(choice.step_key, `${choice.choice_id} missing step_key`);
     assert.equal(typeof choice.source_detail_raw, "string", `${choice.choice_id} should preserve source_detail_raw`);
     assert.equal(typeof choice.source_option_name, "string", `${choice.choice_id} should preserve source_option_name`);
@@ -48,7 +47,6 @@ test("all Grand Sport preview choices resolve section, category, step, and raw d
   }
   assert.equal(preview.normalization.unresolvedIssues.length, 0);
   assert.equal(preview.validation.length, 0);
-  assert.equal(preview.normalization.sectionCategoryResolutions.length, 48);
 });
 
 test("filled Grand Sport source sections do not require blank-section config", () => {

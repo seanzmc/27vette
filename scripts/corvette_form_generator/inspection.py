@@ -64,12 +64,6 @@ def normalized_option_row(row: dict[str, str], config: ModelConfig) -> dict[str,
     option_id = clean(row.get("option_id", ""))
     original_section_id = clean(row.get("section_id", ""))
     resolved_section_id = original_section_id or config.blank_section_overrides.get(option_id, "")
-    source_category_id = (
-        clean(row.get("category_id", ""))
-        or config.source_category_overrides.get(option_id, "")
-        or config.option_category_overrides.get(option_id, "")
-        or config.section_category_overrides.get(resolved_section_id, "")
-    )
     return {
         "option_id": option_id,
         "rpo": clean(row.get("rpo", "")),
@@ -77,7 +71,6 @@ def normalized_option_row(row: dict[str, str], config: ModelConfig) -> dict[str,
         "option_name": clean(row.get("option_name", "")),
         "description": clean(row.get("description", "")),
         "detail_raw": clean(row.get("detail_raw", "")),
-        "category_id": source_category_id,
         "selectable": normalize_selectable(row.get("selectable", "")),
         "active": normalize_selectable(row.get("active", "True")),
         "display_behavior": clean(row.get("display_behavior", "")),
@@ -414,36 +407,15 @@ def build_grand_sport_interiors(config: ModelConfig) -> list[dict[str, Any]]:
     return interiors
 
 
-def resolve_category(
-    row: dict[str, Any],
-    sections: dict[str, dict[str, str]],
-    config: ModelConfig,
-) -> tuple[str, str]:
-    option_id = row["option_id"]
-    section_id = row["section_id"]
-    source_category_id = row["category_id"]
-    section_category_id = sections.get(section_id, {}).get("category_id", "")
-
-    if option_id in config.option_category_overrides:
-        return config.option_category_overrides[option_id], "option_override"
-    if section_id in config.section_category_overrides:
-        return config.section_category_overrides[section_id], "section_override"
-    if source_category_id:
-        return source_category_id, "source"
-    return section_category_id, "section_master"
-
-
 def resolved_step_key(
     section_id: str,
     sections: dict[str, dict[str, str]],
-    resolved_category_id: str,
     config: ModelConfig,
 ) -> str:
     section = sections.get(section_id, {})
     return step_for_section(
         section_id,
         section.get("section_name", ""),
-        section.get("category_id", resolved_category_id),
         standard_sections=config.standard_sections,
         section_step_overrides=config.section_step_overrides,
     )
@@ -718,7 +690,6 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
     wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
     raw_rows = rows_from_sheet(wb, config.source_option_sheet)
     variants_raw = rows_from_sheet(wb, "variant_master")
-    categories = {row["category_id"]: row for row in rows_from_sheet(wb, "category_master")}
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
     rows = [normalized_option_row(row, config) for row in raw_rows]
     status_lookup = status_lookup_from_sheet(wb, config)
@@ -812,34 +783,18 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
     section_mapping_rows: list[dict[str, Any]] = []
     missing_sections: Counter[str] = Counter()
     unknown_sections: Counter[str] = Counter()
-    unknown_categories: Counter[str] = Counter()
-    section_category_mismatches: list[dict[str, Any]] = []
     for row in rows:
         if row["active"] != "True":
             continue
         section_id = row["section_id"]
-        category_id = row["category_id"]
         if not section_id:
             missing_sections[row["option_id"]] += 1
         elif section_id not in sections:
             unknown_sections[section_id] += 1
-        if category_id and category_id not in categories:
-            unknown_categories[category_id] += 1
         section = sections.get(section_id, {})
-        if section and category_id and section.get("category_id") != category_id:
-            section_category_mismatches.append(
-                {
-                    "option_id": row["option_id"],
-                    "rpo": row["rpo"],
-                    "section_id": section_id,
-                    "row_category_id": category_id,
-                    "section_category_id": section.get("category_id", ""),
-                }
-            )
         step_key = step_for_section(
             section_id,
             section.get("section_name", ""),
-            section.get("category_id", category_id),
             standard_sections=config.standard_sections,
             section_step_overrides=config.section_step_overrides,
         )
@@ -847,7 +802,6 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
             {
                 "option_id": row["option_id"],
                 "rpo": row["rpo"],
-                "category_id": category_id,
                 "section_id": section_id,
                 "original_section_id": row["original_section_id"],
                 "section_override_applied": row["section_override_applied"],
@@ -887,10 +841,6 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
         warnings.append(f"Rows still missing resolved sections: {sum(missing_sections.values())}.")
     if unknown_sections:
         warnings.append(f"Unknown resolved section ids: {', '.join(sorted(unknown_sections))}.")
-    if unknown_categories:
-        warnings.append(f"Unknown category ids: {', '.join(sorted(unknown_categories))}.")
-    if section_category_mismatches:
-        warnings.append(f"Section/category mismatches: {len(section_category_mismatches)}.")
     unresolved_blank_overrides = [row["option_id"] for row in blank_section_overrides if not row["handled_by_explicit_config"]]
     if unresolved_blank_overrides:
         warnings.append(f"Configured blank-section overrides not resolved: {', '.join(unresolved_blank_overrides)}.")
@@ -940,8 +890,6 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
             "rows": section_mapping_rows,
             "missing_sections": dict(sorted(missing_sections.items())),
             "unknown_sections": dict(sorted(unknown_sections.items())),
-            "unknown_categories": dict(sorted(unknown_categories.items())),
-            "section_category_mismatches": section_category_mismatches,
         },
         "blank_section_overrides": blank_section_overrides,
         "candidate_standard_equipment": candidate_standard_equipment,
@@ -961,7 +909,6 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
     raw_rows = rows_from_sheet(wb, config.source_option_sheet)
     variants_raw = rows_from_sheet(wb, "variant_master")
-    categories = {row["category_id"]: row for row in rows_from_sheet(wb, "category_master")}
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
     rows = [normalized_option_row(row, config) for row in raw_rows]
     apply_status_lookup(rows, status_lookup_from_sheet(wb, config), config)
@@ -1030,22 +977,16 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
 
     choices: list[dict[str, Any]] = []
     candidate_standard_equipment: list[dict[str, Any]] = []
-    section_category_resolutions: list[dict[str, Any]] = []
     unresolved_issues: list[dict[str, Any]] = []
     validation_rows: list[dict[str, Any]] = []
     text_cleanup_counter: Counter[str] = Counter()
-    section_source_categories: defaultdict[str, set[str]] = defaultdict(set)
     section_ids_with_choices: set[str] = set()
 
     for row in rows:
         if row["active"] != "True":
             continue
         section_id = row["section_id"]
-        source_category_id = row["category_id"]
-        section_category_id = sections.get(section_id, {}).get("category_id", "")
-        resolved_category_id, category_resolution_source = resolve_category(row, sections, config)
-        step_key = resolved_step_key(section_id, sections, resolved_category_id, config)
-        section_source_categories[section_id].add(source_category_id or "")
+        step_key = resolved_step_key(section_id, sections, config)
         if not section_id:
             issue = {
                 "issue_type": "unresolved_section",
@@ -1067,47 +1008,12 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             unresolved_issues.append(issue)
             validation_rows.append({**issue, "severity": "error"})
             continue
-        if not resolved_category_id or resolved_category_id not in categories:
-            issue = {
-                "issue_type": "unknown_category",
-                "option_id": row["option_id"],
-                "rpo": row["rpo"],
-                "resolved_category_id": resolved_category_id,
-                "message": "Grand Sport row resolves to a category id missing from category_master.",
-            }
-            unresolved_issues.append(issue)
-            validation_rows.append({**issue, "severity": "error"})
-            continue
-        if source_category_id and section_category_id and source_category_id != section_category_id:
-            resolution = {
-                "option_id": row["option_id"],
-                "rpo": row["rpo"],
-                "source_category_id": source_category_id,
-                "section_category_id": section_category_id,
-                "resolved_category_id": resolved_category_id,
-                "resolved_section_id": section_id,
-                "category_resolution_source": category_resolution_source,
-            }
-            section_category_resolutions.append(resolution)
-            if category_resolution_source not in {"section_override", "option_override"}:
-                issue = {
-                    "issue_type": "unresolved_section_category_mismatch",
-                    "option_id": row["option_id"],
-                    "rpo": row["rpo"],
-                    "source_category_id": source_category_id,
-                    "section_category_id": section_category_id,
-                    "message": "Section/category mismatch does not have an explicit config resolution.",
-                }
-                unresolved_issues.append(issue)
-                validation_rows.append({**issue, "severity": "warning"})
-
         label, label_notes = cleanup_display_text(row["option_name"], config)
         description, description_notes = cleanup_display_text(row["description"], config)
         text_cleanup_notes = [f"label:{note}" for note in label_notes] + [f"description:{note}" for note in description_notes]
         for note in text_cleanup_notes:
             text_cleanup_counter[note] += 1
 
-        category = categories.get(resolved_category_id, {})
         section = sections.get(section_id, {})
         section_name = config.section_label_overrides.get(section_id, section.get("section_name", ""))
         option_base = {
@@ -1118,15 +1024,10 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             "source_option_name": row["option_name"],
             "source_description": row["description"],
             "source_detail_raw": row["detail_raw"],
-            "source_category_id": source_category_id,
             "source_section_id": row["original_section_id"],
             "section_id": section_id,
             "resolved_section_id": section_id,
-            "section_category_id": section_category_id,
-            "resolved_category_id": resolved_category_id,
-            "category_resolution_source": category_resolution_source,
             "section_name": section_name,
-            "category_name": category.get("category_name", ""),
             "step_key": step_key,
             "selectable": row["selectable"],
             "active": row["active"],
@@ -1165,8 +1066,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
 
     def section_sort_key(section_id: str) -> tuple[int, int, str]:
         section = sections.get(section_id, {})
-        category_id = section.get("category_id", "")
-        step_key = resolved_step_key(section_id, sections, category_id, config)
+        step_key = resolved_step_key(section_id, sections, config)
         return (
             intish(section.get("display_order"), 9999),
             step_order_index.get(step_key, 9999),
@@ -1176,26 +1076,13 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     section_rows: list[dict[str, Any]] = [dict(section) for section in config.context_sections]
     for section_id in sorted(section_ids_with_choices, key=section_sort_key):
         section = sections.get(section_id, {})
-        resolved_categories = sorted(
-            {
-                choice["resolved_category_id"]
-                for choice in choices
-                if choice["resolved_section_id"] == section_id
-            }
-        )
-        resolved_category_id = resolved_categories[0] if resolved_categories else section.get("category_id", "")
-        category = categories.get(resolved_category_id, {})
-        step_key = resolved_step_key(section_id, sections, resolved_category_id, config)
+        step_key = resolved_step_key(section_id, sections, config)
         selection_mode = section.get("selection_mode", "")
         section_rows.append(
             {
                 "section_id": section_id,
                 "section_name": config.section_label_overrides.get(section_id, section.get("section_name", "")),
                 "source_section_name": section.get("section_name", ""),
-                "category_id": resolved_category_id,
-                "category_name": category.get("category_name", ""),
-                "source_category_ids": sorted(value for value in section_source_categories.get(section_id, set()) if value),
-                "section_category_id": section.get("category_id", ""),
                 "selection_mode": selection_mode,
                 "selection_mode_label": selection_mode_label(selection_mode, config.selection_mode_labels),
                 "choice_mode": normalize_mode(selection_mode),
@@ -1260,7 +1147,6 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
         "ruleDetailHotSpots": rule_hot_spots,
         "normalization": {
             "blankSectionOverrides": blank_overrides,
-            "sectionCategoryResolutions": section_category_resolutions,
             "textCleanupSummary": text_cleanup_summary,
             "unresolvedIssues": unresolved_issues,
         },
@@ -1305,8 +1191,6 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
                     "section_id",
                     "section_name",
                     "resolved_section_id",
-                    "resolved_category_id",
-                    "category_name",
                     "step_key",
                     "selectable",
                     "active",
@@ -1337,8 +1221,6 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
                     "description": option["description"],
                     "section_id": option["section_id"],
                     "section_name": option["section_name"],
-                    "category_id": option["resolved_category_id"],
-                    "category_name": option["category_name"],
                     "step_key": option["step_key"],
                     "variant_id": variant_id,
                     "body_style": variant["body_style"],
@@ -1371,7 +1253,6 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
             "description": choice["description"],
             "section_id": choice["section_id"],
             "section_name": choice["section_name"],
-            "category_name": choice["category_name"],
             "display_order": choice["display_order"],
             "source_detail_raw": choice["source_detail_raw"],
         }
@@ -1538,8 +1419,6 @@ def render_markdown_report(report: dict[str, Any]) -> str:
         "",
         f"- Rows still missing resolved sections: {sum(section_mappings['missing_sections'].values())}",
         f"- Unknown section ids: {', '.join(section_mappings['unknown_sections']) or 'none'}",
-        f"- Unknown category ids: {', '.join(section_mappings['unknown_categories']) or 'none'}",
-        f"- Section/category mismatches: {len(section_mappings['section_category_mismatches'])}",
         "",
         "## Blank-Section Overrides",
         "",
@@ -1629,9 +1508,8 @@ def render_contract_preview_markdown(preview: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "## Section/Category Resolution",
+            "## Section Resolution",
             "",
-            f"- Resolved mismatch rows: {len(normalization['sectionCategoryResolutions'])}",
             f"- Unresolved issues: {len(unresolved)}",
             "",
             "## Text Cleanup",

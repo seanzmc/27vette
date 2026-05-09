@@ -91,11 +91,11 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
   assert.equal(draft.variants.length, 6);
   assert.equal(draft.contextChoices.length, 8);
   assert.equal(draft.steps.length, 14);
-  assert.equal(draft.choices.length, 1458);
-  assert.equal(draft.standardEquipment.length, 513);
-  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 781);
-  assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 513);
-  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 164);
+  assert.equal(draft.choices.length, 1446);
+  assert.equal(draft.standardEquipment.length, 507);
+  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 779);
+  assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 507);
+  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 160);
 });
 
 test("Grand Sport draft emits color overrides while deferring price rules", () => {
@@ -239,15 +239,13 @@ test("Grand Sport draft keeps normalized display fields and raw rule evidence", 
   assert.equal(cfl.source_option_name, "NEW! Extended Front Splitter Ground Effects");
   assert.equal(cfl.source_detail_raw, "1. Not available with (CFV/CFZ) ground effects.");
   assert.equal(cfl.step_key, "packages_performance");
-  assert.equal(cfl.category_id, "cat_mech_001");
 });
 
 test("Grand Sport draft preserves rule hot spots and normalization metadata for later phases", () => {
-  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1294);
-  assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1458);
+  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1286);
+  assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1446);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 127);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 26);
-  assert.equal(draft.draftMetadata.normalization.sectionCategoryResolutions.length, 48);
   assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);
   assert.deepEqual(draft.draftMetadata.deferredSurfaces, ["priceRules"]);
 });

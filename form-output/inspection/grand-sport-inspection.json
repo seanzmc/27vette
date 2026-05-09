@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-09T17:30:15+00:00",
+  "generated_at": "2026-05-09T19:38:34+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -102,15 +102,15 @@
     "unique_rpos": 223,
     "variant_status_cells": 1614,
     "status_source_rows": 1614,
-    "candidate_choice_rows_available_or_standard": 1458,
-    "candidate_standard_equipment_cells": 513,
-    "candidate_standard_option_rows": 103,
+    "candidate_choice_rows_available_or_standard": 1446,
+    "candidate_standard_equipment_cells": 507,
+    "candidate_standard_option_rows": 102,
     "selectable_counts": {
       "False": 108,
       "True": 161
     },
-    "active_option_rows_available_or_standard": 243,
-    "inactive_option_rows_all_unavailable_or_blank": 26,
+    "active_option_rows_available_or_standard": 241,
+    "inactive_option_rows_all_unavailable_or_blank": 28,
     "status_counts": {
       "available": 873,
       "standard": 545,
@@ -4149,7 +4149,6 @@
       {
         "option_id": "opt_aq9_004",
         "rpo": "AQ9",
-        "category_id": "",
         "section_id": "sec_1lte_001",
         "original_section_id": "sec_1lte_001",
         "section_override_applied": false,
@@ -4158,7 +4157,6 @@
       {
         "option_id": "opt_uvb_001",
         "rpo": "UVB",
-        "category_id": "",
         "section_id": "sec_1lte_001",
         "original_section_id": "sec_1lte_001",
         "section_override_applied": false,
@@ -4167,7 +4165,6 @@
       {
         "option_id": "opt_uqs_001",
         "rpo": "UQS",
-        "category_id": "",
         "section_id": "sec_1lte_001",
         "original_section_id": "sec_1lte_001",
         "section_override_applied": false,
@@ -4176,7 +4173,6 @@
       {
         "option_id": "opt_k7a_001",
         "rpo": "K7A",
-        "category_id": "",
         "section_id": "sec_1lte_001",
         "original_section_id": "sec_1lte_001",
         "section_override_applied": false,
@@ -4185,7 +4181,6 @@
       {
         "option_id": "opt_dwk_001",
         "rpo": "DWK",
-        "category_id": "",
         "section_id": "sec_1lte_001",
         "original_section_id": "sec_1lte_001",
         "section_override_applied": false,
@@ -4194,7 +4189,6 @@
       {
         "option_id": "opt_uv6_001",
         "rpo": "UV6",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4203,7 +4197,6 @@
       {
         "option_id": "opt_uqt_002",
         "rpo": "UQT",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4212,7 +4205,6 @@
       {
         "option_id": "opt_uqh_001",
         "rpo": "UQH",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4221,7 +4213,6 @@
       {
         "option_id": "opt_uva_001",
         "rpo": "UVA",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4230,7 +4221,6 @@
       {
         "option_id": "opt_ufg_001",
         "rpo": "UFG",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4239,7 +4229,6 @@
       {
         "option_id": "opt_k7b_001",
         "rpo": "K7B",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4248,7 +4237,6 @@
       {
         "option_id": "opt_ug1_001",
         "rpo": "UG1",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4257,7 +4245,6 @@
       {
         "option_id": "opt_ki3_001",
         "rpo": "KI3",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4266,7 +4253,6 @@
       {
         "option_id": "opt_aq9_003",
         "rpo": "AQ9",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4275,7 +4261,6 @@
       {
         "option_id": "opt_kqv_001",
         "rpo": "KQV",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4284,7 +4269,6 @@
       {
         "option_id": "opt_al9_001",
         "rpo": "AL9",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4293,7 +4277,6 @@
       {
         "option_id": "opt_at9_001",
         "rpo": "AT9",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4302,7 +4285,6 @@
       {
         "option_id": "opt_ahe_001",
         "rpo": "AHE",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4311,7 +4293,6 @@
       {
         "option_id": "opt_ahh_001",
         "rpo": "AHH",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4320,7 +4301,6 @@
       {
         "option_id": "opt_aqa_001",
         "rpo": "AQA",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4329,7 +4309,6 @@
       {
         "option_id": "opt_ap9_001",
         "rpo": "AP9",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4338,7 +4317,6 @@
       {
         "option_id": "opt_dyx_001",
         "rpo": "DYX",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4347,7 +4325,6 @@
       {
         "option_id": "opt_uft_001",
         "rpo": "UFT",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4356,7 +4333,6 @@
       {
         "option_id": "opt_utj_001",
         "rpo": "UTJ",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4365,7 +4341,6 @@
       {
         "option_id": "opt_utv_001",
         "rpo": "UTV",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4374,7 +4349,6 @@
       {
         "option_id": "opt_utu_001",
         "rpo": "UTU",
-        "category_id": "",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -4383,7 +4357,6 @@
       {
         "option_id": "opt_ah2_003",
         "rpo": "AH2",
-        "category_id": "",
         "section_id": "sec_3lte_001",
         "original_section_id": "sec_3lte_001",
         "section_override_applied": false,
@@ -4392,7 +4365,6 @@
       {
         "option_id": "opt_iwe_001",
         "rpo": "IWE",
-        "category_id": "",
         "section_id": "sec_3lte_001",
         "original_section_id": "sec_3lte_001",
         "section_override_applied": false,
@@ -4401,7 +4373,6 @@
       {
         "option_id": "opt_026",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_3lte_001",
         "original_section_id": "sec_3lte_001",
         "section_override_applied": false,
@@ -4410,7 +4381,6 @@
       {
         "option_id": "opt_eyt_001",
         "rpo": "EYT",
-        "category_id": "",
         "section_id": "sec_badg_001",
         "original_section_id": "sec_badg_001",
         "section_override_applied": false,
@@ -4419,7 +4389,6 @@
       {
         "option_id": "opt_eyk_001",
         "rpo": "EYK",
-        "category_id": "",
         "section_id": "sec_badg_001",
         "original_section_id": "sec_badg_001",
         "section_override_applied": false,
@@ -4428,7 +4397,6 @@
       {
         "option_id": "opt_j6a_001",
         "rpo": "J6A",
-        "category_id": "cat_mech_001",
         "section_id": "sec_cali_001",
         "original_section_id": "sec_cali_001",
         "section_override_applied": false,
@@ -4437,7 +4405,6 @@
       {
         "option_id": "opt_j6d_001",
         "rpo": "J6D",
-        "category_id": "cat_mech_001",
         "section_id": "sec_cali_001",
         "original_section_id": "sec_cali_001",
         "section_override_applied": false,
@@ -4446,7 +4413,6 @@
       {
         "option_id": "opt_j6f_001",
         "rpo": "J6F",
-        "category_id": "cat_mech_001",
         "section_id": "sec_cali_001",
         "original_section_id": "sec_cali_001",
         "section_override_applied": false,
@@ -4455,7 +4421,6 @@
       {
         "option_id": "opt_j6e_001",
         "rpo": "J6E",
-        "category_id": "cat_mech_001",
         "section_id": "sec_cali_001",
         "original_section_id": "sec_cali_001",
         "section_override_applied": false,
@@ -4464,7 +4429,6 @@
       {
         "option_id": "opt_j6n_001",
         "rpo": "J6N",
-        "category_id": "cat_mech_001",
         "section_id": "sec_cali_001",
         "original_section_id": "sec_cali_001",
         "section_override_applied": false,
@@ -4473,7 +4437,6 @@
       {
         "option_id": "opt_j6b_001",
         "rpo": "J6B",
-        "category_id": "cat_mech_001",
         "section_id": "sec_cali_001",
         "original_section_id": "sec_cali_001",
         "section_override_applied": false,
@@ -4482,7 +4445,6 @@
       {
         "option_id": "opt_j6l_001",
         "rpo": "J6L",
-        "category_id": "cat_mech_001",
         "section_id": "sec_cali_001",
         "original_section_id": "sec_cali_001",
         "section_override_applied": false,
@@ -4491,7 +4453,6 @@
       {
         "option_id": "opt_d30_001",
         "rpo": "D30",
-        "category_id": "",
         "section_id": "sec_colo_001",
         "original_section_id": "sec_colo_001",
         "section_override_applied": false,
@@ -4500,7 +4461,6 @@
       {
         "option_id": "opt_r6x_001",
         "rpo": "R6X",
-        "category_id": "",
         "section_id": "sec_colo_001",
         "original_section_id": "sec_colo_001",
         "section_override_applied": false,
@@ -4509,7 +4469,6 @@
       {
         "option_id": "opt_r8c_001",
         "rpo": "R8C",
-        "category_id": "cat_exte_001",
         "section_id": "sec_cust_001",
         "original_section_id": "sec_cust_001",
         "section_override_applied": false,
@@ -4518,7 +4477,6 @@
       {
         "option_id": "opt_pin_001",
         "rpo": "PIN",
-        "category_id": "cat_exte_001",
         "section_id": "sec_cust_001",
         "original_section_id": "sec_cust_001",
         "section_override_applied": false,
@@ -4527,7 +4485,6 @@
       {
         "option_id": "opt_bv4_001",
         "rpo": "BV4",
-        "category_id": "cat_inte_001",
         "section_id": "sec_cust_001",
         "original_section_id": "sec_cust_001",
         "section_override_applied": false,
@@ -4536,7 +4493,6 @@
       {
         "option_id": "opt_b6p_001",
         "rpo": "B6P",
-        "category_id": "",
         "section_id": "sec_engi_001",
         "original_section_id": "sec_engi_001",
         "section_override_applied": false,
@@ -4545,7 +4501,6 @@
       {
         "option_id": "opt_zz3_001",
         "rpo": "ZZ3",
-        "category_id": "",
         "section_id": "sec_engi_001",
         "original_section_id": "sec_engi_001",
         "section_override_applied": false,
@@ -4554,7 +4509,6 @@
       {
         "option_id": "opt_d3v_001",
         "rpo": "D3V",
-        "category_id": "",
         "section_id": "sec_engi_001",
         "original_section_id": "sec_engi_001",
         "section_override_applied": false,
@@ -4563,7 +4517,6 @@
       {
         "option_id": "opt_sl9_001",
         "rpo": "SL9",
-        "category_id": "",
         "section_id": "sec_engi_001",
         "original_section_id": "sec_engi_001",
         "section_override_applied": false,
@@ -4572,7 +4525,6 @@
       {
         "option_id": "opt_bc7_001",
         "rpo": "BC7",
-        "category_id": "",
         "section_id": "sec_engi_001",
         "original_section_id": "sec_engi_001",
         "section_override_applied": false,
@@ -4581,7 +4533,6 @@
       {
         "option_id": "opt_bcp_002",
         "rpo": "BCP",
-        "category_id": "",
         "section_id": "sec_engi_001",
         "original_section_id": "sec_engi_001",
         "section_override_applied": false,
@@ -4590,7 +4541,6 @@
       {
         "option_id": "opt_bcs_002",
         "rpo": "BCS",
-        "category_id": "",
         "section_id": "sec_engi_001",
         "original_section_id": "sec_engi_001",
         "section_override_applied": false,
@@ -4599,7 +4549,6 @@
       {
         "option_id": "opt_bc4_002",
         "rpo": "BC4",
-        "category_id": "",
         "section_id": "sec_engi_001",
         "original_section_id": "sec_engi_001",
         "section_override_applied": false,
@@ -4608,7 +4557,6 @@
       {
         "option_id": "opt_slk_001",
         "rpo": "SLK",
-        "category_id": "",
         "section_id": "sec_engi_001",
         "original_section_id": "sec_engi_001",
         "section_override_applied": false,
@@ -4617,7 +4565,6 @@
       {
         "option_id": "opt_sln_001",
         "rpo": "SLN",
-        "category_id": "",
         "section_id": "sec_engi_001",
         "original_section_id": "sec_engi_001",
         "section_override_applied": false,
@@ -4626,7 +4573,6 @@
       {
         "option_id": "opt_vup_001",
         "rpo": "VUP",
-        "category_id": "",
         "section_id": "sec_engi_001",
         "original_section_id": "sec_engi_001",
         "section_override_applied": false,
@@ -4635,7 +4581,6 @@
       {
         "option_id": "opt_nga_001",
         "rpo": "NGA",
-        "category_id": "",
         "section_id": "sec_exha_001",
         "original_section_id": "sec_exha_001",
         "section_override_applied": false,
@@ -4644,7 +4589,6 @@
       {
         "option_id": "opt_wub_001",
         "rpo": "WUB",
-        "category_id": "",
         "section_id": "sec_exha_001",
         "original_section_id": "sec_exha_001",
         "section_override_applied": false,
@@ -4653,7 +4597,6 @@
       {
         "option_id": "opt_nwi_001",
         "rpo": "NWI",
-        "category_id": "",
         "section_id": "sec_exha_001",
         "original_section_id": "sec_exha_001",
         "section_override_applied": false,
@@ -4662,7 +4605,6 @@
       {
         "option_id": "opt_efr_001",
         "rpo": "EFR",
-        "category_id": "",
         "section_id": "sec_exte_001",
         "original_section_id": "sec_exte_001",
         "section_override_applied": false,
@@ -4671,7 +4613,6 @@
       {
         "option_id": "opt_zyc_001",
         "rpo": "ZYC",
-        "category_id": "",
         "section_id": "sec_exte_001",
         "original_section_id": "sec_exte_001",
         "section_override_applied": false,
@@ -4680,7 +4621,6 @@
       {
         "option_id": "opt_edu_001",
         "rpo": "EDU",
-        "category_id": "",
         "section_id": "sec_exte_001",
         "original_section_id": "sec_exte_001",
         "section_override_applied": false,
@@ -4689,7 +4629,6 @@
       {
         "option_id": "opt_dmu_001",
         "rpo": "DMU",
-        "category_id": "",
         "section_id": "sec_gsce_001",
         "original_section_id": "sec_gsce_001",
         "section_override_applied": false,
@@ -4698,7 +4637,6 @@
       {
         "option_id": "opt_dmv_001",
         "rpo": "DMV",
-        "category_id": "",
         "section_id": "sec_gsce_001",
         "original_section_id": "sec_gsce_001",
         "section_override_applied": false,
@@ -4707,7 +4645,6 @@
       {
         "option_id": "opt_dmw_001",
         "rpo": "DMW",
-        "category_id": "",
         "section_id": "sec_gsce_001",
         "original_section_id": "sec_gsce_001",
         "section_override_applied": false,
@@ -4716,7 +4653,6 @@
       {
         "option_id": "opt_dmx_001",
         "rpo": "DMX",
-        "category_id": "",
         "section_id": "sec_gsce_001",
         "original_section_id": "sec_gsce_001",
         "section_override_applied": false,
@@ -4725,7 +4661,6 @@
       {
         "option_id": "opt_dmy_001",
         "rpo": "DMY",
-        "category_id": "",
         "section_id": "sec_gsce_001",
         "original_section_id": "sec_gsce_001",
         "section_override_applied": false,
@@ -4734,7 +4669,6 @@
       {
         "option_id": "opt_17a_001",
         "rpo": "17A",
-        "category_id": "",
         "section_id": "sec_gsha_001",
         "original_section_id": "sec_gsha_001",
         "section_override_applied": false,
@@ -4743,7 +4677,6 @@
       {
         "option_id": "opt_20a_001",
         "rpo": "20A",
-        "category_id": "",
         "section_id": "sec_gsha_001",
         "original_section_id": "sec_gsha_001",
         "section_override_applied": false,
@@ -4752,7 +4685,6 @@
       {
         "option_id": "opt_55a_001",
         "rpo": "55A",
-        "category_id": "",
         "section_id": "sec_gsha_001",
         "original_section_id": "sec_gsha_001",
         "section_override_applied": false,
@@ -4761,7 +4693,6 @@
       {
         "option_id": "opt_75a_001",
         "rpo": "75A",
-        "category_id": "",
         "section_id": "sec_gsha_001",
         "original_section_id": "sec_gsha_001",
         "section_override_applied": false,
@@ -4770,7 +4701,6 @@
       {
         "option_id": "opt_97a_001",
         "rpo": "97A",
-        "category_id": "",
         "section_id": "sec_gsha_001",
         "original_section_id": "sec_gsha_001",
         "section_override_applied": false,
@@ -4779,7 +4709,6 @@
       {
         "option_id": "opt_dx4_001",
         "rpo": "DX4",
-        "category_id": "",
         "section_id": "sec_gsha_001",
         "original_section_id": "sec_gsha_001",
         "section_override_applied": false,
@@ -4788,7 +4717,6 @@
       {
         "option_id": "opt_drg_001",
         "rpo": "DRG",
-        "category_id": "cat_exte_001",
         "section_id": "sec_incl_001",
         "original_section_id": "sec_incl_001",
         "section_override_applied": false,
@@ -4797,7 +4725,6 @@
       {
         "option_id": "opt_tr7_001",
         "rpo": "TR7",
-        "category_id": "cat_exte_001",
         "section_id": "sec_incl_001",
         "original_section_id": "sec_incl_001",
         "section_override_applied": false,
@@ -4806,7 +4733,6 @@
       {
         "option_id": "opt_cfx_001",
         "rpo": "CFX",
-        "category_id": "cat_inte_001",
         "section_id": "sec_incl_001",
         "original_section_id": "sec_incl_001",
         "section_override_applied": false,
@@ -4815,7 +4741,6 @@
       {
         "option_id": "opt_j56_001",
         "rpo": "J56",
-        "category_id": "cat_mech_001",
         "section_id": "sec_incl_001",
         "original_section_id": "sec_incl_001",
         "section_override_applied": false,
@@ -4824,7 +4749,6 @@
       {
         "option_id": "opt_t0e_002",
         "rpo": "T0E",
-        "category_id": "cat_exte_001",
         "section_id": "sec_incl_001",
         "original_section_id": "sec_incl_001",
         "section_override_applied": false,
@@ -4833,7 +4757,6 @@
       {
         "option_id": "opt_xfr_001",
         "rpo": "XFR",
-        "category_id": "cat_exte_001",
         "section_id": "sec_incl_001",
         "original_section_id": "sec_incl_001",
         "section_override_applied": false,
@@ -4842,7 +4765,6 @@
       {
         "option_id": "opt_xfs_001",
         "rpo": "XFS",
-        "category_id": "cat_exte_001",
         "section_id": "sec_incl_001",
         "original_section_id": "sec_incl_001",
         "section_override_applied": false,
@@ -4851,7 +4773,6 @@
       {
         "option_id": "opt_uqt_001",
         "rpo": "UQT",
-        "category_id": "",
         "section_id": "sec_inte_001",
         "original_section_id": "sec_inte_001",
         "section_override_applied": false,
@@ -4860,7 +4781,6 @@
       {
         "option_id": "opt_baz_001",
         "rpo": "BAZ",
-        "category_id": "",
         "section_id": "sec_inte_001",
         "original_section_id": "sec_inte_001",
         "section_override_applied": false,
@@ -4869,7 +4789,6 @@
       {
         "option_id": "opt_fa5_001",
         "rpo": "FA5",
-        "category_id": "",
         "section_id": "sec_inte_001",
         "original_section_id": "sec_inte_001",
         "section_override_applied": false,
@@ -4878,7 +4797,6 @@
       {
         "option_id": "opt_sda_001",
         "rpo": "SDA",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -4887,7 +4805,6 @@
       {
         "option_id": "opt_sfz_001",
         "rpo": "SFZ",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -4896,7 +4813,6 @@
       {
         "option_id": "opt_r88_001",
         "rpo": "R88",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -4905,7 +4821,6 @@
       {
         "option_id": "opt_sup_001",
         "rpo": "SUP",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -4914,7 +4829,6 @@
       {
         "option_id": "opt_sbt_001",
         "rpo": "SBT",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -4923,7 +4837,6 @@
       {
         "option_id": "opt_sc7_001",
         "rpo": "SC7",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -4932,7 +4845,6 @@
       {
         "option_id": "opt_vtb_001",
         "rpo": "VTB",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -4941,7 +4853,6 @@
       {
         "option_id": "opt_pcq_001",
         "rpo": "PCQ",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -4950,7 +4861,6 @@
       {
         "option_id": "opt_vwe_001",
         "rpo": "VWE",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -4959,7 +4869,6 @@
       {
         "option_id": "opt_vwt_001",
         "rpo": "VWT",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -4968,7 +4877,6 @@
       {
         "option_id": "opt_5jr_001",
         "rpo": "5JR",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -4977,7 +4885,6 @@
       {
         "option_id": "opt_rwh_001",
         "rpo": "RWH",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -4986,7 +4893,6 @@
       {
         "option_id": "opt_wkr_001",
         "rpo": "WKR",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -4995,7 +4901,6 @@
       {
         "option_id": "opt_rwj_001",
         "rpo": "RWJ",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -5004,7 +4909,6 @@
       {
         "option_id": "opt_rin_001",
         "rpo": "RIN",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -5013,7 +4917,6 @@
       {
         "option_id": "opt_sl8_001",
         "rpo": "SL8",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -5022,7 +4925,6 @@
       {
         "option_id": "opt_rik_001",
         "rpo": "RIK",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -5031,7 +4933,6 @@
       {
         "option_id": "opt_sig_001",
         "rpo": "SIG",
-        "category_id": "cat_exte_001",
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
@@ -5040,7 +4941,6 @@
       {
         "option_id": "opt_pdy_001",
         "rpo": "PDY",
-        "category_id": "",
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
@@ -5049,7 +4949,6 @@
       {
         "option_id": "opt_ryt_001",
         "rpo": "RYT",
-        "category_id": "",
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
@@ -5058,7 +4957,6 @@
       {
         "option_id": "opt_s08_001",
         "rpo": "S08",
-        "category_id": "",
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
@@ -5067,7 +4965,6 @@
       {
         "option_id": "opt_pef_001",
         "rpo": "PEF",
-        "category_id": "",
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
@@ -5076,7 +4973,6 @@
       {
         "option_id": "opt_ria_001",
         "rpo": "RIA",
-        "category_id": "",
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
@@ -5085,7 +4981,6 @@
       {
         "option_id": "opt_cav_001",
         "rpo": "CAV",
-        "category_id": "",
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
@@ -5094,7 +4989,6 @@
       {
         "option_id": "opt_vyw_001",
         "rpo": "VYW",
-        "category_id": "",
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
@@ -5103,7 +4997,6 @@
       {
         "option_id": "opt_rwu_001",
         "rpo": "RWU",
-        "category_id": "",
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
@@ -5112,7 +5005,6 @@
       {
         "option_id": "opt_w2d_001",
         "rpo": "W2D",
-        "category_id": "",
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
@@ -5121,7 +5013,6 @@
       {
         "option_id": "opt_s2l_001",
         "rpo": "S2L",
-        "category_id": "",
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
@@ -5130,7 +5021,6 @@
       {
         "option_id": "opt_sxb_001",
         "rpo": "SXB",
-        "category_id": "",
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
@@ -5139,7 +5029,6 @@
       {
         "option_id": "opt_sxr_001",
         "rpo": "SXR",
-        "category_id": "",
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
@@ -5148,7 +5037,6 @@
       {
         "option_id": "opt_sxt_001",
         "rpo": "SXT",
-        "category_id": "",
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
@@ -5157,7 +5045,6 @@
       {
         "option_id": "opt_g8g_001",
         "rpo": "G8G",
-        "category_id": "",
         "section_id": "sec_pain_001",
         "original_section_id": "sec_pain_001",
         "section_override_applied": false,
@@ -5166,7 +5053,6 @@
       {
         "option_id": "opt_gba_001",
         "rpo": "GBA",
-        "category_id": "",
         "section_id": "sec_pain_001",
         "original_section_id": "sec_pain_001",
         "section_override_applied": false,
@@ -5175,7 +5061,6 @@
       {
         "option_id": "opt_gka_001",
         "rpo": "GKA",
-        "category_id": "",
         "section_id": "sec_pain_001",
         "original_section_id": "sec_pain_001",
         "section_override_applied": false,
@@ -5184,7 +5069,6 @@
       {
         "option_id": "opt_gbk_001",
         "rpo": "GBK",
-        "category_id": "",
         "section_id": "sec_pain_001",
         "original_section_id": "sec_pain_001",
         "section_override_applied": false,
@@ -5193,7 +5077,6 @@
       {
         "option_id": "opt_gtr_001",
         "rpo": "GTR",
-        "category_id": "",
         "section_id": "sec_pain_001",
         "original_section_id": "sec_pain_001",
         "section_override_applied": false,
@@ -5202,7 +5085,6 @@
       {
         "option_id": "opt_gec_001",
         "rpo": "GEC",
-        "category_id": "",
         "section_id": "sec_pain_001",
         "original_section_id": "sec_pain_001",
         "section_override_applied": false,
@@ -5211,7 +5093,6 @@
       {
         "option_id": "opt_gph_001",
         "rpo": "GPH",
-        "category_id": "",
         "section_id": "sec_pain_001",
         "original_section_id": "sec_pain_001",
         "section_override_applied": false,
@@ -5220,7 +5101,6 @@
       {
         "option_id": "opt_g4z_001",
         "rpo": "G4Z",
-        "category_id": "",
         "section_id": "sec_pain_001",
         "original_section_id": "sec_pain_001",
         "section_override_applied": false,
@@ -5229,7 +5109,6 @@
       {
         "option_id": "opt_g26_001",
         "rpo": "G26",
-        "category_id": "",
         "section_id": "sec_pain_001",
         "original_section_id": "sec_pain_001",
         "section_override_applied": false,
@@ -5238,7 +5117,6 @@
       {
         "option_id": "opt_gkz_001",
         "rpo": "GKZ",
-        "category_id": "",
         "section_id": "sec_pain_001",
         "original_section_id": "sec_pain_001",
         "section_override_applied": false,
@@ -5247,7 +5125,6 @@
       {
         "option_id": "opt_eri_001",
         "rpo": "ERI",
-        "category_id": "cat_mech_001",
         "section_id": "sec_perf_001",
         "original_section_id": "sec_perf_001",
         "section_override_applied": false,
@@ -5256,7 +5133,6 @@
       {
         "option_id": "opt_e60_001",
         "rpo": "E60",
-        "category_id": "cat_exte_001",
         "section_id": "sec_perf_001",
         "original_section_id": "sec_perf_001",
         "section_override_applied": false,
@@ -5265,7 +5141,6 @@
       {
         "option_id": "opt_cfl_001",
         "rpo": "CFL",
-        "category_id": "cat_exte_001",
         "section_id": "sec_perf_001",
         "original_section_id": "sec_perf_001",
         "section_override_applied": false,
@@ -5274,7 +5149,6 @@
       {
         "option_id": "opt_cfz_001",
         "rpo": "CFZ",
-        "category_id": "cat_exte_001",
         "section_id": "sec_perf_001",
         "original_section_id": "sec_perf_001",
         "section_override_applied": false,
@@ -5283,7 +5157,6 @@
       {
         "option_id": "opt_feb_001",
         "rpo": "FEB",
-        "category_id": "cat_mech_001",
         "section_id": "sec_perf_001",
         "original_section_id": "sec_perf_001",
         "section_override_applied": false,
@@ -5292,7 +5165,6 @@
       {
         "option_id": "opt_fey_001",
         "rpo": "FEY",
-        "category_id": "cat_mech_001",
         "section_id": "sec_perf_001",
         "original_section_id": "sec_perf_001",
         "section_override_applied": false,
@@ -5301,7 +5173,6 @@
       {
         "option_id": "opt_j57_001",
         "rpo": "J57",
-        "category_id": "cat_mech_001",
         "section_id": "sec_perf_001",
         "original_section_id": "sec_perf_001",
         "section_override_applied": false,
@@ -5310,7 +5181,6 @@
       {
         "option_id": "opt_t0f_001",
         "rpo": "T0F",
-        "category_id": "cat_exte_001",
         "section_id": "sec_perf_001",
         "original_section_id": "sec_perf_001",
         "section_override_applied": false,
@@ -5319,7 +5189,6 @@
       {
         "option_id": "opt_cf7_001",
         "rpo": "CF7",
-        "category_id": "",
         "section_id": "sec_roof_001",
         "original_section_id": "sec_roof_001",
         "section_override_applied": false,
@@ -5328,7 +5197,6 @@
       {
         "option_id": "opt_cm9_001",
         "rpo": "CM9",
-        "category_id": "",
         "section_id": "sec_roof_001",
         "original_section_id": "sec_roof_001",
         "section_override_applied": false,
@@ -5337,7 +5205,6 @@
       {
         "option_id": "opt_c2z_001",
         "rpo": "C2Z",
-        "category_id": "",
         "section_id": "sec_roof_001",
         "original_section_id": "sec_roof_001",
         "section_override_applied": false,
@@ -5346,7 +5213,6 @@
       {
         "option_id": "opt_cc3_001",
         "rpo": "CC3",
-        "category_id": "",
         "section_id": "sec_roof_001",
         "original_section_id": "sec_roof_001",
         "section_override_applied": false,
@@ -5355,7 +5221,6 @@
       {
         "option_id": "opt_cf8_001",
         "rpo": "CF8",
-        "category_id": "",
         "section_id": "sec_roof_001",
         "original_section_id": "sec_roof_001",
         "section_override_applied": false,
@@ -5364,7 +5229,6 @@
       {
         "option_id": "opt_d84_001",
         "rpo": "D84",
-        "category_id": "",
         "section_id": "sec_roof_001",
         "original_section_id": "sec_roof_001",
         "section_override_applied": false,
@@ -5373,7 +5237,6 @@
       {
         "option_id": "opt_d86_001",
         "rpo": "D86",
-        "category_id": "",
         "section_id": "sec_roof_001",
         "original_section_id": "sec_roof_001",
         "section_override_applied": false,
@@ -5382,7 +5245,6 @@
       {
         "option_id": "opt_aj7_001",
         "rpo": "AJ7",
-        "category_id": "",
         "section_id": "sec_safe_001",
         "original_section_id": "sec_safe_001",
         "section_override_applied": false,
@@ -5391,7 +5253,6 @@
       {
         "option_id": "opt_uhy_001",
         "rpo": "UHY",
-        "category_id": "",
         "section_id": "sec_safe_001",
         "original_section_id": "sec_safe_001",
         "section_override_applied": false,
@@ -5400,7 +5261,6 @@
       {
         "option_id": "opt_ueu_001",
         "rpo": "UEU",
-        "category_id": "",
         "section_id": "sec_safe_001",
         "original_section_id": "sec_safe_001",
         "section_override_applied": false,
@@ -5409,7 +5269,6 @@
       {
         "option_id": "opt_ukt_001",
         "rpo": "UKT",
-        "category_id": "",
         "section_id": "sec_safe_001",
         "original_section_id": "sec_safe_001",
         "section_override_applied": false,
@@ -5418,7 +5277,6 @@
       {
         "option_id": "opt_tq5_001",
         "rpo": "TQ5",
-        "category_id": "",
         "section_id": "sec_safe_001",
         "original_section_id": "sec_safe_001",
         "section_override_applied": false,
@@ -5427,7 +5285,6 @@
       {
         "option_id": "opt_uhx_001",
         "rpo": "UHX",
-        "category_id": "",
         "section_id": "sec_safe_001",
         "original_section_id": "sec_safe_001",
         "section_override_applied": false,
@@ -5436,7 +5293,6 @@
       {
         "option_id": "opt_drz_001",
         "rpo": "DRZ",
-        "category_id": "",
         "section_id": "sec_safe_001",
         "original_section_id": "sec_safe_001",
         "section_override_applied": false,
@@ -5445,7 +5301,6 @@
       {
         "option_id": "opt_ud7_001",
         "rpo": "UD7",
-        "category_id": "",
         "section_id": "sec_safe_001",
         "original_section_id": "sec_safe_001",
         "section_override_applied": false,
@@ -5454,7 +5309,6 @@
       {
         "option_id": "opt_tdm_001",
         "rpo": "TDM",
-        "category_id": "",
         "section_id": "sec_safe_001",
         "original_section_id": "sec_safe_001",
         "section_override_applied": false,
@@ -5463,7 +5317,6 @@
       {
         "option_id": "opt_012",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_safe_001",
         "original_section_id": "sec_safe_001",
         "section_override_applied": false,
@@ -5472,7 +5325,6 @@
       {
         "option_id": "opt_019",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_safe_001",
         "original_section_id": "sec_safe_001",
         "section_override_applied": false,
@@ -5481,7 +5333,6 @@
       {
         "option_id": "opt_020",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_safe_001",
         "original_section_id": "sec_safe_001",
         "section_override_applied": false,
@@ -5490,7 +5341,6 @@
       {
         "option_id": "opt_025",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_safe_001",
         "original_section_id": "sec_safe_001",
         "section_override_applied": false,
@@ -5499,7 +5349,6 @@
       {
         "option_id": "opt_719_001",
         "rpo": "719",
-        "category_id": "",
         "section_id": "sec_seat_001",
         "original_section_id": "sec_seat_001",
         "section_override_applied": false,
@@ -5508,7 +5357,6 @@
       {
         "option_id": "opt_3n9_001",
         "rpo": "3N9",
-        "category_id": "",
         "section_id": "sec_seat_001",
         "original_section_id": "sec_seat_001",
         "section_override_applied": false,
@@ -5517,7 +5365,6 @@
       {
         "option_id": "opt_379_001",
         "rpo": "379",
-        "category_id": "",
         "section_id": "sec_seat_001",
         "original_section_id": "sec_seat_001",
         "section_override_applied": false,
@@ -5526,7 +5373,6 @@
       {
         "option_id": "opt_3a9_001",
         "rpo": "3A9",
-        "category_id": "",
         "section_id": "sec_seat_001",
         "original_section_id": "sec_seat_001",
         "section_override_applied": false,
@@ -5535,7 +5381,6 @@
       {
         "option_id": "opt_3f9_001",
         "rpo": "3F9",
-        "category_id": "",
         "section_id": "sec_seat_001",
         "original_section_id": "sec_seat_001",
         "section_override_applied": false,
@@ -5544,7 +5389,6 @@
       {
         "option_id": "opt_3m9_001",
         "rpo": "3M9",
-        "category_id": "",
         "section_id": "sec_seat_001",
         "original_section_id": "sec_seat_001",
         "section_override_applied": false,
@@ -5553,7 +5397,6 @@
       {
         "option_id": "opt_aq9_001",
         "rpo": "AQ9",
-        "category_id": "",
         "section_id": "sec_seat_002",
         "original_section_id": "sec_seat_002",
         "section_override_applied": false,
@@ -5562,7 +5405,6 @@
       {
         "option_id": "opt_ah2_001",
         "rpo": "AH2",
-        "category_id": "",
         "section_id": "sec_seat_002",
         "original_section_id": "sec_seat_002",
         "section_override_applied": false,
@@ -5571,16 +5413,6 @@
       {
         "option_id": "opt_ae4_002",
         "rpo": "AE4",
-        "category_id": "",
-        "section_id": "sec_seat_002",
-        "original_section_id": "sec_seat_002",
-        "section_override_applied": false,
-        "step_key": "seat"
-      },
-      {
-        "option_id": "opt_aup_001",
-        "rpo": "AUP",
-        "category_id": "",
         "section_id": "sec_seat_002",
         "original_section_id": "sec_seat_002",
         "section_override_applied": false,
@@ -5589,7 +5421,6 @@
       {
         "option_id": "opt_z25_001",
         "rpo": "Z25",
-        "category_id": "cat_exte_001",
         "section_id": "sec_spec_001",
         "original_section_id": "sec_spec_001",
         "section_override_applied": false,
@@ -5598,7 +5429,6 @@
       {
         "option_id": "opt_5zv_001",
         "rpo": "5ZV",
-        "category_id": "cat_exte_001",
         "section_id": "sec_spoi_001",
         "original_section_id": "sec_spoi_001",
         "section_override_applied": false,
@@ -5607,7 +5437,6 @@
       {
         "option_id": "opt_cj2_001",
         "rpo": "CJ2",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5616,7 +5445,6 @@
       {
         "option_id": "opt_u80_001",
         "rpo": "U80",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5625,7 +5453,6 @@
       {
         "option_id": "opt_npp_001",
         "rpo": "NPP",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5634,7 +5461,6 @@
       {
         "option_id": "opt_t4l_001",
         "rpo": "T4L",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5643,7 +5469,6 @@
       {
         "option_id": "opt_ls6_001",
         "rpo": "LS6",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5652,7 +5477,6 @@
       {
         "option_id": "opt_a2x_001",
         "rpo": "A2X",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5661,7 +5485,6 @@
       {
         "option_id": "opt_a7k_001",
         "rpo": "A7K",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5670,7 +5493,6 @@
       {
         "option_id": "opt_n38_001",
         "rpo": "N38",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5679,7 +5501,6 @@
       {
         "option_id": "opt_vhm_001",
         "rpo": "VHM",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5688,7 +5509,6 @@
       {
         "option_id": "opt_v08_001",
         "rpo": "V08",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5697,7 +5517,6 @@
       {
         "option_id": "opt_m1n_001",
         "rpo": "M1N",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5706,7 +5525,6 @@
       {
         "option_id": "opt_g0k_001",
         "rpo": "G0K",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5715,7 +5533,6 @@
       {
         "option_id": "opt_b4z_001",
         "rpo": "B4Z",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5724,7 +5541,6 @@
       {
         "option_id": "opt_jx6_001",
         "rpo": "JX6",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5733,7 +5549,6 @@
       {
         "option_id": "opt_xft_001",
         "rpo": "XFT",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5742,7 +5557,6 @@
       {
         "option_id": "opt_001",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5751,7 +5565,6 @@
       {
         "option_id": "opt_002",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5760,7 +5573,6 @@
       {
         "option_id": "opt_003",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5769,7 +5581,6 @@
       {
         "option_id": "opt_004",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5778,7 +5589,6 @@
       {
         "option_id": "opt_005",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5787,7 +5597,6 @@
       {
         "option_id": "opt_006",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5796,7 +5605,6 @@
       {
         "option_id": "opt_007",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5805,7 +5613,6 @@
       {
         "option_id": "opt_008",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5814,7 +5621,6 @@
       {
         "option_id": "opt_010",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5823,7 +5629,6 @@
       {
         "option_id": "opt_011",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5832,7 +5637,6 @@
       {
         "option_id": "opt_013",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5841,7 +5645,6 @@
       {
         "option_id": "opt_014",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5850,7 +5653,6 @@
       {
         "option_id": "opt_016",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5859,7 +5661,6 @@
       {
         "option_id": "opt_017",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5868,7 +5669,6 @@
       {
         "option_id": "opt_018",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5877,7 +5677,6 @@
       {
         "option_id": "opt_021",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5886,7 +5685,6 @@
       {
         "option_id": "opt_022",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5895,7 +5693,6 @@
       {
         "option_id": "opt_023",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5904,7 +5701,6 @@
       {
         "option_id": "opt_024",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_stan_001",
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
@@ -5913,7 +5709,6 @@
       {
         "option_id": "opt_j6a_002",
         "rpo": "J6A",
-        "category_id": "",
         "section_id": "sec_stan_002",
         "original_section_id": "sec_stan_002",
         "section_override_applied": false,
@@ -5922,7 +5717,6 @@
       {
         "option_id": "opt_eyt_002",
         "rpo": "EYT",
-        "category_id": "",
         "section_id": "sec_stan_002",
         "original_section_id": "sec_stan_002",
         "section_override_applied": false,
@@ -5931,7 +5725,6 @@
       {
         "option_id": "opt_cm9_002",
         "rpo": "CM9",
-        "category_id": "",
         "section_id": "sec_stan_002",
         "original_section_id": "sec_stan_002",
         "section_override_applied": false,
@@ -5940,7 +5733,6 @@
       {
         "option_id": "opt_nga_002",
         "rpo": "NGA",
-        "category_id": "",
         "section_id": "sec_stan_002",
         "original_section_id": "sec_stan_002",
         "section_override_applied": false,
@@ -5949,7 +5741,6 @@
       {
         "option_id": "opt_efr_002",
         "rpo": "EFR",
-        "category_id": "",
         "section_id": "sec_stan_002",
         "original_section_id": "sec_stan_002",
         "section_override_applied": false,
@@ -5958,7 +5749,6 @@
       {
         "option_id": "opt_cf7_002",
         "rpo": "CF7",
-        "category_id": "",
         "section_id": "sec_stan_002",
         "original_section_id": "sec_stan_002",
         "section_override_applied": false,
@@ -5967,7 +5757,6 @@
       {
         "option_id": "opt_719_002",
         "rpo": "719",
-        "category_id": "",
         "section_id": "sec_stan_002",
         "original_section_id": "sec_stan_002",
         "section_override_applied": false,
@@ -5976,7 +5765,6 @@
       {
         "option_id": "opt_nk4_001",
         "rpo": "NK4",
-        "category_id": "",
         "section_id": "sec_stan_002",
         "original_section_id": "sec_stan_002",
         "section_override_applied": false,
@@ -5985,7 +5773,6 @@
       {
         "option_id": "opt_fea_001",
         "rpo": "FEA",
-        "category_id": "",
         "section_id": "sec_stan_002",
         "original_section_id": "sec_stan_002",
         "section_override_applied": false,
@@ -5994,16 +5781,6 @@
       {
         "option_id": "opt_swm_002",
         "rpo": "SWM",
-        "category_id": "",
-        "section_id": "sec_stan_002",
-        "original_section_id": "sec_stan_002",
-        "section_override_applied": false,
-        "step_key": "standard_equipment"
-      },
-      {
-        "option_id": "opt_t0e_001",
-        "rpo": "T0E",
-        "category_id": "",
         "section_id": "sec_stan_002",
         "original_section_id": "sec_stan_002",
         "section_override_applied": false,
@@ -6012,7 +5789,6 @@
       {
         "option_id": "opt_dth_001",
         "rpo": "DTH",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6021,7 +5797,6 @@
       {
         "option_id": "opt_dub_001",
         "rpo": "DUB",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6030,7 +5805,6 @@
       {
         "option_id": "opt_dt0_001",
         "rpo": "DT0",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6039,7 +5813,6 @@
       {
         "option_id": "opt_duw_001",
         "rpo": "DUW",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6048,7 +5821,6 @@
       {
         "option_id": "opt_dsy_001",
         "rpo": "DSY",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6057,7 +5829,6 @@
       {
         "option_id": "opt_dsz_001",
         "rpo": "DSZ",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6066,7 +5837,6 @@
       {
         "option_id": "opt_dpb_001",
         "rpo": "DPB",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6075,7 +5845,6 @@
       {
         "option_id": "opt_dpg_001",
         "rpo": "DPG",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6084,7 +5853,6 @@
       {
         "option_id": "opt_dpl_001",
         "rpo": "DPL",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6093,7 +5861,6 @@
       {
         "option_id": "opt_dpt_001",
         "rpo": "DPT",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6102,7 +5869,6 @@
       {
         "option_id": "opt_dpc_001",
         "rpo": "DPC",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6111,7 +5877,6 @@
       {
         "option_id": "opt_duk_001",
         "rpo": "DUK",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6120,7 +5885,6 @@
       {
         "option_id": "opt_due_001",
         "rpo": "DUE",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6129,7 +5893,6 @@
       {
         "option_id": "opt_dzu_001",
         "rpo": "DZU",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6138,7 +5901,6 @@
       {
         "option_id": "opt_dzx_001",
         "rpo": "DZX",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6147,7 +5909,6 @@
       {
         "option_id": "opt_dzv_001",
         "rpo": "DZV",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6156,7 +5917,6 @@
       {
         "option_id": "opt_sht_001",
         "rpo": "SHT",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6165,7 +5925,6 @@
       {
         "option_id": "opt_vpo_001",
         "rpo": "VPO",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6174,7 +5933,6 @@
       {
         "option_id": "opt_z15_001",
         "rpo": "Z15",
-        "category_id": "",
         "section_id": "sec_stri_001",
         "original_section_id": "sec_stri_001",
         "section_override_applied": false,
@@ -6183,7 +5941,6 @@
       {
         "option_id": "opt_ive_001",
         "rpo": "IVE",
-        "category_id": "",
         "section_id": "sec_tech_001",
         "original_section_id": "sec_tech_001",
         "section_override_applied": false,
@@ -6192,7 +5949,6 @@
       {
         "option_id": "opt_ppw_001",
         "rpo": "PPW",
-        "category_id": "",
         "section_id": "sec_tech_001",
         "original_section_id": "sec_tech_001",
         "section_override_applied": false,
@@ -6201,7 +5957,6 @@
       {
         "option_id": "opt_015",
         "rpo": "",
-        "category_id": "",
         "section_id": "sec_tech_001",
         "original_section_id": "sec_tech_001",
         "section_override_applied": false,
@@ -6210,7 +5965,6 @@
       {
         "option_id": "opt_spy_001",
         "rpo": "SPY",
-        "category_id": "cat_exte_001",
         "section_id": "sec_whee_001",
         "original_section_id": "sec_whee_001",
         "section_override_applied": false,
@@ -6219,7 +5973,6 @@
       {
         "option_id": "opt_spz_001",
         "rpo": "SPZ",
-        "category_id": "cat_exte_001",
         "section_id": "sec_whee_001",
         "original_section_id": "sec_whee_001",
         "section_override_applied": false,
@@ -6228,7 +5981,6 @@
       {
         "option_id": "opt_s47_001",
         "rpo": "S47",
-        "category_id": "cat_exte_001",
         "section_id": "sec_whee_001",
         "original_section_id": "sec_whee_001",
         "section_override_applied": false,
@@ -6237,7 +5989,6 @@
       {
         "option_id": "opt_sfe_001",
         "rpo": "SFE",
-        "category_id": "cat_exte_001",
         "section_id": "sec_whee_001",
         "original_section_id": "sec_whee_001",
         "section_override_applied": false,
@@ -6246,7 +5997,6 @@
       {
         "option_id": "opt_5zd_001",
         "rpo": "5ZD",
-        "category_id": "cat_exte_001",
         "section_id": "sec_whee_001",
         "original_section_id": "sec_whee_001",
         "section_override_applied": false,
@@ -6255,7 +6005,6 @@
       {
         "option_id": "opt_5zc_001",
         "rpo": "5ZC",
-        "category_id": "cat_exte_001",
         "section_id": "sec_whee_001",
         "original_section_id": "sec_whee_001",
         "section_override_applied": false,
@@ -6264,7 +6013,6 @@
       {
         "option_id": "opt_5zb_001",
         "rpo": "5ZB",
-        "category_id": "cat_exte_001",
         "section_id": "sec_whee_001",
         "original_section_id": "sec_whee_001",
         "section_override_applied": false,
@@ -6273,7 +6021,6 @@
       {
         "option_id": "opt_swm_001",
         "rpo": "SWM",
-        "category_id": "",
         "section_id": "sec_whee_002",
         "original_section_id": "sec_whee_002",
         "section_override_applied": false,
@@ -6282,7 +6029,6 @@
       {
         "option_id": "opt_roy_001",
         "rpo": "ROY",
-        "category_id": "",
         "section_id": "sec_whee_002",
         "original_section_id": "sec_whee_002",
         "section_override_applied": false,
@@ -6291,7 +6037,6 @@
       {
         "option_id": "opt_roz_001",
         "rpo": "ROZ",
-        "category_id": "",
         "section_id": "sec_whee_002",
         "original_section_id": "sec_whee_002",
         "section_override_applied": false,
@@ -6300,7 +6045,6 @@
       {
         "option_id": "opt_stz_001",
         "rpo": "STZ",
-        "category_id": "",
         "section_id": "sec_whee_002",
         "original_section_id": "sec_whee_002",
         "section_override_applied": false,
@@ -6309,7 +6053,6 @@
       {
         "option_id": "opt_swn_001",
         "rpo": "SWN",
-        "category_id": "",
         "section_id": "sec_whee_002",
         "original_section_id": "sec_whee_002",
         "section_override_applied": false,
@@ -6318,7 +6061,6 @@
       {
         "option_id": "opt_swo_001",
         "rpo": "SWO",
-        "category_id": "",
         "section_id": "sec_whee_002",
         "original_section_id": "sec_whee_002",
         "section_override_applied": false,
@@ -6327,7 +6069,6 @@
       {
         "option_id": "opt_swp_001",
         "rpo": "SWP",
-        "category_id": "",
         "section_id": "sec_whee_002",
         "original_section_id": "sec_whee_002",
         "section_override_applied": false,
@@ -6335,346 +6076,7 @@
       }
     ],
     "missing_sections": {},
-    "unknown_sections": {},
-    "unknown_categories": {},
-    "section_category_mismatches": [
-      {
-        "option_id": "opt_j6a_001",
-        "rpo": "J6A",
-        "section_id": "sec_cali_001",
-        "row_category_id": "cat_mech_001",
-        "section_category_id": "cat_exte_001"
-      },
-      {
-        "option_id": "opt_j6d_001",
-        "rpo": "J6D",
-        "section_id": "sec_cali_001",
-        "row_category_id": "cat_mech_001",
-        "section_category_id": "cat_exte_001"
-      },
-      {
-        "option_id": "opt_j6f_001",
-        "rpo": "J6F",
-        "section_id": "sec_cali_001",
-        "row_category_id": "cat_mech_001",
-        "section_category_id": "cat_exte_001"
-      },
-      {
-        "option_id": "opt_j6e_001",
-        "rpo": "J6E",
-        "section_id": "sec_cali_001",
-        "row_category_id": "cat_mech_001",
-        "section_category_id": "cat_exte_001"
-      },
-      {
-        "option_id": "opt_j6n_001",
-        "rpo": "J6N",
-        "section_id": "sec_cali_001",
-        "row_category_id": "cat_mech_001",
-        "section_category_id": "cat_exte_001"
-      },
-      {
-        "option_id": "opt_j6b_001",
-        "rpo": "J6B",
-        "section_id": "sec_cali_001",
-        "row_category_id": "cat_mech_001",
-        "section_category_id": "cat_exte_001"
-      },
-      {
-        "option_id": "opt_j6l_001",
-        "rpo": "J6L",
-        "section_id": "sec_cali_001",
-        "row_category_id": "cat_mech_001",
-        "section_category_id": "cat_exte_001"
-      },
-      {
-        "option_id": "opt_r8c_001",
-        "rpo": "R8C",
-        "section_id": "sec_cust_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_pin_001",
-        "rpo": "PIN",
-        "section_id": "sec_cust_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_bv4_001",
-        "rpo": "BV4",
-        "section_id": "sec_cust_001",
-        "row_category_id": "cat_inte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_drg_001",
-        "rpo": "DRG",
-        "section_id": "sec_incl_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_stan_001"
-      },
-      {
-        "option_id": "opt_tr7_001",
-        "rpo": "TR7",
-        "section_id": "sec_incl_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_stan_001"
-      },
-      {
-        "option_id": "opt_cfx_001",
-        "rpo": "CFX",
-        "section_id": "sec_incl_001",
-        "row_category_id": "cat_inte_001",
-        "section_category_id": "cat_stan_001"
-      },
-      {
-        "option_id": "opt_j56_001",
-        "rpo": "J56",
-        "section_id": "sec_incl_001",
-        "row_category_id": "cat_mech_001",
-        "section_category_id": "cat_stan_001"
-      },
-      {
-        "option_id": "opt_t0e_002",
-        "rpo": "T0E",
-        "section_id": "sec_incl_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_stan_001"
-      },
-      {
-        "option_id": "opt_xfr_001",
-        "rpo": "XFR",
-        "section_id": "sec_incl_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_stan_001"
-      },
-      {
-        "option_id": "opt_xfs_001",
-        "rpo": "XFS",
-        "section_id": "sec_incl_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_stan_001"
-      },
-      {
-        "option_id": "opt_sda_001",
-        "rpo": "SDA",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_sfz_001",
-        "rpo": "SFZ",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_r88_001",
-        "rpo": "R88",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_sup_001",
-        "rpo": "SUP",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_sbt_001",
-        "rpo": "SBT",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_sc7_001",
-        "rpo": "SC7",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_vtb_001",
-        "rpo": "VTB",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_pcq_001",
-        "rpo": "PCQ",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_vwe_001",
-        "rpo": "VWE",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_vwt_001",
-        "rpo": "VWT",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_5jr_001",
-        "rpo": "5JR",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_rwh_001",
-        "rpo": "RWH",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_wkr_001",
-        "rpo": "WKR",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_rwj_001",
-        "rpo": "RWJ",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_rin_001",
-        "rpo": "RIN",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_sl8_001",
-        "rpo": "SL8",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_rik_001",
-        "rpo": "RIK",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_sig_001",
-        "rpo": "SIG",
-        "section_id": "sec_lpoe_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_e60_001",
-        "rpo": "E60",
-        "section_id": "sec_perf_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_cfl_001",
-        "rpo": "CFL",
-        "section_id": "sec_perf_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_cfz_001",
-        "rpo": "CFZ",
-        "section_id": "sec_perf_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_t0f_001",
-        "rpo": "T0F",
-        "section_id": "sec_perf_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_z25_001",
-        "rpo": "Z25",
-        "section_id": "sec_spec_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_5zv_001",
-        "rpo": "5ZV",
-        "section_id": "sec_spoi_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_spy_001",
-        "rpo": "SPY",
-        "section_id": "sec_whee_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_spz_001",
-        "rpo": "SPZ",
-        "section_id": "sec_whee_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_s47_001",
-        "rpo": "S47",
-        "section_id": "sec_whee_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_sfe_001",
-        "rpo": "SFE",
-        "section_id": "sec_whee_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_5zd_001",
-        "rpo": "5ZD",
-        "section_id": "sec_whee_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_5zc_001",
-        "rpo": "5ZC",
-        "section_id": "sec_whee_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      },
-      {
-        "option_id": "opt_5zb_001",
-        "rpo": "5ZB",
-        "section_id": "sec_whee_001",
-        "row_category_id": "cat_exte_001",
-        "section_category_id": "cat_mech_001"
-      }
-    ]
+    "unknown_sections": {}
   },
   "blank_section_overrides": [],
   "candidate_standard_equipment": [
@@ -10060,48 +9462,6 @@
       "option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels"
     },
     {
-      "option_id": "opt_t0e_001",
-      "rpo": "T0E",
-      "variant_id": "1lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Rear Spoiler"
-    },
-    {
-      "option_id": "opt_t0e_001",
-      "rpo": "T0E",
-      "variant_id": "2lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Rear Spoiler"
-    },
-    {
-      "option_id": "opt_t0e_001",
-      "rpo": "T0E",
-      "variant_id": "3lt_e07",
-      "section_id": "sec_stan_002",
-      "option_name": "Rear Spoiler"
-    },
-    {
-      "option_id": "opt_t0e_001",
-      "rpo": "T0E",
-      "variant_id": "1lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Rear Spoiler"
-    },
-    {
-      "option_id": "opt_t0e_001",
-      "rpo": "T0E",
-      "variant_id": "2lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Rear Spoiler"
-    },
-    {
-      "option_id": "opt_t0e_001",
-      "rpo": "T0E",
-      "variant_id": "3lt_e67",
-      "section_id": "sec_stan_002",
-      "option_name": "Rear Spoiler"
-    },
-    {
       "option_id": "opt_ive_001",
       "rpo": "IVE",
       "variant_id": "1lt_e07",
@@ -12919,7 +12279,6 @@
   "missing_status_cells": [],
   "unknown_status_cells": [],
   "warnings": [
-    "Configured Grand Sport variants are present but inactive in variant_master, preserving the live Stingray-only generator path: 1lt_e07, 1lt_e67, 2lt_e07, 2lt_e67, 3lt_e07, 3lt_e67.",
-    "Section/category mismatches: 48."
+    "Configured Grand Sport variants are present but inactive in variant_master, preserving the live Stingray-only generator path: 1lt_e07, 1lt_e67, 2lt_e07, 2lt_e67, 3lt_e07, 3lt_e67."
   ]
 }

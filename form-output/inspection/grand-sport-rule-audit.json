@@ -6,7 +6,7 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-05-09T17:30:15+00:00",
+    "generated_at": "2026-05-09T19:38:34+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
@@ -15,9 +15,9 @@
     "rawDetailCandidateKeys": 233,
     "dedupedOrSelfReferenceCandidates": 0,
     "finalWorkbookRuleRows": 314,
-    "expectedDraftRuntimeRules": 289,
+    "expectedDraftRuntimeRules": 288,
     "omittedDuplicateExclusiveGroup": 9,
-    "omittedInactiveOrUnemitted": 16,
+    "omittedInactiveOrUnemitted": 17,
     "skippedRequiresReview": 1,
     "unresolvedRpoMentions": 4,
     "exclusiveGroups": 7,
@@ -1955,6 +1955,25 @@
       "runtime_action": "",
       "disabled_reason": "",
       "_audit_origin": "workbook_manual_or_normalized"
+    },
+    {
+      "rule_id": "gs_rule_opt_sig_001_requires_opt_t0e_001",
+      "source_id": "opt_sig_001",
+      "rule_type": "requires",
+      "target_id": "opt_t0e_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Requires (T0E) rear spoiler.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "display_only",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_stan_002",
+      "source_section": "sec_lpoe_001",
+      "generation_action": "",
+      "body_style_scope": "",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_matches_detail_raw"
     }
   ],
   "skippedRequiresReview": [
@@ -2071,14 +2090,6 @@
         "option_ids": [
           "opt_swm_002",
           "opt_swm_001"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      },
-      {
-        "rpo": "T0E",
-        "option_ids": [
-          "opt_t0e_002",
-          "opt_t0e_001"
         ],
         "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
       },

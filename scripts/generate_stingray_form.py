@@ -102,11 +102,10 @@ AERO_EXHAUST_ACCESSORIES_SECTION_ORDER = {
     "sec_lpow_001": 50,
 }
 
-def step_for_section(section_id: str, section_name: str, category_id: str) -> str:
+def step_for_section(section_id: str, section_name: str) -> str:
     return shared_step_for_section(
         section_id,
         section_name,
-        category_id,
         standard_sections=STANDARD_SECTIONS,
         section_step_overrides=SECTION_STEP_OVERRIDES,
     )
@@ -444,7 +443,6 @@ def main() -> None:
     wb = load_workbook(WORKBOOK_PATH)
 
     variants_raw = rows_from_sheet(wb, "variant_master")
-    categories = {row["category_id"]: row for row in rows_from_sheet(wb, "category_master")}
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
     options_raw = rows_from_sheet(wb, MODEL_CONFIG.source_option_sheet)
     statuses_raw = rows_from_sheet(wb, MODEL_CONFIG.status_sheet)
@@ -498,16 +496,13 @@ def main() -> None:
 
     section_rows: list[dict[str, Any]] = [dict(row) for row in CONTEXT_SECTIONS]
     for section_id, section in sections.items():
-        category = categories.get(section.get("category_id", ""), {})
-        step_key = step_for_section(section_id, section.get("section_name", ""), section.get("category_id", ""))
+        step_key = step_for_section(section_id, section.get("section_name", ""))
         selection_mode = section.get("selection_mode", "")
         section_display_order = AERO_EXHAUST_ACCESSORIES_SECTION_ORDER.get(section_id, intish(section.get("display_order")))
         section_rows.append(
             {
                 "section_id": section_id,
                 "section_name": section.get("section_name", ""),
-                "category_id": section.get("category_id", ""),
-                "category_name": category.get("category_name", ""),
                 "selection_mode": selection_mode,
                 "selection_mode_label": selection_mode_label(selection_mode),
                 "choice_mode": normalize_mode(selection_mode),
@@ -583,8 +578,7 @@ def main() -> None:
         if option["option_id"] in options_by_id and option.get("active") != "True":
             continue
         section = sections.get(option.get("section_id", ""), {})
-        category = categories.get(section.get("category_id", ""), {})
-        step_key = step_for_section(option.get("section_id", ""), section.get("section_name", ""), section.get("category_id", ""))
+        step_key = step_for_section(option.get("section_id", ""), section.get("section_name", ""))
         mode = section.get("selection_mode", "")
         options_by_id[option["option_id"]] = {
             "option_id": option["option_id"],
@@ -594,8 +588,6 @@ def main() -> None:
             "source_detail_raw": option.get("detail_raw", ""),
             "section_id": option.get("section_id", ""),
             "section_name": section.get("section_name", ""),
-            "category_id": section.get("category_id", ""),
-            "category_name": category.get("category_name", ""),
             "step_key": step_key,
             "selection_mode": mode,
             "selection_mode_label": selection_mode_label(mode),
@@ -641,8 +633,6 @@ def main() -> None:
                     "description": option["description"],
                     "section_id": option["section_id"],
                     "section_name": option["section_name"],
-                    "category_id": option["category_id"],
-                    "category_name": option["category_name"],
                     "step_key": option["step_key"],
                     "variant_id": variant["variant_id"],
                     "body_style": variant["body_style"],
@@ -971,7 +961,6 @@ def main() -> None:
             "description": choice["description"],
             "section_id": choice["section_id"],
             "section_name": choice["section_name"],
-            "category_name": choice["category_name"],
             "display_order": choice["display_order"],
             "source_detail_raw": choice["source_detail_raw"],
         }
@@ -1040,8 +1029,6 @@ def main() -> None:
             "description",
             "section_id",
             "section_name",
-            "category_id",
-            "category_name",
             "step_key",
             "variant_id",
             "body_style",
@@ -1073,7 +1060,6 @@ def main() -> None:
             "description",
             "section_id",
             "section_name",
-            "category_name",
             "display_order",
             "source_detail_raw",
         ],

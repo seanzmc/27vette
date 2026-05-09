@@ -556,7 +556,7 @@ test("current order option lines are complete, separated, and omit standard equi
   ];
   assert.ok(allLines.length > 0, "order should include option lines");
   for (const line of allLines) {
-    for (const key of ["rpo", "label", "description", "price", "type", "section_key", "section_label", "category_name", "step_key"]) {
+    for (const key of ["rpo", "label", "description", "price", "type", "section_key", "section_label", "step_key"]) {
       assert.ok(Object.hasOwn(line, key), `${line.rpo || line.label} should include ${key}`);
     }
   }

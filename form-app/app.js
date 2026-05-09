@@ -438,7 +438,6 @@ function lineItemFromOption(option, type, price, extra = {}) {
     type,
     section_key: sectionKey,
     section_label: sectionLabelForKey(sectionKey),
-    category_name: option.category_name || "",
     step_key: option.step_key || "",
     ...extra,
   };
@@ -454,7 +453,6 @@ function lineItemFromInterior(interior) {
     type: "selected_interior",
     section_key: "seats_interior",
     section_label: sectionLabelForKey("seats_interior"),
-    category_name: interior.interior_seat_label || "Base Interior",
     step_key: "base_interior",
   };
 }
@@ -482,7 +480,6 @@ function lineItemFromInteriorComponent(interior, component, autoAdded) {
     type: "interior_component",
     section_key: "seats_interior",
     section_label: sectionLabelForKey("seats_interior"),
-    category_name: interior.interior_seat_label || "Base Interior",
     step_key: "base_interior",
     component_type: component.component_type || "",
   };
