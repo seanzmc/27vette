@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import test from "node:test";
 import vm from "node:vm";
 
@@ -123,8 +125,56 @@ test("workbook package tables validate before Excel opens the file", () => {
   assert.equal(validation.issue_count, 0);
 });
 
+test("workbook package validation rejects duplicate worksheet AutoFilters on table sheets", () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "vette-workbook-package-"));
+  const workbookCopy = path.join(tempDir, "duplicate-autofilter.xlsx");
+  fs.copyFileSync("stingray_master.xlsx", workbookCopy);
+
+  execFileSync(
+    ".venv/bin/python",
+    [
+      "-c",
+      [
+        "from pathlib import Path",
+        "from zipfile import ZipFile, ZIP_DEFLATED",
+        "from xml.etree import ElementTree as ET",
+        `path = Path(${JSON.stringify(workbookCopy)})`,
+        "tmp = path.with_suffix('.tmp.xlsx')",
+        "ns = '{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'",
+        "ET.register_namespace('', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main')",
+        "with ZipFile(path, 'r') as source, ZipFile(tmp, 'w', ZIP_DEFLATED) as target:",
+        "    for item in source.infolist():",
+        "        data = source.read(item.filename)",
+        "        if item.filename == 'xl/worksheets/sheet29.xml':",
+        "            root = ET.fromstring(data)",
+        "            if root.find(ns + 'autoFilter') is None:",
+        "                auto_filter = ET.Element(ns + 'autoFilter', {'ref': 'A1:G5'})",
+        "                page_margins = root.find(ns + 'pageMargins')",
+        "                root.insert(list(root).index(page_margins), auto_filter)",
+        "            data = ET.tostring(root, encoding='utf-8', xml_declaration=False)",
+        "        target.writestr(item, data)",
+        "tmp.replace(path)",
+      ].join("\n"),
+    ],
+    { encoding: "utf8" }
+  );
+
+  const validationResult = spawnSync(".venv/bin/python", ["scripts/validate_workbook_package.py", workbookCopy], {
+    encoding: "utf8",
+  });
+  const validation = JSON.parse(validationResult.stdout);
+
+  assert.equal(validationResult.status, 1);
+  assert.equal(validation.status, "invalid");
+  assert.ok(
+    validation.issues.some((issue) => issue.issue === "worksheet_auto_filter_conflicts_with_table"),
+    "expected duplicate worksheet AutoFilter issue"
+  );
+});
+
 test("Stingray generator uses the hardened workbook save path", () => {
   assert.match(generatorSource, /save_workbook_safely/);
+  assert.match(fs.readFileSync("scripts/corvette_form_generator/workbook.py", "utf8"), /remove_table_sheet_auto_filters/);
   assert.doesNotMatch(generatorSource, /\bwb\.save\(WORKBOOK_PATH\)/);
 });
 

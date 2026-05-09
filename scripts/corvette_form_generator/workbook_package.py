@@ -94,6 +94,18 @@ def _ref_for_bounds(min_col: int, min_row: int, max_col: int, max_row: int) -> s
     return f"{get_column_letter(min_col)}{min_row}:{get_column_letter(max_col)}{max_row}"
 
 
+def _table_names_for_worksheet(zf: zipfile.ZipFile, worksheet_path: str) -> list[str]:
+    worksheet_rels = _relationship_targets(zf, _rels_path(worksheet_path))
+    worksheet_root = ET.fromstring(zf.read(worksheet_path))
+    table_names: list[str] = []
+    for table_part in worksheet_root.findall("main:tableParts/main:tablePart", NS):
+        table_rel_id = table_part.attrib[f"{{{REL_NS}}}id"]
+        table_path = _zip_path(worksheet_path, worksheet_rels[table_rel_id])
+        table_root = ET.fromstring(zf.read(table_path))
+        table_names.append(table_root.attrib.get("displayName") or table_root.attrib.get("name") or table_path)
+    return table_names
+
+
 def validate_workbook_package(workbook_path: Path) -> list[dict[str, object]]:
     workbook_path = Path(workbook_path)
     issues: list[dict[str, object]] = []
@@ -101,6 +113,27 @@ def validate_workbook_package(workbook_path: Path) -> list[dict[str, object]]:
     wb = load_workbook(workbook_path, read_only=True, data_only=True)
 
     with zipfile.ZipFile(workbook_path) as zf:
+        workbook_root = ET.fromstring(zf.read("xl/workbook.xml"))
+        workbook_rels = _relationship_targets(zf, "xl/_rels/workbook.xml.rels")
+        for sheet_node in workbook_root.findall("main:sheets/main:sheet", NS):
+            sheet_name = sheet_node.attrib["name"]
+            rel_id = sheet_node.attrib[f"{{{REL_NS}}}id"]
+            worksheet_path = _zip_path("xl/workbook.xml", workbook_rels[rel_id])
+            worksheet_root = ET.fromstring(zf.read(worksheet_path))
+            sheet_auto_filter = worksheet_root.find("main:autoFilter", NS)
+            if sheet_auto_filter is not None and worksheet_root.find("main:tableParts", NS) is not None:
+                issues.append(
+                    {
+                        "table_path": "",
+                        "table_name": "",
+                        "sheet_name": sheet_name,
+                        "ref": sheet_auto_filter.attrib.get("ref", ""),
+                        "issue": "worksheet_auto_filter_conflicts_with_table",
+                        "worksheet_path": worksheet_path,
+                        "tables": _table_names_for_worksheet(zf, worksheet_path),
+                    }
+                )
+
         for table_path in sorted(name for name in zf.namelist() if name.startswith("xl/tables/") and name.endswith(".xml")):
             binding = bindings.get(table_path)
             root = ET.fromstring(zf.read(table_path))
@@ -174,6 +207,7 @@ def repair_workbook_tables(workbook_path: Path, *, backup: bool = True) -> dict[
     bindings = table_bindings(workbook_path)
     wb = load_workbook(workbook_path, read_only=True, data_only=True)
     repaired_tables: list[dict[str, object]] = []
+    repaired_worksheets: list[dict[str, object]] = []
 
     with tempfile.NamedTemporaryFile(prefix=f"{workbook_path.stem}-", suffix=".xlsx", delete=False) as tmp:
         tmp_path = Path(tmp.name)
@@ -181,6 +215,19 @@ def repair_workbook_tables(workbook_path: Path, *, backup: bool = True) -> dict[
     with zipfile.ZipFile(workbook_path, "r") as source, zipfile.ZipFile(tmp_path, "w", compression=zipfile.ZIP_DEFLATED) as target:
         for item in source.infolist():
             data = source.read(item.filename)
+            if item.filename.startswith("xl/worksheets/") and item.filename.endswith(".xml"):
+                root = ET.fromstring(data)
+                auto_filter = root.find("main:autoFilter", NS)
+                if auto_filter is not None and root.find("main:tableParts", NS) is not None:
+                    root.remove(auto_filter)
+                    data = ET.tostring(root, encoding="utf-8", xml_declaration=False)
+                    repaired_worksheets.append(
+                        {
+                            "worksheet_path": item.filename,
+                            "removed": "worksheet_auto_filter",
+                            "ref": auto_filter.attrib.get("ref", ""),
+                        }
+                    )
             if item.filename.startswith("xl/tables/") and item.filename.endswith(".xml") and item.filename in bindings:
                 root = ET.fromstring(data)
                 columns_parent = root.find("main:tableColumns", NS)
@@ -231,7 +278,7 @@ def repair_workbook_tables(workbook_path: Path, *, backup: bool = True) -> dict[
     wb.close()
 
     backup_path = None
-    if repaired_tables:
+    if repaired_tables or repaired_worksheets:
         assert_valid_workbook_package(tmp_path)
         if backup:
             backup_dir = workbook_path.parent / "backups"
@@ -249,4 +296,5 @@ def repair_workbook_tables(workbook_path: Path, *, backup: bool = True) -> dict[
         "issues_before": before,
         "issues_after": after,
         "repaired_tables": repaired_tables,
+        "repaired_worksheets": repaired_worksheets,
     }

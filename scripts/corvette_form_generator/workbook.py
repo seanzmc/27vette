@@ -89,6 +89,12 @@ def backup_workbook(path: Path) -> Path:
     return backup_path
 
 
+def remove_table_sheet_auto_filters(wb) -> None:
+    for ws in wb.worksheets:
+        if ws.tables and ws.auto_filter.ref:
+            ws.auto_filter.ref = None
+
+
 def save_workbook_safely(wb, path: Path, *, loaded_mtime_ns: int | None = None) -> Path:
     path = Path(path)
     lock_path = excel_lock_path(path)
@@ -100,6 +106,7 @@ def save_workbook_safely(wb, path: Path, *, loaded_mtime_ns: int | None = None) 
     with tempfile.NamedTemporaryFile(prefix=f"{path.stem}-", suffix=path.suffix, delete=False, dir=path.parent) as handle:
         tmp_path = Path(handle.name)
     try:
+        remove_table_sheet_auto_filters(wb)
         wb.save(tmp_path)
         assert_valid_workbook_package(tmp_path)
         check_wb = load_workbook(tmp_path, read_only=True, data_only=True)
