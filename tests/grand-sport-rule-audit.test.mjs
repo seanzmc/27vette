@@ -7,6 +7,10 @@ const auditPath = "form-output/inspection/grand-sport-rule-audit.json";
 const auditMarkdownPath = "form-output/inspection/grand-sport-rule-audit.md";
 const draftPath = "form-output/inspection/grand-sport-form-data-draft.json";
 
+function normalizedBool(value) {
+  return String(value).toLowerCase();
+}
+
 function workbookRows(sheetName) {
   const output = execFileSync(
     ".venv/bin/python",
@@ -71,8 +75,9 @@ test("Grand Sport rule audit separates copied, parsed, omitted, and review-neede
   assert.ok(
     audit.copiedFromStingray.some(
       (row) =>
-        row.source_stingray_rule_id === "rule_opt_5jr_001_includes_opt_drg_001" &&
+        row.grand_sport_rule_id.includes("rule_opt_5jr_001_includes_opt_drg_001") &&
         row.source_id === "opt_5jr_001" &&
+        row.rule_type === "includes" &&
         row.target_id === "opt_drg_001"
     ),
     "5JR/DRG should be listed as copied from Stingray"
@@ -80,12 +85,13 @@ test("Grand Sport rule audit separates copied, parsed, omitted, and review-neede
   assert.ok(
     audit.parsedFromDetailRaw.some(
       (row) =>
-        row.option_id === "opt_cfl_001" &&
-        row.matched_phrase === "not_available_with" &&
+        row.rule_id === "gs_rule_opt_cfl_001_excludes_opt_cfz_001" &&
+        row.matched_phrase === "workbook_matches_detail_raw" &&
         row.source_id === "opt_cfl_001" &&
+        row.rule_type === "excludes" &&
         row.target_id === "opt_cfz_001"
     ),
-    "CFL/CFZ should be listed as parsed from detail_raw"
+    "CFL/CFZ should be listed as a workbook rule matching detail_raw"
   );
   assert.ok(
     audit.omittedDuplicateExclusiveGroup.some(
@@ -97,17 +103,50 @@ test("Grand Sport rule audit separates copied, parsed, omitted, and review-neede
     audit.skippedRequiresReview.every((row) => !["R6X", "D30", "PIN", "EDU", "EFR", "36S", "37S", "38S", "379", "3A9", "3F9", "3M9", "3N9"].includes(row.rpo)),
     "reviewed/deferred interior and color-override rows should not remain review-only"
   );
-  assert.deepEqual(audit.unresolvedRpoMentions, []);
+  assert.ok(
+    audit.skippedRequiresReview.some((row) => row.rpo === "R8C" && row.fragment.includes("LPO wheels")),
+    "non-RPO LPO wheel wording should remain review-only"
+  );
+  assert.ok(
+    audit.unresolvedRpoMentions.every((row) => row.mentioned_rpo === "DTB"),
+    "only workbook-missing stripe RPO mentions should remain unresolved"
+  );
+  assert.equal(
+    audit.unresolvedRpoMentions.some((row) => ["CFV", "36S", "37S", "38S", "379", "3A9", "3F9", "3M9", "3N9"].includes(row.mentioned_rpo)),
+    false,
+    "inactive ground-effects and interior/color override codes should not be reported as unresolved"
+  );
 });
 
 test("Grand Sport rule audit captures the approved cleanup decisions", () => {
+  const workbookOptions = workbookRows("grandSport_options");
   const workbookExclusiveMembers = workbookRows("grandSport_exclusive_members");
+  const workbookRules = workbookRows("grandSport_rule_mapping");
   const groundEffectMembers = workbookExclusiveMembers.filter((row) => row.group_id === "gs_excl_ground_effects");
   assert.deepEqual(
     groundEffectMembers.map((row) => row.option_id),
     ["opt_cfl_001", "opt_cfz_001", "opt_cfv_001"]
   );
-  assert.equal(groundEffectMembers.find((row) => row.option_id === "opt_cfv_001").active, "False");
+  assert.equal(normalizedBool(groundEffectMembers.find((row) => row.option_id === "opt_cfv_001").active), "false");
+
+  const optionByRpo = new Map(workbookOptions.map((row) => [row.rpo, row]));
+  assert.equal(normalizedBool(optionByRpo.get("D30").selectable), "false");
+  assert.equal(optionByRpo.get("D30").display_behavior, "display_only");
+  assert.equal(optionByRpo.get("R6X").display_behavior, "auto_only");
+  for (const rpo of ["R6P", "R9V", "R9W", "R9Y", "U2K"]) {
+    assert.equal(normalizedBool(optionByRpo.get(rpo).active), "false", `${rpo} should be inactive in workbook source`);
+  }
+
+  assert.equal(
+    workbookRules.some(
+      (row) =>
+        row.rule_type === "requires" &&
+        ["sec_gsha_001", "sec_gsce_001"].includes(row.source_section) &&
+        row.target_section === "sec_pain_001"
+    ),
+    false,
+    "stripe/hash rows should not retain backwards paint-color requires rules"
+  );
 
   const draftRuleKeys = new Set(draft.rules.map((rule) => `${rule.source_id}::${rule.rule_type}::${rule.target_id}`));
   for (const key of [
@@ -129,4 +168,19 @@ test("Grand Sport rule audit highlights risky duplicate RPO and special package 
   assert.match(markdown, /## Skipped Requires Review/);
   assert.match(markdown, /## Unresolved RPO Mentions/);
   assert.match(markdown, /## Review Hot Spots/);
+});
+
+test("Grand Sport rule audit script does not own workbook business decisions", () => {
+  const source = fs.readFileSync("scripts/build_grand_sport_rule_sources.py", "utf8");
+  for (const forbidden of [
+    "APPROVED_EXCLUSIVE_GROUPS",
+    "INACTIVE_OPTION_RPOS",
+    "DESCRIPTION_UPDATES",
+    "EXPLICIT_RULE_RPOS",
+    "apply_grand_sport_review_decisions",
+    "write_sheet(wb",
+    ".save(",
+  ]) {
+    assert.equal(source.includes(forbidden), false, `${forbidden} should not be in the audit-only builder`);
+  }
 });
