@@ -152,9 +152,22 @@ test("Grand Sport trim-scoped overrides collapse AQ9 and UQT duplicate rows", ()
   }
 });
 
-test("Grand Sport draft emits color overrides while deferring price rules", () => {
+test("Grand Sport draft emits color overrides and workbook-backed package price rules", () => {
   assert.equal(draft.rules.length > 0, true, "Grand Sport draft should include normalized compatibility rules");
-  assert.deepEqual(draft.priceRules, []);
+  assert.equal(draft.priceRules.length, 8);
+  assert.deepEqual(
+    draft.priceRules.map((rule) => [rule.price_rule_id, rule.condition_option_id, rule.target_option_id, rule.price_rule_type, rule.price_value]),
+    [
+      ["gs_pr_fey_j57_001", "opt_fey_001", "opt_j57_001", "override", 0],
+      ["gs_pr_fey_t0f_001", "opt_fey_001", "opt_t0f_001", "override", 0],
+      ["gs_pr_fey_wub_001", "opt_fey_001", "opt_wub_001", "override", 0],
+      ["gs_pr_fey_cfz_001", "opt_fey_001", "opt_cfz_001", "override", 0],
+      ["gs_pr_pcq_vwe_001", "opt_pcq_001", "opt_vwe_001", "override", 0],
+      ["gs_pr_pcq_vwt_001", "opt_pcq_001", "opt_vwt_001", "override", 0],
+      ["gs_pr_pef_ria_001", "opt_pef_001", "opt_ria_001", "override", 0],
+      ["gs_pr_pef_cav_001", "opt_pef_001", "opt_cav_001", "override", 0],
+    ]
+  );
   assert.equal(draft.colorOverrides.length, 245);
   assert.ok(
     draft.colorOverrides.some(
@@ -166,10 +179,13 @@ test("Grand Sport draft emits color overrides while deferring price rules", () =
     "seatbelt color override rows should auto-add D30 like Stingray"
   );
   const warnings = new Set(draft.validation.filter((row) => row.severity === "warning").map((row) => row.check_id));
+  const passes = new Set(draft.validation.filter((row) => row.severity === "pass").map((row) => row.check_id));
   assert.ok(warnings.has("grand_sport_draft_status"));
-  assert.ok(warnings.has("pricing_deferred"));
+  assert.equal(warnings.has("pricing_deferred"), false);
+  assert.ok(passes.has("price_rules"));
   assert.equal(warnings.has("rules_deferred"), false);
   assert.equal(warnings.has("color_overrides"), false);
+  assert.deepEqual(draft.draftMetadata.deferredSurfaces, []);
 });
 
 test("Grand Sport draft emits the approved model-scoped exclusive groups", () => {
@@ -312,5 +328,6 @@ test("Grand Sport draft preserves rule hot spots and normalization metadata for 
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 129);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 26);
   assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);
-  assert.deepEqual(draft.draftMetadata.deferredSurfaces, ["priceRules"]);
+  assert.equal(draft.draftMetadata.priceRuleSourceRows, 8);
+  assert.deepEqual(draft.draftMetadata.deferredSurfaces, []);
 });

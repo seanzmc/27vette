@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-05-09T22:19:13+00:00",
+    "generated_at": "2026-05-09T22:36:53+00:00",
     "status": "draft_not_runtime_active"
   },
   "variants": [
@@ -48472,7 +48472,104 @@
       "review_flag": "False"
     }
   ],
-  "priceRules": [],
+  "priceRules": [
+    {
+      "price_rule_id": "gs_pr_fey_j57_001",
+      "condition_option_id": "opt_fey_001",
+      "target_option_id": "opt_j57_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "review_flag": "False",
+      "notes": "FEY includes J57, so J57 should not add a second charge."
+    },
+    {
+      "price_rule_id": "gs_pr_fey_t0f_001",
+      "condition_option_id": "opt_fey_001",
+      "target_option_id": "opt_t0f_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "review_flag": "False",
+      "notes": "FEY includes T0F, so T0F should not add a second charge."
+    },
+    {
+      "price_rule_id": "gs_pr_fey_wub_001",
+      "condition_option_id": "opt_fey_001",
+      "target_option_id": "opt_wub_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "review_flag": "False",
+      "notes": "FEY includes WUB, so WUB should not add a second charge."
+    },
+    {
+      "price_rule_id": "gs_pr_fey_cfz_001",
+      "condition_option_id": "opt_fey_001",
+      "target_option_id": "opt_cfz_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "review_flag": "False",
+      "notes": "FEY includes CFZ through included T0F."
+    },
+    {
+      "price_rule_id": "gs_pr_pcq_vwe_001",
+      "condition_option_id": "opt_pcq_001",
+      "target_option_id": "opt_vwe_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "review_flag": "False",
+      "notes": "PCQ includes VWE, so VWE should not add a second charge."
+    },
+    {
+      "price_rule_id": "gs_pr_pcq_vwt_001",
+      "condition_option_id": "opt_pcq_001",
+      "target_option_id": "opt_vwt_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "review_flag": "False",
+      "notes": "PCQ includes VWT, so VWT should not add a second charge."
+    },
+    {
+      "price_rule_id": "gs_pr_pef_ria_001",
+      "condition_option_id": "opt_pef_001",
+      "target_option_id": "opt_ria_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "review_flag": "False",
+      "notes": "PEF includes RIA, so RIA should not add a second charge."
+    },
+    {
+      "price_rule_id": "gs_pr_pef_cav_001",
+      "condition_option_id": "opt_pef_001",
+      "target_option_id": "opt_cav_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "review_flag": "False",
+      "notes": "PEF includes CAV, so CAV should not add a second charge."
+    }
+  ],
   "interiors": [
     {
       "interior_id": "1LT_AE4_HTJ_N26",
@@ -56526,11 +56623,11 @@
       "message": "132 model-scoped Grand Sport LT interiors exported."
     },
     {
-      "check_id": "pricing_deferred",
-      "severity": "warning",
+      "check_id": "price_rules",
+      "severity": "pass",
       "entity_type": "price_rule",
       "entity_id": "",
-      "message": "Final Grand Sport price rules are deferred unless directly represented in normalized option prices."
+      "message": "8 active price rules exported from grandSport_price_rules."
     },
     {
       "check_id": "color_overrides",
@@ -58249,8 +58346,7 @@
       },
       "unresolvedIssues": []
     },
-    "deferredSurfaces": [
-      "priceRules"
-    ]
+    "priceRuleSourceRows": 8,
+    "deferredSurfaces": []
   }
 }

@@ -197,6 +197,7 @@ GRAND_SPORT_MODEL = ModelConfig(
     preview_artifact_prefix="grand-sport-contract-preview",
     draft_artifact_prefix="grand-sport-form-data-draft",
     rule_mapping_sheet="grandSport_rule_mapping",
+    price_rules_sheet="grandSport_price_rules",
     rule_groups_sheet="grandSport_rule_groups",
     rule_group_members_sheet="grandSport_rule_group_members",
     exclusive_groups_sheet="grandSport_exclusive_groups",

@@ -35,6 +35,7 @@ class ModelConfig:
     preview_artifact_prefix: str = ""
     draft_artifact_prefix: str = ""
     rule_mapping_sheet: str = "rule_mapping"
+    price_rules_sheet: str = "price_rules"
     rule_groups_sheet: str = "rule_groups"
     rule_group_members_sheet: str = "rule_group_members"
     exclusive_groups_sheet: str = "exclusive_groups"

@@ -67,6 +67,7 @@ def main() -> None:
                     "choices": len(draft["choices"]),
                     "standard_equipment": len(draft["standardEquipment"]),
                     "rules": len(draft["rules"]),
+                    "price_rules": len(draft["priceRules"]),
                     "interiors": len(draft["interiors"]),
                     "validation_warnings": sum(1 for row in draft["validation"] if row["severity"] == "warning"),
                 },

@@ -1,6 +1,6 @@
 # Grand Sport Form Data Draft
 
-Generated: `2026-05-09T22:19:13+00:00`
+Generated: `2026-05-09T22:36:53+00:00`
 Status: `draft_not_runtime_active`
 Source sheet: `grandSport_options`
 
@@ -15,7 +15,7 @@ Source sheet: `grandSport_options`
 - Rule groups: 0 (workbook-backed)
 - Exclusive groups: 7 (workbook-backed)
 - Rules: 288 (workbook-backed)
-- Price rules: 0 (deferred)
+- Price rules: 8 (workbook-backed)
 - Interiors: 132 (model-scoped)
 - Color overrides: 245
 
@@ -29,7 +29,6 @@ Source sheet: `grandSport_options`
 ## Validation Warnings
 
 - `grand_sport_draft_status`: Grand Sport form data is a draft inspection artifact and is not runtime active.
-- `pricing_deferred`: Final Grand Sport price rules are deferred unless directly represented in normalized option prices.
 
 ## Live Output Safety
 

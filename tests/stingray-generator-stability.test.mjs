@@ -83,6 +83,16 @@ const ruleMappingHeaders = [
   "runtime_action",
   "disabled_reason",
 ];
+const priceRuleHeaders = [
+  "price_rule_id",
+  "condition_option_id",
+  "price_rule_type",
+  "target_option_id",
+  "price_value",
+  "body_style_scope",
+  "review_flag",
+  "notes",
+];
 
 function workbookHeaders(sheetName) {
   const output = execFileSync(
@@ -241,6 +251,8 @@ test("section_master owns section step placement without category", () => {
 
 test("Grand Sport draft rule source sheets use workbook-backed contracts", () => {
   assert.deepEqual(workbookHeaders("grandSport_rule_mapping"), ruleMappingHeaders);
+  assert.deepEqual(workbookHeaders("price_rules"), priceRuleHeaders);
+  assert.deepEqual(workbookHeaders("grandSport_price_rules"), priceRuleHeaders);
   assert.deepEqual(workbookHeaders("grandSport_rule_groups"), [
     "group_id",
     "group_type",
@@ -256,6 +268,7 @@ test("Grand Sport draft rule source sheets use workbook-backed contracts", () =>
   assert.deepEqual(workbookHeaders("grandSport_exclusive_groups"), ["group_id", "selection_mode", "active", "notes"]);
   assert.deepEqual(workbookHeaders("grandSport_exclusive_members"), ["group_id", "option_id", "display_order", "active"]);
   assert.ok(workbookRows("grandSport_rule_mapping").length > 0);
+  assert.equal(workbookRows("grandSport_price_rules").length, 8);
   assert.ok(workbookRows("grandSport_exclusive_groups").length > 0);
 });
 

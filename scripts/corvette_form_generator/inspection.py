@@ -738,6 +738,99 @@ def build_draft_rules(
     return raw_rules
 
 
+def build_draft_price_rules(
+    wb,
+    config: ModelConfig,
+    option_rows: dict[str, dict[str, Any]],
+    interiors: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], int]:
+    interiors_by_id = {row["interior_id"]: row for row in interiors if row.get("interior_id")}
+    valid_condition_ids = set(option_rows) | set(interiors_by_id)
+    valid_target_ids = set(option_rows)
+    raw_rows = rows_from_optional_sheet(wb, config.price_rules_sheet)
+    price_rules: list[dict[str, Any]] = []
+    validation_rows: list[dict[str, Any]] = []
+    seen_rule_ids: set[str] = set()
+
+    for row_number, row in enumerate(raw_rows, start=2):
+        price_rule_id = clean(row.get("price_rule_id", ""))
+        condition_option_id = clean(row.get("condition_option_id", ""))
+        target_option_id = clean(row.get("target_option_id", ""))
+        price_rule_type = clean(row.get("price_rule_type", "")).lower()
+        if not any(clean(value) for value in row.values()):
+            continue
+        row_errors: list[dict[str, Any]] = []
+        if not price_rule_id:
+            row_errors.append(
+                {
+                    "check_id": f"price_rule_missing_id_row_{row_number}",
+                    "severity": "error",
+                    "entity_type": "price_rule",
+                    "entity_id": "",
+                    "message": f"{config.price_rules_sheet} row {row_number} is missing price_rule_id.",
+                }
+            )
+        elif price_rule_id in seen_rule_ids:
+            row_errors.append(
+                {
+                    "check_id": f"price_rule_duplicate_id_{price_rule_id}",
+                    "severity": "error",
+                    "entity_type": "price_rule",
+                    "entity_id": price_rule_id,
+                    "message": f"{config.price_rules_sheet} has a duplicate price_rule_id.",
+                }
+            )
+        if price_rule_type != "override":
+            row_errors.append(
+                {
+                    "check_id": f"price_rule_invalid_type_{price_rule_id or row_number}",
+                    "severity": "error",
+                    "entity_type": "price_rule",
+                    "entity_id": price_rule_id,
+                    "message": f"{config.price_rules_sheet} row {row_number} uses unsupported price_rule_type {price_rule_type!r}.",
+                }
+            )
+        if condition_option_id not in valid_condition_ids:
+            row_errors.append(
+                {
+                    "check_id": f"price_rule_unknown_condition_{price_rule_id or row_number}",
+                    "severity": "error",
+                    "entity_type": "price_rule",
+                    "entity_id": price_rule_id,
+                    "message": f"{config.price_rules_sheet} row {row_number} references unknown condition_option_id {condition_option_id!r}.",
+                }
+            )
+        if target_option_id not in valid_target_ids:
+            row_errors.append(
+                {
+                    "check_id": f"price_rule_unknown_target_{price_rule_id or row_number}",
+                    "severity": "error",
+                    "entity_type": "price_rule",
+                    "entity_id": price_rule_id,
+                    "message": f"{config.price_rules_sheet} row {row_number} references unknown target_option_id {target_option_id!r}.",
+                }
+            )
+        validation_rows.extend(row_errors)
+        if row_errors:
+            continue
+        seen_rule_ids.add(price_rule_id)
+        price_rules.append(
+            {
+                "price_rule_id": price_rule_id,
+                "condition_option_id": condition_option_id,
+                "target_option_id": target_option_id,
+                "price_rule_type": price_rule_type,
+                "price_value": money(row.get("price_value", "")),
+                "body_style_scope": clean(row.get("body_style_scope", "")),
+                "trim_level_scope": clean(row.get("trim_level_scope", "")),
+                "variant_scope": clean(row.get("variant_scope", "")),
+                "review_flag": clean(row.get("review_flag", "")),
+                "notes": clean(row.get("notes", "")),
+            }
+        )
+    return price_rules, validation_rows, len(raw_rows)
+
+
 def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
     wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
     raw_rows = rows_from_sheet(wb, config.source_option_sheet)
@@ -1411,6 +1504,12 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
         grouped_requirement_pairs(rule_groups),
         exclusive_group_pairs(exclusive_groups),
     )
+    price_rules, price_rule_validation, price_rule_source_rows = build_draft_price_rules(
+        wb,
+        config,
+        option_rows,
+        interiors,
+    )
 
     validation = [
         {
@@ -1448,14 +1547,28 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
             "entity_id": "",
             "message": f"{len(interiors)} model-scoped Grand Sport LT interiors exported.",
         },
-        {
-            "check_id": "pricing_deferred",
-            "severity": "warning",
-            "entity_type": "price_rule",
-            "entity_id": "",
-            "message": "Final Grand Sport price rules are deferred unless directly represented in normalized option prices.",
-        },
     ]
+    validation.extend(price_rule_validation)
+    if price_rules:
+        validation.append(
+            {
+                "check_id": "price_rules",
+                "severity": "pass",
+                "entity_type": "price_rule",
+                "entity_id": "",
+                "message": f"{len(price_rules)} active price rules exported from {config.price_rules_sheet}.",
+            }
+        )
+    else:
+        validation.append(
+            {
+                "check_id": "pricing_deferred",
+                "severity": "warning",
+                "entity_type": "price_rule",
+                "entity_id": "",
+                "message": f"No valid Grand Sport price rules exported from {config.price_rules_sheet}; package pricing remains deferred.",
+            }
+        )
     if color_overrides:
         validation.append(
             {
@@ -1486,7 +1599,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
         "ruleGroups": rule_groups,
         "exclusiveGroups": exclusive_groups,
         "rules": rules,
-        "priceRules": [],
+        "priceRules": price_rules,
         "interiors": interiors,
         "colorOverrides": color_overrides,
         "validation": validation,
@@ -1496,7 +1609,8 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
             "fullVariantMatrixChoices": len(draft_choices),
             "ruleDetailHotSpots": preview["ruleDetailHotSpots"],
             "normalization": preview["normalization"],
-            "deferredSurfaces": ["priceRules"],
+            "priceRuleSourceRows": price_rule_source_rows,
+            "deferredSurfaces": [] if price_rules else ["priceRules"],
         },
     }
 
@@ -1703,7 +1817,7 @@ def render_form_data_draft_markdown(draft: dict[str, Any]) -> str:
         f"- Rule groups: {len(draft['ruleGroups'])} (workbook-backed)",
         f"- Exclusive groups: {len(draft['exclusiveGroups'])} (workbook-backed)",
         f"- Rules: {len(draft['rules'])} (workbook-backed)",
-        f"- Price rules: {len(draft['priceRules'])} (deferred)",
+        f"- Price rules: {len(draft['priceRules'])} (workbook-backed)",
         f"- Interiors: {len(draft['interiors'])} (model-scoped)",
         f"- Color overrides: {len(draft['colorOverrides'])}",
         "",

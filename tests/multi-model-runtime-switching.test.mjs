@@ -191,6 +191,15 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
   assert.equal(registry.models.grandSport.label, "Grand Sport");
   assert.equal(registry.models.grandSport.modelName, "Corvette Grand Sport");
   assert.equal(registry.models.grandSport.data.dataset.source_sheet, "grandSport_options");
+  assert.ok(
+    registry.models.grandSport.data.priceRules.some((rule) => rule.price_rule_id === "gs_pr_fey_j57_001"),
+    "Grand Sport packaged data should include Grand Sport price rules"
+  );
+  assert.equal(
+    registry.models.stingray.data.priceRules.some((rule) => rule.price_rule_id === "gs_pr_fey_j57_001"),
+    false,
+    "Grand Sport price rules should not leak into Stingray data"
+  );
   assert.deepEqual(dataWindow.STINGRAY_FORM_DATA, registry.models.stingray.data);
   assert.deepEqual(
     JSON.parse(JSON.stringify(registry.models.grandSport.data.variants.map((variant) => variant.variant_id))),
