@@ -2,3 +2,5 @@
 __pycache__/
 *.pyc
 build/
+backups/*.xlsx
+~$*.xlsx

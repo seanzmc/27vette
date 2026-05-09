@@ -52,3 +52,10 @@ Do not commit `.venv/`.
 - Keep each model structurally consistent from raw workbook sheets through scripts to front-end artifacts. Models may differ in options and compatibility, but they should use the same sheet shapes, rule concepts, and output contracts unless there is an explicit documented exception.
 - Use scripts for normalization, artifact emission, validation, audits, and runtime mechanics such as applying workbook-authored includes/requires/excludes, exclusive groups, auto-adds, filtering, and pricing.
 - Flag any proposed hardcoded model-specific business logic before implementing it.
+
+## Workbook safety
+
+- Close Excel before running any script that writes `stingray_master.xlsx`.
+- If Excel shows a repair/recovery prompt, stop and run `.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx`; repair with `.venv/bin/python scripts/repair_workbook_tables.py stingray_master.xlsx` before continuing.
+- Workbook-writing scripts must save through the safe workbook save helper so a temp workbook is validated before replacing the source file.
+- Do not ignore `~$stingray_master.xlsx`; it means Excel has or recently had the workbook open. Confirm it is stale before removing it.

@@ -21,7 +21,7 @@ from corvette_form_generator.mapping import (
 from corvette_form_generator.model_configs import GRAND_SPORT_MODEL, STINGRAY_MODEL
 from corvette_form_generator.output import write_app_data_registry, write_json_output
 from corvette_form_generator.validation import validation_error_count
-from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet, write_sheet
+from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet, save_workbook_safely, write_sheet
 
 
 MODEL_CONFIG = STINGRAY_MODEL
@@ -440,6 +440,7 @@ def truncate_reason(text: str, limit: int = 180) -> str:
 
 
 def main() -> None:
+    loaded_mtime_ns = WORKBOOK_PATH.stat().st_mtime_ns
     wb = load_workbook(WORKBOOK_PATH)
 
     variants_raw = rows_from_sheet(wb, "variant_master")
@@ -1192,7 +1193,7 @@ def main() -> None:
         ["check_id", "severity", "entity_type", "entity_id", "message"],
         validation_rows,
     )
-    wb.save(WORKBOOK_PATH)
+    workbook_backup_path = save_workbook_safely(wb, WORKBOOK_PATH, loaded_mtime_ns=loaded_mtime_ns)
 
     generated_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     data = {
@@ -1252,6 +1253,7 @@ def main() -> None:
 
     print(json.dumps({
         "workbook": str(WORKBOOK_PATH),
+        "workbook_backup": str(workbook_backup_path),
         "json": str(json_path),
         "csv": str(csv_path),
         "choices": len(choices),

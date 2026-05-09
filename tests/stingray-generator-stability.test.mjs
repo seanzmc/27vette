@@ -113,6 +113,21 @@ function assertOptionVariantStatusCoverage(optionSheetName, statusSheetName, var
   }
 }
 
+test("workbook package tables validate before Excel opens the file", () => {
+  const validation = JSON.parse(
+    execFileSync(".venv/bin/python", ["scripts/validate_workbook_package.py", "stingray_master.xlsx"], {
+      encoding: "utf8",
+    })
+  );
+  assert.equal(validation.status, "valid");
+  assert.equal(validation.issue_count, 0);
+});
+
+test("Stingray generator uses the hardened workbook save path", () => {
+  assert.match(generatorSource, /save_workbook_safely/);
+  assert.doesNotMatch(generatorSource, /\bwb\.save\(WORKBOOK_PATH\)/);
+});
+
 test("generated JSON and static app data stay synchronized apart from timestamp", () => {
   assert.deepEqual(withoutGeneratedAt(appData), withoutGeneratedAt(jsonData));
 });
