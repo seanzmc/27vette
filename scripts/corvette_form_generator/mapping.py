@@ -44,13 +44,16 @@ def step_for_section(
     section_id: str,
     section_name: str,
     *,
+    section_step_key: str = "",
     standard_sections: set[str] | frozenset[str],
     section_step_overrides: Mapping[str, str],
 ) -> str:
-    if section_id in standard_sections:
-        return "standard_equipment"
+    if section_step_key:
+        return section_step_key
     if section_id in section_step_overrides:
         return section_step_overrides[section_id]
+    if section_id in standard_sections:
+        return "standard_equipment"
     name = section_name.lower()
     if "stripe" in name or "spoiler" in name or "lpo" in name or "exhaust" in name or "wheel accessory" in name:
         return "aero_exhaust_stripes_accessories"

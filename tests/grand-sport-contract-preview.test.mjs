@@ -49,6 +49,17 @@ test("all Grand Sport preview choices resolve section, step, and raw detail fiel
   assert.equal(preview.validation.length, 0);
 });
 
+test("Grand Sport section placement is owned by section_master step_key", () => {
+  const sectionById = new Map(preview.sections.map((section) => [section.section_id, section]));
+  assert.equal(sectionById.get("sec_gsha_001")?.step_key, "aero_exhaust_stripes_accessories");
+  assert.equal(sectionById.get("sec_gsce_001")?.step_key, "aero_exhaust_stripes_accessories");
+  assert.equal(sectionById.get("sec_exha_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_whee_001")?.step_key, "wheels");
+  assert.equal(sectionById.get("sec_perf_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_cali_001")?.step_key, "wheels");
+  assert.equal(sectionById.get("sec_lpoi_001")?.step_key, "interior_trim");
+});
+
 test("filled Grand Sport source sections do not require blank-section config", () => {
   assert.deepEqual(preview.normalization.blankSectionOverrides, []);
   const choicesByRpo = new Map(preview.choices.map((choice) => [choice.rpo, choice]));
@@ -66,9 +77,9 @@ test("customer-facing text is cleaned while raw source fields stay intact", () =
 });
 
 test("rule/detail hot spot buckets are preserved for later phases", () => {
-  assert.equal(preview.ruleDetailHotSpots.rows.length, 127);
+  assert.equal(preview.ruleDetailHotSpots.rows.length, 129);
   assert.equal(preview.ruleDetailHotSpots.counts.requires, 36);
-  assert.equal(preview.ruleDetailHotSpots.counts.not_available, 47);
+  assert.equal(preview.ruleDetailHotSpots.counts.not_available, 49);
   assert.equal(preview.ruleDetailHotSpots.counts.included_with, 17);
   assert.equal(preview.ruleDetailHotSpots.counts.includes, 47);
   assert.equal(preview.ruleDetailHotSpots.counts.only, 19);

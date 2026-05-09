@@ -6,7 +6,7 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-05-09T20:47:14+00:00",
+    "generated_at": "2026-05-09T22:19:12+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
@@ -18,7 +18,7 @@
     "expectedDraftRuntimeRules": 288,
     "omittedDuplicateExclusiveGroup": 9,
     "omittedInactiveOrUnemitted": 17,
-    "skippedRequiresReview": 1,
+    "skippedRequiresReview": 3,
     "unresolvedRpoMentions": 4,
     "exclusiveGroups": 7,
     "exclusiveGroupMembers": 23,
@@ -1957,17 +1957,17 @@
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
-      "rule_id": "gs_rule_opt_sig_001_requires_opt_t0e_001",
+      "rule_id": "gs_rule_opt_sig_001_requires_opt_t0e_002",
       "source_id": "opt_sig_001",
       "rule_type": "requires",
-      "target_id": "opt_t0e_001",
+      "target_id": "opt_t0e_002",
       "target_type": "option",
       "original_detail_raw": "1. Requires (T0E) rear spoiler.",
       "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "display_only",
       "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_stan_002",
+      "target_section": "sec_incl_001",
       "source_section": "sec_lpoe_001",
       "generation_action": "",
       "body_style_scope": "",
@@ -1982,6 +1982,18 @@
       "rpo": "R8C",
       "reason": "supported_clause_without_resolved_rule",
       "fragment": "Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels."
+    },
+    {
+      "option_id": "opt_aq9_001",
+      "rpo": "AQ9",
+      "reason": "supported_clause_without_resolved_rule",
+      "fragment": "Not Available with 3LT"
+    },
+    {
+      "option_id": "opt_ah2_001",
+      "rpo": "AH2",
+      "reason": "supported_clause_without_resolved_rule",
+      "fragment": "Not Available with 1LT"
     }
   ],
   "unresolvedRpoMentions": [
@@ -2140,6 +2152,14 @@
         "detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package."
       },
       {
+        "option_id": "opt_5zv_001",
+        "rpo": "5ZV",
+        "mentioned_rpos": [
+          "FEY"
+        ],
+        "detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
+      },
+      {
         "option_id": "opt_719_001",
         "rpo": "719",
         "mentioned_rpos": [
@@ -2181,12 +2201,12 @@
         "detail_raw": ""
       },
       {
-        "option_id": "opt_5zv_001",
-        "rpo": "5ZV",
+        "option_id": "opt_z15_001",
+        "rpo": "Z15",
         "mentioned_rpos": [
-          "FEY"
+          "Z15"
         ],
-        "detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
+        "detail_raw": "1. Requires one of the following Grand Sport Heritage Hash Marks: (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist. Only additional stripes or graphics available with Z15 are (DMU/DMV/DMW/DMX/DMY) Grand Sport Heritage Center Stripes."
       },
       {
         "option_id": "opt_sht_001",
@@ -2203,14 +2223,6 @@
           "Z15"
         ],
         "detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics."
-      },
-      {
-        "option_id": "opt_z15_001",
-        "rpo": "Z15",
-        "mentioned_rpos": [
-          "Z15"
-        ],
-        "detail_raw": "1. Requires one of the following Grand Sport Heritage Hash Marks: (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist. Only additional stripes or graphics available with Z15 are (DMU/DMV/DMW/DMX/DMY) Grand Sport Heritage Center Stripes."
       }
     ]
   }

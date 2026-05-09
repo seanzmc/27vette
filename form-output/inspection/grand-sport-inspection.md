@@ -1,6 +1,6 @@
 # Grand Sport Inspection
 
-Generated: `2026-05-09T20:47:14+00:00`
+Generated: `2026-05-09T22:19:13+00:00`
 Source sheet: `grandSport_options`
 Status: `inspection_generated`
 
@@ -21,7 +21,7 @@ Status: `inspection_generated`
 - Candidate standard option rows: 90
 - Active option rows with available/standard status: 229
 - Inactive option rows all unavailable/blank: 40
-- Selectable counts: `{"False": 108, "True": 161}`
+- Selectable counts: `{"False": 107, "True": 162}`
 - Status counts: `{"available": 873, "standard": 547, "unavailable": 194}`
 - Missing status cells: 0
 - Unknown status cells: 0
@@ -36,8 +36,8 @@ Status: `inspection_generated`
 
 ## Rule/Detail Hot Spots
 
-- Hot spot counts: `{"except": 2, "included_with": 17, "includes": 47, "not_available": 47, "not_recommended": 4, "only": 19, "requires": 36}`
-- Rows requiring later rule review: 127
+- Hot spot counts: `{"except": 2, "included_with": 17, "includes": 47, "not_available": 49, "not_recommended": 4, "only": 19, "requires": 36}`
+- Rows requiring later rule review: 129
 
 | RPO | Option | Section | Matched Terms | Special Mentions |
 | --- | --- | --- | --- | --- |
@@ -52,9 +52,6 @@ Status: `inspection_generated`
 | `R8C` | Corvette Museum Delivery | `sec_cust_001` | not_available, includes, only |  |
 | `PIN` | Customer VIN ending reservation | `sec_cust_001` | not_available, only |  |
 | `BV4` | Personalized Specification Plaque | `sec_cust_001` | only |  |
-| `38S` | Adrenaline Red custom leather stitch | `sec_cust_002` | requires, includes |  |
-| `36S` | Competition Yellow custom leather stitch | `sec_cust_002` | requires, includes |  |
-| `37S` | Santorini Blue custom leather stitch | `sec_cust_002` | requires, includes |  |
 | `B6P` | Coupe Engine Appearance Package | `sec_engi_001` | includes |  |
 | `ZZ3` | Convertible Engine Appearance Package | `sec_engi_001` | includes |  |
 | `D3V` | Engine lighting | `sec_engi_001` | included_with |  |
@@ -63,9 +60,6 @@ Status: `inspection_generated`
 | `BCP` | Edge Red LS6 Engine Cover | `sec_engi_001` | includes |  |
 | `BCS` | Sterling Silver LS6 Engine Cover | `sec_engi_001` | includes |  |
 | `BC4` | NEW! Blue LS6 Engine Cover | `sec_engi_001` | includes |  |
-| `BCP` | Edge Red LS6 Engine Cover | `sec_engi_001` | requires, includes |  |
-| `BCS` | Sterling Silver LS6 Engine Cover | `sec_engi_001` | requires, includes |  |
-| `BC4` | NEW! Blue LS6 Engine Cover | `sec_engi_001` | requires, includes |  |
 | `WUB` | NEW! Quad Center Exit Exhaust | `sec_exha_001` | included_with | FEY |
 | `NWI` | NEW! Exhaust tips | `sec_exha_001` | requires |  |
 | `EFR` | Carbon Flash Exterior Accents | `sec_exte_001` | includes |  |
@@ -81,7 +75,13 @@ Status: `inspection_generated`
 | `75A` | Torch Red Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
 | `97A` | Carbon Flash Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires | Z15 |
 | `DX4` | Red Mist Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
-| ... | 87 additional rows in JSON artifact |  |  |  |
+| `DRG` | Carbon Flash Outside Mirrors | `sec_incl_001` | only |  |
+| `TR7` | Automatic Leveling Headlamp Control | `sec_incl_001` | only |  |
+| `CFX` | Personalized Corvette Museum Plaque | `sec_incl_001` | includes, only |  |
+| `J56` | Performance Disc Brakes | `sec_incl_001` | includes, only |  |
+| `XFR` | High Performance Tires | `sec_incl_001` | only |  |
+| `XFS` | Michelin Pilot Sport Cup 2 R Tires | `sec_incl_001` | only | FEY |
+| ... | 89 additional rows in JSON artifact |  |  |  |
 
 ## Warnings
 

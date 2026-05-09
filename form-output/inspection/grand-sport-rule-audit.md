@@ -1,6 +1,6 @@
 # Grand Sport Rule Audit
 
-Generated: `2026-05-09T20:47:14+00:00`
+Generated: `2026-05-09T22:19:12+00:00`
 Status: `rule_audit_generated`
 
 ## Summary
@@ -11,7 +11,7 @@ Status: `rule_audit_generated`
 - Raw detail candidate keys: 232
 - Workbook rules matching detail raw: 86
 - Workbook manual/approved/copied rules: 228
-- Skipped/review rows: 1
+- Skipped/review rows: 3
 - Unresolved non-interior RPO mentions: 4
 
 ## Workbook-Copied Rules
@@ -97,6 +97,8 @@ Status: `rule_audit_generated`
 ## Skipped Requires Review
 
 - `R8C` opt_r8c_001 [supported_clause_without_resolved_rule]: Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels.
+- `AQ9` opt_aq9_001 [supported_clause_without_resolved_rule]: Not Available with 3LT
+- `AH2` opt_ah2_001 [supported_clause_without_resolved_rule]: Not Available with 1LT
 
 ## Unresolved RPO Mentions
 

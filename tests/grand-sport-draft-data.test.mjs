@@ -295,10 +295,21 @@ test("Grand Sport draft keeps normalized display fields and raw rule evidence", 
   assert.equal(cfl.step_key, "packages_performance");
 });
 
+test("Grand Sport draft section placement follows section_master step_key", () => {
+  const sectionById = new Map(draft.sections.map((section) => [section.section_id, section]));
+  assert.equal(sectionById.get("sec_gsha_001")?.step_key, "aero_exhaust_stripes_accessories");
+  assert.equal(sectionById.get("sec_gsce_001")?.step_key, "aero_exhaust_stripes_accessories");
+  assert.equal(sectionById.get("sec_exha_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_whee_001")?.step_key, "wheels");
+  assert.equal(sectionById.get("sec_perf_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_cali_001")?.step_key, "wheels");
+  assert.equal(sectionById.get("sec_lpoi_001")?.step_key, "interior_trim");
+});
+
 test("Grand Sport draft preserves rule hot spots and normalization metadata for later phases", () => {
   assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1230);
   assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1374);
-  assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 127);
+  assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 129);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 26);
   assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);
   assert.deepEqual(draft.draftMetadata.deferredSurfaces, ["priceRules"]);

@@ -41,7 +41,30 @@ const optionSourceHeaders = [
   "display_behavior",
 ];
 const optionVariantStatusHeaders = ["option_id", "variant_id", "status"];
+const sectionMasterHeaders = [
+  "section_id",
+  "section_name",
+  "selection_mode",
+  "is_required",
+  "display_order",
+  "standard_behavior",
+  "help_text",
+  "step_key",
+];
 const optionVariantStatuses = new Set(["available", "standard", "unavailable"]);
+const sectionStepKeys = new Set([
+  "standard_equipment",
+  "paint",
+  "exterior_appearance",
+  "wheels",
+  "packages_performance",
+  "aero_exhaust_stripes_accessories",
+  "seat",
+  "base_interior",
+  "seat_belt",
+  "interior_trim",
+  "delivery",
+]);
 const ruleMappingHeaders = [
   "rule_id",
   "source_id",
@@ -205,6 +228,15 @@ test("model option source sheets use the same normalized contract", () => {
   assert.deepEqual(workbookHeaders("grandSport_ovs"), optionVariantStatusHeaders);
   assertOptionVariantStatusCoverage("stingray_options", "stingray_ovs", stingrayVariantIds);
   assertOptionVariantStatusCoverage("grandSport_options", "grandSport_ovs", grandSportVariantIds);
+});
+
+test("section_master owns section step placement without category", () => {
+  assert.deepEqual(workbookHeaders("section_master"), sectionMasterHeaders);
+  for (const row of workbookRows("section_master")) {
+    assert.ok(row.step_key, `${row.section_id} is missing step_key`);
+    assert.ok(sectionStepKeys.has(row.step_key), `${row.section_id} has invalid step_key ${row.step_key}`);
+    assert.equal(Object.hasOwn(row, "category"), false);
+  }
 });
 
 test("Grand Sport draft rule source sheets use workbook-backed contracts", () => {

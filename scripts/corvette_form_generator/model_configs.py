@@ -192,12 +192,7 @@ GRAND_SPORT_MODEL = ModelConfig(
     body_style_display_order=BODY_STYLE_DISPLAY_ORDER,
     selection_mode_labels=SELECTION_MODE_LABELS,
     standard_sections=STANDARD_SECTIONS,
-    section_step_overrides=SECTION_STEP_OVERRIDES
-    | {
-        "sec_gsha_001": "exterior_appearance",
-        "sec_spec_001": "packages_performance",
-        "sec_colo_001": "interior_trim",
-    },
+    section_step_overrides=SECTION_STEP_OVERRIDES,
     section_label_overrides=GRAND_SPORT_SECTION_LABEL_OVERRIDES,
     preview_artifact_prefix="grand-sport-contract-preview",
     draft_artifact_prefix="grand-sport-form-data-draft",

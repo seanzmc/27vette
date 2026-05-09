@@ -416,9 +416,29 @@ def resolved_step_key(
     return step_for_section(
         section_id,
         section.get("section_name", ""),
+        section_step_key=clean(section.get("step_key", "")),
         standard_sections=config.standard_sections,
         section_step_overrides=config.section_step_overrides,
     )
+
+
+def section_step_resolution_source(
+    section_id: str,
+    sections: dict[str, dict[str, str]],
+    config: ModelConfig,
+) -> str:
+    section = sections.get(section_id, {})
+    if clean(section.get("step_key", "")):
+        return "section_master"
+    if section_id in config.section_step_overrides:
+        return "model_config"
+    if section_id in config.standard_sections:
+        return "standard_sections"
+    return "heuristic"
+
+
+def valid_step_keys(config: ModelConfig) -> set[str]:
+    return set(config.step_order) | {"standard_equipment"}
 
 
 def classify_rule_hot_spots(
@@ -827,6 +847,7 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
         step_key = step_for_section(
             section_id,
             section.get("section_name", ""),
+            section_step_key=clean(section.get("step_key", "")),
             standard_sections=config.standard_sections,
             section_step_overrides=config.section_step_overrides,
         )
@@ -1014,6 +1035,18 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     validation_rows: list[dict[str, Any]] = []
     text_cleanup_counter: Counter[str] = Counter()
     section_ids_with_choices: set[str] = set()
+    known_step_keys = valid_step_keys(config)
+    for section_id, section in sections.items():
+        step_key = clean(section.get("step_key", ""))
+        if step_key and step_key not in known_step_keys:
+            issue = {
+                "issue_type": "unknown_section_step_key",
+                "section_id": section_id,
+                "step_key": step_key,
+                "message": "section_master.step_key is not present in the configured runtime step order.",
+            }
+            unresolved_issues.append(issue)
+            validation_rows.append({**issue, "severity": "error"})
     option_ids = {row["option_id"] for row in rows}
     for (option_id, variant_id), override in variant_option_overrides.items():
         if option_id not in option_ids:
@@ -1135,6 +1168,30 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             section_ids_with_choices.add(choice_section_id)
             if status == "standard":
                 candidate_standard_equipment.append(choice)
+
+    for section_id in sorted(section_ids_with_choices):
+        section = sections.get(section_id, {})
+        step_key = clean(section.get("step_key", ""))
+        if not step_key:
+            issue = {
+                "issue_type": "missing_section_step_key",
+                "section_id": section_id,
+                "message": "Active Grand Sport choices resolve to a section without section_master.step_key.",
+            }
+            unresolved_issues.append(issue)
+            validation_rows.append({**issue, "severity": "error"})
+            continue
+        if step_key not in known_step_keys:
+            continue
+        if section_step_resolution_source(section_id, sections, config) == "heuristic":
+            issue = {
+                "issue_type": "heuristic_section_step_key",
+                "section_id": section_id,
+                "step_key": resolved_step_key(section_id, sections, config),
+                "message": "Active Grand Sport choices fell back to heuristic step placement instead of workbook-owned placement.",
+            }
+            unresolved_issues.append(issue)
+            validation_rows.append({**issue, "severity": "error"})
 
     step_order_index = {step_key: index for index, step_key in enumerate(config.step_order)}
 
