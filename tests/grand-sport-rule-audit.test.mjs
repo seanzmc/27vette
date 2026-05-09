@@ -200,8 +200,8 @@ test("Grand Sport rule audit highlights risky duplicate RPO and special package 
   assert.equal(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "BC4"), false);
   assert.equal(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "BCP"), false);
   assert.equal(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "AH2"), false);
-  assert.ok(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "AQ9"));
-  assert.ok(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "UQT"));
+  assert.equal(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "AQ9"), false);
+  assert.equal(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "UQT"), false);
   assert.ok(audit.reviewHotSpots.specialPackageMentions.some((row) => row.rpo === "FEY"));
   assert.ok(audit.reviewHotSpots.specialPackageMentions.some((row) => row.mentioned_rpos.includes("Z25")));
 

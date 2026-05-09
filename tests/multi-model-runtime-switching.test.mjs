@@ -285,6 +285,40 @@ test("Grand Sport heritage hash marks auto-add Z15 and leave only center stripes
   assert.equal(runtime.state.selected.has("opt_dmu_001"), true, "center stripes should remain selectable with a hash mark");
 });
 
+test("Grand Sport UQT is selectable on 1LT and included on higher trims from workbook overrides", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  let uqt = runtime.activeChoiceRows().find((choice) => choice.rpo === "UQT");
+  assert.ok(uqt, "Grand Sport UQT should exist for 1LT");
+  assert.equal(uqt.option_id, "opt_uqt_001");
+  assert.equal(uqt.status, "available");
+  assert.equal(uqt.selectable, "True");
+  assert.equal(uqt.step_key, "interior_trim");
+
+  runtime.handleChoice(uqt);
+  let order = runtime.currentOrder();
+  assert.equal(order.selected_options.some((item) => item.rpo === "UQT" && item.price === 1495), true);
+
+  runtime.state.trimLevel = "2LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  uqt = runtime.activeChoiceRows().find((choice) => choice.rpo === "UQT");
+  assert.ok(uqt, "Grand Sport UQT should exist for 2LT");
+  assert.equal(uqt.option_id, "opt_uqt_001");
+  assert.equal(uqt.status, "standard");
+  assert.equal(uqt.selectable, "False");
+  assert.equal(uqt.step_key, "standard_equipment");
+
+  order = runtime.currentOrder();
+  assert.equal(order.selected_options.some((item) => item.rpo === "UQT"), false);
+  assert.equal(runtime.data.standardEquipment.some((item) => item.variant_id === "2lt_e07" && item.rpo === "UQT"), true);
+});
+
 test("runtime defaults to Stingray and switches models with a clean build reset", () => {
   const runtime = loadRuntime();
   assert.equal(runtime.activeModelKey, "stingray");

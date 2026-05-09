@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-09T20:32:29+00:00",
+  "generated_at": "2026-05-09T20:47:14+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -102,19 +102,19 @@
     "unique_rpos": 223,
     "variant_status_cells": 1614,
     "status_source_rows": 1614,
-    "candidate_choice_rows_available_or_standard": 1386,
-    "candidate_standard_equipment_cells": 459,
-    "candidate_standard_option_rows": 92,
+    "candidate_choice_rows_available_or_standard": 1374,
+    "candidate_standard_equipment_cells": 455,
+    "candidate_standard_option_rows": 90,
     "selectable_counts": {
       "False": 108,
       "True": 161
     },
-    "active_option_rows_available_or_standard": 231,
-    "inactive_option_rows_all_unavailable_or_blank": 38,
+    "active_option_rows_available_or_standard": 229,
+    "inactive_option_rows_all_unavailable_or_blank": 40,
     "status_counts": {
       "available": 873,
-      "standard": 545,
-      "unavailable": 196
+      "standard": 547,
+      "unavailable": 194
     },
     "status_counts_by_variant": {
       "1lt_e07": {
@@ -124,8 +124,8 @@
       },
       "2lt_e07": {
         "available": 150,
-        "standard": 97,
-        "unavailable": 22
+        "standard": 98,
+        "unavailable": 21
       },
       "3lt_e07": {
         "available": 153,
@@ -139,8 +139,8 @@
       },
       "2lt_e67": {
         "available": 144,
-        "standard": 96,
-        "unavailable": 29
+        "standard": 97,
+        "unavailable": 28
       },
       "3lt_e67": {
         "available": 147,
@@ -2876,10 +2876,10 @@
       "effective_status_label": "Standard",
       "statuses": {
         "1lt_e07": "standard",
-        "2lt_e07": "unavailable",
+        "2lt_e07": "standard",
         "3lt_e07": "unavailable",
         "1lt_e67": "standard",
-        "2lt_e67": "unavailable",
+        "2lt_e67": "standard",
         "3lt_e67": "unavailable"
       }
     },
@@ -4187,14 +4187,6 @@
         "step_key": "standard_equipment"
       },
       {
-        "option_id": "opt_uqt_002",
-        "rpo": "UQT",
-        "section_id": "sec_2lte_001",
-        "original_section_id": "sec_2lte_001",
-        "section_override_applied": false,
-        "step_key": "standard_equipment"
-      },
-      {
         "option_id": "opt_uqh_001",
         "rpo": "UQH",
         "section_id": "sec_2lte_001",
@@ -4237,14 +4229,6 @@
       {
         "option_id": "opt_ki3_001",
         "rpo": "KI3",
-        "section_id": "sec_2lte_001",
-        "original_section_id": "sec_2lte_001",
-        "section_override_applied": false,
-        "step_key": "standard_equipment"
-      },
-      {
-        "option_id": "opt_aq9_003",
-        "rpo": "AQ9",
         "section_id": "sec_2lte_001",
         "original_section_id": "sec_2lte_001",
         "section_override_applied": false,
@@ -6085,34 +6069,6 @@
       "option_name": "Head-Up Display"
     },
     {
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
-      "variant_id": "2lt_e07",
-      "section_id": "sec_2lte_001",
-      "option_name": "Performance Data and Video Recorder"
-    },
-    {
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
-      "variant_id": "3lt_e07",
-      "section_id": "sec_2lte_001",
-      "option_name": "Performance Data and Video Recorder"
-    },
-    {
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
-      "variant_id": "2lt_e67",
-      "section_id": "sec_2lte_001",
-      "option_name": "Performance Data and Video Recorder"
-    },
-    {
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
-      "variant_id": "3lt_e67",
-      "section_id": "sec_2lte_001",
-      "option_name": "Performance Data and Video Recorder"
-    },
-    {
       "option_id": "opt_uqh_001",
       "rpo": "UQH",
       "variant_id": "2lt_e07",
@@ -6279,20 +6235,6 @@
       "variant_id": "3lt_e67",
       "section_id": "sec_2lte_001",
       "option_name": "Heated Steering Wheel"
-    },
-    {
-      "option_id": "opt_aq9_003",
-      "rpo": "AQ9",
-      "variant_id": "2lt_e07",
-      "section_id": "sec_2lte_001",
-      "option_name": "GT1 Bucket Seats"
-    },
-    {
-      "option_id": "opt_aq9_003",
-      "rpo": "AQ9",
-      "variant_id": "2lt_e67",
-      "section_id": "sec_2lte_001",
-      "option_name": "GT1 Bucket Seats"
     },
     {
       "option_id": "opt_kqv_001",
@@ -7557,7 +7499,21 @@
     {
       "option_id": "opt_aq9_001",
       "rpo": "AQ9",
+      "variant_id": "2lt_e07",
+      "section_id": "sec_seat_002",
+      "option_name": "GT1 Bucket Seats"
+    },
+    {
+      "option_id": "opt_aq9_001",
+      "rpo": "AQ9",
       "variant_id": "1lt_e67",
+      "section_id": "sec_seat_002",
+      "option_name": "GT1 Bucket Seats"
+    },
+    {
+      "option_id": "opt_aq9_001",
+      "rpo": "AQ9",
+      "variant_id": "2lt_e67",
       "section_id": "sec_seat_002",
       "option_name": "GT1 Bucket Seats"
     },
@@ -9516,66 +9472,6 @@
       "section_id": "sec_2lte_001"
     },
     {
-      "choice_id": "1lt_e07__opt_uqt_002",
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
-      "variant_id": "1lt_e07",
-      "status": "available",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e07__opt_uqt_002",
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
-      "variant_id": "2lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e07__opt_uqt_002",
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
-      "variant_id": "3lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "1lt_e67__opt_uqt_002",
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
-      "variant_id": "1lt_e67",
-      "status": "available",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e67__opt_uqt_002",
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
-      "variant_id": "2lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e67__opt_uqt_002",
-      "option_id": "opt_uqt_002",
-      "rpo": "UQT",
-      "variant_id": "3lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_2lte_001"
-    },
-    {
       "choice_id": "1lt_e07__opt_uqh_001",
       "option_id": "opt_uqh_001",
       "rpo": "UQH",
@@ -9936,66 +9832,6 @@
       "section_id": "sec_2lte_001"
     },
     {
-      "choice_id": "1lt_e07__opt_aq9_003",
-      "option_id": "opt_aq9_003",
-      "rpo": "AQ9",
-      "variant_id": "1lt_e07",
-      "status": "unavailable",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e07__opt_aq9_003",
-      "option_id": "opt_aq9_003",
-      "rpo": "AQ9",
-      "variant_id": "2lt_e07",
-      "status": "standard",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e07__opt_aq9_003",
-      "option_id": "opt_aq9_003",
-      "rpo": "AQ9",
-      "variant_id": "3lt_e07",
-      "status": "unavailable",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "1lt_e67__opt_aq9_003",
-      "option_id": "opt_aq9_003",
-      "rpo": "AQ9",
-      "variant_id": "1lt_e67",
-      "status": "unavailable",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "2lt_e67__opt_aq9_003",
-      "option_id": "opt_aq9_003",
-      "rpo": "AQ9",
-      "variant_id": "2lt_e67",
-      "status": "standard",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_2lte_001"
-    },
-    {
-      "choice_id": "3lt_e67__opt_aq9_003",
-      "option_id": "opt_aq9_003",
-      "rpo": "AQ9",
-      "variant_id": "3lt_e67",
-      "status": "unavailable",
-      "selectable": "False",
-      "active": "True",
-      "section_id": "sec_2lte_001"
-    },
-    {
       "choice_id": "1lt_e07__opt_kqv_001",
       "option_id": "opt_kqv_001",
       "rpo": "KQV",
@@ -10209,6 +10045,126 @@
       "choice_id": "1lt_e67__opt_ahe_001",
       "option_id": "opt_ahe_001",
       "rpo": "AHE",
+      "variant_id": "1lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "2lt_e67__opt_ahe_001",
+      "option_id": "opt_ahe_001",
+      "rpo": "AHE",
+      "variant_id": "2lt_e67",
+      "status": "standard",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "3lt_e67__opt_ahe_001",
+      "option_id": "opt_ahe_001",
+      "rpo": "AHE",
+      "variant_id": "3lt_e67",
+      "status": "standard",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e07__opt_ahh_001",
+      "option_id": "opt_ahh_001",
+      "rpo": "AHH",
+      "variant_id": "1lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "2lt_e07__opt_ahh_001",
+      "option_id": "opt_ahh_001",
+      "rpo": "AHH",
+      "variant_id": "2lt_e07",
+      "status": "standard",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "3lt_e07__opt_ahh_001",
+      "option_id": "opt_ahh_001",
+      "rpo": "AHH",
+      "variant_id": "3lt_e07",
+      "status": "standard",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e67__opt_ahh_001",
+      "option_id": "opt_ahh_001",
+      "rpo": "AHH",
+      "variant_id": "1lt_e67",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "2lt_e67__opt_ahh_001",
+      "option_id": "opt_ahh_001",
+      "rpo": "AHH",
+      "variant_id": "2lt_e67",
+      "status": "standard",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "3lt_e67__opt_ahh_001",
+      "option_id": "opt_ahh_001",
+      "rpo": "AHH",
+      "variant_id": "3lt_e67",
+      "status": "standard",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e07__opt_aqa_001",
+      "option_id": "opt_aqa_001",
+      "rpo": "AQA",
+      "variant_id": "1lt_e07",
+      "status": "unavailable",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "2lt_e07__opt_aqa_001",
+      "option_id": "opt_aqa_001",
+      "rpo": "AQA",
+      "variant_id": "2lt_e07",
+      "status": "standard",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "3lt_e07__opt_aqa_001",
+      "option_id": "opt_aqa_001",
+      "rpo": "AQA",
+      "variant_id": "3lt_e07",
+      "status": "standard",
+      "selectable": "False",
+      "active": "True",
+      "section_id": "sec_2lte_001"
+    },
+    {
+      "choice_id": "1lt_e67__opt_aqa_001",
+      "option_id": "opt_aqa_001",
+      "rpo": "AQA",
       "variant_id": "1lt_e67",
       "status": "unavailable",
       "selectable": "False",

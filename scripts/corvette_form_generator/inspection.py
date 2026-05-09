@@ -484,8 +484,40 @@ def display_behavior_status(
     if display_behavior == "auto_only":
         return "unavailable", "False", "False"
     if display_behavior == "display_only":
-        return "available", "False", "True"
+        return "standard" if status == "standard" else "available", "False", "True"
     return status, selectable, active
+
+
+def load_variant_option_overrides(wb, config: ModelConfig) -> dict[tuple[str, str], dict[str, str]]:
+    overrides: dict[tuple[str, str], dict[str, str]] = {}
+    if not config.variant_option_overrides_sheet:
+        return overrides
+    for row in rows_from_optional_sheet(wb, config.variant_option_overrides_sheet):
+        if not active_source_row(row):
+            continue
+        option_id = clean(row.get("option_id", ""))
+        variant_id = clean(row.get("variant_id", ""))
+        if not option_id or not variant_id:
+            continue
+        overrides[(option_id, variant_id)] = {
+            "selectable": normalize_selectable(row.get("selectable", "")),
+            "display_behavior": clean(row.get("display_behavior", "")),
+            "section_id": clean(row.get("section_id", "")),
+            "note": clean(row.get("note", "")),
+        }
+    return overrides
+
+
+def apply_variant_option_override(
+    row: dict[str, Any],
+    override: dict[str, str],
+) -> dict[str, Any]:
+    return {
+        **row,
+        "selectable": override.get("selectable") or row["selectable"],
+        "display_behavior": override.get("display_behavior") or row["display_behavior"],
+        "section_id": override.get("section_id") or row["section_id"],
+    }
 
 
 def build_color_overrides(
@@ -912,6 +944,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
     rows = [normalized_option_row(row, config) for row in raw_rows]
     apply_status_lookup(rows, status_lookup_from_sheet(wb, config), config)
+    variant_option_overrides = load_variant_option_overrides(wb, config)
 
     variant_source_rows = {row["variant_id"]: row for row in variants_raw if row.get("variant_id", "") in config.variant_ids}
     variants: list[dict[str, Any]] = []
@@ -981,6 +1014,37 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     validation_rows: list[dict[str, Any]] = []
     text_cleanup_counter: Counter[str] = Counter()
     section_ids_with_choices: set[str] = set()
+    option_ids = {row["option_id"] for row in rows}
+    for (option_id, variant_id), override in variant_option_overrides.items():
+        if option_id not in option_ids:
+            issue = {
+                "issue_type": "unknown_override_option",
+                "option_id": option_id,
+                "variant_id": variant_id,
+                "message": "Variant option override references an option id missing from the source option sheet.",
+            }
+            unresolved_issues.append(issue)
+            validation_rows.append({**issue, "severity": "error"})
+        if variant_id not in config.variant_ids:
+            issue = {
+                "issue_type": "unknown_override_variant",
+                "option_id": option_id,
+                "variant_id": variant_id,
+                "message": "Variant option override references a variant id outside this model config.",
+            }
+            unresolved_issues.append(issue)
+            validation_rows.append({**issue, "severity": "error"})
+        override_section_id = override.get("section_id", "")
+        if override_section_id and override_section_id not in sections:
+            issue = {
+                "issue_type": "unknown_override_section",
+                "option_id": option_id,
+                "variant_id": variant_id,
+                "section_id": override_section_id,
+                "message": "Variant option override references a section id missing from section_master.",
+            }
+            unresolved_issues.append(issue)
+            validation_rows.append({**issue, "severity": "error"})
 
     for row in rows:
         if row["active"] != "True":
@@ -1014,8 +1078,6 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
         for note in text_cleanup_notes:
             text_cleanup_counter[note] += 1
 
-        section = sections.get(section_id, {})
-        section_name = config.section_label_overrides.get(section_id, section.get("section_name", ""))
         option_base = {
             "option_id": row["option_id"],
             "rpo": row["rpo"],
@@ -1025,31 +1087,41 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             "source_description": row["description"],
             "source_detail_raw": row["detail_raw"],
             "source_section_id": row["original_section_id"],
-            "section_id": section_id,
-            "resolved_section_id": section_id,
-            "section_name": section_name,
-            "step_key": step_key,
-            "selectable": row["selectable"],
             "active": row["active"],
-            "display_behavior": row["display_behavior"],
             "base_price": row["price"],
             "text_cleanup_notes": text_cleanup_notes,
         }
-        section_ids_with_choices.add(section_id)
 
         for variant_id, status in row["statuses"].items():
+            choice_row = apply_variant_option_override(
+                row,
+                variant_option_overrides.get((row["option_id"], variant_id), {}),
+            )
+            choice_section_id = choice_row["section_id"]
+            if choice_section_id not in sections:
+                continue
+            choice_section = sections.get(choice_section_id, {})
+            choice_step_key = resolved_step_key(choice_section_id, sections, config)
+            choice_section_name = config.section_label_overrides.get(
+                choice_section_id,
+                choice_section.get("section_name", ""),
+            )
             status, selectable, active = display_behavior_status(
                 status,
-                row["selectable"],
+                choice_row["selectable"],
                 row["active"],
-                row["display_behavior"],
+                choice_row["display_behavior"],
             )
-            if status not in {"available", "standard"} and row["display_behavior"] != "auto_only":
+            if status not in {"available", "standard"} and choice_row["display_behavior"] != "auto_only":
                 continue
             variant = variants_by_id[variant_id]
             choice = {
                 **option_base,
                 "choice_id": f"{variant_id}__{row['option_id']}",
+                "section_id": choice_section_id,
+                "resolved_section_id": choice_section_id,
+                "section_name": choice_section_name,
+                "step_key": choice_step_key,
                 "variant_id": variant_id,
                 "body_style": variant["body_style"],
                 "trim_level": variant["trim_level"],
@@ -1057,8 +1129,10 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
                 "status_label": status_to_label(status),
                 "selectable": selectable,
                 "active": active,
+                "display_behavior": choice_row["display_behavior"],
             }
             choices.append(choice)
+            section_ids_with_choices.add(choice_section_id)
             if status == "standard":
                 candidate_standard_equipment.append(choice)
 
@@ -1171,10 +1245,12 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
     option_rows: dict[str, dict[str, Any]] = {}
     statuses_by_option: defaultdict[str, dict[str, str]] = defaultdict(dict)
     order_by_option: dict[str, int] = {}
+    preview_choice_by_option_variant: dict[tuple[str, str], dict[str, Any]] = {}
 
     for index, choice in enumerate(preview["choices"], start=1):
         option_id = choice["option_id"]
         statuses_by_option[option_id][choice["variant_id"]] = choice["status"]
+        preview_choice_by_option_variant[(option_id, choice["variant_id"])] = choice
         if option_id not in order_by_option:
             order_by_option[option_id] = index
         if option_id not in option_rows:
@@ -1202,16 +1278,21 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
 
     draft_choices: list[dict[str, Any]] = []
     for option_id, option in sorted(option_rows.items(), key=lambda item: order_by_option[item[0]]):
-        section = sections_by_id.get(option["section_id"], {})
         for variant_id in config.variant_ids:
             variant = variants_by_id[variant_id]
             status = statuses_by_option[option_id].get(variant_id, "unavailable")
-            status, selectable, active = display_behavior_status(
-                status,
-                option["selectable"],
-                option.get("active", "True"),
-                option.get("display_behavior", ""),
-            )
+            choice_source = preview_choice_by_option_variant.get((option_id, variant_id), option)
+            section = sections_by_id.get(choice_source["section_id"], {})
+            if (option_id, variant_id) in preview_choice_by_option_variant:
+                selectable = choice_source["selectable"]
+                active = choice_source["active"]
+            else:
+                status, selectable, active = display_behavior_status(
+                    status,
+                    option["selectable"],
+                    option.get("active", "True"),
+                    option.get("display_behavior", ""),
+                )
             draft_choices.append(
                 {
                     "choice_id": f"{variant_id}__{option_id}",
@@ -1219,9 +1300,9 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
                     "rpo": option["rpo"],
                     "label": option["label"],
                     "description": option["description"],
-                    "section_id": option["section_id"],
-                    "section_name": option["section_name"],
-                    "step_key": option["step_key"],
+                    "section_id": choice_source["section_id"],
+                    "section_name": choice_source["section_name"],
+                    "step_key": choice_source["step_key"],
                     "variant_id": variant_id,
                     "body_style": variant["body_style"],
                     "trim_level": variant["trim_level"],

@@ -40,6 +40,7 @@ class ModelConfig:
     exclusive_groups_sheet: str = "exclusive_groups"
     exclusive_group_members_sheet: str = "exclusive_group_members"
     color_overrides_sheet: str = "color_overrides"
+    variant_option_overrides_sheet: str = ""
     exclusive_groups: tuple[Mapping[str, Any], ...] = ()
     text_cleanup: Mapping[str, Any] = field(default_factory=dict)
     special_rule_review_rpos: tuple[str, ...] = ()

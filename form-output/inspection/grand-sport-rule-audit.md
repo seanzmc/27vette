@@ -1,6 +1,6 @@
 # Grand Sport Rule Audit
 
-Generated: `2026-05-09T20:32:28+00:00`
+Generated: `2026-05-09T20:47:14+00:00`
 Status: `rule_audit_generated`
 
 ## Summary
@@ -107,5 +107,5 @@ Status: `rule_audit_generated`
 
 ## Review Hot Spots
 
-- Duplicate active RPOs: 2
+- Duplicate active RPOs: 0
 - Special package mention rows: 25

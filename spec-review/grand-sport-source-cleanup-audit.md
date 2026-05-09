@@ -1,21 +1,22 @@
 # Grand Sport Source Cleanup Audit
 
-Generated from the saved workbook after the standard mirror cleanup pass.
+Generated from the saved workbook after the trim-scoped selectability pass.
 
 ## Summary
 
 - Grand Sport option rows: 269.
-- Active Grand Sport option rows: 231.
+- Active Grand Sport option rows: 229.
 - OVS coverage: 269 option ids in `grandSport_ovs`; missing option ids: none.
-- Active duplicate RPO groups remaining: 2.
-- Active non-selectable rows without `display_behavior`: 86; these are standard/included equipment source rows, not visible selectable cards.
+- Active duplicate RPO groups remaining: 0.
+- Active non-selectable rows without `display_behavior`: 84; these are standard/included equipment source rows, not visible selectable cards.
 - Inactive option references in source rule/group sheets: 23 raw references; current draft generator omits inactive/unemitted rule rows.
 - Sections with active Grand Sport rows: 30.
 - Sections with no active Grand Sport rows: 7.
+- Variant option override rows: 4 in `grandSport_variant_overrides`.
 
 ## Workbook Changes Applied
 
-These rows are inactive now; their `grandSport_ovs` rows remain intact:
+These duplicate or mirror rows are inactive now; their `grandSport_ovs` rows remain intact:
 
 - `opt_719_002` / `719` from `sec_stan_002`: `active=False`.
 - `opt_cf7_002` / `CF7` from `sec_stan_002`: `active=False`.
@@ -27,21 +28,23 @@ These rows are inactive now; their `grandSport_ovs` rows remain intact:
 - `opt_swm_002` / `SWM` from `sec_stan_002`: `active=False`.
 - `opt_ah2_003` / `AH2` from `sec_3lte_001`: `active=False`.
 - `opt_aq9_004` / `AQ9` from `sec_1lte_001`: `active=False`.
+- `opt_aq9_003` / `AQ9` from `sec_2lte_001`: `active=False`.
 - `opt_aup_001` / `AUP` from `sec_seat_002`: `active=False`.
 - `opt_t0e_001` / `T0E` from `sec_stan_002`: `active=False`.
+- `opt_uqt_002` / `UQT` from `sec_2lte_001`: `active=False`.
 
-Rows intentionally kept active:
+`grandSport_variant_overrides` rows now provide variant-scoped generated choice behavior:
 
-- `opt_aq9_003` / `AQ9` from `sec_2lte_001`: 2LT AQ9 mirror remains because canonical AQ9 is unavailable for 2LT, so this row is still needed for 2LT standard-equipment output.
-- `opt_uqt_001` / `UQT` from `sec_inte_001`: UQT remains split because current workbook fields cannot express one row that is selectable in 1LT but equipment-list only in 2LT/3LT.
-- `opt_uqt_002` / `UQT` from `sec_2lte_001`: UQT remains split because current workbook fields cannot express one row that is selectable in 1LT but equipment-list only in 2LT/3LT.
+| Option | Variant | Selectable | Display behavior | Section | Note |
+| --- | --- | --- | --- | --- | --- |
+| `opt_uqt_001` | `2lt_e07` | `False` | `display_only` | `sec_2lte_001` | 2LT included equipment. |
+| `opt_uqt_001` | `2lt_e67` | `False` | `display_only` | `sec_2lte_001` | 2LT included equipment. |
+| `opt_uqt_001` | `3lt_e07` | `False` | `display_only` | `sec_3lte_001` | 3LT included equipment. |
+| `opt_uqt_001` | `3lt_e67` | `False` | `display_only` | `sec_3lte_001` | 3LT included equipment. |
 
 ## Active Duplicate RPOs Remaining
 
-| RPO | Active rows | Assessment |
-| --- | --- | --- |
-| `AQ9` | `opt_aq9_003` `sec_2lte_001` selectable=FALSE statuses-kept; `opt_aq9_001` `sec_seat_002` selectable=TRUE statuses-kept | 2LT mirror remains required because canonical AQ9 row is unavailable for 2LT. |
-| `UQT` | `opt_uqt_002` `sec_2lte_001` selectable=FALSE statuses-kept; `opt_uqt_001` `sec_inte_001` selectable=TRUE statuses-kept | Needs trim-scoped section/selectability or equivalent generic workbook support before this can collapse to one row. |
+- none
 
 ## Inactive Option References From Rule/Group Sources
 
@@ -80,14 +83,14 @@ Rows intentionally kept active:
 | `38S` | `opt_38s_001` | `False` | `False` | `` | `sec_cust_002` | 10 | interior-only/component-only suppressed from normal options |
 | `5ZV` | `opt_5zv_001` | `True` | `TRUE` | `` | `sec_spoi_001` | 20 |  |
 | `719` | `opt_719_001` | `True` | `TRUE` | `` | `sec_seat_001` | 10 |  |
-| `719` | `opt_719_002` | `False` | `FALSE` | `` | `sec_stan_002` | 70 | inactive after this cleanup pass |
+| `719` | `opt_719_002` | `False` | `FALSE` | `` | `sec_stan_002` | 70 | inactive after cleanup pass |
 | `AH2` | `opt_ah2_001` | `True` | `TRUE` | `` | `sec_seat_002` | 25 |  |
 | `AH2` | `opt_ah2_002` | `False` | `TRUE` | `` | `sec_seat_002` | 70 |  |
-| `AH2` | `opt_ah2_003` | `False` | `FALSE` | `` | `sec_3lte_001` | 10 | inactive after this cleanup pass |
-| `AQ9` | `opt_aq9_001` | `True` | `TRUE` | `` | `sec_seat_002` | 10 |  |
+| `AH2` | `opt_ah2_003` | `False` | `FALSE` | `` | `sec_3lte_001` | 10 | inactive after cleanup pass |
+| `AQ9` | `opt_aq9_001` | `True` | `TRUE` | `` | `sec_seat_002` | 10 | canonical row; standard for 1LT/2LT via OVS |
 | `AQ9` | `opt_aq9_002` | `False` | `TRUE` | `` | `sec_seat_002` | 20 |  |
-| `AQ9` | `opt_aq9_003` | `True` | `FALSE` | `` | `sec_2lte_001` | 90 | kept for 2LT standard equipment |
-| `AQ9` | `opt_aq9_004` | `False` | `FALSE` | `` | `sec_1lte_001` | 10 | inactive after this cleanup pass |
+| `AQ9` | `opt_aq9_003` | `False` | `FALSE` | `` | `sec_2lte_001` | 90 | inactive after cleanup pass |
+| `AQ9` | `opt_aq9_004` | `False` | `FALSE` | `` | `sec_1lte_001` | 10 | inactive after cleanup pass |
 | `AUP` | `opt_aup_001` | `False` | `TRUE` | `` | `sec_seat_002` | 80 | interior-only/component-only suppressed from normal options |
 | `B6P` | `opt_b6p_001` | `True` | `TRUE` | `` | `sec_engi_001` | 1 |  |
 | `BC4` | `opt_bc4_001` | `False` | `TRUE` | `` | `sec_engi_001` | 45 |  |
@@ -98,24 +101,24 @@ Rows intentionally kept active:
 | `BCS` | `opt_bcs_001` | `False` | `TRUE` | `` | `sec_engi_001` | 40 |  |
 | `BCS` | `opt_bcs_002` | `True` | `TRUE` | `` | `sec_engi_001` | 26 |  |
 | `CF7` | `opt_cf7_001` | `True` | `TRUE` | `` | `sec_roof_001` | 10 |  |
-| `CF7` | `opt_cf7_002` | `False` | `FALSE` | `` | `sec_stan_002` | 60 | inactive after this cleanup pass |
+| `CF7` | `opt_cf7_002` | `False` | `FALSE` | `` | `sec_stan_002` | 60 | inactive after cleanup pass |
 | `CFL` | `opt_cfl_001` | `True` | `TRUE` | `` | `sec_perf_001` | 30 |  |
 | `CFV` | `opt_cfv_001` | `False` | `TRUE` | `` | `sec_perf_001` | 40 | inactive/deferred ground effects row |
 | `CFZ` | `opt_cfz_001` | `True` | `TRUE` | `` | `sec_perf_001` | 50 |  |
 | `CM9` | `opt_cm9_001` | `True` | `TRUE` | `` | `sec_roof_001` | 20 |  |
-| `CM9` | `opt_cm9_002` | `False` | `FALSE` | `` | `sec_stan_002` | 30 | inactive after this cleanup pass |
+| `CM9` | `opt_cm9_002` | `False` | `FALSE` | `` | `sec_stan_002` | 30 | inactive after cleanup pass |
 | `D3V` | `opt_d3v_001` | `True` | `TRUE` | `` | `sec_engi_001` | 10 |  |
 | `EFR` | `opt_efr_001` | `True` | `TRUE` | `` | `sec_exte_001` | 10 |  |
-| `EFR` | `opt_efr_002` | `False` | `FALSE` | `` | `sec_stan_002` | 50 | inactive after this cleanup pass |
+| `EFR` | `opt_efr_002` | `False` | `FALSE` | `` | `sec_stan_002` | 50 | inactive after cleanup pass |
 | `EYT` | `opt_eyt_001` | `True` | `TRUE` | `` | `sec_badg_001` | 10 |  |
-| `EYT` | `opt_eyt_002` | `False` | `FALSE` | `` | `sec_stan_002` | 20 | inactive after this cleanup pass |
+| `EYT` | `opt_eyt_002` | `False` | `FALSE` | `` | `sec_stan_002` | 20 | inactive after cleanup pass |
 | `FEB` | `opt_feb_001` | `True` | `TRUE` | `` | `sec_perf_001` | 60 |  |
 | `FEY` | `opt_fey_001` | `True` | `TRUE` | `` | `sec_perf_001` | 70 |  |
 | `J57` | `opt_j57_001` | `True` | `TRUE` | `` | `sec_perf_001` | 80 |  |
 | `J6A` | `opt_j6a_001` | `True` | `TRUE` | `` | `sec_cali_001` | 10 |  |
-| `J6A` | `opt_j6a_002` | `False` | `FALSE` | `` | `sec_stan_002` | 10 | inactive after this cleanup pass |
+| `J6A` | `opt_j6a_002` | `False` | `FALSE` | `` | `sec_stan_002` | 10 | inactive after cleanup pass |
 | `NGA` | `opt_nga_001` | `True` | `TRUE` | `` | `sec_exha_001` | 10 |  |
-| `NGA` | `opt_nga_002` | `False` | `FALSE` | `` | `sec_stan_002` | 40 | inactive after this cleanup pass |
+| `NGA` | `opt_nga_002` | `False` | `FALSE` | `` | `sec_stan_002` | 40 | inactive after cleanup pass |
 | `PCQ` | `opt_pcq_001` | `True` | `TRUE` | `` | `sec_lpoe_001` | 45 |  |
 | `PEF` | `opt_pef_001` | `True` | `TRUE` | `` | `sec_lpoi_001` | 30 |  |
 | `R6P` | `opt_r6p_001` | `False` | `TRUE` | `` | `sec_onst_001` | 20 | OnStar/deferred inactive |
@@ -127,13 +130,13 @@ Rows intentionally kept active:
 | `SFZ` | `opt_sfz_001` | `True` | `TRUE` | `` | `sec_lpoe_001` | 20 |  |
 | `SL9` | `opt_sl9_001` | `True` | `TRUE` | `` | `sec_engi_001` | 11 |  |
 | `SWM` | `opt_swm_001` | `True` | `TRUE` | `` | `sec_whee_002` | 10 |  |
-| `SWM` | `opt_swm_002` | `False` | `FALSE` | `` | `sec_stan_002` | 100 | inactive after this cleanup pass |
-| `T0E` | `opt_t0e_001` | `False` | `FALSE` | `` | `sec_stan_002` | 110 | inactive after this cleanup pass |
+| `SWM` | `opt_swm_002` | `False` | `FALSE` | `` | `sec_stan_002` | 100 | inactive after cleanup pass |
+| `T0E` | `opt_t0e_001` | `False` | `FALSE` | `` | `sec_stan_002` | 110 | inactive after cleanup pass |
 | `T0E` | `opt_t0e_002` | `True` | `FALSE` | `` | `sec_incl_001` | 50 |  |
 | `T0F` | `opt_t0f_001` | `True` | `TRUE` | `` | `sec_perf_001` | 90 |  |
 | `U2K` | `opt_u2k_001` | `False` | `FALSE` | `` | `sec_onst_001` | 90 | OnStar/deferred inactive |
-| `UQT` | `opt_uqt_001` | `True` | `TRUE` | `` | `sec_inte_001` | 10 | remaining duplicate pending trim-scoped data capability |
-| `UQT` | `opt_uqt_002` | `True` | `FALSE` | `` | `sec_2lte_001` | 20 | remaining duplicate pending trim-scoped data capability |
+| `UQT` | `opt_uqt_001` | `True` | `TRUE` | `` | `sec_inte_001` | 10 | canonical row; trim-scoped overrides make 2LT/3LT included equipment |
+| `UQT` | `opt_uqt_002` | `False` | `FALSE` | `` | `sec_2lte_001` | 20 | inactive after cleanup pass |
 | `Z15` | `opt_z15_001` | `True` | `False` | `display_only` | `sec_stri_001` | 190 |  |
 | `Z25` | `opt_z25_001` | `True` | `TRUE` | `` | `sec_spec_001` | 10 |  |
 | `ZZ3` | `opt_zz3_001` | `True` | `TRUE` | `` | `sec_engi_001` | 5 |  |
@@ -150,7 +153,7 @@ Rows intentionally kept active:
 | `sec_seat_002` | Seats | `seat` | 10 | 3 | 10-40 | none |
 | `sec_stan_002` | Standard Options | `standard_equipment` | 10 | 2 | 80-90 | none |
 | `sec_whee_002` | Wheels | `wheels` | 10 | 7 | 10-70 | none |
-| `sec_2lte_001` | 2LT Equipment | `standard_equipment` | 20 | 21 | 10-210 | none |
+| `sec_2lte_001` | 2LT Equipment | `standard_equipment` | 20 | 19 | 10-210 | none |
 | `sec_cali_001` | Caliper Color | `wheels` | 20 | 7 | 10-70 | none |
 | `sec_exte_001` | Exterior Accents | `exterior_appearance` | 20 | 3 | 10-30 | none |
 | `sec_seat_001` | Seat Belt | `seat_belt` | 20 | 6 | 10-60 | none |
@@ -185,10 +188,11 @@ Rows intentionally kept active:
 | `sec_onst_001` | OnStar | `interior_trim` | 70 |
 | `sec_lpow_001` | LPO Wheels | `aero_exhaust_stripes_accessories` | 100 |
 
-## Remaining Blocker
+## Remaining Notes
 
-- `UQT` cannot be safely collapsed to one row with the current workbook fields because it needs to be selectable and chargeable for `1LT`, but equipment-list/display-only standard for `2LT` and `3LT`.
-- `AQ9` still has one 2LT equipment mirror because the canonical selectable `AQ9` row is unavailable for 2LT. Collapsing it requires either changing canonical seat statuses or adding a clearer trim-standard-equipment source model.
+- Active duplicate RPO cleanup is closed for this pass.
+- Some inactive rule/group source references remain as source evidence; generated runtime rules omit inactive/unemitted rows.
+- Broader section/display-order cleanup remains separate from this trim-scoped selectability pass.
 
 ## Display Order Anomalies
 

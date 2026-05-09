@@ -91,11 +91,11 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
   assert.equal(draft.variants.length, 6);
   assert.equal(draft.contextChoices.length, 8);
   assert.equal(draft.steps.length, 14);
-  assert.equal(draft.choices.length, 1386);
-  assert.equal(draft.standardEquipment.length, 459);
-  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 777);
-  assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 459);
-  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 150);
+  assert.equal(draft.choices.length, 1374);
+  assert.equal(draft.standardEquipment.length, 455);
+  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 775);
+  assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 455);
+  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 144);
 });
 
 test("Grand Sport standard equipment is preserved after standard mirror rows are inactive", () => {
@@ -115,6 +115,40 @@ test("Grand Sport standard equipment is preserved after standard mirror rows are
     for (const rpo of expectedRpos) {
       assert.ok(standardRpos.includes(rpo), `${variantId} should keep ${rpo} in standard equipment`);
     }
+  }
+});
+
+test("Grand Sport trim-scoped overrides collapse AQ9 and UQT duplicate rows", () => {
+  assert.equal(draft.choices.some((choice) => choice.option_id === "opt_aq9_003"), false);
+  assert.equal(draft.choices.some((choice) => choice.option_id === "opt_uqt_002"), false);
+
+  for (const variantId of ["1lt_e07", "1lt_e67", "2lt_e07", "2lt_e67"]) {
+    const aq9 = draft.choices.find((choice) => choice.choice_id === `${variantId}__opt_aq9_001`);
+    assert.ok(aq9, `${variantId} should emit canonical AQ9`);
+    assert.equal(aq9.status, "standard");
+    assert.equal(aq9.section_id, "sec_seat_002");
+  }
+
+  for (const variantId of ["1lt_e07", "1lt_e67"]) {
+    const uqt = draft.choices.find((choice) => choice.choice_id === `${variantId}__opt_uqt_001`);
+    assert.ok(uqt, `${variantId} should emit canonical UQT`);
+    assert.equal(uqt.status, "available");
+    assert.equal(uqt.selectable, "True");
+    assert.equal(uqt.section_id, "sec_inte_001");
+  }
+
+  for (const [variantId, sectionId] of [
+    ["2lt_e07", "sec_2lte_001"],
+    ["2lt_e67", "sec_2lte_001"],
+    ["3lt_e07", "sec_3lte_001"],
+    ["3lt_e67", "sec_3lte_001"],
+  ]) {
+    const uqt = draft.choices.find((choice) => choice.choice_id === `${variantId}__opt_uqt_001`);
+    assert.ok(uqt, `${variantId} should emit canonical UQT`);
+    assert.equal(uqt.status, "standard");
+    assert.equal(uqt.selectable, "False");
+    assert.equal(uqt.section_id, sectionId);
+    assert.equal(uqt.step_key, "standard_equipment");
   }
 });
 
@@ -262,8 +296,8 @@ test("Grand Sport draft keeps normalized display fields and raw rule evidence", 
 });
 
 test("Grand Sport draft preserves rule hot spots and normalization metadata for later phases", () => {
-  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1236);
-  assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1386);
+  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1230);
+  assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1374);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 127);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 26);
   assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);

@@ -206,6 +206,7 @@ GRAND_SPORT_MODEL = ModelConfig(
     rule_group_members_sheet="grandSport_rule_group_members",
     exclusive_groups_sheet="grandSport_exclusive_groups",
     exclusive_group_members_sheet="grandSport_exclusive_members",
+    variant_option_overrides_sheet="grandSport_variant_overrides",
     text_cleanup={
         "enabled": True,
         "normalize_new_prefix": True,

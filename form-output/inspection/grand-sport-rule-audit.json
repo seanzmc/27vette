@@ -6,7 +6,7 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-05-09T20:32:28+00:00",
+    "generated_at": "2026-05-09T20:47:14+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
@@ -2011,24 +2011,7 @@
     }
   ],
   "reviewHotSpots": {
-    "duplicateRpos": [
-      {
-        "rpo": "AQ9",
-        "option_ids": [
-          "opt_aq9_003",
-          "opt_aq9_001"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      },
-      {
-        "rpo": "UQT",
-        "option_ids": [
-          "opt_uqt_002",
-          "opt_uqt_001"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      }
-    ],
+    "duplicateRpos": [],
     "specialPackageMentions": [
       {
         "option_id": "opt_wub_001",
