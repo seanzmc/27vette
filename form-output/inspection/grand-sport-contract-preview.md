@@ -1,6 +1,6 @@
 # Grand Sport Contract Preview
 
-Generated: `2026-05-09T05:30:05+00:00`
+Generated: `2026-05-09T17:30:15+00:00`
 Status: `read_only_preview`
 Source sheet: `grandSport_options`
 
@@ -9,10 +9,10 @@ Source sheet: `grandSport_options`
 - Variants: 6
 - Context choices: 8
 - Steps: 14
-- Sections: 33
-- Choices: 1354
-- Candidate standard equipment cells: 539
-- Rule/detail hot spot rows: 123
+- Sections: 32
+- Choices: 1294
+- Candidate standard equipment cells: 513
+- Rule/detail hot spot rows: 127
 - Unresolved normalization issues: 0
 
 ## Variants
@@ -31,18 +31,18 @@ Source sheet: `grandSport_options`
 
 ## Section/Category Resolution
 
-- Resolved mismatch rows: 55
+- Resolved mismatch rows: 48
 - Unresolved issues: 0
 
 ## Text Cleanup
 
-- Changed display fields: 22
-- Notes: `{"description:collapsed_whitespace": 1, "label:collapsed_whitespace": 9, "label:normalized_capitalization": 1, "label:normalized_new_prefix": 11}`
+- Changed display fields: 10
+- Notes: `{"label:normalized_new_prefix": 10}`
 
 ## Rule/Detail Hot Spots
 
-- Counts: `{"except": 2, "included_with": 17, "includes": 41, "not_available": 47, "not_recommended": 4, "only": 19, "requires": 36, "special_package_review": 26}`
-- Rows: 123
+- Counts: `{"except": 2, "included_with": 17, "includes": 47, "not_available": 47, "not_recommended": 4, "only": 19, "requires": 36, "special_package_review": 26}`
+- Rows: 127
 
 ## Unresolved Normalization Issues
 

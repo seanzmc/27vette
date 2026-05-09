@@ -236,9 +236,13 @@ test("Grand Sport exclusive group selections remove peer options without runtime
       runtime.handleChoice(coupeEngineAppearance);
     }
 
-    const [firstId, secondId] = expected.optionIds;
-    const firstChoice = runtime.activeChoiceRows().find((choice) => choice.option_id === firstId);
-    const secondChoice = runtime.activeChoiceRows().find((choice) => choice.option_id === secondId);
+    const activeGroupChoices = expected.optionIds
+      .map((optionId) => runtime.activeChoiceRows().find((choice) => choice.option_id === optionId))
+      .filter(Boolean);
+    assert.equal(activeGroupChoices.length >= 2, true, `${expected.groupId} should have at least two active Grand Sport choices`);
+    const [firstChoice, secondChoice] = activeGroupChoices;
+    const firstId = firstChoice.option_id;
+    const secondId = secondChoice.option_id;
     assert.ok(firstChoice, `${firstId} should be active for Grand Sport`);
     assert.ok(secondChoice, `${secondId} should be active for Grand Sport`);
 

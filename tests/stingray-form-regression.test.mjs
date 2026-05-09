@@ -1196,9 +1196,10 @@ test("interior grouping preserves required 1LT, 2LT, and 3LT examples", () => {
 test("R6X is auto-only and D30 is the only visible disabled color override card", () => {
   assert.equal(data.choices.some((choice) => choice.rpo === "R6X" && choice.active === "True"), false);
   assert.ok(data.rules.some((rule) => rule.target_id === "opt_r6x_001" && rule.rule_type === "includes"), "R6X needs interior include rules");
-  assert.ok(
-    data.priceRules.some((rule) => rule.condition_option_id === "opt_d30_001" && rule.target_option_id === "opt_r6x_001" && Number(rule.price_value) === 0),
-    "R6X should price at $0 only when D30 is present"
+  assert.equal(
+    data.priceRules.some((rule) => rule.condition_option_id === "opt_d30_001" && rule.target_option_id === "opt_r6x_001"),
+    false,
+    "R6X pricing is carried by interior setup, not a D30 price override"
   );
   assert.ok(
     data.choices.some((choice) => choice.rpo === "D30" && choice.active === "True" && choice.selectable === "False"),
@@ -1225,7 +1226,7 @@ test("generated R6X interiors include the PriceRef R6X price component", () => {
   assert.equal(Number(byId.get("3LT_AE4_HUW")?.price), 595, "non-R6X AE4 interiors should keep their existing seat component only");
 });
 
-test("R6X keeps normal price unless D30 is present in the selected context", () => {
+test("R6X keeps normal price even when D30 is present in the selected context", () => {
   const runtime = loadRuntime();
   runtime.state.trimLevel = "3LT";
   runtime.state.bodyStyle = "coupe";
@@ -1238,7 +1239,7 @@ test("R6X keeps normal price unless D30 is present in the selected context", () 
   d30Runtime.state.selectedInterior = "3LT_R6X_AH2_HZP_N26";
   d30Runtime.state.selected.add("opt_g26_001");
   assert.equal(d30Runtime.computeAutoAdded().has("opt_d30_001"), true, "D30 should be auto-added by selected color/interior context");
-  assert.equal(d30Runtime.optionPrice("opt_r6x_001"), 0, "R6X should price at $0 when D30 is present");
+  assert.equal(d30Runtime.optionPrice("opt_r6x_001"), 995, "R6X should keep normal option price when D30 is present");
 });
 
 test("single interior and included seatbelt defaults are handled in runtime", () => {

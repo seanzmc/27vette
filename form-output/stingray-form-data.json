@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-05-09T05:29:46+00:00"
+    "generated_at": "2026-05-09T17:29:35+00:00"
   },
   "variants": [
     {
@@ -51619,18 +51619,6 @@
       "variant_scope": "",
       "review_flag": "False",
       "notes": "ZZ3 selected sets convertible LS6 engine cover price to 595"
-    },
-    {
-      "price_rule_id": "pr_d30_r6x_001",
-      "condition_option_id": "opt_d30_001",
-      "target_option_id": "opt_r6x_001",
-      "price_rule_type": "override",
-      "price_value": 0,
-      "body_style_scope": "",
-      "trim_level_scope": "",
-      "variant_scope": "",
-      "review_flag": "False",
-      "notes": "R6X prices at $0 only when D30 is present in the selected context."
     }
   ],
   "interiors": [

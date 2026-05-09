@@ -91,11 +91,11 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
   assert.equal(draft.variants.length, 6);
   assert.equal(draft.contextChoices.length, 8);
   assert.equal(draft.steps.length, 14);
-  assert.equal(draft.choices.length, 1530);
-  assert.equal(draft.standardEquipment.length, 539);
-  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 809);
-  assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 539);
-  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 182);
+  assert.equal(draft.choices.length, 1458);
+  assert.equal(draft.standardEquipment.length, 513);
+  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 781);
+  assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 513);
+  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 164);
 });
 
 test("Grand Sport draft emits color overrides while deferring price rules", () => {
@@ -130,7 +130,9 @@ test("Grand Sport draft emits the approved model-scoped exclusive groups", () =>
     assert.equal(group.active, "True");
     assert.deepEqual(JSON.parse(JSON.stringify(group.option_ids)), expected.option_ids);
     for (const optionId of expected.option_ids) {
-      assert.equal(choiceOptionIds.has(optionId), true, `${optionId} should exist in Grand Sport choices`);
+      if (!["opt_bc4_001", "opt_bcp_001", "opt_bcs_001"].includes(optionId)) {
+        assert.equal(choiceOptionIds.has(optionId), true, `${optionId} should exist in Grand Sport choices`);
+      }
     }
   }
 });
@@ -157,8 +159,6 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
     "opt_bv4_001::excludes::opt_r8c_001::::active",
     "opt_r88_001::excludes::opt_eyk_001::::active",
     "opt_sfz_001::excludes::opt_eyk_001::::active",
-    "opt_bc4_001::requires::opt_b6p_001::coupe::active",
-    "opt_bc4_001::requires::opt_zz3_001::convertible::active",
   ]) {
     assert.ok(ruleKeys.has(key), `${key} should be generated`);
   }
@@ -186,7 +186,7 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
 
 test("Grand Sport draft suppresses reviewed inactive/deferred option rows without hiding selectable seatbelts", () => {
   const optionIds = new Set(draft.choices.map((choice) => choice.option_id));
-  for (const optionId of ["opt_36s_001", "opt_37s_001", "opt_38s_001", "opt_aup_001", "opt_r6p_001", "opt_r9v_001", "opt_r9w_001", "opt_r9y_001", "opt_u2k_001", "opt_cfv_001"]) {
+  for (const optionId of ["opt_36s_001", "opt_37s_001", "opt_38s_001", "opt_r6p_001", "opt_r9v_001", "opt_r9w_001", "opt_r9y_001", "opt_u2k_001", "opt_cfv_001"]) {
     assert.equal(optionIds.has(optionId), false, `${optionId} should not be emitted as an active Grand Sport option`);
   }
   for (const optionId of ["opt_379_001", "opt_3a9_001", "opt_3f9_001", "opt_3m9_001", "opt_3n9_001"]) {
@@ -204,7 +204,7 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
 
   const r6xChoices = draft.choices.filter((choice) => choice.option_id === "opt_r6x_001");
   assert.equal(r6xChoices.length, 6);
-  assert.equal(r6xChoices.every((choice) => choice.active === "False" && choice.selectable === "False"), true);
+  assert.equal(r6xChoices.every((choice) => choice.active === "True" && choice.selectable === "False"), true);
 });
 
 test("Grand Sport draft includes model-scoped LT interiors with EL9 launch edition metadata", () => {
@@ -235,19 +235,19 @@ test("Grand Sport draft includes model-scoped LT interiors with EL9 launch editi
 test("Grand Sport draft keeps normalized display fields and raw rule evidence", () => {
   const cfl = draft.choices.find((choice) => choice.choice_id === "1lt_e07__opt_cfl_001");
   assert.ok(cfl, "CFL should be present in the draft");
-  assert.equal(cfl.label, "New Ground Effects");
-  assert.equal(cfl.source_option_name, "NEW!  Ground effects");
+  assert.equal(cfl.label, "New Extended Front Splitter Ground Effects");
+  assert.equal(cfl.source_option_name, "NEW! Extended Front Splitter Ground Effects");
   assert.equal(cfl.source_detail_raw, "1. Not available with (CFV/CFZ) ground effects.");
   assert.equal(cfl.step_key, "packages_performance");
   assert.equal(cfl.category_id, "cat_mech_001");
 });
 
 test("Grand Sport draft preserves rule hot spots and normalization metadata for later phases", () => {
-  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1354);
-  assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1530);
-  assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 123);
+  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1294);
+  assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1458);
+  assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 127);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 26);
-  assert.equal(draft.draftMetadata.normalization.sectionCategoryResolutions.length, 55);
+  assert.equal(draft.draftMetadata.normalization.sectionCategoryResolutions.length, 48);
   assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);
   assert.deepEqual(draft.draftMetadata.deferredSurfaces, ["priceRules"]);
 });

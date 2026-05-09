@@ -6,23 +6,24 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-05-09T05:30:04+00:00",
+    "generated_at": "2026-05-09T17:30:15+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
     "copiedRuleCandidates": 94,
-    "rawDetailRuleCandidates": 243,
-    "rawDetailCandidateKeys": 243,
+    "rawDetailRuleCandidates": 233,
+    "rawDetailCandidateKeys": 233,
     "dedupedOrSelfReferenceCandidates": 0,
     "finalWorkbookRuleRows": 314,
-    "expectedDraftRuntimeRules": 305,
+    "expectedDraftRuntimeRules": 289,
     "omittedDuplicateExclusiveGroup": 9,
+    "omittedInactiveOrUnemitted": 16,
     "skippedRequiresReview": 1,
     "unresolvedRpoMentions": 4,
     "exclusiveGroups": 7,
     "exclusiveGroupMembers": 23,
-    "workbookRulesMatchingDetailRaw": 93,
-    "workbookManualOrApprovedRules": 221
+    "workbookRulesMatchingDetailRaw": 86,
+    "workbookManualOrApprovedRules": 228
   },
   "sourceSheets": {
     "optionSheet": "grandSport_options",
@@ -33,86 +34,6 @@
     "exclusiveMembersSheet": "grandSport_exclusive_members"
   },
   "copiedFromStingray": [
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_5jr_001_includes_opt_drg_001_opt_5jr_001_includes_opt_drg_001",
-      "source_id": "opt_5jr_001",
-      "rule_type": "includes",
-      "target_id": "opt_drg_001",
-      "body_style_scope": "",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_b6p_001_includes_opt_d3v_001_opt_b6p_001_includes_opt_d3v_001_coupe",
-      "source_id": "opt_b6p_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "coupe",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_b6p_001_includes_opt_sl9_001_opt_b6p_001_includes_opt_sl9_001",
-      "source_id": "opt_b6p_001",
-      "rule_type": "includes",
-      "target_id": "opt_sl9_001",
-      "body_style_scope": "",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_bc4_001_includes_opt_d3v_001_opt_bc4_001_includes_opt_d3v_001_coupe",
-      "source_id": "opt_bc4_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "coupe",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible",
-      "source_id": "opt_bc4_001",
-      "rule_type": "requires",
-      "target_id": "opt_zz3_001",
-      "body_style_scope": "convertible",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_bc7_001_requires_opt_zz3_001_convertible_opt_bc7_001_requires_opt_zz3_001_convertible",
-      "source_id": "opt_bc7_001",
-      "rule_type": "requires",
-      "target_id": "opt_zz3_001",
-      "body_style_scope": "convertible",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe",
-      "source_id": "opt_bcp_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "coupe",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible",
-      "source_id": "opt_bcp_001",
-      "rule_type": "requires",
-      "target_id": "opt_zz3_001",
-      "body_style_scope": "convertible",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe",
-      "source_id": "opt_bcs_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "coupe",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible",
-      "source_id": "opt_bcs_001",
-      "rule_type": "requires",
-      "target_id": "opt_zz3_001",
-      "body_style_scope": "convertible",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
     {
       "grand_sport_rule_id": "gs_copy_rule_opt_bv4_001_excludes_opt_r8c_001_opt_bv4_001_excludes_opt_r8c_001",
       "source_id": "opt_bv4_001",
@@ -370,54 +291,6 @@
       "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
     },
     {
-      "grand_sport_rule_id": "gs_copy_rule_opt_e60_001_includes_opt_tr7_001_opt_e60_001_includes_opt_tr7_001",
-      "source_id": "opt_e60_001",
-      "rule_type": "includes",
-      "target_id": "opt_tr7_001",
-      "body_style_scope": "",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_nwi_001_requires_opt_wub_001_opt_nwi_001_requires_opt_wub_001",
-      "source_id": "opt_nwi_001",
-      "rule_type": "requires",
-      "target_id": "opt_wub_001",
-      "body_style_scope": "",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_pdy_001_includes_opt_ryt_001_opt_pdy_001_includes_opt_ryt_001",
-      "source_id": "opt_pdy_001",
-      "rule_type": "includes",
-      "target_id": "opt_ryt_001",
-      "body_style_scope": "",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_pdy_001_includes_opt_s08_001_opt_pdy_001_includes_opt_s08_001",
-      "source_id": "opt_pdy_001",
-      "rule_type": "includes",
-      "target_id": "opt_s08_001",
-      "body_style_scope": "",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_pef_001_includes_opt_cav_001_opt_pef_001_includes_opt_cav_001",
-      "source_id": "opt_pef_001",
-      "rule_type": "includes",
-      "target_id": "opt_cav_001",
-      "body_style_scope": "",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_pef_001_includes_opt_ria_001_opt_pef_001_includes_opt_ria_001",
-      "source_id": "opt_pef_001",
-      "rule_type": "includes",
-      "target_id": "opt_ria_001",
-      "body_style_scope": "",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
       "grand_sport_rule_id": "gs_copy_rule_opt_r88_001_excludes_opt_dpb_001_opt_r88_001_excludes_opt_dpb_001",
       "source_id": "opt_r88_001",
       "rule_type": "excludes",
@@ -538,14 +411,6 @@
       "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
     },
     {
-      "grand_sport_rule_id": "gs_copy_rule_opt_r8c_001_includes_opt_cfx_001_opt_r8c_001_includes_opt_cfx_001",
-      "source_id": "opt_r8c_001",
-      "rule_type": "includes",
-      "target_id": "opt_cfx_001",
-      "body_style_scope": "",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
       "grand_sport_rule_id": "gs_copy_rule_opt_rik_001_excludes_opt_rin_001_opt_rik_001_excludes_opt_rin_001",
       "source_id": "opt_rik_001",
       "rule_type": "excludes",
@@ -590,14 +455,6 @@
       "source_id": "opt_sbt_001",
       "rule_type": "excludes",
       "target_id": "opt_cc3_001",
-      "body_style_scope": "",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_sbt_001_includes_opt_sc7_001_opt_sbt_001_includes_opt_sc7_001",
-      "source_id": "opt_sbt_001",
-      "rule_type": "includes",
-      "target_id": "opt_sc7_001",
       "body_style_scope": "",
       "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
     },
@@ -746,18 +603,114 @@
       "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
     },
     {
-      "grand_sport_rule_id": "gs_copy_rule_opt_spz_001_requires_opt_spy_001_opt_spz_001_requires_opt_spy_001",
-      "source_id": "opt_spz_001",
-      "rule_type": "requires",
-      "target_id": "opt_spy_001",
-      "body_style_scope": "",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
       "grand_sport_rule_id": "gs_copy_rule_opt_zyc_001_excludes_opt_gba_001_opt_zyc_001_excludes_opt_gba_001",
       "source_id": "opt_zyc_001",
       "rule_type": "excludes",
       "target_id": "opt_gba_001",
+      "body_style_scope": "",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_5jr_001_includes_opt_drg_001_opt_5jr_001_includes_opt_drg_001",
+      "source_id": "opt_5jr_001",
+      "rule_type": "includes",
+      "target_id": "opt_drg_001",
+      "body_style_scope": "",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_b6p_001_includes_opt_d3v_001_opt_b6p_001_includes_opt_d3v_001_coupe",
+      "source_id": "opt_b6p_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "body_style_scope": "coupe",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_b6p_001_includes_opt_sl9_001_opt_b6p_001_includes_opt_sl9_001",
+      "source_id": "opt_b6p_001",
+      "rule_type": "includes",
+      "target_id": "opt_sl9_001",
+      "body_style_scope": "",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_bc4_001_includes_opt_d3v_001_opt_bc4_001_includes_opt_d3v_001_coupe",
+      "source_id": "opt_bc4_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "body_style_scope": "coupe",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe",
+      "source_id": "opt_bcp_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "body_style_scope": "coupe",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe",
+      "source_id": "opt_bcs_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "body_style_scope": "coupe",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_e60_001_includes_opt_tr7_001_opt_e60_001_includes_opt_tr7_001",
+      "source_id": "opt_e60_001",
+      "rule_type": "includes",
+      "target_id": "opt_tr7_001",
+      "body_style_scope": "",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_pdy_001_includes_opt_ryt_001_opt_pdy_001_includes_opt_ryt_001",
+      "source_id": "opt_pdy_001",
+      "rule_type": "includes",
+      "target_id": "opt_ryt_001",
+      "body_style_scope": "",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_pdy_001_includes_opt_s08_001_opt_pdy_001_includes_opt_s08_001",
+      "source_id": "opt_pdy_001",
+      "rule_type": "includes",
+      "target_id": "opt_s08_001",
+      "body_style_scope": "",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_pef_001_includes_opt_cav_001_opt_pef_001_includes_opt_cav_001",
+      "source_id": "opt_pef_001",
+      "rule_type": "includes",
+      "target_id": "opt_cav_001",
+      "body_style_scope": "",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_pef_001_includes_opt_ria_001_opt_pef_001_includes_opt_ria_001",
+      "source_id": "opt_pef_001",
+      "rule_type": "includes",
+      "target_id": "opt_ria_001",
+      "body_style_scope": "",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_r8c_001_includes_opt_cfx_001_opt_r8c_001_includes_opt_cfx_001",
+      "source_id": "opt_r8c_001",
+      "rule_type": "includes",
+      "target_id": "opt_cfx_001",
+      "body_style_scope": "",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_sbt_001_includes_opt_sc7_001_opt_sbt_001_includes_opt_sc7_001",
+      "source_id": "opt_sbt_001",
+      "rule_type": "includes",
+      "target_id": "opt_sc7_001",
       "body_style_scope": "",
       "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
     },
@@ -784,17 +737,57 @@
       "target_id": "opt_sl9_001",
       "body_style_scope": "",
       "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible",
+      "source_id": "opt_bc4_001",
+      "rule_type": "requires",
+      "target_id": "opt_zz3_001",
+      "body_style_scope": "convertible",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_bc7_001_requires_opt_zz3_001_convertible_opt_bc7_001_requires_opt_zz3_001_convertible",
+      "source_id": "opt_bc7_001",
+      "rule_type": "requires",
+      "target_id": "opt_zz3_001",
+      "body_style_scope": "convertible",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible",
+      "source_id": "opt_bcp_001",
+      "rule_type": "requires",
+      "target_id": "opt_zz3_001",
+      "body_style_scope": "convertible",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible",
+      "source_id": "opt_bcs_001",
+      "rule_type": "requires",
+      "target_id": "opt_zz3_001",
+      "body_style_scope": "convertible",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_nwi_001_requires_opt_wub_001_opt_nwi_001_requires_opt_wub_001",
+      "source_id": "opt_nwi_001",
+      "rule_type": "requires",
+      "target_id": "opt_wub_001",
+      "body_style_scope": "",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
+    },
+    {
+      "grand_sport_rule_id": "gs_copy_rule_opt_spz_001_requires_opt_spy_001_opt_spz_001_requires_opt_spy_001",
+      "source_id": "opt_spz_001",
+      "rule_type": "requires",
+      "target_id": "opt_spy_001",
+      "body_style_scope": "",
+      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
     }
   ],
   "parsedFromDetailRaw": [
-    {
-      "rule_id": "gs_rule_opt_009_requires_opt_ue1_001",
-      "source_id": "opt_009",
-      "rule_type": "requires",
-      "target_id": "opt_ue1_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
     {
       "rule_id": "gs_rule_opt_17a_001_excludes_opt_gka_001",
       "source_id": "opt_17a_001",
@@ -852,126 +845,6 @@
       "matched_phrase": "workbook_matches_detail_raw"
     },
     {
-      "rule_id": "gs_rule_opt_b6p_001_includes_opt_d3v_001",
-      "source_id": "opt_b6p_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bc4_001_includes_opt_d3v_001",
-      "source_id": "opt_bc4_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bc4_001_requires_opt_b6p_001_coupe",
-      "source_id": "opt_bc4_001",
-      "rule_type": "requires",
-      "target_id": "opt_b6p_001",
-      "body_style_scope": "coupe",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bc4_002_includes_opt_b6p_001",
-      "source_id": "opt_bc4_002",
-      "rule_type": "includes",
-      "target_id": "opt_b6p_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bc4_002_includes_opt_d3v_001",
-      "source_id": "opt_bc4_002",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcp_001_includes_opt_d3v_001",
-      "source_id": "opt_bcp_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcp_001_requires_opt_b6p_001_coupe",
-      "source_id": "opt_bcp_001",
-      "rule_type": "requires",
-      "target_id": "opt_b6p_001",
-      "body_style_scope": "coupe",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcp_001_requires_opt_d3v_001_coupe",
-      "source_id": "opt_bcp_001",
-      "rule_type": "requires",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "coupe",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcp_002_includes_opt_b6p_001",
-      "source_id": "opt_bcp_002",
-      "rule_type": "includes",
-      "target_id": "opt_b6p_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcp_002_includes_opt_d3v_001",
-      "source_id": "opt_bcp_002",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcs_001_includes_opt_d3v_001",
-      "source_id": "opt_bcs_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcs_001_requires_opt_b6p_001_coupe",
-      "source_id": "opt_bcs_001",
-      "rule_type": "requires",
-      "target_id": "opt_b6p_001",
-      "body_style_scope": "coupe",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcs_001_requires_opt_d3v_001_coupe",
-      "source_id": "opt_bcs_001",
-      "rule_type": "requires",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "coupe",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcs_002_includes_opt_b6p_001",
-      "source_id": "opt_bcs_002",
-      "rule_type": "includes",
-      "target_id": "opt_b6p_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcs_002_includes_opt_d3v_001",
-      "source_id": "opt_bcs_002",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
       "rule_id": "gs_rule_opt_cf8_001_excludes_opt_dmu_001",
       "source_id": "opt_cf8_001",
       "rule_type": "excludes",
@@ -1020,22 +893,6 @@
       "matched_phrase": "workbook_matches_detail_raw"
     },
     {
-      "rule_id": "gs_rule_opt_dmu_001_requires_opt_d84_001",
-      "source_id": "opt_dmu_001",
-      "rule_type": "requires",
-      "target_id": "opt_d84_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_dmu_001_requires_opt_z15_001",
-      "source_id": "opt_dmu_001",
-      "rule_type": "requires",
-      "target_id": "opt_z15_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
       "rule_id": "gs_rule_opt_dmv_001_excludes_opt_d84_001",
       "source_id": "opt_dmv_001",
       "rule_type": "excludes",
@@ -1048,22 +905,6 @@
       "source_id": "opt_dmv_001",
       "rule_type": "excludes",
       "target_id": "opt_gka_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_dmv_001_requires_opt_d84_001",
-      "source_id": "opt_dmv_001",
-      "rule_type": "requires",
-      "target_id": "opt_d84_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_dmv_001_requires_opt_z15_001",
-      "source_id": "opt_dmv_001",
-      "rule_type": "requires",
-      "target_id": "opt_z15_001",
       "body_style_scope": "",
       "matched_phrase": "workbook_matches_detail_raw"
     },
@@ -1084,22 +925,6 @@
       "matched_phrase": "workbook_matches_detail_raw"
     },
     {
-      "rule_id": "gs_rule_opt_dmw_001_requires_opt_d84_001",
-      "source_id": "opt_dmw_001",
-      "rule_type": "requires",
-      "target_id": "opt_d84_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_dmw_001_requires_opt_z15_001",
-      "source_id": "opt_dmw_001",
-      "rule_type": "requires",
-      "target_id": "opt_z15_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
       "rule_id": "gs_rule_opt_dmx_001_excludes_opt_d84_001",
       "source_id": "opt_dmx_001",
       "rule_type": "excludes",
@@ -1112,22 +937,6 @@
       "source_id": "opt_dmx_001",
       "rule_type": "excludes",
       "target_id": "opt_gtr_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_dmx_001_requires_opt_d84_001",
-      "source_id": "opt_dmx_001",
-      "rule_type": "requires",
-      "target_id": "opt_d84_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_dmx_001_requires_opt_z15_001",
-      "source_id": "opt_dmx_001",
-      "rule_type": "requires",
-      "target_id": "opt_z15_001",
       "body_style_scope": "",
       "matched_phrase": "workbook_matches_detail_raw"
     },
@@ -1156,22 +965,6 @@
       "matched_phrase": "workbook_matches_detail_raw"
     },
     {
-      "rule_id": "gs_rule_opt_dmy_001_requires_opt_d84_001",
-      "source_id": "opt_dmy_001",
-      "rule_type": "requires",
-      "target_id": "opt_d84_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_dmy_001_requires_opt_z15_001",
-      "source_id": "opt_dmy_001",
-      "rule_type": "requires",
-      "target_id": "opt_z15_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
       "rule_id": "gs_rule_opt_dx4_001_excludes_opt_gkz_001",
       "source_id": "opt_dx4_001",
       "rule_type": "excludes",
@@ -1184,110 +977,6 @@
       "source_id": "opt_dx4_001",
       "rule_type": "excludes",
       "target_id": "opt_gph_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_feb_001_includes_opt_j56_001",
-      "source_id": "opt_feb_001",
-      "rule_type": "includes",
-      "target_id": "opt_j56_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_feb_001_includes_opt_xfr_001",
-      "source_id": "opt_feb_001",
-      "rule_type": "includes",
-      "target_id": "opt_xfr_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_fey_001_includes_opt_j57_001",
-      "source_id": "opt_fey_001",
-      "rule_type": "includes",
-      "target_id": "opt_j57_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_fey_001_includes_opt_t0f_001",
-      "source_id": "opt_fey_001",
-      "rule_type": "includes",
-      "target_id": "opt_t0f_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_fey_001_includes_opt_wub_001",
-      "source_id": "opt_fey_001",
-      "rule_type": "includes",
-      "target_id": "opt_wub_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_fey_001_includes_opt_xfs_001",
-      "source_id": "opt_fey_001",
-      "rule_type": "includes",
-      "target_id": "opt_xfs_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_j57_001_includes_opt_j6d_001",
-      "source_id": "opt_j57_001",
-      "rule_type": "includes",
-      "target_id": "opt_j6d_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_j6l_001_requires_opt_j57_001",
-      "source_id": "opt_j6l_001",
-      "rule_type": "requires",
-      "target_id": "opt_j57_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_pcq_001_includes_opt_vwe_001",
-      "source_id": "opt_pcq_001",
-      "rule_type": "includes",
-      "target_id": "opt_vwe_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_pcq_001_includes_opt_vwt_001",
-      "source_id": "opt_pcq_001",
-      "rule_type": "includes",
-      "target_id": "opt_vwt_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_prb_001_requires_opt_ue1_001",
-      "source_id": "opt_prb_001",
-      "rule_type": "requires",
-      "target_id": "opt_ue1_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_roy_001_requires_opt_j57_001",
-      "source_id": "opt_roy_001",
-      "rule_type": "requires",
-      "target_id": "opt_j57_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_roz_001_requires_opt_j57_001",
-      "source_id": "opt_roz_001",
-      "rule_type": "requires",
-      "target_id": "opt_j57_001",
       "body_style_scope": "",
       "matched_phrase": "workbook_matches_detail_raw"
     },
@@ -1476,6 +1165,278 @@
       "matched_phrase": "workbook_matches_detail_raw"
     },
     {
+      "rule_id": "gs_rule_opt_vpo_001_excludes_opt_z15_001",
+      "source_id": "opt_vpo_001",
+      "rule_type": "excludes",
+      "target_id": "opt_z15_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_b6p_001_includes_opt_d3v_001",
+      "source_id": "opt_b6p_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_bc4_001_includes_opt_d3v_001",
+      "source_id": "opt_bc4_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_bc4_002_includes_opt_b6p_001",
+      "source_id": "opt_bc4_002",
+      "rule_type": "includes",
+      "target_id": "opt_b6p_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_bc4_002_includes_opt_d3v_001",
+      "source_id": "opt_bc4_002",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_bcp_001_includes_opt_d3v_001",
+      "source_id": "opt_bcp_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_bcp_002_includes_opt_b6p_001",
+      "source_id": "opt_bcp_002",
+      "rule_type": "includes",
+      "target_id": "opt_b6p_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_bcp_002_includes_opt_d3v_001",
+      "source_id": "opt_bcp_002",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_bcs_001_includes_opt_d3v_001",
+      "source_id": "opt_bcs_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_bcs_002_includes_opt_b6p_001",
+      "source_id": "opt_bcs_002",
+      "rule_type": "includes",
+      "target_id": "opt_b6p_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_bcs_002_includes_opt_d3v_001",
+      "source_id": "opt_bcs_002",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_feb_001_includes_opt_j56_001",
+      "source_id": "opt_feb_001",
+      "rule_type": "includes",
+      "target_id": "opt_j56_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_feb_001_includes_opt_xfr_001",
+      "source_id": "opt_feb_001",
+      "rule_type": "includes",
+      "target_id": "opt_xfr_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_fey_001_includes_opt_j57_001",
+      "source_id": "opt_fey_001",
+      "rule_type": "includes",
+      "target_id": "opt_j57_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_fey_001_includes_opt_t0f_001",
+      "source_id": "opt_fey_001",
+      "rule_type": "includes",
+      "target_id": "opt_t0f_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_fey_001_includes_opt_wub_001",
+      "source_id": "opt_fey_001",
+      "rule_type": "includes",
+      "target_id": "opt_wub_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_fey_001_includes_opt_xfs_001",
+      "source_id": "opt_fey_001",
+      "rule_type": "includes",
+      "target_id": "opt_xfs_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_j57_001_includes_opt_j6d_001",
+      "source_id": "opt_j57_001",
+      "rule_type": "includes",
+      "target_id": "opt_j6d_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_pcq_001_includes_opt_vwe_001",
+      "source_id": "opt_pcq_001",
+      "rule_type": "includes",
+      "target_id": "opt_vwe_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_pcq_001_includes_opt_vwt_001",
+      "source_id": "opt_pcq_001",
+      "rule_type": "includes",
+      "target_id": "opt_vwt_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_t0f_001_includes_opt_cfz_001",
+      "source_id": "opt_t0f_001",
+      "rule_type": "includes",
+      "target_id": "opt_cfz_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_dmu_001_requires_opt_d84_001",
+      "source_id": "opt_dmu_001",
+      "rule_type": "requires",
+      "target_id": "opt_d84_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_dmu_001_requires_opt_z15_001",
+      "source_id": "opt_dmu_001",
+      "rule_type": "requires",
+      "target_id": "opt_z15_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_dmv_001_requires_opt_d84_001",
+      "source_id": "opt_dmv_001",
+      "rule_type": "requires",
+      "target_id": "opt_d84_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_dmv_001_requires_opt_z15_001",
+      "source_id": "opt_dmv_001",
+      "rule_type": "requires",
+      "target_id": "opt_z15_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_dmw_001_requires_opt_d84_001",
+      "source_id": "opt_dmw_001",
+      "rule_type": "requires",
+      "target_id": "opt_d84_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_dmw_001_requires_opt_z15_001",
+      "source_id": "opt_dmw_001",
+      "rule_type": "requires",
+      "target_id": "opt_z15_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_dmx_001_requires_opt_d84_001",
+      "source_id": "opt_dmx_001",
+      "rule_type": "requires",
+      "target_id": "opt_d84_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_dmx_001_requires_opt_z15_001",
+      "source_id": "opt_dmx_001",
+      "rule_type": "requires",
+      "target_id": "opt_z15_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_dmy_001_requires_opt_d84_001",
+      "source_id": "opt_dmy_001",
+      "rule_type": "requires",
+      "target_id": "opt_d84_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_dmy_001_requires_opt_z15_001",
+      "source_id": "opt_dmy_001",
+      "rule_type": "requires",
+      "target_id": "opt_z15_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_j6l_001_requires_opt_j57_001",
+      "source_id": "opt_j6l_001",
+      "rule_type": "requires",
+      "target_id": "opt_j57_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_roy_001_requires_opt_j57_001",
+      "source_id": "opt_roy_001",
+      "rule_type": "requires",
+      "target_id": "opt_j57_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_roz_001_requires_opt_j57_001",
+      "source_id": "opt_roz_001",
+      "rule_type": "requires",
+      "target_id": "opt_j57_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
       "rule_id": "gs_rule_opt_sig_001_requires_opt_t0e_001",
       "source_id": "opt_sig_001",
       "rule_type": "requires",
@@ -1500,14 +1461,6 @@
       "matched_phrase": "workbook_matches_detail_raw"
     },
     {
-      "rule_id": "gs_rule_opt_t0f_001_includes_opt_cfz_001",
-      "source_id": "opt_t0f_001",
-      "rule_type": "includes",
-      "target_id": "opt_cfz_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
       "rule_id": "gs_rule_opt_t0f_001_requires_opt_feb_001",
       "source_id": "opt_t0f_001",
       "rule_type": "requires",
@@ -1520,14 +1473,6 @@
       "source_id": "opt_t0f_001",
       "rule_type": "requires",
       "target_id": "opt_j57_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_vpo_001_excludes_opt_z15_001",
-      "source_id": "opt_vpo_001",
-      "rule_type": "excludes",
-      "target_id": "opt_z15_001",
       "body_style_scope": "",
       "matched_phrase": "workbook_matches_detail_raw"
     }
@@ -1706,6 +1651,312 @@
       "_audit_origin": "workbook_manual_or_normalized"
     }
   ],
+  "omittedInactiveOrUnemitted": [
+    {
+      "rule_id": "gs_rule_opt_bc4_001_includes_opt_d3v_001",
+      "source_id": "opt_bc4_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Includes (D3V) engine lighting. Requires (B6P) on Coupe\n2. Requires (ZZ3) Convertible Engine Appearance Package.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_engi_001",
+      "source_section": "sec_engi_001",
+      "generation_action": "",
+      "body_style_scope": "",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_copy_rule_opt_bc4_001_includes_opt_d3v_001_opt_bc4_001_includes_opt_d3v_001_coupe",
+      "source_id": "opt_bc4_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_engi_001",
+      "source_section": "sec_engi_001",
+      "generation_action": "",
+      "body_style_scope": "coupe",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_copied_from_stingray"
+    },
+    {
+      "rule_id": "gs_rule_opt_bcp_001_includes_opt_d3v_001",
+      "source_id": "opt_bcp_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_engi_001",
+      "source_section": "sec_engi_001",
+      "generation_action": "",
+      "body_style_scope": "",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe",
+      "source_id": "opt_bcp_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_engi_001",
+      "source_section": "sec_engi_001",
+      "generation_action": "",
+      "body_style_scope": "coupe",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_copied_from_stingray"
+    },
+    {
+      "rule_id": "gs_rule_opt_bcs_001_includes_opt_d3v_001",
+      "source_id": "opt_bcs_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_engi_001",
+      "source_section": "sec_engi_001",
+      "generation_action": "",
+      "body_style_scope": "",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe",
+      "source_id": "opt_bcs_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_engi_001",
+      "source_section": "sec_engi_001",
+      "generation_action": "",
+      "body_style_scope": "coupe",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_copied_from_stingray"
+    },
+    {
+      "rule_id": "gs_rule_opt_009_requires_opt_ue1_001",
+      "source_id": "opt_009",
+      "rule_type": "requires",
+      "target_id": "opt_ue1_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Requires (UE1) OnStar. OnStar Basics is standard for 8 years; working electrical system, cell reception and GPS signal required. OnStar links to emergency services. Service coverage varies with conditions and location. Service availability, features and functionality vary by device and software version. Subject to user terms. See onstar.com for details and limitations. Removed with a ship-to of Guam, Puerto Rico or the Virgin Islands.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "single_select_opt",
+      "source_selection_mode": "single_select_opt",
+      "target_section": "sec_onst_001",
+      "source_section": "sec_onst_001",
+      "generation_action": "",
+      "body_style_scope": "",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_manual_or_normalized"
+    },
+    {
+      "rule_id": "gs_rule_opt_bc4_001_requires_opt_b6p_001_coupe",
+      "source_id": "opt_bc4_001",
+      "rule_type": "requires",
+      "target_id": "opt_b6p_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Includes (D3V) engine lighting. Requires (B6P) on Coupe\n2. Requires (ZZ3) Convertible Engine Appearance Package.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_engi_001",
+      "source_section": "sec_engi_001",
+      "generation_action": "",
+      "body_style_scope": "coupe",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_manual_or_normalized"
+    },
+    {
+      "rule_id": "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible",
+      "source_id": "opt_bc4_001",
+      "rule_type": "requires",
+      "target_id": "opt_zz3_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Includes (D3V) engine lighting. Requires (B6P) on Coupe 2. Requires (ZZ3) Convertible Engine Appearance Package.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_engi_001",
+      "source_section": "sec_engi_001",
+      "generation_action": "",
+      "body_style_scope": "convertible",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_copied_from_stingray"
+    },
+    {
+      "rule_id": "gs_rule_opt_bcp_001_requires_opt_b6p_001_coupe",
+      "source_id": "opt_bcp_001",
+      "rule_type": "requires",
+      "target_id": "opt_b6p_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_engi_001",
+      "source_section": "sec_engi_001",
+      "generation_action": "",
+      "body_style_scope": "coupe",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_manual_or_normalized"
+    },
+    {
+      "rule_id": "gs_rule_opt_bcp_001_requires_opt_d3v_001_coupe",
+      "source_id": "opt_bcp_001",
+      "rule_type": "requires",
+      "target_id": "opt_d3v_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_engi_001",
+      "source_section": "sec_engi_001",
+      "generation_action": "",
+      "body_style_scope": "coupe",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_manual_or_normalized"
+    },
+    {
+      "rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible",
+      "source_id": "opt_bcp_001",
+      "rule_type": "requires",
+      "target_id": "opt_zz3_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting. 2. Requires (ZZ3) Convertible Engine Appearance Package.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_engi_001",
+      "source_section": "sec_engi_001",
+      "generation_action": "",
+      "body_style_scope": "convertible",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_copied_from_stingray"
+    },
+    {
+      "rule_id": "gs_rule_opt_bcs_001_requires_opt_b6p_001_coupe",
+      "source_id": "opt_bcs_001",
+      "rule_type": "requires",
+      "target_id": "opt_b6p_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_engi_001",
+      "source_section": "sec_engi_001",
+      "generation_action": "",
+      "body_style_scope": "coupe",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_manual_or_normalized"
+    },
+    {
+      "rule_id": "gs_rule_opt_bcs_001_requires_opt_d3v_001_coupe",
+      "source_id": "opt_bcs_001",
+      "rule_type": "requires",
+      "target_id": "opt_d3v_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_engi_001",
+      "source_section": "sec_engi_001",
+      "generation_action": "",
+      "body_style_scope": "coupe",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_manual_or_normalized"
+    },
+    {
+      "rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible",
+      "source_id": "opt_bcs_001",
+      "rule_type": "requires",
+      "target_id": "opt_zz3_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting. 2. Requires (ZZ3) Convertible Engine Appearance Package.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_engi_001",
+      "source_section": "sec_engi_001",
+      "generation_action": "",
+      "body_style_scope": "convertible",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_copied_from_stingray"
+    },
+    {
+      "rule_id": "gs_rule_opt_prb_001_requires_opt_ue1_001",
+      "source_id": "opt_prb_001",
+      "rule_type": "requires",
+      "target_id": "opt_ue1_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Requires (UE1) OnStar and a Retail order type. Not available on vehicles being shipped to Puerto Rico, the Virgin Islands, or Guam. OnStar plan, working electrical system, cell reception and GPS signal required. OnStar links to emergency services. Not all vehicles may transmit all crash data. Service coverage varies with conditions and location. Service availability, features and functionality vary by device and software version. Subject to user terms. See onstar.com for details and limitations.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "single_select_opt",
+      "source_selection_mode": "single_select_opt",
+      "target_section": "sec_onst_001",
+      "source_section": "sec_onst_001",
+      "generation_action": "",
+      "body_style_scope": "",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_manual_or_normalized"
+    }
+  ],
   "skippedRequiresReview": [
     {
       "option_id": "opt_r8c_001",
@@ -1716,16 +1967,16 @@
   ],
   "unresolvedRpoMentions": [
     {
-      "option_id": "opt_r88_001",
-      "rpo": "R88",
-      "mentioned_rpo": "DTB",
-      "fragment": "Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
-    },
-    {
       "option_id": "opt_sfz_001",
       "rpo": "SFZ",
       "mentioned_rpo": "DTB",
       "fragment": "Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
+    },
+    {
+      "option_id": "opt_r88_001",
+      "rpo": "R88",
+      "mentioned_rpo": "DTB",
+      "fragment": "Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
     },
     {
       "option_id": "opt_cf8_001",
@@ -1751,20 +2002,10 @@
         "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
       },
       {
-        "rpo": "AE4",
-        "option_ids": [
-          "opt_ae4_001",
-          "opt_ae4_002",
-          "opt_ae4_003"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      },
-      {
         "rpo": "AH2",
         "option_ids": [
           "opt_ah2_003",
-          "opt_ah2_001",
-          "opt_ah2_002"
+          "opt_ah2_001"
         ],
         "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
       },
@@ -1773,32 +2014,7 @@
         "option_ids": [
           "opt_aq9_004",
           "opt_aq9_003",
-          "opt_aq9_001",
-          "opt_aq9_002"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      },
-      {
-        "rpo": "BC4",
-        "option_ids": [
-          "opt_bc4_001",
-          "opt_bc4_002"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      },
-      {
-        "rpo": "BCP",
-        "option_ids": [
-          "opt_bcp_001",
-          "opt_bcp_002"
-        ],
-        "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
-      },
-      {
-        "rpo": "BCS",
-        "option_ids": [
-          "opt_bcs_001",
-          "opt_bcs_002"
+          "opt_aq9_001"
         ],
         "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant."
       },
@@ -2003,20 +2219,20 @@
         "detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package."
       },
       {
-        "option_id": "opt_379_001",
-        "rpo": "379",
-        "mentioned_rpos": [
-          "EL9"
-        ],
-        "detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior. Included with (HUW, HUX) Habanero interiors."
-      },
-      {
         "option_id": "opt_719_001",
         "rpo": "719",
         "mentioned_rpos": [
           "EL9"
         ],
         "detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color."
+      },
+      {
+        "option_id": "opt_379_001",
+        "rpo": "379",
+        "mentioned_rpos": [
+          "EL9"
+        ],
+        "detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior. Included with (HUW, HUX) Habanero interiors."
       },
       {
         "option_id": "opt_3f9_001",

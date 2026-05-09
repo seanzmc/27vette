@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import posixpath
 import shutil
 import tempfile
 import zipfile
@@ -33,9 +34,9 @@ def _zip_path(base: str, target: str) -> str:
     if target.startswith("/"):
         target = target[1:]
     if target.startswith("xl/"):
-        return target
+        return posixpath.normpath(target)
     base_dir = PurePosixPath(base).parent
-    return str(PurePosixPath(base_dir, target))
+    return posixpath.normpath(str(PurePosixPath(base_dir, target)))
 
 
 def _rels_path(part_path: str) -> str:

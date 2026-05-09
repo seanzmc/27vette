@@ -70,7 +70,12 @@ test("Grand Sport rule audit reconciles builder, workbook, and draft rule counts
   assert.equal(audit.summary.expectedDraftRuntimeRules, draft.rules.length);
   assert.equal(
     audit.summary.omittedDuplicateExclusiveGroup,
-    audit.summary.finalWorkbookRuleRows - audit.summary.expectedDraftRuntimeRules
+    audit.omittedDuplicateExclusiveGroup.length
+  );
+  assert.equal(audit.summary.omittedInactiveOrUnemitted, audit.omittedInactiveOrUnemitted.length);
+  assert.equal(
+    audit.summary.finalWorkbookRuleRows - audit.summary.omittedDuplicateExclusiveGroup - audit.summary.omittedInactiveOrUnemitted,
+    audit.summary.expectedDraftRuntimeRules
   );
   assert.equal(audit.summary.exclusiveGroups, workbookExclusiveGroups.length);
   assert.equal(audit.summary.exclusiveGroupMembers, workbookExclusiveMembers.length);
@@ -143,7 +148,7 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
   assert.equal(optionByRpo.get("D30").display_behavior, "display_only");
   assert.equal(normalizedBool(optionByRpo.get("Z15").selectable), "false");
   assert.equal(optionByRpo.get("Z15").display_behavior, "display_only");
-  assert.equal(optionByRpo.get("R6X").display_behavior, "auto_only");
+  assert.equal(optionByRpo.get("R6X").display_behavior, "display_only");
   for (const rpo of ["R6P", "R9V", "R9W", "R9Y", "U2K"]) {
     assert.equal(normalizedBool(optionByRpo.get(rpo).active), "false", `${rpo} should be inactive in workbook source`);
   }
@@ -192,8 +197,9 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
 });
 
 test("Grand Sport rule audit highlights risky duplicate RPO and special package surfaces", () => {
-  assert.ok(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "BC4"));
-  assert.ok(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "BCP"));
+  assert.equal(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "BC4"), false);
+  assert.equal(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "BCP"), false);
+  assert.ok(audit.reviewHotSpots.duplicateRpos.some((row) => row.rpo === "AH2"));
   assert.ok(audit.reviewHotSpots.specialPackageMentions.some((row) => row.rpo === "FEY"));
   assert.ok(audit.reviewHotSpots.specialPackageMentions.some((row) => row.mentioned_rpos.includes("Z25")));
 

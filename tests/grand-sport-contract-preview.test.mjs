@@ -33,8 +33,8 @@ test("Grand Sport contract preview has the expected read-only contract shape", (
   assert.equal(preview.variants.every((variant) => variant.source_active === "False"), true);
   assert.equal(preview.contextChoices.length, 8);
   assert.equal(preview.steps.length, 14);
-  assert.equal(preview.choices.length, 1418);
-  assert.equal(preview.candidateStandardEquipment.length, 545);
+  assert.equal(preview.choices.length, 1294);
+  assert.equal(preview.candidateStandardEquipment.length, 513);
 });
 
 test("all Grand Sport preview choices resolve section, category, step, and raw detail fields", () => {
@@ -48,35 +48,31 @@ test("all Grand Sport preview choices resolve section, category, step, and raw d
   }
   assert.equal(preview.normalization.unresolvedIssues.length, 0);
   assert.equal(preview.validation.length, 0);
-  assert.equal(preview.normalization.sectionCategoryResolutions.length, 62);
+  assert.equal(preview.normalization.sectionCategoryResolutions.length, 48);
 });
 
 test("filled Grand Sport source sections do not require blank-section config", () => {
   assert.deepEqual(preview.normalization.blankSectionOverrides, []);
   const choicesByRpo = new Map(preview.choices.map((choice) => [choice.rpo, choice]));
   assert.equal(choicesByRpo.get("PCQ")?.resolved_section_id, "sec_lpoe_001");
-  assert.equal(choicesByRpo.get("PDY")?.resolved_section_id, "sec_lpoe_001");
+  assert.equal(choicesByRpo.get("PDY")?.resolved_section_id, "sec_lpoi_001");
   assert.equal(choicesByRpo.get("PEF")?.resolved_section_id, "sec_lpoi_001");
 });
 
 test("customer-facing text is cleaned while raw source fields stay intact", () => {
   const cfl = preview.choices.find((choice) => choice.option_id === "opt_cfl_001");
   assert.ok(cfl, "CFL should be present in Grand Sport preview choices");
-  assert.equal(cfl.label, "New Ground Effects");
-  assert.equal(cfl.source_option_name, "NEW!  Ground effects");
-  assert.deepEqual(cfl.text_cleanup_notes, [
-    "label:collapsed_whitespace",
-    "label:normalized_new_prefix",
-    "label:normalized_capitalization",
-  ]);
+  assert.equal(cfl.label, "New Extended Front Splitter Ground Effects");
+  assert.equal(cfl.source_option_name, "NEW! Extended Front Splitter Ground Effects");
+  assert.deepEqual(cfl.text_cleanup_notes, ["label:normalized_new_prefix"]);
 });
 
 test("rule/detail hot spot buckets are preserved for later phases", () => {
-  assert.equal(preview.ruleDetailHotSpots.rows.length, 123);
+  assert.equal(preview.ruleDetailHotSpots.rows.length, 127);
   assert.equal(preview.ruleDetailHotSpots.counts.requires, 36);
   assert.equal(preview.ruleDetailHotSpots.counts.not_available, 47);
   assert.equal(preview.ruleDetailHotSpots.counts.included_with, 17);
-  assert.equal(preview.ruleDetailHotSpots.counts.includes, 41);
+  assert.equal(preview.ruleDetailHotSpots.counts.includes, 47);
   assert.equal(preview.ruleDetailHotSpots.counts.only, 19);
   assert.equal(preview.ruleDetailHotSpots.counts.not_recommended, 4);
   assert.equal(preview.ruleDetailHotSpots.counts.except, 2);

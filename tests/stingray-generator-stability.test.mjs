@@ -143,7 +143,7 @@ test("Stingray generated contract keeps the closed-out shape", () => {
   assert.equal(jsonData.choices.length, 1548);
   assert.equal(jsonData.standardEquipment.length, 464);
   assert.equal(jsonData.rules.length, 238);
-  assert.equal(jsonData.priceRules.length, 43);
+  assert.equal(jsonData.priceRules.length, 42);
   assert.equal(jsonData.interiors.length, 130);
   assert.equal(jsonData.validation.filter((row) => row.severity === "error").length, 0);
 });

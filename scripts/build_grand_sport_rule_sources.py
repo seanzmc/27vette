@@ -72,6 +72,36 @@ def option_indexes(rows: list[dict[str, str]]) -> tuple[dict[str, dict[str, str]
     return options_by_id, option_ids_by_rpo
 
 
+def runtime_available_option_ids(options: list[dict[str, str]], status_rows: list[dict[str, str]], variant_ids: tuple[str, ...]) -> set[str]:
+    statuses_by_option: dict[str, set[str]] = defaultdict(set)
+    for row in status_rows:
+        if row.get("variant_id") in variant_ids:
+            statuses_by_option[row.get("option_id", "")].add(row.get("status", "").lower())
+    return {
+        row["option_id"]
+        for row in options
+        if row.get("option_id")
+        and active_source_row(row)
+        and (
+            row.get("display_behavior", "") == "auto_only"
+            or bool(statuses_by_option.get(row["option_id"], set()) & {"available", "standard"})
+        )
+    }
+
+
+def runtime_rule_rows(workbook_rules: list[dict[str, str]], runtime_option_ids: set[str], grouped_excludes: set[tuple[str, str]]) -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
+    for row in workbook_rules:
+        source_id = row.get("source_id", "")
+        target_id = row.get("target_id", "")
+        if source_id not in runtime_option_ids or target_id not in runtime_option_ids:
+            continue
+        if row.get("rule_type", "").lower() == "excludes" and (source_id, target_id) in grouped_excludes:
+            continue
+        rows.append(row)
+    return rows
+
+
 def rpo_codes(text: str) -> list[str]:
     codes: list[str] = []
     for group in re.findall(r"\(([A-Z0-9][A-Z0-9/,\s-]*)\)", text):
@@ -373,6 +403,7 @@ def render_audit_markdown(audit: dict[str, Any]) -> str:
 def write_rule_audit(
     config,
     options: list[dict[str, str]],
+    status_rows: list[dict[str, str]],
     option_ids_by_rpo: dict[str, list[str]],
     candidate_keys: set[tuple[str, str, str]],
     review_rows: list[dict[str, Any]],
@@ -392,6 +423,13 @@ def write_rule_audit(
         for row in annotated_rules
         if row.get("rule_type", "").lower() == "excludes" and (row.get("source_id", ""), row.get("target_id", "")) in grouped_excludes
     ]
+    runtime_ids = runtime_available_option_ids(options, status_rows, tuple(config.variant_ids))
+    runtime_rows = runtime_rule_rows(workbook_rules, runtime_ids, grouped_excludes)
+    omitted_inactive_or_unemitted = [
+        row
+        for row in annotated_rules
+        if row.get("source_id", "") not in runtime_ids or row.get("target_id", "") not in runtime_ids
+    ]
     origin_counts = Counter(row["_audit_origin"] for row in annotated_rules)
     audit = {
         "dataset": {
@@ -410,8 +448,9 @@ def write_rule_audit(
             "rawDetailCandidateKeys": len(candidate_keys),
             "dedupedOrSelfReferenceCandidates": len(duplicate_keys),
             "finalWorkbookRuleRows": len(workbook_rules),
-            "expectedDraftRuntimeRules": len(workbook_rules) - len(omitted_exclusive),
+            "expectedDraftRuntimeRules": len(runtime_rows),
             "omittedDuplicateExclusiveGroup": len(omitted_exclusive),
+            "omittedInactiveOrUnemitted": len(omitted_inactive_or_unemitted),
             "skippedRequiresReview": len(review_rows),
             "unresolvedRpoMentions": len(unresolved_mentions),
             "exclusiveGroups": len(exclusive_groups),
@@ -435,6 +474,7 @@ def write_rule_audit(
         "parsedFromDetailRaw": parsed_rule_audit_rows(annotated_rules),
         "omittedDeduped": [{"source_id": key[0], "rule_type": key[1], "target_id": key[2], "body_style_scope": key[3], "runtime_action": key[4]} for key in duplicate_keys],
         "omittedDuplicateExclusiveGroup": omitted_exclusive,
+        "omittedInactiveOrUnemitted": omitted_inactive_or_unemitted,
         "skippedRequiresReview": review_rows,
         "unresolvedRpoMentions": unresolved_mentions,
         "reviewHotSpots": review_hot_spots(options, option_ids_by_rpo, tuple(config.special_rule_review_rpos)),
@@ -452,6 +492,7 @@ def main() -> None:
     config = GRAND_SPORT_MODEL
     wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
     all_grand_sport_options = rows_from_sheet(wb, config.source_option_sheet)
+    status_rows = rows_from_sheet(wb, config.status_sheet)
     grand_sport_options = [row for row in all_grand_sport_options if active_source_row(row)]
     _, active_option_ids_by_rpo = option_indexes(grand_sport_options)
     _, all_option_ids_by_rpo = option_indexes(all_grand_sport_options)
@@ -465,6 +506,7 @@ def main() -> None:
     audit_paths = write_rule_audit(
         config,
         grand_sport_options,
+        status_rows,
         active_option_ids_by_rpo,
         candidate_keys,
         review_rows,
