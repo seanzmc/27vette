@@ -1,22 +1,25 @@
 # Grand Sport Rule Audit
 
-Generated: `2026-05-10T19:26:24+00:00`
+Generated: `2026-05-10T21:08:26+00:00`
 Status: `rule_audit_generated`
 
 ## Summary
 
-- Workbook rule rows: 313
-- Expected draft runtime rules: 289
+- Workbook rule rows: 320
+- Expected draft runtime rules: 296
 - Omitted duplicate exclusive-group rules: 9
 - Raw detail candidate keys: 232
 - Workbook rules matching detail raw: 85
-- Workbook manual/approved/copied rules: 228
+- Workbook manual/approved/copied rules: 235
 - Skipped/review rows: 3
 - Unresolved non-interior RPO mentions: 4
-- Duplicate semantic rule keys: 0
+- Duplicate semantic rule keys: 1
+- Exact duplicate rule rows: 1
+- Overlapping scoped rule rows: 1
+- Redundant scoped rule rows: 0
 - Missing option references: 0
-- Inactive option references: 17
-- Engine-cover inactive references: 12
+- Inactive option references: 5
+- Engine-cover inactive references: 0
 
 ## Workbook-Copied Rules
 
@@ -29,9 +32,9 @@ Status: `rule_audit_generated`
 - `gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible`: opt_bc4_002 requires opt_zz3_001
 - `gs_copy_rule_opt_bc7_001_requires_opt_zz3_001_convertible_opt_bc7_001_requires_opt_zz3_001_convertible`: opt_bc7_001 requires opt_zz3_001
 - `gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe`: opt_bcp_001 includes opt_d3v_001
-- `gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible`: opt_bcp_001 requires opt_zz3_001
+- `gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible`: opt_bcp_002 requires opt_zz3_001
 - `gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe`: opt_bcs_001 includes opt_d3v_001
-- `gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible`: opt_bcs_001 requires opt_zz3_001
+- `gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible`: opt_bcs_002 requires opt_zz3_001
 - `gs_copy_rule_opt_zz3_001_includes_opt_bc7_002_opt_zz3_001_includes_opt_bc7_001`: opt_zz3_001 includes opt_bc7_001
 - `gs_copy_rule_opt_zz3_001_includes_opt_sl9_001_opt_zz3_001_includes_opt_sl9_001`: opt_zz3_001 includes opt_sl9_001
 - `gs_copy_rule_opt_nwi_001_requires_opt_wub_001_opt_nwi_001_requires_opt_wub_001`: opt_nwi_001 requires opt_wub_001
@@ -118,6 +121,18 @@ Status: `rule_audit_generated`
 
 ## Duplicate Semantic Rule Keys
 
+- opt_bc4_002 requires opt_zz3_001 [convertible]: gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible, gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible
+
+## Exact Duplicate Rule Rows
+
+- opt_bc4_002 requires opt_zz3_001 [convertible]: keep `gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible`; rows: gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible, gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible
+
+## Overlapping Scoped Rule Rows
+
+- opt_bc4_002 includes opt_d3v_001: scopes coupe; source body styles convertible, coupe; scope_overlap_requires_review
+
+## Redundant Scoped Rule Rows
+
 - none
 
 ## Missing Option References
@@ -126,18 +141,6 @@ Status: `rule_audit_generated`
 
 ## Inactive Option References
 
-- `gs_copy_rule_opt_bc4_001_includes_opt_d3v_001_opt_bc4_001_includes_opt_d3v_001_coupe` source_id -> `opt_bc4_001` (BC4): active same-RPO ids: opt_bc4_002
-- `gs_rule_opt_bc4_001_requires_opt_b6p_001_coupe` source_id -> `opt_bc4_001` (BC4): active same-RPO ids: opt_bc4_002
-- `gs_rule_opt_bcp_001_includes_opt_d3v_001` source_id -> `opt_bcp_001` (BCP): active same-RPO ids: opt_bcp_002
-- `gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe` source_id -> `opt_bcp_001` (BCP): active same-RPO ids: opt_bcp_002
-- `gs_rule_opt_bcp_001_requires_opt_b6p_001_coupe` source_id -> `opt_bcp_001` (BCP): active same-RPO ids: opt_bcp_002
-- `gs_rule_opt_bcp_001_requires_opt_d3v_001_coupe` source_id -> `opt_bcp_001` (BCP): active same-RPO ids: opt_bcp_002
-- `gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible` source_id -> `opt_bcp_001` (BCP): active same-RPO ids: opt_bcp_002
-- `gs_rule_opt_bcs_001_includes_opt_d3v_001` source_id -> `opt_bcs_001` (BCS): active same-RPO ids: opt_bcs_002
-- `gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe` source_id -> `opt_bcs_001` (BCS): active same-RPO ids: opt_bcs_002
-- `gs_rule_opt_bcs_001_requires_opt_b6p_001_coupe` source_id -> `opt_bcs_001` (BCS): active same-RPO ids: opt_bcs_002
-- `gs_rule_opt_bcs_001_requires_opt_d3v_001_coupe` source_id -> `opt_bcs_001` (BCS): active same-RPO ids: opt_bcs_002
-- `gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible` source_id -> `opt_bcs_001` (BCS): active same-RPO ids: opt_bcs_002
 - `gs_rule_opt_sig_001_requires_opt_t0e_002` target_id -> `opt_t0e_002` (T0E): active same-RPO ids: opt_t0e_001
 - `gs_rule_opt_009_requires_opt_ue1_001` source_id -> `opt_009` (): active same-RPO ids: none
 - `gs_rule_opt_009_requires_opt_ue1_001` target_id -> `opt_ue1_001` (UE1): active same-RPO ids: none
@@ -146,17 +149,5 @@ Status: `rule_audit_generated`
 
 ## Engine Cover Rule Focus
 
-- Engine-cover rule rows: 25
-- Engine-cover inactive references: 12
-- `gs_copy_rule_opt_bc4_001_includes_opt_d3v_001_opt_bc4_001_includes_opt_d3v_001_coupe` references inactive `opt_bc4_001` (BC4); active same-RPO ids: opt_bc4_002
-- `gs_rule_opt_bc4_001_requires_opt_b6p_001_coupe` references inactive `opt_bc4_001` (BC4); active same-RPO ids: opt_bc4_002
-- `gs_rule_opt_bcp_001_includes_opt_d3v_001` references inactive `opt_bcp_001` (BCP); active same-RPO ids: opt_bcp_002
-- `gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe` references inactive `opt_bcp_001` (BCP); active same-RPO ids: opt_bcp_002
-- `gs_rule_opt_bcp_001_requires_opt_b6p_001_coupe` references inactive `opt_bcp_001` (BCP); active same-RPO ids: opt_bcp_002
-- `gs_rule_opt_bcp_001_requires_opt_d3v_001_coupe` references inactive `opt_bcp_001` (BCP); active same-RPO ids: opt_bcp_002
-- `gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible` references inactive `opt_bcp_001` (BCP); active same-RPO ids: opt_bcp_002
-- `gs_rule_opt_bcs_001_includes_opt_d3v_001` references inactive `opt_bcs_001` (BCS); active same-RPO ids: opt_bcs_002
-- `gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe` references inactive `opt_bcs_001` (BCS); active same-RPO ids: opt_bcs_002
-- `gs_rule_opt_bcs_001_requires_opt_b6p_001_coupe` references inactive `opt_bcs_001` (BCS); active same-RPO ids: opt_bcs_002
-- `gs_rule_opt_bcs_001_requires_opt_d3v_001_coupe` references inactive `opt_bcs_001` (BCS); active same-RPO ids: opt_bcs_002
-- `gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible` references inactive `opt_bcs_001` (BCS); active same-RPO ids: opt_bcs_002
+- Engine-cover rule rows: 26
+- Engine-cover inactive references: 0

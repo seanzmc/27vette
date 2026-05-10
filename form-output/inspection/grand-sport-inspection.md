@@ -1,6 +1,6 @@
 # Grand Sport Inspection
 
-Generated: `2026-05-10T19:26:24+00:00`
+Generated: `2026-05-10T21:09:33+00:00`
 Source sheet: `grandSport_options`
 Status: `inspection_generated`
 
@@ -19,8 +19,8 @@ Status: `inspection_generated`
 - Candidate choice rows with available/standard status: 1374
 - Candidate standard equipment cells: 455
 - Candidate standard option rows: 90
-- Active option rows with available/standard status: 229
-- Inactive option rows all unavailable/blank: 40
+- Active option rows with available/standard status: 227
+- Inactive option rows all unavailable/blank: 42
 - Selectable counts: `{"False": 107, "True": 162}`
 - Status counts: `{"available": 873, "standard": 547, "unavailable": 194}`
 - Missing status cells: 0
@@ -36,7 +36,7 @@ Status: `inspection_generated`
 
 ## Rule/Detail Hot Spots
 
-- Hot spot counts: `{"except": 2, "included_with": 17, "includes": 47, "not_available": 49, "not_recommended": 4, "only": 19, "requires": 36}`
+- Hot spot counts: `{"except": 2, "included_with": 17, "includes": 53, "not_available": 49, "not_recommended": 4, "only": 19, "requires": 36}`
 - Rows requiring later rule review: 129
 
 | RPO | Option | Section | Matched Terms | Special Mentions |
@@ -69,16 +69,16 @@ Status: `inspection_generated`
 | `DMW` | Arctic White Grand Sport Heritage Center Stripe | `sec_gsce_001` | requires, not_available, includes | Z15 |
 | `DMX` | Admiral Blue Grand Sport Heritage Center Stripe | `sec_gsce_001` | requires, not_available, includes | Z15 |
 | `DMY` | Red Mist Grand Sport Heritage Center Stripe | `sec_gsce_001` | requires, not_available, includes | Z15 |
-| `17A` | Blade Silver Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
-| `20A` | Admiral Blue Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
-| `55A` | Competition Yellow Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
-| `75A` | Torch Red Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
-| `97A` | Carbon Flash Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires | Z15 |
-| `DX4` | Red Mist Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
+| `17A` | Blade Silver Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available, includes | Z15 |
+| `20A` | Admiral Blue Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available, includes | Z15 |
+| `55A` | Competition Yellow Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available, includes | Z15 |
+| `75A` | Torch Red Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available, includes | Z15 |
+| `97A` | Carbon Flash Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, includes | Z15 |
+| `DX4` | Red Mist Grand Sport Heritage Hash Marks | `sec_gsha_001` | requires, not_available, includes | Z15 |
 | `DRG` | Carbon Flash Outside Mirrors | `sec_incl_001` | only |  |
 | `TR7` | Automatic Leveling Headlamp Control | `sec_incl_001` | only |  |
 | `CFX` | Personalized Corvette Museum Plaque | `sec_incl_001` | includes, only |  |
-| `J56` | Performance Disc Brakes | `sec_incl_001` | includes, only |  |
+| `J56` | Performance Disc Brakes | `sec_perf_brake_001` | includes, only |  |
 | `XFR` | High Performance Tires | `sec_incl_001` | only |  |
 | `XFS` | Michelin Pilot Sport Cup 2 R Tires | `sec_incl_001` | only | FEY |
 | ... | 89 additional rows in JSON artifact |  |  |  |

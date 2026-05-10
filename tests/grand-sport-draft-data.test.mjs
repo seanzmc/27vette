@@ -37,12 +37,13 @@ const requiredPackagePriceRules = [
   ["gs_pr_pcq_vwt_001", "opt_pcq_001", "opt_vwt_001", "override", 0],
   ["gs_pr_pef_ria_001", "opt_pef_001", "opt_ria_001", "override", 0],
   ["gs_pr_pef_cav_001", "opt_pef_001", "opt_cav_001", "override", 0],
+  ["gs_pr_t0f_cfz_001", "opt_t0f_001", "opt_cfz_001", "override", 0],
 ];
 
 const expectedGrandSportExclusiveGroups = [
   {
     group_id: "gs_excl_ls6_engine_covers",
-    option_ids: ["opt_bc7_001", "opt_bc4_001", "opt_bc4_002", "opt_bcp_001", "opt_bcp_002", "opt_bcs_001", "opt_bcs_002"],
+    option_ids: ["opt_bc7_001", "opt_bc4_002", "opt_bcp_002", "opt_bcs_002"],
   },
   {
     group_id: "gs_excl_center_caps",
@@ -67,6 +68,10 @@ const expectedGrandSportExclusiveGroups = [
   {
     group_id: "gs_excl_z52_packages",
     option_ids: ["opt_feb_001", "opt_fey_001"],
+  },
+  {
+    group_id: "gs_excl_exterior_accents",
+    option_ids: ["opt_efr_001", "opt_edu_001"],
   },
 ];
 
@@ -103,9 +108,9 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
   assert.equal(draft.steps.length, 14);
   assert.equal(draft.choices.length, 1374);
   assert.equal(draft.standardEquipment.length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 775);
+  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 767);
   assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 144);
+  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 152);
 });
 
 test("Grand Sport standard equipment is preserved after standard mirror rows are inactive", () => {
@@ -231,8 +236,11 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
   for (const key of [
     "opt_5jr_001::includes::opt_drg_001::::active",
     "opt_j6l_001::requires::opt_j57_001::::active",
-    "opt_j57_001::includes::opt_j6d_001::::active",
+    "opt_j6d_001::requires::opt_j57_001::::active",
     "opt_t0f_001::requires::opt_j57_001::::active",
+    "opt_j57_001::excludes::opt_j6a_001::::replace",
+    "opt_j57_001::excludes::opt_j56_001::::replace",
+    "opt_fey_001::excludes::opt_t0e_001::::replace",
     "opt_fey_001::includes::opt_t0f_001::::active",
     "opt_fey_001::includes::opt_cfz_001::::active",
     "opt_t0f_001::includes::opt_cfz_001::::active",
@@ -246,7 +254,11 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
   const groundEffectsGroup = draft.exclusiveGroups.find((group) => group.group_id === "gs_excl_ground_effects");
   assert.deepEqual(JSON.parse(JSON.stringify(groundEffectsGroup.option_ids)), ["opt_cfl_001", "opt_cfz_001"]);
 
-  assert.equal(draft.ruleGroups.some((group) => group.source_id === "opt_z15_001"), false);
+  const z15Group = draft.ruleGroups.find((group) => group.group_id === "gs_group_z15_excludes_non_center_stripes");
+  assert.ok(z15Group, "Z15 grouped exclusion source should be present for Pass 3 runtime wiring");
+  assert.equal(z15Group.group_type, "excludes_any");
+  assert.equal(z15Group.source_id, "opt_z15_001");
+  assert.deepEqual(JSON.parse(JSON.stringify(z15Group.target_ids)), nonCenterStripeOptionIds);
   assert.equal(
     [...ruleKeys].some((key) => key.startsWith("opt_z15_001::requires::")),
     false,
@@ -278,8 +290,8 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
   assert.equal(d30.selectable, "False");
 
   const z15 = draft.choices.find((choice) => choice.option_id === "opt_z15_001");
-  assert.equal(z15.active, "True");
-  assert.equal(z15.status, "available");
+  assert.equal(z15.active, "False");
+  assert.equal(z15.status, "unavailable");
   assert.equal(z15.selectable, "False");
 
   const r6xChoices = draft.choices.filter((choice) => choice.option_id === "opt_r6x_001");
@@ -304,6 +316,8 @@ test("Grand Sport draft includes model-scoped LT interiors with EL9 launch editi
 
   const ae4El9 = byId.get("3LT_AE4_EL9");
   const ah2El9 = byId.get("3LT_AH2_EL9");
+  assert.equal(ah2El9.interior_choice_display_order < byId.get("3LT_AH2_HTE").interior_choice_display_order, true);
+  assert.equal(ae4El9.interior_choice_display_order < byId.get("3LT_AE4_HTE").interior_choice_display_order, true);
   assert.equal(Number(ae4El9.price), 595);
   assert.equal(Number(ah2El9.price), 0);
   assert.deepEqual(
@@ -327,13 +341,17 @@ test("Grand Sport draft section placement follows section_master step_key", () =
   assert.equal(sectionById.get("sec_gsce_001")?.step_key, "aero_exhaust_stripes_accessories");
   assert.equal(sectionById.get("sec_exha_001")?.step_key, "packages_performance");
   assert.equal(sectionById.get("sec_whee_001")?.step_key, "wheels");
-  assert.equal(sectionById.get("sec_perf_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_perf_support_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_perf_ground_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_perf_z52_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_perf_aero_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_perf_brake_001")?.step_key, "packages_performance");
   assert.equal(sectionById.get("sec_cali_001")?.step_key, "wheels");
   assert.equal(sectionById.get("sec_lpoi_001")?.step_key, "interior_trim");
 });
 
 test("Grand Sport draft preserves rule hot spots and normalization metadata for later phases", () => {
-  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1230);
+  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1234);
   assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1374);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 129);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 26);

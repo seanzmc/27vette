@@ -207,7 +207,11 @@ function ruleAppliesToCurrentVariant(rule) {
   const sourceChoice = choiceForCurrentVariant(rule.source_id);
   const targetChoice = choiceForCurrentVariant(rule.target_id);
   if (sourceChoice && (sourceChoice.active !== "True" || sourceChoice.status === "unavailable")) return false;
-  if (targetChoice && (targetChoice.active !== "True" || targetChoice.status === "unavailable")) return false;
+  if (
+    targetChoice &&
+    targetChoice.display_behavior !== "auto_only" &&
+    (targetChoice.active !== "True" || targetChoice.status === "unavailable")
+  ) return false;
   return true;
 }
 

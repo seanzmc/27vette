@@ -800,7 +800,7 @@ def main() -> None:
         rule_type = rule.get("rule_type", "").lower()
         source_id = rule.get("source_id", "")
         target_id = rule.get("target_id", "")
-        if rule.get("generation_action", "") == "omit_grouped_requirement":
+        if rule.get("generation_action", "").startswith("omit"):
             continue
         if rule_type == "requires" and (source_id, target_id) in grouped_requires:
             continue

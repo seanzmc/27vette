@@ -6,29 +6,32 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-05-10T19:26:24+00:00",
+    "generated_at": "2026-05-10T21:08:26+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
     "copiedRuleCandidates": 94,
     "rawDetailRuleCandidates": 232,
     "rawDetailCandidateKeys": 232,
-    "dedupedOrSelfReferenceCandidates": 0,
-    "finalWorkbookRuleRows": 313,
-    "expectedDraftRuntimeRules": 289,
+    "dedupedOrSelfReferenceCandidates": 1,
+    "finalWorkbookRuleRows": 320,
+    "expectedDraftRuntimeRules": 296,
     "omittedDuplicateExclusiveGroup": 9,
     "omittedInactiveOrUnemitted": 15,
     "skippedRequiresReview": 3,
     "unresolvedRpoMentions": 4,
-    "exclusiveGroups": 7,
-    "exclusiveGroupMembers": 23,
-    "duplicateSemanticRuleKeys": 0,
+    "exclusiveGroups": 8,
+    "exclusiveGroupMembers": 25,
+    "duplicateSemanticRuleKeys": 1,
+    "exactDuplicateRuleRows": 1,
+    "overlappingScopedRuleRows": 1,
+    "redundantScopedRuleRows": 0,
     "missingOptionReferences": 0,
-    "inactiveOptionReferences": 17,
-    "engineCoverRuleRows": 25,
-    "engineCoverInactiveReferences": 12,
+    "inactiveOptionReferences": 5,
+    "engineCoverRuleRows": 26,
+    "engineCoverInactiveReferences": 0,
     "workbookRulesMatchingDetailRaw": 85,
-    "workbookManualOrApprovedRules": 228
+    "workbookManualOrApprovedRules": 235
   },
   "sourceSheets": {
     "optionSheet": "grandSport_options",
@@ -113,7 +116,7 @@
     },
     {
       "grand_sport_rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible",
-      "source_id": "opt_bcp_001",
+      "source_id": "opt_bcp_002",
       "rule_type": "requires",
       "target_id": "opt_zz3_001",
       "body_style_scope": "convertible",
@@ -129,7 +132,7 @@
     },
     {
       "grand_sport_rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible",
-      "source_id": "opt_bcs_001",
+      "source_id": "opt_bcs_002",
       "rule_type": "requires",
       "target_id": "opt_zz3_001",
       "body_style_scope": "convertible",
@@ -1474,7 +1477,15 @@
       "matched_phrase": "workbook_matches_detail_raw"
     }
   ],
-  "omittedDeduped": [],
+  "omittedDeduped": [
+    {
+      "source_id": "opt_bc4_002",
+      "rule_type": "requires",
+      "target_id": "opt_zz3_001",
+      "body_style_scope": "convertible",
+      "runtime_action": ""
+    }
+  ],
   "omittedDuplicateExclusiveGroup": [
     {
       "rule_id": "gs_copy_rule_opt_rik_001_excludes_opt_rin_001_opt_rik_001_excludes_opt_rin_001",
@@ -1601,8 +1612,8 @@
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_perf_001",
-      "source_section": "sec_perf_001",
+      "target_section": "sec_perf_ground_001",
+      "source_section": "sec_perf_ground_001",
       "generation_action": "",
       "body_style_scope": "",
       "runtime_action": "",
@@ -1620,8 +1631,8 @@
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_perf_001",
-      "source_section": "sec_perf_001",
+      "target_section": "sec_perf_z52_001",
+      "source_section": "sec_perf_z52_001",
       "generation_action": "",
       "body_style_scope": "",
       "runtime_action": "",
@@ -1639,8 +1650,8 @@
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_perf_001",
-      "source_section": "sec_perf_001",
+      "target_section": "sec_perf_z52_001",
+      "source_section": "sec_perf_z52_001",
       "generation_action": "",
       "body_style_scope": "",
       "runtime_action": "",
@@ -1649,6 +1660,44 @@
     }
   ],
   "omittedInactiveOrUnemitted": [
+    {
+      "rule_id": "gs_rule_opt_j57_001_includes_opt_j6d_001",
+      "source_id": "opt_j57_001",
+      "rule_type": "includes",
+      "target_id": "opt_j6d_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Included and only available with (J57) carbon ceramic brakes.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "single_select_req",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_cali_001",
+      "source_section": "sec_perf_brake_001",
+      "generation_action": "omit_replaced_by_j6d_requires_j57",
+      "body_style_scope": "",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_copy_rule_opt_b6p_001_includes_opt_d3v_001_opt_b6p_001_includes_opt_d3v_001_coupe",
+      "source_id": "opt_b6p_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "multi_select_opt",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_engi_001",
+      "source_section": "sec_engi_001",
+      "generation_action": "omit_redundant_scoped_duplicate",
+      "body_style_scope": "coupe",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "_audit_origin": "workbook_copied_from_stingray"
+    },
     {
       "rule_id": "gs_copy_rule_opt_bc4_001_includes_opt_d3v_001_opt_bc4_001_includes_opt_d3v_001_coupe",
       "source_id": "opt_bc4_001",
@@ -1662,7 +1711,7 @@
       "source_selection_mode": "multi_select_opt",
       "target_section": "sec_engi_001",
       "source_section": "sec_engi_001",
-      "generation_action": "",
+      "generation_action": "omit_inactive_duplicate_source",
       "body_style_scope": "coupe",
       "runtime_action": "",
       "disabled_reason": "",
@@ -1681,7 +1730,7 @@
       "source_selection_mode": "multi_select_opt",
       "target_section": "sec_engi_001",
       "source_section": "sec_engi_001",
-      "generation_action": "",
+      "generation_action": "omit_inactive_duplicate_source",
       "body_style_scope": "coupe",
       "runtime_action": "",
       "disabled_reason": "",
@@ -1700,7 +1749,7 @@
       "source_selection_mode": "multi_select_opt",
       "target_section": "sec_engi_001",
       "source_section": "sec_engi_001",
-      "generation_action": "",
+      "generation_action": "omit_inactive_duplicate_source",
       "body_style_scope": "",
       "runtime_action": "",
       "disabled_reason": "",
@@ -1719,7 +1768,7 @@
       "source_selection_mode": "multi_select_opt",
       "target_section": "sec_engi_001",
       "source_section": "sec_engi_001",
-      "generation_action": "",
+      "generation_action": "omit_inactive_duplicate_source",
       "body_style_scope": "coupe",
       "runtime_action": "",
       "disabled_reason": "",
@@ -1738,7 +1787,7 @@
       "source_selection_mode": "multi_select_opt",
       "target_section": "sec_engi_001",
       "source_section": "sec_engi_001",
-      "generation_action": "",
+      "generation_action": "omit_inactive_duplicate_source",
       "body_style_scope": "coupe",
       "runtime_action": "",
       "disabled_reason": "",
@@ -1757,30 +1806,11 @@
       "source_selection_mode": "multi_select_opt",
       "target_section": "sec_engi_001",
       "source_section": "sec_engi_001",
-      "generation_action": "",
+      "generation_action": "omit_inactive_duplicate_source",
       "body_style_scope": "coupe",
       "runtime_action": "",
       "disabled_reason": "",
       "_audit_origin": "workbook_manual_or_normalized"
-    },
-    {
-      "rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible",
-      "source_id": "opt_bcp_001",
-      "rule_type": "requires",
-      "target_id": "opt_zz3_001",
-      "target_type": "option",
-      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting. 2. Requires (ZZ3) Convertible Engine Appearance Package.",
-      "review_flag": "False",
-      "source_type": "option",
-      "target_selection_mode": "multi_select_opt",
-      "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_engi_001",
-      "source_section": "sec_engi_001",
-      "generation_action": "",
-      "body_style_scope": "convertible",
-      "runtime_action": "",
-      "disabled_reason": "",
-      "_audit_origin": "workbook_copied_from_stingray"
     },
     {
       "rule_id": "gs_rule_opt_bcs_001_includes_opt_d3v_001",
@@ -1795,7 +1825,7 @@
       "source_selection_mode": "multi_select_opt",
       "target_section": "sec_engi_001",
       "source_section": "sec_engi_001",
-      "generation_action": "",
+      "generation_action": "omit_inactive_duplicate_source",
       "body_style_scope": "",
       "runtime_action": "",
       "disabled_reason": "",
@@ -1814,7 +1844,7 @@
       "source_selection_mode": "multi_select_opt",
       "target_section": "sec_engi_001",
       "source_section": "sec_engi_001",
-      "generation_action": "",
+      "generation_action": "omit_inactive_duplicate_source",
       "body_style_scope": "coupe",
       "runtime_action": "",
       "disabled_reason": "",
@@ -1833,7 +1863,7 @@
       "source_selection_mode": "multi_select_opt",
       "target_section": "sec_engi_001",
       "source_section": "sec_engi_001",
-      "generation_action": "",
+      "generation_action": "omit_inactive_duplicate_source",
       "body_style_scope": "coupe",
       "runtime_action": "",
       "disabled_reason": "",
@@ -1852,30 +1882,11 @@
       "source_selection_mode": "multi_select_opt",
       "target_section": "sec_engi_001",
       "source_section": "sec_engi_001",
-      "generation_action": "",
+      "generation_action": "omit_inactive_duplicate_source",
       "body_style_scope": "coupe",
       "runtime_action": "",
       "disabled_reason": "",
       "_audit_origin": "workbook_manual_or_normalized"
-    },
-    {
-      "rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible",
-      "source_id": "opt_bcs_001",
-      "rule_type": "requires",
-      "target_id": "opt_zz3_001",
-      "target_type": "option",
-      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting. 2. Requires (ZZ3) Convertible Engine Appearance Package.",
-      "review_flag": "False",
-      "source_type": "option",
-      "target_selection_mode": "multi_select_opt",
-      "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_engi_001",
-      "source_section": "sec_engi_001",
-      "generation_action": "",
-      "body_style_scope": "convertible",
-      "runtime_action": "",
-      "disabled_reason": "",
-      "_audit_origin": "workbook_copied_from_stingray"
     },
     {
       "rule_id": "gs_rule_opt_sig_001_requires_opt_t0e_002",
@@ -2186,225 +2197,69 @@
     ]
   },
   "focusedReview": {
-    "duplicateSemanticRuleKeys": [],
+    "duplicateSemanticRuleKeys": [
+      {
+        "source_id": "opt_bc4_002",
+        "rule_type": "requires",
+        "target_id": "opt_zz3_001",
+        "body_style_scope": "convertible",
+        "rule_ids": [
+          "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible",
+          "gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible"
+        ],
+        "copied_rule_ids": [
+          "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible"
+        ],
+        "canonical_rule_id": "gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible",
+        "recommended_action": "omit copied duplicate rows and keep canonical rule row",
+        "count": 2
+      }
+    ],
+    "exactDuplicateRuleRows": [
+      {
+        "source_id": "opt_bc4_002",
+        "rule_type": "requires",
+        "target_id": "opt_zz3_001",
+        "body_style_scope": "convertible",
+        "rule_ids": [
+          "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible",
+          "gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible"
+        ],
+        "copied_rule_ids": [
+          "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible"
+        ],
+        "canonical_rule_id": "gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible",
+        "recommended_action": "omit copied duplicate rows and keep canonical rule row",
+        "count": 2
+      }
+    ],
+    "overlappingScopedRuleRows": [
+      {
+        "source_id": "opt_bc4_002",
+        "source_rpo": "BC4",
+        "rule_type": "includes",
+        "target_id": "opt_d3v_001",
+        "target_rpo": "D3V",
+        "global_rule_ids": [
+          "gs_rule_opt_bc4_002_includes_opt_d3v_001"
+        ],
+        "scoped_rule_ids": [
+          "gs_rule_opt_bc4_001_includes_opt_d3v_001"
+        ],
+        "scopes": [
+          "coupe"
+        ],
+        "source_option_body_styles": [
+          "convertible",
+          "coupe"
+        ],
+        "classification": "scope_overlap_requires_review",
+        "recommended_action": "review before changing workbook rows"
+      }
+    ],
+    "redundantScopedRuleRows": [],
     "missingOptionReferences": [],
     "inactiveOptionReferences": [
-      {
-        "rule_id": "gs_copy_rule_opt_bc4_001_includes_opt_d3v_001_opt_bc4_001_includes_opt_d3v_001_coupe",
-        "field": "source_id",
-        "option_id": "opt_bc4_001",
-        "rpo": "BC4",
-        "label": "BC4 NEW! Blue LS6 Engine Cover",
-        "canonical_active_option_ids": [
-          "opt_bc4_002"
-        ],
-        "same_rpo_option_ids": [
-          "opt_bc4_002",
-          "opt_bc4_001"
-        ],
-        "source_id": "opt_bc4_001",
-        "rule_type": "includes",
-        "target_id": "opt_d3v_001",
-        "body_style_scope": "coupe"
-      },
-      {
-        "rule_id": "gs_rule_opt_bc4_001_requires_opt_b6p_001_coupe",
-        "field": "source_id",
-        "option_id": "opt_bc4_001",
-        "rpo": "BC4",
-        "label": "BC4 NEW! Blue LS6 Engine Cover",
-        "canonical_active_option_ids": [
-          "opt_bc4_002"
-        ],
-        "same_rpo_option_ids": [
-          "opt_bc4_002",
-          "opt_bc4_001"
-        ],
-        "source_id": "opt_bc4_001",
-        "rule_type": "requires",
-        "target_id": "opt_b6p_001",
-        "body_style_scope": "coupe"
-      },
-      {
-        "rule_id": "gs_rule_opt_bcp_001_includes_opt_d3v_001",
-        "field": "source_id",
-        "option_id": "opt_bcp_001",
-        "rpo": "BCP",
-        "label": "BCP Edge Red LS6 Engine Cover",
-        "canonical_active_option_ids": [
-          "opt_bcp_002"
-        ],
-        "same_rpo_option_ids": [
-          "opt_bcp_002",
-          "opt_bcp_001"
-        ],
-        "source_id": "opt_bcp_001",
-        "rule_type": "includes",
-        "target_id": "opt_d3v_001",
-        "body_style_scope": ""
-      },
-      {
-        "rule_id": "gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe",
-        "field": "source_id",
-        "option_id": "opt_bcp_001",
-        "rpo": "BCP",
-        "label": "BCP Edge Red LS6 Engine Cover",
-        "canonical_active_option_ids": [
-          "opt_bcp_002"
-        ],
-        "same_rpo_option_ids": [
-          "opt_bcp_002",
-          "opt_bcp_001"
-        ],
-        "source_id": "opt_bcp_001",
-        "rule_type": "includes",
-        "target_id": "opt_d3v_001",
-        "body_style_scope": "coupe"
-      },
-      {
-        "rule_id": "gs_rule_opt_bcp_001_requires_opt_b6p_001_coupe",
-        "field": "source_id",
-        "option_id": "opt_bcp_001",
-        "rpo": "BCP",
-        "label": "BCP Edge Red LS6 Engine Cover",
-        "canonical_active_option_ids": [
-          "opt_bcp_002"
-        ],
-        "same_rpo_option_ids": [
-          "opt_bcp_002",
-          "opt_bcp_001"
-        ],
-        "source_id": "opt_bcp_001",
-        "rule_type": "requires",
-        "target_id": "opt_b6p_001",
-        "body_style_scope": "coupe"
-      },
-      {
-        "rule_id": "gs_rule_opt_bcp_001_requires_opt_d3v_001_coupe",
-        "field": "source_id",
-        "option_id": "opt_bcp_001",
-        "rpo": "BCP",
-        "label": "BCP Edge Red LS6 Engine Cover",
-        "canonical_active_option_ids": [
-          "opt_bcp_002"
-        ],
-        "same_rpo_option_ids": [
-          "opt_bcp_002",
-          "opt_bcp_001"
-        ],
-        "source_id": "opt_bcp_001",
-        "rule_type": "requires",
-        "target_id": "opt_d3v_001",
-        "body_style_scope": "coupe"
-      },
-      {
-        "rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible",
-        "field": "source_id",
-        "option_id": "opt_bcp_001",
-        "rpo": "BCP",
-        "label": "BCP Edge Red LS6 Engine Cover",
-        "canonical_active_option_ids": [
-          "opt_bcp_002"
-        ],
-        "same_rpo_option_ids": [
-          "opt_bcp_002",
-          "opt_bcp_001"
-        ],
-        "source_id": "opt_bcp_001",
-        "rule_type": "requires",
-        "target_id": "opt_zz3_001",
-        "body_style_scope": "convertible"
-      },
-      {
-        "rule_id": "gs_rule_opt_bcs_001_includes_opt_d3v_001",
-        "field": "source_id",
-        "option_id": "opt_bcs_001",
-        "rpo": "BCS",
-        "label": "BCS Sterling Silver LS6 Engine Cover",
-        "canonical_active_option_ids": [
-          "opt_bcs_002"
-        ],
-        "same_rpo_option_ids": [
-          "opt_bcs_002",
-          "opt_bcs_001"
-        ],
-        "source_id": "opt_bcs_001",
-        "rule_type": "includes",
-        "target_id": "opt_d3v_001",
-        "body_style_scope": ""
-      },
-      {
-        "rule_id": "gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe",
-        "field": "source_id",
-        "option_id": "opt_bcs_001",
-        "rpo": "BCS",
-        "label": "BCS Sterling Silver LS6 Engine Cover",
-        "canonical_active_option_ids": [
-          "opt_bcs_002"
-        ],
-        "same_rpo_option_ids": [
-          "opt_bcs_002",
-          "opt_bcs_001"
-        ],
-        "source_id": "opt_bcs_001",
-        "rule_type": "includes",
-        "target_id": "opt_d3v_001",
-        "body_style_scope": "coupe"
-      },
-      {
-        "rule_id": "gs_rule_opt_bcs_001_requires_opt_b6p_001_coupe",
-        "field": "source_id",
-        "option_id": "opt_bcs_001",
-        "rpo": "BCS",
-        "label": "BCS Sterling Silver LS6 Engine Cover",
-        "canonical_active_option_ids": [
-          "opt_bcs_002"
-        ],
-        "same_rpo_option_ids": [
-          "opt_bcs_002",
-          "opt_bcs_001"
-        ],
-        "source_id": "opt_bcs_001",
-        "rule_type": "requires",
-        "target_id": "opt_b6p_001",
-        "body_style_scope": "coupe"
-      },
-      {
-        "rule_id": "gs_rule_opt_bcs_001_requires_opt_d3v_001_coupe",
-        "field": "source_id",
-        "option_id": "opt_bcs_001",
-        "rpo": "BCS",
-        "label": "BCS Sterling Silver LS6 Engine Cover",
-        "canonical_active_option_ids": [
-          "opt_bcs_002"
-        ],
-        "same_rpo_option_ids": [
-          "opt_bcs_002",
-          "opt_bcs_001"
-        ],
-        "source_id": "opt_bcs_001",
-        "rule_type": "requires",
-        "target_id": "opt_d3v_001",
-        "body_style_scope": "coupe"
-      },
-      {
-        "rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible",
-        "field": "source_id",
-        "option_id": "opt_bcs_001",
-        "rpo": "BCS",
-        "label": "BCS Sterling Silver LS6 Engine Cover",
-        "canonical_active_option_ids": [
-          "opt_bcs_002"
-        ],
-        "same_rpo_option_ids": [
-          "opt_bcs_002",
-          "opt_bcs_001"
-        ],
-        "source_id": "opt_bcs_001",
-        "rule_type": "requires",
-        "target_id": "opt_zz3_001",
-        "body_style_scope": "convertible"
-      },
       {
         "rule_id": "gs_rule_opt_sig_001_requires_opt_t0e_002",
         "field": "target_id",
@@ -2531,7 +2386,7 @@
           "target_active": true,
           "body_style_scope": "coupe",
           "runtime_action": "",
-          "generation_action": ""
+          "generation_action": "omit_redundant_scoped_duplicate"
         },
         {
           "rule_id": "gs_copy_rule_opt_b6p_001_includes_opt_sl9_001_opt_b6p_001_includes_opt_sl9_001",
@@ -2570,7 +2425,7 @@
           "target_active": true,
           "body_style_scope": "coupe",
           "runtime_action": "",
-          "generation_action": ""
+          "generation_action": "omit_inactive_duplicate_source"
         },
         {
           "rule_id": "gs_rule_opt_bc4_001_requires_opt_b6p_001_coupe",
@@ -2583,7 +2438,7 @@
           "target_active": true,
           "body_style_scope": "coupe",
           "runtime_action": "",
-          "generation_action": ""
+          "generation_action": "omit_inactive_duplicate_source"
         },
         {
           "rule_id": "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible",
@@ -2635,7 +2490,7 @@
           "target_active": true,
           "body_style_scope": "",
           "runtime_action": "",
-          "generation_action": ""
+          "generation_action": "omit_inactive_duplicate_source"
         },
         {
           "rule_id": "gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe",
@@ -2648,7 +2503,7 @@
           "target_active": true,
           "body_style_scope": "coupe",
           "runtime_action": "",
-          "generation_action": ""
+          "generation_action": "omit_inactive_duplicate_source"
         },
         {
           "rule_id": "gs_rule_opt_bcp_001_requires_opt_b6p_001_coupe",
@@ -2661,7 +2516,7 @@
           "target_active": true,
           "body_style_scope": "coupe",
           "runtime_action": "",
-          "generation_action": ""
+          "generation_action": "omit_inactive_duplicate_source"
         },
         {
           "rule_id": "gs_rule_opt_bcp_001_requires_opt_d3v_001_coupe",
@@ -2674,13 +2529,13 @@
           "target_active": true,
           "body_style_scope": "coupe",
           "runtime_action": "",
-          "generation_action": ""
+          "generation_action": "omit_inactive_duplicate_source"
         },
         {
           "rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible",
-          "source_id": "opt_bcp_001",
+          "source_id": "opt_bcp_002",
           "source_rpo": "BCP",
-          "source_active": false,
+          "source_active": true,
           "rule_type": "requires",
           "target_id": "opt_zz3_001",
           "target_rpo": "ZZ3",
@@ -2726,7 +2581,7 @@
           "target_active": true,
           "body_style_scope": "",
           "runtime_action": "",
-          "generation_action": ""
+          "generation_action": "omit_inactive_duplicate_source"
         },
         {
           "rule_id": "gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe",
@@ -2739,7 +2594,7 @@
           "target_active": true,
           "body_style_scope": "coupe",
           "runtime_action": "",
-          "generation_action": ""
+          "generation_action": "omit_inactive_duplicate_source"
         },
         {
           "rule_id": "gs_rule_opt_bcs_001_requires_opt_b6p_001_coupe",
@@ -2752,7 +2607,7 @@
           "target_active": true,
           "body_style_scope": "coupe",
           "runtime_action": "",
-          "generation_action": ""
+          "generation_action": "omit_inactive_duplicate_source"
         },
         {
           "rule_id": "gs_rule_opt_bcs_001_requires_opt_d3v_001_coupe",
@@ -2765,13 +2620,13 @@
           "target_active": true,
           "body_style_scope": "coupe",
           "runtime_action": "",
-          "generation_action": ""
+          "generation_action": "omit_inactive_duplicate_source"
         },
         {
           "rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible",
-          "source_id": "opt_bcs_001",
+          "source_id": "opt_bcs_002",
           "source_rpo": "BCS",
-          "source_active": false,
+          "source_active": true,
           "rule_type": "requires",
           "target_id": "opt_zz3_001",
           "target_rpo": "ZZ3",
@@ -2831,226 +2686,22 @@
           "body_style_scope": "",
           "runtime_action": "",
           "generation_action": ""
+        },
+        {
+          "rule_id": "gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible",
+          "source_id": "opt_bc4_002",
+          "source_rpo": "BC4",
+          "source_active": true,
+          "rule_type": "requires",
+          "target_id": "opt_zz3_001",
+          "target_rpo": "ZZ3",
+          "target_active": true,
+          "body_style_scope": "convertible",
+          "runtime_action": "",
+          "generation_action": ""
         }
       ],
-      "inactiveReferences": [
-        {
-          "rule_id": "gs_copy_rule_opt_bc4_001_includes_opt_d3v_001_opt_bc4_001_includes_opt_d3v_001_coupe",
-          "field": "source_id",
-          "option_id": "opt_bc4_001",
-          "rpo": "BC4",
-          "label": "BC4 NEW! Blue LS6 Engine Cover",
-          "canonical_active_option_ids": [
-            "opt_bc4_002"
-          ],
-          "same_rpo_option_ids": [
-            "opt_bc4_002",
-            "opt_bc4_001"
-          ],
-          "source_id": "opt_bc4_001",
-          "rule_type": "includes",
-          "target_id": "opt_d3v_001",
-          "body_style_scope": "coupe"
-        },
-        {
-          "rule_id": "gs_rule_opt_bc4_001_requires_opt_b6p_001_coupe",
-          "field": "source_id",
-          "option_id": "opt_bc4_001",
-          "rpo": "BC4",
-          "label": "BC4 NEW! Blue LS6 Engine Cover",
-          "canonical_active_option_ids": [
-            "opt_bc4_002"
-          ],
-          "same_rpo_option_ids": [
-            "opt_bc4_002",
-            "opt_bc4_001"
-          ],
-          "source_id": "opt_bc4_001",
-          "rule_type": "requires",
-          "target_id": "opt_b6p_001",
-          "body_style_scope": "coupe"
-        },
-        {
-          "rule_id": "gs_rule_opt_bcp_001_includes_opt_d3v_001",
-          "field": "source_id",
-          "option_id": "opt_bcp_001",
-          "rpo": "BCP",
-          "label": "BCP Edge Red LS6 Engine Cover",
-          "canonical_active_option_ids": [
-            "opt_bcp_002"
-          ],
-          "same_rpo_option_ids": [
-            "opt_bcp_002",
-            "opt_bcp_001"
-          ],
-          "source_id": "opt_bcp_001",
-          "rule_type": "includes",
-          "target_id": "opt_d3v_001",
-          "body_style_scope": ""
-        },
-        {
-          "rule_id": "gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe",
-          "field": "source_id",
-          "option_id": "opt_bcp_001",
-          "rpo": "BCP",
-          "label": "BCP Edge Red LS6 Engine Cover",
-          "canonical_active_option_ids": [
-            "opt_bcp_002"
-          ],
-          "same_rpo_option_ids": [
-            "opt_bcp_002",
-            "opt_bcp_001"
-          ],
-          "source_id": "opt_bcp_001",
-          "rule_type": "includes",
-          "target_id": "opt_d3v_001",
-          "body_style_scope": "coupe"
-        },
-        {
-          "rule_id": "gs_rule_opt_bcp_001_requires_opt_b6p_001_coupe",
-          "field": "source_id",
-          "option_id": "opt_bcp_001",
-          "rpo": "BCP",
-          "label": "BCP Edge Red LS6 Engine Cover",
-          "canonical_active_option_ids": [
-            "opt_bcp_002"
-          ],
-          "same_rpo_option_ids": [
-            "opt_bcp_002",
-            "opt_bcp_001"
-          ],
-          "source_id": "opt_bcp_001",
-          "rule_type": "requires",
-          "target_id": "opt_b6p_001",
-          "body_style_scope": "coupe"
-        },
-        {
-          "rule_id": "gs_rule_opt_bcp_001_requires_opt_d3v_001_coupe",
-          "field": "source_id",
-          "option_id": "opt_bcp_001",
-          "rpo": "BCP",
-          "label": "BCP Edge Red LS6 Engine Cover",
-          "canonical_active_option_ids": [
-            "opt_bcp_002"
-          ],
-          "same_rpo_option_ids": [
-            "opt_bcp_002",
-            "opt_bcp_001"
-          ],
-          "source_id": "opt_bcp_001",
-          "rule_type": "requires",
-          "target_id": "opt_d3v_001",
-          "body_style_scope": "coupe"
-        },
-        {
-          "rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible",
-          "field": "source_id",
-          "option_id": "opt_bcp_001",
-          "rpo": "BCP",
-          "label": "BCP Edge Red LS6 Engine Cover",
-          "canonical_active_option_ids": [
-            "opt_bcp_002"
-          ],
-          "same_rpo_option_ids": [
-            "opt_bcp_002",
-            "opt_bcp_001"
-          ],
-          "source_id": "opt_bcp_001",
-          "rule_type": "requires",
-          "target_id": "opt_zz3_001",
-          "body_style_scope": "convertible"
-        },
-        {
-          "rule_id": "gs_rule_opt_bcs_001_includes_opt_d3v_001",
-          "field": "source_id",
-          "option_id": "opt_bcs_001",
-          "rpo": "BCS",
-          "label": "BCS Sterling Silver LS6 Engine Cover",
-          "canonical_active_option_ids": [
-            "opt_bcs_002"
-          ],
-          "same_rpo_option_ids": [
-            "opt_bcs_002",
-            "opt_bcs_001"
-          ],
-          "source_id": "opt_bcs_001",
-          "rule_type": "includes",
-          "target_id": "opt_d3v_001",
-          "body_style_scope": ""
-        },
-        {
-          "rule_id": "gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe",
-          "field": "source_id",
-          "option_id": "opt_bcs_001",
-          "rpo": "BCS",
-          "label": "BCS Sterling Silver LS6 Engine Cover",
-          "canonical_active_option_ids": [
-            "opt_bcs_002"
-          ],
-          "same_rpo_option_ids": [
-            "opt_bcs_002",
-            "opt_bcs_001"
-          ],
-          "source_id": "opt_bcs_001",
-          "rule_type": "includes",
-          "target_id": "opt_d3v_001",
-          "body_style_scope": "coupe"
-        },
-        {
-          "rule_id": "gs_rule_opt_bcs_001_requires_opt_b6p_001_coupe",
-          "field": "source_id",
-          "option_id": "opt_bcs_001",
-          "rpo": "BCS",
-          "label": "BCS Sterling Silver LS6 Engine Cover",
-          "canonical_active_option_ids": [
-            "opt_bcs_002"
-          ],
-          "same_rpo_option_ids": [
-            "opt_bcs_002",
-            "opt_bcs_001"
-          ],
-          "source_id": "opt_bcs_001",
-          "rule_type": "requires",
-          "target_id": "opt_b6p_001",
-          "body_style_scope": "coupe"
-        },
-        {
-          "rule_id": "gs_rule_opt_bcs_001_requires_opt_d3v_001_coupe",
-          "field": "source_id",
-          "option_id": "opt_bcs_001",
-          "rpo": "BCS",
-          "label": "BCS Sterling Silver LS6 Engine Cover",
-          "canonical_active_option_ids": [
-            "opt_bcs_002"
-          ],
-          "same_rpo_option_ids": [
-            "opt_bcs_002",
-            "opt_bcs_001"
-          ],
-          "source_id": "opt_bcs_001",
-          "rule_type": "requires",
-          "target_id": "opt_d3v_001",
-          "body_style_scope": "coupe"
-        },
-        {
-          "rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible",
-          "field": "source_id",
-          "option_id": "opt_bcs_001",
-          "rpo": "BCS",
-          "label": "BCS Sterling Silver LS6 Engine Cover",
-          "canonical_active_option_ids": [
-            "opt_bcs_002"
-          ],
-          "same_rpo_option_ids": [
-            "opt_bcs_002",
-            "opt_bcs_001"
-          ],
-          "source_id": "opt_bcs_001",
-          "rule_type": "requires",
-          "target_id": "opt_zz3_001",
-          "body_style_scope": "convertible"
-        }
-      ]
+      "inactiveReferences": []
     }
   }
 }

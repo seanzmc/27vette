@@ -124,7 +124,7 @@ init();
 const expectedGrandSportExclusiveGroups = [
   {
     groupId: "gs_excl_ls6_engine_covers",
-    optionIds: ["opt_bc7_001", "opt_bc4_001", "opt_bc4_002", "opt_bcp_001", "opt_bcp_002", "opt_bcs_001", "opt_bcs_002"],
+    optionIds: ["opt_bc7_001", "opt_bc4_002", "opt_bcp_002", "opt_bcs_002"],
   },
   {
     groupId: "gs_excl_center_caps",
@@ -149,6 +149,10 @@ const expectedGrandSportExclusiveGroups = [
   {
     groupId: "gs_excl_z52_packages",
     optionIds: ["opt_feb_001", "opt_fey_001"],
+  },
+  {
+    groupId: "gs_excl_exterior_accents",
+    optionIds: ["opt_efr_001", "opt_edu_001"],
   },
 ];
 

@@ -34,7 +34,6 @@ RULE_HOT_SPOT_PATTERNS = {
     "except": re.compile(r"\bexcept\b", re.IGNORECASE),
 }
 SPECIAL_REVIEW_RPOS = {"EL9", "Z25", "FEY", "Z15"}
-GRAND_SPORT_ONLY_INTERIOR_IDS = {"3LT_AE4_EL9", "3LT_AH2_EL9"}
 INTERIOR_COMPONENT_LABELS = {
     "36S": "Yellow Stitching",
     "37S": "Blue Stitching",
@@ -358,6 +357,14 @@ def build_grand_sport_interiors(config: ModelConfig) -> list[dict[str, Any]]:
     wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
     lt_interiors_raw = rows_from_sheet(wb, "lt_interiors")
     price_ref_rows = rows_from_sheet(wb, "PriceRef")
+    rule_rows = rows_from_sheet(wb, config.rule_mapping_sheet)
+    z25_interior_ids = {
+        row.get("source_id", "")
+        for row in rule_rows
+        if row.get("rule_type", "").lower() == "includes"
+        and row.get("target_id", "") == "opt_z25_001"
+        and not row.get("generation_action", "").startswith("omit")
+    }
     interior_price_ref = price_ref_prices(price_ref_rows)
     interior_component_price_ref = price_ref_component_prices(price_ref_rows)
     reference_by_id, reference_rows = read_interior_reference(config)
@@ -379,7 +386,7 @@ def build_grand_sport_interiors(config: ModelConfig) -> list[dict[str, Any]]:
             "source_sheet": "lt_interiors",
             "active_for_stingray": False,
             "active_for_grand_sport": True,
-            "requires_z25": "True" if interior_id in GRAND_SPORT_ONLY_INTERIOR_IDS else "False",
+            "requires_z25": "True" if interior_id in z25_interior_ids else "False",
             "trim_level": trim.replace("_R6X", ""),
             "requires_r6x": "True" if "_R6X" in trim or interior_id.endswith("_R6X") else "False",
             "seat_code": clean(row.get("Seat", "")),
@@ -680,7 +687,7 @@ def build_draft_rules(
         target_id = rule.get("target_id", "")
         if not rule_type or source_id not in valid_ids or target_id not in valid_ids:
             continue
-        if rule.get("generation_action", "") == "omit_grouped_requirement":
+        if rule.get("generation_action", "").startswith("omit"):
             continue
         if rule_type == "requires" and (source_id, target_id) in grouped_requires:
             continue
@@ -1464,6 +1471,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
                     "selection_mode": section.get("selection_mode", ""),
                     "selection_mode_label": section.get("selection_mode_label", ""),
                     "base_price": option["base_price"],
+                    "display_behavior": option.get("display_behavior", ""),
                     "display_order": order_by_option[option_id],
                     "source_detail_raw": option["source_detail_raw"],
                     "source_option_name": option["source_option_name"],

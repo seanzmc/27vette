@@ -147,7 +147,7 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
   assert.equal(normalizedBool(optionByRpo.get("D30").selectable), "false");
   assert.equal(optionByRpo.get("D30").display_behavior, "display_only");
   assert.equal(normalizedBool(optionByRpo.get("Z15").selectable), "false");
-  assert.equal(optionByRpo.get("Z15").display_behavior, "display_only");
+  assert.equal(optionByRpo.get("Z15").display_behavior, "auto_only");
   assert.equal(optionByRpo.get("R6X").display_behavior, "display_only");
   for (const rpo of ["R6P", "R9V", "R9W", "R9Y", "U2K"]) {
     assert.equal(normalizedBool(optionByRpo.get(rpo).active), "false", `${rpo} should be inactive in workbook source`);
@@ -210,6 +210,9 @@ test("Grand Sport rule audit highlights risky duplicate RPO and special package 
   assert.match(markdown, /## Unresolved RPO Mentions/);
   assert.match(markdown, /## Review Hot Spots/);
   assert.match(markdown, /## Duplicate Semantic Rule Keys/);
+  assert.match(markdown, /## Exact Duplicate Rule Rows/);
+  assert.match(markdown, /## Overlapping Scoped Rule Rows/);
+  assert.match(markdown, /## Redundant Scoped Rule Rows/);
   assert.match(markdown, /## Missing Option References/);
   assert.match(markdown, /## Inactive Option References/);
   assert.match(markdown, /## Engine Cover Rule Focus/);
@@ -229,9 +232,10 @@ test("Grand Sport rule audit flags inactive workbook rule references without mut
     focused.inactiveOptionReferences.length > 0,
     "inactive source/target references should be visible for workbook cleanup"
   );
-  assert.ok(
-    focused.engineCoverRules.inactiveReferences.length > 0,
-    "inactive engine-cover references should be visible for workbook cleanup"
+  assert.equal(
+    focused.engineCoverRules.inactiveReferences.length,
+    0,
+    "Pass 2 should remove inactive engine-cover references from runtime-authored rules"
   );
 
   for (const [inactiveId, activeId] of [
@@ -239,13 +243,14 @@ test("Grand Sport rule audit flags inactive workbook rule references without mut
     ["opt_bcp_001", "opt_bcp_002"],
     ["opt_bcs_001", "opt_bcs_002"],
   ]) {
-    assert.ok(
+    assert.equal(
       focused.engineCoverRules.inactiveReferences.some(
         (row) =>
           row.option_id === inactiveId &&
           row.canonical_active_option_ids.includes(activeId)
       ),
-      `${inactiveId} should be reported with ${activeId} as the canonical active same-RPO row`
+      false,
+      `${inactiveId} should no longer be reported after canonical engine-cover cleanup`
     );
   }
 
@@ -259,6 +264,29 @@ test("Grand Sport rule audit flags inactive workbook rule references without mut
     ),
     "engine-cover focused rule rows should include the LS6 cover surface"
   );
+});
+
+test("Grand Sport rule audit classifies scoped duplicate cleanup separately", () => {
+  const focused = audit.focusedReview;
+  const workbookRules = workbookRows("grandSport_rule_mapping");
+  const copiedB6pRuleId = "gs_copy_rule_opt_b6p_001_includes_opt_d3v_001_opt_b6p_001_includes_opt_d3v_001_coupe";
+  const canonicalB6pRuleId = "gs_rule_opt_b6p_001_includes_opt_d3v_001";
+  const copiedB6pRow = workbookRules.find((row) => row.rule_id === copiedB6pRuleId);
+  const draftRuleIds = new Set(draft.rules.map((rule) => rule.rule_id));
+
+  assert.equal(audit.summary.exactDuplicateRuleRows, focused.exactDuplicateRuleRows.length);
+  assert.equal(audit.summary.overlappingScopedRuleRows, focused.overlappingScopedRuleRows.length);
+  assert.equal(audit.summary.redundantScopedRuleRows, focused.redundantScopedRuleRows.length);
+  assert.equal(audit.summary.duplicateSemanticRuleKeys, audit.summary.exactDuplicateRuleRows);
+  assert.ok(copiedB6pRow, "copied B6P/D3V scoped row should remain in the workbook for traceability");
+  assert.equal(copiedB6pRow.generation_action, "omit_redundant_scoped_duplicate");
+  assert.equal(
+    focused.redundantScopedRuleRows.some((row) => row.redundant_rule_id === copiedB6pRuleId),
+    false,
+    "omitted redundant scoped rows should not remain runtime-authored audit findings"
+  );
+  assert.ok(draftRuleIds.has(canonicalB6pRuleId), "canonical global B6P/D3V rule should remain in draft output");
+  assert.equal(draftRuleIds.has(copiedB6pRuleId), false, "redundant scoped copied B6P/D3V rule should be omitted from draft output");
 });
 
 test("Grand Sport rule audit script does not own workbook business decisions", () => {

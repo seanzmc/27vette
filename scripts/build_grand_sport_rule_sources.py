@@ -93,9 +93,15 @@ def runtime_available_option_ids(options: list[dict[str, str]], status_rows: lis
 def runtime_rule_rows(workbook_rules: list[dict[str, str]], runtime_option_ids: set[str], grouped_excludes: set[tuple[str, str]]) -> list[dict[str, str]]:
     rows: list[dict[str, str]] = []
     for row in workbook_rules:
+        if not runtime_authored_rule(row):
+            continue
         source_id = row.get("source_id", "")
         target_id = row.get("target_id", "")
-        if source_id not in runtime_option_ids or target_id not in runtime_option_ids:
+        source_type = row.get("source_type", "option") or "option"
+        target_type = row.get("target_type", "option") or "option"
+        if source_type == "option" and source_id not in runtime_option_ids:
+            continue
+        if target_type == "option" and target_id not in runtime_option_ids:
             continue
         if row.get("rule_type", "").lower() == "excludes" and (source_id, target_id) in grouped_excludes:
             continue
@@ -247,27 +253,59 @@ def full_rule_key(row: dict[str, Any]) -> tuple[str, str, str, str, str]:
     )
 
 
+def grand_sport_rule_dedupe_key(row: dict[str, Any]) -> tuple[str, str, str]:
+    return (
+        row.get("source_id", ""),
+        row.get("rule_type", "").lower(),
+        row.get("target_id", ""),
+    )
+
+
+def grand_sport_rule_exact_key(row: dict[str, Any]) -> tuple[str, str, str, str]:
+    return (
+        row.get("source_id", ""),
+        row.get("rule_type", "").lower(),
+        row.get("target_id", ""),
+        clean(row.get("body_style_scope", "")),
+    )
+
+
 def runtime_authored_rule(row: dict[str, Any]) -> bool:
     return not clean(row.get("generation_action", "")).lower().startswith("omit")
 
 
+def canonical_rule_row(rows: list[dict[str, str]]) -> dict[str, str]:
+    return sorted(
+        rows,
+        key=lambda row: (
+            row.get("rule_id", "").startswith("gs_copy_"),
+            len(row.get("rule_id", "")),
+            bool(clean(row.get("body_style_scope", ""))),
+            row.get("rule_id", ""),
+        ),
+    )[0]
+
+
 def focused_duplicate_rule_rows(workbook_rules: list[dict[str, str]]) -> list[dict[str, Any]]:
-    rows_by_key: dict[tuple[str, str, str, str, str], list[dict[str, str]]] = defaultdict(list)
+    rows_by_key: dict[tuple[str, str, str, str], list[dict[str, str]]] = defaultdict(list)
     for row in workbook_rules:
         if runtime_authored_rule(row):
-            rows_by_key[full_rule_key(row)].append(row)
+            rows_by_key[grand_sport_rule_exact_key(row)].append(row)
     duplicates = []
     for key, rows in sorted(rows_by_key.items()):
         if len(rows) <= 1:
             continue
+        canonical = canonical_rule_row(rows)
         duplicates.append(
             {
                 "source_id": key[0],
                 "rule_type": key[1],
                 "target_id": key[2],
                 "body_style_scope": key[3],
-                "runtime_action": key[4],
                 "rule_ids": [row.get("rule_id", "") for row in rows],
+                "copied_rule_ids": [row.get("rule_id", "") for row in rows if row.get("rule_id", "").startswith("gs_copy_")],
+                "canonical_rule_id": canonical.get("rule_id", ""),
+                "recommended_action": "omit copied duplicate rows and keep canonical rule row",
                 "count": len(rows),
             }
         )
@@ -277,6 +315,91 @@ def focused_duplicate_rule_rows(workbook_rules: list[dict[str, str]]) -> list[di
 def option_label(option_id: str, options_by_id: dict[str, dict[str, str]]) -> str:
     option = options_by_id.get(option_id, {})
     return " ".join(part for part in (option.get("rpo", ""), option.get("option_name", "")) if part).strip()
+
+
+def option_body_style_coverage(
+    status_rows: list[dict[str, str]],
+    variant_rows: list[dict[str, str]],
+    variant_ids: tuple[str, ...],
+) -> dict[str, list[str]]:
+    body_style_by_variant = {
+        row.get("variant_id", ""): row.get("body_style", "")
+        for row in variant_rows
+        if row.get("variant_id", "") in variant_ids
+    }
+    body_styles_by_option: dict[str, set[str]] = defaultdict(set)
+    for row in status_rows:
+        if row.get("status", "").lower() not in {"available", "standard"}:
+            continue
+        body_style = body_style_by_variant.get(row.get("variant_id", ""))
+        option_id = row.get("option_id", "")
+        if option_id and body_style:
+            body_styles_by_option[option_id].add(body_style)
+    return {option_id: sorted(body_styles) for option_id, body_styles in body_styles_by_option.items()}
+
+
+def scoped_rule_dedupe_audit(
+    workbook_rules: list[dict[str, str]],
+    options_by_id: dict[str, dict[str, str]],
+    body_styles_by_option: dict[str, list[str]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    rows_by_key: dict[tuple[str, str, str], list[dict[str, str]]] = defaultdict(list)
+    for row in workbook_rules:
+        if runtime_authored_rule(row):
+            rows_by_key[grand_sport_rule_dedupe_key(row)].append(row)
+
+    overlapping_rows: list[dict[str, Any]] = []
+    redundant_rows: list[dict[str, Any]] = []
+    for key, rows in sorted(rows_by_key.items()):
+        global_rows = [row for row in rows if not clean(row.get("body_style_scope", ""))]
+        scoped_rows = [row for row in rows if clean(row.get("body_style_scope", ""))]
+        if not global_rows or not scoped_rows:
+            continue
+        canonical = canonical_rule_row(global_rows)
+        source_id, rule_type, target_id = key
+        source_option = options_by_id.get(source_id, {})
+        target_option = options_by_id.get(target_id, {})
+        source_body_styles = body_styles_by_option.get(source_id, [])
+        redundant_for_key: list[dict[str, Any]] = []
+        for scoped_row in scoped_rows:
+            scope = clean(scoped_row.get("body_style_scope", ""))
+            rule_id = scoped_row.get("rule_id", "")
+            if (
+                rule_id.startswith("gs_copy_")
+                and len(source_body_styles) == 1
+                and source_body_styles[0] == scope
+            ):
+                redundant = {
+                    "redundant_rule_id": rule_id,
+                    "canonical_rule_id": canonical.get("rule_id", ""),
+                    "source_id": source_id,
+                    "source_rpo": source_option.get("rpo", ""),
+                    "rule_type": rule_type,
+                    "target_id": target_id,
+                    "target_rpo": target_option.get("rpo", ""),
+                    "body_style_scope": scope,
+                    "source_option_body_styles": source_body_styles,
+                    "reason": "A global canonical row already covers this relationship, and the source option is only available for the scoped body style.",
+                    "recommended_generation_action": "omit_redundant_scoped_duplicate",
+                }
+                redundant_rows.append(redundant)
+                redundant_for_key.append(redundant)
+        overlapping_rows.append(
+            {
+                "source_id": source_id,
+                "source_rpo": source_option.get("rpo", ""),
+                "rule_type": rule_type,
+                "target_id": target_id,
+                "target_rpo": target_option.get("rpo", ""),
+                "global_rule_ids": [row.get("rule_id", "") for row in global_rows],
+                "scoped_rule_ids": [row.get("rule_id", "") for row in scoped_rows],
+                "scopes": sorted({clean(row.get("body_style_scope", "")) for row in scoped_rows if clean(row.get("body_style_scope", ""))}),
+                "source_option_body_styles": source_body_styles,
+                "classification": "has_redundant_scoped_rows" if redundant_for_key else "scope_overlap_requires_review",
+                "recommended_action": "omit redundant scoped copied rows only" if redundant_for_key else "review before changing workbook rows",
+            }
+        )
+    return overlapping_rows, redundant_rows
 
 
 def rule_reference_issues(
@@ -296,6 +419,9 @@ def rule_reference_issues(
         if not runtime_authored_rule(row):
             continue
         for field in ("source_id", "target_id"):
+            type_field = "source_type" if field == "source_id" else "target_type"
+            if (row.get(type_field, "option") or "option") != "option":
+                continue
             option_id = row.get(field, "")
             if not option_id:
                 missing_references.append(
@@ -499,6 +625,9 @@ def render_audit_markdown(audit: dict[str, Any]) -> str:
         f"- Skipped/review rows: {summary['skippedRequiresReview']}",
         f"- Unresolved non-interior RPO mentions: {summary['unresolvedRpoMentions']}",
         f"- Duplicate semantic rule keys: {summary['duplicateSemanticRuleKeys']}",
+        f"- Exact duplicate rule rows: {summary['exactDuplicateRuleRows']}",
+        f"- Overlapping scoped rule rows: {summary['overlappingScopedRuleRows']}",
+        f"- Redundant scoped rule rows: {summary['redundantScopedRuleRows']}",
         f"- Missing option references: {summary['missingOptionReferences']}",
         f"- Inactive option references: {summary['inactiveOptionReferences']}",
         f"- Engine-cover inactive references: {summary['engineCoverInactiveReferences']}",
@@ -544,8 +673,36 @@ def render_audit_markdown(audit: dict[str, Any]) -> str:
     if audit["focusedReview"]["duplicateSemanticRuleKeys"]:
         for row in audit["focusedReview"]["duplicateSemanticRuleKeys"][:50]:
             scope = f" [{row['body_style_scope']}]" if row.get("body_style_scope") else ""
-            action = f" ({row['runtime_action']})" if row.get("runtime_action") else ""
-            lines.append(f"- {row['source_id']} {row['rule_type']} {row['target_id']}{scope}{action}: {', '.join(row['rule_ids'])}")
+            lines.append(f"- {row['source_id']} {row['rule_type']} {row['target_id']}{scope}: {', '.join(row['rule_ids'])}")
+    else:
+        lines.append("- none")
+
+    lines.extend(["", "## Exact Duplicate Rule Rows", ""])
+    if audit["focusedReview"]["exactDuplicateRuleRows"]:
+        for row in audit["focusedReview"]["exactDuplicateRuleRows"][:50]:
+            scope = f" [{row['body_style_scope']}]" if row.get("body_style_scope") else ""
+            lines.append(f"- {row['source_id']} {row['rule_type']} {row['target_id']}{scope}: keep `{row['canonical_rule_id']}`; rows: {', '.join(row['rule_ids'])}")
+    else:
+        lines.append("- none")
+
+    lines.extend(["", "## Overlapping Scoped Rule Rows", ""])
+    if audit["focusedReview"]["overlappingScopedRuleRows"]:
+        for row in audit["focusedReview"]["overlappingScopedRuleRows"][:75]:
+            scopes = ", ".join(row.get("scopes", [])) or "none"
+            body_styles = ", ".join(row.get("source_option_body_styles", [])) or "none"
+            lines.append(
+                f"- {row['source_id']} {row['rule_type']} {row['target_id']}: scopes {scopes}; source body styles {body_styles}; {row['classification']}"
+            )
+    else:
+        lines.append("- none")
+
+    lines.extend(["", "## Redundant Scoped Rule Rows", ""])
+    if audit["focusedReview"]["redundantScopedRuleRows"]:
+        for row in audit["focusedReview"]["redundantScopedRuleRows"][:75]:
+            body_styles = ", ".join(row.get("source_option_body_styles", [])) or "none"
+            lines.append(
+                f"- omit `{row['redundant_rule_id']}`; keep `{row['canonical_rule_id']}`; scope `{row['body_style_scope']}`; source body styles {body_styles}"
+            )
     else:
         lines.append("- none")
 
@@ -581,6 +738,7 @@ def write_rule_audit(
     options: list[dict[str, str]],
     all_options: list[dict[str, str]],
     status_rows: list[dict[str, str]],
+    variant_rows: list[dict[str, str]],
     option_ids_by_rpo: dict[str, list[str]],
     candidate_keys: set[tuple[str, str, str]],
     review_rows: list[dict[str, Any]],
@@ -599,6 +757,12 @@ def write_rule_audit(
     duplicate_semantic_rule_keys = focused_duplicate_rule_rows(workbook_rules)
     missing_references, inactive_references = rule_reference_issues(workbook_rules, options_by_id, all_option_ids_by_rpo)
     engine_cover_rules = engine_cover_rule_audit(workbook_rules, options_by_id, inactive_references)
+    body_styles_by_option = option_body_style_coverage(status_rows, variant_rows, tuple(config.variant_ids))
+    overlapping_scoped_rule_rows, redundant_scoped_rule_rows = scoped_rule_dedupe_audit(
+        workbook_rules,
+        options_by_id,
+        body_styles_by_option,
+    )
     annotated_rules = [
         {**row, "_audit_origin": workbook_rule_origin(row, candidate_keys)}
         for row in workbook_rules
@@ -613,7 +777,9 @@ def write_rule_audit(
     omitted_inactive_or_unemitted = [
         row
         for row in annotated_rules
-        if row.get("source_id", "") not in runtime_ids or row.get("target_id", "") not in runtime_ids
+        if not runtime_authored_rule(row)
+        or ((row.get("source_type", "option") or "option") == "option" and row.get("source_id", "") not in runtime_ids)
+        or ((row.get("target_type", "option") or "option") == "option" and row.get("target_id", "") not in runtime_ids)
     ]
     origin_counts = Counter(row["_audit_origin"] for row in annotated_rules)
     audit = {
@@ -641,6 +807,9 @@ def write_rule_audit(
             "exclusiveGroups": len(exclusive_groups),
             "exclusiveGroupMembers": len(exclusive_group_members),
             "duplicateSemanticRuleKeys": len(duplicate_semantic_rule_keys),
+            "exactDuplicateRuleRows": len(duplicate_semantic_rule_keys),
+            "overlappingScopedRuleRows": len(overlapping_scoped_rule_rows),
+            "redundantScopedRuleRows": len(redundant_scoped_rule_rows),
             "missingOptionReferences": len(missing_references),
             "inactiveOptionReferences": len(inactive_references),
             "engineCoverRuleRows": len(engine_cover_rules["rules"]),
@@ -670,6 +839,9 @@ def write_rule_audit(
         "reviewHotSpots": review_hot_spots(options, option_ids_by_rpo, tuple(config.special_rule_review_rpos)),
         "focusedReview": {
             "duplicateSemanticRuleKeys": duplicate_semantic_rule_keys,
+            "exactDuplicateRuleRows": duplicate_semantic_rule_keys,
+            "overlappingScopedRuleRows": overlapping_scoped_rule_rows,
+            "redundantScopedRuleRows": redundant_scoped_rule_rows,
             "missingOptionReferences": missing_references,
             "inactiveOptionReferences": inactive_references,
             "engineCoverRules": engine_cover_rules,
@@ -689,6 +861,7 @@ def main() -> None:
     wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
     all_grand_sport_options = rows_from_sheet(wb, config.source_option_sheet)
     status_rows = rows_from_sheet(wb, config.status_sheet)
+    variant_rows = rows_from_sheet(wb, "variant_master")
     grand_sport_options = [row for row in all_grand_sport_options if active_source_row(row)]
     _, active_option_ids_by_rpo = option_indexes(grand_sport_options)
     _, all_option_ids_by_rpo = option_indexes(all_grand_sport_options)
@@ -704,6 +877,7 @@ def main() -> None:
         grand_sport_options,
         all_grand_sport_options,
         status_rows,
+        variant_rows,
         active_option_ids_by_rpo,
         candidate_keys,
         review_rows,
