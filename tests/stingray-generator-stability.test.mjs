@@ -93,6 +93,16 @@ const priceRuleHeaders = [
   "review_flag",
   "notes",
 ];
+const requiredGrandSportPriceRuleIds = [
+  "gs_pr_fey_j57_001",
+  "gs_pr_fey_t0f_001",
+  "gs_pr_fey_wub_001",
+  "gs_pr_fey_cfz_001",
+  "gs_pr_pcq_vwe_001",
+  "gs_pr_pcq_vwt_001",
+  "gs_pr_pef_ria_001",
+  "gs_pr_pef_cav_001",
+];
 
 function workbookHeaders(sheetName) {
   const output = execFileSync(
@@ -123,9 +133,13 @@ function workbookRows(sheetName) {
         "wb = load_workbook('stingray_master.xlsx', read_only=True, data_only=True)",
         `ws = wb['${sheetName}']`,
         "headers = [ws.cell(1, col).value for col in range(1, ws.max_column + 1)]",
-        "rows = [{header: value for header, value in zip(headers, raw) if header and value is not None} for raw in ws.iter_rows(min_row=2, values_only=True)]",
+        "rows = []",
+        "for raw in ws.iter_rows(min_row=2, values_only=True):",
+        "    record = {header: value for header, value in zip(headers, raw) if header and value is not None}",
+        "    if record:",
+        "        rows.append(record)",
         "print(json.dumps(rows))",
-      ].join("; "),
+      ].join("\n"),
     ],
     { encoding: "utf8" }
   );
@@ -268,7 +282,11 @@ test("Grand Sport draft rule source sheets use workbook-backed contracts", () =>
   assert.deepEqual(workbookHeaders("grandSport_exclusive_groups"), ["group_id", "selection_mode", "active", "notes"]);
   assert.deepEqual(workbookHeaders("grandSport_exclusive_members"), ["group_id", "option_id", "display_order", "active"]);
   assert.ok(workbookRows("grandSport_rule_mapping").length > 0);
-  assert.equal(workbookRows("grandSport_price_rules").length, 8);
+  const grandSportPriceRuleIds = new Set(workbookRows("grandSport_price_rules").map((row) => row.price_rule_id));
+  assert.equal(grandSportPriceRuleIds.size >= requiredGrandSportPriceRuleIds.length, true);
+  for (const priceRuleId of requiredGrandSportPriceRuleIds) {
+    assert.ok(grandSportPriceRuleIds.has(priceRuleId), `${priceRuleId} should remain authored in grandSport_price_rules`);
+  }
   assert.ok(workbookRows("grandSport_exclusive_groups").length > 0);
 });
 

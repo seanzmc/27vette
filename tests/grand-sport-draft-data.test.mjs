@@ -28,6 +28,16 @@ const nonCenterStripeOptionIds = [
   "opt_dth_001", "opt_dub_001", "opt_due_001", "opt_duk_001", "opt_duw_001", "opt_dzu_001", "opt_dzv_001", "opt_dzx_001",
   "opt_sht_001", "opt_vpo_001",
 ];
+const requiredPackagePriceRules = [
+  ["gs_pr_fey_j57_001", "opt_fey_001", "opt_j57_001", "override", 0],
+  ["gs_pr_fey_t0f_001", "opt_fey_001", "opt_t0f_001", "override", 0],
+  ["gs_pr_fey_wub_001", "opt_fey_001", "opt_wub_001", "override", 0],
+  ["gs_pr_fey_cfz_001", "opt_fey_001", "opt_cfz_001", "override", 0],
+  ["gs_pr_pcq_vwe_001", "opt_pcq_001", "opt_vwe_001", "override", 0],
+  ["gs_pr_pcq_vwt_001", "opt_pcq_001", "opt_vwt_001", "override", 0],
+  ["gs_pr_pef_ria_001", "opt_pef_001", "opt_ria_001", "override", 0],
+  ["gs_pr_pef_cav_001", "opt_pef_001", "opt_cav_001", "override", 0],
+];
 
 const expectedGrandSportExclusiveGroups = [
   {
@@ -154,20 +164,20 @@ test("Grand Sport trim-scoped overrides collapse AQ9 and UQT duplicate rows", ()
 
 test("Grand Sport draft emits color overrides and workbook-backed package price rules", () => {
   assert.equal(draft.rules.length > 0, true, "Grand Sport draft should include normalized compatibility rules");
-  assert.equal(draft.priceRules.length, 8);
-  assert.deepEqual(
-    draft.priceRules.map((rule) => [rule.price_rule_id, rule.condition_option_id, rule.target_option_id, rule.price_rule_type, rule.price_value]),
-    [
-      ["gs_pr_fey_j57_001", "opt_fey_001", "opt_j57_001", "override", 0],
-      ["gs_pr_fey_t0f_001", "opt_fey_001", "opt_t0f_001", "override", 0],
-      ["gs_pr_fey_wub_001", "opt_fey_001", "opt_wub_001", "override", 0],
-      ["gs_pr_fey_cfz_001", "opt_fey_001", "opt_cfz_001", "override", 0],
-      ["gs_pr_pcq_vwe_001", "opt_pcq_001", "opt_vwe_001", "override", 0],
-      ["gs_pr_pcq_vwt_001", "opt_pcq_001", "opt_vwt_001", "override", 0],
-      ["gs_pr_pef_ria_001", "opt_pef_001", "opt_ria_001", "override", 0],
-      ["gs_pr_pef_cav_001", "opt_pef_001", "opt_cav_001", "override", 0],
-    ]
+  assert.equal(draft.priceRules.length >= requiredPackagePriceRules.length, true);
+  const priceRuleKeys = new Set(
+    draft.priceRules.map((rule) => [rule.price_rule_id, rule.condition_option_id, rule.target_option_id, rule.price_rule_type, rule.price_value].join("::"))
   );
+  for (const expectedRule of requiredPackagePriceRules) {
+    assert.ok(priceRuleKeys.has(expectedRule.join("::")), `${expectedRule[0]} should be emitted from grandSport_price_rules`);
+  }
+  for (const rule of draft.priceRules) {
+    assert.ok(rule.price_rule_id, "price rule should have price_rule_id");
+    assert.ok(rule.condition_option_id, `${rule.price_rule_id} should have condition_option_id`);
+    assert.ok(rule.target_option_id, `${rule.price_rule_id} should have target_option_id`);
+    assert.equal(rule.price_rule_type, "override", `${rule.price_rule_id} should use supported override type`);
+    assert.equal(typeof rule.price_value, "number", `${rule.price_rule_id} should emit numeric price_value`);
+  }
   assert.equal(draft.colorOverrides.length, 245);
   assert.ok(
     draft.colorOverrides.some(
@@ -328,6 +338,6 @@ test("Grand Sport draft preserves rule hot spots and normalization metadata for 
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 129);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 26);
   assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);
-  assert.equal(draft.draftMetadata.priceRuleSourceRows, 8);
+  assert.equal(draft.draftMetadata.priceRuleSourceRows, draft.priceRules.length);
   assert.deepEqual(draft.draftMetadata.deferredSurfaces, []);
 });
