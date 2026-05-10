@@ -209,6 +209,56 @@ test("Grand Sport rule audit highlights risky duplicate RPO and special package 
   assert.match(markdown, /## Skipped Requires Review/);
   assert.match(markdown, /## Unresolved RPO Mentions/);
   assert.match(markdown, /## Review Hot Spots/);
+  assert.match(markdown, /## Duplicate Semantic Rule Keys/);
+  assert.match(markdown, /## Missing Option References/);
+  assert.match(markdown, /## Inactive Option References/);
+  assert.match(markdown, /## Engine Cover Rule Focus/);
+});
+
+test("Grand Sport rule audit flags inactive workbook rule references without mutating source rows", () => {
+  const focused = audit.focusedReview;
+
+  assert.equal(audit.summary.duplicateSemanticRuleKeys, focused.duplicateSemanticRuleKeys.length);
+  assert.equal(audit.summary.missingOptionReferences, focused.missingOptionReferences.length);
+  assert.equal(audit.summary.inactiveOptionReferences, focused.inactiveOptionReferences.length);
+  assert.equal(audit.summary.engineCoverRuleRows, focused.engineCoverRules.rules.length);
+  assert.equal(audit.summary.engineCoverInactiveReferences, focused.engineCoverRules.inactiveReferences.length);
+
+  assert.equal(focused.missingOptionReferences.length, 0);
+  assert.ok(
+    focused.inactiveOptionReferences.length > 0,
+    "inactive source/target references should be visible for workbook cleanup"
+  );
+  assert.ok(
+    focused.engineCoverRules.inactiveReferences.length > 0,
+    "inactive engine-cover references should be visible for workbook cleanup"
+  );
+
+  for (const [inactiveId, activeId] of [
+    ["opt_bc4_001", "opt_bc4_002"],
+    ["opt_bcp_001", "opt_bcp_002"],
+    ["opt_bcs_001", "opt_bcs_002"],
+  ]) {
+    assert.ok(
+      focused.engineCoverRules.inactiveReferences.some(
+        (row) =>
+          row.option_id === inactiveId &&
+          row.canonical_active_option_ids.includes(activeId)
+      ),
+      `${inactiveId} should be reported with ${activeId} as the canonical active same-RPO row`
+    );
+  }
+
+  assert.ok(
+    focused.engineCoverRules.rules.some(
+      (row) =>
+        row.source_rpo === "BC7" ||
+        row.source_rpo === "BCP" ||
+        row.source_rpo === "BCS" ||
+        row.source_rpo === "BC4"
+    ),
+    "engine-cover focused rule rows should include the LS6 cover surface"
+  );
 });
 
 test("Grand Sport rule audit script does not own workbook business decisions", () => {

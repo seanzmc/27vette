@@ -55,6 +55,7 @@ RULE_PHRASES = (
     "only available with",
     "included and only available with",
 )
+ENGINE_COVER_RPOS = {"BC7", "BCP", "BCS", "BC4", "B6P", "ZZ3", "D3V", "SL9"}
 
 
 def active_source_row(row: dict[str, str]) -> bool:
@@ -246,6 +247,143 @@ def full_rule_key(row: dict[str, Any]) -> tuple[str, str, str, str, str]:
     )
 
 
+def runtime_authored_rule(row: dict[str, Any]) -> bool:
+    return not clean(row.get("generation_action", "")).lower().startswith("omit")
+
+
+def focused_duplicate_rule_rows(workbook_rules: list[dict[str, str]]) -> list[dict[str, Any]]:
+    rows_by_key: dict[tuple[str, str, str, str, str], list[dict[str, str]]] = defaultdict(list)
+    for row in workbook_rules:
+        if runtime_authored_rule(row):
+            rows_by_key[full_rule_key(row)].append(row)
+    duplicates = []
+    for key, rows in sorted(rows_by_key.items()):
+        if len(rows) <= 1:
+            continue
+        duplicates.append(
+            {
+                "source_id": key[0],
+                "rule_type": key[1],
+                "target_id": key[2],
+                "body_style_scope": key[3],
+                "runtime_action": key[4],
+                "rule_ids": [row.get("rule_id", "") for row in rows],
+                "count": len(rows),
+            }
+        )
+    return duplicates
+
+
+def option_label(option_id: str, options_by_id: dict[str, dict[str, str]]) -> str:
+    option = options_by_id.get(option_id, {})
+    return " ".join(part for part in (option.get("rpo", ""), option.get("option_name", "")) if part).strip()
+
+
+def rule_reference_issues(
+    workbook_rules: list[dict[str, str]],
+    options_by_id: dict[str, dict[str, str]],
+    option_ids_by_rpo: dict[str, list[str]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    missing_references: list[dict[str, Any]] = []
+    inactive_references: list[dict[str, Any]] = []
+    active_ids_by_rpo: dict[str, list[str]] = defaultdict(list)
+    for option_id, option in options_by_id.items():
+        rpo = option.get("rpo", "")
+        if rpo and active_source_row(option):
+            active_ids_by_rpo[rpo].append(option_id)
+
+    for row in workbook_rules:
+        if not runtime_authored_rule(row):
+            continue
+        for field in ("source_id", "target_id"):
+            option_id = row.get(field, "")
+            if not option_id:
+                missing_references.append(
+                    {
+                        "rule_id": row.get("rule_id", ""),
+                        "field": field,
+                        "option_id": option_id,
+                        "message": "Rule row has a blank option reference.",
+                    }
+                )
+                continue
+            option = options_by_id.get(option_id)
+            if not option:
+                missing_references.append(
+                    {
+                        "rule_id": row.get("rule_id", ""),
+                        "field": field,
+                        "option_id": option_id,
+                        "message": "Rule row references an option_id missing from grandSport_options.",
+                    }
+                )
+                continue
+            if not active_source_row(option):
+                rpo = option.get("rpo", "")
+                inactive_references.append(
+                    {
+                        "rule_id": row.get("rule_id", ""),
+                        "field": field,
+                        "option_id": option_id,
+                        "rpo": rpo,
+                        "label": option_label(option_id, options_by_id),
+                        "canonical_active_option_ids": active_ids_by_rpo.get(rpo, []),
+                        "same_rpo_option_ids": option_ids_by_rpo.get(rpo, []),
+                        "source_id": row.get("source_id", ""),
+                        "rule_type": row.get("rule_type", ""),
+                        "target_id": row.get("target_id", ""),
+                        "body_style_scope": row.get("body_style_scope", ""),
+                    }
+                )
+    return missing_references, inactive_references
+
+
+def engine_cover_rule_audit(
+    workbook_rules: list[dict[str, str]],
+    options_by_id: dict[str, dict[str, str]],
+    inactive_references: list[dict[str, Any]],
+) -> dict[str, Any]:
+    engine_cover_option_ids = {
+        option_id
+        for option_id, option in options_by_id.items()
+        if option.get("rpo", "") in ENGINE_COVER_RPOS
+    }
+    rows = []
+    for row in workbook_rules:
+        source_id = row.get("source_id", "")
+        target_id = row.get("target_id", "")
+        if source_id not in engine_cover_option_ids and target_id not in engine_cover_option_ids:
+            continue
+        rows.append(
+            {
+                "rule_id": row.get("rule_id", ""),
+                "source_id": source_id,
+                "source_rpo": options_by_id.get(source_id, {}).get("rpo", ""),
+                "source_active": active_source_row(options_by_id.get(source_id, {})) if source_id in options_by_id else False,
+                "rule_type": row.get("rule_type", ""),
+                "target_id": target_id,
+                "target_rpo": options_by_id.get(target_id, {}).get("rpo", ""),
+                "target_active": active_source_row(options_by_id.get(target_id, {})) if target_id in options_by_id else False,
+                "body_style_scope": row.get("body_style_scope", ""),
+                "runtime_action": row.get("runtime_action", ""),
+                "generation_action": row.get("generation_action", ""),
+            }
+        )
+    inactive_engine_cover_refs = [
+        row
+        for row in inactive_references
+        if row.get("rpo", "") in ENGINE_COVER_RPOS
+        or row.get("source_id", "") in engine_cover_option_ids
+        or row.get("target_id", "") in engine_cover_option_ids
+    ]
+    return {
+        "rpos": sorted(ENGINE_COVER_RPOS),
+        "option_ids": sorted(engine_cover_option_ids),
+        "rules": rows,
+        "inactiveReferences": inactive_engine_cover_refs,
+    }
+
+
 def exclusive_group_pairs(exclusive_groups: list[dict[str, Any]], exclusive_group_members: list[dict[str, Any]]) -> set[tuple[str, str]]:
     option_ids_by_group: dict[str, list[str]] = defaultdict(list)
     for member in exclusive_group_members:
@@ -360,6 +498,10 @@ def render_audit_markdown(audit: dict[str, Any]) -> str:
         f"- Workbook manual/approved/copied rules: {summary['workbookManualOrApprovedRules']}",
         f"- Skipped/review rows: {summary['skippedRequiresReview']}",
         f"- Unresolved non-interior RPO mentions: {summary['unresolvedRpoMentions']}",
+        f"- Duplicate semantic rule keys: {summary['duplicateSemanticRuleKeys']}",
+        f"- Missing option references: {summary['missingOptionReferences']}",
+        f"- Inactive option references: {summary['inactiveOptionReferences']}",
+        f"- Engine-cover inactive references: {summary['engineCoverInactiveReferences']}",
         "",
         "## Workbook-Copied Rules",
         "",
@@ -397,12 +539,47 @@ def render_audit_markdown(audit: dict[str, Any]) -> str:
     lines.extend(["", "## Review Hot Spots", ""])
     lines.append(f"- Duplicate active RPOs: {len(audit['reviewHotSpots']['duplicateRpos'])}")
     lines.append(f"- Special package mention rows: {len(audit['reviewHotSpots']['specialPackageMentions'])}")
+
+    lines.extend(["", "## Duplicate Semantic Rule Keys", ""])
+    if audit["focusedReview"]["duplicateSemanticRuleKeys"]:
+        for row in audit["focusedReview"]["duplicateSemanticRuleKeys"][:50]:
+            scope = f" [{row['body_style_scope']}]" if row.get("body_style_scope") else ""
+            action = f" ({row['runtime_action']})" if row.get("runtime_action") else ""
+            lines.append(f"- {row['source_id']} {row['rule_type']} {row['target_id']}{scope}{action}: {', '.join(row['rule_ids'])}")
+    else:
+        lines.append("- none")
+
+    lines.extend(["", "## Missing Option References", ""])
+    if audit["focusedReview"]["missingOptionReferences"]:
+        for row in audit["focusedReview"]["missingOptionReferences"][:50]:
+            lines.append(f"- `{row['rule_id']}` {row['field']} -> `{row['option_id']}`: {row['message']}")
+    else:
+        lines.append("- none")
+
+    lines.extend(["", "## Inactive Option References", ""])
+    if audit["focusedReview"]["inactiveOptionReferences"]:
+        for row in audit["focusedReview"]["inactiveOptionReferences"][:75]:
+            active_ids = ", ".join(row.get("canonical_active_option_ids", [])) or "none"
+            lines.append(
+                f"- `{row['rule_id']}` {row['field']} -> `{row['option_id']}` ({row['rpo']}): active same-RPO ids: {active_ids}"
+            )
+    else:
+        lines.append("- none")
+
+    lines.extend(["", "## Engine Cover Rule Focus", ""])
+    engine_cover = audit["focusedReview"]["engineCoverRules"]
+    lines.append(f"- Engine-cover rule rows: {len(engine_cover['rules'])}")
+    lines.append(f"- Engine-cover inactive references: {len(engine_cover['inactiveReferences'])}")
+    for row in engine_cover["inactiveReferences"][:50]:
+        active_ids = ", ".join(row.get("canonical_active_option_ids", [])) or "none"
+        lines.append(f"- `{row['rule_id']}` references inactive `{row['option_id']}` ({row['rpo']}); active same-RPO ids: {active_ids}")
     return "\n".join(lines) + "\n"
 
 
 def write_rule_audit(
     config,
     options: list[dict[str, str]],
+    all_options: list[dict[str, str]],
     status_rows: list[dict[str, str]],
     option_ids_by_rpo: dict[str, list[str]],
     candidate_keys: set[tuple[str, str, str]],
@@ -414,6 +591,14 @@ def write_rule_audit(
 ) -> dict[str, str]:
     grouped_excludes = exclusive_group_pairs(exclusive_groups, exclusive_group_members)
     duplicate_keys = [key for key, count in Counter(full_rule_key(row) for row in workbook_rules).items() if count > 1]
+    options_by_id = {row.get("option_id", ""): row for row in all_options if row.get("option_id", "")}
+    all_option_ids_by_rpo: dict[str, list[str]] = defaultdict(list)
+    for row in all_options:
+        if row.get("option_id", "") and row.get("rpo", ""):
+            all_option_ids_by_rpo[row.get("rpo", "")].append(row.get("option_id", ""))
+    duplicate_semantic_rule_keys = focused_duplicate_rule_rows(workbook_rules)
+    missing_references, inactive_references = rule_reference_issues(workbook_rules, options_by_id, all_option_ids_by_rpo)
+    engine_cover_rules = engine_cover_rule_audit(workbook_rules, options_by_id, inactive_references)
     annotated_rules = [
         {**row, "_audit_origin": workbook_rule_origin(row, candidate_keys)}
         for row in workbook_rules
@@ -455,6 +640,11 @@ def write_rule_audit(
             "unresolvedRpoMentions": len(unresolved_mentions),
             "exclusiveGroups": len(exclusive_groups),
             "exclusiveGroupMembers": len(exclusive_group_members),
+            "duplicateSemanticRuleKeys": len(duplicate_semantic_rule_keys),
+            "missingOptionReferences": len(missing_references),
+            "inactiveOptionReferences": len(inactive_references),
+            "engineCoverRuleRows": len(engine_cover_rules["rules"]),
+            "engineCoverInactiveReferences": len(engine_cover_rules["inactiveReferences"]),
             "workbookRulesMatchingDetailRaw": origin_counts["workbook_matches_detail_raw"],
             "workbookManualOrApprovedRules": (
                 origin_counts["workbook_manual_or_normalized"]
@@ -478,6 +668,12 @@ def write_rule_audit(
         "skippedRequiresReview": review_rows,
         "unresolvedRpoMentions": unresolved_mentions,
         "reviewHotSpots": review_hot_spots(options, option_ids_by_rpo, tuple(config.special_rule_review_rpos)),
+        "focusedReview": {
+            "duplicateSemanticRuleKeys": duplicate_semantic_rule_keys,
+            "missingOptionReferences": missing_references,
+            "inactiveOptionReferences": inactive_references,
+            "engineCoverRules": engine_cover_rules,
+        },
     }
     output_dir = config.output_dir / "inspection"
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -506,6 +702,7 @@ def main() -> None:
     audit_paths = write_rule_audit(
         config,
         grand_sport_options,
+        all_grand_sport_options,
         status_rows,
         active_option_ids_by_rpo,
         candidate_keys,

@@ -1,98 +1,102 @@
 # Grand Sport Rule Audit
 
-Generated: `2026-05-09T22:19:12+00:00`
+Generated: `2026-05-10T19:26:24+00:00`
 Status: `rule_audit_generated`
 
 ## Summary
 
-- Workbook rule rows: 314
-- Expected draft runtime rules: 288
+- Workbook rule rows: 313
+- Expected draft runtime rules: 289
 - Omitted duplicate exclusive-group rules: 9
 - Raw detail candidate keys: 232
-- Workbook rules matching detail raw: 86
+- Workbook rules matching detail raw: 85
 - Workbook manual/approved/copied rules: 228
 - Skipped/review rows: 3
 - Unresolved non-interior RPO mentions: 4
+- Duplicate semantic rule keys: 0
+- Missing option references: 0
+- Inactive option references: 17
+- Engine-cover inactive references: 12
 
 ## Workbook-Copied Rules
 
+- `gs_copy_rule_opt_r88_001_excludes_opt_eyk_001_opt_r88_001_excludes_opt_eyk_001`: opt_r88_001 excludes opt_eyk_001
+- `gs_copy_rule_opt_sfz_001_excludes_opt_eyk_001_opt_sfz_001_excludes_opt_eyk_001`: opt_sfz_001 excludes opt_eyk_001
 - `gs_copy_rule_opt_bv4_001_excludes_opt_r8c_001_opt_bv4_001_excludes_opt_r8c_001`: opt_bv4_001 excludes opt_r8c_001
-- `gs_copy_rule_opt_cf8_001_excludes_opt_dpb_001_opt_cf8_001_excludes_opt_dpb_001`: opt_cf8_001 excludes opt_dpb_001
-- `gs_copy_rule_opt_cf8_001_excludes_opt_dpc_001_opt_cf8_001_excludes_opt_dpc_001`: opt_cf8_001 excludes opt_dpc_001
-- `gs_copy_rule_opt_cf8_001_excludes_opt_dpg_001_opt_cf8_001_excludes_opt_dpg_001`: opt_cf8_001 excludes opt_dpg_001
-- `gs_copy_rule_opt_cf8_001_excludes_opt_dpl_001_opt_cf8_001_excludes_opt_dpl_001`: opt_cf8_001 excludes opt_dpl_001
-- `gs_copy_rule_opt_cf8_001_excludes_opt_dpt_001_opt_cf8_001_excludes_opt_dpt_001`: opt_cf8_001 excludes opt_dpt_001
-- `gs_copy_rule_opt_cf8_001_excludes_opt_dsy_001_opt_cf8_001_excludes_opt_dsy_001`: opt_cf8_001 excludes opt_dsy_001
-- `gs_copy_rule_opt_cf8_001_excludes_opt_dsz_001_opt_cf8_001_excludes_opt_dsz_001`: opt_cf8_001 excludes opt_dsz_001
-- `gs_copy_rule_opt_cf8_001_excludes_opt_dt0_001_opt_cf8_001_excludes_opt_dt0_001`: opt_cf8_001 excludes opt_dt0_001
-- `gs_copy_rule_opt_cf8_001_excludes_opt_dth_001_opt_cf8_001_excludes_opt_dth_001`: opt_cf8_001 excludes opt_dth_001
-- `gs_copy_rule_opt_cf8_001_excludes_opt_dub_001_opt_cf8_001_excludes_opt_dub_001`: opt_cf8_001 excludes opt_dub_001
-- `gs_copy_rule_opt_cf8_001_excludes_opt_due_001_opt_cf8_001_excludes_opt_due_001`: opt_cf8_001 excludes opt_due_001
-- `gs_copy_rule_opt_cf8_001_excludes_opt_duk_001_opt_cf8_001_excludes_opt_duk_001`: opt_cf8_001 excludes opt_duk_001
-- `gs_copy_rule_opt_cf8_001_excludes_opt_duw_001_opt_cf8_001_excludes_opt_duw_001`: opt_cf8_001 excludes opt_duw_001
-- `gs_copy_rule_opt_d84_001_excludes_opt_gba_001_opt_d84_001_excludes_opt_gba_001`: opt_d84_001 excludes opt_gba_001
-- `gs_copy_rule_opt_d86_001_excludes_opt_gba_001_opt_d86_001_excludes_opt_gba_001`: opt_d86_001 excludes opt_gba_001
-- `gs_copy_rule_opt_dpb_001_excludes_opt_gtr_001_opt_dpb_001_excludes_opt_gtr_001`: opt_dpb_001 excludes opt_gtr_001
-- `gs_copy_rule_opt_dpc_001_excludes_opt_gbk_001_opt_dpc_001_excludes_opt_gbk_001`: opt_dpc_001 excludes opt_gbk_001
-- `gs_copy_rule_opt_dpg_001_excludes_opt_g26_001_opt_dpg_001_excludes_opt_g26_001`: opt_dpg_001 excludes opt_g26_001
-- `gs_copy_rule_opt_dpl_001_excludes_opt_gkz_001_opt_dpl_001_excludes_opt_gkz_001`: opt_dpl_001 excludes opt_gkz_001
-- `gs_copy_rule_opt_dpl_001_excludes_opt_gph_001_opt_dpl_001_excludes_opt_gph_001`: opt_dpl_001 excludes opt_gph_001
-- `gs_copy_rule_opt_dsy_001_excludes_opt_g26_001_opt_dsy_001_excludes_opt_g26_001`: opt_dsy_001 excludes opt_g26_001
-- `gs_copy_rule_opt_dsz_001_excludes_opt_gkz_001_opt_dsz_001_excludes_opt_gkz_001`: opt_dsz_001 excludes opt_gkz_001
-- `gs_copy_rule_opt_dsz_001_excludes_opt_gph_001_opt_dsz_001_excludes_opt_gph_001`: opt_dsz_001 excludes opt_gph_001
-- `gs_copy_rule_opt_dt0_001_excludes_opt_gbk_001_opt_dt0_001_excludes_opt_gbk_001`: opt_dt0_001 excludes opt_gbk_001
+- `gs_copy_rule_opt_b6p_001_includes_opt_d3v_001_opt_b6p_001_includes_opt_d3v_001_coupe`: opt_b6p_001 includes opt_d3v_001
+- `gs_copy_rule_opt_b6p_001_includes_opt_sl9_001_opt_b6p_001_includes_opt_sl9_001`: opt_b6p_001 includes opt_sl9_001
+- `gs_copy_rule_opt_bc4_001_includes_opt_d3v_001_opt_bc4_001_includes_opt_d3v_001_coupe`: opt_bc4_001 includes opt_d3v_001
+- `gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible`: opt_bc4_002 requires opt_zz3_001
+- `gs_copy_rule_opt_bc7_001_requires_opt_zz3_001_convertible_opt_bc7_001_requires_opt_zz3_001_convertible`: opt_bc7_001 requires opt_zz3_001
+- `gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe`: opt_bcp_001 includes opt_d3v_001
+- `gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible`: opt_bcp_001 requires opt_zz3_001
+- `gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe`: opt_bcs_001 includes opt_d3v_001
+- `gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible`: opt_bcs_001 requires opt_zz3_001
+- `gs_copy_rule_opt_zz3_001_includes_opt_bc7_002_opt_zz3_001_includes_opt_bc7_001`: opt_zz3_001 includes opt_bc7_001
+- `gs_copy_rule_opt_zz3_001_includes_opt_sl9_001_opt_zz3_001_includes_opt_sl9_001`: opt_zz3_001 includes opt_sl9_001
+- `gs_copy_rule_opt_nwi_001_requires_opt_wub_001_opt_nwi_001_requires_opt_wub_001`: opt_nwi_001 requires opt_wub_001
+- `gs_copy_rule_opt_r8c_001_includes_opt_cfx_001_opt_r8c_001_includes_opt_cfx_001`: opt_r8c_001 includes opt_cfx_001
+- `gs_copy_rule_opt_5jr_001_includes_opt_drg_001_opt_5jr_001_includes_opt_drg_001`: opt_5jr_001 includes opt_drg_001
+- `gs_copy_rule_opt_e60_001_includes_opt_tr7_001_opt_e60_001_includes_opt_tr7_001`: opt_e60_001 includes opt_tr7_001
+- `gs_copy_rule_opt_zyc_001_includes_opt_drg_001_opt_zyc_001_includes_opt_drg_001`: opt_zyc_001 includes opt_drg_001
+- `gs_copy_rule_opt_r88_001_excludes_opt_sfz_001_opt_r88_001_excludes_opt_sfz_001`: opt_r88_001 excludes opt_sfz_001
+- `gs_copy_rule_opt_rik_001_excludes_opt_rin_001_opt_rik_001_excludes_opt_rin_001`: opt_rik_001 excludes opt_rin_001
+- `gs_copy_rule_opt_rik_001_excludes_opt_sl8_001_opt_rik_001_excludes_opt_sl8_001`: opt_rik_001 excludes opt_sl8_001
+- `gs_copy_rule_opt_rin_001_excludes_opt_rik_001_opt_rin_001_excludes_opt_rik_001`: opt_rin_001 excludes opt_rik_001
+- `gs_copy_rule_opt_rin_001_excludes_opt_sl8_001_opt_rin_001_excludes_opt_sl8_001`: opt_rin_001 excludes opt_sl8_001
+- `gs_copy_rule_opt_sl8_001_excludes_opt_rik_001_opt_sl8_001_excludes_opt_rik_001`: opt_sl8_001 excludes opt_rik_001
 - ... 69 more
 
 ## Workbook Rules Matching Detail Raw
 
-- `gs_rule_opt_17a_001_excludes_opt_gka_001`: opt_17a_001 excludes opt_gka_001
-- `gs_rule_opt_20a_001_excludes_opt_gtr_001`: opt_20a_001 excludes opt_gtr_001
-- `gs_rule_opt_55a_001_excludes_opt_gbk_001`: opt_55a_001 excludes opt_gbk_001
-- `gs_rule_opt_5zv_001_excludes_opt_fey_001`: opt_5zv_001 excludes opt_fey_001
-- `gs_rule_opt_5zv_001_excludes_opt_t0f_001`: opt_5zv_001 excludes opt_t0f_001
-- `gs_rule_opt_75a_001_excludes_opt_gkz_001`: opt_75a_001 excludes opt_gkz_001
-- `gs_rule_opt_75a_001_excludes_opt_gph_001`: opt_75a_001 excludes opt_gph_001
+- `gs_rule_opt_j57_001_includes_opt_j6d_001`: opt_j57_001 includes opt_j6d_001
+- `gs_rule_opt_b6p_001_includes_opt_d3v_001`: opt_b6p_001 includes opt_d3v_001
+- `gs_rule_opt_bc4_001_includes_opt_d3v_001`: opt_bc4_002 includes opt_d3v_001 [coupe]
+- `gs_rule_opt_bc4_002_includes_opt_d3v_001`: opt_bc4_002 includes opt_d3v_001
+- `gs_rule_opt_bcp_001_includes_opt_d3v_001`: opt_bcp_001 includes opt_d3v_001
+- `gs_rule_opt_bcp_002_includes_opt_b6p_001`: opt_bcp_002 includes opt_b6p_001
+- `gs_rule_opt_bcp_002_includes_opt_d3v_001`: opt_bcp_002 includes opt_d3v_001
+- `gs_rule_opt_bcs_001_includes_opt_d3v_001`: opt_bcs_001 includes opt_d3v_001
+- `gs_rule_opt_bcs_002_includes_opt_b6p_001`: opt_bcs_002 includes opt_b6p_001
+- `gs_rule_opt_bcs_002_includes_opt_d3v_001`: opt_bcs_002 includes opt_d3v_001
+- `gs_rule_opt_fey_001_includes_opt_wub_001`: opt_fey_001 includes opt_wub_001
 - `gs_rule_opt_cf8_001_excludes_opt_dmu_001`: opt_cf8_001 excludes opt_dmu_001
 - `gs_rule_opt_cf8_001_excludes_opt_dmv_001`: opt_cf8_001 excludes opt_dmv_001
 - `gs_rule_opt_cf8_001_excludes_opt_dmw_001`: opt_cf8_001 excludes opt_dmw_001
 - `gs_rule_opt_cf8_001_excludes_opt_dmx_001`: opt_cf8_001 excludes opt_dmx_001
 - `gs_rule_opt_cf8_001_excludes_opt_dmy_001`: opt_cf8_001 excludes opt_dmy_001
-- `gs_rule_opt_cfl_001_excludes_opt_cfz_001`: opt_cfl_001 excludes opt_cfz_001
-- `gs_rule_opt_dmv_001_excludes_opt_d84_001`: opt_dmv_001 excludes opt_d84_001
+- `gs_rule_opt_sig_001_requires_opt_t0e_002`: opt_sig_001 requires opt_t0e_002
+- `gs_rule_opt_feb_001_includes_opt_j56_001`: opt_feb_001 includes opt_j56_001
+- `gs_rule_opt_feb_001_includes_opt_xfr_001`: opt_feb_001 includes opt_xfr_001
+- `gs_rule_opt_fey_001_includes_opt_xfs_001`: opt_fey_001 includes opt_xfs_001
+- `gs_rule_opt_pcq_001_includes_opt_vwe_001`: opt_pcq_001 includes opt_vwe_001
+- `gs_rule_opt_pcq_001_includes_opt_vwt_001`: opt_pcq_001 includes opt_vwt_001
 - `gs_rule_opt_dmv_001_excludes_opt_gka_001`: opt_dmv_001 excludes opt_gka_001
-- `gs_rule_opt_dmw_001_excludes_opt_d84_001`: opt_dmw_001 excludes opt_d84_001
 - `gs_rule_opt_dmw_001_excludes_opt_g8g_001`: opt_dmw_001 excludes opt_g8g_001
-- `gs_rule_opt_dmx_001_excludes_opt_d84_001`: opt_dmx_001 excludes opt_d84_001
 - `gs_rule_opt_dmx_001_excludes_opt_gtr_001`: opt_dmx_001 excludes opt_gtr_001
-- `gs_rule_opt_dmy_001_excludes_opt_d84_001`: opt_dmy_001 excludes opt_d84_001
 - `gs_rule_opt_dmy_001_excludes_opt_gkz_001`: opt_dmy_001 excludes opt_gkz_001
 - `gs_rule_opt_dmy_001_excludes_opt_gph_001`: opt_dmy_001 excludes opt_gph_001
+- `gs_rule_opt_17a_001_excludes_opt_gka_001`: opt_17a_001 excludes opt_gka_001
+- `gs_rule_opt_20a_001_excludes_opt_gtr_001`: opt_20a_001 excludes opt_gtr_001
+- `gs_rule_opt_55a_001_excludes_opt_gbk_001`: opt_55a_001 excludes opt_gbk_001
+- `gs_rule_opt_75a_001_excludes_opt_gkz_001`: opt_75a_001 excludes opt_gkz_001
+- `gs_rule_opt_75a_001_excludes_opt_gph_001`: opt_75a_001 excludes opt_gph_001
 - `gs_rule_opt_dx4_001_excludes_opt_gkz_001`: opt_dx4_001 excludes opt_gkz_001
 - `gs_rule_opt_dx4_001_excludes_opt_gph_001`: opt_dx4_001 excludes opt_gph_001
-- `gs_rule_opt_s47_001_excludes_opt_roy_001`: opt_s47_001 excludes opt_roy_001
-- `gs_rule_opt_s47_001_excludes_opt_roz_001`: opt_s47_001 excludes opt_roz_001
-- `gs_rule_opt_s47_001_excludes_opt_stz_001`: opt_s47_001 excludes opt_stz_001
-- `gs_rule_opt_sfe_001_excludes_opt_roy_001`: opt_sfe_001 excludes opt_roy_001
-- `gs_rule_opt_sfe_001_excludes_opt_roz_001`: opt_sfe_001 excludes opt_roz_001
-- `gs_rule_opt_sfe_001_excludes_opt_stz_001`: opt_sfe_001 excludes opt_stz_001
-- `gs_rule_opt_sht_001_excludes_opt_dpb_001`: opt_sht_001 excludes opt_dpb_001
-- `gs_rule_opt_sht_001_excludes_opt_dpc_001`: opt_sht_001 excludes opt_dpc_001
-- `gs_rule_opt_sht_001_excludes_opt_dpg_001`: opt_sht_001 excludes opt_dpg_001
-- `gs_rule_opt_sht_001_excludes_opt_dpl_001`: opt_sht_001 excludes opt_dpl_001
-- `gs_rule_opt_sht_001_excludes_opt_dpt_001`: opt_sht_001 excludes opt_dpt_001
-- ... 51 more
+- `gs_rule_opt_j6l_001_requires_opt_j57_001`: opt_j6l_001 requires opt_j57_001
+- ... 50 more
 
 ## Omitted Duplicate Exclusive Group Rules
 
-- `gs_rule_opt_cfl_001_excludes_opt_cfz_001`: opt_cfl_001 excludes opt_cfz_001
 - `gs_copy_rule_opt_rik_001_excludes_opt_rin_001_opt_rik_001_excludes_opt_rin_001`: opt_rik_001 excludes opt_rin_001
 - `gs_copy_rule_opt_rik_001_excludes_opt_sl8_001_opt_rik_001_excludes_opt_sl8_001`: opt_rik_001 excludes opt_sl8_001
 - `gs_copy_rule_opt_rin_001_excludes_opt_rik_001_opt_rin_001_excludes_opt_rik_001`: opt_rin_001 excludes opt_rik_001
 - `gs_copy_rule_opt_rin_001_excludes_opt_sl8_001_opt_rin_001_excludes_opt_sl8_001`: opt_rin_001 excludes opt_sl8_001
 - `gs_copy_rule_opt_sl8_001_excludes_opt_rik_001_opt_sl8_001_excludes_opt_rik_001`: opt_sl8_001 excludes opt_rik_001
 - `gs_copy_rule_opt_sl8_001_excludes_opt_rin_001_opt_sl8_001_excludes_opt_rin_001`: opt_sl8_001 excludes opt_rin_001
-- `gs_rule_opt_fey_001_excludes_opt_feb_001`: opt_fey_001 excludes opt_feb_001
+- `gs_rule_opt_cfl_001_excludes_opt_cfz_001`: opt_cfl_001 excludes opt_cfz_001
 - `gs_rule_opt_feb_001_excludes_opt_fey_001`: opt_feb_001 excludes opt_fey_001
+- `gs_rule_opt_fey_001_excludes_opt_feb_001`: opt_fey_001 excludes opt_feb_001
 
 ## Skipped Requires Review
 
@@ -111,3 +115,48 @@ Status: `rule_audit_generated`
 
 - Duplicate active RPOs: 0
 - Special package mention rows: 25
+
+## Duplicate Semantic Rule Keys
+
+- none
+
+## Missing Option References
+
+- none
+
+## Inactive Option References
+
+- `gs_copy_rule_opt_bc4_001_includes_opt_d3v_001_opt_bc4_001_includes_opt_d3v_001_coupe` source_id -> `opt_bc4_001` (BC4): active same-RPO ids: opt_bc4_002
+- `gs_rule_opt_bc4_001_requires_opt_b6p_001_coupe` source_id -> `opt_bc4_001` (BC4): active same-RPO ids: opt_bc4_002
+- `gs_rule_opt_bcp_001_includes_opt_d3v_001` source_id -> `opt_bcp_001` (BCP): active same-RPO ids: opt_bcp_002
+- `gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe` source_id -> `opt_bcp_001` (BCP): active same-RPO ids: opt_bcp_002
+- `gs_rule_opt_bcp_001_requires_opt_b6p_001_coupe` source_id -> `opt_bcp_001` (BCP): active same-RPO ids: opt_bcp_002
+- `gs_rule_opt_bcp_001_requires_opt_d3v_001_coupe` source_id -> `opt_bcp_001` (BCP): active same-RPO ids: opt_bcp_002
+- `gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible` source_id -> `opt_bcp_001` (BCP): active same-RPO ids: opt_bcp_002
+- `gs_rule_opt_bcs_001_includes_opt_d3v_001` source_id -> `opt_bcs_001` (BCS): active same-RPO ids: opt_bcs_002
+- `gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe` source_id -> `opt_bcs_001` (BCS): active same-RPO ids: opt_bcs_002
+- `gs_rule_opt_bcs_001_requires_opt_b6p_001_coupe` source_id -> `opt_bcs_001` (BCS): active same-RPO ids: opt_bcs_002
+- `gs_rule_opt_bcs_001_requires_opt_d3v_001_coupe` source_id -> `opt_bcs_001` (BCS): active same-RPO ids: opt_bcs_002
+- `gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible` source_id -> `opt_bcs_001` (BCS): active same-RPO ids: opt_bcs_002
+- `gs_rule_opt_sig_001_requires_opt_t0e_002` target_id -> `opt_t0e_002` (T0E): active same-RPO ids: opt_t0e_001
+- `gs_rule_opt_009_requires_opt_ue1_001` source_id -> `opt_009` (): active same-RPO ids: none
+- `gs_rule_opt_009_requires_opt_ue1_001` target_id -> `opt_ue1_001` (UE1): active same-RPO ids: none
+- `gs_rule_opt_prb_001_requires_opt_ue1_001` source_id -> `opt_prb_001` (PRB): active same-RPO ids: none
+- `gs_rule_opt_prb_001_requires_opt_ue1_001` target_id -> `opt_ue1_001` (UE1): active same-RPO ids: none
+
+## Engine Cover Rule Focus
+
+- Engine-cover rule rows: 25
+- Engine-cover inactive references: 12
+- `gs_copy_rule_opt_bc4_001_includes_opt_d3v_001_opt_bc4_001_includes_opt_d3v_001_coupe` references inactive `opt_bc4_001` (BC4); active same-RPO ids: opt_bc4_002
+- `gs_rule_opt_bc4_001_requires_opt_b6p_001_coupe` references inactive `opt_bc4_001` (BC4); active same-RPO ids: opt_bc4_002
+- `gs_rule_opt_bcp_001_includes_opt_d3v_001` references inactive `opt_bcp_001` (BCP); active same-RPO ids: opt_bcp_002
+- `gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe` references inactive `opt_bcp_001` (BCP); active same-RPO ids: opt_bcp_002
+- `gs_rule_opt_bcp_001_requires_opt_b6p_001_coupe` references inactive `opt_bcp_001` (BCP); active same-RPO ids: opt_bcp_002
+- `gs_rule_opt_bcp_001_requires_opt_d3v_001_coupe` references inactive `opt_bcp_001` (BCP); active same-RPO ids: opt_bcp_002
+- `gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible` references inactive `opt_bcp_001` (BCP); active same-RPO ids: opt_bcp_002
+- `gs_rule_opt_bcs_001_includes_opt_d3v_001` references inactive `opt_bcs_001` (BCS); active same-RPO ids: opt_bcs_002
+- `gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe` references inactive `opt_bcs_001` (BCS); active same-RPO ids: opt_bcs_002
+- `gs_rule_opt_bcs_001_requires_opt_b6p_001_coupe` references inactive `opt_bcs_001` (BCS); active same-RPO ids: opt_bcs_002
+- `gs_rule_opt_bcs_001_requires_opt_d3v_001_coupe` references inactive `opt_bcs_001` (BCS); active same-RPO ids: opt_bcs_002
+- `gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible` references inactive `opt_bcs_001` (BCS); active same-RPO ids: opt_bcs_002
