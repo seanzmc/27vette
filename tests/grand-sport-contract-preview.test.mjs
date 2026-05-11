@@ -57,7 +57,7 @@ test("Grand Sport section placement is owned by section_master step_key", () => 
   assert.equal(sectionById.get("sec_whee_001")?.step_key, "wheels");
   assert.equal(sectionById.get("sec_perf_support_001")?.step_key, "wheels");
   assert.equal(sectionById.get("sec_perf_support_001")?.section_name, "Mechanical");
-  assert.equal(sectionById.get("sec_perf_brake_001")?.step_key, "wheels");
+  assert.equal(sectionById.get("sec_perf_brake_001")?.step_key, "packages_performance");
   assert.equal(sectionById.get("sec_perf_z52_001")?.step_key, "packages_performance");
   assert.equal(sectionById.get("sec_perf_aero_001")?.step_key, "packages_performance");
   assert.equal(sectionById.get("sec_perf_ground_001")?.step_key, "packages_performance");

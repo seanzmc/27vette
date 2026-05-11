@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-05-11T03:29:25+00:00"
+    "generated_at": "2026-05-11T04:18:17+00:00"
   },
   "variants": [
     {
@@ -656,7 +656,7 @@
       "choice_mode": "single",
       "is_required": "FALSE",
       "standard_behavior": "user_selected",
-      "section_display_order": 40,
+      "section_display_order": 50,
       "step_key": "standard_equipment",
       "step_label": "Standard Equipment"
     },
@@ -680,7 +680,7 @@
       "choice_mode": "single",
       "is_required": "TRUE",
       "standard_behavior": "user_selected",
-      "section_display_order": 30,
+      "section_display_order": 40,
       "step_key": "standard_equipment",
       "step_label": "Standard Equipment"
     },
@@ -692,7 +692,7 @@
       "choice_mode": "single",
       "is_required": "TRUE",
       "standard_behavior": "user_selected",
-      "section_display_order": 50,
+      "section_display_order": 20,
       "step_key": "standard_equipment",
       "step_label": "Standard Equipment"
     }
