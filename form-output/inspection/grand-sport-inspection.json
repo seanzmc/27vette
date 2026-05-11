@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-11T02:52:25+00:00",
+  "generated_at": "2026-05-11T03:29:32+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -112,9 +112,9 @@
     "active_option_rows_available_or_standard": 225,
     "inactive_option_rows_all_unavailable_or_blank": 44,
     "status_counts": {
-      "available": 873,
+      "available": 879,
       "standard": 547,
-      "unavailable": 194
+      "unavailable": 188
     },
     "status_counts_by_variant": {
       "1lt_e07": {
@@ -123,14 +123,14 @@
         "unavailable": 48
       },
       "2lt_e07": {
-        "available": 150,
+        "available": 152,
         "standard": 98,
-        "unavailable": 21
+        "unavailable": 19
       },
       "3lt_e07": {
-        "available": 153,
+        "available": 154,
         "standard": 98,
-        "unavailable": 18
+        "unavailable": 17
       },
       "1lt_e67": {
         "available": 137,
@@ -138,14 +138,14 @@
         "unavailable": 54
       },
       "2lt_e67": {
-        "available": 144,
+        "available": 146,
         "standard": 97,
-        "unavailable": 28
+        "unavailable": 26
       },
       "3lt_e67": {
-        "available": 147,
+        "available": 148,
         "standard": 97,
-        "unavailable": 25
+        "unavailable": 24
       }
     },
     "missing_status_cells": 0,
@@ -2554,10 +2554,10 @@
       "effective_status_label": "Standard",
       "statuses": {
         "1lt_e07": "unavailable",
-        "2lt_e07": "unavailable",
+        "2lt_e07": "available",
         "3lt_e07": "standard",
         "1lt_e67": "unavailable",
-        "2lt_e67": "unavailable",
+        "2lt_e67": "available",
         "3lt_e67": "standard"
       }
     },
@@ -2568,11 +2568,11 @@
       "effective_status_label": "Available",
       "statuses": {
         "1lt_e07": "available",
-        "2lt_e07": "unavailable",
-        "3lt_e07": "unavailable",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
         "1lt_e67": "available",
-        "2lt_e67": "unavailable",
-        "3lt_e67": "unavailable"
+        "2lt_e67": "available",
+        "3lt_e67": "available"
       }
     },
     {

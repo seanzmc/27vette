@@ -71,6 +71,7 @@ def normalized_option_row(row: dict[str, str], config: ModelConfig) -> dict[str,
         "description": clean(row.get("description", "")),
         "detail_raw": clean(row.get("detail_raw", "")),
         "selectable": normalize_selectable(row.get("selectable", "")),
+        "display_order": intish(row.get("display_order")),
         "active": normalize_selectable(row.get("active", "True")),
         "display_behavior": clean(row.get("display_behavior", "")),
         "original_section_id": original_section_id,
@@ -1234,6 +1235,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             "source_section_id": row["original_section_id"],
             "active": row["active"],
             "base_price": row["price"],
+            "display_order": row["display_order"],
             "text_cleanup_notes": text_cleanup_notes,
         }
 
@@ -1441,6 +1443,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
                     "active",
                     "display_behavior",
                     "base_price",
+                    "display_order",
                     "text_cleanup_notes",
                 )
             }
@@ -1484,7 +1487,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
                     "selection_mode_label": section.get("selection_mode_label", ""),
                     "base_price": option["base_price"],
                     "display_behavior": option.get("display_behavior", ""),
-                    "display_order": order_by_option[option_id],
+                    "display_order": option.get("display_order") or order_by_option[option_id],
                     "source_detail_raw": option["source_detail_raw"],
                     "source_option_name": option["source_option_name"],
                     "source_description": option["source_description"],
