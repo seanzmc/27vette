@@ -226,7 +226,11 @@ function ruleGroupAppliesToCurrentVariant(group) {
   if (!scopeMatches(group.trim_level_scope, state.trimLevel)) return false;
   if (!scopeMatches(group.variant_scope, currentVariantId())) return false;
   const sourceChoice = choiceForCurrentVariant(group.source_id);
-  if (sourceChoice && (sourceChoice.active !== "True" || sourceChoice.status === "unavailable")) return false;
+  if (
+    sourceChoice &&
+    sourceChoice.display_behavior !== "auto_only" &&
+    (sourceChoice.active !== "True" || sourceChoice.status === "unavailable")
+  ) return false;
   return true;
 }
 
@@ -289,6 +293,7 @@ function selectedExcludesTarget(targetId, selectedIds) {
     if (rules.some((rule) => rule.rule_type === "excludes" && rule.target_id === targetId && ruleAppliesToCurrentVariant(rule))) {
       return true;
     }
+    if (sourceExcludesTargetViaGroup(sourceId, targetId)) return true;
   }
   return false;
 }
@@ -303,6 +308,12 @@ function selectedExclusiveGroupPeer(optionId, selectedIds) {
   const group = optionExclusiveGroup(optionId);
   if (!group || group.selection_mode !== "single_within_group") return false;
   return (group.option_ids || []).some((id) => id !== optionId && selectedIds.has(id));
+}
+
+function userSelectedExclusiveGroupPeer(optionId, selectedIds) {
+  const group = optionExclusiveGroup(optionId);
+  if (!group || group.selection_mode !== "single_within_group") return false;
+  return (group.option_ids || []).some((id) => id !== optionId && selectedIds.has(id) && state.userSelected.has(id));
 }
 
 function sameExclusiveGroupPeer(optionId, peerId) {
@@ -321,6 +332,30 @@ function requiresAnyReason(choice, selectedIds) {
   return "";
 }
 
+function sourceExcludesTargetViaGroup(sourceId, targetId) {
+  const groups = ruleGroupsBySource.get(sourceId) || [];
+  return groups.some(
+    (group) =>
+      group.group_type === "excludes_any" &&
+      ruleGroupAppliesToCurrentVariant(group) &&
+      (group.target_ids || []).includes(targetId)
+  );
+}
+
+function excludesAnyReason(choice, selectedIds) {
+  for (const sourceId of selectedIds) {
+    if (!sourceExcludesTargetViaGroup(sourceId, choice.option_id)) continue;
+    const group = (ruleGroupsBySource.get(sourceId) || []).find(
+      (candidate) =>
+        candidate.group_type === "excludes_any" &&
+        ruleGroupAppliesToCurrentVariant(candidate) &&
+        (candidate.target_ids || []).includes(choice.option_id)
+    );
+    return group?.disabled_reason || `Blocked by ${getEntityLabel(sourceId)}.`;
+  }
+  return "";
+}
+
 function computeAutoAdded() {
   const autoAdded = new Map();
   const selectedIds = new Set(state.selected);
@@ -335,7 +370,7 @@ function computeAutoAdded() {
         !state.userSelected.has(rule.target_id) &&
         !selectedExcludesTarget(rule.target_id, selectedIds) &&
         !shouldSuppressIncludedDefault(rule) &&
-        !selectedExclusiveGroupPeer(rule.target_id, selectedIds)
+        !userSelectedExclusiveGroupPeer(rule.target_id, selectedIds)
       ) {
         autoAdded.set(rule.target_id, rule.disabled_reason || `Included with ${getEntityLabel(sourceId)}.`);
       }
@@ -366,6 +401,8 @@ function disableReasonForChoice(choice) {
   const selectedIds = selectedContextIds();
   const groupedReason = requiresAnyReason(choice, selectedIds);
   if (groupedReason) return groupedReason;
+  const groupedExclusionReason = excludesAnyReason(choice, selectedIds);
+  if (groupedExclusionReason) return groupedExclusionReason;
   const targetRules = rulesByTarget.get(choice.option_id) || [];
   for (const rule of targetRules) {
     if (rule.rule_type === "excludes" && selectedIds.has(rule.source_id) && ruleAppliesToCurrentVariant(rule)) {
@@ -564,6 +601,7 @@ function resetDefaults() {
   for (const choices of bySection.values()) {
     if (choices.length === 1) state.selected.add(choices[0].option_id);
   }
+  addWorkbookDefaultChoices({ restoreSingleRequiredOnly: false });
   for (const defaultRpo of ["FE1", "NGA", "BC7"]) {
     const defaultChoice = rows.find((choice) => choice.rpo === defaultRpo && choice.active === "True" && choice.status !== "unavailable");
     if (defaultRpo === "BC7") {
@@ -571,6 +609,26 @@ function resetDefaults() {
       continue;
     }
     if (defaultChoice) state.selected.add(defaultChoice.option_id);
+  }
+}
+
+function addWorkbookDefaultChoices({ restoreSingleRequiredOnly = true } = {}) {
+  const rows = activeChoiceRows()
+    .filter(
+      (choice) =>
+        choice.display_behavior === "default_selected" &&
+        choice.active === "True" &&
+        choice.status !== "unavailable" &&
+        choice.selectable === "True"
+    )
+    .sort((a, b) => Number(a.display_order || 0) - Number(b.display_order || 0));
+  for (const choice of rows) {
+    const section = sectionsById.get(choice.section_id);
+    if (!section) continue;
+    if (restoreSingleRequiredOnly && section.selection_mode !== "single_select_req") continue;
+    if (section.choice_mode === "single" && selectedOrAutoInSection(choice.section_id)) continue;
+    if (disableReasonForChoice(choice)) continue;
+    state.selected.add(choice.option_id);
   }
 }
 
@@ -701,8 +759,13 @@ function reconcileSelections() {
   }
   reconcileInteriorSelection();
   const autoAdded = computeAutoAdded();
+  for (const id of [...state.selected]) {
+    const choice = choiceForCurrentVariant(id);
+    if (!choice || shouldHideChoice(choice) || disableReasonForChoice(choice)) deleteSelectedOption(id);
+  }
   removeAutoDefaultDuplicates(autoAdded);
   const refreshedAutoAdded = computeAutoAdded();
+  addWorkbookDefaultChoices();
   if (!selectedOptionByRpo("Z51") && !selectedOrAutoInSection("sec_susp_001", refreshedAutoAdded)) addDefaultRpo("FE1");
   if (!selectedOptionByRpo("NWI") && !selectedOptionByRpo("NGA")) addDefaultRpo("NGA");
   if (!selectedOrAutoInSection("sec_seat_001", refreshedAutoAdded)) addDefaultRpo("719");

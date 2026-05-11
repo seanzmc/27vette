@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-10T21:09:33+00:00",
+  "generated_at": "2026-05-10T23:47:12+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -109,8 +109,8 @@
       "False": 107,
       "True": 162
     },
-    "active_option_rows_available_or_standard": 227,
-    "inactive_option_rows_all_unavailable_or_blank": 42,
+    "active_option_rows_available_or_standard": 225,
+    "inactive_option_rows_all_unavailable_or_blank": 44,
     "status_counts": {
       "available": 873,
       "standard": 547,

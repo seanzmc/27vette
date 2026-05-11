@@ -145,10 +145,11 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
 
   const optionByRpo = new Map(workbookOptions.map((row) => [row.rpo, row]));
   assert.equal(normalizedBool(optionByRpo.get("D30").selectable), "false");
-  assert.equal(optionByRpo.get("D30").display_behavior, "display_only");
+  assert.equal(optionByRpo.get("D30").display_behavior, "auto_only");
   assert.equal(normalizedBool(optionByRpo.get("Z15").selectable), "false");
   assert.equal(optionByRpo.get("Z15").display_behavior, "auto_only");
-  assert.equal(optionByRpo.get("R6X").display_behavior, "display_only");
+  assert.equal(optionByRpo.get("R6X").display_behavior, "auto_only");
+  assert.equal(Number(optionByRpo.get("Z25").price), 0);
   for (const rpo of ["R6P", "R9V", "R9W", "R9Y", "U2K"]) {
     assert.equal(normalizedBool(optionByRpo.get(rpo).active), "false", `${rpo} should be inactive in workbook source`);
   }
@@ -178,14 +179,20 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
     "opt_r88_001::excludes::opt_eyk_001",
     "opt_sfz_001::excludes::opt_eyk_001",
     "opt_fey_001::includes::opt_cfz_001",
+    "opt_bcp_002::includes::opt_d3v_001",
+    "opt_bcs_002::includes::opt_d3v_001",
+    "opt_bc4_002::includes::opt_d3v_001",
   ]) {
     assert.ok(draftRuleKeys.has(key), `${key} should be present`);
   }
+  assert.equal(draftRuleKeys.has("opt_bcp_002::includes::opt_b6p_001"), false, "BCP should not auto-add B6P");
+  assert.equal(draftRuleKeys.has("opt_bcs_002::includes::opt_b6p_001"), false, "BCS should not auto-add B6P");
+  assert.equal(draftRuleKeys.has("opt_j57_001::excludes::opt_j56_001"), false, "J56/J57 should use an exclusive group, not one-way replacement");
   for (const hashOptionId of heritageHashOptionIds) {
     assert.ok(draftRuleKeys.has(`${hashOptionId}::includes::opt_z15_001`), `${hashOptionId} should auto-add Z15`);
     assert.equal(draftRuleKeys.has(`${hashOptionId}::requires::opt_z15_001`), false, `${hashOptionId} should not require manual Z15`);
     for (const targetId of nonCenterStripeOptionIds) {
-      assert.ok(draftRuleKeys.has(`${hashOptionId}::excludes::${targetId}`), `${hashOptionId} should block ${targetId}`);
+      assert.equal(draftRuleKeys.has(`${hashOptionId}::excludes::${targetId}`), false, `${hashOptionId} should use the Z15 grouped exclusion for ${targetId}`);
     }
     for (const targetId of heritageCenterStripeOptionIds) {
       assert.equal(draftRuleKeys.has(`${hashOptionId}::excludes::${targetId}`), false, `${hashOptionId} should allow ${targetId}`);
@@ -194,6 +201,9 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
 
   const z52Members = workbookExclusiveMembers.filter((row) => row.group_id === "gs_excl_z52_packages");
   assert.deepEqual(z52Members.map((row) => row.option_id), ["opt_feb_001", "opt_fey_001"]);
+
+  const brakeMembers = workbookExclusiveMembers.filter((row) => row.group_id === "gs_excl_performance_brakes");
+  assert.deepEqual(brakeMembers.map((row) => row.option_id), ["opt_j56_001", "opt_j57_001"]);
 });
 
 test("Grand Sport rule audit highlights risky duplicate RPO and special package surfaces", () => {

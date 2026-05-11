@@ -1,13 +1,13 @@
 # Grand Sport Rule Audit
 
-Generated: `2026-05-10T21:08:26+00:00`
+Generated: `2026-05-10T23:47:12+00:00`
 Status: `rule_audit_generated`
 
 ## Summary
 
 - Workbook rule rows: 320
-- Expected draft runtime rules: 296
-- Omitted duplicate exclusive-group rules: 9
+- Expected draft runtime rules: 186
+- Omitted duplicate exclusive-group rules: 8
 - Raw detail candidate keys: 232
 - Workbook rules matching detail raw: 85
 - Workbook manual/approved/copied rules: 235
@@ -97,7 +97,6 @@ Status: `rule_audit_generated`
 - `gs_copy_rule_opt_rin_001_excludes_opt_sl8_001_opt_rin_001_excludes_opt_sl8_001`: opt_rin_001 excludes opt_sl8_001
 - `gs_copy_rule_opt_sl8_001_excludes_opt_rik_001_opt_sl8_001_excludes_opt_rik_001`: opt_sl8_001 excludes opt_rik_001
 - `gs_copy_rule_opt_sl8_001_excludes_opt_rin_001_opt_sl8_001_excludes_opt_rin_001`: opt_sl8_001 excludes opt_rin_001
-- `gs_rule_opt_cfl_001_excludes_opt_cfz_001`: opt_cfl_001 excludes opt_cfz_001
 - `gs_rule_opt_feb_001_excludes_opt_fey_001`: opt_feb_001 excludes opt_fey_001
 - `gs_rule_opt_fey_001_excludes_opt_feb_001`: opt_fey_001 excludes opt_feb_001
 

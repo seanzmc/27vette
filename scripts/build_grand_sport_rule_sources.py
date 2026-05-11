@@ -103,7 +103,11 @@ def runtime_rule_rows(workbook_rules: list[dict[str, str]], runtime_option_ids: 
             continue
         if target_type == "option" and target_id not in runtime_option_ids:
             continue
-        if row.get("rule_type", "").lower() == "excludes" and (source_id, target_id) in grouped_excludes:
+        if (
+            row.get("rule_type", "").lower() == "excludes"
+            and (source_id, target_id) in grouped_excludes
+            and row.get("generation_action", "") != "preserve_runtime_exclude"
+        ):
             continue
         rows.append(row)
     return rows
@@ -528,6 +532,27 @@ def exclusive_group_pairs(exclusive_groups: list[dict[str, Any]], exclusive_grou
     return pairs
 
 
+def rule_group_pairs(
+    rule_groups: list[dict[str, Any]],
+    rule_group_members: list[dict[str, Any]],
+    group_type: str,
+) -> set[tuple[str, str]]:
+    target_ids_by_group: dict[str, list[str]] = defaultdict(list)
+    for member in rule_group_members:
+        if active_source_row(member):
+            target_ids_by_group[member.get("group_id", "")].append(member.get("target_id", ""))
+
+    pairs: set[tuple[str, str]] = set()
+    for group in rule_groups:
+        if not active_source_row(group) or group.get("group_type", "") != group_type:
+            continue
+        source_id = group.get("source_id", "")
+        for target_id in target_ids_by_group.get(group.get("group_id", ""), []):
+            if source_id and target_id:
+                pairs.add((source_id, target_id))
+    return pairs
+
+
 def workbook_rule_origin(row: dict[str, str], candidate_keys: set[tuple[str, str, str]]) -> str:
     rule_id = row.get("rule_id", "")
     if rule_id.startswith("gs_copy_"):
@@ -746,8 +771,12 @@ def write_rule_audit(
     workbook_rules: list[dict[str, str]],
     exclusive_groups: list[dict[str, str]],
     exclusive_group_members: list[dict[str, str]],
+    rule_groups: list[dict[str, str]],
+    rule_group_members: list[dict[str, str]],
 ) -> dict[str, str]:
-    grouped_excludes = exclusive_group_pairs(exclusive_groups, exclusive_group_members)
+    exclusive_group_excludes = exclusive_group_pairs(exclusive_groups, exclusive_group_members)
+    rule_group_excludes = rule_group_pairs(rule_groups, rule_group_members, "excludes_any")
+    grouped_excludes = exclusive_group_excludes | rule_group_excludes
     duplicate_keys = [key for key, count in Counter(full_rule_key(row) for row in workbook_rules).items() if count > 1]
     options_by_id = {row.get("option_id", ""): row for row in all_options if row.get("option_id", "")}
     all_option_ids_by_rpo: dict[str, list[str]] = defaultdict(list)
@@ -770,7 +799,10 @@ def write_rule_audit(
     omitted_exclusive = [
         row
         for row in annotated_rules
-        if row.get("rule_type", "").lower() == "excludes" and (row.get("source_id", ""), row.get("target_id", "")) in grouped_excludes
+        if runtime_authored_rule(row)
+        and row.get("rule_type", "").lower() == "excludes"
+        and row.get("generation_action", "") != "preserve_runtime_exclude"
+        and (row.get("source_id", ""), row.get("target_id", "")) in grouped_excludes
     ]
     runtime_ids = runtime_available_option_ids(options, status_rows, tuple(config.variant_ids))
     runtime_rows = runtime_rule_rows(workbook_rules, runtime_ids, grouped_excludes)
@@ -806,6 +838,9 @@ def write_rule_audit(
             "unresolvedRpoMentions": len(unresolved_mentions),
             "exclusiveGroups": len(exclusive_groups),
             "exclusiveGroupMembers": len(exclusive_group_members),
+            "ruleGroups": len(rule_groups),
+            "ruleGroupMembers": len(rule_group_members),
+            "groupedExclusionPairs": len(rule_group_excludes),
             "duplicateSemanticRuleKeys": len(duplicate_semantic_rule_keys),
             "exactDuplicateRuleRows": len(duplicate_semantic_rule_keys),
             "overlappingScopedRuleRows": len(overlapping_scoped_rule_rows),
@@ -885,6 +920,8 @@ def main() -> None:
         workbook_rules,
         exclusive_groups,
         exclusive_group_members,
+        rule_groups,
+        rule_group_members,
     )
 
     print(

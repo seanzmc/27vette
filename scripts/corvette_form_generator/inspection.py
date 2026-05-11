@@ -629,9 +629,17 @@ def load_exclusive_groups(wb, config: ModelConfig) -> list[dict[str, Any]]:
 
 
 def grouped_requirement_pairs(rule_groups: list[dict[str, Any]]) -> set[tuple[str, str]]:
+    return grouped_rule_pairs(rule_groups, "requires_any")
+
+
+def grouped_exclusion_pairs(rule_groups: list[dict[str, Any]]) -> set[tuple[str, str]]:
+    return grouped_rule_pairs(rule_groups, "excludes_any")
+
+
+def grouped_rule_pairs(rule_groups: list[dict[str, Any]], group_type: str) -> set[tuple[str, str]]:
     pairs: set[tuple[str, str]] = set()
     for group in rule_groups:
-        if group.get("active") != "True" or group.get("group_type") != "requires_any":
+        if group.get("active") != "True" or group.get("group_type") != group_type:
             continue
         source_id = group.get("source_id", "")
         for target_id in group.get("target_ids", []):
@@ -691,7 +699,11 @@ def build_draft_rules(
             continue
         if rule_type == "requires" and (source_id, target_id) in grouped_requires:
             continue
-        if rule_type == "excludes" and (source_id, target_id) in grouped_excludes:
+        if (
+            rule_type == "excludes"
+            and (source_id, target_id) in grouped_excludes
+            and rule.get("generation_action", "") != "preserve_runtime_exclude"
+        ):
             continue
         source_section = rule.get("source_section", "")
         target_section = rule.get("target_section", "")
@@ -1510,7 +1522,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
         sections_by_id,
         interiors,
         grouped_requirement_pairs(rule_groups),
-        exclusive_group_pairs(exclusive_groups),
+        grouped_exclusion_pairs(rule_groups) | exclusive_group_pairs(exclusive_groups),
     )
     price_rules, price_rule_validation, price_rule_source_rows = build_draft_price_rules(
         wb,

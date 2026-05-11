@@ -38,6 +38,9 @@ const requiredPackagePriceRules = [
   ["gs_pr_pef_ria_001", "opt_pef_001", "opt_ria_001", "override", 0],
   ["gs_pr_pef_cav_001", "opt_pef_001", "opt_cav_001", "override", 0],
   ["gs_pr_t0f_cfz_001", "opt_t0f_001", "opt_cfz_001", "override", 0],
+  ["gs_pr_bcp_d3v_001", "opt_bcp_002", "opt_d3v_001", "override", 0],
+  ["gs_pr_bcs_d3v_001", "opt_bcs_002", "opt_d3v_001", "override", 0],
+  ["gs_pr_bc4_d3v_001", "opt_bc4_002", "opt_d3v_001", "override", 0],
 ];
 
 const expectedGrandSportExclusiveGroups = [
@@ -72,6 +75,10 @@ const expectedGrandSportExclusiveGroups = [
   {
     group_id: "gs_excl_exterior_accents",
     option_ids: ["opt_efr_001", "opt_edu_001"],
+  },
+  {
+    group_id: "gs_excl_performance_brakes",
+    option_ids: ["opt_j56_001", "opt_j57_001"],
   },
 ];
 
@@ -108,9 +115,9 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
   assert.equal(draft.steps.length, 14);
   assert.equal(draft.choices.length, 1374);
   assert.equal(draft.standardEquipment.length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 767);
+  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 755);
   assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 152);
+  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 164);
 });
 
 test("Grand Sport standard equipment is preserved after standard mirror rows are inactive", () => {
@@ -239,7 +246,6 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
     "opt_j6d_001::requires::opt_j57_001::::active",
     "opt_t0f_001::requires::opt_j57_001::::active",
     "opt_j57_001::excludes::opt_j6a_001::::replace",
-    "opt_j57_001::excludes::opt_j56_001::::replace",
     "opt_fey_001::excludes::opt_t0e_001::::replace",
     "opt_fey_001::includes::opt_t0f_001::::active",
     "opt_fey_001::includes::opt_cfz_001::::active",
@@ -268,7 +274,7 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
     assert.ok(ruleKeys.has(`${hashOptionId}::includes::opt_z15_001::::active`), `${hashOptionId} should auto-add Z15`);
     assert.equal(ruleKeys.has(`${hashOptionId}::requires::opt_z15_001::::active`), false, `${hashOptionId} should not require manual Z15`);
     for (const targetId of nonCenterStripeOptionIds) {
-      assert.ok(ruleKeys.has(`${hashOptionId}::excludes::${targetId}::::active`), `${hashOptionId} should block ${targetId}`);
+      assert.equal(ruleKeys.has(`${hashOptionId}::excludes::${targetId}::::active`), false, `${hashOptionId} should use the Z15 group to block ${targetId}`);
     }
     for (const targetId of heritageCenterStripeOptionIds) {
       assert.equal(ruleKeys.has(`${hashOptionId}::excludes::${targetId}::::active`), false, `${hashOptionId} should allow ${targetId}`);
@@ -286,8 +292,9 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
   }
 
   const d30 = draft.choices.find((choice) => choice.option_id === "opt_d30_001");
-  assert.equal(d30.active, "True");
+  assert.equal(d30.active, "False");
   assert.equal(d30.selectable, "False");
+  assert.equal(d30.display_behavior, "auto_only");
 
   const z15 = draft.choices.find((choice) => choice.option_id === "opt_z15_001");
   assert.equal(z15.active, "False");
@@ -296,7 +303,7 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
 
   const r6xChoices = draft.choices.filter((choice) => choice.option_id === "opt_r6x_001");
   assert.equal(r6xChoices.length, 6);
-  assert.equal(r6xChoices.every((choice) => choice.active === "True" && choice.selectable === "False"), true);
+  assert.equal(r6xChoices.every((choice) => choice.active === "False" && choice.selectable === "False" && choice.display_behavior === "auto_only"), true);
 });
 
 test("Grand Sport draft includes model-scoped LT interiors with EL9 launch edition metadata", () => {
@@ -318,8 +325,8 @@ test("Grand Sport draft includes model-scoped LT interiors with EL9 launch editi
   const ah2El9 = byId.get("3LT_AH2_EL9");
   assert.equal(ah2El9.interior_choice_display_order < byId.get("3LT_AH2_HTE").interior_choice_display_order, true);
   assert.equal(ae4El9.interior_choice_display_order < byId.get("3LT_AE4_HTE").interior_choice_display_order, true);
-  assert.equal(Number(ae4El9.price), 595);
-  assert.equal(Number(ah2El9.price), 0);
+  assert.equal(Number(ae4El9.price), 1995);
+  assert.equal(Number(ah2El9.price), 1995);
   assert.deepEqual(
     JSON.parse(JSON.stringify(ae4El9.interior_components)),
     [{ rpo: "AE4", label: "AE4 Seat Upgrade", price: 595, component_type: "seat" }]

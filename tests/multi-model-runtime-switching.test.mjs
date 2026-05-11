@@ -154,6 +154,10 @@ const expectedGrandSportExclusiveGroups = [
     groupId: "gs_excl_exterior_accents",
     optionIds: ["opt_efr_001", "opt_edu_001"],
   },
+  {
+    groupId: "gs_excl_performance_brakes",
+    optionIds: ["opt_j56_001", "opt_j57_001"],
+  },
 ];
 
 const expectedStingrayExclusiveGroups = [
@@ -330,6 +334,73 @@ test("Grand Sport UQT is selectable on 1LT and included on higher trims from wor
   order = runtime.currentOrder();
   assert.equal(order.selected_options.some((item) => item.rpo === "UQT"), false);
   assert.equal(runtime.data.standardEquipment.some((item) => item.variant_id === "2lt_e07" && item.rpo === "UQT"), true);
+});
+
+test("Grand Sport workbook default_selected rows seed and reconcile defaults generically", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  for (const optionId of ["opt_efr_001", "opt_t0e_001", "opt_j56_001"]) {
+    assert.equal(runtime.state.selected.has(optionId), true, `${optionId} should be selected from display_behavior=default_selected`);
+  }
+
+  const fey = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_fey_001");
+  runtime.handleChoice(fey);
+  assert.equal(runtime.state.selected.has("opt_fey_001"), true, "FEY should be selectable");
+  assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "FEY should replace the default T0E aero row");
+  assert.equal(runtime.state.selected.has("opt_j56_001"), false, "FEY auto-added J57 should replace the default J56 brake row");
+
+  const order = runtime.currentOrder();
+  assert.equal(order.auto_added_options.some((item) => item.rpo === "J57"), true, "FEY should auto-add J57");
+});
+
+test("Grand Sport Pass 1 workbook rules drive engine, brake, ground-effect, and launch edition behavior", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  for (const optionId of ["opt_bcp_002", "opt_bcs_002", "opt_bc4_002"]) {
+    const cover = runtime.activeChoiceRows().find((choice) => choice.option_id === optionId);
+    assert.ok(cover, `${optionId} should exist for Grand Sport`);
+    runtime.handleChoice(cover);
+    const order = runtime.currentOrder();
+    assert.equal(order.auto_added_options.some((item) => item.rpo === "D3V" && item.price === 0), true, `${optionId} should auto-add D3V at $0`);
+    assert.equal(order.auto_added_options.some((item) => item.rpo === "B6P"), false, `${optionId} should not auto-add B6P`);
+  }
+
+  const j57 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j57_001");
+  const j56 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j56_001");
+  runtime.handleChoice(j57);
+  assert.equal(runtime.state.selected.has("opt_j57_001"), true, "J57 should be selected");
+  assert.equal(runtime.state.selected.has("opt_j56_001"), false, "J57 should replace J56");
+  runtime.handleChoice(j56);
+  assert.equal(runtime.state.selected.has("opt_j56_001"), true, "J56 should be selectable again");
+  assert.equal(runtime.state.selected.has("opt_j57_001"), false, "J56 should replace J57");
+
+  const feb = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_feb_001");
+  runtime.handleChoice(feb);
+  runtime.handleChoice(j57);
+  const t0f = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0f_001");
+  const cfl = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_cfl_001");
+  runtime.handleChoice(t0f);
+  assert.equal(runtime.currentOrder().auto_added_options.some((item) => item.rpo === "CFZ" && item.price === 0), true, "T0F should auto-add CFZ at $0");
+  runtime.handleChoice(cfl);
+  assert.equal(runtime.state.selected.has("opt_cfl_001"), false, "CFL should remain blocked when T0F auto-adds CFZ");
+
+  runtime.state.trimLevel = "3LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.state.selectedInterior = "3LT_AH2_EL9";
+  const launchOrder = runtime.currentOrder();
+  assert.equal(launchOrder.selected_interior.price, 1995, "EL9 should own the Launch Edition price");
+  assert.equal(launchOrder.auto_added_options.some((item) => item.rpo === "Z25" && item.price === 0), true, "Z25 should auto-add at $0");
 });
 
 test("runtime defaults to Stingray and switches models with a clean build reset", () => {
