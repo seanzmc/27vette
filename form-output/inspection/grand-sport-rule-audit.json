@@ -6,7 +6,7 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-05-11T05:26:30+00:00",
+    "generated_at": "2026-05-11T05:32:42+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
@@ -14,8 +14,8 @@
     "rawDetailRuleCandidates": 232,
     "rawDetailCandidateKeys": 232,
     "dedupedOrSelfReferenceCandidates": 1,
-    "finalWorkbookRuleRows": 320,
-    "expectedDraftRuntimeRules": 186,
+    "finalWorkbookRuleRows": 337,
+    "expectedDraftRuntimeRules": 203,
     "omittedDuplicateExclusiveGroup": 8,
     "omittedInactiveOrUnemitted": 126,
     "skippedRequiresReview": 3,
@@ -34,7 +34,7 @@
     "engineCoverRuleRows": 26,
     "engineCoverInactiveReferences": 0,
     "workbookRulesMatchingDetailRaw": 85,
-    "workbookManualOrApprovedRules": 235
+    "workbookManualOrApprovedRules": 252
   },
   "sourceSheets": {
     "optionSheet": "grandSport_options",

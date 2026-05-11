@@ -518,11 +518,14 @@ test("Grand Sport interiors are model-scoped and export selected interior identi
   assert.ok(runtime.currentOrder().metadata.missing_required.includes("Base Interior"));
 
   runtime.state.selectedInterior = "3LT_AH2_EL9";
+  runtime.reconcileSelections();
   const order = runtime.currentOrder();
   assert.equal(order.metadata.selected_interior_id, "3LT_AH2_EL9");
   assert.equal(order.selected_interior.rpo, "EL9");
   assert.equal(order.selected_interior.label, "Santorini Blue Dipped with Torch Red accents");
   assert.equal(order.metadata.missing_required.includes("Base Interior"), false);
+  assert.equal(runtime.state.selected.has("opt_719_001"), false, "EL9 included seatbelt should replace default 719");
+  assert.equal(order.auto_added_options.some((item) => item.rpo === "3F9" && item.price === 0), true, "EL9 should auto-add 3F9 at no charge");
 
   const compact = runtime.compactOrder();
   const seatsInterior = compact.sections.find((section) => section.section === "Seats & Interior");
@@ -532,4 +535,34 @@ test("Grand Sport interiors are model-scoped and export selected interior identi
     "compact order should include selected Grand Sport interior"
   );
   assert.match(runtime.plainTextOrderSummary(compact), /EL9 Santorini Blue Dipped with Torch Red accents/);
+});
+
+test("Grand Sport 3LT interiors auto-add included color seatbelts from workbook rules", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "3LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const ah2Seat = runtime.activeChoiceRows().find((choice) => choice.rpo === "AH2" && choice.step_key === "seat");
+  runtime.handleChoice(ah2Seat);
+
+  for (const [interiorId, rpo] of [
+    ["3LT_AH2_HZN", "3N9"],
+    ["3LT_AH2_HNK", "3F9"],
+    ["3LT_AH2_H8T", "3A9"],
+    ["3LT_AH2_HUW", "379"],
+  ]) {
+    runtime.state.selectedInterior = interiorId;
+    runtime.reconcileSelections();
+    const order = runtime.currentOrder();
+    assert.equal(runtime.state.selected.has("opt_719_001"), false, `${interiorId} should replace default 719`);
+    assert.equal(order.auto_added_options.some((item) => item.rpo === rpo && item.price === 0), true, `${interiorId} should auto-add ${rpo} at no charge`);
+  }
+
+  runtime.state.selectedInterior = "3LT_AH2_HTE";
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has("opt_719_001"), true, "3LT interior without included color seatbelt should keep 719 default");
+  assert.equal(runtime.currentOrder().auto_added_options.some((item) => ["3N9", "3F9", "3A9", "379"].includes(item.rpo)), false);
 });

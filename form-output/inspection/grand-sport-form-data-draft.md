@@ -1,6 +1,6 @@
 # Grand Sport Form Data Draft
 
-Generated: `2026-05-11T05:26:30+00:00`
+Generated: `2026-05-11T05:32:43+00:00`
 Status: `draft_not_runtime_active`
 Source sheet: `grandSport_options`
 
@@ -14,8 +14,8 @@ Source sheet: `grandSport_options`
 - Standard equipment rows: 455
 - Rule groups: 1 (workbook-backed)
 - Exclusive groups: 9 (workbook-backed)
-- Rules: 186 (workbook-backed)
-- Price rules: 38 (workbook-backed)
+- Rules: 203 (workbook-backed)
+- Price rules: 39 (workbook-backed)
 - Interiors: 132 (model-scoped)
 - Color overrides: 245
 
