@@ -334,6 +334,9 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
   for (const optionId of ["opt_379_001", "opt_3a9_001", "opt_3f9_001", "opt_3m9_001", "opt_3n9_001"]) {
     assert.equal(optionIds.has(optionId), true, `${optionId} should remain selectable for Grand Sport`);
   }
+  const defaultSeatbelt = draft.choices.find((choice) => choice.option_id === "opt_719_001");
+  assert.equal(defaultSeatbelt.display_behavior, "default_selected");
+  assert.equal(defaultSeatbelt.selectable, "True");
 
   const d30 = draft.choices.find((choice) => choice.option_id === "opt_d30_001");
   assert.equal(d30.active, "False");
