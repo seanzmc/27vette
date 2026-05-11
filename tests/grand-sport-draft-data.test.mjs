@@ -112,7 +112,27 @@ test("Grand Sport draft preserves the live generated-data top-level contract", (
 test("Grand Sport draft includes the full variant matrix and standard equipment rows", () => {
   assert.equal(draft.variants.length, 6);
   assert.equal(draft.contextChoices.length, 8);
-  assert.equal(draft.steps.length, 14);
+  assert.equal(draft.steps.length, 15);
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(draft.steps.map((step) => [step.step_key, step.step_label]))),
+    [
+      ["body_style", "Body Style"],
+      ["trim_level", "Trim Level"],
+      ["paint", "Exterior Paint"],
+      ["exterior_appearance", "Exterior Appearance"],
+      ["wheels", "Wheels & Brake Calipers"],
+      ["packages_performance", "Performance & Aero"],
+      ["aero_exhaust_stripes_accessories", "Stripes"],
+      ["seat", "Seats"],
+      ["base_interior", "Base Interior"],
+      ["seat_belt", "Seat Belt"],
+      ["interior_trim", "Interior Trim"],
+      ["accessories", "Accessories"],
+      ["delivery", "Custom Delivery"],
+      ["customer_info", "Customer Information"],
+      ["summary", "Summary"],
+    ]
+  );
   assert.equal(draft.choices.length, 1374);
   assert.equal(draft.standardEquipment.length, 455);
   assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 755);
@@ -345,16 +365,27 @@ test("Grand Sport draft keeps normalized display fields and raw rule evidence", 
 test("Grand Sport draft section placement follows section_master step_key", () => {
   const sectionById = new Map(draft.sections.map((section) => [section.section_id, section]));
   assert.equal(sectionById.get("sec_gsha_001")?.step_key, "aero_exhaust_stripes_accessories");
+  assert.equal(sectionById.get("sec_gsha_001")?.section_display_order, 10);
   assert.equal(sectionById.get("sec_gsce_001")?.step_key, "aero_exhaust_stripes_accessories");
+  assert.equal(sectionById.get("sec_gsce_001")?.section_display_order, 20);
+  assert.equal(sectionById.get("sec_stri_001")?.step_key, "aero_exhaust_stripes_accessories");
+  assert.equal(sectionById.get("sec_stri_001")?.section_display_order, 30);
   assert.equal(sectionById.get("sec_exha_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_exha_001")?.section_display_order, 20);
   assert.equal(sectionById.get("sec_whee_001")?.step_key, "wheels");
-  assert.equal(sectionById.get("sec_perf_support_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_perf_support_001")?.step_key, "wheels");
+  assert.equal(sectionById.get("sec_perf_support_001")?.section_name, "Mechanical");
   assert.equal(sectionById.get("sec_perf_ground_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_perf_ground_001")?.section_display_order, 40);
   assert.equal(sectionById.get("sec_perf_z52_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_perf_z52_001")?.section_display_order, 10);
   assert.equal(sectionById.get("sec_perf_aero_001")?.step_key, "packages_performance");
-  assert.equal(sectionById.get("sec_perf_brake_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_perf_aero_001")?.section_display_order, 30);
+  assert.equal(sectionById.get("sec_perf_brake_001")?.step_key, "wheels");
   assert.equal(sectionById.get("sec_cali_001")?.step_key, "wheels");
-  assert.equal(sectionById.get("sec_lpoi_001")?.step_key, "interior_trim");
+  assert.equal(sectionById.get("sec_lpoe_001")?.step_key, "accessories");
+  assert.equal(sectionById.has("sec_lpow_001"), false, "LPO Wheels has no active Grand Sport choices in the draft");
+  assert.equal(sectionById.get("sec_lpoi_001")?.step_key, "accessories");
 });
 
 test("Grand Sport draft preserves rule hot spots and normalization metadata for later phases", () => {

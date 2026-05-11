@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-10T23:47:12+00:00",
+  "generated_at": "2026-05-11T02:52:25+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -4712,7 +4712,7 @@
         "section_id": "sec_perf_brake_001",
         "original_section_id": "sec_perf_brake_001",
         "section_override_applied": false,
-        "step_key": "packages_performance"
+        "step_key": "wheels"
       },
       {
         "option_id": "opt_xfr_001",
@@ -4760,7 +4760,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_sfz_001",
@@ -4768,7 +4768,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_r88_001",
@@ -4776,7 +4776,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_sup_001",
@@ -4784,7 +4784,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_sbt_001",
@@ -4792,7 +4792,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_sc7_001",
@@ -4800,7 +4800,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_vtb_001",
@@ -4808,7 +4808,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_pcq_001",
@@ -4816,7 +4816,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_vwe_001",
@@ -4824,7 +4824,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_vwt_001",
@@ -4832,7 +4832,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_5jr_001",
@@ -4840,7 +4840,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_rwh_001",
@@ -4848,7 +4848,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_wkr_001",
@@ -4856,7 +4856,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_rwj_001",
@@ -4864,7 +4864,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_rin_001",
@@ -4872,7 +4872,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_sl8_001",
@@ -4880,7 +4880,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_rik_001",
@@ -4888,7 +4888,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_sig_001",
@@ -4896,7 +4896,7 @@
         "section_id": "sec_lpoe_001",
         "original_section_id": "sec_lpoe_001",
         "section_override_applied": false,
-        "step_key": "aero_exhaust_stripes_accessories"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_pdy_001",
@@ -4904,7 +4904,7 @@
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
-        "step_key": "interior_trim"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_ryt_001",
@@ -4912,7 +4912,7 @@
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
-        "step_key": "interior_trim"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_s08_001",
@@ -4920,7 +4920,7 @@
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
-        "step_key": "interior_trim"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_pef_001",
@@ -4928,7 +4928,7 @@
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
-        "step_key": "interior_trim"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_ria_001",
@@ -4936,7 +4936,7 @@
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
-        "step_key": "interior_trim"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_cav_001",
@@ -4944,7 +4944,7 @@
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
-        "step_key": "interior_trim"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_vyw_001",
@@ -4952,7 +4952,7 @@
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
-        "step_key": "interior_trim"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_rwu_001",
@@ -4960,7 +4960,7 @@
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
-        "step_key": "interior_trim"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_w2d_001",
@@ -4968,7 +4968,7 @@
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
-        "step_key": "interior_trim"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_s2l_001",
@@ -4976,7 +4976,7 @@
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
-        "step_key": "interior_trim"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_sxb_001",
@@ -4984,7 +4984,7 @@
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
-        "step_key": "interior_trim"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_sxr_001",
@@ -4992,7 +4992,7 @@
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
-        "step_key": "interior_trim"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_sxt_001",
@@ -5000,7 +5000,7 @@
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,
-        "step_key": "interior_trim"
+        "step_key": "accessories"
       },
       {
         "option_id": "opt_g8g_001",
@@ -5088,7 +5088,7 @@
         "section_id": "sec_perf_support_001",
         "original_section_id": "sec_perf_support_001",
         "section_override_applied": false,
-        "step_key": "packages_performance"
+        "step_key": "wheels"
       },
       {
         "option_id": "opt_e60_001",
@@ -5096,7 +5096,7 @@
         "section_id": "sec_perf_support_001",
         "original_section_id": "sec_perf_support_001",
         "section_override_applied": false,
-        "step_key": "packages_performance"
+        "step_key": "wheels"
       },
       {
         "option_id": "opt_cfl_001",
@@ -5136,7 +5136,7 @@
         "section_id": "sec_perf_brake_001",
         "original_section_id": "sec_perf_brake_001",
         "section_override_applied": false,
-        "step_key": "packages_performance"
+        "step_key": "wheels"
       },
       {
         "option_id": "opt_t0e_001",

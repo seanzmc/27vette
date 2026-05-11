@@ -101,6 +101,10 @@ AERO_EXHAUST_ACCESSORIES_SECTION_ORDER = {
     "sec_lpoe_001": 40,
     "sec_lpow_001": 50,
 }
+STINGRAY_SECTION_DISPLAY_ORDER_OVERRIDES = {
+    "sec_gsha_001": 50,
+    "sec_gsce_001": 51,
+}
 
 def step_for_section(section_id: str, section_name: str) -> str:
     return shared_step_for_section(
@@ -498,7 +502,10 @@ def main() -> None:
     for section_id, section in sections.items():
         step_key = step_for_section(section_id, section.get("section_name", ""))
         selection_mode = section.get("selection_mode", "")
-        section_display_order = AERO_EXHAUST_ACCESSORIES_SECTION_ORDER.get(section_id, intish(section.get("display_order")))
+        section_display_order = STINGRAY_SECTION_DISPLAY_ORDER_OVERRIDES.get(
+            section_id,
+            AERO_EXHAUST_ACCESSORIES_SECTION_ORDER.get(section_id, intish(section.get("display_order"))),
+        )
         section_rows.append(
             {
                 "section_id": section_id,

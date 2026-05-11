@@ -63,6 +63,7 @@ const sectionStepKeys = new Set([
   "base_interior",
   "seat_belt",
   "interior_trim",
+  "accessories",
   "delivery",
 ]);
 const ruleMappingHeaders = [

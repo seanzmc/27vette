@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-05-10T23:47:01+00:00"
+    "generated_at": "2026-05-11T02:52:17+00:00"
   },
   "variants": [
     {
@@ -98,14 +98,14 @@
     },
     {
       "step_key": "packages_performance",
-      "step_label": "Packages & Performance",
+      "step_label": "Performance & Aero",
       "runtime_order": 6,
       "source": "runtime",
       "section_ids": "sec_perf_001|sec_spec_001|sec_susp_001"
     },
     {
       "step_key": "aero_exhaust_stripes_accessories",
-      "step_label": "Aero, Exhaust, Stripes & Accessories",
+      "step_label": "Stripes",
       "runtime_order": 7,
       "source": "runtime",
       "section_ids": "sec_exha_001|sec_lpoe_001|sec_lpow_001|sec_spoi_001|sec_stri_001"
@@ -139,23 +139,30 @@
       "section_ids": "sec_colo_001|sec_cust_002|sec_inte_001|sec_lpoi_001|sec_onst_001"
     },
     {
+      "step_key": "accessories",
+      "step_label": "Accessories",
+      "runtime_order": 12,
+      "source": "runtime",
+      "section_ids": ""
+    },
+    {
       "step_key": "delivery",
       "step_label": "Custom Delivery",
-      "runtime_order": 12,
+      "runtime_order": 13,
       "source": "runtime",
       "section_ids": "sec_cust_001"
     },
     {
       "step_key": "customer_info",
       "step_label": "Customer Information",
-      "runtime_order": 13,
+      "runtime_order": 14,
       "source": "runtime",
       "section_ids": ""
     },
     {
       "step_key": "summary",
       "step_label": "Summary",
-      "runtime_order": 14,
+      "runtime_order": 15,
       "source": "runtime",
       "section_ids": ""
     }
@@ -279,7 +286,7 @@
       "standard_behavior": "locked_included",
       "section_display_order": 30,
       "step_key": "aero_exhaust_stripes_accessories",
-      "step_label": "Aero, Exhaust, Stripes & Accessories"
+      "step_label": "Stripes"
     },
     {
       "section_id": "sec_gsce_001",
@@ -409,7 +416,7 @@
       "choice_mode": "multi",
       "is_required": "False",
       "standard_behavior": "locked_included",
-      "section_display_order": 45,
+      "section_display_order": 30,
       "step_key": "interior_trim",
       "step_label": "Interior Trim"
     },
@@ -459,7 +466,7 @@
       "standard_behavior": "locked_included",
       "section_display_order": 10,
       "step_key": "packages_performance",
-      "step_label": "Packages & Performance"
+      "step_label": "Performance & Aero"
     },
     {
       "section_id": "sec_susp_001",
@@ -471,7 +478,7 @@
       "standard_behavior": "replaceable_default",
       "section_display_order": 20,
       "step_key": "packages_performance",
-      "step_label": "Packages & Performance"
+      "step_label": "Performance & Aero"
     },
     {
       "section_id": "sec_exha_001",
@@ -483,7 +490,7 @@
       "standard_behavior": "replaceable_default",
       "section_display_order": 10,
       "step_key": "aero_exhaust_stripes_accessories",
-      "step_label": "Aero, Exhaust, Stripes & Accessories"
+      "step_label": "Stripes"
     },
     {
       "section_id": "sec_engi_001",
@@ -507,7 +514,7 @@
       "standard_behavior": "locked_included",
       "section_display_order": 20,
       "step_key": "aero_exhaust_stripes_accessories",
-      "step_label": "Aero, Exhaust, Stripes & Accessories"
+      "step_label": "Stripes"
     },
     {
       "section_id": "sec_lpoe_001",
@@ -519,7 +526,7 @@
       "standard_behavior": "locked_included",
       "section_display_order": 40,
       "step_key": "aero_exhaust_stripes_accessories",
-      "step_label": "Aero, Exhaust, Stripes & Accessories"
+      "step_label": "Stripes"
     },
     {
       "section_id": "sec_lpow_001",
@@ -531,7 +538,7 @@
       "standard_behavior": "locked_included",
       "section_display_order": 50,
       "step_key": "aero_exhaust_stripes_accessories",
-      "step_label": "Aero, Exhaust, Stripes & Accessories"
+      "step_label": "Stripes"
     },
     {
       "section_id": "sec_whee_001",
@@ -555,7 +562,7 @@
       "standard_behavior": "locked_included",
       "section_display_order": 110,
       "step_key": "packages_performance",
-      "step_label": "Packages & Performance"
+      "step_label": "Performance & Aero"
     },
     {
       "section_id": "sec_cust_001",
@@ -631,13 +638,13 @@
     },
     {
       "section_id": "sec_perf_support_001",
-      "section_name": "Performance Support",
+      "section_name": "Mechanical",
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "choice_mode": "multi",
       "is_required": "FALSE",
       "standard_behavior": "user_selected",
-      "section_display_order": 10,
+      "section_display_order": 40,
       "step_key": "standard_equipment",
       "step_label": "Standard Equipment"
     },
@@ -649,7 +656,7 @@
       "choice_mode": "single",
       "is_required": "FALSE",
       "standard_behavior": "user_selected",
-      "section_display_order": 20,
+      "section_display_order": 40,
       "step_key": "standard_equipment",
       "step_label": "Standard Equipment"
     },
@@ -661,7 +668,7 @@
       "choice_mode": "single",
       "is_required": "FALSE",
       "standard_behavior": "user_selected",
-      "section_display_order": 30,
+      "section_display_order": 10,
       "step_key": "standard_equipment",
       "step_label": "Standard Equipment"
     },
@@ -673,7 +680,7 @@
       "choice_mode": "single",
       "is_required": "TRUE",
       "standard_behavior": "user_selected",
-      "section_display_order": 40,
+      "section_display_order": 30,
       "step_key": "standard_equipment",
       "step_label": "Standard Equipment"
     },

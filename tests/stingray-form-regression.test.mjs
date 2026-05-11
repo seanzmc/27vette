@@ -589,7 +589,7 @@ test("current order section recap has predictable labels, one interior, and corr
     "Exterior Appearance",
     "Wheels & Brakes",
     "Performance & Mechanical",
-    "Aero, Exhaust, Stripes & Accessories",
+    "Stripes",
     "Seats & Interior",
     "Pricing Summary",
     "Customer Information",
@@ -1022,7 +1022,7 @@ test("5ZU body-color spoiler can satisfy its paint requirement with any allowed 
   assert.doesNotMatch(appSource, /selectedOptionByRpo\("G8G"\) \|\| selectedOptionByRpo\("GBA"\) \|\| selectedOptionByRpo\("GKZ"\)/);
 });
 
-test("aero exhaust accessories sections use the requested order", () => {
+test("stripe sections use the requested order", () => {
   const sectionNames = data.sections
     .filter((section) => section.step_key === "aero_exhaust_stripes_accessories")
     .sort((a, b) => Number(a.section_display_order) - Number(b.section_display_order))
