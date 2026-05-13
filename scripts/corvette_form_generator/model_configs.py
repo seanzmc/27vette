@@ -40,7 +40,6 @@ STEP_ORDER = (
     "interior_trim",
     "accessories",
     "delivery",
-    "customer_info",
     "summary",
 )
 
@@ -58,7 +57,6 @@ STEP_LABELS = {
     "interior_trim": "Interior Trim",
     "accessories": "Accessories",
     "delivery": "Custom Delivery",
-    "customer_info": "Customer Information",
     "summary": "Summary",
     "standard_equipment": "Standard Equipment",
 }

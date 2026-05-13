@@ -57,8 +57,11 @@ function makeElement() {
   return {
     textContent: "",
     innerHTML: "",
+    value: "",
     dataset: {},
+    hidden: false,
     addEventListener() {},
+    focus() {},
     querySelectorAll() {
       return [];
     },
@@ -74,6 +77,7 @@ function makeElement() {
 
 function loadRuntime() {
   const downloads = [];
+  const elements = new Map();
   const context = {
     window: {
       STINGRAY_FORM_DATA: data,
@@ -85,8 +89,13 @@ function loadRuntime() {
       scrollTo() {},
     },
     document: {
-      querySelector() {
-        return makeElement();
+      querySelector(selector) {
+        if (!elements.has(selector)) {
+          const element = makeElement();
+          if (selector === "#dealerSubmitModal") element.hidden = true;
+          elements.set(selector, element);
+        }
+        return elements.get(selector);
       },
       createElement() {
         const element = makeElement();
@@ -100,6 +109,7 @@ function loadRuntime() {
         return element;
       },
     },
+    elements,
     Intl,
     Number,
     Set,
@@ -132,12 +142,20 @@ window.__testApi = {
   computeAutoAdded,
   lineItems,
   currentOrder,
+  render,
   compactOrder: typeof compactOrder === "function" ? compactOrder : undefined,
   plainTextOrderSummary: typeof plainTextOrderSummary === "function" ? plainTextOrderSummary : undefined,
+  buildMarkdown: typeof buildMarkdown === "function" ? buildMarkdown : undefined,
+  downloadBuild: typeof downloadBuild === "function" ? downloadBuild : undefined,
+  openDealerSubmitModal: typeof openDealerSubmitModal === "function" ? openDealerSubmitModal : undefined,
+  closeDealerSubmitModal: typeof closeDealerSubmitModal === "function" ? closeDealerSubmitModal : undefined,
+  submitDealerBuild: typeof submitDealerBuild === "function" ? submitDealerBuild : undefined,
+  dealerSubmissionPayload: typeof dealerSubmissionPayload === "function" ? dealerSubmissionPayload : undefined,
   exportJson: typeof exportJson === "function" ? exportJson : undefined,
   exportCsv: typeof exportCsv === "function" ? exportCsv : undefined,
   downloads: window.__downloads,
   optionPrice,
+  elements,
 };
 `
   );
@@ -217,12 +235,11 @@ function compactSeatInteriorItems(runtime) {
   return section.items;
 }
 
-test("runtime steps include customer info and omit interior styling", () => {
+test("runtime steps omit customer info and interior styling", () => {
   const keys = data.steps.map((step) => step.step_key);
-  assert.ok(keys.includes("customer_info"));
+  assert.equal(keys.includes("customer_info"), false);
   assert.equal(keys.includes("interior_style"), false);
-  assert.ok(keys.indexOf("customer_info") > keys.indexOf("delivery"));
-  assert.ok(keys.indexOf("customer_info") < keys.indexOf("summary"));
+  assert.ok(keys.indexOf("delivery") < keys.indexOf("summary"));
 });
 
 test("selection modes have friendly display labels", () => {
@@ -440,7 +457,7 @@ test("app runtime has the requested navigation and filtering hooks", () => {
   assert.match(appSource, /function shouldHideChoice/);
   assert.match(appSource, /data-next-step/);
   assert.match(appSource, /renderTrimStandardEquipment/);
-  assert.match(appSource, /customer_info/);
+  assert.doesNotMatch(appSource, /state\.activeStep === "customer_info"/);
 });
 
 test("body style choices put coupe before convertible", () => {
@@ -592,7 +609,6 @@ test("current order section recap has predictable labels, one interior, and corr
     "Stripes",
     "Seats & Interior",
     "Pricing Summary",
-    "Customer Information",
   ]);
 
   const recapInteriorLines = order.sections.flatMap((section) => section.items).filter((item) => item.type === "selected_interior");
@@ -698,31 +714,79 @@ test("compact order sections omit empty/admin sections and use minimal item rows
   assert.ok(autoSection.items.some((item) => item.rpo === "FE3"), "auto-added FE3 should be grouped as required");
 });
 
-test("JSON and CSV exports use compact customer-facing output", () => {
+test("download build exports customer-facing Markdown", () => {
   const runtime = loadRuntime();
   runtime.state.bodyStyle = "coupe";
   runtime.state.trimLevel = "1LT";
   runtime.resetDefaults();
   runtime.reconcileSelections();
+  runtime.render();
+  runtime.downloadBuild();
+  assert.equal(runtime.downloads.length, 0, "incomplete build should not download");
+  assert.equal(runtime.elements.get("#downloadBuildButton").disabled, true);
+  assert.match(runtime.elements.get("#downloadBuildButton").title, /Complete required selections/);
 
   const paint = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001");
   assert.ok(paint, "Black paint should exist for the current variant");
   runtime.handleChoice(paint);
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+  runtime.reconcileSelections();
+  runtime.render();
+  assert.equal(runtime.elements.get("#downloadBuildButton").disabled, false);
 
-  runtime.exportJson();
-  const jsonDownload = runtime.downloads.at(-1);
-  assert.equal(jsonDownload.filename, "stingray-order-summary.json");
-  const json = JSON.parse(jsonDownload.content);
-  assert.equal(json.title, "2027 Corvette Stingray");
-  assert.equal(Object.hasOwn(json, "metadata"), false);
-  assert.equal(json.sections.every((section) => section.items.every((item) => Object.keys(item).join(",") === "rpo,label,price")), true);
+  runtime.downloadBuild();
+  const markdownDownload = runtime.downloads.at(-1);
+  assert.equal(markdownDownload.filename, "stingray-build.md");
+  assert.equal(markdownDownload.type, "text/markdown");
+  assert.match(markdownDownload.content, /^# 2027 Corvette Stingray/);
+  assert.match(markdownDownload.content, /### Variant\n\n- Corvette Stingray Coupe 1LT/);
+  assert.doesNotMatch(markdownDownload.content, /Body Style:/);
+  assert.doesNotMatch(markdownDownload.content, /Trim Level:/);
+  assert.match(markdownDownload.content, /### Exterior Paint/);
+  assert.doesNotMatch(markdownDownload.content, /Standard & Included/);
+  assert.doesNotMatch(markdownDownload.content, /Base MSRP/);
+  assert.match(markdownDownload.content, /### MSRP/);
+  assert.equal(markdownDownload.content.includes("option_id"), false);
+});
 
-  runtime.exportCsv();
-  const csvDownload = runtime.downloads.at(-1);
-  assert.equal(csvDownload.filename, "stingray-order-summary.csv");
-  assert.equal(csvDownload.content.split("\n")[0], "section,rpo,label,price");
-  assert.equal(csvDownload.content.includes("description"), false);
-  assert.equal(csvDownload.content.includes("option_id"), false);
+test("submit to dealer modal prepares a validated front-end payload", () => {
+  assert.match(htmlSource, /id="submitDealerButton"[\s\S]*Submit to Dealer/);
+  assert.match(htmlSource, /id="dealerSubmitModal"/);
+
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.render();
+  runtime.openDealerSubmitModal();
+  assert.equal(runtime.elements.get("#dealerSubmitModal").hidden, true, "incomplete builds should not open the submit modal");
+  assert.equal(runtime.elements.get("#submitDealerButton").disabled, true);
+
+  const paint = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001");
+  runtime.handleChoice(paint);
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+  runtime.reconcileSelections();
+  runtime.render();
+  assert.equal(runtime.elements.get("#submitDealerButton").disabled, false);
+
+  runtime.openDealerSubmitModal();
+  assert.equal(runtime.elements.get("#dealerSubmitModal").hidden, false);
+  assert.equal(runtime.submitDealerBuild(), null, "name and email should be required");
+  assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Name is required/);
+
+  runtime.elements.get("#dealerSubmitName").value = "Ada Buyer";
+  runtime.elements.get("#dealerSubmitEmail").value = "ada@example.com";
+  runtime.elements.get("#dealerSubmitPhone").value = "555-0100";
+  runtime.elements.get("#dealerSubmitComments").value = "Please contact me about this build.";
+  const payload = runtime.submitDealerBuild();
+  assert.equal(payload.model, "stingray");
+  assert.equal(payload.customer.name, "Ada Buyer");
+  assert.equal(payload.customer.email, "ada@example.com");
+  assert.match(payload.plain_text_summary, /Ada Buyer/);
+  assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /endpoint still needs to be connected/);
+  runtime.closeDealerSubmitModal();
+  assert.equal(runtime.elements.get("#dealerSubmitModal").hidden, true);
 });
 
 test("plain text order summary renders compact order data for emails and review", () => {
@@ -783,7 +847,6 @@ test("plain text order summary omits empty comments and internal debug fields", 
     "description",
     "section_key",
     "Pricing Summary",
-    "Customer Information",
   ]) {
     assert.equal(summary.includes(forbidden), false, `summary should omit ${forbidden}`);
   }
@@ -900,7 +963,7 @@ test("R6X component order output uses PriceRef pricing and D30 only zeroes the R
 });
 
 test("order summary helpers are exposed for browser debug inspection", () => {
-  assert.match(appSource, /window\.__orderDebug\s*=\s*\{\s*currentOrder,\s*compactOrder,\s*plainTextOrderSummary,\s*\}/);
+  assert.match(appSource, /window\.__orderDebug\s*=\s*\{[\s\S]*currentOrder,[\s\S]*compactOrder,[\s\S]*plainTextOrderSummary,[\s\S]*buildMarkdown,[\s\S]*\}/);
 });
 
 test("replaceable suspension and exhaust defaults are encoded", () => {

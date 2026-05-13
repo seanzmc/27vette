@@ -120,6 +120,12 @@ button:hover {
   background: var(--accent-dark);
 }
 
+button:disabled {
+  border-color: var(--disabled);
+  background: var(--disabled);
+  cursor: not-allowed;
+}
+
 .ghost-button {
   background: transparent;
   color: var(--accent-dark);
@@ -477,6 +483,73 @@ textarea {
 
 .full-field {
   grid-column: 1 / -1;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  padding: 20px;
+  background: rgba(23, 32, 38, 0.48);
+}
+
+.modal-backdrop[hidden] {
+  display: none;
+}
+
+.dealer-submit-modal {
+  width: min(680px, 100%);
+  max-height: min(760px, calc(100vh - 40px));
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.modal-header,
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--line);
+  padding: 18px 20px;
+}
+
+.icon-button {
+  min-width: 0;
+}
+
+.dealer-submit-form {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+}
+
+.dealer-submit-status {
+  min-height: 20px;
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.dealer-submit-status[data-status="error"] {
+  color: var(--accent-dark);
+}
+
+.dealer-submit-status[data-status="success"] {
+  color: var(--ok);
+}
+
+.modal-actions {
+  justify-content: flex-end;
 }
 
 .total-list {

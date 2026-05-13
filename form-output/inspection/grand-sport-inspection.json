@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-11T05:32:43+00:00",
+  "generated_at": "2026-05-13T19:39:55+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -10455,7 +10455,7 @@
         "special_mentions": [
           "Z15"
         ],
-        "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.\n2. Requires (Z15) Grand Sport Heritage Graphics. Note: When (D84) Carbon Flash painted nacelles and roof is ordered (required or selected) roof will not include the stripe."
+        "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics."
       },
       {
         "option_id": "opt_dmv_001",
@@ -10470,7 +10470,7 @@
         "special_mentions": [
           "Z15"
         ],
-        "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic. \n2. Requires (Z15) Grand Sport Heritage Graphics. Requires (D84) Carbon Flash painted nacelles and roof when the following exterior colors are ordered: G26/G4Z/GBK/GKZ/GPH. Not available with exterior color (GKA) Blade Silver Metallic. Note: When (D84) Carbon Flash painted nacelles and roof is ordered (required or selected) roof will not include the stripe."
+        "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
       },
       {
         "option_id": "opt_dmw_001",
@@ -10485,7 +10485,7 @@
         "special_mentions": [
           "Z15"
         ],
-        "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White. \n2. Requires (Z15) Grand Sport Heritage Graphics. Requires (D84) Carbon Flash painted nacelles and roof when the following exterior colors are ordered: G26/G4Z/GBK. Not available with exterior color (G8G) Arctic White. Note: When (D84) Carbon Flash painted nacelles and roof is ordered (required or selected) roof will not include the stripe."
+        "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White."
       },
       {
         "option_id": "opt_dmx_001",
@@ -10500,7 +10500,7 @@
         "special_mentions": [
           "Z15"
         ],
-        "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.\n2. Requires (Z15) Grand Sport Heritage Graphics. Requires (D84) Carbon Flash painted nacelles and roof when the following exterior colors are ordered: G26/G4Z/GBK/GKZ/GPH. Not available with exterior color (GTR) Admiral Blue Metallic. Note: When (D84) Carbon Flash painted nacelles and roof is ordered (required or selected) roof will not include the stripe."
+        "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
       },
       {
         "option_id": "opt_dmy_001",
@@ -10515,7 +10515,7 @@
         "special_mentions": [
           "Z15"
         ],
-        "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat. \n2. Requires (Z15) Grand Sport Heritage Graphics. Requires (D84) Carbon Flash painted nacelles and roof when the following exterior colors are ordered: G26/G4Z/GBK/GTR. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat. Note: When (D84) Carbon Flash painted nacelles and roof is ordered (required or selected) roof will not include the stripe."
+        "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
       },
       {
         "option_id": "opt_17a_001",

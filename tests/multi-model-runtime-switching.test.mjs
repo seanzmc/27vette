@@ -44,7 +44,11 @@ function loadRuntime() {
   const elements = new Map();
   const document = {
     querySelector(selector) {
-      if (!elements.has(selector)) elements.set(selector, makeElement());
+      if (!elements.has(selector)) {
+        const element = makeElement();
+        if (selector === "#dealerSubmitModal") element.hidden = true;
+        elements.set(selector, element);
+      }
       return elements.get(selector);
     },
     createElement() {
@@ -106,10 +110,17 @@ window.__testApi = {
   resetDefaults,
   reconcileSelections,
   handleChoice,
+  render,
   currentOrder,
   compactOrder,
   plainTextOrderSummary,
-  exportJson,
+    buildMarkdown,
+    downloadBuild,
+    openDealerSubmitModal,
+    closeDealerSubmitModal,
+    submitDealerBuild,
+    dealerSubmissionPayload,
+    exportJson,
   exportCsv,
   downloads: window.__downloads,
   elements,
@@ -300,6 +311,22 @@ test("Grand Sport heritage hash marks auto-add Z15 and leave only center stripes
 
   runtime.handleChoice(centerStripe);
   assert.equal(runtime.state.selected.has("opt_dmu_001"), true, "center stripes should remain selectable with a hash mark");
+  const coupeD84 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_d84_001");
+  assert.equal(coupeD84.status, "unavailable", "D84 message should not display for coupe");
+
+  runtime.state.bodyStyle = "convertible";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  const convertibleD84 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_d84_001");
+  assert.ok(convertibleD84, "D84 should remain visible for Grand Sport convertibles");
+  assert.equal(convertibleD84.description, "Painted nacelles and roof");
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_17a_001"));
+  const convertibleCenterStripe = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_dmu_001");
+  assert.equal(convertibleCenterStripe.description, "When D84 is selected, the roof will not include the stripe.");
+  runtime.handleChoice(convertibleCenterStripe);
+  assert.equal(runtime.state.selected.has("opt_dmu_001"), true, "center stripe should not require D84 on convertible");
+  assert.equal(runtime.state.selected.has("opt_d84_001"), false, "center stripe should not auto-select D84");
 });
 
 test("Grand Sport UQT is selectable on 1LT and included on higher trims from workbook overrides", () => {
@@ -455,37 +482,97 @@ test("runtime defaults to Stingray and switches models with a clean build reset"
   assert.equal(runtime.compactOrder().title, "2027 Corvette Stingray");
 });
 
-test("model-specific exports keep the compact schema and Stingray filenames", () => {
+test("model-specific build downloads keep customer-facing Markdown and filenames", () => {
   const runtime = loadRuntime();
 
-  runtime.exportJson();
-  let jsonDownload = runtime.downloads.at(-1);
-  assert.equal(jsonDownload.filename, "stingray-order-summary.json");
-  assert.deepEqual(Object.keys(JSON.parse(jsonDownload.content)), [
-    "title",
-    "submitted_at",
-    "customer",
-    "vehicle",
-    "sections",
-    "standard_equipment",
-    "msrp",
-  ]);
-
-  runtime.exportCsv();
-  let csvDownload = runtime.downloads.at(-1);
-  assert.equal(csvDownload.filename, "stingray-order-summary.csv");
-  assert.equal(csvDownload.content.split("\n")[0], "section,rpo,label,price");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001"));
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+  runtime.reconcileSelections();
+  runtime.downloadBuild();
+  let markdownDownload = runtime.downloads.at(-1);
+  assert.equal(markdownDownload.filename, "stingray-build.md");
+  assert.match(markdownDownload.content, /^# 2027 Corvette Stingray/);
+  assert.match(markdownDownload.content, /### Variant\n\n- Corvette Stingray Coupe 1LT/);
+  assert.doesNotMatch(markdownDownload.content, /Body Style:/);
+  assert.doesNotMatch(markdownDownload.content, /Trim Level:/);
+  assert.doesNotMatch(markdownDownload.content, /Standard & Included/);
+  assert.doesNotMatch(markdownDownload.content, /Base MSRP/);
 
   runtime.activateModel("grandSport");
-  runtime.exportJson();
-  jsonDownload = runtime.downloads.at(-1);
-  assert.equal(jsonDownload.filename, "grand-sport-order-summary.json");
-  assert.equal(JSON.parse(jsonDownload.content).title, "2027 Corvette Grand Sport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001"));
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+  runtime.reconcileSelections();
+  runtime.downloadBuild();
+  markdownDownload = runtime.downloads.at(-1);
+  assert.equal(markdownDownload.filename, "grand-sport-build.md");
+  assert.match(markdownDownload.content, /^# 2027 Corvette Grand Sport/);
+  assert.match(markdownDownload.content, /### Variant\n\n- Corvette Grand Sport Coupe 1LT/);
+  assert.doesNotMatch(markdownDownload.content, /Standard & Included/);
+  assert.doesNotMatch(markdownDownload.content, /Base MSRP/);
+});
 
-  runtime.exportCsv();
-  csvDownload = runtime.downloads.at(-1);
-  assert.equal(csvDownload.filename, "grand-sport-order-summary.csv");
-  assert.equal(csvDownload.content.split("\n")[0], "section,rpo,label,price");
+test("Grand Sport dealer submission payload stays model-scoped and front-end-only", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001"));
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+  runtime.reconcileSelections();
+  runtime.render();
+
+  runtime.openDealerSubmitModal();
+  assert.equal(runtime.elements.get("#dealerSubmitModal").hidden, false);
+  runtime.elements.get("#dealerSubmitName").value = "Ada Buyer";
+  runtime.elements.get("#dealerSubmitEmail").value = "ada@example.com";
+  const payload = runtime.submitDealerBuild();
+  assert.equal(payload.model, "grandSport");
+  assert.match(payload.plain_text_summary, /^2027 Corvette Grand Sport\n\n/);
+  assert.equal(payload.customer.email, "ada@example.com");
+});
+
+test("Grand Sport Markdown export includes audited sections and auto-added options", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "3LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001"));
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_17a_001"));
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_feb_001"));
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j57_001"));
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0f_001"));
+  runtime.state.selectedInterior = "3LT_AH2_EL9";
+  runtime.reconcileSelections();
+
+  const markdown = runtime.buildMarkdown();
+  assert.match(markdown, /^# 2027 Corvette Grand Sport/);
+  assert.match(markdown, /### Variant\n\n- Corvette Grand Sport Coupe 3LT/);
+  for (const heading of ["Performance & Mechanical", "Stripes", "Seats & Interior", "Auto-Added / Required", "MSRP"]) {
+    assert.match(markdown, new RegExp(`### ${heading}`), `${heading} should be present`);
+  }
+  assert.match(markdown, /- EL9 Santorini Blue Dipped with Torch Red accents: \$1,995/);
+  assert.match(markdown, /- 17A .*: \$0/);
+  assert.match(markdown, /- T0F .*: \$8,995/);
+  assert.match(markdown, /- Z15 .*: \$995/);
+  assert.match(markdown, /- Z25 .*: \$0/);
+  assert.match(markdown, /- CFZ .*: \$0/);
+  assert.match(markdown, /- 3F9 .*: \$0/);
+  assert.doesNotMatch(markdown, /### [^\n]+\n\n### /, "empty sections should not be emitted");
+  assert.doesNotMatch(markdown, /^## /m, "export sections should use h3 headings");
+  assert.doesNotMatch(markdown, /Body Style:|Trim Level:|Standard & Included|Base MSRP|option_id/);
 });
 
 test("Grand Sport interiors are model-scoped and export selected interior identity", () => {

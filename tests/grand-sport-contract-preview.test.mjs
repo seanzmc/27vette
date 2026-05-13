@@ -32,7 +32,7 @@ test("Grand Sport contract preview has the expected read-only contract shape", (
   assert.equal(preview.variants.every((variant) => variant.preview_included === true), true);
   assert.equal(preview.variants.every((variant) => variant.source_active === "False"), true);
   assert.equal(preview.contextChoices.length, 8);
-  assert.equal(preview.steps.length, 15);
+  assert.equal(preview.steps.length, 14);
   assert.equal(preview.choices.length, 1240);
   assert.equal(preview.candidateStandardEquipment.length, 455);
 });
@@ -89,6 +89,12 @@ test("rule/detail hot spot buckets are preserved for later phases", () => {
   assert.equal(preview.ruleDetailHotSpots.counts.not_available, 49);
   assert.equal(preview.ruleDetailHotSpots.counts.included_with, 17);
   assert.equal(preview.ruleDetailHotSpots.counts.includes, 53);
+  assert.equal(
+    preview.ruleDetailHotSpots.rows.some(
+      (row) => ["DMU", "DMV", "DMW", "DMX", "DMY"].includes(row.rpo) && /Requires \(D84\)/.test(row.detail_raw)
+    ),
+    false
+  );
   assert.equal(preview.ruleDetailHotSpots.counts.only, 19);
   assert.equal(preview.ruleDetailHotSpots.counts.not_recommended, 4);
   assert.equal(preview.ruleDetailHotSpots.counts.except, 2);

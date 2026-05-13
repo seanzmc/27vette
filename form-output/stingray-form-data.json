@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-05-11T05:31:09+00:00"
+    "generated_at": "2026-05-13T19:38:51+00:00"
   },
   "variants": [
     {
@@ -153,16 +153,9 @@
       "section_ids": "sec_cust_001"
     },
     {
-      "step_key": "customer_info",
-      "step_label": "Customer Information",
-      "runtime_order": 14,
-      "source": "runtime",
-      "section_ids": ""
-    },
-    {
       "step_key": "summary",
       "step_label": "Summary",
-      "runtime_order": 15,
+      "runtime_order": 14,
       "source": "runtime",
       "section_ids": ""
     }

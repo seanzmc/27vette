@@ -23,8 +23,8 @@
             </select>
           </label>
           <button id="resetButton" type="button" class="ghost-button">Reset</button>
-          <button id="exportJsonButton" type="button">Export JSON</button>
-          <button id="exportCsvButton" type="button">Export CSV</button>
+          <button id="downloadBuildButton" type="button">Download Build</button>
+          <button id="submitDealerButton" type="button">Submit to Dealer</button>
         </div>
       </header>
 
@@ -79,7 +79,44 @@
       </div>
     </main>
 
-    <script src="./data.js?v=6"></script>
-    <script src="./app.js?v=6"></script>
+    <div id="dealerSubmitModal" class="modal-backdrop" hidden>
+      <div class="dealer-submit-modal" role="dialog" aria-modal="true" aria-labelledby="dealerSubmitTitle">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">Dealer Request</p>
+            <h2 id="dealerSubmitTitle">Submit to Dealer</h2>
+          </div>
+          <button id="dealerSubmitCloseButton" class="ghost-button icon-button" type="button" aria-label="Close dealer submission">Close</button>
+        </div>
+        <form id="dealerSubmitForm" class="dealer-submit-form">
+          <div class="customer-field-grid">
+            <label>
+              Name
+              <input id="dealerSubmitName" name="name" type="text" autocomplete="name" required>
+            </label>
+            <label>
+              Email
+              <input id="dealerSubmitEmail" name="email" type="email" autocomplete="email" required>
+            </label>
+            <label>
+              Phone Number
+              <input id="dealerSubmitPhone" name="phone" type="tel" autocomplete="tel">
+            </label>
+            <label class="full-field">
+              Message
+              <textarea id="dealerSubmitComments" name="comments" rows="5"></textarea>
+            </label>
+          </div>
+          <p id="dealerSubmitStatus" class="dealer-submit-status" role="status" aria-live="polite"></p>
+          <div class="modal-actions">
+            <button id="dealerSubmitCancelButton" class="ghost-button" type="button">Cancel</button>
+            <button id="dealerSubmitConfirmButton" type="submit">Prepare Submission</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="./data.js?v=11"></script>
+    <script src="./app.js?v=11"></script>
   </body>
 </html>

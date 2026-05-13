@@ -52,8 +52,17 @@ const els = {
   missingList: document.querySelector("#missingList"),
   alertRegion: document.querySelector("#alertRegion"),
   resetButton: document.querySelector("#resetButton"),
-  exportJsonButton: document.querySelector("#exportJsonButton"),
-  exportCsvButton: document.querySelector("#exportCsvButton"),
+  downloadBuildButton: document.querySelector("#downloadBuildButton"),
+  submitDealerButton: document.querySelector("#submitDealerButton"),
+  dealerSubmitModal: document.querySelector("#dealerSubmitModal"),
+  dealerSubmitForm: document.querySelector("#dealerSubmitForm"),
+  dealerSubmitName: document.querySelector("#dealerSubmitName"),
+  dealerSubmitEmail: document.querySelector("#dealerSubmitEmail"),
+  dealerSubmitPhone: document.querySelector("#dealerSubmitPhone"),
+  dealerSubmitComments: document.querySelector("#dealerSubmitComments"),
+  dealerSubmitStatus: document.querySelector("#dealerSubmitStatus"),
+  dealerSubmitCloseButton: document.querySelector("#dealerSubmitCloseButton"),
+  dealerSubmitCancelButton: document.querySelector("#dealerSubmitCancelButton"),
   modelSelect: document.querySelector("#modelSelect"),
   appTitle: document.querySelector("#appTitle"),
 };
@@ -81,7 +90,6 @@ const orderSectionDefinitions = [
   ["delivery", "Delivery"],
   ["auto_added_required", "Auto-Added / Required"],
   ["pricing_summary", "Pricing Summary"],
-  ["customer_information", "Customer Information"],
 ];
 const orderSectionLabels = new Map(orderSectionDefinitions);
 const orderSectionOrder = new Map(orderSectionDefinitions.map(([key], index) => [key, index]));
@@ -1110,13 +1118,6 @@ function renderStepContent({ resetScroll = false } = {}) {
         ${renderInteriorGroups(interiors)}
       </section>
     `;
-  } else if (state.activeStep === "customer_info") {
-    body = `
-      <section class="section-block">
-        <div class="section-title"><h3>Customer Information</h3><span>Optional order details</span></div>
-        ${renderCustomerForm()}
-      </section>
-    `;
   } else {
     const rows = activeChoiceRows()
       .filter((choice) => choice.step_key === state.activeStep)
@@ -1210,6 +1211,12 @@ function renderSummary() {
     "<li class=\"empty\">No auto-added RPOs.</li>";
   const missing = missingRequired();
   els.missingList.innerHTML = missing.map((item) => `<li>${item}</li>`).join("") || "<li class=\"empty\">No open required choices.</li>";
+  els.downloadBuildButton.disabled = missing.length > 0;
+  els.downloadBuildButton.title = missing.length ? "Complete required selections before downloading your build." : "";
+  if (els.submitDealerButton) {
+    els.submitDealerButton.disabled = missing.length > 0;
+    els.submitDealerButton.title = missing.length ? "Complete required selections before submitting your build." : "";
+  }
   renderStandardEquipment();
 
   const dataWarnings = (data.validation || []).filter((item) => item.severity === "error");
@@ -1300,7 +1307,7 @@ function sectionedOrderRecap(items, pricing) {
     .filter(
       (section) =>
         section.items.length ||
-        ["vehicle", "pricing_summary", "customer_information"].includes(section.section_key)
+        ["vehicle", "pricing_summary"].includes(section.section_key)
     )
     .sort((a, b) => (orderSectionOrder.get(a.section_key) ?? 999) - (orderSectionOrder.get(b.section_key) ?? 999));
 }
@@ -1370,7 +1377,7 @@ function compactOrder() {
       base_price: order.vehicle.base_price,
     },
     sections: order.sections
-      .filter((section) => !["vehicle", "pricing_summary", "customer_information"].includes(section.section_key))
+      .filter((section) => !["vehicle", "pricing_summary"].includes(section.section_key))
       .filter((section) => section.items.length)
       .map((section) => ({
         section: section.section_label,
@@ -1419,10 +1426,37 @@ function plainTextOrderSummary(order = compactOrder()) {
   return lines.join("\n").replace(/\n{3,}/g, "\n\n");
 }
 
+function buildMarkdown(order = compactOrder()) {
+  const lines = [
+    `# ${order.title}`,
+    "",
+    `Generated: ${order.submitted_at}`,
+    "",
+    "### Variant",
+    "",
+    `- ${order.vehicle.display_name || ""}`,
+    "",
+  ];
+
+  for (const section of order.sections) {
+    if (!section.items.length) continue;
+    lines.push(`### ${section.section}`, "");
+    for (const item of section.items) {
+      const rpo = item.rpo ? `${item.rpo} ` : "";
+      lines.push(`- ${rpo}${item.label || ""}: ${formatMoney(item.price)}`);
+    }
+    lines.push("");
+  }
+
+  lines.push("### MSRP", "", `- Total MSRP: ${formatMoney(order.msrp)}`, "");
+  return lines.join("\n").replace(/\n{3,}/g, "\n\n");
+}
+
 window.__orderDebug = {
   currentOrder,
   compactOrder,
   plainTextOrderSummary,
+  buildMarkdown,
 };
 
 function download(filename, content, type) {
@@ -1449,6 +1483,86 @@ function exportCsv() {
   }
   rows.push(["MSRP", "", "", order.msrp].map((value) => JSON.stringify(value)).join(","));
   download(`${activeModel.exportSlug || "stingray"}-order-summary.csv`, rows.join("\n"), "text/csv");
+}
+
+function downloadBuild() {
+  if (missingRequired().length > 0) return;
+  download(`${activeModel.exportSlug || "stingray"}-build.md`, buildMarkdown(), "text/markdown");
+}
+
+function setDealerSubmitStatus(message, type = "") {
+  if (!els.dealerSubmitStatus) return;
+  els.dealerSubmitStatus.textContent = message;
+  els.dealerSubmitStatus.dataset.status = type;
+}
+
+function populateDealerSubmitForm() {
+  if (els.dealerSubmitName) els.dealerSubmitName.value = state.customer.name;
+  if (els.dealerSubmitEmail) els.dealerSubmitEmail.value = state.customer.email;
+  if (els.dealerSubmitPhone) els.dealerSubmitPhone.value = state.customer.phone;
+  if (els.dealerSubmitComments) els.dealerSubmitComments.value = state.customer.comments;
+}
+
+function readDealerSubmitForm() {
+  state.customer.name = (els.dealerSubmitName?.value || "").trim();
+  state.customer.email = (els.dealerSubmitEmail?.value || "").trim();
+  state.customer.phone = (els.dealerSubmitPhone?.value || "").trim();
+  state.customer.comments = (els.dealerSubmitComments?.value || "").trim();
+  return customerInformation();
+}
+
+function dealerSubmitErrors(customer = readDealerSubmitForm()) {
+  const errors = [];
+  if (!customer.name) errors.push("Name is required.");
+  if (!customer.email) {
+    errors.push("Email is required.");
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email)) {
+    errors.push("Enter a valid email address.");
+  }
+  return errors;
+}
+
+function dealerSubmissionPayload(order = compactOrder()) {
+  return {
+    model: activeModelKey,
+    customer: order.customer,
+    vehicle: order.vehicle,
+    sections: order.sections,
+    msrp: order.msrp,
+    plain_text_summary: plainTextOrderSummary(order),
+  };
+}
+
+function openDealerSubmitModal() {
+  if (missingRequired().length > 0 || !els.dealerSubmitModal) return;
+  populateDealerSubmitForm();
+  setDealerSubmitStatus("", "");
+  els.dealerSubmitModal.hidden = false;
+  els.dealerSubmitName?.focus?.();
+}
+
+function closeDealerSubmitModal() {
+  if (!els.dealerSubmitModal) return;
+  els.dealerSubmitModal.hidden = true;
+  setDealerSubmitStatus("", "");
+}
+
+function submitDealerBuild(event) {
+  event?.preventDefault?.();
+  if (missingRequired().length > 0) {
+    setDealerSubmitStatus("Complete required selections before submitting your build.", "error");
+    return null;
+  }
+  const customer = readDealerSubmitForm();
+  const errors = dealerSubmitErrors(customer);
+  if (errors.length) {
+    setDealerSubmitStatus(errors.join(" "), "error");
+    return null;
+  }
+  const payload = dealerSubmissionPayload();
+  window.__lastDealerSubmission = payload;
+  setDealerSubmitStatus("Build prepared for dealer submission. A dealer endpoint still needs to be connected before this sends automatically.", "success");
+  return payload;
 }
 
 function resetModelScopedState() {
@@ -1507,8 +1621,11 @@ function init() {
     reconcileSelections();
     render({ resetScroll: true });
   });
-  els.exportJsonButton.addEventListener("click", exportJson);
-  els.exportCsvButton.addEventListener("click", exportCsv);
+  els.downloadBuildButton.addEventListener("click", downloadBuild);
+  els.submitDealerButton?.addEventListener("click", openDealerSubmitModal);
+  els.dealerSubmitForm?.addEventListener("submit", submitDealerBuild);
+  els.dealerSubmitCloseButton?.addEventListener("click", closeDealerSubmitModal);
+  els.dealerSubmitCancelButton?.addEventListener("click", closeDealerSubmitModal);
   render();
 }
 

@@ -112,7 +112,7 @@ test("Grand Sport draft preserves the live generated-data top-level contract", (
 test("Grand Sport draft includes the full variant matrix and standard equipment rows", () => {
   assert.equal(draft.variants.length, 6);
   assert.equal(draft.contextChoices.length, 8);
-  assert.equal(draft.steps.length, 15);
+  assert.equal(draft.steps.length, 14);
   assert.deepEqual(
     JSON.parse(JSON.stringify(draft.steps.map((step) => [step.step_key, step.step_label]))),
     [
@@ -129,7 +129,6 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
       ["interior_trim", "Interior Trim"],
       ["accessories", "Accessories"],
       ["delivery", "Custom Delivery"],
-      ["customer_info", "Customer Information"],
       ["summary", "Summary"],
     ]
   );
@@ -328,6 +327,39 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
       assert.equal(ruleKeys.has(`${hashOptionId}::excludes::${targetId}::::active`), false, `${hashOptionId} should allow ${targetId}`);
     }
   }
+
+  for (const centerStripeOptionId of heritageCenterStripeOptionIds) {
+    assert.equal(ruleKeys.has(`${centerStripeOptionId}::requires::opt_d84_001::::active`), false, `${centerStripeOptionId} should not require D84`);
+    assert.equal(ruleKeys.has(`${centerStripeOptionId}::excludes::opt_d84_001::::active`), false, `${centerStripeOptionId} should not exclude D84`);
+  }
+  assert.equal(
+    draft.rules.some(
+      (rule) =>
+        heritageCenterStripeOptionIds.includes(rule.source_id) &&
+        (rule.source_note || rule.original_detail_raw || "").includes("Requires (D84)")
+    ),
+    false,
+    "Grand Sport center stripe rule notes should not preserve stale D84 requirement text"
+  );
+
+  const d84Choices = draft.choices.filter((choice) => choice.option_id === "opt_d84_001");
+  const centerStripeChoices = draft.choices.filter((choice) => heritageCenterStripeOptionIds.includes(choice.option_id));
+  assert.ok(d84Choices.length > 0, "D84 should still be emitted as a convertible roof option");
+  assert.equal(
+    d84Choices.every((choice) => (choice.body_style === "convertible" ? choice.status === "available" : choice.status === "unavailable")),
+    true,
+    "D84 should only be available, and therefore visible, on convertible choices"
+  );
+  assert.equal(
+    d84Choices.filter((choice) => choice.status === "available").every((choice) => choice.description === "Painted nacelles and roof"),
+    true,
+    "D84 should keep the roof-option description"
+  );
+  assert.equal(
+    centerStripeChoices.every((choice) => choice.description === "When D84 is selected, the roof will not include the stripe."),
+    true,
+    "Grand Sport center stripes should carry the workbook-authored D84 disclosure"
+  );
 });
 
 test("Grand Sport draft suppresses reviewed inactive/deferred option rows without hiding selectable seatbelts", () => {

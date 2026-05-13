@@ -1,15 +1,15 @@
 # Grand Sport Rule Audit
 
-Generated: `2026-05-11T05:32:42+00:00`
+Generated: `2026-05-13T19:39:55+00:00`
 Status: `rule_audit_generated`
 
 ## Summary
 
-- Workbook rule rows: 337
-- Expected draft runtime rules: 203
+- Workbook rule rows: 328
+- Expected draft runtime rules: 194
 - Omitted duplicate exclusive-group rules: 8
-- Raw detail candidate keys: 232
-- Workbook rules matching detail raw: 85
+- Raw detail candidate keys: 206
+- Workbook rules matching detail raw: 76
 - Workbook manual/approved/copied rules: 252
 - Skipped/review rows: 3
 - Unresolved non-interior RPO mentions: 4
@@ -87,7 +87,7 @@ Status: `rule_audit_generated`
 - `gs_rule_opt_dx4_001_excludes_opt_gkz_001`: opt_dx4_001 excludes opt_gkz_001
 - `gs_rule_opt_dx4_001_excludes_opt_gph_001`: opt_dx4_001 excludes opt_gph_001
 - `gs_rule_opt_j6l_001_requires_opt_j57_001`: opt_j6l_001 requires opt_j57_001
-- ... 50 more
+- ... 41 more
 
 ## Omitted Duplicate Exclusive Group Rules
 
