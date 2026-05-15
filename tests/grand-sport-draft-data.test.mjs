@@ -128,7 +128,7 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
       ["packages_performance", "Performance & Aero"],
       ["aero_exhaust_stripes_accessories", "Stripes"],
       ["seat", "Seats"],
-      ["base_interior", "Base Interior"],
+      ["base_interior", "Interior Color"],
       ["seat_belt", "Seat Belt"],
       ["interior_trim", "Interior Trim"],
       ["accessories", "Accessories"],
@@ -457,7 +457,7 @@ test("Grand Sport draft section placement follows section_master step_key", () =
   assert.equal(sectionById.get("sec_stri_001")?.step_key, "aero_exhaust_stripes_accessories");
   assert.equal(sectionById.get("sec_stri_001")?.section_display_order, 30);
   assert.equal(sectionById.get("sec_exha_001")?.step_key, "packages_performance");
-  assert.equal(sectionById.get("sec_exha_001")?.section_display_order, 30);
+  assert.equal(sectionById.get("sec_exha_001")?.section_display_order, 40);
   assert.equal(sectionById.get("sec_whee_001")?.step_key, "wheels");
   assert.equal(sectionById.get("sec_perf_support_001")?.step_key, "wheels");
   assert.equal(sectionById.get("sec_perf_support_001")?.section_name, "Mechanical");

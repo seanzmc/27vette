@@ -472,7 +472,7 @@ test("BC7, N26/TU7, and ZF1/T0A visibility follow the QA contract", () => {
   const t0a = uniqueChoicesByRpo("T0A")[0];
   assert.ok(t0a, "T0A should exist");
   assert.equal(t0a.selectable, "True");
-  assert.equal(t0a.step_key, "aero_exhaust_stripes_accessories");
+  assert.equal(t0a.step_key, "packages_performance");
 });
 
 test("app runtime has the requested navigation and filtering hooks", () => {
@@ -628,7 +628,6 @@ test("current order section recap has predictable labels, one interior, and corr
     "Exterior Appearance",
     "Wheels & Brakes",
     "Performance & Mechanical",
-    "Stripes",
     "Seats & Interior",
     "Pricing Summary",
   ]);
@@ -825,7 +824,7 @@ test("submit to dealer modal posts a validated dealer payload", async () => {
   assert.match(postedBody.msrp, /^\$\d{1,3}(,\d{3})*$/);
   assert.equal(postedBody.plain_text_summary.includes(`<strong>Total MSRP: ${postedBody.msrp}</strong>`), true);
   assert.doesNotMatch(postedBody.plain_text_summary, /<h3/i);
-  assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Build submitted\. A Corvette specialist will contact you soon\. Confirmation ID: 112233\./);
+  assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Build submitted to Stingray Chevrolet\. A Corvette specialist will contact you soon\. Confirmation ID: 112233\./);
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").hidden, true, "successful submit should remove the submit button");
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").disabled, true, "successful submit should keep submit unavailable");
   assert.equal(runtime.elements.get("#dealerSubmitCancelButton").textContent, "Close", "successful submit should change bottom cancel action to close");
@@ -835,7 +834,7 @@ test("submit to dealer modal posts a validated dealer payload", async () => {
   assert.equal(runtime.elements.get("#dealerSubmitModal").hidden, true);
   runtime.openDealerSubmitModal();
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").hidden, true, "reopened successful modal should keep submit hidden");
-  assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Build submitted\. A Corvette specialist will contact you soon\./);
+  assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Build submitted to Stingray Chevrolet\. A Corvette specialist will contact you soon\./);
 });
 
 test("submit to dealer modal surfaces endpoint failures", async () => {
@@ -1237,9 +1236,36 @@ test("stripe sections use the requested order", () => {
 
   assert.deepEqual(
     JSON.parse(JSON.stringify(sectionNames)),
-    ["Exhaust", "Spoiler", "Stripes", "LPO Exterior", "LPO Wheels"]
+    ["Stripes", "GS Hash Marks", "GS Center Stripes"]
   );
   assert.match(appSource, /section_display_order/);
+});
+
+test("Stingray section placement follows workbook step ownership", () => {
+  const sectionById = new Map(data.sections.map((section) => [section.section_id, section]));
+  assert.equal(sectionById.get("sec_perf_001")?.section_name, "Mechanical");
+  assert.equal(sectionById.get("sec_perf_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_exha_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_spoi_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_lpoe_001")?.step_key, "accessories");
+  assert.equal(sectionById.get("sec_lpow_001")?.step_key, "accessories");
+  assert.equal(sectionById.get("sec_lpoi_001")?.step_key, "accessories");
+  assert.equal(data.choices.some((choice) => choice.section_id === "sec_onst_001" && choice.active === "True"), false);
+
+  const activeSectionIds = new Set(data.choices.filter((choice) => choice.active === "True").map((choice) => choice.section_id));
+  const activePerformanceSections = data.sections
+    .filter((section) => section.step_key === "packages_performance" && activeSectionIds.has(section.section_id))
+    .sort((a, b) => Number(a.section_display_order) - Number(b.section_display_order))
+    .map((section) => section.section_name);
+  assert.deepEqual(JSON.parse(JSON.stringify(activePerformanceSections)), ["Mechanical", "Suspension", "Spoiler", "Exhaust"]);
+
+  const activeAccessorySections = data.sections
+    .filter((section) => section.step_key === "accessories" && activeSectionIds.has(section.section_id))
+    .sort((a, b) => Number(a.section_display_order) - Number(b.section_display_order))
+    .map((section) => section.section_name);
+  assert.deepEqual(JSON.parse(JSON.stringify(activeAccessorySections)), ["LPO Wheels", "LPO Exterior", "LPO Interior"]);
+
+  assert.equal(data.steps.find((step) => step.step_key === "base_interior")?.step_label, "Interior Color");
 });
 
 test("exterior appearance, engine appearance, and wheel sections use QA-4 ordering", () => {
@@ -1256,8 +1282,10 @@ test("exterior appearance, engine appearance, and wheel sections use QA-4 orderi
     .map((choice) => choice.rpo);
   assert.deepEqual(JSON.parse(JSON.stringify(engineOrder)), ["BC7", "BCP", "BCS", "BC4", "B6P", "ZZ3", "D3V", "SL9", "SLK", "SLN", "VUP"]);
 
+  const activeSectionIds = new Set(data.choices.filter((choice) => choice.active === "True").map((choice) => choice.section_id));
   const wheelSections = data.sections
     .filter((section) => section.step_key === "wheels")
+    .filter((section) => activeSectionIds.has(section.section_id))
     .sort((a, b) => Number(a.section_display_order) - Number(b.section_display_order))
     .map((section) => section.section_name);
   assert.deepEqual(JSON.parse(JSON.stringify(wheelSections)), ["Wheels", "Caliper Color", "Wheel Accessory"]);

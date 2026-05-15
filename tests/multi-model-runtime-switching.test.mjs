@@ -677,7 +677,7 @@ test("Grand Sport interiors are model-scoped and export selected interior identi
   const ah2Seat = runtime.activeChoiceRows().find((choice) => choice.rpo === "AH2" && choice.step_key === "seat");
   assert.ok(ah2Seat, "Grand Sport AH2 seat should exist for 3LT");
   runtime.handleChoice(ah2Seat);
-  assert.ok(runtime.currentOrder().metadata.missing_required.includes("Base Interior"));
+  assert.ok(runtime.currentOrder().metadata.missing_required.includes("Interior Color"));
 
   runtime.state.selectedInterior = "3LT_AH2_EL9";
   runtime.reconcileSelections();
@@ -685,7 +685,7 @@ test("Grand Sport interiors are model-scoped and export selected interior identi
   assert.equal(order.metadata.selected_interior_id, "3LT_AH2_EL9");
   assert.equal(order.selected_interior.rpo, "EL9");
   assert.equal(order.selected_interior.label, "Santorini Blue Dipped with Torch Red accents");
-  assert.equal(order.metadata.missing_required.includes("Base Interior"), false);
+  assert.equal(order.metadata.missing_required.includes("Interior Color"), false);
   assert.equal(runtime.state.selected.has("opt_719_001"), false, "EL9 included seatbelt should replace default 719");
   assert.equal(order.auto_added_options.some((item) => item.rpo === "3F9" && item.price === 0), true, "EL9 should auto-add 3F9 at no charge");
 

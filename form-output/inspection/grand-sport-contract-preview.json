@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-05-15T13:42:44+00:00",
+    "generated_at": "2026-05-15T18:23:06+00:00",
     "status": "read_only_preview"
   },
   "variants": [
@@ -141,7 +141,7 @@
     },
     {
       "step_key": "base_interior",
-      "step_label": "Base Interior",
+      "step_label": "Interior Color",
       "runtime_order": 9,
       "source": "runtime",
       "section_ids": ""
@@ -286,19 +286,6 @@
       "step_label": "Seats"
     },
     {
-      "section_id": "sec_lpoe_001",
-      "section_name": "LPO Exterior",
-      "source_section_name": "LPO Exterior",
-      "selection_mode": "multi_select_opt",
-      "selection_mode_label": "Optional multiple choice",
-      "choice_mode": "multi",
-      "is_required": "False",
-      "standard_behavior": "locked_included",
-      "section_display_order": 10,
-      "step_key": "accessories",
-      "step_label": "Accessories"
-    },
-    {
       "section_id": "sec_1lte_001",
       "section_name": "1LT Equipment",
       "source_section_name": "1LT Equipment",
@@ -403,6 +390,19 @@
       "step_label": "Seat Belt"
     },
     {
+      "section_id": "sec_lpoe_001",
+      "section_name": "LPO Exterior",
+      "source_section_name": "LPO Exterior",
+      "selection_mode": "multi_select_opt",
+      "selection_mode_label": "Optional multiple choice",
+      "choice_mode": "multi",
+      "is_required": "False",
+      "standard_behavior": "locked_included",
+      "section_display_order": 20,
+      "step_key": "accessories",
+      "step_label": "Accessories"
+    },
+    {
       "section_id": "sec_2lte_001",
       "section_name": "2LT Equipment",
       "source_section_name": "2LT Equipment",
@@ -453,19 +453,6 @@
       "section_display_order": 30,
       "step_key": "wheels",
       "step_label": "Wheels & Brake Calipers"
-    },
-    {
-      "section_id": "sec_exha_001",
-      "section_name": "Exhaust",
-      "source_section_name": "Exhaust",
-      "selection_mode": "multi_select_opt",
-      "selection_mode_label": "Optional multiple choice",
-      "choice_mode": "multi",
-      "is_required": "False",
-      "standard_behavior": "replaceable_default",
-      "section_display_order": 30,
-      "step_key": "packages_performance",
-      "step_label": "Performance & Aero"
     },
     {
       "section_id": "sec_stri_001",
@@ -544,6 +531,19 @@
       "section_display_order": 40,
       "step_key": "wheels",
       "step_label": "Wheels & Brake Calipers"
+    },
+    {
+      "section_id": "sec_exha_001",
+      "section_name": "Exhaust",
+      "source_section_name": "Exhaust",
+      "selection_mode": "multi_select_opt",
+      "selection_mode_label": "Optional multiple choice",
+      "choice_mode": "multi",
+      "is_required": "False",
+      "standard_behavior": "replaceable_default",
+      "section_display_order": 40,
+      "step_key": "packages_performance",
+      "step_label": "Performance & Aero"
     },
     {
       "section_id": "sec_perf_aero_001",

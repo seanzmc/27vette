@@ -52,7 +52,7 @@ STEP_LABELS = {
     "packages_performance": "Performance & Aero",
     "aero_exhaust_stripes_accessories": "Stripes",
     "seat": "Seats",
-    "base_interior": "Base Interior",
+    "base_interior": "Interior Color",
     "seat_belt": "Seat Belt",
     "interior_trim": "Interior Trim",
     "accessories": "Accessories",

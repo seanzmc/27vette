@@ -608,7 +608,7 @@ function missingRequired() {
     const hasSelection = [...selectedIds].some((id) => optionSectionId(id) === sectionId);
     if (!hasSelection) missing.push(section.section_name);
   }
-  if (!state.selectedInterior) missing.push("Base Interior");
+  if (!state.selectedInterior) missing.push("Interior Color");
   return missing;
 }
 
@@ -1133,7 +1133,7 @@ function renderStepContent({ resetScroll = false } = {}) {
     const selectedSeat = selectedSeatChoice();
     body = `
       <section class="section-block">
-        <div class="section-title"><h3>Base Interior</h3><span>${interiors.length} choices</span></div>
+        <div class="section-title"><h3>Interior Color</h3><span>${interiors.length} choices</span></div>
         ${selectedSeat ? `<p class="selected-seat-context">${escapeHtml(selectedSeat.rpo)} ${escapeHtml(selectedSeat.label)}</p>` : ""}
         ${renderInteriorGroups(interiors)}
       </section>
@@ -1523,7 +1523,7 @@ function setDealerSubmitStatus(message, type = "") {
 
 function dealerSubmitSuccessMessage() {
   const entryText = state.dealerSubmissionEntryId ? ` Confirmation ID: ${state.dealerSubmissionEntryId}.` : "";
-  return `Build submitted. A Corvette specialist will contact you soon.${entryText}`;
+  return `Build submitted to Stingray Chevrolet. A Corvette specialist will contact you soon.${entryText}`;
 }
 
 function syncDealerSubmitControls() {

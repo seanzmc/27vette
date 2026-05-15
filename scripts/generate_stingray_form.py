@@ -94,22 +94,17 @@ def build_app_data_registry(stingray_data: dict[str, Any]) -> dict[str, Any]:
         "models": models,
     }
 
-AERO_EXHAUST_ACCESSORIES_SECTION_ORDER = {
-    "sec_exha_001": 10,
-    "sec_spoi_001": 20,
-    "sec_stri_001": 30,
-    "sec_lpoe_001": 40,
-    "sec_lpow_001": 50,
-}
 STINGRAY_SECTION_DISPLAY_ORDER_OVERRIDES = {
+    "sec_stri_001": 30,
     "sec_gsha_001": 50,
     "sec_gsce_001": 51,
 }
 
-def step_for_section(section_id: str, section_name: str) -> str:
+def step_for_section(section_id: str, section_name: str, section_step_key: str = "") -> str:
     return shared_step_for_section(
         section_id,
         section_name,
+        section_step_key=section_step_key,
         standard_sections=STANDARD_SECTIONS,
         section_step_overrides=SECTION_STEP_OVERRIDES,
     )
@@ -500,11 +495,11 @@ def main() -> None:
 
     section_rows: list[dict[str, Any]] = [dict(row) for row in CONTEXT_SECTIONS]
     for section_id, section in sections.items():
-        step_key = step_for_section(section_id, section.get("section_name", ""))
+        step_key = step_for_section(section_id, section.get("section_name", ""), section.get("step_key", ""))
         selection_mode = section.get("selection_mode", "")
         section_display_order = STINGRAY_SECTION_DISPLAY_ORDER_OVERRIDES.get(
             section_id,
-            AERO_EXHAUST_ACCESSORIES_SECTION_ORDER.get(section_id, intish(section.get("display_order"))),
+            intish(section.get("display_order")),
         )
         section_rows.append(
             {
@@ -585,7 +580,7 @@ def main() -> None:
         if option["option_id"] in options_by_id and option.get("active") != "True":
             continue
         section = sections.get(option.get("section_id", ""), {})
-        step_key = step_for_section(option.get("section_id", ""), section.get("section_name", ""))
+        step_key = step_for_section(option.get("section_id", ""), section.get("section_name", ""), section.get("step_key", ""))
         mode = section.get("selection_mode", "")
         options_by_id[option["option_id"]] = {
             "option_id": option["option_id"],

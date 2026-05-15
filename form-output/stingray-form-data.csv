@@ -311,24 +311,24 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_zz3_001,opt_zz3_001,ZZ3,Convertible Engine Appearance Package,sec_engi_001,exterior_appearance,1lt_c67,convertible,1LT,available,True,1195
 2lt_c67__opt_zz3_001,opt_zz3_001,ZZ3,Convertible Engine Appearance Package,sec_engi_001,exterior_appearance,2lt_c67,convertible,2LT,available,True,1195
 3lt_c67__opt_zz3_001,opt_zz3_001,ZZ3,Convertible Engine Appearance Package,sec_engi_001,exterior_appearance,3lt_c67,convertible,3LT,available,True,1195
-1lt_c07__opt_nga_001,opt_nga_001,NGA,Exhaust tips,sec_exha_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,standard,True,0
-2lt_c07__opt_nga_001,opt_nga_001,NGA,Exhaust tips,sec_exha_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,standard,True,0
-3lt_c07__opt_nga_001,opt_nga_001,NGA,Exhaust tips,sec_exha_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,standard,True,0
-1lt_c67__opt_nga_001,opt_nga_001,NGA,Exhaust tips,sec_exha_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,standard,True,0
-2lt_c67__opt_nga_001,opt_nga_001,NGA,Exhaust tips,sec_exha_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,standard,True,0
-3lt_c67__opt_nga_001,opt_nga_001,NGA,Exhaust tips,sec_exha_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,standard,True,0
-1lt_c07__opt_nwi_001,opt_nwi_001,NWI,NEW! Exhaust tips,sec_exha_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,395
-2lt_c07__opt_nwi_001,opt_nwi_001,NWI,NEW! Exhaust tips,sec_exha_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,395
-3lt_c07__opt_nwi_001,opt_nwi_001,NWI,NEW! Exhaust tips,sec_exha_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,395
-1lt_c67__opt_nwi_001,opt_nwi_001,NWI,NEW! Exhaust tips,sec_exha_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,395
-2lt_c67__opt_nwi_001,opt_nwi_001,NWI,NEW! Exhaust tips,sec_exha_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,395
-3lt_c67__opt_nwi_001,opt_nwi_001,NWI,NEW! Exhaust tips,sec_exha_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,395
-1lt_c07__opt_wub_001,opt_wub_001,WUB,NEW! Exhaust,sec_exha_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,1995
-2lt_c07__opt_wub_001,opt_wub_001,WUB,NEW! Exhaust,sec_exha_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,1995
-3lt_c07__opt_wub_001,opt_wub_001,WUB,NEW! Exhaust,sec_exha_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,1995
-1lt_c67__opt_wub_001,opt_wub_001,WUB,NEW! Exhaust,sec_exha_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,1995
-2lt_c67__opt_wub_001,opt_wub_001,WUB,NEW! Exhaust,sec_exha_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,1995
-3lt_c67__opt_wub_001,opt_wub_001,WUB,NEW! Exhaust,sec_exha_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,1995
+1lt_c07__opt_nga_001,opt_nga_001,NGA,Exhaust tips,sec_exha_001,packages_performance,1lt_c07,coupe,1LT,standard,True,0
+2lt_c07__opt_nga_001,opt_nga_001,NGA,Exhaust tips,sec_exha_001,packages_performance,2lt_c07,coupe,2LT,standard,True,0
+3lt_c07__opt_nga_001,opt_nga_001,NGA,Exhaust tips,sec_exha_001,packages_performance,3lt_c07,coupe,3LT,standard,True,0
+1lt_c67__opt_nga_001,opt_nga_001,NGA,Exhaust tips,sec_exha_001,packages_performance,1lt_c67,convertible,1LT,standard,True,0
+2lt_c67__opt_nga_001,opt_nga_001,NGA,Exhaust tips,sec_exha_001,packages_performance,2lt_c67,convertible,2LT,standard,True,0
+3lt_c67__opt_nga_001,opt_nga_001,NGA,Exhaust tips,sec_exha_001,packages_performance,3lt_c67,convertible,3LT,standard,True,0
+1lt_c07__opt_nwi_001,opt_nwi_001,NWI,NEW! Exhaust tips,sec_exha_001,packages_performance,1lt_c07,coupe,1LT,available,True,395
+2lt_c07__opt_nwi_001,opt_nwi_001,NWI,NEW! Exhaust tips,sec_exha_001,packages_performance,2lt_c07,coupe,2LT,available,True,395
+3lt_c07__opt_nwi_001,opt_nwi_001,NWI,NEW! Exhaust tips,sec_exha_001,packages_performance,3lt_c07,coupe,3LT,available,True,395
+1lt_c67__opt_nwi_001,opt_nwi_001,NWI,NEW! Exhaust tips,sec_exha_001,packages_performance,1lt_c67,convertible,1LT,available,True,395
+2lt_c67__opt_nwi_001,opt_nwi_001,NWI,NEW! Exhaust tips,sec_exha_001,packages_performance,2lt_c67,convertible,2LT,available,True,395
+3lt_c67__opt_nwi_001,opt_nwi_001,NWI,NEW! Exhaust tips,sec_exha_001,packages_performance,3lt_c67,convertible,3LT,available,True,395
+1lt_c07__opt_wub_001,opt_wub_001,WUB,NEW! Exhaust,sec_exha_001,packages_performance,1lt_c07,coupe,1LT,available,True,1995
+2lt_c07__opt_wub_001,opt_wub_001,WUB,NEW! Exhaust,sec_exha_001,packages_performance,2lt_c07,coupe,2LT,available,True,1995
+3lt_c07__opt_wub_001,opt_wub_001,WUB,NEW! Exhaust,sec_exha_001,packages_performance,3lt_c07,coupe,3LT,available,True,1995
+1lt_c67__opt_wub_001,opt_wub_001,WUB,NEW! Exhaust,sec_exha_001,packages_performance,1lt_c67,convertible,1LT,available,True,1995
+2lt_c67__opt_wub_001,opt_wub_001,WUB,NEW! Exhaust,sec_exha_001,packages_performance,2lt_c67,convertible,2LT,available,True,1995
+3lt_c67__opt_wub_001,opt_wub_001,WUB,NEW! Exhaust,sec_exha_001,packages_performance,3lt_c67,convertible,3LT,available,True,1995
 1lt_c07__opt_edu_001,opt_edu_001,EDU,Carbon Flash and body-color accents,sec_exte_001,exterior_appearance,1lt_c07,coupe,1LT,available,True,995
 2lt_c07__opt_edu_001,opt_edu_001,EDU,Carbon Flash and body-color accents,sec_exte_001,exterior_appearance,2lt_c07,coupe,2LT,available,True,995
 3lt_c07__opt_edu_001,opt_edu_001,EDU,Carbon Flash and body-color accents,sec_exte_001,exterior_appearance,3lt_c07,coupe,3LT,available,True,995
@@ -401,12 +401,12 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_qtu_001,opt_qtu_001,QTU,NEW! Tires,sec_incl_001,standard_equipment,1lt_c67,convertible,1LT,available,False,0
 2lt_c67__opt_qtu_001,opt_qtu_001,QTU,NEW! Tires,sec_incl_001,standard_equipment,2lt_c67,convertible,2LT,available,False,0
 3lt_c67__opt_qtu_001,opt_qtu_001,QTU,NEW! Tires,sec_incl_001,standard_equipment,3lt_c67,convertible,3LT,available,False,0
-1lt_c07__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,0
-2lt_c07__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,0
-3lt_c07__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,0
-1lt_c67__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,0
-2lt_c67__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,0
-3lt_c67__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,0
+1lt_c07__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,packages_performance,1lt_c07,coupe,1LT,available,True,0
+2lt_c07__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,packages_performance,2lt_c07,coupe,2LT,available,True,0
+3lt_c07__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,packages_performance,3lt_c07,coupe,3LT,available,True,0
+1lt_c67__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,packages_performance,1lt_c67,convertible,1LT,available,True,0
+2lt_c67__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,packages_performance,2lt_c67,convertible,2LT,available,True,0
+3lt_c67__opt_t0a_001,opt_t0a_001,T0A,Z51 Spoiler,sec_spoi_001,packages_performance,3lt_c67,convertible,3LT,available,True,0
 1lt_c07__opt_tr7_001,opt_tr7_001,TR7,Headlamp control,sec_incl_001,standard_equipment,1lt_c07,coupe,1LT,unavailable,False,0
 2lt_c07__opt_tr7_001,opt_tr7_001,TR7,Headlamp control,sec_incl_001,standard_equipment,2lt_c07,coupe,2LT,available,False,0
 3lt_c07__opt_tr7_001,opt_tr7_001,TR7,Headlamp control,sec_incl_001,standard_equipment,3lt_c07,coupe,3LT,available,False,0
@@ -443,276 +443,240 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,1lt_c67,convertible,1LT,available,True,1495
 2lt_c67__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,2lt_c67,convertible,2LT,unavailable,False,1495
 3lt_c67__opt_uqt_002,opt_uqt_002,UQT,Performance data and video recorder,sec_inte_001,interior_trim,3lt_c67,convertible,3LT,unavailable,False,1495
-1lt_c07__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,unavailable,True,1395
-2lt_c07__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,unavailable,True,1395
-3lt_c07__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,1395
-1lt_c67__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,unavailable,True,1395
-2lt_c67__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,unavailable,True,1395
-3lt_c67__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,1395
-1lt_c07__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,650
-2lt_c07__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,650
-3lt_c07__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,650
-1lt_c67__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,650
-2lt_c67__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,650
-3lt_c67__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,650
-1lt_c07__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,1575
-2lt_c07__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,1575
-3lt_c07__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,1575
-1lt_c67__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,1575
-2lt_c67__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,1575
-3lt_c67__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,1575
-1lt_c07__opt_pcx_001,opt_pcx_001,PCX,"LPO, Tech Bronze Accent Package",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,4595
-2lt_c07__opt_pcx_001,opt_pcx_001,PCX,"LPO, Tech Bronze Accent Package",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,4595
-3lt_c07__opt_pcx_001,opt_pcx_001,PCX,"LPO, Tech Bronze Accent Package",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,4595
-1lt_c67__opt_pcx_001,opt_pcx_001,PCX,"LPO, Tech Bronze Accent Package",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,4595
-2lt_c67__opt_pcx_001,opt_pcx_001,PCX,"LPO, Tech Bronze Accent Package",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,4595
-3lt_c67__opt_pcx_001,opt_pcx_001,PCX,"LPO, Tech Bronze Accent Package",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,4595
-1lt_c07__opt_pdv_001,opt_pdv_001,PDV,"LPO, Stingray R Appearance Package",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,750
-2lt_c07__opt_pdv_001,opt_pdv_001,PDV,"LPO, Stingray R Appearance Package",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,750
-3lt_c07__opt_pdv_001,opt_pdv_001,PDV,"LPO, Stingray R Appearance Package",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,750
-1lt_c67__opt_pdv_001,opt_pdv_001,PDV,"LPO, Stingray R Appearance Package",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,750
-2lt_c67__opt_pdv_001,opt_pdv_001,PDV,"LPO, Stingray R Appearance Package",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,750
-3lt_c67__opt_pdv_001,opt_pdv_001,PDV,"LPO, Stingray R Appearance Package",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,750
-1lt_c07__opt_r88_001,opt_r88_001,R88,"LPO, Illuminated crossed flags emblem",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,695
-2lt_c07__opt_r88_001,opt_r88_001,R88,"LPO, Illuminated crossed flags emblem",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,695
-3lt_c07__opt_r88_001,opt_r88_001,R88,"LPO, Illuminated crossed flags emblem",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,695
-1lt_c67__opt_r88_001,opt_r88_001,R88,"LPO, Illuminated crossed flags emblem",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,695
-2lt_c67__opt_r88_001,opt_r88_001,R88,"LPO, Illuminated crossed flags emblem",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,695
-3lt_c67__opt_r88_001,opt_r88_001,R88,"LPO, Illuminated crossed flags emblem",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,695
-1lt_c07__opt_rik_001,opt_rik_001,RIK,"LPO, Rear Corvette script badge in Torch Red",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,395
-2lt_c07__opt_rik_001,opt_rik_001,RIK,"LPO, Rear Corvette script badge in Torch Red",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,395
-3lt_c07__opt_rik_001,opt_rik_001,RIK,"LPO, Rear Corvette script badge in Torch Red",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,395
-1lt_c67__opt_rik_001,opt_rik_001,RIK,"LPO, Rear Corvette script badge in Torch Red",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,395
-2lt_c67__opt_rik_001,opt_rik_001,RIK,"LPO, Rear Corvette script badge in Torch Red",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,395
-3lt_c67__opt_rik_001,opt_rik_001,RIK,"LPO, Rear Corvette script badge in Torch Red",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,395
-1lt_c07__opt_rin_001,opt_rin_001,RIN,"LPO, Rear Corvette script badge in Arctic White",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,440
-2lt_c07__opt_rin_001,opt_rin_001,RIN,"LPO, Rear Corvette script badge in Arctic White",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,440
-3lt_c07__opt_rin_001,opt_rin_001,RIN,"LPO, Rear Corvette script badge in Arctic White",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,440
-1lt_c67__opt_rin_001,opt_rin_001,RIN,"LPO, Rear Corvette script badge in Arctic White",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,440
-2lt_c67__opt_rin_001,opt_rin_001,RIN,"LPO, Rear Corvette script badge in Arctic White",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,440
-3lt_c67__opt_rin_001,opt_rin_001,RIN,"LPO, Rear Corvette script badge in Arctic White",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,440
-1lt_c07__opt_rnx_001,opt_rnx_001,RNX,"LPO, Premium outdoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,495
-2lt_c07__opt_rnx_001,opt_rnx_001,RNX,"LPO, Premium outdoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,495
-3lt_c07__opt_rnx_001,opt_rnx_001,RNX,"LPO, Premium outdoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,495
-1lt_c67__opt_rnx_001,opt_rnx_001,RNX,"LPO, Premium outdoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,495
-2lt_c67__opt_rnx_001,opt_rnx_001,RNX,"LPO, Premium outdoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,495
-3lt_c67__opt_rnx_001,opt_rnx_001,RNX,"LPO, Premium outdoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,495
-1lt_c07__opt_rwh_001,opt_rwh_001,RWH,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,495
-2lt_c07__opt_rwh_001,opt_rwh_001,RWH,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,495
-3lt_c07__opt_rwh_001,opt_rwh_001,RWH,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,495
-1lt_c67__opt_rwh_001,opt_rwh_001,RWH,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,495
-2lt_c67__opt_rwh_001,opt_rwh_001,RWH,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,495
-3lt_c67__opt_rwh_001,opt_rwh_001,RWH,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,495
-1lt_c07__opt_rwj_001,opt_rwj_001,RWJ,"LPO, Premium outdoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,495
-2lt_c07__opt_rwj_001,opt_rwj_001,RWJ,"LPO, Premium outdoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,495
-3lt_c07__opt_rwj_001,opt_rwj_001,RWJ,"LPO, Premium outdoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,495
-1lt_c67__opt_rwj_001,opt_rwj_001,RWJ,"LPO, Premium outdoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,495
-2lt_c67__opt_rwj_001,opt_rwj_001,RWJ,"LPO, Premium outdoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,495
-3lt_c67__opt_rwj_001,opt_rwj_001,RWJ,"LPO, Premium outdoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,495
-1lt_c07__opt_rz9_001,opt_rz9_001,RZ9,"LPO, Visible Carbon Fiber grille insert",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,2495
-2lt_c07__opt_rz9_001,opt_rz9_001,RZ9,"LPO, Visible Carbon Fiber grille insert",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,2495
-3lt_c07__opt_rz9_001,opt_rz9_001,RZ9,"LPO, Visible Carbon Fiber grille insert",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,2495
-1lt_c67__opt_rz9_001,opt_rz9_001,RZ9,"LPO, Visible Carbon Fiber grille insert",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,2495
-2lt_c67__opt_rz9_001,opt_rz9_001,RZ9,"LPO, Visible Carbon Fiber grille insert",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,2495
-3lt_c67__opt_rz9_001,opt_rz9_001,RZ9,"LPO, Visible Carbon Fiber grille insert",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,2495
-1lt_c07__opt_sbt_001,opt_sbt_001,SBT,"LPO, Dual roof",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,2525
-2lt_c07__opt_sbt_001,opt_sbt_001,SBT,"LPO, Dual roof",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,2525
-3lt_c07__opt_sbt_001,opt_sbt_001,SBT,"LPO, Dual roof",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,2525
-1lt_c67__opt_sbt_001,opt_sbt_001,SBT,"LPO, Dual roof",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,unavailable,True,2525
-2lt_c67__opt_sbt_001,opt_sbt_001,SBT,"LPO, Dual roof",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,unavailable,True,2525
-3lt_c67__opt_sbt_001,opt_sbt_001,SBT,"LPO, Dual roof",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,unavailable,True,2525
-1lt_c07__opt_sda_001,opt_sda_001,SDA,"LPO, Black recovery hook",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,150
-2lt_c07__opt_sda_001,opt_sda_001,SDA,"LPO, Black recovery hook",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,150
-3lt_c07__opt_sda_001,opt_sda_001,SDA,"LPO, Black recovery hook",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,150
-1lt_c67__opt_sda_001,opt_sda_001,SDA,"LPO, Black recovery hook",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,150
-2lt_c67__opt_sda_001,opt_sda_001,SDA,"LPO, Black recovery hook",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,150
-3lt_c67__opt_sda_001,opt_sda_001,SDA,"LPO, Black recovery hook",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,150
-1lt_c07__opt_sfz_001,opt_sfz_001,SFZ,"LPO, Dark Stealth crossed flags emblem",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,250
-2lt_c07__opt_sfz_001,opt_sfz_001,SFZ,"LPO, Dark Stealth crossed flags emblem",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,250
-3lt_c07__opt_sfz_001,opt_sfz_001,SFZ,"LPO, Dark Stealth crossed flags emblem",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,250
-1lt_c67__opt_sfz_001,opt_sfz_001,SFZ,"LPO, Dark Stealth crossed flags emblem",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,250
-2lt_c67__opt_sfz_001,opt_sfz_001,SFZ,"LPO, Dark Stealth crossed flags emblem",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,250
-3lt_c67__opt_sfz_001,opt_sfz_001,SFZ,"LPO, Dark Stealth crossed flags emblem",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,250
-1lt_c07__opt_sl1_001,opt_sl1_001,SL1,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,475
-2lt_c07__opt_sl1_001,opt_sl1_001,SL1,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,475
-3lt_c07__opt_sl1_001,opt_sl1_001,SL1,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,475
-1lt_c67__opt_sl1_001,opt_sl1_001,SL1,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,475
-2lt_c67__opt_sl1_001,opt_sl1_001,SL1,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,475
-3lt_c67__opt_sl1_001,opt_sl1_001,SL1,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,475
-1lt_c07__opt_sl8_001,opt_sl8_001,SL8,"LPO, Rear Corvette script badge in Edge Red",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,495
-2lt_c07__opt_sl8_001,opt_sl8_001,SL8,"LPO, Rear Corvette script badge in Edge Red",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,495
-3lt_c07__opt_sl8_001,opt_sl8_001,SL8,"LPO, Rear Corvette script badge in Edge Red",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,495
-1lt_c67__opt_sl8_001,opt_sl8_001,SL8,"LPO, Rear Corvette script badge in Edge Red",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,495
-2lt_c67__opt_sl8_001,opt_sl8_001,SL8,"LPO, Rear Corvette script badge in Edge Red",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,495
-3lt_c67__opt_sl8_001,opt_sl8_001,SL8,"LPO, Rear Corvette script badge in Edge Red",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,495
-1lt_c07__opt_sti_001,opt_sti_001,STI,"LPO, Composite rocker extensions",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,675
-2lt_c07__opt_sti_001,opt_sti_001,STI,"LPO, Composite rocker extensions",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,675
-3lt_c07__opt_sti_001,opt_sti_001,STI,"LPO, Composite rocker extensions",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,675
-1lt_c67__opt_sti_001,opt_sti_001,STI,"LPO, Composite rocker extensions",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,675
-2lt_c67__opt_sti_001,opt_sti_001,STI,"LPO, Composite rocker extensions",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,675
-3lt_c67__opt_sti_001,opt_sti_001,STI,"LPO, Composite rocker extensions",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,675
-1lt_c07__opt_vqk_001,opt_vqk_001,VQK,"LPO, Custom splash guards",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,395
-2lt_c07__opt_vqk_001,opt_vqk_001,VQK,"LPO, Custom splash guards",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,395
-3lt_c07__opt_vqk_001,opt_vqk_001,VQK,"LPO, Custom splash guards",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,395
-1lt_c67__opt_vqk_001,opt_vqk_001,VQK,"LPO, Custom splash guards",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,395
-2lt_c67__opt_vqk_001,opt_vqk_001,VQK,"LPO, Custom splash guards",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,395
-3lt_c67__opt_vqk_001,opt_vqk_001,VQK,"LPO, Custom splash guards",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,395
-1lt_c07__opt_vtb_001,opt_vtb_001,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,150
-2lt_c07__opt_vtb_001,opt_vtb_001,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,150
-3lt_c07__opt_vtb_001,opt_vtb_001,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,150
-1lt_c67__opt_vtb_001,opt_vtb_001,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,150
-2lt_c67__opt_vtb_001,opt_vtb_001,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,150
-3lt_c67__opt_vtb_001,opt_vtb_001,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,150
-1lt_c07__opt_vwe_001,opt_vwe_001,VWE,"LPO, Front radiator grille screens",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,695
-2lt_c07__opt_vwe_001,opt_vwe_001,VWE,"LPO, Front radiator grille screens",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,695
-3lt_c07__opt_vwe_001,opt_vwe_001,VWE,"LPO, Front radiator grille screens",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,695
-1lt_c67__opt_vwe_001,opt_vwe_001,VWE,"LPO, Front radiator grille screens",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,695
-2lt_c67__opt_vwe_001,opt_vwe_001,VWE,"LPO, Front radiator grille screens",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,695
-3lt_c67__opt_vwe_001,opt_vwe_001,VWE,"LPO, Front radiator grille screens",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,695
-1lt_c07__opt_wkq_001,opt_wkq_001,WKQ,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,495
-2lt_c07__opt_wkq_001,opt_wkq_001,WKQ,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,495
-3lt_c07__opt_wkq_001,opt_wkq_001,WKQ,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,495
-1lt_c67__opt_wkq_001,opt_wkq_001,WKQ,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,495
-2lt_c67__opt_wkq_001,opt_wkq_001,WKQ,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,495
-3lt_c67__opt_wkq_001,opt_wkq_001,WKQ,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,495
-1lt_c07__opt_wkr_001,opt_wkr_001,WKR,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,1275
-2lt_c07__opt_wkr_001,opt_wkr_001,WKR,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,1275
-3lt_c07__opt_wkr_001,opt_wkr_001,WKR,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,1275
-1lt_c67__opt_wkr_001,opt_wkr_001,WKR,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,1275
-2lt_c67__opt_wkr_001,opt_wkr_001,WKR,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,1275
-3lt_c67__opt_wkr_001,opt_wkr_001,WKR,"LPO, Premium indoor car cover",sec_lpoe_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,1275
-1lt_c07__opt_cav_001,opt_cav_001,CAV,"LPO, Contoured cargo area liners with Jake logo",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,available,True,230
-2lt_c07__opt_cav_001,opt_cav_001,CAV,"LPO, Contoured cargo area liners with Jake logo",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,available,True,230
-3lt_c07__opt_cav_001,opt_cav_001,CAV,"LPO, Contoured cargo area liners with Jake logo",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,available,True,230
-1lt_c67__opt_cav_001,opt_cav_001,CAV,"LPO, Contoured cargo area liners with Jake logo",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,available,True,230
-2lt_c67__opt_cav_001,opt_cav_001,CAV,"LPO, Contoured cargo area liners with Jake logo",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,available,True,230
-3lt_c67__opt_cav_001,opt_cav_001,CAV,"LPO, Contoured cargo area liners with Jake logo",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,available,True,230
-1lt_c07__opt_pdy_001,opt_pdy_001,PDY,"LPO, Roadside Safety Package",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,available,True,195
-2lt_c07__opt_pdy_001,opt_pdy_001,PDY,"LPO, Roadside Safety Package",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,available,True,195
-3lt_c07__opt_pdy_001,opt_pdy_001,PDY,"LPO, Roadside Safety Package",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,available,True,195
-1lt_c67__opt_pdy_001,opt_pdy_001,PDY,"LPO, Roadside Safety Package",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,available,True,195
-2lt_c67__opt_pdy_001,opt_pdy_001,PDY,"LPO, Roadside Safety Package",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,available,True,195
-3lt_c67__opt_pdy_001,opt_pdy_001,PDY,"LPO, Roadside Safety Package",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,available,True,195
-1lt_c07__opt_pef_001,opt_pef_001,PEF,"LPO, Contoured Liner Protection Package",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,available,True,475
-2lt_c07__opt_pef_001,opt_pef_001,PEF,"LPO, Contoured Liner Protection Package",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,available,True,475
-3lt_c07__opt_pef_001,opt_pef_001,PEF,"LPO, Contoured Liner Protection Package",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,available,True,475
-1lt_c67__opt_pef_001,opt_pef_001,PEF,"LPO, Contoured Liner Protection Package",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,available,True,475
-2lt_c67__opt_pef_001,opt_pef_001,PEF,"LPO, Contoured Liner Protection Package",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,available,True,475
-3lt_c67__opt_pef_001,opt_pef_001,PEF,"LPO, Contoured Liner Protection Package",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,available,True,475
-1lt_c07__opt_ria_001,opt_ria_001,RIA,"LPO, All-weather floor liners with Jake logo",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,available,True,265
-2lt_c07__opt_ria_001,opt_ria_001,RIA,"LPO, All-weather floor liners with Jake logo",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,available,True,265
-3lt_c07__opt_ria_001,opt_ria_001,RIA,"LPO, All-weather floor liners with Jake logo",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,available,True,265
-1lt_c67__opt_ria_001,opt_ria_001,RIA,"LPO, All-weather floor liners with Jake logo",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,available,True,265
-2lt_c67__opt_ria_001,opt_ria_001,RIA,"LPO, All-weather floor liners with Jake logo",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,available,True,265
-3lt_c67__opt_ria_001,opt_ria_001,RIA,"LPO, All-weather floor liners with Jake logo",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,available,True,265
-1lt_c07__opt_rwu_001,opt_rwu_001,RWU,"LPO, Cargo area organizer",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,available,True,175
-2lt_c07__opt_rwu_001,opt_rwu_001,RWU,"LPO, Cargo area organizer",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,available,True,175
-3lt_c07__opt_rwu_001,opt_rwu_001,RWU,"LPO, Cargo area organizer",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,available,True,175
-1lt_c67__opt_rwu_001,opt_rwu_001,RWU,"LPO, Cargo area organizer",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,available,True,175
-2lt_c67__opt_rwu_001,opt_rwu_001,RWU,"LPO, Cargo area organizer",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,available,True,175
-3lt_c67__opt_rwu_001,opt_rwu_001,RWU,"LPO, Cargo area organizer",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,available,True,175
-1lt_c07__opt_ryt_001,opt_ryt_001,RYT,"LPO, First Aid Kit",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,available,True,60
-2lt_c07__opt_ryt_001,opt_ryt_001,RYT,"LPO, First Aid Kit",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,available,True,60
-3lt_c07__opt_ryt_001,opt_ryt_001,RYT,"LPO, First Aid Kit",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,available,True,60
-1lt_c67__opt_ryt_001,opt_ryt_001,RYT,"LPO, First Aid Kit",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,available,True,60
-2lt_c67__opt_ryt_001,opt_ryt_001,RYT,"LPO, First Aid Kit",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,available,True,60
-3lt_c67__opt_ryt_001,opt_ryt_001,RYT,"LPO, First Aid Kit",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,available,True,60
-1lt_c07__opt_s08_001,opt_s08_001,S08,"LPO, Highway Safety Kit",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,available,True,150
-2lt_c07__opt_s08_001,opt_s08_001,S08,"LPO, Highway Safety Kit",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,available,True,150
-3lt_c07__opt_s08_001,opt_s08_001,S08,"LPO, Highway Safety Kit",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,available,True,150
-1lt_c67__opt_s08_001,opt_s08_001,S08,"LPO, Highway Safety Kit",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,available,True,150
-2lt_c67__opt_s08_001,opt_s08_001,S08,"LPO, Highway Safety Kit",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,available,True,150
-3lt_c67__opt_s08_001,opt_s08_001,S08,"LPO, Highway Safety Kit",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,available,True,150
-1lt_c07__opt_s2l_001,opt_s2l_001,S2L,"LPO, Set of premium leather weekend/travel bags",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,available,True,1695
-2lt_c07__opt_s2l_001,opt_s2l_001,S2L,"LPO, Set of premium leather weekend/travel bags",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,available,True,1695
-3lt_c07__opt_s2l_001,opt_s2l_001,S2L,"LPO, Set of premium leather weekend/travel bags",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,available,True,1695
-1lt_c67__opt_s2l_001,opt_s2l_001,S2L,"LPO, Set of premium leather weekend/travel bags",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,available,True,1695
-2lt_c67__opt_s2l_001,opt_s2l_001,S2L,"LPO, Set of premium leather weekend/travel bags",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,available,True,1695
-3lt_c67__opt_s2l_001,opt_s2l_001,S2L,"LPO, Set of premium leather weekend/travel bags",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,available,True,1695
-1lt_c07__opt_sc7_001,opt_sc7_001,SC7,"LPO, Roof panel storage pouch",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,available,True,195
-2lt_c07__opt_sc7_001,opt_sc7_001,SC7,"LPO, Roof panel storage pouch",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,available,True,195
-3lt_c07__opt_sc7_001,opt_sc7_001,SC7,"LPO, Roof panel storage pouch",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,available,True,195
-1lt_c67__opt_sc7_001,opt_sc7_001,SC7,"LPO, Roof panel storage pouch",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,unavailable,True,195
-2lt_c67__opt_sc7_001,opt_sc7_001,SC7,"LPO, Roof panel storage pouch",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,unavailable,True,195
-3lt_c67__opt_sc7_001,opt_sc7_001,SC7,"LPO, Roof panel storage pouch",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,unavailable,True,195
-1lt_c07__opt_sxb_001,opt_sxb_001,SXB,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,available,True,2095
-2lt_c07__opt_sxb_001,opt_sxb_001,SXB,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,available,True,2095
-3lt_c07__opt_sxb_001,opt_sxb_001,SXB,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,available,True,2095
-1lt_c67__opt_sxb_001,opt_sxb_001,SXB,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,available,True,2095
-2lt_c67__opt_sxb_001,opt_sxb_001,SXB,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,available,True,2095
-3lt_c67__opt_sxb_001,opt_sxb_001,SXB,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,available,True,2095
-1lt_c07__opt_sxr_001,opt_sxr_001,SXR,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,available,True,2095
-2lt_c07__opt_sxr_001,opt_sxr_001,SXR,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,available,True,2095
-3lt_c07__opt_sxr_001,opt_sxr_001,SXR,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,available,True,2095
-1lt_c67__opt_sxr_001,opt_sxr_001,SXR,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,available,True,2095
-2lt_c67__opt_sxr_001,opt_sxr_001,SXR,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,available,True,2095
-3lt_c67__opt_sxr_001,opt_sxr_001,SXR,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,available,True,2095
-1lt_c07__opt_sxt_001,opt_sxt_001,SXT,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,available,True,2695
-2lt_c07__opt_sxt_001,opt_sxt_001,SXT,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,available,True,2695
-3lt_c07__opt_sxt_001,opt_sxt_001,SXT,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,available,True,2695
-1lt_c67__opt_sxt_001,opt_sxt_001,SXT,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,available,True,2695
-2lt_c67__opt_sxt_001,opt_sxt_001,SXT,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,available,True,2695
-3lt_c67__opt_sxt_001,opt_sxt_001,SXT,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,available,True,2695
-1lt_c07__opt_vyw_001,opt_vyw_001,VYW,"LPO, Floor mats",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,available,True,275
-2lt_c07__opt_vyw_001,opt_vyw_001,VYW,"LPO, Floor mats",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,available,True,275
-3lt_c07__opt_vyw_001,opt_vyw_001,VYW,"LPO, Floor mats",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,available,True,275
-1lt_c67__opt_vyw_001,opt_vyw_001,VYW,"LPO, Floor mats",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,available,True,275
-2lt_c67__opt_vyw_001,opt_vyw_001,VYW,"LPO, Floor mats",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,available,True,275
-3lt_c67__opt_vyw_001,opt_vyw_001,VYW,"LPO, Floor mats",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,available,True,275
-1lt_c07__opt_w2d_001,opt_w2d_001,W2D,"LPO, Cargo net set",sec_lpoi_001,interior_trim,1lt_c07,coupe,1LT,available,True,125
-2lt_c07__opt_w2d_001,opt_w2d_001,W2D,"LPO, Cargo net set",sec_lpoi_001,interior_trim,2lt_c07,coupe,2LT,unavailable,True,125
-3lt_c07__opt_w2d_001,opt_w2d_001,W2D,"LPO, Cargo net set",sec_lpoi_001,interior_trim,3lt_c07,coupe,3LT,unavailable,True,125
-1lt_c67__opt_w2d_001,opt_w2d_001,W2D,"LPO, Cargo net set",sec_lpoi_001,interior_trim,1lt_c67,convertible,1LT,available,True,125
-2lt_c67__opt_w2d_001,opt_w2d_001,W2D,"LPO, Cargo net set",sec_lpoi_001,interior_trim,2lt_c67,convertible,2LT,unavailable,True,125
-3lt_c67__opt_w2d_001,opt_w2d_001,W2D,"LPO, Cargo net set",sec_lpoi_001,interior_trim,3lt_c67,convertible,3LT,unavailable,True,125
-1lt_c07__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,4395
-2lt_c07__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,4395
-3lt_c07__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,4395
-1lt_c67__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,4395
-2lt_c67__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,4395
-3lt_c67__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,4395
-1lt_c07__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,4395
-2lt_c07__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,4395
-3lt_c07__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,4395
-1lt_c67__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,4395
-2lt_c67__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,4395
-3lt_c67__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,4395
-1lt_c07__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone),sec_onst_001,interior_trim,1lt_c07,coupe,1LT,available,True,800
-2lt_c07__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone),sec_onst_001,interior_trim,2lt_c07,coupe,2LT,available,True,800
-3lt_c07__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone),sec_onst_001,interior_trim,3lt_c07,coupe,3LT,available,True,800
-1lt_c67__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone),sec_onst_001,interior_trim,1lt_c67,convertible,1LT,available,True,800
-2lt_c67__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone),sec_onst_001,interior_trim,2lt_c67,convertible,2LT,available,True,800
-3lt_c67__opt_prb_001,opt_prb_001,PRB,3 Years OnStar One (Standalone),sec_onst_001,interior_trim,3lt_c67,convertible,3LT,available,True,800
-1lt_c07__opt_r6p_001,opt_r6p_001,R6P,3 Years SiriusXM,sec_onst_001,interior_trim,1lt_c07,coupe,1LT,available,True,299
-2lt_c07__opt_r6p_001,opt_r6p_001,R6P,3 Years SiriusXM,sec_onst_001,interior_trim,2lt_c07,coupe,2LT,available,True,299
-3lt_c07__opt_r6p_001,opt_r6p_001,R6P,3 Years SiriusXM,sec_onst_001,interior_trim,3lt_c07,coupe,3LT,available,True,299
-1lt_c67__opt_r6p_001,opt_r6p_001,R6P,3 Years SiriusXM,sec_onst_001,interior_trim,1lt_c67,convertible,1LT,available,True,299
-2lt_c67__opt_r6p_001,opt_r6p_001,R6P,3 Years SiriusXM,sec_onst_001,interior_trim,2lt_c67,convertible,2LT,available,True,299
-3lt_c67__opt_r6p_001,opt_r6p_001,R6P,3 Years SiriusXM,sec_onst_001,interior_trim,3lt_c67,convertible,3LT,available,True,299
-1lt_c07__opt_r9l_001,opt_r9l_001,R9L,Removes OnStar Basics (OnStar Fleet Basics for Fleet),sec_onst_001,interior_trim,1lt_c07,coupe,1LT,available,True,0
-2lt_c07__opt_r9l_001,opt_r9l_001,R9L,Removes OnStar Basics (OnStar Fleet Basics for Fleet),sec_onst_001,interior_trim,2lt_c07,coupe,2LT,available,True,0
-3lt_c07__opt_r9l_001,opt_r9l_001,R9L,Removes OnStar Basics (OnStar Fleet Basics for Fleet),sec_onst_001,interior_trim,3lt_c07,coupe,3LT,available,True,0
-1lt_c67__opt_r9l_001,opt_r9l_001,R9L,Removes OnStar Basics (OnStar Fleet Basics for Fleet),sec_onst_001,interior_trim,1lt_c67,convertible,1LT,available,True,0
-2lt_c67__opt_r9l_001,opt_r9l_001,R9L,Removes OnStar Basics (OnStar Fleet Basics for Fleet),sec_onst_001,interior_trim,2lt_c67,convertible,2LT,available,True,0
-3lt_c67__opt_r9l_001,opt_r9l_001,R9L,Removes OnStar Basics (OnStar Fleet Basics for Fleet),sec_onst_001,interior_trim,3lt_c67,convertible,3LT,available,True,0
-1lt_c07__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus,sec_onst_001,interior_trim,1lt_c07,coupe,1LT,available,True,599
-2lt_c07__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus,sec_onst_001,interior_trim,2lt_c07,coupe,2LT,available,True,599
-3lt_c07__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus,sec_onst_001,interior_trim,3lt_c07,coupe,3LT,available,True,599
-1lt_c67__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus,sec_onst_001,interior_trim,1lt_c67,convertible,1LT,available,True,599
-2lt_c67__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus,sec_onst_001,interior_trim,2lt_c67,convertible,2LT,available,True,599
-3lt_c67__opt_r9v_001,opt_r9v_001,R9V,Mobile Service Plus,sec_onst_001,interior_trim,3lt_c67,convertible,3LT,available,True,599
-1lt_c07__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus,sec_onst_001,interior_trim,1lt_c07,coupe,1LT,available,True,0
-2lt_c07__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus,sec_onst_001,interior_trim,2lt_c07,coupe,2LT,available,True,0
-3lt_c07__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus,sec_onst_001,interior_trim,3lt_c07,coupe,3LT,available,True,0
-1lt_c67__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus,sec_onst_001,interior_trim,1lt_c67,convertible,1LT,available,True,0
-2lt_c67__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus,sec_onst_001,interior_trim,2lt_c67,convertible,2LT,available,True,0
-3lt_c67__opt_r9w_001,opt_r9w_001,R9W,Deleted Mobile Service Plus,sec_onst_001,interior_trim,3lt_c67,convertible,3LT,available,True,0
-1lt_c07__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus,sec_onst_001,interior_trim,1lt_c07,coupe,1LT,available,True,199
-2lt_c07__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus,sec_onst_001,interior_trim,2lt_c07,coupe,2LT,available,True,199
-3lt_c07__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus,sec_onst_001,interior_trim,3lt_c07,coupe,3LT,available,True,199
-1lt_c67__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus,sec_onst_001,interior_trim,1lt_c67,convertible,1LT,available,True,199
-2lt_c67__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus,sec_onst_001,interior_trim,2lt_c67,convertible,2LT,available,True,199
-3lt_c67__opt_r9y_001,opt_r9y_001,R9Y,Mobile Service Plus,sec_onst_001,interior_trim,3lt_c67,convertible,3LT,available,True,199
+1lt_c07__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,unavailable,True,1395
+2lt_c07__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,unavailable,True,1395
+3lt_c07__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,1395
+1lt_c67__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,unavailable,True,1395
+2lt_c67__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,unavailable,True,1395
+3lt_c67__opt_5jr_001,opt_5jr_001,5JR,"LPO, Outside mirror covers in visible Carbon Fiber",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,1395
+1lt_c07__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,650
+2lt_c07__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,650
+3lt_c07__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,650
+1lt_c67__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,650
+2lt_c67__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,650
+3lt_c67__opt_5v7_001,opt_5v7_001,5V7,"LPO, Black Ground Effects",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,650
+1lt_c07__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,1575
+2lt_c07__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,1575
+3lt_c07__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,1575
+1lt_c67__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,1575
+2lt_c67__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,1575
+3lt_c67__opt_pcu_001,opt_pcu_001,PCU,"LPO, Stingray Protection Package",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,1575
+1lt_c07__opt_pcx_001,opt_pcx_001,PCX,"LPO, Tech Bronze Accent Package",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,4595
+2lt_c07__opt_pcx_001,opt_pcx_001,PCX,"LPO, Tech Bronze Accent Package",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,4595
+3lt_c07__opt_pcx_001,opt_pcx_001,PCX,"LPO, Tech Bronze Accent Package",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,4595
+1lt_c67__opt_pcx_001,opt_pcx_001,PCX,"LPO, Tech Bronze Accent Package",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,4595
+2lt_c67__opt_pcx_001,opt_pcx_001,PCX,"LPO, Tech Bronze Accent Package",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,4595
+3lt_c67__opt_pcx_001,opt_pcx_001,PCX,"LPO, Tech Bronze Accent Package",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,4595
+1lt_c07__opt_pdv_001,opt_pdv_001,PDV,"LPO, Stingray R Appearance Package",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,750
+2lt_c07__opt_pdv_001,opt_pdv_001,PDV,"LPO, Stingray R Appearance Package",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,750
+3lt_c07__opt_pdv_001,opt_pdv_001,PDV,"LPO, Stingray R Appearance Package",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,750
+1lt_c67__opt_pdv_001,opt_pdv_001,PDV,"LPO, Stingray R Appearance Package",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,750
+2lt_c67__opt_pdv_001,opt_pdv_001,PDV,"LPO, Stingray R Appearance Package",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,750
+3lt_c67__opt_pdv_001,opt_pdv_001,PDV,"LPO, Stingray R Appearance Package",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,750
+1lt_c07__opt_r88_001,opt_r88_001,R88,"LPO, Illuminated crossed flags emblem",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,695
+2lt_c07__opt_r88_001,opt_r88_001,R88,"LPO, Illuminated crossed flags emblem",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,695
+3lt_c07__opt_r88_001,opt_r88_001,R88,"LPO, Illuminated crossed flags emblem",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,695
+1lt_c67__opt_r88_001,opt_r88_001,R88,"LPO, Illuminated crossed flags emblem",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,695
+2lt_c67__opt_r88_001,opt_r88_001,R88,"LPO, Illuminated crossed flags emblem",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,695
+3lt_c67__opt_r88_001,opt_r88_001,R88,"LPO, Illuminated crossed flags emblem",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,695
+1lt_c07__opt_rik_001,opt_rik_001,RIK,"LPO, Rear Corvette script badge in Torch Red",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,395
+2lt_c07__opt_rik_001,opt_rik_001,RIK,"LPO, Rear Corvette script badge in Torch Red",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,395
+3lt_c07__opt_rik_001,opt_rik_001,RIK,"LPO, Rear Corvette script badge in Torch Red",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,395
+1lt_c67__opt_rik_001,opt_rik_001,RIK,"LPO, Rear Corvette script badge in Torch Red",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,395
+2lt_c67__opt_rik_001,opt_rik_001,RIK,"LPO, Rear Corvette script badge in Torch Red",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,395
+3lt_c67__opt_rik_001,opt_rik_001,RIK,"LPO, Rear Corvette script badge in Torch Red",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,395
+1lt_c07__opt_rin_001,opt_rin_001,RIN,"LPO, Rear Corvette script badge in Arctic White",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,440
+2lt_c07__opt_rin_001,opt_rin_001,RIN,"LPO, Rear Corvette script badge in Arctic White",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,440
+3lt_c07__opt_rin_001,opt_rin_001,RIN,"LPO, Rear Corvette script badge in Arctic White",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,440
+1lt_c67__opt_rin_001,opt_rin_001,RIN,"LPO, Rear Corvette script badge in Arctic White",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,440
+2lt_c67__opt_rin_001,opt_rin_001,RIN,"LPO, Rear Corvette script badge in Arctic White",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,440
+3lt_c67__opt_rin_001,opt_rin_001,RIN,"LPO, Rear Corvette script badge in Arctic White",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,440
+1lt_c07__opt_rnx_001,opt_rnx_001,RNX,"LPO, Premium outdoor car cover",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,495
+2lt_c07__opt_rnx_001,opt_rnx_001,RNX,"LPO, Premium outdoor car cover",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,495
+3lt_c07__opt_rnx_001,opt_rnx_001,RNX,"LPO, Premium outdoor car cover",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,495
+1lt_c67__opt_rnx_001,opt_rnx_001,RNX,"LPO, Premium outdoor car cover",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,495
+2lt_c67__opt_rnx_001,opt_rnx_001,RNX,"LPO, Premium outdoor car cover",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,495
+3lt_c67__opt_rnx_001,opt_rnx_001,RNX,"LPO, Premium outdoor car cover",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,495
+1lt_c07__opt_rwh_001,opt_rwh_001,RWH,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,495
+2lt_c07__opt_rwh_001,opt_rwh_001,RWH,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,495
+3lt_c07__opt_rwh_001,opt_rwh_001,RWH,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,495
+1lt_c67__opt_rwh_001,opt_rwh_001,RWH,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,495
+2lt_c67__opt_rwh_001,opt_rwh_001,RWH,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,495
+3lt_c67__opt_rwh_001,opt_rwh_001,RWH,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,495
+1lt_c07__opt_rwj_001,opt_rwj_001,RWJ,"LPO, Premium outdoor car cover",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,495
+2lt_c07__opt_rwj_001,opt_rwj_001,RWJ,"LPO, Premium outdoor car cover",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,495
+3lt_c07__opt_rwj_001,opt_rwj_001,RWJ,"LPO, Premium outdoor car cover",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,495
+1lt_c67__opt_rwj_001,opt_rwj_001,RWJ,"LPO, Premium outdoor car cover",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,495
+2lt_c67__opt_rwj_001,opt_rwj_001,RWJ,"LPO, Premium outdoor car cover",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,495
+3lt_c67__opt_rwj_001,opt_rwj_001,RWJ,"LPO, Premium outdoor car cover",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,495
+1lt_c07__opt_rz9_001,opt_rz9_001,RZ9,"LPO, Visible Carbon Fiber grille insert",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,2495
+2lt_c07__opt_rz9_001,opt_rz9_001,RZ9,"LPO, Visible Carbon Fiber grille insert",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,2495
+3lt_c07__opt_rz9_001,opt_rz9_001,RZ9,"LPO, Visible Carbon Fiber grille insert",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,2495
+1lt_c67__opt_rz9_001,opt_rz9_001,RZ9,"LPO, Visible Carbon Fiber grille insert",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,2495
+2lt_c67__opt_rz9_001,opt_rz9_001,RZ9,"LPO, Visible Carbon Fiber grille insert",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,2495
+3lt_c67__opt_rz9_001,opt_rz9_001,RZ9,"LPO, Visible Carbon Fiber grille insert",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,2495
+1lt_c07__opt_sbt_001,opt_sbt_001,SBT,"LPO, Dual roof",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,2525
+2lt_c07__opt_sbt_001,opt_sbt_001,SBT,"LPO, Dual roof",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,2525
+3lt_c07__opt_sbt_001,opt_sbt_001,SBT,"LPO, Dual roof",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,2525
+1lt_c67__opt_sbt_001,opt_sbt_001,SBT,"LPO, Dual roof",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,unavailable,True,2525
+2lt_c67__opt_sbt_001,opt_sbt_001,SBT,"LPO, Dual roof",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,unavailable,True,2525
+3lt_c67__opt_sbt_001,opt_sbt_001,SBT,"LPO, Dual roof",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,unavailable,True,2525
+1lt_c07__opt_sda_001,opt_sda_001,SDA,"LPO, Black recovery hook",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,150
+2lt_c07__opt_sda_001,opt_sda_001,SDA,"LPO, Black recovery hook",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,150
+3lt_c07__opt_sda_001,opt_sda_001,SDA,"LPO, Black recovery hook",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,150
+1lt_c67__opt_sda_001,opt_sda_001,SDA,"LPO, Black recovery hook",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,150
+2lt_c67__opt_sda_001,opt_sda_001,SDA,"LPO, Black recovery hook",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,150
+3lt_c67__opt_sda_001,opt_sda_001,SDA,"LPO, Black recovery hook",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,150
+1lt_c07__opt_sfz_001,opt_sfz_001,SFZ,"LPO, Dark Stealth crossed flags emblem",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,250
+2lt_c07__opt_sfz_001,opt_sfz_001,SFZ,"LPO, Dark Stealth crossed flags emblem",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,250
+3lt_c07__opt_sfz_001,opt_sfz_001,SFZ,"LPO, Dark Stealth crossed flags emblem",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,250
+1lt_c67__opt_sfz_001,opt_sfz_001,SFZ,"LPO, Dark Stealth crossed flags emblem",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,250
+2lt_c67__opt_sfz_001,opt_sfz_001,SFZ,"LPO, Dark Stealth crossed flags emblem",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,250
+3lt_c67__opt_sfz_001,opt_sfz_001,SFZ,"LPO, Dark Stealth crossed flags emblem",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,250
+1lt_c07__opt_sl1_001,opt_sl1_001,SL1,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,475
+2lt_c07__opt_sl1_001,opt_sl1_001,SL1,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,475
+3lt_c07__opt_sl1_001,opt_sl1_001,SL1,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,475
+1lt_c67__opt_sl1_001,opt_sl1_001,SL1,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,475
+2lt_c67__opt_sl1_001,opt_sl1_001,SL1,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,475
+3lt_c67__opt_sl1_001,opt_sl1_001,SL1,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,475
+1lt_c07__opt_sl8_001,opt_sl8_001,SL8,"LPO, Rear Corvette script badge in Edge Red",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,495
+2lt_c07__opt_sl8_001,opt_sl8_001,SL8,"LPO, Rear Corvette script badge in Edge Red",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,495
+3lt_c07__opt_sl8_001,opt_sl8_001,SL8,"LPO, Rear Corvette script badge in Edge Red",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,495
+1lt_c67__opt_sl8_001,opt_sl8_001,SL8,"LPO, Rear Corvette script badge in Edge Red",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,495
+2lt_c67__opt_sl8_001,opt_sl8_001,SL8,"LPO, Rear Corvette script badge in Edge Red",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,495
+3lt_c67__opt_sl8_001,opt_sl8_001,SL8,"LPO, Rear Corvette script badge in Edge Red",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,495
+1lt_c07__opt_sti_001,opt_sti_001,STI,"LPO, Composite rocker extensions",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,675
+2lt_c07__opt_sti_001,opt_sti_001,STI,"LPO, Composite rocker extensions",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,675
+3lt_c07__opt_sti_001,opt_sti_001,STI,"LPO, Composite rocker extensions",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,675
+1lt_c67__opt_sti_001,opt_sti_001,STI,"LPO, Composite rocker extensions",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,675
+2lt_c67__opt_sti_001,opt_sti_001,STI,"LPO, Composite rocker extensions",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,675
+3lt_c67__opt_sti_001,opt_sti_001,STI,"LPO, Composite rocker extensions",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,675
+1lt_c07__opt_vqk_001,opt_vqk_001,VQK,"LPO, Custom splash guards",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,395
+2lt_c07__opt_vqk_001,opt_vqk_001,VQK,"LPO, Custom splash guards",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,395
+3lt_c07__opt_vqk_001,opt_vqk_001,VQK,"LPO, Custom splash guards",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,395
+1lt_c67__opt_vqk_001,opt_vqk_001,VQK,"LPO, Custom splash guards",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,395
+2lt_c67__opt_vqk_001,opt_vqk_001,VQK,"LPO, Custom splash guards",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,395
+3lt_c67__opt_vqk_001,opt_vqk_001,VQK,"LPO, Custom splash guards",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,395
+1lt_c07__opt_vtb_001,opt_vtb_001,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,150
+2lt_c07__opt_vtb_001,opt_vtb_001,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,150
+3lt_c07__opt_vtb_001,opt_vtb_001,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,150
+1lt_c67__opt_vtb_001,opt_vtb_001,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,150
+2lt_c67__opt_vtb_001,opt_vtb_001,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,150
+3lt_c67__opt_vtb_001,opt_vtb_001,VTB,"LPO, Rear fascia/roof storage protector in Black with embroidered crossed flags logo",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,150
+1lt_c07__opt_vwe_001,opt_vwe_001,VWE,"LPO, Front radiator grille screens",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,695
+2lt_c07__opt_vwe_001,opt_vwe_001,VWE,"LPO, Front radiator grille screens",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,695
+3lt_c07__opt_vwe_001,opt_vwe_001,VWE,"LPO, Front radiator grille screens",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,695
+1lt_c67__opt_vwe_001,opt_vwe_001,VWE,"LPO, Front radiator grille screens",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,695
+2lt_c67__opt_vwe_001,opt_vwe_001,VWE,"LPO, Front radiator grille screens",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,695
+3lt_c67__opt_vwe_001,opt_vwe_001,VWE,"LPO, Front radiator grille screens",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,695
+1lt_c07__opt_wkq_001,opt_wkq_001,WKQ,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,495
+2lt_c07__opt_wkq_001,opt_wkq_001,WKQ,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,495
+3lt_c07__opt_wkq_001,opt_wkq_001,WKQ,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,495
+1lt_c67__opt_wkq_001,opt_wkq_001,WKQ,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,495
+2lt_c67__opt_wkq_001,opt_wkq_001,WKQ,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,495
+3lt_c67__opt_wkq_001,opt_wkq_001,WKQ,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,495
+1lt_c07__opt_wkr_001,opt_wkr_001,WKR,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,1275
+2lt_c07__opt_wkr_001,opt_wkr_001,WKR,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,1275
+3lt_c07__opt_wkr_001,opt_wkr_001,WKR,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,1275
+1lt_c67__opt_wkr_001,opt_wkr_001,WKR,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,1275
+2lt_c67__opt_wkr_001,opt_wkr_001,WKR,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,1275
+3lt_c67__opt_wkr_001,opt_wkr_001,WKR,"LPO, Premium indoor car cover",sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,1275
+1lt_c07__opt_cav_001,opt_cav_001,CAV,"LPO, Contoured cargo area liners with Jake logo",sec_lpoi_001,accessories,1lt_c07,coupe,1LT,available,True,230
+2lt_c07__opt_cav_001,opt_cav_001,CAV,"LPO, Contoured cargo area liners with Jake logo",sec_lpoi_001,accessories,2lt_c07,coupe,2LT,available,True,230
+3lt_c07__opt_cav_001,opt_cav_001,CAV,"LPO, Contoured cargo area liners with Jake logo",sec_lpoi_001,accessories,3lt_c07,coupe,3LT,available,True,230
+1lt_c67__opt_cav_001,opt_cav_001,CAV,"LPO, Contoured cargo area liners with Jake logo",sec_lpoi_001,accessories,1lt_c67,convertible,1LT,available,True,230
+2lt_c67__opt_cav_001,opt_cav_001,CAV,"LPO, Contoured cargo area liners with Jake logo",sec_lpoi_001,accessories,2lt_c67,convertible,2LT,available,True,230
+3lt_c67__opt_cav_001,opt_cav_001,CAV,"LPO, Contoured cargo area liners with Jake logo",sec_lpoi_001,accessories,3lt_c67,convertible,3LT,available,True,230
+1lt_c07__opt_pdy_001,opt_pdy_001,PDY,"LPO, Roadside Safety Package",sec_lpoi_001,accessories,1lt_c07,coupe,1LT,available,True,195
+2lt_c07__opt_pdy_001,opt_pdy_001,PDY,"LPO, Roadside Safety Package",sec_lpoi_001,accessories,2lt_c07,coupe,2LT,available,True,195
+3lt_c07__opt_pdy_001,opt_pdy_001,PDY,"LPO, Roadside Safety Package",sec_lpoi_001,accessories,3lt_c07,coupe,3LT,available,True,195
+1lt_c67__opt_pdy_001,opt_pdy_001,PDY,"LPO, Roadside Safety Package",sec_lpoi_001,accessories,1lt_c67,convertible,1LT,available,True,195
+2lt_c67__opt_pdy_001,opt_pdy_001,PDY,"LPO, Roadside Safety Package",sec_lpoi_001,accessories,2lt_c67,convertible,2LT,available,True,195
+3lt_c67__opt_pdy_001,opt_pdy_001,PDY,"LPO, Roadside Safety Package",sec_lpoi_001,accessories,3lt_c67,convertible,3LT,available,True,195
+1lt_c07__opt_pef_001,opt_pef_001,PEF,"LPO, Contoured Liner Protection Package",sec_lpoi_001,accessories,1lt_c07,coupe,1LT,available,True,475
+2lt_c07__opt_pef_001,opt_pef_001,PEF,"LPO, Contoured Liner Protection Package",sec_lpoi_001,accessories,2lt_c07,coupe,2LT,available,True,475
+3lt_c07__opt_pef_001,opt_pef_001,PEF,"LPO, Contoured Liner Protection Package",sec_lpoi_001,accessories,3lt_c07,coupe,3LT,available,True,475
+1lt_c67__opt_pef_001,opt_pef_001,PEF,"LPO, Contoured Liner Protection Package",sec_lpoi_001,accessories,1lt_c67,convertible,1LT,available,True,475
+2lt_c67__opt_pef_001,opt_pef_001,PEF,"LPO, Contoured Liner Protection Package",sec_lpoi_001,accessories,2lt_c67,convertible,2LT,available,True,475
+3lt_c67__opt_pef_001,opt_pef_001,PEF,"LPO, Contoured Liner Protection Package",sec_lpoi_001,accessories,3lt_c67,convertible,3LT,available,True,475
+1lt_c07__opt_ria_001,opt_ria_001,RIA,"LPO, All-weather floor liners with Jake logo",sec_lpoi_001,accessories,1lt_c07,coupe,1LT,available,True,265
+2lt_c07__opt_ria_001,opt_ria_001,RIA,"LPO, All-weather floor liners with Jake logo",sec_lpoi_001,accessories,2lt_c07,coupe,2LT,available,True,265
+3lt_c07__opt_ria_001,opt_ria_001,RIA,"LPO, All-weather floor liners with Jake logo",sec_lpoi_001,accessories,3lt_c07,coupe,3LT,available,True,265
+1lt_c67__opt_ria_001,opt_ria_001,RIA,"LPO, All-weather floor liners with Jake logo",sec_lpoi_001,accessories,1lt_c67,convertible,1LT,available,True,265
+2lt_c67__opt_ria_001,opt_ria_001,RIA,"LPO, All-weather floor liners with Jake logo",sec_lpoi_001,accessories,2lt_c67,convertible,2LT,available,True,265
+3lt_c67__opt_ria_001,opt_ria_001,RIA,"LPO, All-weather floor liners with Jake logo",sec_lpoi_001,accessories,3lt_c67,convertible,3LT,available,True,265
+1lt_c07__opt_rwu_001,opt_rwu_001,RWU,"LPO, Cargo area organizer",sec_lpoi_001,accessories,1lt_c07,coupe,1LT,available,True,175
+2lt_c07__opt_rwu_001,opt_rwu_001,RWU,"LPO, Cargo area organizer",sec_lpoi_001,accessories,2lt_c07,coupe,2LT,available,True,175
+3lt_c07__opt_rwu_001,opt_rwu_001,RWU,"LPO, Cargo area organizer",sec_lpoi_001,accessories,3lt_c07,coupe,3LT,available,True,175
+1lt_c67__opt_rwu_001,opt_rwu_001,RWU,"LPO, Cargo area organizer",sec_lpoi_001,accessories,1lt_c67,convertible,1LT,available,True,175
+2lt_c67__opt_rwu_001,opt_rwu_001,RWU,"LPO, Cargo area organizer",sec_lpoi_001,accessories,2lt_c67,convertible,2LT,available,True,175
+3lt_c67__opt_rwu_001,opt_rwu_001,RWU,"LPO, Cargo area organizer",sec_lpoi_001,accessories,3lt_c67,convertible,3LT,available,True,175
+1lt_c07__opt_ryt_001,opt_ryt_001,RYT,"LPO, First Aid Kit",sec_lpoi_001,accessories,1lt_c07,coupe,1LT,available,True,60
+2lt_c07__opt_ryt_001,opt_ryt_001,RYT,"LPO, First Aid Kit",sec_lpoi_001,accessories,2lt_c07,coupe,2LT,available,True,60
+3lt_c07__opt_ryt_001,opt_ryt_001,RYT,"LPO, First Aid Kit",sec_lpoi_001,accessories,3lt_c07,coupe,3LT,available,True,60
+1lt_c67__opt_ryt_001,opt_ryt_001,RYT,"LPO, First Aid Kit",sec_lpoi_001,accessories,1lt_c67,convertible,1LT,available,True,60
+2lt_c67__opt_ryt_001,opt_ryt_001,RYT,"LPO, First Aid Kit",sec_lpoi_001,accessories,2lt_c67,convertible,2LT,available,True,60
+3lt_c67__opt_ryt_001,opt_ryt_001,RYT,"LPO, First Aid Kit",sec_lpoi_001,accessories,3lt_c67,convertible,3LT,available,True,60
+1lt_c07__opt_s08_001,opt_s08_001,S08,"LPO, Highway Safety Kit",sec_lpoi_001,accessories,1lt_c07,coupe,1LT,available,True,150
+2lt_c07__opt_s08_001,opt_s08_001,S08,"LPO, Highway Safety Kit",sec_lpoi_001,accessories,2lt_c07,coupe,2LT,available,True,150
+3lt_c07__opt_s08_001,opt_s08_001,S08,"LPO, Highway Safety Kit",sec_lpoi_001,accessories,3lt_c07,coupe,3LT,available,True,150
+1lt_c67__opt_s08_001,opt_s08_001,S08,"LPO, Highway Safety Kit",sec_lpoi_001,accessories,1lt_c67,convertible,1LT,available,True,150
+2lt_c67__opt_s08_001,opt_s08_001,S08,"LPO, Highway Safety Kit",sec_lpoi_001,accessories,2lt_c67,convertible,2LT,available,True,150
+3lt_c67__opt_s08_001,opt_s08_001,S08,"LPO, Highway Safety Kit",sec_lpoi_001,accessories,3lt_c67,convertible,3LT,available,True,150
+1lt_c07__opt_s2l_001,opt_s2l_001,S2L,"LPO, Set of premium leather weekend/travel bags",sec_lpoi_001,accessories,1lt_c07,coupe,1LT,available,True,1695
+2lt_c07__opt_s2l_001,opt_s2l_001,S2L,"LPO, Set of premium leather weekend/travel bags",sec_lpoi_001,accessories,2lt_c07,coupe,2LT,available,True,1695
+3lt_c07__opt_s2l_001,opt_s2l_001,S2L,"LPO, Set of premium leather weekend/travel bags",sec_lpoi_001,accessories,3lt_c07,coupe,3LT,available,True,1695
+1lt_c67__opt_s2l_001,opt_s2l_001,S2L,"LPO, Set of premium leather weekend/travel bags",sec_lpoi_001,accessories,1lt_c67,convertible,1LT,available,True,1695
+2lt_c67__opt_s2l_001,opt_s2l_001,S2L,"LPO, Set of premium leather weekend/travel bags",sec_lpoi_001,accessories,2lt_c67,convertible,2LT,available,True,1695
+3lt_c67__opt_s2l_001,opt_s2l_001,S2L,"LPO, Set of premium leather weekend/travel bags",sec_lpoi_001,accessories,3lt_c67,convertible,3LT,available,True,1695
+1lt_c07__opt_sc7_001,opt_sc7_001,SC7,"LPO, Roof panel storage pouch",sec_lpoi_001,accessories,1lt_c07,coupe,1LT,available,True,195
+2lt_c07__opt_sc7_001,opt_sc7_001,SC7,"LPO, Roof panel storage pouch",sec_lpoi_001,accessories,2lt_c07,coupe,2LT,available,True,195
+3lt_c07__opt_sc7_001,opt_sc7_001,SC7,"LPO, Roof panel storage pouch",sec_lpoi_001,accessories,3lt_c07,coupe,3LT,available,True,195
+1lt_c67__opt_sc7_001,opt_sc7_001,SC7,"LPO, Roof panel storage pouch",sec_lpoi_001,accessories,1lt_c67,convertible,1LT,unavailable,True,195
+2lt_c67__opt_sc7_001,opt_sc7_001,SC7,"LPO, Roof panel storage pouch",sec_lpoi_001,accessories,2lt_c67,convertible,2LT,unavailable,True,195
+3lt_c67__opt_sc7_001,opt_sc7_001,SC7,"LPO, Roof panel storage pouch",sec_lpoi_001,accessories,3lt_c67,convertible,3LT,unavailable,True,195
+1lt_c07__opt_sxb_001,opt_sxb_001,SXB,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,1lt_c07,coupe,1LT,available,True,2095
+2lt_c07__opt_sxb_001,opt_sxb_001,SXB,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,2lt_c07,coupe,2LT,available,True,2095
+3lt_c07__opt_sxb_001,opt_sxb_001,SXB,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,3lt_c07,coupe,3LT,available,True,2095
+1lt_c67__opt_sxb_001,opt_sxb_001,SXB,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,1lt_c67,convertible,1LT,available,True,2095
+2lt_c67__opt_sxb_001,opt_sxb_001,SXB,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,2lt_c67,convertible,2LT,available,True,2095
+3lt_c67__opt_sxb_001,opt_sxb_001,SXB,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,3lt_c67,convertible,3LT,available,True,2095
+1lt_c07__opt_sxr_001,opt_sxr_001,SXR,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,1lt_c07,coupe,1LT,available,True,2095
+2lt_c07__opt_sxr_001,opt_sxr_001,SXR,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,2lt_c07,coupe,2LT,available,True,2095
+3lt_c07__opt_sxr_001,opt_sxr_001,SXR,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,3lt_c07,coupe,3LT,available,True,2095
+1lt_c67__opt_sxr_001,opt_sxr_001,SXR,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,1lt_c67,convertible,1LT,available,True,2095
+2lt_c67__opt_sxr_001,opt_sxr_001,SXR,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,2lt_c67,convertible,2LT,available,True,2095
+3lt_c67__opt_sxr_001,opt_sxr_001,SXR,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,3lt_c67,convertible,3LT,available,True,2095
+1lt_c07__opt_sxt_001,opt_sxt_001,SXT,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,1lt_c07,coupe,1LT,available,True,2695
+2lt_c07__opt_sxt_001,opt_sxt_001,SXT,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,2lt_c07,coupe,2LT,available,True,2695
+3lt_c07__opt_sxt_001,opt_sxt_001,SXT,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,3lt_c07,coupe,3LT,available,True,2695
+1lt_c67__opt_sxt_001,opt_sxt_001,SXT,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,1lt_c67,convertible,1LT,available,True,2695
+2lt_c67__opt_sxt_001,opt_sxt_001,SXT,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,2lt_c67,convertible,2LT,available,True,2695
+3lt_c67__opt_sxt_001,opt_sxt_001,SXT,"LPO, Suede frunk and trunk compartment liner",sec_lpoi_001,accessories,3lt_c67,convertible,3LT,available,True,2695
+1lt_c07__opt_vyw_001,opt_vyw_001,VYW,"LPO, Floor mats",sec_lpoi_001,accessories,1lt_c07,coupe,1LT,available,True,275
+2lt_c07__opt_vyw_001,opt_vyw_001,VYW,"LPO, Floor mats",sec_lpoi_001,accessories,2lt_c07,coupe,2LT,available,True,275
+3lt_c07__opt_vyw_001,opt_vyw_001,VYW,"LPO, Floor mats",sec_lpoi_001,accessories,3lt_c07,coupe,3LT,available,True,275
+1lt_c67__opt_vyw_001,opt_vyw_001,VYW,"LPO, Floor mats",sec_lpoi_001,accessories,1lt_c67,convertible,1LT,available,True,275
+2lt_c67__opt_vyw_001,opt_vyw_001,VYW,"LPO, Floor mats",sec_lpoi_001,accessories,2lt_c67,convertible,2LT,available,True,275
+3lt_c67__opt_vyw_001,opt_vyw_001,VYW,"LPO, Floor mats",sec_lpoi_001,accessories,3lt_c67,convertible,3LT,available,True,275
+1lt_c07__opt_w2d_001,opt_w2d_001,W2D,"LPO, Cargo net set",sec_lpoi_001,accessories,1lt_c07,coupe,1LT,available,True,125
+2lt_c07__opt_w2d_001,opt_w2d_001,W2D,"LPO, Cargo net set",sec_lpoi_001,accessories,2lt_c07,coupe,2LT,unavailable,True,125
+3lt_c07__opt_w2d_001,opt_w2d_001,W2D,"LPO, Cargo net set",sec_lpoi_001,accessories,3lt_c07,coupe,3LT,unavailable,True,125
+1lt_c67__opt_w2d_001,opt_w2d_001,W2D,"LPO, Cargo net set",sec_lpoi_001,accessories,1lt_c67,convertible,1LT,available,True,125
+2lt_c67__opt_w2d_001,opt_w2d_001,W2D,"LPO, Cargo net set",sec_lpoi_001,accessories,2lt_c67,convertible,2LT,unavailable,True,125
+3lt_c67__opt_w2d_001,opt_w2d_001,W2D,"LPO, Cargo net set",sec_lpoi_001,accessories,3lt_c67,convertible,3LT,unavailable,True,125
+1lt_c07__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,accessories,1lt_c07,coupe,1LT,available,True,4395
+2lt_c07__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,accessories,2lt_c07,coupe,2LT,available,True,4395
+3lt_c07__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,accessories,3lt_c07,coupe,3LT,available,True,4395
+1lt_c67__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,accessories,1lt_c67,convertible,1LT,available,True,4395
+2lt_c67__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,accessories,2lt_c67,convertible,2LT,available,True,4395
+3lt_c67__opt_5dg_001,opt_5dg_001,5DG,"LPO, 20-spoke Tech Bronze aluminum wheels",sec_lpow_001,accessories,3lt_c67,convertible,3LT,available,True,4395
+1lt_c07__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,accessories,1lt_c07,coupe,1LT,available,True,4395
+2lt_c07__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,accessories,2lt_c07,coupe,2LT,available,True,4395
+3lt_c07__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,accessories,3lt_c07,coupe,3LT,available,True,4395
+1lt_c67__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,accessories,1lt_c67,convertible,1LT,available,True,4395
+2lt_c67__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,accessories,2lt_c67,convertible,2LT,available,True,4395
+3lt_c67__opt_5do_001,opt_5do_001,5DO,"LPO, 15-spoke bright polished aluminum wheels",sec_lpow_001,accessories,3lt_c67,convertible,3LT,available,True,4395
 1lt_c07__opt_g26_001,opt_g26_001,G26,Sebring Orange Tintcoat,sec_pain_001,paint,1lt_c07,coupe,1LT,available,True,995
 2lt_c07__opt_g26_001,opt_g26_001,G26,Sebring Orange Tintcoat,sec_pain_001,paint,2lt_c07,coupe,2LT,available,True,995
 3lt_c07__opt_g26_001,opt_g26_001,G26,Sebring Orange Tintcoat,sec_pain_001,paint,3lt_c07,coupe,3LT,available,True,995
@@ -989,30 +953,30 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_aup_001,opt_aup_001,AUP,"Mixed seats, driver Competition Sport bucket, passenger GT2 bucket",sec_seat_002,seat,1lt_c67,convertible,1LT,unavailable,True,350
 2lt_c67__opt_aup_001,opt_aup_001,AUP,"Mixed seats, driver Competition Sport bucket, passenger GT2 bucket",sec_seat_002,seat,2lt_c67,convertible,2LT,unavailable,True,350
 3lt_c67__opt_aup_001,opt_aup_001,AUP,"Mixed seats, driver Competition Sport bucket, passenger GT2 bucket",sec_seat_002,seat,3lt_c67,convertible,3LT,available,True,350
-1lt_c07__opt_5zu_001,opt_5zu_001,5ZU,"LPO, High wing spoiler, Body color",sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,1395
-2lt_c07__opt_5zu_001,opt_5zu_001,5ZU,"LPO, High wing spoiler, Body color",sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,1395
-3lt_c07__opt_5zu_001,opt_5zu_001,5ZU,"LPO, High wing spoiler, Body color",sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,1395
-1lt_c67__opt_5zu_001,opt_5zu_001,5ZU,"LPO, High wing spoiler, Body color",sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,1395
-2lt_c67__opt_5zu_001,opt_5zu_001,5ZU,"LPO, High wing spoiler, Body color",sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,1395
-3lt_c67__opt_5zu_001,opt_5zu_001,5ZU,"LPO, High wing spoiler, Body color",sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,1395
-1lt_c07__opt_5zz_001,opt_5zz_001,5ZZ,"LPO, High wing spoiler",sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,1550
-2lt_c07__opt_5zz_001,opt_5zz_001,5ZZ,"LPO, High wing spoiler",sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,1550
-3lt_c07__opt_5zz_001,opt_5zz_001,5ZZ,"LPO, High wing spoiler",sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,1550
-1lt_c67__opt_5zz_001,opt_5zz_001,5ZZ,"LPO, High wing spoiler",sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,1550
-2lt_c67__opt_5zz_001,opt_5zz_001,5ZZ,"LPO, High wing spoiler",sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,1550
-3lt_c67__opt_5zz_001,opt_5zz_001,5ZZ,"LPO, High wing spoiler",sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,1550
-1lt_c07__opt_tvs_001,opt_tvs_001,TVS,Low-profile rear spoiler and front splitter,sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,995
-2lt_c07__opt_tvs_001,opt_tvs_001,TVS,Low-profile rear spoiler and front splitter,sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,995
-3lt_c07__opt_tvs_001,opt_tvs_001,TVS,Low-profile rear spoiler and front splitter,sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,995
-1lt_c67__opt_tvs_001,opt_tvs_001,TVS,Low-profile rear spoiler and front splitter,sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,995
-2lt_c67__opt_tvs_001,opt_tvs_001,TVS,Low-profile rear spoiler and front splitter,sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,995
-3lt_c67__opt_tvs_001,opt_tvs_001,TVS,Low-profile rear spoiler and front splitter,sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,995
-1lt_c07__opt_zyc_001,opt_zyc_001,ZYC,Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped),sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c07,coupe,1LT,available,True,295
-2lt_c07__opt_zyc_001,opt_zyc_001,ZYC,Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped),sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c07,coupe,2LT,available,True,295
-3lt_c07__opt_zyc_001,opt_zyc_001,ZYC,Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped),sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c07,coupe,3LT,available,True,295
-1lt_c67__opt_zyc_001,opt_zyc_001,ZYC,Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped),sec_spoi_001,aero_exhaust_stripes_accessories,1lt_c67,convertible,1LT,available,True,295
-2lt_c67__opt_zyc_001,opt_zyc_001,ZYC,Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped),sec_spoi_001,aero_exhaust_stripes_accessories,2lt_c67,convertible,2LT,available,True,295
-3lt_c67__opt_zyc_001,opt_zyc_001,ZYC,Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped),sec_spoi_001,aero_exhaust_stripes_accessories,3lt_c67,convertible,3LT,available,True,295
+1lt_c07__opt_5zu_001,opt_5zu_001,5ZU,"LPO, High wing spoiler, Body color",sec_spoi_001,packages_performance,1lt_c07,coupe,1LT,available,True,1395
+2lt_c07__opt_5zu_001,opt_5zu_001,5ZU,"LPO, High wing spoiler, Body color",sec_spoi_001,packages_performance,2lt_c07,coupe,2LT,available,True,1395
+3lt_c07__opt_5zu_001,opt_5zu_001,5ZU,"LPO, High wing spoiler, Body color",sec_spoi_001,packages_performance,3lt_c07,coupe,3LT,available,True,1395
+1lt_c67__opt_5zu_001,opt_5zu_001,5ZU,"LPO, High wing spoiler, Body color",sec_spoi_001,packages_performance,1lt_c67,convertible,1LT,available,True,1395
+2lt_c67__opt_5zu_001,opt_5zu_001,5ZU,"LPO, High wing spoiler, Body color",sec_spoi_001,packages_performance,2lt_c67,convertible,2LT,available,True,1395
+3lt_c67__opt_5zu_001,opt_5zu_001,5ZU,"LPO, High wing spoiler, Body color",sec_spoi_001,packages_performance,3lt_c67,convertible,3LT,available,True,1395
+1lt_c07__opt_5zz_001,opt_5zz_001,5ZZ,"LPO, High wing spoiler",sec_spoi_001,packages_performance,1lt_c07,coupe,1LT,available,True,1550
+2lt_c07__opt_5zz_001,opt_5zz_001,5ZZ,"LPO, High wing spoiler",sec_spoi_001,packages_performance,2lt_c07,coupe,2LT,available,True,1550
+3lt_c07__opt_5zz_001,opt_5zz_001,5ZZ,"LPO, High wing spoiler",sec_spoi_001,packages_performance,3lt_c07,coupe,3LT,available,True,1550
+1lt_c67__opt_5zz_001,opt_5zz_001,5ZZ,"LPO, High wing spoiler",sec_spoi_001,packages_performance,1lt_c67,convertible,1LT,available,True,1550
+2lt_c67__opt_5zz_001,opt_5zz_001,5ZZ,"LPO, High wing spoiler",sec_spoi_001,packages_performance,2lt_c67,convertible,2LT,available,True,1550
+3lt_c67__opt_5zz_001,opt_5zz_001,5ZZ,"LPO, High wing spoiler",sec_spoi_001,packages_performance,3lt_c67,convertible,3LT,available,True,1550
+1lt_c07__opt_tvs_001,opt_tvs_001,TVS,Low-profile rear spoiler and front splitter,sec_spoi_001,packages_performance,1lt_c07,coupe,1LT,available,True,995
+2lt_c07__opt_tvs_001,opt_tvs_001,TVS,Low-profile rear spoiler and front splitter,sec_spoi_001,packages_performance,2lt_c07,coupe,2LT,available,True,995
+3lt_c07__opt_tvs_001,opt_tvs_001,TVS,Low-profile rear spoiler and front splitter,sec_spoi_001,packages_performance,3lt_c07,coupe,3LT,available,True,995
+1lt_c67__opt_tvs_001,opt_tvs_001,TVS,Low-profile rear spoiler and front splitter,sec_spoi_001,packages_performance,1lt_c67,convertible,1LT,available,True,995
+2lt_c67__opt_tvs_001,opt_tvs_001,TVS,Low-profile rear spoiler and front splitter,sec_spoi_001,packages_performance,2lt_c67,convertible,2LT,available,True,995
+3lt_c67__opt_tvs_001,opt_tvs_001,TVS,Low-profile rear spoiler and front splitter,sec_spoi_001,packages_performance,3lt_c67,convertible,3LT,available,True,995
+1lt_c07__opt_zyc_001,opt_zyc_001,ZYC,Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped),sec_spoi_001,packages_performance,1lt_c07,coupe,1LT,available,True,295
+2lt_c07__opt_zyc_001,opt_zyc_001,ZYC,Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped),sec_spoi_001,packages_performance,2lt_c07,coupe,2LT,available,True,295
+3lt_c07__opt_zyc_001,opt_zyc_001,ZYC,Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped),sec_spoi_001,packages_performance,3lt_c07,coupe,3LT,available,True,295
+1lt_c67__opt_zyc_001,opt_zyc_001,ZYC,Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped),sec_spoi_001,packages_performance,1lt_c67,convertible,1LT,available,True,295
+2lt_c67__opt_zyc_001,opt_zyc_001,ZYC,Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped),sec_spoi_001,packages_performance,2lt_c67,convertible,2LT,available,True,295
+3lt_c67__opt_zyc_001,opt_zyc_001,ZYC,Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped),sec_spoi_001,packages_performance,3lt_c67,convertible,3LT,available,True,295
 1lt_c07__opt_002,opt_002,,Keyless Open and Start,sec_stan_001,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
 2lt_c07__opt_002,opt_002,,Keyless Open and Start,sec_stan_001,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
 3lt_c07__opt_002,opt_002,,Keyless Open and Start,sec_stan_001,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
