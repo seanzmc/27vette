@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T20:32:24+00:00",
+  "generated_at": "2026-05-15T21:41:45+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -109,8 +109,8 @@
       "False": 107,
       "True": 162
     },
-    "active_option_rows_available_or_standard": 226,
-    "inactive_option_rows_all_unavailable_or_blank": 43,
+    "active_option_rows_available_or_standard": 225,
+    "inactive_option_rows_all_unavailable_or_blank": 44,
     "status_counts": {
       "available": 879,
       "standard": 547,
@@ -5509,10 +5509,10 @@
       {
         "option_id": "opt_jx6_001",
         "rpo": "JX6",
-        "section_id": "sec_stan_001",
-        "original_section_id": "sec_stan_001",
+        "section_id": "sec_perf_brake_001",
+        "original_section_id": "sec_perf_brake_001",
         "section_override_applied": false,
-        "step_key": "standard_equipment"
+        "step_key": "packages_performance"
       },
       {
         "option_id": "opt_xft_001",
@@ -8089,42 +8089,42 @@
       "option_id": "opt_jx6_001",
       "rpo": "JX6",
       "variant_id": "1lt_e07",
-      "section_id": "sec_stan_001",
+      "section_id": "sec_perf_brake_001",
       "option_name": "Low-Dust Touring Brakes"
     },
     {
       "option_id": "opt_jx6_001",
       "rpo": "JX6",
       "variant_id": "2lt_e07",
-      "section_id": "sec_stan_001",
+      "section_id": "sec_perf_brake_001",
       "option_name": "Low-Dust Touring Brakes"
     },
     {
       "option_id": "opt_jx6_001",
       "rpo": "JX6",
       "variant_id": "3lt_e07",
-      "section_id": "sec_stan_001",
+      "section_id": "sec_perf_brake_001",
       "option_name": "Low-Dust Touring Brakes"
     },
     {
       "option_id": "opt_jx6_001",
       "rpo": "JX6",
       "variant_id": "1lt_e67",
-      "section_id": "sec_stan_001",
+      "section_id": "sec_perf_brake_001",
       "option_name": "Low-Dust Touring Brakes"
     },
     {
       "option_id": "opt_jx6_001",
       "rpo": "JX6",
       "variant_id": "2lt_e67",
-      "section_id": "sec_stan_001",
+      "section_id": "sec_perf_brake_001",
       "option_name": "Low-Dust Touring Brakes"
     },
     {
       "option_id": "opt_jx6_001",
       "rpo": "JX6",
       "variant_id": "3lt_e67",
-      "section_id": "sec_stan_001",
+      "section_id": "sec_perf_brake_001",
       "option_name": "Low-Dust Touring Brakes"
     },
     {
@@ -10187,7 +10187,7 @@
       "includes": 53,
       "not_available": 49,
       "not_recommended": 4,
-      "only": 19,
+      "only": 20,
       "requires": 36
     },
     "rows": [
@@ -10922,7 +10922,8 @@
         "option_name": "Z52 Sport Performance Package",
         "section_id": "sec_perf_z52_001",
         "matched_terms": [
-          "includes"
+          "includes",
+          "only"
         ],
         "special_mentions": [],
         "detail_raw": ""
@@ -11151,7 +11152,7 @@
         "option_id": "opt_jx6_001",
         "rpo": "JX6",
         "option_name": "Low-Dust Touring Brakes",
-        "section_id": "sec_stan_001",
+        "section_id": "sec_perf_brake_001",
         "matched_terms": [
           "includes"
         ],

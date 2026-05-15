@@ -1,6 +1,6 @@
 # Grand Sport Inspection
 
-Generated: `2026-05-15T20:32:24+00:00`
+Generated: `2026-05-15T21:41:45+00:00`
 Source sheet: `grandSport_options`
 Status: `inspection_generated`
 
@@ -19,8 +19,8 @@ Status: `inspection_generated`
 - Candidate choice rows with available/standard status: 1380
 - Candidate standard equipment cells: 455
 - Candidate standard option rows: 90
-- Active option rows with available/standard status: 226
-- Inactive option rows all unavailable/blank: 43
+- Active option rows with available/standard status: 225
+- Inactive option rows all unavailable/blank: 44
 - Selectable counts: `{"False": 107, "True": 162}`
 - Status counts: `{"available": 879, "standard": 547, "unavailable": 188}`
 - Missing status cells: 0
@@ -36,7 +36,7 @@ Status: `inspection_generated`
 
 ## Rule/Detail Hot Spots
 
-- Hot spot counts: `{"except": 2, "included_with": 17, "includes": 53, "not_available": 49, "not_recommended": 4, "only": 19, "requires": 36}`
+- Hot spot counts: `{"except": 2, "included_with": 17, "includes": 53, "not_available": 49, "not_recommended": 4, "only": 20, "requires": 36}`
 - Rows requiring later rule review: 129
 
 | RPO | Option | Section | Matched Terms | Special Mentions |

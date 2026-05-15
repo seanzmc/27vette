@@ -136,6 +136,7 @@ window.__testApi = {
   render,
   optionPrice,
   choiceDisplayPrice,
+  adjustedInteriorDisplayPrice,
   currentOrder,
   compactOrder,
   plainTextOrderSummary,
@@ -194,7 +195,7 @@ const expectedGrandSportExclusiveGroups = [
   },
   {
     groupId: "gs_excl_performance_brakes",
-    optionIds: ["opt_j56_001", "opt_j57_001"],
+    optionIds: ["opt_jx6_001", "opt_j56_001", "opt_j57_001"],
   },
 ];
 
@@ -293,6 +294,7 @@ test("Grand Sport exclusive group selections remove peer options without runtime
 
     const activeGroupChoices = expected.optionIds
       .map((optionId) => runtime.activeChoiceRows().find((choice) => choice.option_id === optionId))
+      .filter((choice) => choice?.display_behavior !== "auto_only")
       .filter(Boolean);
     assert.equal(activeGroupChoices.length >= 2, true, `${expected.groupId} should have at least two active Grand Sport choices`);
     const [firstChoice, secondChoice] = activeGroupChoices;
@@ -406,6 +408,9 @@ test("Grand Sport seat prices are workbook-scoped by trim", () => {
   assert.equal(runtime.choiceDisplayPrice(ae4), 2095, "2LT AE4 tile should preview the scoped price before selection");
   runtime.handleChoice(ah2);
   assert.equal(runtime.optionPrice("opt_ah2_001"), 1695);
+  const ah2Interior = runtime.data.interiors.find((interior) => interior.interior_id === "2LT_AH2_HTM");
+  assert.ok(ah2Interior, "2LT AH2 Jet Black interior should exist");
+  assert.equal(runtime.adjustedInteriorDisplayPrice(ah2Interior), 0, "2LT AH2 interior tile should subtract the scoped AH2 seat price");
   runtime.handleChoice(ae4);
   assert.equal(runtime.optionPrice("opt_ae4_002"), 2095);
 
@@ -432,7 +437,7 @@ test("Grand Sport workbook default_selected rows seed and reconcile defaults gen
   runtime.resetDefaults();
   runtime.reconcileSelections();
 
-  for (const optionId of ["opt_efr_001", "opt_t0e_001", "opt_j56_001", "opt_719_001"]) {
+  for (const optionId of ["opt_efr_001", "opt_t0e_001", "opt_jx6_001", "opt_719_001"]) {
     assert.equal(runtime.state.selected.has(optionId), true, `${optionId} should be selected from display_behavior=default_selected`);
   }
 
@@ -440,7 +445,8 @@ test("Grand Sport workbook default_selected rows seed and reconcile defaults gen
   runtime.handleChoice(fey);
   assert.equal(runtime.state.selected.has("opt_fey_001"), true, "FEY should be selectable");
   assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "FEY should replace the default T0E aero row");
-  assert.equal(runtime.state.selected.has("opt_j56_001"), false, "FEY auto-added J57 should replace the default J56 brake row");
+  assert.equal(runtime.state.selected.has("opt_jx6_001"), false, "FEY auto-added J57 should replace the default JX6 brake row");
+  assert.equal(runtime.state.selected.has("opt_j56_001"), false, "FEY auto-added J57 should not leave J56 selected");
 
   const order = runtime.currentOrder();
   assert.equal(order.auto_added_options.some((item) => item.rpo === "J57"), true, "FEY should auto-add J57");
@@ -465,16 +471,23 @@ test("Grand Sport Pass 1 workbook rules drive engine, brake, ground-effect, and 
 
   const j57 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j57_001");
   const j56 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j56_001");
+  assert.equal(runtime.state.selected.has("opt_jx6_001"), true, "JX6 should be the default Grand Sport brake");
   runtime.handleChoice(j57);
   assert.equal(runtime.state.selected.has("opt_j57_001"), true, "J57 should be selected");
-  assert.equal(runtime.state.selected.has("opt_j56_001"), false, "J57 should replace J56");
-  runtime.handleChoice(j56);
-  assert.equal(runtime.state.selected.has("opt_j56_001"), true, "J56 should be selectable again");
-  assert.equal(runtime.state.selected.has("opt_j57_001"), false, "J56 should replace J57");
+  assert.equal(runtime.state.selected.has("opt_jx6_001"), false, "J57 should replace JX6");
+  assert.equal(runtime.state.selected.has("opt_j56_001"), false, "J57 should not leave J56 selected");
 
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
   const feb = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_feb_001");
   runtime.handleChoice(feb);
+  let order = runtime.currentOrder();
+  assert.equal(order.auto_added_options.some((item) => item.rpo === "J56" && item.price === 0), true, "FEB should auto-add J56 at $0");
+  assert.equal(runtime.state.selected.has("opt_jx6_001"), false, "FEB auto-added J56 should replace default JX6");
   runtime.handleChoice(j57);
+  order = runtime.currentOrder();
+  assert.equal(runtime.state.selected.has("opt_j57_001"), true, "J57 should remain selectable after FEB");
+  assert.equal(order.auto_added_options.some((item) => item.rpo === "J56"), false, "J57 should replace FEB auto-added J56");
   const t0f = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0f_001");
   const cfl = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_cfl_001");
   runtime.handleChoice(t0f);

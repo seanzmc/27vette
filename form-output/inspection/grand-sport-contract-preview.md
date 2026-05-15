@@ -1,6 +1,6 @@
 # Grand Sport Contract Preview
 
-Generated: `2026-05-15T20:32:24+00:00`
+Generated: `2026-05-15T21:41:45+00:00`
 Status: `read_only_preview`
 Source sheet: `grandSport_options`
 
@@ -40,7 +40,7 @@ Source sheet: `grandSport_options`
 
 ## Rule/Detail Hot Spots
 
-- Counts: `{"except": 2, "included_with": 17, "includes": 53, "not_available": 49, "not_recommended": 4, "only": 19, "requires": 36, "special_package_review": 26}`
+- Counts: `{"except": 2, "included_with": 17, "includes": 53, "not_available": 49, "not_recommended": 4, "only": 20, "requires": 36, "special_package_review": 26}`
 - Rows: 129
 
 ## Unresolved Normalization Issues

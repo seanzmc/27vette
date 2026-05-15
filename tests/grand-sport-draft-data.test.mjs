@@ -45,6 +45,8 @@ const requiredPackagePriceRules = [
   ["gs_pr_2lt_ae4_seat_001", "opt_ae4_002", "opt_ae4_002", "override", 2095],
   ["gs_pr_3lt_ae4_seat_001", "opt_ae4_002", "opt_ae4_002", "override", 595],
   ["gs_pr_3lt_aup_seat_001", "opt_aup_001", "opt_aup_001", "override", 350],
+  ["gs_pr_pdyryt_001", "opt_pdy_001", "opt_ryt_001", "override", 0],
+  ["gs_pr_pdys08_001", "opt_pdy_001", "opt_s08_001", "override", 0],
 ];
 
 const expectedGrandSportExclusiveGroups = [
@@ -82,7 +84,7 @@ const expectedGrandSportExclusiveGroups = [
   },
   {
     group_id: "gs_excl_performance_brakes",
-    option_ids: ["opt_j56_001", "opt_j57_001"],
+    option_ids: ["opt_jx6_001", "opt_j56_001", "opt_j57_001"],
   },
 ];
 
@@ -138,9 +140,9 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
   );
   assert.equal(draft.choices.length, 1380);
   assert.equal(draft.standardEquipment.length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 763);
+  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 757);
   assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 162);
+  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 168);
 });
 
 test("Grand Sport standard equipment is preserved after standard mirror rows are inactive", () => {
@@ -293,6 +295,7 @@ test("Grand Sport draft emits the approved model-scoped exclusive groups", () =>
       }
     }
   }
+  assert.equal([...byId.values()].some((group) => (group.option_ids || []).includes("opt_jxa_001")), false);
 });
 
 test("Grand Sport draft emits deterministic option rules from copied Stingray rows and raw detail", () => {
@@ -396,6 +399,16 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
   const defaultSeatbelt = draft.choices.find((choice) => choice.option_id === "opt_719_001");
   assert.equal(defaultSeatbelt.display_behavior, "default_selected");
   assert.equal(defaultSeatbelt.selectable, "True");
+
+  const defaultBrakes = draft.choices.filter((choice) => choice.option_id === "opt_jx6_001");
+  assert.equal(defaultBrakes.length, 6);
+  assert.equal(defaultBrakes.every((choice) => choice.rpo === "JX6" && choice.status === "standard"), true);
+  assert.equal(defaultBrakes.every((choice) => choice.display_behavior === "default_selected"), true);
+
+  const performanceBrakes = draft.choices.filter((choice) => choice.option_id === "opt_j56_001");
+  assert.equal(performanceBrakes.length, 6);
+  assert.equal(performanceBrakes.every((choice) => choice.rpo === "J56" && choice.display_behavior === "auto_only"), true);
+  assert.equal(draft.rules.some((rule) => rule.source_id === "opt_feb_001" && rule.rule_type === "includes" && rule.target_id === "opt_j56_001"), true);
 
   const d30 = draft.choices.find((choice) => choice.option_id === "opt_d30_001");
   assert.equal(d30.active, "False");

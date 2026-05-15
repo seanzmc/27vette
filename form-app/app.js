@@ -284,6 +284,11 @@ function adjustedInteriorPrice(interior) {
   return Math.max(0, Number(interior.price || 0) - Number(seat?.base_price || 0));
 }
 
+function adjustedInteriorDisplayPrice(interior) {
+  const seat = selectedSeatChoice();
+  return Math.max(0, Number(interior.price || 0) - (seat ? optionPrice(seat.option_id) : 0));
+}
+
 function shouldHideChoice(choice) {
   return choice.active !== "True" || choice.status === "unavailable";
 }
@@ -922,7 +927,7 @@ function renderInteriorCard(interior) {
   const detail = [interior.interior_material_family || interior.material, interior.source_note].filter(Boolean).join(" ");
   return `
     <button class="${classes.join(" ")}" type="button" data-interior="${interior.interior_id}" ${disabledReason ? "aria-disabled=\"true\"" : ""}>
-      <span class="topline"><span class="rpo">${interior.interior_code}</span><span class="price">${formatMoney(adjustedInteriorPrice(interior))}</span></span>
+      <span class="topline"><span class="rpo">${interior.interior_code}</span><span class="price">${formatMoney(adjustedInteriorDisplayPrice(interior))}</span></span>
       <p class="choice-name">${escapeHtml(interior.interior_leaf_label || interior.interior_name)}</p>
       <p class="choice-note">${escapeHtml(detail || interior.interior_id)}</p>
       ${disabledReason ? `<p class="disabled-reason">${disabledReason}</p>` : ""}
