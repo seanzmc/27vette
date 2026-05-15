@@ -586,9 +586,13 @@ test("Grand Sport dealer submission payload stays model-scoped when posted", asy
   const submission = await runtime.submitDealerBuild();
   assert.equal(submission.payload.model, "grandSport");
   assert.match(submission.payload.plain_text_summary, /^2027 Corvette Grand Sport\n\n/);
+  assert.match(submission.payload.plain_text_summary, /VARIANT\nCorvette Grand Sport Coupe 1LT/);
+  assert.doesNotMatch(submission.payload.plain_text_summary, /Base MSRP|STANDARD & INCLUDED/);
   assert.equal(submission.payload.customer.email, "ada@example.com");
+  assert.match(submission.payload.msrp, /^\$\d{1,3}(,\d{3})*$/);
   assert.equal(submission.result.entry_id, 445566);
   assert.equal(JSON.parse(runtime.fetchCalls[0].options.body).model, "grandSport");
+  assert.equal(JSON.parse(runtime.fetchCalls[0].options.body).msrp, submission.payload.msrp);
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").hidden, true);
   assert.equal(await runtime.submitDealerBuild(), null);
   assert.equal(runtime.fetchCalls.length, 1, "Grand Sport dealer submission should not post duplicates after success");

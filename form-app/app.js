@@ -1405,6 +1405,7 @@ function compactOrder() {
 }
 
 function plainTextOrderSummary(order = compactOrder()) {
+  const sectionHeader = (label) => String(label || "").trim().toUpperCase();
   const lines = [
     order.title,
     "",
@@ -1417,26 +1418,21 @@ function plainTextOrderSummary(order = compactOrder()) {
   lines.push(
     `Submitted: ${order.submitted_at}`,
     "",
-    "Vehicle",
-    order.vehicle.body_style || "",
-    order.vehicle.trim_level || "",
+    sectionHeader("Variant"),
     order.vehicle.display_name || "",
-    `Base MSRP: ${formatMoney(order.vehicle.base_price)}`,
     ""
   );
 
   for (const section of order.sections) {
-    lines.push(section.section);
+    lines.push(sectionHeader(section.section));
     for (const item of section.items) {
-      lines.push(`${item.rpo} ${item.label} ${formatMoney(item.price)}`.trim());
+      const label = `${item.rpo} ${item.label}`.trim();
+      lines.push(`${label}: ${formatMoney(item.price)}`);
     }
     lines.push("");
   }
 
-  if (Number.isFinite(Number(order.standard_equipment?.count))) {
-    lines.push(`Standard & Included: ${Number(order.standard_equipment.count)} items`, "");
-  }
-  lines.push(`MSRP: ${formatMoney(order.msrp)}`);
+  lines.push(`${sectionHeader("MSRP")}: ${formatMoney(order.msrp)}`);
   return lines.join("\n").replace(/\n{3,}/g, "\n\n");
 }
 
@@ -1559,7 +1555,7 @@ function dealerSubmissionPayload(order = compactOrder()) {
     customer: order.customer,
     vehicle: order.vehicle,
     sections: order.sections,
-    msrp: order.msrp,
+    msrp: formatMoney(order.msrp),
     plain_text_summary: plainTextOrderSummary(order),
   };
 }

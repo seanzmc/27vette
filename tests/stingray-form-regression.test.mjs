@@ -803,7 +803,11 @@ test("submit to dealer modal posts a validated dealer payload", async () => {
   assert.equal(runtime.fetchCalls[0].url, "https://stingraychevroletcorvette.com/wp-json/corvette-build/v1/submit");
   assert.equal(runtime.fetchCalls[0].options.method, "POST");
   assert.equal(runtime.fetchCalls[0].options.headers["Content-Type"], "application/json");
-  assert.equal(JSON.parse(runtime.fetchCalls[0].options.body).customer.email, "ada@example.com");
+  const postedBody = JSON.parse(runtime.fetchCalls[0].options.body);
+  assert.equal(postedBody.customer.email, "ada@example.com");
+  assert.deepEqual(Object.keys(postedBody), ["model", "customer", "vehicle", "sections", "msrp", "plain_text_summary"]);
+  assert.match(postedBody.msrp, /^\$\d{1,3}(,\d{3})*$/);
+  assert.equal(postedBody.plain_text_summary.includes(`MSRP: ${postedBody.msrp}`), true);
   assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Build submitted\. A Corvette specialist will contact you soon\. Confirmation ID: 112233\./);
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").hidden, true, "successful submit should remove the submit button");
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").disabled, true, "successful submit should keep submit unavailable");
@@ -873,12 +877,16 @@ test("plain text order summary renders compact order data for emails and review"
   assert.match(summary, /Address: 1 Corvette Way/);
   assert.match(summary, /Comments: Dealer follow-up requested\./);
   assert.match(summary, /Submitted: .+/);
-  assert.match(summary, /Vehicle\ncoupe\n1LT\nCorvette Stingray Coupe 1LT\nBase MSRP: \$73,495/);
-  assert.match(summary, /Exterior Paint\nGBA Black \$0/);
-  assert.match(summary, /Seats & Interior[\s\S]*AQ9 GT1 Bucket Seats \$0[\s\S]*HTA Jet Black \$0/);
-  assert.match(summary, /Auto-Added \/ Required[\s\S]*FE3 Z51 performance suspension \$0/);
-  assert.match(summary, /Standard & Included: \d+ items/);
+  assert.match(summary, /VARIANT\nCorvette Stingray Coupe 1LT/);
+  assert.doesNotMatch(summary, /VARIANT\ncoupe\n1LT/);
+  assert.doesNotMatch(summary, /Base MSRP/);
+  assert.match(summary, /EXTERIOR PAINT\nGBA Black: \$0/);
+  assert.match(summary, /SEATS & INTERIOR[\s\S]*AQ9 GT1 Bucket Seats: \$0[\s\S]*HTA Jet Black: \$0/);
+  assert.match(summary, /AUTO-ADDED \/ REQUIRED[\s\S]*FE3 Z51 performance suspension: \$0/);
+  assert.doesNotMatch(summary, /STANDARD & INCLUDED/);
   assert.match(summary, /MSRP: \$\d/);
+  assert.doesNotMatch(summary, /(?:^|\n)(?:Vehicle|Exterior Paint|Seats & Interior|Auto-Added \/ Required)(?:\n|$)/);
+  assert.doesNotMatch(summary, /\b(?:GBA Black|GT1 Bucket Seats|Z51 performance suspension) \d+\b/);
 });
 
 test("plain text order summary omits empty comments and internal debug fields", () => {
@@ -984,7 +992,7 @@ test("compact and plain text order output break selected interior into priced co
     const summary = runtime.plainTextOrderSummary();
     assert.match(
       summary,
-      new RegExp(`${item.expected.rpo} ${item.expected.label} \\$${item.expected.price.toLocaleString("en-US")}`),
+      new RegExp(`${item.expected.rpo} ${item.expected.label}: \\$${item.expected.price.toLocaleString("en-US")}`),
       `${item.interiorId} should show ${item.expected.rpo} in plain text`
     );
   }
