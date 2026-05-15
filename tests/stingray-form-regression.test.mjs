@@ -800,6 +800,10 @@ test("submit to dealer modal posts a validated dealer payload", async () => {
   assert.equal(runtime.elements.get("#dealerSubmitModal").hidden, false);
   assert.equal(runtime.elements.get("#dealerSubmitCancelButton").textContent, "Cancel");
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").textContent, "Submit");
+  assert.equal(
+    runtime.elements.get("#dealerSubmitStatus").textContent,
+    "Form will be submitted to Stingray Chevrolet in Plant City, FL."
+  );
   assert.equal(await runtime.submitDealerBuild(), null, "name and email should be required");
   assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Name is required/);
   assert.equal(runtime.fetchCalls.length, 0, "invalid submission should not call the endpoint");
@@ -835,6 +839,19 @@ test("submit to dealer modal posts a validated dealer payload", async () => {
   runtime.openDealerSubmitModal();
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").hidden, true, "reopened successful modal should keep submit hidden");
   assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Build submitted to Stingray Chevrolet\. A Corvette specialist will contact you soon\./);
+});
+
+test("Stingray workbook option placement keeps VK3 and BV4 in customer-facing sections", () => {
+  const vk3 = uniqueChoicesByRpo("VK3")[0];
+  const bv4 = uniqueChoicesByRpo("BV4")[0];
+  assert.ok(vk3, "VK3 should exist");
+  assert.ok(bv4, "BV4 should exist");
+  assert.equal(vk3.section_id, "sec_lpoe_001");
+  assert.equal(vk3.section_name, "LPO Exterior");
+  assert.equal(vk3.step_key, "accessories");
+  assert.equal(bv4.section_id, "sec_cust_001");
+  assert.equal(bv4.section_name, "Custom Delivery");
+  assert.equal(bv4.step_key, "delivery");
 });
 
 test("submit to dealer modal surfaces endpoint failures", async () => {
@@ -926,7 +943,8 @@ test("plain text order summary renders compact order data for emails and review"
   const summary = runtime.plainTextOrderSummary();
 
   assert.doesNotMatch(summary, /^<p>2027 Corvette Stingray<\/p>/);
-  assert.match(summary, /^<p><strong>Name:<\/strong> Ada Buyer<br><strong>Email:<\/strong> ada@example\.com<br><strong>Phone:<\/strong> 555-0100<br><strong>Address:<\/strong> 1 Corvette Way/);
+  assert.match(summary, /^<p><strong>Name:<\/strong> Ada Buyer<br><strong>Email:<\/strong> ada@example\.com<br><strong>Phone:<\/strong> 555-0100/);
+  assert.doesNotMatch(summary, /<strong>Address:<\/strong>/);
   assert.match(summary, /<strong>Comments:<\/strong> Dealer follow-up requested\./);
   assert.match(summary, /<strong>Submitted:<\/strong> .+/);
   assert.match(summary, /<p><strong><u>Variant<\/u><\/strong><\/p><ul><li>Corvette Stingray Coupe 1LT<\/li><\/ul>/);

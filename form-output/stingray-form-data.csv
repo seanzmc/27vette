@@ -239,12 +239,12 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_r8c_001,opt_r8c_001,R8C,Corvette Museum Delivery,sec_cust_001,delivery,1lt_c67,convertible,1LT,available,True,1695
 2lt_c67__opt_r8c_001,opt_r8c_001,R8C,Corvette Museum Delivery,sec_cust_001,delivery,2lt_c67,convertible,2LT,available,True,1695
 3lt_c67__opt_r8c_001,opt_r8c_001,R8C,Corvette Museum Delivery,sec_cust_001,delivery,3lt_c67,convertible,3LT,available,True,1695
-1lt_c07__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_cust_001,delivery,1lt_c07,coupe,1LT,available,True,40
-2lt_c07__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_cust_001,delivery,2lt_c07,coupe,2LT,available,True,40
-3lt_c07__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_cust_001,delivery,3lt_c07,coupe,3LT,available,True,40
-1lt_c67__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_cust_001,delivery,1lt_c67,convertible,1LT,available,True,40
-2lt_c67__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_cust_001,delivery,2lt_c67,convertible,2LT,available,True,40
-3lt_c67__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_cust_001,delivery,3lt_c67,convertible,3LT,available,True,40
+1lt_c07__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_lpoe_001,accessories,1lt_c07,coupe,1LT,available,True,40
+2lt_c07__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_lpoe_001,accessories,2lt_c07,coupe,2LT,available,True,40
+3lt_c07__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_lpoe_001,accessories,3lt_c07,coupe,3LT,available,True,40
+1lt_c67__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_lpoe_001,accessories,1lt_c67,convertible,1LT,available,True,40
+2lt_c67__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_lpoe_001,accessories,2lt_c67,convertible,2LT,available,True,40
+3lt_c67__opt_vk3_001,opt_vk3_001,VK3,Front License plate bracket,sec_lpoe_001,accessories,3lt_c67,convertible,3LT,available,True,40
 1lt_c07__opt_b6p_001,opt_b6p_001,B6P,Coupe Engine Appearance Package,sec_engi_001,exterior_appearance,1lt_c07,coupe,1LT,available,True,1895
 2lt_c07__opt_b6p_001,opt_b6p_001,B6P,Coupe Engine Appearance Package,sec_engi_001,exterior_appearance,2lt_c07,coupe,2LT,available,True,1895
 3lt_c07__opt_b6p_001,opt_b6p_001,B6P,Coupe Engine Appearance Package,sec_engi_001,exterior_appearance,3lt_c07,coupe,3LT,available,True,1895
@@ -425,12 +425,12 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_baz_001,opt_baz_001,BAZ,Stealth Interior Trim Package,sec_inte_001,interior_trim,1lt_c67,convertible,1LT,unavailable,True,695
 2lt_c67__opt_baz_001,opt_baz_001,BAZ,Stealth Interior Trim Package,sec_inte_001,interior_trim,2lt_c67,convertible,2LT,available,True,695
 3lt_c67__opt_baz_001,opt_baz_001,BAZ,Stealth Interior Trim Package,sec_inte_001,interior_trim,3lt_c67,convertible,3LT,available,True,695
-1lt_c07__opt_bv4_001,opt_bv4_001,BV4,Personalized Plaque,sec_inte_001,interior_trim,1lt_c07,coupe,1LT,available,True,395
-2lt_c07__opt_bv4_001,opt_bv4_001,BV4,Personalized Plaque,sec_inte_001,interior_trim,2lt_c07,coupe,2LT,available,True,395
-3lt_c07__opt_bv4_001,opt_bv4_001,BV4,Personalized Plaque,sec_inte_001,interior_trim,3lt_c07,coupe,3LT,available,True,395
-1lt_c67__opt_bv4_001,opt_bv4_001,BV4,Personalized Plaque,sec_inte_001,interior_trim,1lt_c67,convertible,1LT,available,True,395
-2lt_c67__opt_bv4_001,opt_bv4_001,BV4,Personalized Plaque,sec_inte_001,interior_trim,2lt_c67,convertible,2LT,available,True,395
-3lt_c67__opt_bv4_001,opt_bv4_001,BV4,Personalized Plaque,sec_inte_001,interior_trim,3lt_c67,convertible,3LT,available,True,395
+1lt_c07__opt_bv4_001,opt_bv4_001,BV4,Personalized Plaque,sec_cust_001,delivery,1lt_c07,coupe,1LT,available,True,395
+2lt_c07__opt_bv4_001,opt_bv4_001,BV4,Personalized Plaque,sec_cust_001,delivery,2lt_c07,coupe,2LT,available,True,395
+3lt_c07__opt_bv4_001,opt_bv4_001,BV4,Personalized Plaque,sec_cust_001,delivery,3lt_c07,coupe,3LT,available,True,395
+1lt_c67__opt_bv4_001,opt_bv4_001,BV4,Personalized Plaque,sec_cust_001,delivery,1lt_c67,convertible,1LT,available,True,395
+2lt_c67__opt_bv4_001,opt_bv4_001,BV4,Personalized Plaque,sec_cust_001,delivery,2lt_c67,convertible,2LT,available,True,395
+3lt_c67__opt_bv4_001,opt_bv4_001,BV4,Personalized Plaque,sec_cust_001,delivery,3lt_c67,convertible,3LT,available,True,395
 1lt_c07__opt_fa5_001,opt_fa5_001,FA5,Carbon Fiber trim,sec_inte_001,interior_trim,1lt_c07,coupe,1LT,unavailable,True,1795
 2lt_c07__opt_fa5_001,opt_fa5_001,FA5,Carbon Fiber trim,sec_inte_001,interior_trim,2lt_c07,coupe,2LT,available,True,1795
 3lt_c07__opt_fa5_001,opt_fa5_001,FA5,Carbon Fiber trim,sec_inte_001,interior_trim,3lt_c07,coupe,3LT,available,True,1795

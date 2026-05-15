@@ -17,6 +17,7 @@ function formDataRegistry() {
 
 const registry = formDataRegistry();
 const DEALER_SUBMIT_ENDPOINT = "https://stingraychevroletcorvette.com/wp-json/corvette-build/v1/submit";
+const DEALER_SUBMIT_HELPER_TEXT = "Form will be submitted to Stingray Chevrolet in Plant City, FL.";
 let activeModelKey = registry.defaultModelKey || "stingray";
 let activeModel = registry.models[activeModelKey] || registry.models.stingray;
 let data = activeModel.data;
@@ -1431,8 +1432,7 @@ function plainTextOrderSummary(order = compactOrder()) {
     "<p>",
     `<strong>Name:</strong> ${escapeHtml(order.customer.name || "")}<br>`,
     `<strong>Email:</strong> ${escapeHtml(order.customer.email || "")}<br>`,
-    `<strong>Phone:</strong> ${escapeHtml(order.customer.phone || "")}<br>`,
-    `<strong>Address:</strong> ${escapeHtml(order.customer.address || "")}`,
+    `<strong>Phone:</strong> ${escapeHtml(order.customer.phone || "")}`,
   ];
   if (order.customer.comments) lines.push(`<br><strong>Comments:</strong> ${escapeHtml(order.customer.comments)}`);
   lines.push(`</p>`, `<p><strong>Submitted:</strong> ${escapeHtml(order.submitted_at)}</p>`);
@@ -1607,7 +1607,7 @@ function openDealerSubmitModal() {
   if (state.dealerSubmissionComplete) {
     setDealerSubmitStatus(dealerSubmitSuccessMessage(), "success");
   } else {
-    setDealerSubmitStatus("", "");
+    setDealerSubmitStatus(DEALER_SUBMIT_HELPER_TEXT, "");
   }
   els.dealerSubmitModal.hidden = false;
   els.dealerSubmitName?.focus?.();
@@ -1616,7 +1616,7 @@ function openDealerSubmitModal() {
 function closeDealerSubmitModal() {
   if (!els.dealerSubmitModal) return;
   els.dealerSubmitModal.hidden = true;
-  if (!state.dealerSubmissionComplete) setDealerSubmitStatus("", "");
+  if (!state.dealerSubmissionComplete) setDealerSubmitStatus(DEALER_SUBMIT_HELPER_TEXT, "");
 }
 
 async function submitDealerBuild(event) {
