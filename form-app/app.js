@@ -1665,6 +1665,7 @@ async function submitDealerBuild(event) {
     resetTurnstileWidget();
     return null;
   }
+  if (!state.turnstileToken) renderTurnstileWidget();
   if (!state.turnstileToken) {
     setDealerSubmitStatus("Security check is required. Please try again.", "error");
     resetTurnstileWidget();

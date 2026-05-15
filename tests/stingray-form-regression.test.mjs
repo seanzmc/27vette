@@ -81,31 +81,32 @@ function makeElement() {
   };
 }
 
-function loadRuntime({ fetchImpl } = {}) {
+function loadRuntime({ fetchImpl, turnstileAvailable = true } = {}) {
   const downloads = [];
   const elements = new Map();
   const fetchCalls = [];
   const turnstileCalls = [];
   let turnstileToken = "test-turnstile-token";
+  const turnstileApi = {
+    render(selector, options) {
+      turnstileCalls.push({ fn: "render", selector, options });
+      options.callback?.(turnstileToken);
+      return "test-widget-id";
+    },
+    reset(widgetId) {
+      turnstileCalls.push({ fn: "reset", widgetId });
+    },
+    remove(widgetId) {
+      turnstileCalls.push({ fn: "remove", widgetId });
+    },
+  };
   const context = {
     window: {
       STINGRAY_FORM_DATA: data,
       __downloads: downloads,
       __lastBlobContent: "",
       __lastBlobType: "",
-      turnstile: {
-        render(selector, options) {
-          turnstileCalls.push({ fn: "render", selector, options });
-          options.callback?.(turnstileToken);
-          return "test-widget-id";
-        },
-        reset(widgetId) {
-          turnstileCalls.push({ fn: "reset", widgetId });
-        },
-        remove(widgetId) {
-          turnstileCalls.push({ fn: "remove", widgetId });
-        },
-      },
+      turnstile: turnstileAvailable ? turnstileApi : undefined,
       scrollX: 0,
       scrollY: 0,
       scrollTo() {},
@@ -144,6 +145,7 @@ function loadRuntime({ fetchImpl } = {}) {
     fetchCalls,
     elements,
     turnstileCalls,
+    turnstileApi,
     setTurnstileToken(value) {
       turnstileToken = value;
     },
@@ -194,6 +196,9 @@ window.__testApi = {
   fetchCalls,
   turnstileCalls,
   setTurnstileToken: typeof setTurnstileToken === "function" ? setTurnstileToken : undefined,
+  setWindowTurnstile: () => {
+    window.turnstile = ${"turnstileApi"};
+  },
   exportJson: typeof exportJson === "function" ? exportJson : undefined,
   exportCsv: typeof exportCsv === "function" ? exportCsv : undefined,
   downloads: window.__downloads,
@@ -885,6 +890,29 @@ test("submit to dealer modal requires a Turnstile token before posting", async (
   assert.equal(runtime.fetchCalls.length, 0);
   assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Security check is required/);
   assert.equal(runtime.turnstileCalls.some((call) => call.fn === "reset"), true);
+});
+
+test("submit to dealer modal renders Turnstile when the async API arrives after opening", async () => {
+  const runtime = loadRuntime({ turnstileAvailable: false });
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001"));
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+  runtime.reconcileSelections();
+  runtime.openDealerSubmitModal();
+  assert.equal(runtime.elements.get("#dealerSubmitModal").hidden, false);
+  assert.equal(runtime.turnstileCalls.length, 0, "modal open should not render before Turnstile is available");
+
+  runtime.setWindowTurnstile();
+  runtime.elements.get("#dealerSubmitName").value = "Ada Buyer";
+  runtime.elements.get("#dealerSubmitEmail").value = "ada@example.com";
+  const submission = await runtime.submitDealerBuild();
+
+  assert.equal(runtime.turnstileCalls.some((call) => call.fn === "render" && call.selector === "#dealerTurnstile"), true);
+  assert.equal(runtime.fetchCalls.length, 1);
+  assert.equal(submission.payload.turnstile_token, "test-turnstile-token");
 });
 
 test("Stingray workbook option placement keeps VK3 and BV4 in customer-facing sections", () => {
