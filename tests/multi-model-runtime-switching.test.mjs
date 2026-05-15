@@ -123,6 +123,7 @@ window.__testApi = {
   handleChoice,
   render,
   optionPrice,
+  choiceDisplayPrice,
   currentOrder,
   compactOrder,
   plainTextOrderSummary,
@@ -388,6 +389,8 @@ test("Grand Sport seat prices are workbook-scoped by trim", () => {
   const ae4 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_ae4_002");
   assert.ok(ah2, "2LT AH2 seat should exist");
   assert.ok(ae4, "2LT AE4 seat should exist");
+  assert.equal(runtime.choiceDisplayPrice(ah2), 1695, "2LT AH2 tile should preview the scoped price before selection");
+  assert.equal(runtime.choiceDisplayPrice(ae4), 2095, "2LT AE4 tile should preview the scoped price before selection");
   runtime.handleChoice(ah2);
   assert.equal(runtime.optionPrice("opt_ah2_001"), 1695);
   runtime.handleChoice(ae4);
@@ -400,6 +403,8 @@ test("Grand Sport seat prices are workbook-scoped by trim", () => {
   const aup = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_aup_001");
   assert.ok(ae4ThreeLt, "3LT AE4 seat should exist");
   assert.ok(aup, "3LT AUP seat should exist");
+  assert.equal(runtime.choiceDisplayPrice(ae4ThreeLt), 595, "3LT AE4 tile should preview the scoped price before selection");
+  assert.equal(runtime.choiceDisplayPrice(aup), 350, "3LT AUP tile should preview the scoped price before selection");
   runtime.handleChoice(ae4ThreeLt);
   assert.equal(runtime.optionPrice("opt_ae4_002"), 595);
   runtime.handleChoice(aup);

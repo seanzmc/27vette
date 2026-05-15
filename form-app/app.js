@@ -279,9 +279,12 @@ function optionIsSelectedOrAuto(choice, autoAdded) {
   return state.selected.has(choice.option_id) || autoAdded.has(choice.option_id);
 }
 
-function selectedContextIds() {
+function selectedContextIds(extraIds = []) {
   const ids = new Set(state.selected);
   if (state.selectedInterior) ids.add(state.selectedInterior);
+  for (const id of extraIds) {
+    if (id) ids.add(id);
+  }
   for (const id of computeAutoAdded().keys()) ids.add(id);
   return ids;
 }
@@ -457,8 +460,8 @@ function disableReasonForInterior(interior) {
   return "";
 }
 
-function optionPrice(optionId) {
-  const selectedIds = selectedContextIds();
+function optionPrice(optionId, candidateIds = []) {
+  const selectedIds = selectedContextIds(candidateIds);
   const priceRules = priceRulesByTarget.get(optionId) || [];
   for (const rule of priceRules) {
     if (!scopeMatches(rule.body_style_scope, state.bodyStyle)) continue;
@@ -469,6 +472,10 @@ function optionPrice(optionId) {
     }
   }
   return Number(optionsById.get(optionId)?.base_price || 0);
+}
+
+function choiceDisplayPrice(choice) {
+  return optionPrice(choice.option_id, [choice.option_id]);
 }
 
 function sectionKeyForStep(stepKey, type = "") {
@@ -877,7 +884,7 @@ function renderChoiceCard(choice, autoAdded) {
   if (autoReason) classes.push("auto");
   return `
     <button class="${classes.join(" ")}" type="button" data-option="${choice.option_id}" ${disabled ? "aria-disabled=\"true\" disabled" : ""}>
-      <span class="topline"><span class="rpo">${choice.rpo || choice.option_id}</span><span class="price">${formatMoney(optionPrice(choice.option_id))}</span></span>
+      <span class="topline"><span class="rpo">${choice.rpo || choice.option_id}</span><span class="price">${formatMoney(choiceDisplayPrice(choice))}</span></span>
       <p class="choice-name">${choice.label}</p>
       <p class="choice-note">${choice.description || choice.status_label}</p>
       ${disabledReason ? `<p class="disabled-reason">${disabledReason}</p>` : ""}
