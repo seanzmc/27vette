@@ -804,9 +804,16 @@ test("submit to dealer modal posts a validated dealer payload", async () => {
   assert.equal(runtime.fetchCalls[0].options.method, "POST");
   assert.equal(runtime.fetchCalls[0].options.headers["Content-Type"], "application/json");
   assert.equal(JSON.parse(runtime.fetchCalls[0].options.body).customer.email, "ada@example.com");
-  assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Build submitted to dealer. Entry ID: 112233./);
+  assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Build submitted\. A Corvette specialist will contact you soon\. Confirmation ID: 112233\./);
+  assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").hidden, true, "successful submit should remove the submit button");
+  assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").disabled, true, "successful submit should keep submit unavailable");
+  assert.equal(await runtime.submitDealerBuild(), null, "successful submission should not be submitted twice");
+  assert.equal(runtime.fetchCalls.length, 1, "duplicate successful submission should not call the endpoint again");
   runtime.closeDealerSubmitModal();
   assert.equal(runtime.elements.get("#dealerSubmitModal").hidden, true);
+  runtime.openDealerSubmitModal();
+  assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").hidden, true, "reopened successful modal should keep submit hidden");
+  assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Build submitted\. A Corvette specialist will contact you soon\./);
 });
 
 test("submit to dealer modal surfaces endpoint failures", async () => {
@@ -832,6 +839,8 @@ test("submit to dealer modal surfaces endpoint failures", async () => {
   assert.equal(await runtime.submitDealerBuild(), null);
   assert.equal(runtime.fetchCalls.length, 1);
   assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Could not create Formidable entry/);
+  assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").hidden, false, "failed submit should keep submit visible for retry");
+  assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").disabled, false, "failed submit should keep submit retryable");
 });
 
 test("plain text order summary renders compact order data for emails and review", () => {
@@ -1084,6 +1093,33 @@ test("initial selected FE1 state is de-duped to the visible suspension choice", 
   assert.equal(selectedRpos.includes("FE1"), false, "Z51 should remove FE1");
   assert.equal(selectedRpos.includes("FE2"), false, "Z51 should remove FE2");
   assert.equal(runtime.computeAutoAdded().has("opt_fe3_001"), true, "Z51 should still include FE3");
+});
+
+test("Stingray workbook default-selected standard choices seed every variant", () => {
+  const expectedDefaultIds = ["opt_efr_001", "opt_719_001"];
+
+  for (const variant of data.variants) {
+    for (const optionId of expectedDefaultIds) {
+      const choice = data.choices.find((row) => row.variant_id === variant.variant_id && row.option_id === optionId);
+      assert.ok(choice, `${variant.variant_id} should emit ${optionId}`);
+      assert.equal(choice.status, "standard", `${variant.variant_id} ${choice.rpo} should remain standard`);
+      assert.equal(choice.selectable, "True", `${variant.variant_id} ${choice.rpo} should remain selectable`);
+      assert.equal(
+        choice.display_behavior,
+        "default_selected",
+        `${variant.variant_id} ${choice.rpo} should be workbook-authored default_selected`
+      );
+    }
+
+    const runtime = loadRuntime();
+    runtime.state.bodyStyle = variant.body_style;
+    runtime.state.trimLevel = variant.trim_level;
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+    for (const optionId of expectedDefaultIds) {
+      assert.equal(runtime.state.selected.has(optionId), true, `${variant.variant_id} should select ${optionId} by default`);
+    }
+  }
 });
 
 test("coupe defaults include BC7 engine appearance", () => {

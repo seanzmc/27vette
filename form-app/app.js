@@ -35,6 +35,8 @@ const state = {
     phone: "",
     comments: "",
   },
+  dealerSubmissionComplete: false,
+  dealerSubmissionEntryId: "",
 };
 
 const els = {
@@ -792,6 +794,7 @@ function reconcileSelections() {
 }
 
 function setBodyAndTrim(bodyStyle, trimLevel) {
+  resetDealerSubmissionState();
   state.bodyStyle = bodyStyle;
   state.trimLevel = trimLevel;
   resetDefaults();
@@ -815,6 +818,7 @@ function handleChoice(choice) {
   if (autoAdded.has(choice.option_id)) return;
   const reason = disableReasonForChoice(choice);
   if (reason) return;
+  resetDealerSubmissionState();
   const section = sectionsById.get(choice.section_id);
   if (section?.choice_mode === "single") {
     if (section.selection_mode === "single_select_opt" && state.selected.has(choice.option_id)) {
@@ -844,6 +848,7 @@ function handleChoice(choice) {
 function handleInterior(interior) {
   const reason = disableReasonForInterior(interior);
   if (reason) return;
+  resetDealerSubmissionState();
   state.selectedInterior = state.selectedInterior === interior.interior_id ? "" : interior.interior_id;
   reconcileSelections();
   render({ preserveScroll: true });
@@ -1505,6 +1510,23 @@ function setDealerSubmitStatus(message, type = "") {
   els.dealerSubmitStatus.dataset.status = type;
 }
 
+function dealerSubmitSuccessMessage() {
+  const entryText = state.dealerSubmissionEntryId ? ` Confirmation ID: ${state.dealerSubmissionEntryId}.` : "";
+  return `Build submitted. A Corvette specialist will contact you soon.${entryText}`;
+}
+
+function syncDealerSubmitControls() {
+  if (!els.dealerSubmitConfirmButton) return;
+  els.dealerSubmitConfirmButton.hidden = state.dealerSubmissionComplete;
+  els.dealerSubmitConfirmButton.disabled = state.dealerSubmissionComplete;
+}
+
+function resetDealerSubmissionState() {
+  state.dealerSubmissionComplete = false;
+  state.dealerSubmissionEntryId = "";
+  syncDealerSubmitControls();
+}
+
 function populateDealerSubmitForm() {
   if (els.dealerSubmitName) els.dealerSubmitName.value = state.customer.name;
   if (els.dealerSubmitEmail) els.dealerSubmitEmail.value = state.customer.email;
@@ -1565,7 +1587,12 @@ async function postDealerSubmission(payload) {
 function openDealerSubmitModal() {
   if (missingRequired().length > 0 || !els.dealerSubmitModal) return;
   populateDealerSubmitForm();
-  setDealerSubmitStatus("", "");
+  syncDealerSubmitControls();
+  if (state.dealerSubmissionComplete) {
+    setDealerSubmitStatus(dealerSubmitSuccessMessage(), "success");
+  } else {
+    setDealerSubmitStatus("", "");
+  }
   els.dealerSubmitModal.hidden = false;
   els.dealerSubmitName?.focus?.();
 }
@@ -1573,11 +1600,16 @@ function openDealerSubmitModal() {
 function closeDealerSubmitModal() {
   if (!els.dealerSubmitModal) return;
   els.dealerSubmitModal.hidden = true;
-  setDealerSubmitStatus("", "");
+  if (!state.dealerSubmissionComplete) setDealerSubmitStatus("", "");
 }
 
 async function submitDealerBuild(event) {
   event?.preventDefault?.();
+  if (state.dealerSubmissionComplete) {
+    setDealerSubmitStatus(dealerSubmitSuccessMessage(), "success");
+    syncDealerSubmitControls();
+    return null;
+  }
   if (missingRequired().length > 0) {
     setDealerSubmitStatus("Complete required selections before submitting your build.", "error");
     return null;
@@ -1594,19 +1626,22 @@ async function submitDealerBuild(event) {
   if (els.dealerSubmitConfirmButton) els.dealerSubmitConfirmButton.disabled = true;
   try {
     const result = await postDealerSubmission(payload);
-    const entryText = result.entry_id ? ` Entry ID: ${result.entry_id}.` : "";
-    setDealerSubmitStatus(`Build submitted to dealer.${entryText}`, "success");
+    state.dealerSubmissionComplete = true;
+    state.dealerSubmissionEntryId = result.entry_id || "";
+    setDealerSubmitStatus(dealerSubmitSuccessMessage(), "success");
+    syncDealerSubmitControls();
     return { payload, result };
   } catch (error) {
     setDealerSubmitStatus(error?.message || "Could not submit build to dealer.", "error");
     return null;
   } finally {
-    if (els.dealerSubmitConfirmButton) els.dealerSubmitConfirmButton.disabled = false;
+    if (els.dealerSubmitConfirmButton && !state.dealerSubmissionComplete) els.dealerSubmitConfirmButton.disabled = false;
   }
 }
 
 function resetModelScopedState() {
   const first = variants[0] || {};
+  resetDealerSubmissionState();
   state.bodyStyle = first.body_style || "";
   state.trimLevel = first.trim_level || "";
   state.selected.clear();

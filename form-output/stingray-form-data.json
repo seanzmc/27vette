@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-05-15T13:39:34+00:00"
+    "generated_at": "2026-05-15T14:55:01+00:00"
   },
   "variants": [
     {
@@ -5794,7 +5794,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1495,
       "display_order": 10,
-      "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
+      "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
+      "display_behavior": "display_only"
     },
     {
       "choice_id": "2lt_c07__opt_d30_001",
@@ -5817,7 +5818,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1495,
       "display_order": 10,
-      "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
+      "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
+      "display_behavior": "display_only"
     },
     {
       "choice_id": "3lt_c07__opt_d30_001",
@@ -5840,7 +5842,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1495,
       "display_order": 10,
-      "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
+      "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
+      "display_behavior": "display_only"
     },
     {
       "choice_id": "1lt_c67__opt_d30_001",
@@ -5863,7 +5866,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1495,
       "display_order": 10,
-      "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
+      "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
+      "display_behavior": "display_only"
     },
     {
       "choice_id": "2lt_c67__opt_d30_001",
@@ -5886,7 +5890,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1495,
       "display_order": 10,
-      "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
+      "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
+      "display_behavior": "display_only"
     },
     {
       "choice_id": "3lt_c67__opt_d30_001",
@@ -5909,7 +5914,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1495,
       "display_order": 10,
-      "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
+      "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
+      "display_behavior": "display_only"
     },
     {
       "choice_id": "1lt_c07__opt_r6x_001",
@@ -5932,7 +5938,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 995,
       "display_order": 20,
-      "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+      "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart.",
+      "display_behavior": "auto_only"
     },
     {
       "choice_id": "2lt_c07__opt_r6x_001",
@@ -5955,7 +5962,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 995,
       "display_order": 20,
-      "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+      "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart.",
+      "display_behavior": "auto_only"
     },
     {
       "choice_id": "3lt_c07__opt_r6x_001",
@@ -5978,7 +5986,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 995,
       "display_order": 20,
-      "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+      "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart.",
+      "display_behavior": "auto_only"
     },
     {
       "choice_id": "1lt_c67__opt_r6x_001",
@@ -6001,7 +6010,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 995,
       "display_order": 20,
-      "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+      "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart.",
+      "display_behavior": "auto_only"
     },
     {
       "choice_id": "2lt_c67__opt_r6x_001",
@@ -6024,7 +6034,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 995,
       "display_order": 20,
-      "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+      "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart.",
+      "display_behavior": "auto_only"
     },
     {
       "choice_id": "3lt_c67__opt_r6x_001",
@@ -6047,7 +6058,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 995,
       "display_order": 20,
-      "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+      "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart.",
+      "display_behavior": "auto_only"
     },
     {
       "choice_id": "1lt_c07__opt_pin_001",
@@ -8554,7 +8566,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 0,
       "display_order": 10,
-      "source_detail_raw": "1. Also includes tonneau grille."
+      "source_detail_raw": "1. Also includes tonneau grille.",
+      "display_behavior": "default_selected"
     },
     {
       "choice_id": "2lt_c07__opt_efr_001",
@@ -8577,7 +8590,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 0,
       "display_order": 10,
-      "source_detail_raw": "1. Also includes tonneau grille."
+      "source_detail_raw": "1. Also includes tonneau grille.",
+      "display_behavior": "default_selected"
     },
     {
       "choice_id": "3lt_c07__opt_efr_001",
@@ -8600,7 +8614,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 0,
       "display_order": 10,
-      "source_detail_raw": "1. Also includes tonneau grille."
+      "source_detail_raw": "1. Also includes tonneau grille.",
+      "display_behavior": "default_selected"
     },
     {
       "choice_id": "1lt_c67__opt_efr_001",
@@ -8623,7 +8638,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 0,
       "display_order": 10,
-      "source_detail_raw": "1. Also includes tonneau grille."
+      "source_detail_raw": "1. Also includes tonneau grille.",
+      "display_behavior": "default_selected"
     },
     {
       "choice_id": "2lt_c67__opt_efr_001",
@@ -8646,7 +8662,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 0,
       "display_order": 10,
-      "source_detail_raw": "1. Also includes tonneau grille."
+      "source_detail_raw": "1. Also includes tonneau grille.",
+      "display_behavior": "default_selected"
     },
     {
       "choice_id": "3lt_c67__opt_efr_001",
@@ -8669,7 +8686,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 0,
       "display_order": 10,
-      "source_detail_raw": "1. Also includes tonneau grille."
+      "source_detail_raw": "1. Also includes tonneau grille.",
+      "display_behavior": "default_selected"
     },
     {
       "choice_id": "1lt_c07__opt_efy_001",
@@ -22354,7 +22372,8 @@
       "selection_mode_label": "Required single choice",
       "base_price": 0,
       "display_order": 1,
-      "source_detail_raw": ""
+      "source_detail_raw": "",
+      "display_behavior": "default_selected"
     },
     {
       "choice_id": "2lt_c07__opt_719_001",
@@ -22377,7 +22396,8 @@
       "selection_mode_label": "Required single choice",
       "base_price": 0,
       "display_order": 1,
-      "source_detail_raw": ""
+      "source_detail_raw": "",
+      "display_behavior": "default_selected"
     },
     {
       "choice_id": "3lt_c07__opt_719_001",
@@ -22400,7 +22420,8 @@
       "selection_mode_label": "Required single choice",
       "base_price": 0,
       "display_order": 1,
-      "source_detail_raw": ""
+      "source_detail_raw": "",
+      "display_behavior": "default_selected"
     },
     {
       "choice_id": "1lt_c67__opt_719_001",
@@ -22423,7 +22444,8 @@
       "selection_mode_label": "Required single choice",
       "base_price": 0,
       "display_order": 1,
-      "source_detail_raw": ""
+      "source_detail_raw": "",
+      "display_behavior": "default_selected"
     },
     {
       "choice_id": "2lt_c67__opt_719_001",
@@ -22446,7 +22468,8 @@
       "selection_mode_label": "Required single choice",
       "base_price": 0,
       "display_order": 1,
-      "source_detail_raw": ""
+      "source_detail_raw": "",
+      "display_behavior": "default_selected"
     },
     {
       "choice_id": "3lt_c67__opt_719_001",
@@ -22469,7 +22492,8 @@
       "selection_mode_label": "Required single choice",
       "base_price": 0,
       "display_order": 1,
-      "source_detail_raw": ""
+      "source_detail_raw": "",
+      "display_behavior": "default_selected"
     },
     {
       "choice_id": "1lt_c07__opt_ae4_001",

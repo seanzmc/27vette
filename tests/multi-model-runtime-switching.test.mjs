@@ -589,6 +589,9 @@ test("Grand Sport dealer submission payload stays model-scoped when posted", asy
   assert.equal(submission.payload.customer.email, "ada@example.com");
   assert.equal(submission.result.entry_id, 445566);
   assert.equal(JSON.parse(runtime.fetchCalls[0].options.body).model, "grandSport");
+  assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").hidden, true);
+  assert.equal(await runtime.submitDealerBuild(), null);
+  assert.equal(runtime.fetchCalls.length, 1, "Grand Sport dealer submission should not post duplicates after success");
 });
 
 test("Grand Sport Markdown export includes audited sections and auto-added options", () => {

@@ -631,31 +631,32 @@ def main() -> None:
                 status = "available"
                 selectable = "False"
                 active = "True"
-            choices.append(
-                {
-                    "choice_id": f"{variant['variant_id']}__{option_id}",
-                    "option_id": option_id,
-                    "rpo": option["rpo"],
-                    "label": option["label"],
-                    "description": option["description"],
-                    "section_id": option["section_id"],
-                    "section_name": option["section_name"],
-                    "step_key": option["step_key"],
-                    "variant_id": variant["variant_id"],
-                    "body_style": variant["body_style"],
-                    "trim_level": variant["trim_level"],
-                    "status": status,
-                    "status_label": status_to_label(status),
-                    "selectable": selectable,
-                    "active": active,
-                    "choice_mode": option["choice_mode"],
-                    "selection_mode": option["selection_mode"],
-                    "selection_mode_label": option["selection_mode_label"],
-                    "base_price": option["base_price"],
-                    "display_order": option["display_order"],
-                    "source_detail_raw": option["source_detail_raw"],
-                }
-            )
+            choice = {
+                "choice_id": f"{variant['variant_id']}__{option_id}",
+                "option_id": option_id,
+                "rpo": option["rpo"],
+                "label": option["label"],
+                "description": option["description"],
+                "section_id": option["section_id"],
+                "section_name": option["section_name"],
+                "step_key": option["step_key"],
+                "variant_id": variant["variant_id"],
+                "body_style": variant["body_style"],
+                "trim_level": variant["trim_level"],
+                "status": status,
+                "status_label": status_to_label(status),
+                "selectable": selectable,
+                "active": active,
+                "choice_mode": option["choice_mode"],
+                "selection_mode": option["selection_mode"],
+                "selection_mode_label": option["selection_mode_label"],
+                "base_price": option["base_price"],
+                "display_order": option["display_order"],
+                "source_detail_raw": option["source_detail_raw"],
+            }
+            if option["display_behavior"]:
+                choice["display_behavior"] = option["display_behavior"]
+            choices.append(choice)
 
     interiors: list[dict[str, Any]] = []
     for row in lt_interiors_raw:
@@ -1048,6 +1049,7 @@ def main() -> None:
             "selection_mode",
             "selection_mode_label",
             "base_price",
+            "display_behavior",
             "display_order",
             "source_detail_raw",
         ],
