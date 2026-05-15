@@ -1404,36 +1404,46 @@ function compactOrder() {
   };
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function titleCaseSection(label) {
+  return String(label || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 function plainTextOrderSummary(order = compactOrder()) {
-  const sectionHeader = (label) => String(label || "").trim().toUpperCase();
   const lines = [
-    order.title,
-    "",
-    `Name: ${order.customer.name || ""}`,
-    `Email: ${order.customer.email || ""}`,
-    `Phone: ${order.customer.phone || ""}`,
-    `Address: ${order.customer.address || ""}`,
+    `<p>${escapeHtml(order.title)}</p>`,
+    "<p>",
+    `Name: ${escapeHtml(order.customer.name || "")}<br>`,
+    `Email: ${escapeHtml(order.customer.email || "")}<br>`,
+    `Phone: ${escapeHtml(order.customer.phone || "")}<br>`,
+    `Address: ${escapeHtml(order.customer.address || "")}`,
   ];
-  if (order.customer.comments) lines.push(`Comments: ${order.customer.comments}`);
-  lines.push(
-    `Submitted: ${order.submitted_at}`,
-    "",
-    sectionHeader("Variant"),
-    order.vehicle.display_name || "",
-    ""
-  );
+  if (order.customer.comments) lines.push(`<br>Comments: ${escapeHtml(order.customer.comments)}`);
+  lines.push(`</p>`, `<p>Submitted: ${escapeHtml(order.submitted_at)}</p>`);
+  lines.push(`<p><strong><u>Variant</u></strong></p>`, `<ul><li>${escapeHtml(order.vehicle.display_name || "")}</li></ul>`);
 
   for (const section of order.sections) {
-    lines.push(sectionHeader(section.section));
+    lines.push(`<p><strong><u>${escapeHtml(titleCaseSection(section.section))}</u></strong></p>`, "<ul>");
     for (const item of section.items) {
       const label = `${item.rpo} ${item.label}`.trim();
-      lines.push(`${label}: ${formatMoney(item.price)}`);
+      lines.push(`<li>${escapeHtml(label)}: ${escapeHtml(formatMoney(item.price))}</li>`);
     }
-    lines.push("");
+    lines.push("</ul>");
   }
 
-  lines.push(`${sectionHeader("MSRP")}: ${formatMoney(order.msrp)}`);
-  return lines.join("\n").replace(/\n{3,}/g, "\n\n");
+  lines.push(`<p><strong>Final MSRP: ${escapeHtml(formatMoney(order.msrp))}</strong></p>`);
+  return lines.join("");
 }
 
 function buildMarkdown(order = compactOrder()) {
@@ -1512,9 +1522,14 @@ function dealerSubmitSuccessMessage() {
 }
 
 function syncDealerSubmitControls() {
-  if (!els.dealerSubmitConfirmButton) return;
-  els.dealerSubmitConfirmButton.hidden = state.dealerSubmissionComplete;
-  els.dealerSubmitConfirmButton.disabled = state.dealerSubmissionComplete;
+  if (els.dealerSubmitConfirmButton) {
+    els.dealerSubmitConfirmButton.textContent = "Submit";
+    els.dealerSubmitConfirmButton.hidden = state.dealerSubmissionComplete;
+    els.dealerSubmitConfirmButton.disabled = state.dealerSubmissionComplete;
+  }
+  if (els.dealerSubmitCancelButton) {
+    els.dealerSubmitCancelButton.textContent = state.dealerSubmissionComplete ? "Close" : "Cancel";
+  }
 }
 
 function resetDealerSubmissionState() {

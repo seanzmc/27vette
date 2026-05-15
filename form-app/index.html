@@ -86,16 +86,16 @@
             <p class="eyebrow">Dealer Request</p>
             <h2 id="dealerSubmitTitle">Submit to Dealer</h2>
           </div>
-          <button id="dealerSubmitCloseButton" class="ghost-button icon-button" type="button" aria-label="Close dealer submission">Close</button>
+          <button id="dealerSubmitCloseButton" class="modal-close-button" type="button" aria-label="Close dealer submission">×</button>
         </div>
         <form id="dealerSubmitForm" class="dealer-submit-form">
           <div class="customer-field-grid">
             <label>
-              Name
+              <span>Name <span class="required-mark" aria-hidden="true">*</span></span>
               <input id="dealerSubmitName" name="name" type="text" autocomplete="name" required>
             </label>
             <label>
-              Email
+              <span>Email <span class="required-mark" aria-hidden="true">*</span></span>
               <input id="dealerSubmitEmail" name="email" type="email" autocomplete="email" required>
             </label>
             <label>
@@ -110,13 +110,13 @@
           <p id="dealerSubmitStatus" class="dealer-submit-status" role="status" aria-live="polite"></p>
           <div class="modal-actions">
             <button id="dealerSubmitCancelButton" class="ghost-button" type="button">Cancel</button>
-            <button id="dealerSubmitConfirmButton" type="submit">Prepare Submission</button>
+            <button id="dealerSubmitConfirmButton" type="submit">Submit</button>
           </div>
         </form>
       </div>
     </div>
 
-    <script src="./data.js?v=17"></script>
-    <script src="./app.js?v=17"></script>
+    <script src="./data.js?v=20"></script>
+    <script src="./app.js?v=20"></script>
   </body>
 </html>

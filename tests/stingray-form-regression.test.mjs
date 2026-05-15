@@ -765,6 +765,11 @@ test("download build exports customer-facing Markdown", () => {
 test("submit to dealer modal posts a validated dealer payload", async () => {
   assert.match(htmlSource, /id="submitDealerButton"[\s\S]*Submit to Dealer/);
   assert.match(htmlSource, /id="dealerSubmitModal"/);
+  assert.match(htmlSource, /id="dealerSubmitCloseButton"[\s\S]*aria-label="Close dealer submission"[\s\S]*>×<\/button>/);
+  assert.match(htmlSource, /Name <span class="required-mark" aria-hidden="true">\*<\/span>/);
+  assert.match(htmlSource, /Email <span class="required-mark" aria-hidden="true">\*<\/span>/);
+  assert.match(htmlSource, /id="dealerSubmitCancelButton"[\s\S]*>Cancel<\/button>/);
+  assert.match(htmlSource, /id="dealerSubmitConfirmButton"[\s\S]*>Submit<\/button>/);
 
   const runtime = loadRuntime();
   runtime.state.bodyStyle = "coupe";
@@ -785,6 +790,8 @@ test("submit to dealer modal posts a validated dealer payload", async () => {
 
   runtime.openDealerSubmitModal();
   assert.equal(runtime.elements.get("#dealerSubmitModal").hidden, false);
+  assert.equal(runtime.elements.get("#dealerSubmitCancelButton").textContent, "Cancel");
+  assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").textContent, "Submit");
   assert.equal(await runtime.submitDealerBuild(), null, "name and email should be required");
   assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Name is required/);
   assert.equal(runtime.fetchCalls.length, 0, "invalid submission should not call the endpoint");
@@ -807,10 +814,12 @@ test("submit to dealer modal posts a validated dealer payload", async () => {
   assert.equal(postedBody.customer.email, "ada@example.com");
   assert.deepEqual(Object.keys(postedBody), ["model", "customer", "vehicle", "sections", "msrp", "plain_text_summary"]);
   assert.match(postedBody.msrp, /^\$\d{1,3}(,\d{3})*$/);
-  assert.equal(postedBody.plain_text_summary.includes(`MSRP: ${postedBody.msrp}`), true);
+  assert.equal(postedBody.plain_text_summary.includes(`<strong>Final MSRP: ${postedBody.msrp}</strong>`), true);
+  assert.doesNotMatch(postedBody.plain_text_summary, /<h3/i);
   assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Build submitted\. A Corvette specialist will contact you soon\. Confirmation ID: 112233\./);
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").hidden, true, "successful submit should remove the submit button");
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").disabled, true, "successful submit should keep submit unavailable");
+  assert.equal(runtime.elements.get("#dealerSubmitCancelButton").textContent, "Close", "successful submit should change bottom cancel action to close");
   assert.equal(await runtime.submitDealerBuild(), null, "successful submission should not be submitted twice");
   assert.equal(runtime.fetchCalls.length, 1, "duplicate successful submission should not call the endpoint again");
   runtime.closeDealerSubmitModal();
@@ -843,6 +852,7 @@ test("submit to dealer modal surfaces endpoint failures", async () => {
   assert.equal(await runtime.submitDealerBuild(), null);
   assert.equal(runtime.fetchCalls.length, 1);
   assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Could not create Formidable entry/);
+  assert.equal(runtime.elements.get("#dealerSubmitCancelButton").textContent, "Cancel", "failed submit should keep cancel label");
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").hidden, false, "failed submit should keep submit visible for retry");
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").disabled, false, "failed submit should keep submit retryable");
 });
@@ -870,23 +880,25 @@ test("plain text order summary renders compact order data for emails and review"
   assert.equal(typeof runtime.plainTextOrderSummary, "function", "plainTextOrderSummary should be exposed");
   const summary = runtime.plainTextOrderSummary();
 
-  assert.match(summary, /^2027 Corvette Stingray\n\n/);
+  assert.match(summary, /^<p>2027 Corvette Stingray<\/p>/);
   assert.match(summary, /Name: Ada Buyer/);
   assert.match(summary, /Email: ada@example\.com/);
   assert.match(summary, /Phone: 555-0100/);
   assert.match(summary, /Address: 1 Corvette Way/);
   assert.match(summary, /Comments: Dealer follow-up requested\./);
   assert.match(summary, /Submitted: .+/);
-  assert.match(summary, /VARIANT\nCorvette Stingray Coupe 1LT/);
-  assert.doesNotMatch(summary, /VARIANT\ncoupe\n1LT/);
+  assert.match(summary, /<p><strong><u>Variant<\/u><\/strong><\/p><ul><li>Corvette Stingray Coupe 1LT<\/li><\/ul>/);
+  assert.doesNotMatch(summary, /Variant<\/u><\/strong><\/p><ul><li>coupe<\/li><li>1LT/);
   assert.doesNotMatch(summary, /Base MSRP/);
-  assert.match(summary, /EXTERIOR PAINT\nGBA Black: \$0/);
-  assert.match(summary, /SEATS & INTERIOR[\s\S]*AQ9 GT1 Bucket Seats: \$0[\s\S]*HTA Jet Black: \$0/);
-  assert.match(summary, /AUTO-ADDED \/ REQUIRED[\s\S]*FE3 Z51 performance suspension: \$0/);
+  assert.match(summary, /<p><strong><u>Exterior Paint<\/u><\/strong><\/p><ul><li>GBA Black: \$0<\/li>/);
+  assert.match(summary, /<p><strong><u>Seats &amp; Interior<\/u><\/strong><\/p><ul>[\s\S]*<li>AQ9 GT1 Bucket Seats: \$0<\/li>[\s\S]*<li>HTA Jet Black: \$0<\/li>/);
+  assert.match(summary, /<p><strong><u>Auto-Added \/ Required<\/u><\/strong><\/p><ul>[\s\S]*<li>FE3 Z51 performance suspension: \$0<\/li>/);
   assert.doesNotMatch(summary, /STANDARD & INCLUDED/);
-  assert.match(summary, /MSRP: \$\d/);
+  assert.match(summary, /<p><strong>Final MSRP: \$\d/);
   assert.doesNotMatch(summary, /(?:^|\n)(?:Vehicle|Exterior Paint|Seats & Interior|Auto-Added \/ Required)(?:\n|$)/);
   assert.doesNotMatch(summary, /\b(?:GBA Black|GT1 Bucket Seats|Z51 performance suspension) \d+\b/);
+  assert.doesNotMatch(summary, /<li><strong>/);
+  assert.doesNotMatch(summary, /<h3/i);
 });
 
 test("plain text order summary omits empty comments and internal debug fields", () => {

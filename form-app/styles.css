@@ -481,6 +481,10 @@ textarea {
   text-transform: none;
 }
 
+.required-mark {
+  color: var(--accent-dark);
+}
+
 .full-field {
   grid-column: 1 / -1;
 }
@@ -523,8 +527,29 @@ textarea {
   padding: 18px 20px;
 }
 
-.icon-button {
+.icon-button,
+.modal-close-button {
+  display: inline-grid;
+  place-items: center;
   min-width: 0;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.modal-close-button {
+  border: 0;
+  background: transparent;
+  color: var(--accent-dark);
+  cursor: pointer;
+}
+
+.modal-close-button:hover,
+.modal-close-button:focus-visible {
+  color: var(--accent);
+  background: transparent;
 }
 
 .dealer-submit-form {

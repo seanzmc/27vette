@@ -520,7 +520,7 @@ test("runtime defaults to Stingray and switches models with a clean build reset"
 
   const grandSportOrder = runtime.compactOrder();
   assert.equal(grandSportOrder.title, "2027 Corvette Grand Sport");
-  assert.match(runtime.plainTextOrderSummary(), /^2027 Corvette Grand Sport\n\n/);
+  assert.match(runtime.plainTextOrderSummary(), /^<p>2027 Corvette Grand Sport<\/p>/);
 
   modelSelect.value = "stingray";
   modelSelect.change();
@@ -585,9 +585,10 @@ test("Grand Sport dealer submission payload stays model-scoped when posted", asy
   runtime.elements.get("#dealerSubmitEmail").value = "ada@example.com";
   const submission = await runtime.submitDealerBuild();
   assert.equal(submission.payload.model, "grandSport");
-  assert.match(submission.payload.plain_text_summary, /^2027 Corvette Grand Sport\n\n/);
-  assert.match(submission.payload.plain_text_summary, /VARIANT\nCorvette Grand Sport Coupe 1LT/);
+  assert.match(submission.payload.plain_text_summary, /^<p>2027 Corvette Grand Sport<\/p>/);
+  assert.match(submission.payload.plain_text_summary, /<p><strong><u>Variant<\/u><\/strong><\/p><ul><li>Corvette Grand Sport Coupe 1LT<\/li><\/ul>/);
   assert.doesNotMatch(submission.payload.plain_text_summary, /Base MSRP|STANDARD & INCLUDED/);
+  assert.doesNotMatch(submission.payload.plain_text_summary, /<h3/i);
   assert.equal(submission.payload.customer.email, "ada@example.com");
   assert.match(submission.payload.msrp, /^\$\d{1,3}(,\d{3})*$/);
   assert.equal(submission.result.entry_id, 445566);
