@@ -43,6 +43,7 @@ function loadRuntime() {
   const downloads = [];
   const elements = new Map();
   const fetchCalls = [];
+  const turnstileCalls = [];
   const document = {
     querySelector(selector) {
       if (!elements.has(selector)) {
@@ -70,6 +71,16 @@ function loadRuntime() {
       __downloads: downloads,
       __lastBlobContent: "",
       __lastBlobType: "",
+      turnstile: {
+        render(selector, options) {
+          turnstileCalls.push({ fn: "render", selector, options });
+          options.callback?.("test-turnstile-token");
+          return "test-widget-id";
+        },
+        reset(widgetId) {
+          turnstileCalls.push({ fn: "reset", widgetId });
+        },
+      },
       scrollX: 0,
       scrollY: 0,
       scrollTo() {},
@@ -86,6 +97,7 @@ function loadRuntime() {
     document,
     fetchCalls,
     elements,
+    turnstileCalls,
     Intl,
     Number,
     Set,
@@ -134,6 +146,7 @@ window.__testApi = {
     submitDealerBuild,
     dealerSubmissionPayload,
     fetchCalls,
+    turnstileCalls,
     exportJson,
   exportCsv,
   downloads: window.__downloads,

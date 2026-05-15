@@ -18,6 +18,7 @@ function formDataRegistry() {
 const registry = formDataRegistry();
 const DEALER_SUBMIT_ENDPOINT = "https://stingraychevroletcorvette.com/wp-json/corvette-build/v1/submit";
 const DEALER_SUBMIT_HELPER_TEXT = "Form will be submitted to Stingray Chevrolet in Plant City, FL.";
+const TURNSTILE_SITE_KEY = "0x4AAAAAADQDIWu6RmhF8_wH";
 let activeModelKey = registry.defaultModelKey || "stingray";
 let activeModel = registry.models[activeModelKey] || registry.models.stingray;
 let data = activeModel.data;
@@ -38,6 +39,8 @@ const state = {
   },
   dealerSubmissionComplete: false,
   dealerSubmissionEntryId: "",
+  turnstileToken: "",
+  turnstileWidgetId: "",
 };
 
 const els = {
@@ -65,6 +68,7 @@ const els = {
   dealerSubmitPhone: document.querySelector("#dealerSubmitPhone"),
   dealerSubmitComments: document.querySelector("#dealerSubmitComments"),
   dealerSubmitStatus: document.querySelector("#dealerSubmitStatus"),
+  dealerTurnstile: document.querySelector("#dealerTurnstile"),
   dealerSubmitCloseButton: document.querySelector("#dealerSubmitCloseButton"),
   dealerSubmitCancelButton: document.querySelector("#dealerSubmitCancelButton"),
   dealerSubmitConfirmButton: document.querySelector("#dealerSubmitConfirmButton"),
@@ -1526,6 +1530,27 @@ function dealerSubmitSuccessMessage() {
   return `Build submitted to Stingray Chevrolet. A Corvette specialist will contact you soon.${entryText}`;
 }
 
+function setTurnstileToken(token = "") {
+  state.turnstileToken = token;
+}
+
+function resetTurnstileWidget() {
+  state.turnstileToken = "";
+  if (window.turnstile && state.turnstileWidgetId) {
+    window.turnstile.reset(state.turnstileWidgetId);
+  }
+}
+
+function renderTurnstileWidget() {
+  if (!els.dealerTurnstile || !window.turnstile || state.turnstileWidgetId) return;
+  state.turnstileWidgetId = window.turnstile.render("#dealerTurnstile", {
+    sitekey: TURNSTILE_SITE_KEY,
+    callback: setTurnstileToken,
+    "expired-callback": resetTurnstileWidget,
+    "error-callback": resetTurnstileWidget,
+  });
+}
+
 function syncDealerSubmitControls() {
   if (els.dealerSubmitConfirmButton) {
     els.dealerSubmitConfirmButton.textContent = "Submit";
@@ -1540,6 +1565,7 @@ function syncDealerSubmitControls() {
 function resetDealerSubmissionState() {
   state.dealerSubmissionComplete = false;
   state.dealerSubmissionEntryId = "";
+  resetTurnstileWidget();
   syncDealerSubmitControls();
 }
 
@@ -1577,6 +1603,7 @@ function dealerSubmissionPayload(order = compactOrder()) {
     sections: order.sections,
     msrp: formatMoney(order.msrp),
     plain_text_summary: plainTextOrderSummary(order),
+    turnstile_token: state.turnstileToken,
   };
 }
 
@@ -1604,6 +1631,7 @@ function openDealerSubmitModal() {
   if (missingRequired().length > 0 || !els.dealerSubmitModal) return;
   populateDealerSubmitForm();
   syncDealerSubmitControls();
+  renderTurnstileWidget();
   if (state.dealerSubmissionComplete) {
     setDealerSubmitStatus(dealerSubmitSuccessMessage(), "success");
   } else {
@@ -1634,6 +1662,12 @@ async function submitDealerBuild(event) {
   const errors = dealerSubmitErrors(customer);
   if (errors.length) {
     setDealerSubmitStatus(errors.join(" "), "error");
+    resetTurnstileWidget();
+    return null;
+  }
+  if (!state.turnstileToken) {
+    setDealerSubmitStatus("Security check is required. Please try again.", "error");
+    resetTurnstileWidget();
     return null;
   }
   const payload = dealerSubmissionPayload();
@@ -1649,6 +1683,7 @@ async function submitDealerBuild(event) {
     return { payload, result };
   } catch (error) {
     setDealerSubmitStatus(error?.message || "Could not submit build to dealer.", "error");
+    resetTurnstileWidget();
     return null;
   } finally {
     if (els.dealerSubmitConfirmButton && !state.dealerSubmissionComplete) els.dealerSubmitConfirmButton.disabled = false;

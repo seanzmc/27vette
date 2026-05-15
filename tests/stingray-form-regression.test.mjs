@@ -85,12 +85,27 @@ function loadRuntime({ fetchImpl } = {}) {
   const downloads = [];
   const elements = new Map();
   const fetchCalls = [];
+  const turnstileCalls = [];
+  let turnstileToken = "test-turnstile-token";
   const context = {
     window: {
       STINGRAY_FORM_DATA: data,
       __downloads: downloads,
       __lastBlobContent: "",
       __lastBlobType: "",
+      turnstile: {
+        render(selector, options) {
+          turnstileCalls.push({ fn: "render", selector, options });
+          options.callback?.(turnstileToken);
+          return "test-widget-id";
+        },
+        reset(widgetId) {
+          turnstileCalls.push({ fn: "reset", widgetId });
+        },
+        remove(widgetId) {
+          turnstileCalls.push({ fn: "remove", widgetId });
+        },
+      },
       scrollX: 0,
       scrollY: 0,
       scrollTo() {},
@@ -128,6 +143,10 @@ function loadRuntime({ fetchImpl } = {}) {
     },
     fetchCalls,
     elements,
+    turnstileCalls,
+    setTurnstileToken(value) {
+      turnstileToken = value;
+    },
     Intl,
     Number,
     Set,
@@ -173,6 +192,8 @@ window.__testApi = {
   closeConfirmActionModal: typeof closeConfirmActionModal === "function" ? closeConfirmActionModal : undefined,
   confirmPendingAction: typeof confirmPendingAction === "function" ? confirmPendingAction : undefined,
   fetchCalls,
+  turnstileCalls,
+  setTurnstileToken: typeof setTurnstileToken === "function" ? setTurnstileToken : undefined,
   exportJson: typeof exportJson === "function" ? exportJson : undefined,
   exportCsv: typeof exportCsv === "function" ? exportCsv : undefined,
   downloads: window.__downloads,
@@ -776,6 +797,8 @@ test("submit to dealer modal posts a validated dealer payload", async () => {
   assert.match(htmlSource, /id="dealerSubmitCloseButton"[\s\S]*aria-label="Close dealer submission"[\s\S]*>×<\/button>/);
   assert.match(htmlSource, /Name <span class="required-mark" aria-hidden="true">\*<\/span>/);
   assert.match(htmlSource, /Email <span class="required-mark" aria-hidden="true">\*<\/span>/);
+  assert.match(htmlSource, /https:\/\/challenges\.cloudflare\.com\/turnstile\/v0\/api\.js/);
+  assert.match(htmlSource, /id="dealerTurnstile"/);
   assert.match(htmlSource, /id="dealerSubmitCancelButton"[\s\S]*>Cancel<\/button>/);
   assert.match(htmlSource, /id="dealerSubmitConfirmButton"[\s\S]*>Submit<\/button>/);
 
@@ -800,6 +823,7 @@ test("submit to dealer modal posts a validated dealer payload", async () => {
   assert.equal(runtime.elements.get("#dealerSubmitModal").hidden, false);
   assert.equal(runtime.elements.get("#dealerSubmitCancelButton").textContent, "Cancel");
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").textContent, "Submit");
+  assert.equal(runtime.turnstileCalls.some((call) => call.fn === "render" && call.selector === "#dealerTurnstile"), true);
   assert.equal(
     runtime.elements.get("#dealerSubmitStatus").textContent,
     "Form will be submitted to Stingray Chevrolet in Plant City, FL."
@@ -812,6 +836,7 @@ test("submit to dealer modal posts a validated dealer payload", async () => {
   runtime.elements.get("#dealerSubmitEmail").value = "ada@example.com";
   runtime.elements.get("#dealerSubmitPhone").value = "555-0100";
   runtime.elements.get("#dealerSubmitComments").value = "Please contact me about this build.";
+  runtime.setTurnstileToken("test-turnstile-token");
   const submission = await runtime.submitDealerBuild();
   assert.equal(submission.payload.model, "stingray");
   assert.equal(submission.payload.customer.name, "Ada Buyer");
@@ -824,7 +849,8 @@ test("submit to dealer modal posts a validated dealer payload", async () => {
   assert.equal(runtime.fetchCalls[0].options.headers["Content-Type"], "application/json");
   const postedBody = JSON.parse(runtime.fetchCalls[0].options.body);
   assert.equal(postedBody.customer.email, "ada@example.com");
-  assert.deepEqual(Object.keys(postedBody), ["model", "customer", "vehicle", "sections", "msrp", "plain_text_summary"]);
+  assert.deepEqual(Object.keys(postedBody), ["model", "customer", "vehicle", "sections", "msrp", "plain_text_summary", "turnstile_token"]);
+  assert.equal(postedBody.turnstile_token, "test-turnstile-token");
   assert.match(postedBody.msrp, /^\$\d{1,3}(,\d{3})*$/);
   assert.equal(postedBody.plain_text_summary.includes(`<strong>Total MSRP: ${postedBody.msrp}</strong>`), true);
   assert.doesNotMatch(postedBody.plain_text_summary, /<h3/i);
@@ -839,6 +865,26 @@ test("submit to dealer modal posts a validated dealer payload", async () => {
   runtime.openDealerSubmitModal();
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").hidden, true, "reopened successful modal should keep submit hidden");
   assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Build submitted to Stingray Chevrolet\. A Corvette specialist will contact you soon\./);
+});
+
+test("submit to dealer modal requires a Turnstile token before posting", async () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001"));
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+  runtime.reconcileSelections();
+  runtime.openDealerSubmitModal();
+  runtime.setTurnstileToken("");
+  runtime.elements.get("#dealerSubmitName").value = "Ada Buyer";
+  runtime.elements.get("#dealerSubmitEmail").value = "ada@example.com";
+
+  assert.equal(await runtime.submitDealerBuild(), null, "missing Turnstile token should block submission");
+  assert.equal(runtime.fetchCalls.length, 0);
+  assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Security check is required/);
+  assert.equal(runtime.turnstileCalls.some((call) => call.fn === "reset"), true);
 });
 
 test("Stingray workbook option placement keeps VK3 and BV4 in customer-facing sections", () => {
