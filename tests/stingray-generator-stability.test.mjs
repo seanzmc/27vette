@@ -91,6 +91,7 @@ const priceRuleHeaders = [
   "target_option_id",
   "price_value",
   "body_style_scope",
+  "trim_level_scope",
   "review_flag",
   "notes",
 ];

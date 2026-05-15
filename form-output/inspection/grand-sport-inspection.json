@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-13T19:39:55+00:00",
+  "generated_at": "2026-05-15T13:42:44+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -102,15 +102,15 @@
     "unique_rpos": 223,
     "variant_status_cells": 1614,
     "status_source_rows": 1614,
-    "candidate_choice_rows_available_or_standard": 1374,
+    "candidate_choice_rows_available_or_standard": 1380,
     "candidate_standard_equipment_cells": 455,
     "candidate_standard_option_rows": 90,
     "selectable_counts": {
       "False": 107,
       "True": 162
     },
-    "active_option_rows_available_or_standard": 225,
-    "inactive_option_rows_all_unavailable_or_blank": 44,
+    "active_option_rows_available_or_standard": 226,
+    "inactive_option_rows_all_unavailable_or_blank": 43,
     "status_counts": {
       "available": 879,
       "standard": 547,
@@ -5977,6 +5977,14 @@
         "original_section_id": "sec_whee_002",
         "section_override_applied": false,
         "step_key": "wheels"
+      },
+      {
+        "option_id": "opt_aup_001",
+        "rpo": "AUP",
+        "section_id": "sec_seat_002",
+        "original_section_id": "sec_seat_002",
+        "section_override_applied": false,
+        "step_key": "seat"
       }
     ],
     "missing_sections": {},

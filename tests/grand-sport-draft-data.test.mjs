@@ -41,6 +41,10 @@ const requiredPackagePriceRules = [
   ["gs_pr_bcp_d3v_001", "opt_bcp_002", "opt_d3v_001", "override", 0],
   ["gs_pr_bcs_d3v_001", "opt_bcs_002", "opt_d3v_001", "override", 0],
   ["gs_pr_bc4_d3v_001", "opt_bc4_002", "opt_d3v_001", "override", 0],
+  ["gs_pr_2lt_ah2_seat_001", "opt_ah2_001", "opt_ah2_001", "override", 1695],
+  ["gs_pr_2lt_ae4_seat_001", "opt_ae4_002", "opt_ae4_002", "override", 2095],
+  ["gs_pr_3lt_ae4_seat_001", "opt_ae4_002", "opt_ae4_002", "override", 595],
+  ["gs_pr_3lt_aup_seat_001", "opt_aup_001", "opt_aup_001", "override", 350],
 ];
 
 const expectedGrandSportExclusiveGroups = [
@@ -132,11 +136,11 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
       ["summary", "Summary"],
     ]
   );
-  assert.equal(draft.choices.length, 1374);
+  assert.equal(draft.choices.length, 1380);
   assert.equal(draft.standardEquipment.length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 761);
+  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 763);
   assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 158);
+  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 162);
 });
 
 test("Grand Sport standard equipment is preserved after standard mirror rows are inactive", () => {
@@ -204,16 +208,19 @@ test("Grand Sport seat availability comes from grandSport_ovs by trim", () => {
     ["AQ9", "standard"],
     ["AH2", "unavailable"],
     ["AE4", "available"],
+    ["AUP", "unavailable"],
   ]);
   assert.deepEqual(JSON.parse(JSON.stringify(seatsForVariant("2lt_e07"))), [
     ["AQ9", "standard"],
     ["AH2", "available"],
     ["AE4", "available"],
+    ["AUP", "unavailable"],
   ]);
   assert.deepEqual(JSON.parse(JSON.stringify(seatsForVariant("3lt_e07"))), [
     ["AQ9", "unavailable"],
     ["AH2", "standard"],
     ["AE4", "available"],
+    ["AUP", "available"],
   ]);
 });
 
@@ -226,6 +233,22 @@ test("Grand Sport draft emits color overrides and workbook-backed package price 
   for (const expectedRule of requiredPackagePriceRules) {
     assert.ok(priceRuleKeys.has(expectedRule.join("::")), `${expectedRule[0]} should be emitted from grandSport_price_rules`);
   }
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(
+        draft.priceRules
+          .filter((rule) => rule.price_rule_id.endsWith("_seat_001"))
+          .map((rule) => [rule.price_rule_id, rule.trim_level_scope])
+          .sort()
+      )
+    ),
+    [
+      ["gs_pr_2lt_ae4_seat_001", "2LT"],
+      ["gs_pr_2lt_ah2_seat_001", "2LT"],
+      ["gs_pr_3lt_ae4_seat_001", "3LT"],
+      ["gs_pr_3lt_aup_seat_001", "3LT"],
+    ]
+  );
   for (const rule of draft.priceRules) {
     assert.ok(rule.price_rule_id, "price rule should have price_rule_id");
     assert.ok(rule.condition_option_id, `${rule.price_rule_id} should have condition_option_id`);
@@ -470,8 +493,8 @@ test("Grand Sport wheel choices use workbook display order by ascending price", 
 });
 
 test("Grand Sport draft preserves rule hot spots and normalization metadata for later phases", () => {
-  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1240);
-  assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1374);
+  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1242);
+  assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1380);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 129);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 26);
   assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);

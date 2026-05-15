@@ -122,6 +122,7 @@ window.__testApi = {
   reconcileSelections,
   handleChoice,
   render,
+  optionPrice,
   currentOrder,
   compactOrder,
   plainTextOrderSummary,
@@ -373,6 +374,36 @@ test("Grand Sport UQT is selectable on 1LT and included on higher trims from wor
   order = runtime.currentOrder();
   assert.equal(order.selected_options.some((item) => item.rpo === "UQT"), false);
   assert.equal(runtime.data.standardEquipment.some((item) => item.variant_id === "2lt_e07" && item.rpo === "UQT"), true);
+});
+
+test("Grand Sport seat prices are workbook-scoped by trim", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "2LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const ah2 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_ah2_001");
+  const ae4 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_ae4_002");
+  assert.ok(ah2, "2LT AH2 seat should exist");
+  assert.ok(ae4, "2LT AE4 seat should exist");
+  runtime.handleChoice(ah2);
+  assert.equal(runtime.optionPrice("opt_ah2_001"), 1695);
+  runtime.handleChoice(ae4);
+  assert.equal(runtime.optionPrice("opt_ae4_002"), 2095);
+
+  runtime.state.trimLevel = "3LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  const ae4ThreeLt = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_ae4_002");
+  const aup = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_aup_001");
+  assert.ok(ae4ThreeLt, "3LT AE4 seat should exist");
+  assert.ok(aup, "3LT AUP seat should exist");
+  runtime.handleChoice(ae4ThreeLt);
+  assert.equal(runtime.optionPrice("opt_ae4_002"), 595);
+  runtime.handleChoice(aup);
+  assert.equal(runtime.optionPrice("opt_aup_001"), 350);
 });
 
 test("Grand Sport workbook default_selected rows seed and reconcile defaults generically", () => {
