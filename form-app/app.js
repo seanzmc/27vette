@@ -16,6 +16,7 @@ function formDataRegistry() {
 }
 
 const registry = formDataRegistry();
+const DEALER_SUBMIT_ENDPOINT = "https://stingraychevroletcorvette.com/wp-json/corvette-build/v1/submit";
 let activeModelKey = registry.defaultModelKey || "stingray";
 let activeModel = registry.models[activeModelKey] || registry.models.stingray;
 let data = activeModel.data;
@@ -63,6 +64,7 @@ const els = {
   dealerSubmitStatus: document.querySelector("#dealerSubmitStatus"),
   dealerSubmitCloseButton: document.querySelector("#dealerSubmitCloseButton"),
   dealerSubmitCancelButton: document.querySelector("#dealerSubmitCancelButton"),
+  dealerSubmitConfirmButton: document.querySelector("#dealerSubmitConfirmButton"),
   modelSelect: document.querySelector("#modelSelect"),
   appTitle: document.querySelector("#appTitle"),
 };
@@ -1533,6 +1535,26 @@ function dealerSubmissionPayload(order = compactOrder()) {
   };
 }
 
+async function postDealerSubmission(payload) {
+  const response = await fetch(DEALER_SUBMIT_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  let result = {};
+  try {
+    result = await response.json();
+  } catch {
+    result = {};
+  }
+  if (!response.ok || result.success === false) {
+    throw new Error(result.message || "Could not submit build to dealer.");
+  }
+  return result;
+}
+
 function openDealerSubmitModal() {
   if (missingRequired().length > 0 || !els.dealerSubmitModal) return;
   populateDealerSubmitForm();
@@ -1547,7 +1569,7 @@ function closeDealerSubmitModal() {
   setDealerSubmitStatus("", "");
 }
 
-function submitDealerBuild(event) {
+async function submitDealerBuild(event) {
   event?.preventDefault?.();
   if (missingRequired().length > 0) {
     setDealerSubmitStatus("Complete required selections before submitting your build.", "error");
@@ -1561,8 +1583,19 @@ function submitDealerBuild(event) {
   }
   const payload = dealerSubmissionPayload();
   window.__lastDealerSubmission = payload;
-  setDealerSubmitStatus("Build prepared for dealer submission. A dealer endpoint still needs to be connected before this sends automatically.", "success");
-  return payload;
+  setDealerSubmitStatus("Submitting build to dealer...", "");
+  if (els.dealerSubmitConfirmButton) els.dealerSubmitConfirmButton.disabled = true;
+  try {
+    const result = await postDealerSubmission(payload);
+    const entryText = result.entry_id ? ` Entry ID: ${result.entry_id}.` : "";
+    setDealerSubmitStatus(`Build submitted to dealer.${entryText}`, "success");
+    return { payload, result };
+  } catch (error) {
+    setDealerSubmitStatus(error?.message || "Could not submit build to dealer.", "error");
+    return null;
+  } finally {
+    if (els.dealerSubmitConfirmButton) els.dealerSubmitConfirmButton.disabled = false;
+  }
 }
 
 function resetModelScopedState() {

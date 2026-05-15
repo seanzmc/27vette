@@ -42,6 +42,7 @@ function loadRuntime() {
   const dataWindow = loadDataWindow();
   const downloads = [];
   const elements = new Map();
+  const fetchCalls = [];
   const document = {
     querySelector(selector) {
       if (!elements.has(selector)) {
@@ -73,7 +74,17 @@ function loadRuntime() {
       scrollY: 0,
       scrollTo() {},
     },
+    fetch: async (url, options = {}) => {
+      fetchCalls.push({ url, options });
+      return {
+        ok: true,
+        async json() {
+          return { success: true, entry_id: 445566 };
+        },
+      };
+    },
     document,
+    fetchCalls,
     elements,
     Intl,
     Number,
@@ -120,6 +131,7 @@ window.__testApi = {
     closeDealerSubmitModal,
     submitDealerBuild,
     dealerSubmissionPayload,
+    fetchCalls,
     exportJson,
   exportCsv,
   downloads: window.__downloads,
@@ -519,7 +531,7 @@ test("model-specific build downloads keep customer-facing Markdown and filenames
   assert.doesNotMatch(markdownDownload.content, /Base MSRP/);
 });
 
-test("Grand Sport dealer submission payload stays model-scoped and front-end-only", () => {
+test("Grand Sport dealer submission payload stays model-scoped when posted", async () => {
   const runtime = loadRuntime();
   runtime.activateModel("grandSport");
   runtime.state.bodyStyle = "coupe";
@@ -535,10 +547,12 @@ test("Grand Sport dealer submission payload stays model-scoped and front-end-onl
   assert.equal(runtime.elements.get("#dealerSubmitModal").hidden, false);
   runtime.elements.get("#dealerSubmitName").value = "Ada Buyer";
   runtime.elements.get("#dealerSubmitEmail").value = "ada@example.com";
-  const payload = runtime.submitDealerBuild();
-  assert.equal(payload.model, "grandSport");
-  assert.match(payload.plain_text_summary, /^2027 Corvette Grand Sport\n\n/);
-  assert.equal(payload.customer.email, "ada@example.com");
+  const submission = await runtime.submitDealerBuild();
+  assert.equal(submission.payload.model, "grandSport");
+  assert.match(submission.payload.plain_text_summary, /^2027 Corvette Grand Sport\n\n/);
+  assert.equal(submission.payload.customer.email, "ada@example.com");
+  assert.equal(submission.result.entry_id, 445566);
+  assert.equal(JSON.parse(runtime.fetchCalls[0].options.body).model, "grandSport");
 });
 
 test("Grand Sport Markdown export includes audited sections and auto-added options", () => {

@@ -75,9 +75,10 @@ function makeElement() {
   };
 }
 
-function loadRuntime() {
+function loadRuntime({ fetchImpl } = {}) {
   const downloads = [];
   const elements = new Map();
+  const fetchCalls = [];
   const context = {
     window: {
       STINGRAY_FORM_DATA: data,
@@ -87,6 +88,16 @@ function loadRuntime() {
       scrollX: 0,
       scrollY: 0,
       scrollTo() {},
+    },
+    fetch: async (url, options = {}) => {
+      fetchCalls.push({ url, options });
+      if (fetchImpl) return fetchImpl(url, options);
+      return {
+        ok: true,
+        async json() {
+          return { success: true, entry_id: 112233 };
+        },
+      };
     },
     document: {
       querySelector(selector) {
@@ -109,6 +120,7 @@ function loadRuntime() {
         return element;
       },
     },
+    fetchCalls,
     elements,
     Intl,
     Number,
@@ -151,6 +163,7 @@ window.__testApi = {
   closeDealerSubmitModal: typeof closeDealerSubmitModal === "function" ? closeDealerSubmitModal : undefined,
   submitDealerBuild: typeof submitDealerBuild === "function" ? submitDealerBuild : undefined,
   dealerSubmissionPayload: typeof dealerSubmissionPayload === "function" ? dealerSubmissionPayload : undefined,
+  fetchCalls,
   exportJson: typeof exportJson === "function" ? exportJson : undefined,
   exportCsv: typeof exportCsv === "function" ? exportCsv : undefined,
   downloads: window.__downloads,
@@ -749,7 +762,7 @@ test("download build exports customer-facing Markdown", () => {
   assert.equal(markdownDownload.content.includes("option_id"), false);
 });
 
-test("submit to dealer modal prepares a validated front-end payload", () => {
+test("submit to dealer modal posts a validated dealer payload", async () => {
   assert.match(htmlSource, /id="submitDealerButton"[\s\S]*Submit to Dealer/);
   assert.match(htmlSource, /id="dealerSubmitModal"/);
 
@@ -772,21 +785,53 @@ test("submit to dealer modal prepares a validated front-end payload", () => {
 
   runtime.openDealerSubmitModal();
   assert.equal(runtime.elements.get("#dealerSubmitModal").hidden, false);
-  assert.equal(runtime.submitDealerBuild(), null, "name and email should be required");
+  assert.equal(await runtime.submitDealerBuild(), null, "name and email should be required");
   assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Name is required/);
+  assert.equal(runtime.fetchCalls.length, 0, "invalid submission should not call the endpoint");
 
   runtime.elements.get("#dealerSubmitName").value = "Ada Buyer";
   runtime.elements.get("#dealerSubmitEmail").value = "ada@example.com";
   runtime.elements.get("#dealerSubmitPhone").value = "555-0100";
   runtime.elements.get("#dealerSubmitComments").value = "Please contact me about this build.";
-  const payload = runtime.submitDealerBuild();
-  assert.equal(payload.model, "stingray");
-  assert.equal(payload.customer.name, "Ada Buyer");
-  assert.equal(payload.customer.email, "ada@example.com");
-  assert.match(payload.plain_text_summary, /Ada Buyer/);
-  assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /endpoint still needs to be connected/);
+  const submission = await runtime.submitDealerBuild();
+  assert.equal(submission.payload.model, "stingray");
+  assert.equal(submission.payload.customer.name, "Ada Buyer");
+  assert.equal(submission.payload.customer.email, "ada@example.com");
+  assert.match(submission.payload.plain_text_summary, /Ada Buyer/);
+  assert.equal(submission.result.entry_id, 112233);
+  assert.equal(runtime.fetchCalls.length, 1);
+  assert.equal(runtime.fetchCalls[0].url, "https://stingraychevroletcorvette.com/wp-json/corvette-build/v1/submit");
+  assert.equal(runtime.fetchCalls[0].options.method, "POST");
+  assert.equal(runtime.fetchCalls[0].options.headers["Content-Type"], "application/json");
+  assert.equal(JSON.parse(runtime.fetchCalls[0].options.body).customer.email, "ada@example.com");
+  assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Build submitted to dealer. Entry ID: 112233./);
   runtime.closeDealerSubmitModal();
   assert.equal(runtime.elements.get("#dealerSubmitModal").hidden, true);
+});
+
+test("submit to dealer modal surfaces endpoint failures", async () => {
+  const runtime = loadRuntime({
+    fetchImpl: async () => ({
+      ok: false,
+      async json() {
+        return { success: false, message: "Could not create Formidable entry." };
+      },
+    }),
+  });
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001"));
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+  runtime.reconcileSelections();
+  runtime.openDealerSubmitModal();
+  runtime.elements.get("#dealerSubmitName").value = "Ada Buyer";
+  runtime.elements.get("#dealerSubmitEmail").value = "ada@example.com";
+
+  assert.equal(await runtime.submitDealerBuild(), null);
+  assert.equal(runtime.fetchCalls.length, 1);
+  assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Could not create Formidable entry/);
 });
 
 test("plain text order summary renders compact order data for emails and review", () => {
