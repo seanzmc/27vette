@@ -60,7 +60,10 @@ function makeElement() {
     value: "",
     dataset: {},
     hidden: false,
-    addEventListener() {},
+    listeners: {},
+    addEventListener(type, listener) {
+      this.listeners[type] = listener;
+    },
     focus() {},
     querySelectorAll() {
       return [];
@@ -72,6 +75,9 @@ function makeElement() {
       return makeElement();
     },
     scrollTo() {},
+    click() {
+      this.listeners.click?.({ target: this });
+    },
   };
 }
 
@@ -103,7 +109,7 @@ function loadRuntime({ fetchImpl } = {}) {
       querySelector(selector) {
         if (!elements.has(selector)) {
           const element = makeElement();
-          if (selector === "#dealerSubmitModal") element.hidden = true;
+          if (selector === "#dealerSubmitModal" || selector === "#confirmActionModal") element.hidden = true;
           elements.set(selector, element);
         }
         return elements.get(selector);
@@ -163,6 +169,9 @@ window.__testApi = {
   closeDealerSubmitModal: typeof closeDealerSubmitModal === "function" ? closeDealerSubmitModal : undefined,
   submitDealerBuild: typeof submitDealerBuild === "function" ? submitDealerBuild : undefined,
   dealerSubmissionPayload: typeof dealerSubmissionPayload === "function" ? dealerSubmissionPayload : undefined,
+  requestResetBuild: typeof requestResetBuild === "function" ? requestResetBuild : undefined,
+  closeConfirmActionModal: typeof closeConfirmActionModal === "function" ? closeConfirmActionModal : undefined,
+  confirmPendingAction: typeof confirmPendingAction === "function" ? confirmPendingAction : undefined,
   fetchCalls,
   exportJson: typeof exportJson === "function" ? exportJson : undefined,
   exportCsv: typeof exportCsv === "function" ? exportCsv : undefined,
@@ -814,7 +823,7 @@ test("submit to dealer modal posts a validated dealer payload", async () => {
   assert.equal(postedBody.customer.email, "ada@example.com");
   assert.deepEqual(Object.keys(postedBody), ["model", "customer", "vehicle", "sections", "msrp", "plain_text_summary"]);
   assert.match(postedBody.msrp, /^\$\d{1,3}(,\d{3})*$/);
-  assert.equal(postedBody.plain_text_summary.includes(`<strong>Final MSRP: ${postedBody.msrp}</strong>`), true);
+  assert.equal(postedBody.plain_text_summary.includes(`<strong>Total MSRP: ${postedBody.msrp}</strong>`), true);
   assert.doesNotMatch(postedBody.plain_text_summary, /<h3/i);
   assert.match(runtime.elements.get("#dealerSubmitStatus").textContent, /Build submitted\. A Corvette specialist will contact you soon\. Confirmation ID: 112233\./);
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").hidden, true, "successful submit should remove the submit button");
@@ -857,6 +866,43 @@ test("submit to dealer modal surfaces endpoint failures", async () => {
   assert.equal(runtime.elements.get("#dealerSubmitConfirmButton").disabled, false, "failed submit should keep submit retryable");
 });
 
+test("reset button confirms dirty builds and returns to step one", () => {
+  assert.match(htmlSource, /id="confirmActionModal"/);
+  assert.match(htmlSource, /id="confirmActionCancelButton"[\s\S]*>No, Cancel<\/button>/);
+  assert.match(htmlSource, /id="confirmActionConfirmButton"[\s\S]*>Yes, Reset<\/button>/);
+
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.render();
+
+  runtime.requestResetBuild();
+  assert.equal(runtime.elements.get("#confirmActionModal").hidden, true, "clean reset should not prompt");
+
+  runtime.state.selected.add("opt_z51_001");
+  runtime.state.userSelected.add("opt_z51_001");
+  runtime.state.activeStep = "paint";
+  runtime.requestResetBuild();
+  assert.equal(runtime.elements.get("#confirmActionModal").hidden, false);
+  assert.equal(runtime.elements.get("#confirmActionMessage").textContent, "This will reset all selected options. Are you sure?");
+  assert.equal(runtime.elements.get("#confirmActionConfirmButton").textContent, "Yes, Reset");
+
+  runtime.closeConfirmActionModal();
+  assert.equal(runtime.elements.get("#confirmActionModal").hidden, true);
+  assert.equal(runtime.state.selected.has("opt_z51_001"), true, "cancel should preserve selected options");
+  assert.equal(runtime.state.activeStep, "paint");
+
+  runtime.requestResetBuild();
+  runtime.confirmPendingAction();
+  assert.equal(runtime.elements.get("#confirmActionModal").hidden, true);
+  assert.equal(runtime.state.selected.has("opt_z51_001"), false, "confirmed reset should clear selected options");
+  assert.equal(runtime.state.userSelected.size, 0);
+  assert.equal(runtime.state.selectedInterior, "");
+  assert.equal(runtime.state.activeStep, "body_style");
+});
+
 test("plain text order summary renders compact order data for emails and review", () => {
   const runtime = loadRuntime();
   runtime.state.bodyStyle = "coupe";
@@ -880,13 +926,10 @@ test("plain text order summary renders compact order data for emails and review"
   assert.equal(typeof runtime.plainTextOrderSummary, "function", "plainTextOrderSummary should be exposed");
   const summary = runtime.plainTextOrderSummary();
 
-  assert.match(summary, /^<p>2027 Corvette Stingray<\/p>/);
-  assert.match(summary, /Name: Ada Buyer/);
-  assert.match(summary, /Email: ada@example\.com/);
-  assert.match(summary, /Phone: 555-0100/);
-  assert.match(summary, /Address: 1 Corvette Way/);
-  assert.match(summary, /Comments: Dealer follow-up requested\./);
-  assert.match(summary, /Submitted: .+/);
+  assert.doesNotMatch(summary, /^<p>2027 Corvette Stingray<\/p>/);
+  assert.match(summary, /^<p><strong>Name:<\/strong> Ada Buyer<br><strong>Email:<\/strong> ada@example\.com<br><strong>Phone:<\/strong> 555-0100<br><strong>Address:<\/strong> 1 Corvette Way/);
+  assert.match(summary, /<strong>Comments:<\/strong> Dealer follow-up requested\./);
+  assert.match(summary, /<strong>Submitted:<\/strong> .+/);
   assert.match(summary, /<p><strong><u>Variant<\/u><\/strong><\/p><ul><li>Corvette Stingray Coupe 1LT<\/li><\/ul>/);
   assert.doesNotMatch(summary, /Variant<\/u><\/strong><\/p><ul><li>coupe<\/li><li>1LT/);
   assert.doesNotMatch(summary, /Base MSRP/);
@@ -894,7 +937,7 @@ test("plain text order summary renders compact order data for emails and review"
   assert.match(summary, /<p><strong><u>Seats &amp; Interior<\/u><\/strong><\/p><ul>[\s\S]*<li>AQ9 GT1 Bucket Seats: \$0<\/li>[\s\S]*<li>HTA Jet Black: \$0<\/li>/);
   assert.match(summary, /<p><strong><u>Auto-Added \/ Required<\/u><\/strong><\/p><ul>[\s\S]*<li>FE3 Z51 performance suspension: \$0<\/li>/);
   assert.doesNotMatch(summary, /STANDARD & INCLUDED/);
-  assert.match(summary, /<p><strong>Final MSRP: \$\d/);
+  assert.match(summary, /<p><strong>Total MSRP: \$\d/);
   assert.doesNotMatch(summary, /(?:^|\n)(?:Vehicle|Exterior Paint|Seats & Interior|Auto-Added \/ Required)(?:\n|$)/);
   assert.doesNotMatch(summary, /\b(?:GBA Black|GT1 Bucket Seats|Z51 performance suspension) \d+\b/);
   assert.doesNotMatch(summary, /<li><strong>/);

@@ -116,7 +116,18 @@
       </div>
     </div>
 
-    <script src="./data.js?v=20"></script>
-    <script src="./app.js?v=20"></script>
+    <div id="confirmActionModal" class="modal-backdrop" hidden>
+      <div class="confirm-action-modal" role="dialog" aria-modal="true" aria-labelledby="confirmActionTitle">
+        <h2 id="confirmActionTitle">Confirm Reset</h2>
+        <p id="confirmActionMessage"></p>
+        <div class="modal-actions">
+          <button id="confirmActionCancelButton" class="ghost-button" type="button">No, Cancel</button>
+          <button id="confirmActionConfirmButton" type="button">Yes, Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./data.js?v=22"></script>
+    <script src="./app.js?v=22"></script>
   </body>
 </html>

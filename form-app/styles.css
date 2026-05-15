@@ -514,6 +514,28 @@ textarea {
   box-shadow: var(--shadow);
 }
 
+.confirm-action-modal {
+  display: grid;
+  gap: 14px;
+  width: min(440px, 100%);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.confirm-action-modal h2,
+.confirm-action-modal p {
+  margin: 0;
+}
+
+.confirm-action-modal p {
+  color: var(--muted);
+  font-weight: 700;
+  line-height: 1.45;
+}
+
 .modal-header,
 .modal-actions {
   display: flex;

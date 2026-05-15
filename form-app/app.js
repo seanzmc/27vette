@@ -67,12 +67,18 @@ const els = {
   dealerSubmitCloseButton: document.querySelector("#dealerSubmitCloseButton"),
   dealerSubmitCancelButton: document.querySelector("#dealerSubmitCancelButton"),
   dealerSubmitConfirmButton: document.querySelector("#dealerSubmitConfirmButton"),
+  confirmActionModal: document.querySelector("#confirmActionModal"),
+  confirmActionTitle: document.querySelector("#confirmActionTitle"),
+  confirmActionMessage: document.querySelector("#confirmActionMessage"),
+  confirmActionCancelButton: document.querySelector("#confirmActionCancelButton"),
+  confirmActionConfirmButton: document.querySelector("#confirmActionConfirmButton"),
   modelSelect: document.querySelector("#modelSelect"),
   appTitle: document.querySelector("#appTitle"),
 };
 
 let runtimeSteps = [];
 let variants = [];
+let pendingConfirmationAction = null;
 const choicesByOption = new Map();
 const sectionsById = new Map();
 const optionsById = new Map();
@@ -1422,15 +1428,14 @@ function titleCaseSection(label) {
 
 function plainTextOrderSummary(order = compactOrder()) {
   const lines = [
-    `<p>${escapeHtml(order.title)}</p>`,
     "<p>",
-    `Name: ${escapeHtml(order.customer.name || "")}<br>`,
-    `Email: ${escapeHtml(order.customer.email || "")}<br>`,
-    `Phone: ${escapeHtml(order.customer.phone || "")}<br>`,
-    `Address: ${escapeHtml(order.customer.address || "")}`,
+    `<strong>Name:</strong> ${escapeHtml(order.customer.name || "")}<br>`,
+    `<strong>Email:</strong> ${escapeHtml(order.customer.email || "")}<br>`,
+    `<strong>Phone:</strong> ${escapeHtml(order.customer.phone || "")}<br>`,
+    `<strong>Address:</strong> ${escapeHtml(order.customer.address || "")}`,
   ];
-  if (order.customer.comments) lines.push(`<br>Comments: ${escapeHtml(order.customer.comments)}`);
-  lines.push(`</p>`, `<p>Submitted: ${escapeHtml(order.submitted_at)}</p>`);
+  if (order.customer.comments) lines.push(`<br><strong>Comments:</strong> ${escapeHtml(order.customer.comments)}`);
+  lines.push(`</p>`, `<p><strong>Submitted:</strong> ${escapeHtml(order.submitted_at)}</p>`);
   lines.push(`<p><strong><u>Variant</u></strong></p>`, `<ul><li>${escapeHtml(order.vehicle.display_name || "")}</li></ul>`);
 
   for (const section of order.sections) {
@@ -1442,7 +1447,7 @@ function plainTextOrderSummary(order = compactOrder()) {
     lines.push("</ul>");
   }
 
-  lines.push(`<p><strong>Final MSRP: ${escapeHtml(formatMoney(order.msrp))}</strong></p>`);
+  lines.push(`<p><strong>Total MSRP: ${escapeHtml(formatMoney(order.msrp))}</strong></p>`);
   return lines.join("");
 }
 
@@ -1693,25 +1698,82 @@ function render({ resetScroll = false, preserveScroll = false } = {}) {
   restoreScrollPosition(scrollPosition);
 }
 
+function buildHasResettableChanges() {
+  return state.userSelected.size > 0 || Boolean(state.selectedInterior) || state.activeStep !== "body_style";
+}
+
+function closeConfirmActionModal() {
+  if (els.confirmActionModal) els.confirmActionModal.hidden = true;
+  pendingConfirmationAction = null;
+}
+
+function openConfirmActionModal({ title, message, confirmLabel, onConfirm }) {
+  pendingConfirmationAction = onConfirm;
+  if (els.confirmActionTitle) els.confirmActionTitle.textContent = title;
+  if (els.confirmActionMessage) els.confirmActionMessage.textContent = message;
+  if (els.confirmActionConfirmButton) els.confirmActionConfirmButton.textContent = confirmLabel;
+  if (els.confirmActionCancelButton) els.confirmActionCancelButton.textContent = "No, Cancel";
+  if (els.confirmActionModal) els.confirmActionModal.hidden = false;
+}
+
+function confirmPendingAction() {
+  const action = pendingConfirmationAction;
+  closeConfirmActionModal();
+  action?.();
+}
+
+function resetBuild() {
+  resetDefaults();
+  resetCustomerInformation();
+  state.activeStep = "body_style";
+  reconcileSelections();
+  render({ resetScroll: true });
+}
+
+function requestResetBuild() {
+  if (!buildHasResettableChanges()) {
+    resetBuild();
+    return;
+  }
+  openConfirmActionModal({
+    title: "Reset Build",
+    message: "This will reset all selected options. Are you sure?",
+    confirmLabel: "Yes, Reset",
+    onConfirm: resetBuild,
+  });
+}
+
+function requestModelChange(modelKey) {
+  if (!modelKey || modelKey === activeModelKey) return;
+  if (!buildHasResettableChanges()) {
+    activateModel(modelKey);
+    return;
+  }
+  if (els.modelSelect) els.modelSelect.value = activeModelKey;
+  openConfirmActionModal({
+    title: "Change Model",
+    message: "Changing models will reset all selected options. Are you sure?",
+    confirmLabel: "Yes, Change Model",
+    onConfirm: () => activateModel(modelKey),
+  });
+}
+
 function init() {
   activateModel(activeModelKey, { shouldRender: false });
   if (els.modelSelect) {
     els.modelSelect.value = activeModelKey;
     els.modelSelect.addEventListener("change", () => {
-      activateModel(els.modelSelect.value);
+      requestModelChange(els.modelSelect.value);
     });
   }
-  els.resetButton.addEventListener("click", () => {
-    resetDefaults();
-    resetCustomerInformation();
-    reconcileSelections();
-    render({ resetScroll: true });
-  });
+  els.resetButton.addEventListener("click", requestResetBuild);
   els.downloadBuildButton.addEventListener("click", downloadBuild);
   els.submitDealerButton?.addEventListener("click", openDealerSubmitModal);
   els.dealerSubmitForm?.addEventListener("submit", submitDealerBuild);
   els.dealerSubmitCloseButton?.addEventListener("click", closeDealerSubmitModal);
   els.dealerSubmitCancelButton?.addEventListener("click", closeDealerSubmitModal);
+  els.confirmActionCancelButton?.addEventListener("click", closeConfirmActionModal);
+  els.confirmActionConfirmButton?.addEventListener("click", confirmPendingAction);
   render();
 }
 

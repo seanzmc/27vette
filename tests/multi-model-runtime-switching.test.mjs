@@ -47,7 +47,7 @@ function loadRuntime() {
     querySelector(selector) {
       if (!elements.has(selector)) {
         const element = makeElement();
-        if (selector === "#dealerSubmitModal") element.hidden = true;
+        if (selector === "#dealerSubmitModal" || selector === "#confirmActionModal") element.hidden = true;
         elements.set(selector, element);
       }
       return elements.get(selector);
@@ -502,6 +502,20 @@ test("runtime defaults to Stingray and switches models with a clean build reset"
   assert.ok(modelSelect, "model picker element should be wired");
   modelSelect.value = "grandSport";
   modelSelect.change();
+  assert.equal(runtime.elements.get("#confirmActionModal").hidden, false, "dirty model switch should prompt");
+  assert.equal(runtime.elements.get("#confirmActionMessage").textContent, "Changing models will reset all selected options. Are you sure?");
+  assert.equal(runtime.elements.get("#confirmActionConfirmButton").textContent, "Yes, Change Model");
+  assert.equal(modelSelect.value, "stingray", "cancelable model change should restore the current select value before confirmation");
+  assert.equal(runtime.activeModelKey, "stingray");
+
+  runtime.elements.get("#confirmActionCancelButton").click();
+  assert.equal(runtime.elements.get("#confirmActionModal").hidden, true);
+  assert.equal(runtime.activeModelKey, "stingray");
+  assert.equal(runtime.state.selected.has("opt_gba_001"), true, "canceling model switch should preserve current selections");
+
+  modelSelect.value = "grandSport";
+  modelSelect.change();
+  runtime.elements.get("#confirmActionConfirmButton").click();
 
   assert.equal(runtime.activeModelKey, "grandSport");
   assert.equal(runtime.activeModelLabel, "Grand Sport");
@@ -520,10 +534,11 @@ test("runtime defaults to Stingray and switches models with a clean build reset"
 
   const grandSportOrder = runtime.compactOrder();
   assert.equal(grandSportOrder.title, "2027 Corvette Grand Sport");
-  assert.match(runtime.plainTextOrderSummary(), /^<p>2027 Corvette Grand Sport<\/p>/);
+  assert.doesNotMatch(runtime.plainTextOrderSummary(), /^<p>2027 Corvette Grand Sport<\/p>/);
 
   modelSelect.value = "stingray";
   modelSelect.change();
+  assert.equal(runtime.elements.get("#confirmActionModal").hidden, true, "clean model switch should not prompt");
   assert.equal(runtime.activeModelKey, "stingray");
   assert.equal(runtime.state.selected.has("opt_gba_001"), false, "Grand Sport reset should not recreate prior user selections");
   assert.equal(runtime.activeChoiceRows().every((choice) => choice.variant_id.endsWith("_c07")), true);
@@ -585,8 +600,10 @@ test("Grand Sport dealer submission payload stays model-scoped when posted", asy
   runtime.elements.get("#dealerSubmitEmail").value = "ada@example.com";
   const submission = await runtime.submitDealerBuild();
   assert.equal(submission.payload.model, "grandSport");
-  assert.match(submission.payload.plain_text_summary, /^<p>2027 Corvette Grand Sport<\/p>/);
+  assert.doesNotMatch(submission.payload.plain_text_summary, /^<p>2027 Corvette Grand Sport<\/p>/);
   assert.match(submission.payload.plain_text_summary, /<p><strong><u>Variant<\/u><\/strong><\/p><ul><li>Corvette Grand Sport Coupe 1LT<\/li><\/ul>/);
+  assert.match(submission.payload.plain_text_summary, /<strong>Email:<\/strong> ada@example\.com/);
+  assert.match(submission.payload.plain_text_summary, /<strong>Total MSRP: \$\d/);
   assert.doesNotMatch(submission.payload.plain_text_summary, /Base MSRP|STANDARD & INCLUDED/);
   assert.doesNotMatch(submission.payload.plain_text_summary, /<h3/i);
   assert.equal(submission.payload.customer.email, "ada@example.com");
