@@ -1215,6 +1215,14 @@ test("FE3 disabled tile explains that Z51 includes it without duplicating the RP
   assert.ok(fe3, "FE3 should exist for the current variant");
   assert.equal(runtime.disableReasonForChoice(fe3), "Included with Z51 Performance Package.");
 
+  const fe4 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_fe4_001");
+  assert.ok(fe4, "FE4 should exist for the current variant");
+  assert.equal(runtime.disableReasonForChoice(fe4), "Requires Z51 Performance Package.");
+
+  const t0a = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0a_001");
+  assert.ok(t0a, "T0A should exist for the current variant");
+  assert.equal(runtime.disableReasonForChoice(t0a), "Requires Z51 Performance Package.");
+
   const z51 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_z51_001");
   assert.ok(z51, "Z51 should exist for the current variant");
   runtime.handleChoice(z51);

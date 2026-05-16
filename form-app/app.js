@@ -333,6 +333,11 @@ function includedWithReason(rule) {
   return removeDuplicatedEntityRpo(reason, rule.source_id);
 }
 
+function requiresReason(rule) {
+  const reason = rule.disabled_reason || `Requires ${getEntityLabel(rule.target_id)}.`;
+  return removeDuplicatedEntityRpo(reason, rule.target_id);
+}
+
 function selectedExcludesTarget(targetId, selectedIds) {
   for (const sourceId of selectedIds) {
     const rules = ruleTargetsBySource.get(sourceId) || [];
@@ -469,7 +474,7 @@ function disableReasonForChoice(choice) {
   for (const rule of sourceRules) {
     if (!ruleAppliesToCurrentVariant(rule)) continue;
     if (rule.rule_type === "requires" && !selectedIds.has(rule.target_id)) {
-      return rule.disabled_reason || `Requires ${getEntityLabel(rule.target_id)}.`;
+      return requiresReason(rule);
     }
     if (rule.rule_type === "excludes" && selectedIds.has(rule.target_id)) {
       if (rule.runtime_action === "replace") continue;
