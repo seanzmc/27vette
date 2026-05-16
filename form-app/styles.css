@@ -755,12 +755,18 @@ textarea {
 
   .vehicle-bar {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    padding: 12px 16px;
+    gap: 12px;
+    padding: 16px;
   }
 
   .vehicle-price {
     grid-column: 1 / -1;
+    align-content: start;
+    justify-items: start;
+    gap: 2px;
+    border-top: 1px solid var(--line);
+    margin-top: 2px;
+    padding-top: 12px;
   }
 
   .vehicle-context-item strong {
@@ -768,11 +774,7 @@ textarea {
   }
 
   .vehicle-price strong {
-    font-size: 20px;
-  }
-
-  .vehicle-price {
-    justify-items: start;
+    font-size: 18px;
   }
 
   .mobile-summary-bar {
@@ -783,10 +785,15 @@ textarea {
     margin-bottom: 10px;
     border: 1px solid var(--line);
     border-radius: 8px;
-    padding: 12px 14px;
+    padding: 16px;
     background: var(--panel);
     color: var(--ink);
     cursor: pointer;
+  }
+
+  .mobile-summary-total-block {
+    display: grid;
+    gap: 2px;
   }
 
   .mobile-summary-bar strong,
@@ -796,6 +803,7 @@ textarea {
 
   .mobile-summary-bar strong {
     font-size: 20px;
+    line-height: 1.05;
   }
 
   .mobile-summary-bar small,
@@ -803,6 +811,11 @@ textarea {
     color: var(--muted);
     font-size: 12px;
     font-weight: 800;
+  }
+
+  .mobile-summary-label {
+    color: var(--accent-dark);
+    text-transform: uppercase;
   }
 
   .mobile-progress {
@@ -814,6 +827,18 @@ textarea {
     border-bottom: 1px solid var(--line);
     padding: 14px 16px;
     background: #efe8dc;
+  }
+
+  .mobile-progress[data-has-previous="false"] {
+    grid-template-columns: minmax(0, 1fr) minmax(74px, 0.35fr);
+  }
+
+  .mobile-progress[data-has-previous="false"] div {
+    grid-column: 1;
+  }
+
+  .mobile-progress[data-has-previous="false"] #mobileNextStep {
+    grid-column: 2;
   }
 
   .mobile-progress div {

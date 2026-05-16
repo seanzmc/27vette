@@ -512,6 +512,7 @@ test("app runtime has the requested navigation and filtering hooks", () => {
 
 test("mobile shell exposes compact progress and summary targets", () => {
   assert.match(htmlSource, /id="mobileSummaryToggle"/);
+  assert.match(htmlSource, /Current Build/);
   assert.match(htmlSource, /id="mobileSummaryTotal"/);
   assert.match(htmlSource, /id="mobileSummaryMissing"/);
   assert.match(htmlSource, /id="mobileProgress"/);
@@ -526,6 +527,8 @@ test("mobile progress and compact summary update from runtime state", () => {
   assert.equal(runtime.elements.get("#mobileStepCount").textContent, "Step 1 of 13");
   assert.equal(runtime.elements.get("#mobileStepName").textContent, "Body Style");
   assert.equal(runtime.elements.get("#mobilePrevStep").disabled, true);
+  assert.equal(runtime.elements.get("#mobilePrevStep").hidden, true);
+  assert.equal(runtime.elements.get("#mobileProgress").dataset.hasPrevious, "false");
   assert.equal(runtime.elements.get("#mobileNextStep").textContent, "Next");
   assert.equal(runtime.elements.get("#mobileNextStep").title, "Next: Trim Level");
   assert.match(runtime.elements.get("#mobileSummaryTotal").textContent, /^\$/);
@@ -536,8 +539,10 @@ test("mobile progress and compact summary update from runtime state", () => {
   runtime.render();
   assert.equal(runtime.elements.get("#mobileStepCount").textContent, "Step 2 of 13");
   assert.equal(runtime.elements.get("#mobileStepName").textContent, "Trim Level");
+  assert.equal(runtime.elements.get("#mobilePrevStep").hidden, false);
   assert.equal(runtime.elements.get("#mobilePrevStep").textContent, "Back");
   assert.equal(runtime.elements.get("#mobilePrevStep").title, "Back: Body Style");
+  assert.equal(runtime.elements.get("#mobileProgress").dataset.hasPrevious, "true");
 });
 
 test("body style choices put coupe before convertible", () => {

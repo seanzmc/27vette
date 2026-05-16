@@ -53,6 +53,7 @@ const els = {
   variantName: document.querySelector("#variantName"),
   stepRail: document.querySelector("#stepRail"),
   stepContent: document.querySelector("#stepContent"),
+  mobileProgress: document.querySelector("#mobileProgress"),
   mobileStepCount: document.querySelector("#mobileStepCount"),
   mobileStepName: document.querySelector("#mobileStepName"),
   mobilePrevStep: document.querySelector("#mobilePrevStep"),
@@ -904,8 +905,10 @@ function renderMobileProgress() {
   const { index, total, step, previous, next } = currentStepSummary();
   if (els.mobileStepCount) els.mobileStepCount.textContent = `Step ${index + 1} of ${total || 1}`;
   if (els.mobileStepName) els.mobileStepName.textContent = step?.step_label || "Step";
+  if (els.mobileProgress) els.mobileProgress.dataset.hasPrevious = previous ? "true" : "false";
   if (els.mobilePrevStep) {
     els.mobilePrevStep.disabled = !previous;
+    els.mobilePrevStep.hidden = !previous;
     els.mobilePrevStep.textContent = previous ? "Back" : "Previous";
     els.mobilePrevStep.title = previous ? `Back: ${previous.step_label}` : "";
   }
