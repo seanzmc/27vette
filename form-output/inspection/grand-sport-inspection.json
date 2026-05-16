@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T03:57:05+00:00",
+  "generated_at": "2026-05-16T17:08:49+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -1358,34 +1358,6 @@
       }
     },
     {
-      "option_id": "opt_j56_001",
-      "rpo": "J56",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_t0e_002",
-      "rpo": "T0E",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "standard",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "standard"
-      }
-    },
-    {
       "option_id": "opt_xfr_001",
       "rpo": "XFR",
       "effective_status": "available",
@@ -2030,8 +2002,22 @@
       }
     },
     {
-      "option_id": "opt_eri_001",
-      "rpo": "ERI",
+      "option_id": "opt_t0e_001",
+      "rpo": "T0E",
+      "effective_status": "standard",
+      "effective_status_label": "Standard",
+      "statuses": {
+        "1lt_e07": "standard",
+        "2lt_e07": "standard",
+        "3lt_e07": "standard",
+        "1lt_e67": "standard",
+        "2lt_e67": "standard",
+        "3lt_e67": "standard"
+      }
+    },
+    {
+      "option_id": "opt_t0f_001",
+      "rpo": "T0F",
       "effective_status": "available",
       "effective_status_label": "Available",
       "statuses": {
@@ -2044,15 +2030,57 @@
       }
     },
     {
-      "option_id": "opt_e60_001",
-      "rpo": "E60",
+      "option_id": "opt_5zv_001",
+      "rpo": "5ZV",
       "effective_status": "available",
       "effective_status_label": "Available",
       "statuses": {
-        "1lt_e07": "unavailable",
+        "1lt_e07": "available",
         "2lt_e07": "available",
         "3lt_e07": "available",
-        "1lt_e67": "unavailable",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
+    },
+    {
+      "option_id": "opt_jx6_001",
+      "rpo": "JX6",
+      "effective_status": "standard",
+      "effective_status_label": "Standard",
+      "statuses": {
+        "1lt_e07": "standard",
+        "2lt_e07": "standard",
+        "3lt_e07": "standard",
+        "1lt_e67": "standard",
+        "2lt_e67": "standard",
+        "3lt_e67": "standard"
+      }
+    },
+    {
+      "option_id": "opt_j56_001",
+      "rpo": "J56",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
+    },
+    {
+      "option_id": "opt_j57_001",
+      "rpo": "J57",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
         "2lt_e67": "available",
         "3lt_e67": "available"
       }
@@ -2086,6 +2114,34 @@
       }
     },
     {
+      "option_id": "opt_eri_001",
+      "rpo": "ERI",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
+    },
+    {
+      "option_id": "opt_e60_001",
+      "rpo": "E60",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "unavailable",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "unavailable",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
+    },
+    {
       "option_id": "opt_feb_001",
       "rpo": "FEB",
       "effective_status": "available",
@@ -2102,62 +2158,6 @@
     {
       "option_id": "opt_fey_001",
       "rpo": "FEY",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_j57_001",
-      "rpo": "J57",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_t0e_001",
-      "rpo": "T0E",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "standard",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "standard"
-      }
-    },
-    {
-      "option_id": "opt_t0f_001",
-      "rpo": "T0F",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_5zv_001",
-      "rpo": "5ZV",
       "effective_status": "available",
       "effective_status_label": "Available",
       "statuses": {
@@ -2576,6 +2576,20 @@
       }
     },
     {
+      "option_id": "opt_aup_001",
+      "rpo": "AUP",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "unavailable",
+        "2lt_e07": "unavailable",
+        "3lt_e07": "available",
+        "1lt_e67": "unavailable",
+        "2lt_e67": "unavailable",
+        "3lt_e67": "available"
+      }
+    },
+    {
       "option_id": "opt_z25_001",
       "rpo": "Z25",
       "effective_status": "available",
@@ -2760,20 +2774,6 @@
     {
       "option_id": "opt_b4z_001",
       "rpo": "B4Z",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "standard",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "standard"
-      }
-    },
-    {
-      "option_id": "opt_jx6_001",
-      "rpo": "JX6",
       "effective_status": "standard",
       "effective_status_label": "Standard",
       "statuses": {
@@ -3514,48 +3514,6 @@
       }
     },
     {
-      "option_id": "opt_roy_001",
-      "rpo": "ROY",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_roz_001",
-      "rpo": "ROZ",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_stz_001",
-      "rpo": "STZ",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
       "option_id": "opt_swn_001",
       "rpo": "SWN",
       "effective_status": "available",
@@ -3586,6 +3544,48 @@
     {
       "option_id": "opt_swp_001",
       "rpo": "SWP",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
+    },
+    {
+      "option_id": "opt_roy_001",
+      "rpo": "ROY",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
+    },
+    {
+      "option_id": "opt_roz_001",
+      "rpo": "ROZ",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
+    },
+    {
+      "option_id": "opt_stz_001",
+      "rpo": "STZ",
       "effective_status": "available",
       "effective_status_label": "Available",
       "statuses": {
@@ -3735,6 +3735,20 @@
         "1lt_e67": "available",
         "2lt_e67": "available",
         "3lt_e67": "available"
+      }
+    },
+    {
+      "option_id": "opt_t0e_002",
+      "rpo": "T0E",
+      "effective_status": "standard",
+      "effective_status_label": "Standard",
+      "statuses": {
+        "1lt_e07": "standard",
+        "2lt_e07": "standard",
+        "3lt_e07": "standard",
+        "1lt_e67": "standard",
+        "2lt_e67": "standard",
+        "3lt_e67": "standard"
       }
     },
     {
@@ -4015,20 +4029,6 @@
         "1lt_e67": "unavailable",
         "2lt_e67": "available",
         "3lt_e67": "unavailable"
-      }
-    },
-    {
-      "option_id": "opt_aup_001",
-      "rpo": "AUP",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "unavailable",
-        "2lt_e07": "unavailable",
-        "3lt_e07": "available",
-        "1lt_e67": "unavailable",
-        "2lt_e67": "unavailable",
-        "3lt_e67": "available"
       }
     },
     {
@@ -4707,14 +4707,6 @@
         "step_key": "standard_equipment"
       },
       {
-        "option_id": "opt_j56_001",
-        "rpo": "J56",
-        "section_id": "sec_perf_brake_001",
-        "original_section_id": "sec_perf_brake_001",
-        "section_override_applied": false,
-        "step_key": "packages_performance"
-      },
-      {
         "option_id": "opt_xfr_001",
         "rpo": "XFR",
         "section_id": "sec_incl_001",
@@ -5083,62 +5075,6 @@
         "step_key": "paint"
       },
       {
-        "option_id": "opt_eri_001",
-        "rpo": "ERI",
-        "section_id": "sec_perf_support_001",
-        "original_section_id": "sec_perf_support_001",
-        "section_override_applied": false,
-        "step_key": "wheels"
-      },
-      {
-        "option_id": "opt_e60_001",
-        "rpo": "E60",
-        "section_id": "sec_perf_support_001",
-        "original_section_id": "sec_perf_support_001",
-        "section_override_applied": false,
-        "step_key": "wheels"
-      },
-      {
-        "option_id": "opt_cfl_001",
-        "rpo": "CFL",
-        "section_id": "sec_perf_ground_001",
-        "original_section_id": "sec_perf_ground_001",
-        "section_override_applied": false,
-        "step_key": "packages_performance"
-      },
-      {
-        "option_id": "opt_cfz_001",
-        "rpo": "CFZ",
-        "section_id": "sec_perf_ground_001",
-        "original_section_id": "sec_perf_ground_001",
-        "section_override_applied": false,
-        "step_key": "packages_performance"
-      },
-      {
-        "option_id": "opt_feb_001",
-        "rpo": "FEB",
-        "section_id": "sec_perf_z52_001",
-        "original_section_id": "sec_perf_z52_001",
-        "section_override_applied": false,
-        "step_key": "packages_performance"
-      },
-      {
-        "option_id": "opt_fey_001",
-        "rpo": "FEY",
-        "section_id": "sec_perf_z52_001",
-        "original_section_id": "sec_perf_z52_001",
-        "section_override_applied": false,
-        "step_key": "packages_performance"
-      },
-      {
-        "option_id": "opt_j57_001",
-        "rpo": "J57",
-        "section_id": "sec_perf_brake_001",
-        "original_section_id": "sec_perf_brake_001",
-        "section_override_applied": false,
-        "step_key": "packages_performance"
-      },
-      {
         "option_id": "opt_t0e_001",
         "rpo": "T0E",
         "section_id": "sec_perf_aero_001",
@@ -5159,6 +5095,78 @@
         "rpo": "5ZV",
         "section_id": "sec_perf_aero_001",
         "original_section_id": "sec_perf_aero_001",
+        "section_override_applied": false,
+        "step_key": "packages_performance"
+      },
+      {
+        "option_id": "opt_jx6_001",
+        "rpo": "JX6",
+        "section_id": "sec_perf_brake_001",
+        "original_section_id": "sec_perf_brake_001",
+        "section_override_applied": false,
+        "step_key": "packages_performance"
+      },
+      {
+        "option_id": "opt_j56_001",
+        "rpo": "J56",
+        "section_id": "sec_perf_brake_001",
+        "original_section_id": "sec_perf_brake_001",
+        "section_override_applied": false,
+        "step_key": "packages_performance"
+      },
+      {
+        "option_id": "opt_j57_001",
+        "rpo": "J57",
+        "section_id": "sec_perf_brake_001",
+        "original_section_id": "sec_perf_brake_001",
+        "section_override_applied": false,
+        "step_key": "packages_performance"
+      },
+      {
+        "option_id": "opt_cfl_001",
+        "rpo": "CFL",
+        "section_id": "sec_perf_ground_001",
+        "original_section_id": "sec_perf_ground_001",
+        "section_override_applied": false,
+        "step_key": "packages_performance"
+      },
+      {
+        "option_id": "opt_cfz_001",
+        "rpo": "CFZ",
+        "section_id": "sec_perf_ground_001",
+        "original_section_id": "sec_perf_ground_001",
+        "section_override_applied": false,
+        "step_key": "packages_performance"
+      },
+      {
+        "option_id": "opt_eri_001",
+        "rpo": "ERI",
+        "section_id": "sec_perf_support_001",
+        "original_section_id": "sec_perf_support_001",
+        "section_override_applied": false,
+        "step_key": "wheels"
+      },
+      {
+        "option_id": "opt_e60_001",
+        "rpo": "E60",
+        "section_id": "sec_perf_support_001",
+        "original_section_id": "sec_perf_support_001",
+        "section_override_applied": false,
+        "step_key": "wheels"
+      },
+      {
+        "option_id": "opt_feb_001",
+        "rpo": "FEB",
+        "section_id": "sec_perf_z52_001",
+        "original_section_id": "sec_perf_z52_001",
+        "section_override_applied": false,
+        "step_key": "packages_performance"
+      },
+      {
+        "option_id": "opt_fey_001",
+        "rpo": "FEY",
+        "section_id": "sec_perf_z52_001",
+        "original_section_id": "sec_perf_z52_001",
         "section_override_applied": false,
         "step_key": "packages_performance"
       },
@@ -5395,6 +5403,14 @@
         "step_key": "seat"
       },
       {
+        "option_id": "opt_aup_001",
+        "rpo": "AUP",
+        "section_id": "sec_seat_002",
+        "original_section_id": "sec_seat_002",
+        "section_override_applied": false,
+        "step_key": "seat"
+      },
+      {
         "option_id": "opt_z25_001",
         "rpo": "Z25",
         "section_id": "sec_spec_001",
@@ -5505,14 +5521,6 @@
         "original_section_id": "sec_stan_001",
         "section_override_applied": false,
         "step_key": "standard_equipment"
-      },
-      {
-        "option_id": "opt_jx6_001",
-        "rpo": "JX6",
-        "section_id": "sec_perf_brake_001",
-        "original_section_id": "sec_perf_brake_001",
-        "section_override_applied": false,
-        "step_key": "packages_performance"
       },
       {
         "option_id": "opt_xft_001",
@@ -5931,30 +5939,6 @@
         "step_key": "wheels"
       },
       {
-        "option_id": "opt_roy_001",
-        "rpo": "ROY",
-        "section_id": "sec_whee_002",
-        "original_section_id": "sec_whee_002",
-        "section_override_applied": false,
-        "step_key": "wheels"
-      },
-      {
-        "option_id": "opt_roz_001",
-        "rpo": "ROZ",
-        "section_id": "sec_whee_002",
-        "original_section_id": "sec_whee_002",
-        "section_override_applied": false,
-        "step_key": "wheels"
-      },
-      {
-        "option_id": "opt_stz_001",
-        "rpo": "STZ",
-        "section_id": "sec_whee_002",
-        "original_section_id": "sec_whee_002",
-        "section_override_applied": false,
-        "step_key": "wheels"
-      },
-      {
         "option_id": "opt_swn_001",
         "rpo": "SWN",
         "section_id": "sec_whee_002",
@@ -5979,12 +5963,28 @@
         "step_key": "wheels"
       },
       {
-        "option_id": "opt_aup_001",
-        "rpo": "AUP",
-        "section_id": "sec_seat_002",
-        "original_section_id": "sec_seat_002",
+        "option_id": "opt_roy_001",
+        "rpo": "ROY",
+        "section_id": "sec_whee_002",
+        "original_section_id": "sec_whee_002",
         "section_override_applied": false,
-        "step_key": "seat"
+        "step_key": "wheels"
+      },
+      {
+        "option_id": "opt_roz_001",
+        "rpo": "ROZ",
+        "section_id": "sec_whee_002",
+        "original_section_id": "sec_whee_002",
+        "section_override_applied": false,
+        "step_key": "wheels"
+      },
+      {
+        "option_id": "opt_stz_001",
+        "rpo": "STZ",
+        "section_id": "sec_whee_002",
+        "original_section_id": "sec_whee_002",
+        "section_override_applied": false,
+        "step_key": "wheels"
       }
     ],
     "missing_sections": {},
@@ -6193,28 +6193,28 @@
       "rpo": "UG1",
       "variant_id": "2lt_e07",
       "section_id": "sec_2lte_001",
-      "option_name": "Universal Home Remote"
+      "option_name": "Three-Channel Programmable Universal Home Remote"
     },
     {
       "option_id": "opt_ug1_001",
       "rpo": "UG1",
       "variant_id": "3lt_e07",
       "section_id": "sec_2lte_001",
-      "option_name": "Universal Home Remote"
+      "option_name": "Three-Channel Programmable Universal Home Remote"
     },
     {
       "option_id": "opt_ug1_001",
       "rpo": "UG1",
       "variant_id": "2lt_e67",
       "section_id": "sec_2lte_001",
-      "option_name": "Universal Home Remote"
+      "option_name": "Three-Channel Programmable Universal Home Remote"
     },
     {
       "option_id": "opt_ug1_001",
       "rpo": "UG1",
       "variant_id": "3lt_e67",
       "section_id": "sec_2lte_001",
-      "option_name": "Universal Home Remote"
+      "option_name": "Three-Channel Programmable Universal Home Remote"
     },
     {
       "option_id": "opt_ki3_001",
@@ -6277,56 +6277,56 @@
       "rpo": "AL9",
       "variant_id": "2lt_e07",
       "section_id": "sec_2lte_001",
-      "option_name": "Power Driver Lumbar Seat Adjuster"
+      "option_name": "Driver Power Lumbar Seat Adjuster"
     },
     {
       "option_id": "opt_al9_001",
       "rpo": "AL9",
       "variant_id": "3lt_e07",
       "section_id": "sec_2lte_001",
-      "option_name": "Power Driver Lumbar Seat Adjuster"
+      "option_name": "Driver Power Lumbar Seat Adjuster"
     },
     {
       "option_id": "opt_al9_001",
       "rpo": "AL9",
       "variant_id": "2lt_e67",
       "section_id": "sec_2lte_001",
-      "option_name": "Power Driver Lumbar Seat Adjuster"
+      "option_name": "Driver Power Lumbar Seat Adjuster"
     },
     {
       "option_id": "opt_al9_001",
       "rpo": "AL9",
       "variant_id": "3lt_e67",
       "section_id": "sec_2lte_001",
-      "option_name": "Power Driver Lumbar Seat Adjuster"
+      "option_name": "Driver Power Lumbar Seat Adjuster"
     },
     {
       "option_id": "opt_at9_001",
       "rpo": "AT9",
       "variant_id": "2lt_e07",
       "section_id": "sec_2lte_001",
-      "option_name": "Power Passenger Lumbar Seat Adjuster"
+      "option_name": "Passenger Power Lumbar Seat Adjuster"
     },
     {
       "option_id": "opt_at9_001",
       "rpo": "AT9",
       "variant_id": "3lt_e07",
       "section_id": "sec_2lte_001",
-      "option_name": "Power Passenger Lumbar Seat Adjuster"
+      "option_name": "Passenger Power Lumbar Seat Adjuster"
     },
     {
       "option_id": "opt_at9_001",
       "rpo": "AT9",
       "variant_id": "2lt_e67",
       "section_id": "sec_2lte_001",
-      "option_name": "Power Passenger Lumbar Seat Adjuster"
+      "option_name": "Passenger Power Lumbar Seat Adjuster"
     },
     {
       "option_id": "opt_at9_001",
       "rpo": "AT9",
       "variant_id": "3lt_e67",
       "section_id": "sec_2lte_001",
-      "option_name": "Power Passenger Lumbar Seat Adjuster"
+      "option_name": "Passenger Power Lumbar Seat Adjuster"
     },
     {
       "option_id": "opt_ahe_001",
@@ -6760,70 +6760,70 @@
       "rpo": "EFR",
       "variant_id": "1lt_e07",
       "section_id": "sec_exte_001",
-      "option_name": "Carbon Flash Exterior Accents"
+      "option_name": "Carbon Flash Painted Accents"
     },
     {
       "option_id": "opt_efr_001",
       "rpo": "EFR",
       "variant_id": "2lt_e07",
       "section_id": "sec_exte_001",
-      "option_name": "Carbon Flash Exterior Accents"
+      "option_name": "Carbon Flash Painted Accents"
     },
     {
       "option_id": "opt_efr_001",
       "rpo": "EFR",
       "variant_id": "3lt_e07",
       "section_id": "sec_exte_001",
-      "option_name": "Carbon Flash Exterior Accents"
+      "option_name": "Carbon Flash Painted Accents"
     },
     {
       "option_id": "opt_efr_001",
       "rpo": "EFR",
       "variant_id": "1lt_e67",
       "section_id": "sec_exte_001",
-      "option_name": "Carbon Flash Exterior Accents"
+      "option_name": "Carbon Flash Painted Accents"
     },
     {
       "option_id": "opt_efr_001",
       "rpo": "EFR",
       "variant_id": "2lt_e67",
       "section_id": "sec_exte_001",
-      "option_name": "Carbon Flash Exterior Accents"
+      "option_name": "Carbon Flash Painted Accents"
     },
     {
       "option_id": "opt_efr_001",
       "rpo": "EFR",
       "variant_id": "3lt_e67",
       "section_id": "sec_exte_001",
-      "option_name": "Carbon Flash Exterior Accents"
+      "option_name": "Carbon Flash Painted Accents"
     },
     {
       "option_id": "opt_uqt_001",
       "rpo": "UQT",
       "variant_id": "2lt_e07",
       "section_id": "sec_inte_001",
-      "option_name": "Performance data and video recorder"
+      "option_name": "Performance Data and Video Recorder"
     },
     {
       "option_id": "opt_uqt_001",
       "rpo": "UQT",
       "variant_id": "3lt_e07",
       "section_id": "sec_inte_001",
-      "option_name": "Performance data and video recorder"
+      "option_name": "Performance Data and Video Recorder"
     },
     {
       "option_id": "opt_uqt_001",
       "rpo": "UQT",
       "variant_id": "2lt_e67",
       "section_id": "sec_inte_001",
-      "option_name": "Performance data and video recorder"
+      "option_name": "Performance Data and Video Recorder"
     },
     {
       "option_id": "opt_uqt_001",
       "rpo": "UQT",
       "variant_id": "3lt_e67",
       "section_id": "sec_inte_001",
-      "option_name": "Performance data and video recorder"
+      "option_name": "Performance Data and Video Recorder"
     },
     {
       "option_id": "opt_t0e_001",
@@ -6866,6 +6866,48 @@
       "variant_id": "3lt_e67",
       "section_id": "sec_perf_aero_001",
       "option_name": "Low Rear Spoiler"
+    },
+    {
+      "option_id": "opt_jx6_001",
+      "rpo": "JX6",
+      "variant_id": "1lt_e07",
+      "section_id": "sec_perf_brake_001",
+      "option_name": "Low-Dust Touring Brakes"
+    },
+    {
+      "option_id": "opt_jx6_001",
+      "rpo": "JX6",
+      "variant_id": "2lt_e07",
+      "section_id": "sec_perf_brake_001",
+      "option_name": "Low-Dust Touring Brakes"
+    },
+    {
+      "option_id": "opt_jx6_001",
+      "rpo": "JX6",
+      "variant_id": "3lt_e07",
+      "section_id": "sec_perf_brake_001",
+      "option_name": "Low-Dust Touring Brakes"
+    },
+    {
+      "option_id": "opt_jx6_001",
+      "rpo": "JX6",
+      "variant_id": "1lt_e67",
+      "section_id": "sec_perf_brake_001",
+      "option_name": "Low-Dust Touring Brakes"
+    },
+    {
+      "option_id": "opt_jx6_001",
+      "rpo": "JX6",
+      "variant_id": "2lt_e67",
+      "section_id": "sec_perf_brake_001",
+      "option_name": "Low-Dust Touring Brakes"
+    },
+    {
+      "option_id": "opt_jx6_001",
+      "rpo": "JX6",
+      "variant_id": "3lt_e67",
+      "section_id": "sec_perf_brake_001",
+      "option_name": "Low-Dust Touring Brakes"
     },
     {
       "option_id": "opt_cf7_001",
@@ -7124,84 +7166,84 @@
       "rpo": "UHX",
       "variant_id": "1lt_e07",
       "section_id": "sec_safe_001",
-      "option_name": "Lane Keep Assist with Lane Departure Warning"
+      "option_name": "Lane Keep Assist"
     },
     {
       "option_id": "opt_uhx_001",
       "rpo": "UHX",
       "variant_id": "2lt_e07",
       "section_id": "sec_safe_001",
-      "option_name": "Lane Keep Assist with Lane Departure Warning"
+      "option_name": "Lane Keep Assist"
     },
     {
       "option_id": "opt_uhx_001",
       "rpo": "UHX",
       "variant_id": "3lt_e07",
       "section_id": "sec_safe_001",
-      "option_name": "Lane Keep Assist with Lane Departure Warning"
+      "option_name": "Lane Keep Assist"
     },
     {
       "option_id": "opt_uhx_001",
       "rpo": "UHX",
       "variant_id": "1lt_e67",
       "section_id": "sec_safe_001",
-      "option_name": "Lane Keep Assist with Lane Departure Warning"
+      "option_name": "Lane Keep Assist"
     },
     {
       "option_id": "opt_uhx_001",
       "rpo": "UHX",
       "variant_id": "2lt_e67",
       "section_id": "sec_safe_001",
-      "option_name": "Lane Keep Assist with Lane Departure Warning"
+      "option_name": "Lane Keep Assist"
     },
     {
       "option_id": "opt_uhx_001",
       "rpo": "UHX",
       "variant_id": "3lt_e67",
       "section_id": "sec_safe_001",
-      "option_name": "Lane Keep Assist with Lane Departure Warning"
+      "option_name": "Lane Keep Assist"
     },
     {
       "option_id": "opt_drz_001",
       "rpo": "DRZ",
       "variant_id": "1lt_e07",
       "section_id": "sec_safe_001",
-      "option_name": "Rear Camera Mirror"
+      "option_name": "Auto-Dimming Rear Camera Mirror"
     },
     {
       "option_id": "opt_drz_001",
       "rpo": "DRZ",
       "variant_id": "2lt_e07",
       "section_id": "sec_safe_001",
-      "option_name": "Rear Camera Mirror"
+      "option_name": "Auto-Dimming Rear Camera Mirror"
     },
     {
       "option_id": "opt_drz_001",
       "rpo": "DRZ",
       "variant_id": "3lt_e07",
       "section_id": "sec_safe_001",
-      "option_name": "Rear Camera Mirror"
+      "option_name": "Auto-Dimming Rear Camera Mirror"
     },
     {
       "option_id": "opt_drz_001",
       "rpo": "DRZ",
       "variant_id": "1lt_e67",
       "section_id": "sec_safe_001",
-      "option_name": "Rear Camera Mirror"
+      "option_name": "Auto-Dimming Rear Camera Mirror"
     },
     {
       "option_id": "opt_drz_001",
       "rpo": "DRZ",
       "variant_id": "2lt_e67",
       "section_id": "sec_safe_001",
-      "option_name": "Rear Camera Mirror"
+      "option_name": "Auto-Dimming Rear Camera Mirror"
     },
     {
       "option_id": "opt_drz_001",
       "rpo": "DRZ",
       "variant_id": "3lt_e67",
       "section_id": "sec_safe_001",
-      "option_name": "Rear Camera Mirror"
+      "option_name": "Auto-Dimming Rear Camera Mirror"
     },
     {
       "option_id": "opt_ud7_001",
@@ -7376,42 +7418,42 @@
       "rpo": "",
       "variant_id": "1lt_e07",
       "section_id": "sec_safe_001",
-      "option_name": "NEW! Intersection Automatic Emergency Braking"
+      "option_name": "Intersection Automatic Emergency Braking"
     },
     {
       "option_id": "opt_020",
       "rpo": "",
       "variant_id": "2lt_e07",
       "section_id": "sec_safe_001",
-      "option_name": "NEW! Intersection Automatic Emergency Braking"
+      "option_name": "Intersection Automatic Emergency Braking"
     },
     {
       "option_id": "opt_020",
       "rpo": "",
       "variant_id": "3lt_e07",
       "section_id": "sec_safe_001",
-      "option_name": "NEW! Intersection Automatic Emergency Braking"
+      "option_name": "Intersection Automatic Emergency Braking"
     },
     {
       "option_id": "opt_020",
       "rpo": "",
       "variant_id": "1lt_e67",
       "section_id": "sec_safe_001",
-      "option_name": "NEW! Intersection Automatic Emergency Braking"
+      "option_name": "Intersection Automatic Emergency Braking"
     },
     {
       "option_id": "opt_020",
       "rpo": "",
       "variant_id": "2lt_e67",
       "section_id": "sec_safe_001",
-      "option_name": "NEW! Intersection Automatic Emergency Braking"
+      "option_name": "Intersection Automatic Emergency Braking"
     },
     {
       "option_id": "opt_020",
       "rpo": "",
       "variant_id": "3lt_e67",
       "section_id": "sec_safe_001",
-      "option_name": "NEW! Intersection Automatic Emergency Braking"
+      "option_name": "Intersection Automatic Emergency Braking"
     },
     {
       "option_id": "opt_025",
@@ -7628,42 +7670,42 @@
       "rpo": "NPP",
       "variant_id": "1lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "Performance Exhaust"
+      "option_name": "Driver Mode-Variable Performance Exhaust"
     },
     {
       "option_id": "opt_npp_001",
       "rpo": "NPP",
       "variant_id": "2lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "Performance Exhaust"
+      "option_name": "Driver Mode-Variable Performance Exhaust"
     },
     {
       "option_id": "opt_npp_001",
       "rpo": "NPP",
       "variant_id": "3lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "Performance Exhaust"
+      "option_name": "Driver Mode-Variable Performance Exhaust"
     },
     {
       "option_id": "opt_npp_001",
       "rpo": "NPP",
       "variant_id": "1lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "Performance Exhaust"
+      "option_name": "Driver Mode-Variable Performance Exhaust"
     },
     {
       "option_id": "opt_npp_001",
       "rpo": "NPP",
       "variant_id": "2lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "Performance Exhaust"
+      "option_name": "Driver Mode-Variable Performance Exhaust"
     },
     {
       "option_id": "opt_npp_001",
       "rpo": "NPP",
       "variant_id": "3lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "Performance Exhaust"
+      "option_name": "Driver Mode-Variable Performance Exhaust"
     },
     {
       "option_id": "opt_t4l_001",
@@ -7712,42 +7754,42 @@
       "rpo": "LS6",
       "variant_id": "1lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "NEW! 6.7L V8 Engine"
+      "option_name": "6.7L V8 Engine"
     },
     {
       "option_id": "opt_ls6_001",
       "rpo": "LS6",
       "variant_id": "2lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "NEW! 6.7L V8 Engine"
+      "option_name": "6.7L V8 Engine"
     },
     {
       "option_id": "opt_ls6_001",
       "rpo": "LS6",
       "variant_id": "3lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "NEW! 6.7L V8 Engine"
+      "option_name": "6.7L V8 Engine"
     },
     {
       "option_id": "opt_ls6_001",
       "rpo": "LS6",
       "variant_id": "1lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "NEW! 6.7L V8 Engine"
+      "option_name": "6.7L V8 Engine"
     },
     {
       "option_id": "opt_ls6_001",
       "rpo": "LS6",
       "variant_id": "2lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "NEW! 6.7L V8 Engine"
+      "option_name": "6.7L V8 Engine"
     },
     {
       "option_id": "opt_ls6_001",
       "rpo": "LS6",
       "variant_id": "3lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "NEW! 6.7L V8 Engine"
+      "option_name": "6.7L V8 Engine"
     },
     {
       "option_id": "opt_a2x_001",
@@ -7964,42 +8006,42 @@
       "rpo": "M1N",
       "variant_id": "1lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "NEW! 8-Speed Dual Clutch Transmission"
+      "option_name": "8-Speed Dual Clutch Transmission"
     },
     {
       "option_id": "opt_m1n_001",
       "rpo": "M1N",
       "variant_id": "2lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "NEW! 8-Speed Dual Clutch Transmission"
+      "option_name": "8-Speed Dual Clutch Transmission"
     },
     {
       "option_id": "opt_m1n_001",
       "rpo": "M1N",
       "variant_id": "3lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "NEW! 8-Speed Dual Clutch Transmission"
+      "option_name": "8-Speed Dual Clutch Transmission"
     },
     {
       "option_id": "opt_m1n_001",
       "rpo": "M1N",
       "variant_id": "1lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "NEW! 8-Speed Dual Clutch Transmission"
+      "option_name": "8-Speed Dual Clutch Transmission"
     },
     {
       "option_id": "opt_m1n_001",
       "rpo": "M1N",
       "variant_id": "2lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "NEW! 8-Speed Dual Clutch Transmission"
+      "option_name": "8-Speed Dual Clutch Transmission"
     },
     {
       "option_id": "opt_m1n_001",
       "rpo": "M1N",
       "variant_id": "3lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "NEW! 8-Speed Dual Clutch Transmission"
+      "option_name": "8-Speed Dual Clutch Transmission"
     },
     {
       "option_id": "opt_g0k_001",
@@ -8086,48 +8128,6 @@
       "option_name": "Performance Traction Management"
     },
     {
-      "option_id": "opt_jx6_001",
-      "rpo": "JX6",
-      "variant_id": "1lt_e07",
-      "section_id": "sec_perf_brake_001",
-      "option_name": "Low-Dust Touring Brakes"
-    },
-    {
-      "option_id": "opt_jx6_001",
-      "rpo": "JX6",
-      "variant_id": "2lt_e07",
-      "section_id": "sec_perf_brake_001",
-      "option_name": "Low-Dust Touring Brakes"
-    },
-    {
-      "option_id": "opt_jx6_001",
-      "rpo": "JX6",
-      "variant_id": "3lt_e07",
-      "section_id": "sec_perf_brake_001",
-      "option_name": "Low-Dust Touring Brakes"
-    },
-    {
-      "option_id": "opt_jx6_001",
-      "rpo": "JX6",
-      "variant_id": "1lt_e67",
-      "section_id": "sec_perf_brake_001",
-      "option_name": "Low-Dust Touring Brakes"
-    },
-    {
-      "option_id": "opt_jx6_001",
-      "rpo": "JX6",
-      "variant_id": "2lt_e67",
-      "section_id": "sec_perf_brake_001",
-      "option_name": "Low-Dust Touring Brakes"
-    },
-    {
-      "option_id": "opt_jx6_001",
-      "rpo": "JX6",
-      "variant_id": "3lt_e67",
-      "section_id": "sec_perf_brake_001",
-      "option_name": "Low-Dust Touring Brakes"
-    },
-    {
       "option_id": "opt_xft_001",
       "rpo": "XFT",
       "variant_id": "1lt_e07",
@@ -8174,42 +8174,42 @@
       "rpo": "",
       "variant_id": "1lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "Air Filtration System with Pollen Filter"
+      "option_name": "Air Filtration System"
     },
     {
       "option_id": "opt_001",
       "rpo": "",
       "variant_id": "2lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "Air Filtration System with Pollen Filter"
+      "option_name": "Air Filtration System"
     },
     {
       "option_id": "opt_001",
       "rpo": "",
       "variant_id": "3lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "Air Filtration System with Pollen Filter"
+      "option_name": "Air Filtration System"
     },
     {
       "option_id": "opt_001",
       "rpo": "",
       "variant_id": "1lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "Air Filtration System with Pollen Filter"
+      "option_name": "Air Filtration System"
     },
     {
       "option_id": "opt_001",
       "rpo": "",
       "variant_id": "2lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "Air Filtration System with Pollen Filter"
+      "option_name": "Air Filtration System"
     },
     {
       "option_id": "opt_001",
       "rpo": "",
       "variant_id": "3lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "Air Filtration System with Pollen Filter"
+      "option_name": "Air Filtration System"
     },
     {
       "option_id": "opt_002",
@@ -8594,84 +8594,84 @@
       "rpo": "",
       "variant_id": "1lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "Illuminated Vanity Visors"
+      "option_name": "Covered Illuminated Driver and Passenger Vanity Visors"
     },
     {
       "option_id": "opt_014",
       "rpo": "",
       "variant_id": "2lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "Illuminated Vanity Visors"
+      "option_name": "Covered Illuminated Driver and Passenger Vanity Visors"
     },
     {
       "option_id": "opt_014",
       "rpo": "",
       "variant_id": "3lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "Illuminated Vanity Visors"
+      "option_name": "Covered Illuminated Driver and Passenger Vanity Visors"
     },
     {
       "option_id": "opt_014",
       "rpo": "",
       "variant_id": "1lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "Illuminated Vanity Visors"
+      "option_name": "Covered Illuminated Driver and Passenger Vanity Visors"
     },
     {
       "option_id": "opt_014",
       "rpo": "",
       "variant_id": "2lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "Illuminated Vanity Visors"
+      "option_name": "Covered Illuminated Driver and Passenger Vanity Visors"
     },
     {
       "option_id": "opt_014",
       "rpo": "",
       "variant_id": "3lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "Illuminated Vanity Visors"
+      "option_name": "Covered Illuminated Driver and Passenger Vanity Visors"
     },
     {
       "option_id": "opt_016",
       "rpo": "",
       "variant_id": "1lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "Power Windows"
+      "option_name": "Driver and Passenger Express-Down/Up Power Windows"
     },
     {
       "option_id": "opt_016",
       "rpo": "",
       "variant_id": "2lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "Power Windows"
+      "option_name": "Driver and Passenger Express-Down/Up Power Windows"
     },
     {
       "option_id": "opt_016",
       "rpo": "",
       "variant_id": "3lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "Power Windows"
+      "option_name": "Driver and Passenger Express-Down/Up Power Windows"
     },
     {
       "option_id": "opt_016",
       "rpo": "",
       "variant_id": "1lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "Power Windows"
+      "option_name": "Driver and Passenger Express-Down/Up Power Windows"
     },
     {
       "option_id": "opt_016",
       "rpo": "",
       "variant_id": "2lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "Power Windows"
+      "option_name": "Driver and Passenger Express-Down/Up Power Windows"
     },
     {
       "option_id": "opt_016",
       "rpo": "",
       "variant_id": "3lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "Power Windows"
+      "option_name": "Driver and Passenger Express-Down/Up Power Windows"
     },
     {
       "option_id": "opt_017",
@@ -8846,42 +8846,42 @@
       "rpo": "",
       "variant_id": "1lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "Speed-Sensitive Power Steering"
+      "option_name": "Electric Rack-and-Pinion Speed-Sensitive Power Steering"
     },
     {
       "option_id": "opt_023",
       "rpo": "",
       "variant_id": "2lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "Speed-Sensitive Power Steering"
+      "option_name": "Electric Rack-and-Pinion Speed-Sensitive Power Steering"
     },
     {
       "option_id": "opt_023",
       "rpo": "",
       "variant_id": "3lt_e07",
       "section_id": "sec_stan_001",
-      "option_name": "Speed-Sensitive Power Steering"
+      "option_name": "Electric Rack-and-Pinion Speed-Sensitive Power Steering"
     },
     {
       "option_id": "opt_023",
       "rpo": "",
       "variant_id": "1lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "Speed-Sensitive Power Steering"
+      "option_name": "Electric Rack-and-Pinion Speed-Sensitive Power Steering"
     },
     {
       "option_id": "opt_023",
       "rpo": "",
       "variant_id": "2lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "Speed-Sensitive Power Steering"
+      "option_name": "Electric Rack-and-Pinion Speed-Sensitive Power Steering"
     },
     {
       "option_id": "opt_023",
       "rpo": "",
       "variant_id": "3lt_e67",
       "section_id": "sec_stan_001",
-      "option_name": "Speed-Sensitive Power Steering"
+      "option_name": "Electric Rack-and-Pinion Speed-Sensitive Power Steering"
     },
     {
       "option_id": "opt_024",
@@ -9056,42 +9056,42 @@
       "rpo": "PPW",
       "variant_id": "1lt_e07",
       "section_id": "sec_tech_001",
-      "option_name": "Wireless Apple CarPlay/Wireless Android Auto"
+      "option_name": "Wireless Apple CarPlay and Android Auto"
     },
     {
       "option_id": "opt_ppw_001",
       "rpo": "PPW",
       "variant_id": "2lt_e07",
       "section_id": "sec_tech_001",
-      "option_name": "Wireless Apple CarPlay/Wireless Android Auto"
+      "option_name": "Wireless Apple CarPlay and Android Auto"
     },
     {
       "option_id": "opt_ppw_001",
       "rpo": "PPW",
       "variant_id": "3lt_e07",
       "section_id": "sec_tech_001",
-      "option_name": "Wireless Apple CarPlay/Wireless Android Auto"
+      "option_name": "Wireless Apple CarPlay and Android Auto"
     },
     {
       "option_id": "opt_ppw_001",
       "rpo": "PPW",
       "variant_id": "1lt_e67",
       "section_id": "sec_tech_001",
-      "option_name": "Wireless Apple CarPlay/Wireless Android Auto"
+      "option_name": "Wireless Apple CarPlay and Android Auto"
     },
     {
       "option_id": "opt_ppw_001",
       "rpo": "PPW",
       "variant_id": "2lt_e67",
       "section_id": "sec_tech_001",
-      "option_name": "Wireless Apple CarPlay/Wireless Android Auto"
+      "option_name": "Wireless Apple CarPlay and Android Auto"
     },
     {
       "option_id": "opt_ppw_001",
       "rpo": "PPW",
       "variant_id": "3lt_e67",
       "section_id": "sec_tech_001",
-      "option_name": "Wireless Apple CarPlay/Wireless Android Auto"
+      "option_name": "Wireless Apple CarPlay and Android Auto"
     },
     {
       "option_id": "opt_015",
@@ -10184,10 +10184,10 @@
     "counts": {
       "except": 2,
       "included_with": 17,
-      "includes": 53,
+      "includes": 46,
       "not_available": 49,
       "not_recommended": 4,
-      "only": 20,
+      "only": 26,
       "requires": 36
     },
     "rows": [
@@ -10195,17 +10195,6 @@
         "option_id": "opt_uqh_001",
         "rpo": "UQH",
         "option_name": "Bose Performance Series Audio System",
-        "section_id": "sec_2lte_001",
-        "matched_terms": [
-          "includes"
-        ],
-        "special_mentions": [],
-        "detail_raw": ""
-      },
-      {
-        "option_id": "opt_ug1_001",
-        "rpo": "UG1",
-        "option_name": "Universal Home Remote",
         "section_id": "sec_2lte_001",
         "matched_terms": [
           "includes"
@@ -10296,7 +10285,7 @@
       {
         "option_id": "opt_pin_001",
         "rpo": "PIN",
-        "option_name": "Customer VIN ending reservation",
+        "option_name": "Customer VIN Ending Reservation",
         "section_id": "sec_cust_001",
         "matched_terms": [
           "not_available",
@@ -10341,7 +10330,7 @@
       {
         "option_id": "opt_d3v_001",
         "rpo": "D3V",
-        "option_name": "Engine lighting",
+        "option_name": "Engine Lighting",
         "section_id": "sec_engi_001",
         "matched_terms": [
           "included_with"
@@ -10352,7 +10341,7 @@
       {
         "option_id": "opt_sl9_001",
         "rpo": "SL9",
-        "option_name": "LPO, Engine specification plaque",
+        "option_name": "Engine Specification Plaque",
         "section_id": "sec_engi_001",
         "matched_terms": [
           "included_with"
@@ -10396,7 +10385,7 @@
       {
         "option_id": "opt_bc4_002",
         "rpo": "BC4",
-        "option_name": "NEW! Blue LS6 Engine Cover",
+        "option_name": "Blue LS6 Engine Cover",
         "section_id": "sec_engi_001",
         "matched_terms": [
           "includes"
@@ -10407,7 +10396,7 @@
       {
         "option_id": "opt_wub_001",
         "rpo": "WUB",
-        "option_name": "NEW! Quad Center Exit Exhaust",
+        "option_name": "Quad Center Exit Exhaust",
         "section_id": "sec_exha_001",
         "matched_terms": [
           "included_with"
@@ -10420,7 +10409,7 @@
       {
         "option_id": "opt_nwi_001",
         "rpo": "NWI",
-        "option_name": "NEW! Exhaust tips",
+        "option_name": "Bright Chrome Exhaust Tips",
         "section_id": "sec_exha_001",
         "matched_terms": [
           "requires"
@@ -10431,7 +10420,7 @@
       {
         "option_id": "opt_efr_001",
         "rpo": "EFR",
-        "option_name": "Carbon Flash Exterior Accents",
+        "option_name": "Carbon Flash Painted Accents",
         "section_id": "sec_exte_001",
         "matched_terms": [
           "includes"
@@ -10454,11 +10443,12 @@
       {
         "option_id": "opt_dmu_001",
         "rpo": "DMU",
-        "option_name": "Carbon Flash Grand Sport Heritage Center Stripe",
+        "option_name": "Carbon Flash Center Stripe",
         "section_id": "sec_gsce_001",
         "matched_terms": [
           "requires",
-          "includes"
+          "includes",
+          "only"
         ],
         "special_mentions": [
           "Z15"
@@ -10468,12 +10458,13 @@
       {
         "option_id": "opt_dmv_001",
         "rpo": "DMV",
-        "option_name": "Blade Silver Grand Sport Heritage Center Stripe",
+        "option_name": "Blade Silver Center Stripe",
         "section_id": "sec_gsce_001",
         "matched_terms": [
           "requires",
           "not_available",
-          "includes"
+          "includes",
+          "only"
         ],
         "special_mentions": [
           "Z15"
@@ -10483,12 +10474,13 @@
       {
         "option_id": "opt_dmw_001",
         "rpo": "DMW",
-        "option_name": "Arctic White Grand Sport Heritage Center Stripe",
+        "option_name": "Arctic White Center Stripe",
         "section_id": "sec_gsce_001",
         "matched_terms": [
           "requires",
           "not_available",
-          "includes"
+          "includes",
+          "only"
         ],
         "special_mentions": [
           "Z15"
@@ -10498,12 +10490,13 @@
       {
         "option_id": "opt_dmx_001",
         "rpo": "DMX",
-        "option_name": "Admiral Blue Grand Sport Heritage Center Stripe",
+        "option_name": "Admiral Blue Center Stripe",
         "section_id": "sec_gsce_001",
         "matched_terms": [
           "requires",
           "not_available",
-          "includes"
+          "includes",
+          "only"
         ],
         "special_mentions": [
           "Z15"
@@ -10513,12 +10506,13 @@
       {
         "option_id": "opt_dmy_001",
         "rpo": "DMY",
-        "option_name": "Red Mist Grand Sport Heritage Center Stripe",
+        "option_name": "Red Mist Center Stripe",
         "section_id": "sec_gsce_001",
         "matched_terms": [
           "requires",
           "not_available",
-          "includes"
+          "includes",
+          "only"
         ],
         "special_mentions": [
           "Z15"
@@ -10528,12 +10522,11 @@
       {
         "option_id": "opt_17a_001",
         "rpo": "17A",
-        "option_name": "Blade Silver Grand Sport Heritage Hash Marks",
+        "option_name": "Blade Silver Hash Marks",
         "section_id": "sec_gsha_001",
         "matched_terms": [
           "requires",
-          "not_available",
-          "includes"
+          "not_available"
         ],
         "special_mentions": [
           "Z15"
@@ -10543,12 +10536,11 @@
       {
         "option_id": "opt_20a_001",
         "rpo": "20A",
-        "option_name": "Admiral Blue Grand Sport Heritage Hash Marks",
+        "option_name": "Admiral Blue Hash Marks",
         "section_id": "sec_gsha_001",
         "matched_terms": [
           "requires",
-          "not_available",
-          "includes"
+          "not_available"
         ],
         "special_mentions": [
           "Z15"
@@ -10558,12 +10550,11 @@
       {
         "option_id": "opt_55a_001",
         "rpo": "55A",
-        "option_name": "Competition Yellow Grand Sport Heritage Hash Marks",
+        "option_name": "Competition Yellow Hash Marks.",
         "section_id": "sec_gsha_001",
         "matched_terms": [
           "requires",
-          "not_available",
-          "includes"
+          "not_available"
         ],
         "special_mentions": [
           "Z15"
@@ -10573,12 +10564,11 @@
       {
         "option_id": "opt_75a_001",
         "rpo": "75A",
-        "option_name": "Torch Red Grand Sport Heritage Hash Marks",
+        "option_name": "Torch Red Hash Marks",
         "section_id": "sec_gsha_001",
         "matched_terms": [
           "requires",
-          "not_available",
-          "includes"
+          "not_available"
         ],
         "special_mentions": [
           "Z15"
@@ -10588,11 +10578,10 @@
       {
         "option_id": "opt_97a_001",
         "rpo": "97A",
-        "option_name": "Carbon Flash Grand Sport Heritage Hash Marks",
+        "option_name": "Vcarbon Flash Hash Marks",
         "section_id": "sec_gsha_001",
         "matched_terms": [
-          "requires",
-          "includes"
+          "requires"
         ],
         "special_mentions": [
           "Z15"
@@ -10602,12 +10591,11 @@
       {
         "option_id": "opt_dx4_001",
         "rpo": "DX4",
-        "option_name": "Red Mist Grand Sport Heritage Hash Marks",
+        "option_name": "Red Mist Hash Marks",
         "section_id": "sec_gsha_001",
         "matched_terms": [
           "requires",
-          "not_available",
-          "includes"
+          "not_available"
         ],
         "special_mentions": [
           "Z15"
@@ -10649,18 +10637,6 @@
         "detail_raw": "1. Included and only available with (R8C) Corvette Museum Delivery."
       },
       {
-        "option_id": "opt_j56_001",
-        "rpo": "J56",
-        "option_name": "Performance Disc Brakes",
-        "section_id": "sec_perf_brake_001",
-        "matched_terms": [
-          "includes",
-          "only"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
-      },
-      {
         "option_id": "opt_xfr_001",
         "rpo": "XFR",
         "option_name": "High Performance Tires",
@@ -10687,7 +10663,7 @@
       {
         "option_id": "opt_sfz_001",
         "rpo": "SFZ",
-        "option_name": "LPO, Dark Stealth crossed flags emblems",
+        "option_name": "Dark Stealth Crossed Flags Emblems",
         "section_id": "sec_lpoe_001",
         "matched_terms": [
           "not_available"
@@ -10698,7 +10674,7 @@
       {
         "option_id": "opt_r88_001",
         "rpo": "R88",
-        "option_name": "LPO, Illuminated Crossed Flags Emblem",
+        "option_name": "Front Illuminated Crossed Flags Emblem",
         "section_id": "sec_lpoe_001",
         "matched_terms": [
           "not_available"
@@ -10709,7 +10685,7 @@
       {
         "option_id": "opt_sbt_001",
         "rpo": "SBT",
-        "option_name": "LPO, Dual roof package",
+        "option_name": "Dual Roof Package",
         "section_id": "sec_lpoe_001",
         "matched_terms": [
           "not_available",
@@ -10721,7 +10697,7 @@
       {
         "option_id": "opt_sc7_001",
         "rpo": "SC7",
-        "option_name": "LPO, Roof panel storage pouch",
+        "option_name": "Roof Panel Storage Pouch",
         "section_id": "sec_lpoe_001",
         "matched_terms": [
           "included_with"
@@ -10732,7 +10708,7 @@
       {
         "option_id": "opt_pcq_001",
         "rpo": "PCQ",
-        "option_name": "LPO, Grille Screen Protection Package",
+        "option_name": "Grille Screen Protection Package",
         "section_id": "sec_lpoe_001",
         "matched_terms": [
           "includes"
@@ -10743,7 +10719,7 @@
       {
         "option_id": "opt_vwe_001",
         "rpo": "VWE",
-        "option_name": "LPO, Front Radiator Grille Screens",
+        "option_name": "Front Radiator Grille Screens",
         "section_id": "sec_lpoe_001",
         "matched_terms": [
           "included_with"
@@ -10754,7 +10730,7 @@
       {
         "option_id": "opt_vwt_001",
         "rpo": "VWT",
-        "option_name": "LPO, Insect Protection Grille Screen",
+        "option_name": "Insect Protection Grille Screen",
         "section_id": "sec_lpoe_001",
         "matched_terms": [
           "included_with"
@@ -10765,7 +10741,7 @@
       {
         "option_id": "opt_5jr_001",
         "rpo": "5JR",
-        "option_name": "LPO, Visible Carbon Fiber Outside Mirror Covers",
+        "option_name": "Visible Carbon Fiber Outside Mirror Covers",
         "section_id": "sec_lpoe_001",
         "matched_terms": [
           "includes"
@@ -10776,7 +10752,7 @@
       {
         "option_id": "opt_rin_001",
         "rpo": "RIN",
-        "option_name": "LPO, Arctic White Rear Corvette Script Badge",
+        "option_name": "Arctic White Rear Corvette Script Badge",
         "section_id": "sec_lpoe_001",
         "matched_terms": [
           "not_available"
@@ -10787,7 +10763,7 @@
       {
         "option_id": "opt_sl8_001",
         "rpo": "SL8",
-        "option_name": "LPO, Edge Red Rear Corvette Script Badge",
+        "option_name": "Edge Red Rear Corvette Script Badge",
         "section_id": "sec_lpoe_001",
         "matched_terms": [
           "not_available"
@@ -10798,7 +10774,7 @@
       {
         "option_id": "opt_rik_001",
         "rpo": "RIK",
-        "option_name": "LPO, Torch Red Rear Corvette Script Badge",
+        "option_name": "Torch Red Rear Corvette Script Badge",
         "section_id": "sec_lpoe_001",
         "matched_terms": [
           "not_available"
@@ -10809,7 +10785,7 @@
       {
         "option_id": "opt_sig_001",
         "rpo": "SIG",
-        "option_name": "LPO, Spoiler Extension",
+        "option_name": "Clear Smoked Jake Logo Spoiler Extension",
         "section_id": "sec_lpoe_001",
         "matched_terms": [
           "requires"
@@ -10820,7 +10796,7 @@
       {
         "option_id": "opt_pdy_001",
         "rpo": "PDY",
-        "option_name": "LPO, Roadside Safety Package",
+        "option_name": "Roadside Safety Package",
         "section_id": "sec_lpoi_001",
         "matched_terms": [
           "includes"
@@ -10831,7 +10807,7 @@
       {
         "option_id": "opt_ryt_001",
         "rpo": "RYT",
-        "option_name": "LPO, First Aid Kit",
+        "option_name": "First Aid Kit",
         "section_id": "sec_lpoi_001",
         "matched_terms": [
           "included_with"
@@ -10842,7 +10818,7 @@
       {
         "option_id": "opt_s08_001",
         "rpo": "S08",
-        "option_name": "LPO, Highway Safety Kit",
+        "option_name": "Highway Safety Kit",
         "section_id": "sec_lpoi_001",
         "matched_terms": [
           "included_with"
@@ -10853,7 +10829,7 @@
       {
         "option_id": "opt_pef_001",
         "rpo": "PEF",
-        "option_name": "LPO, Contoured Liner Protection Package",
+        "option_name": "Jake Logo Contoured Liner Protection Package",
         "section_id": "sec_lpoi_001",
         "matched_terms": [
           "includes"
@@ -10864,7 +10840,7 @@
       {
         "option_id": "opt_ria_001",
         "rpo": "RIA",
-        "option_name": "LPO, All-Weather Floor Liners with Jake Logo",
+        "option_name": "All-Weather Floor Liners",
         "section_id": "sec_lpoi_001",
         "matched_terms": [
           "included_with"
@@ -10875,7 +10851,7 @@
       {
         "option_id": "opt_cav_001",
         "rpo": "CAV",
-        "option_name": "LPO, Contoured cargo area liners with Jake logo",
+        "option_name": "Contoured Cargo Area Liners",
         "section_id": "sec_lpoi_001",
         "matched_terms": [
           "included_with"
@@ -10884,10 +10860,10 @@
         "detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
       },
       {
-        "option_id": "opt_e60_001",
-        "rpo": "E60",
-        "option_name": "Front Lift Adjustable Height with Memory",
-        "section_id": "sec_perf_support_001",
+        "option_id": "opt_t0e_001",
+        "rpo": "T0E",
+        "option_name": "Low Rear Spoiler",
+        "section_id": "sec_perf_aero_001",
         "matched_terms": [
           "includes"
         ],
@@ -10895,12 +10871,79 @@
         "detail_raw": ""
       },
       {
-        "option_id": "opt_cfl_001",
-        "rpo": "CFL",
-        "option_name": "NEW! Extended Front Splitter Ground Effects",
-        "section_id": "sec_perf_ground_001",
+        "option_id": "opt_t0f_001",
+        "rpo": "T0F",
+        "option_name": "Carbon Flash-Painted Carbon Fiber Aero Package",
+        "section_id": "sec_perf_aero_001",
+        "matched_terms": [
+          "requires",
+          "included_with",
+          "includes"
+        ],
+        "special_mentions": [
+          "FEY"
+        ],
+        "detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package."
+      },
+      {
+        "option_id": "opt_5zv_001",
+        "rpo": "5ZV",
+        "option_name": "Carbon Flash Metallic Three-Stanchion High Wing Spoiler",
+        "section_id": "sec_perf_aero_001",
         "matched_terms": [
           "not_available"
+        ],
+        "special_mentions": [
+          "FEY"
+        ],
+        "detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
+      },
+      {
+        "option_id": "opt_jx6_001",
+        "rpo": "JX6",
+        "option_name": "Low-Dust Touring Brakes",
+        "section_id": "sec_perf_brake_001",
+        "matched_terms": [
+          "includes"
+        ],
+        "special_mentions": [],
+        "detail_raw": ""
+      },
+      {
+        "option_id": "opt_j56_001",
+        "rpo": "J56",
+        "option_name": "Performance Disc Brakes",
+        "section_id": "sec_perf_brake_001",
+        "matched_terms": [
+          "includes",
+          "only"
+        ],
+        "special_mentions": [],
+        "detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
+      },
+      {
+        "option_id": "opt_j57_001",
+        "rpo": "J57",
+        "option_name": "Carbon Ceramic Brakes",
+        "section_id": "sec_perf_brake_001",
+        "matched_terms": [
+          "included_with",
+          "includes"
+        ],
+        "special_mentions": [
+          "FEY"
+        ],
+        "detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
+      },
+      {
+        "option_id": "opt_cfl_001",
+        "rpo": "CFL",
+        "option_name": "Extended Front Splitter, Carbon Flash",
+        "section_id": "sec_perf_ground_001",
+        "matched_terms": [
+          "not_available",
+          "includes",
+          "only"
         ],
         "special_mentions": [],
         "detail_raw": "1. Not available with (CFV/CFZ) ground effects."
@@ -10911,10 +10954,22 @@
         "option_name": "Carbon Flash Carbon Fiber Ground Effects",
         "section_id": "sec_perf_ground_001",
         "matched_terms": [
-          "included_with"
+          "included_with",
+          "includes"
         ],
         "special_mentions": [],
         "detail_raw": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package."
+      },
+      {
+        "option_id": "opt_e60_001",
+        "rpo": "E60",
+        "option_name": "Front Lift Adjustable Height",
+        "section_id": "sec_perf_support_001",
+        "matched_terms": [
+          "includes"
+        ],
+        "special_mentions": [],
+        "detail_raw": ""
       },
       {
         "option_id": "opt_feb_001",
@@ -10938,48 +10993,6 @@
         ],
         "special_mentions": [],
         "detail_raw": ""
-      },
-      {
-        "option_id": "opt_j57_001",
-        "rpo": "J57",
-        "option_name": "Carbon Ceramic Brakes",
-        "section_id": "sec_perf_brake_001",
-        "matched_terms": [
-          "included_with",
-          "includes"
-        ],
-        "special_mentions": [
-          "FEY"
-        ],
-        "detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
-      },
-      {
-        "option_id": "opt_t0f_001",
-        "rpo": "T0F",
-        "option_name": "Carbon Fiber Aero Package",
-        "section_id": "sec_perf_aero_001",
-        "matched_terms": [
-          "requires",
-          "included_with",
-          "includes"
-        ],
-        "special_mentions": [
-          "FEY"
-        ],
-        "detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package."
-      },
-      {
-        "option_id": "opt_5zv_001",
-        "rpo": "5ZV",
-        "option_name": "LPO, Three-Stanchion high wing spoiler",
-        "section_id": "sec_perf_aero_001",
-        "matched_terms": [
-          "not_available"
-        ],
-        "special_mentions": [
-          "FEY"
-        ],
-        "detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
       },
       {
         "option_id": "opt_cm9_001",
@@ -11018,7 +11031,7 @@
       {
         "option_id": "opt_d86_001",
         "rpo": "D86",
-        "option_name": "Body-Color Roof Convertible Top",
+        "option_name": "Body-Color Roof, Carbon Flash-painted Nacelles",
         "section_id": "sec_roof_001",
         "matched_terms": [
           "not_available"
@@ -11125,6 +11138,17 @@
         "detail_raw": "Not Available with 1LT"
       },
       {
+        "option_id": "opt_aup_001",
+        "rpo": "AUP",
+        "option_name": "Asymmetrical Seats",
+        "section_id": "sec_seat_002",
+        "matched_terms": [
+          "requires"
+        ],
+        "special_mentions": [],
+        "detail_raw": "1. Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
+      },
+      {
         "option_id": "opt_z25_001",
         "rpo": "Z25",
         "option_name": "Grand Sport Launch Edition",
@@ -11140,19 +11164,8 @@
       {
         "option_id": "opt_m1n_001",
         "rpo": "M1N",
-        "option_name": "NEW! 8-Speed Dual Clutch Transmission",
+        "option_name": "8-Speed Dual Clutch Transmission",
         "section_id": "sec_stan_001",
-        "matched_terms": [
-          "includes"
-        ],
-        "special_mentions": [],
-        "detail_raw": ""
-      },
-      {
-        "option_id": "opt_jx6_001",
-        "rpo": "JX6",
-        "option_name": "Low-Dust Touring Brakes",
-        "section_id": "sec_perf_brake_001",
         "matched_terms": [
           "includes"
         ],
@@ -11298,7 +11311,7 @@
       {
         "option_id": "opt_due_001",
         "rpo": "DUE",
-        "option_name": "NEW! Santorini Blue/Carbon Flash Racing Stripes",
+        "option_name": "Santorini Blue/Carbon Flash Racing Stripes",
         "section_id": "sec_stri_001",
         "matched_terms": [
           "not_available"
@@ -11331,7 +11344,7 @@
       {
         "option_id": "opt_sht_001",
         "rpo": "SHT",
-        "option_name": "LPO, Jake Hood Graphic",
+        "option_name": "Tech Bronze Jake Hood Graphic",
         "section_id": "sec_stri_001",
         "matched_terms": [
           "not_available"
@@ -11344,7 +11357,7 @@
       {
         "option_id": "opt_vpo_001",
         "rpo": "VPO",
-        "option_name": "LPO, Jake C8.R Rear Hash Graphic",
+        "option_name": "Tech Bronze Jake C8.R Rear Hash Graphic",
         "section_id": "sec_stri_001",
         "matched_terms": [
           "not_available"
@@ -11368,7 +11381,7 @@
       {
         "option_id": "opt_spy_001",
         "rpo": "SPY",
-        "option_name": "LPO, Black lug nuts",
+        "option_name": "Black Lug Nuts",
         "section_id": "sec_whee_001",
         "matched_terms": [
           "not_available"
@@ -11379,7 +11392,7 @@
       {
         "option_id": "opt_spz_001",
         "rpo": "SPZ",
-        "option_name": "LPO, Black wheel locks",
+        "option_name": "Black Wheel Locks",
         "section_id": "sec_whee_001",
         "matched_terms": [
           "requires"
@@ -11390,7 +11403,7 @@
       {
         "option_id": "opt_s47_001",
         "rpo": "S47",
-        "option_name": "LPO, Chrome lug nuts",
+        "option_name": "Chrome Lug Nuts",
         "section_id": "sec_whee_001",
         "matched_terms": [
           "not_available"
@@ -11401,7 +11414,7 @@
       {
         "option_id": "opt_sfe_001",
         "rpo": "SFE",
-        "option_name": "LPO, Chrome wheel locks",
+        "option_name": "Chrome Wheel Locks",
         "section_id": "sec_whee_001",
         "matched_terms": [
           "not_available"
@@ -11445,11 +11458,10 @@
       {
         "option_id": "opt_38s_001",
         "rpo": "38S",
-        "option_name": "Adrenaline Red custom leather stitch",
+        "option_name": "Adrenaline Red Custom Leather Stitching",
         "section_id": "sec_cust_002",
         "matched_terms": [
-          "requires",
-          "includes"
+          "requires"
         ],
         "special_mentions": [],
         "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior or (HU0/HXO) Adrenaline Red/Jet Black interior."
@@ -11457,11 +11469,10 @@
       {
         "option_id": "opt_36s_001",
         "rpo": "36S",
-        "option_name": "Competition Yellow custom leather stitch",
+        "option_name": "Competition Yellow Custom Leather Stitching",
         "section_id": "sec_cust_002",
         "matched_terms": [
-          "requires",
-          "includes"
+          "requires"
         ],
         "special_mentions": [],
         "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior."
@@ -11469,11 +11480,10 @@
       {
         "option_id": "opt_37s_001",
         "rpo": "37S",
-        "option_name": "Santorini Blue custom leather stitch",
+        "option_name": "Santorini Blue Custom Leather Stitching",
         "section_id": "sec_cust_002",
         "matched_terms": [
-          "requires",
-          "includes"
+          "requires"
         ],
         "special_mentions": [],
         "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior."
@@ -11505,7 +11515,7 @@
       {
         "option_id": "opt_bc4_001",
         "rpo": "BC4",
-        "option_name": "NEW! Blue LS6 Engine Cover",
+        "option_name": "Blue LS6 Engine Cover",
         "section_id": "sec_engi_001",
         "matched_terms": [
           "requires",
@@ -11539,7 +11549,7 @@
       {
         "option_id": "opt_rz9_001",
         "rpo": "RZ9",
-        "option_name": "LPO, Visible Carbon Fiber grille insert",
+        "option_name": "Visible Carbon Fiber Grille Insert",
         "section_id": "sec_lpoe_001",
         "matched_terms": [
           "not_available"
@@ -11550,7 +11560,7 @@
       {
         "option_id": "opt_v8x_001",
         "rpo": "V8X",
-        "option_name": "LPO, Visible Carbon Fiber Sill Plates",
+        "option_name": "Visible Carbon Fiber Sill Plates",
         "section_id": "sec_lpoi_001",
         "matched_terms": [
           "not_available"
@@ -11572,7 +11582,7 @@
       {
         "option_id": "opt_r6p_001",
         "rpo": "R6P",
-        "option_name": "Three Years SiriusXM",
+        "option_name": "Three-Year SiriusXM Subscription",
         "section_id": "sec_onst_001",
         "matched_terms": [
           "requires",
@@ -11585,7 +11595,7 @@
       {
         "option_id": "opt_prb_001",
         "rpo": "PRB",
-        "option_name": "Three Years OnStar One (Standalone)",
+        "option_name": "Three-Year OnStar One Standalone Plan",
         "section_id": "sec_onst_001",
         "matched_terms": [
           "requires",
@@ -11597,7 +11607,7 @@
       {
         "option_id": "opt_r9y_001",
         "rpo": "R9Y",
-        "option_name": "Mobile Service Plus",
+        "option_name": "One-Year Mobile Service Plus",
         "section_id": "sec_onst_001",
         "matched_terms": [
           "requires",
@@ -11611,7 +11621,7 @@
       {
         "option_id": "opt_r9v_001",
         "rpo": "R9V",
-        "option_name": "Mobile Service Plus",
+        "option_name": "Three-Year Mobile Service Plus",
         "section_id": "sec_onst_001",
         "matched_terms": [
           "requires",
@@ -11636,7 +11646,7 @@
       {
         "option_id": "opt_u2k_001",
         "rpo": "U2K",
-        "option_name": "SiriusXM with 360L Trial Subscription",
+        "option_name": "SiriusXM Trial Subscription",
         "section_id": "sec_onst_001",
         "matched_terms": [
           "includes"
@@ -11665,17 +11675,6 @@
         ],
         "special_mentions": [],
         "detail_raw": "1. Not available at this time."
-      },
-      {
-        "option_id": "opt_aup_001",
-        "rpo": "AUP",
-        "option_name": "Asymetrical Seats",
-        "section_id": "sec_seat_002",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
       },
       {
         "option_id": "opt_cm9_002",
@@ -11749,7 +11748,7 @@
         {
           "option_id": "opt_wub_001",
           "rpo": "WUB",
-          "option_name": "NEW! Quad Center Exit Exhaust"
+          "option_name": "Quad Center Exit Exhaust"
         },
         {
           "option_id": "opt_xfs_001",
@@ -11757,76 +11756,76 @@
           "option_name": "Michelin Pilot Sport Cup 2 R Tires"
         },
         {
-          "option_id": "opt_j57_001",
-          "rpo": "J57",
-          "option_name": "Carbon Ceramic Brakes"
-        },
-        {
           "option_id": "opt_t0f_001",
           "rpo": "T0F",
-          "option_name": "Carbon Fiber Aero Package"
+          "option_name": "Carbon Flash-Painted Carbon Fiber Aero Package"
         },
         {
           "option_id": "opt_5zv_001",
           "rpo": "5ZV",
-          "option_name": "LPO, Three-Stanchion high wing spoiler"
+          "option_name": "Carbon Flash Metallic Three-Stanchion High Wing Spoiler"
+        },
+        {
+          "option_id": "opt_j57_001",
+          "rpo": "J57",
+          "option_name": "Carbon Ceramic Brakes"
         }
       ],
       "Z15": [
         {
           "option_id": "opt_dmu_001",
           "rpo": "DMU",
-          "option_name": "Carbon Flash Grand Sport Heritage Center Stripe"
+          "option_name": "Carbon Flash Center Stripe"
         },
         {
           "option_id": "opt_dmv_001",
           "rpo": "DMV",
-          "option_name": "Blade Silver Grand Sport Heritage Center Stripe"
+          "option_name": "Blade Silver Center Stripe"
         },
         {
           "option_id": "opt_dmw_001",
           "rpo": "DMW",
-          "option_name": "Arctic White Grand Sport Heritage Center Stripe"
+          "option_name": "Arctic White Center Stripe"
         },
         {
           "option_id": "opt_dmx_001",
           "rpo": "DMX",
-          "option_name": "Admiral Blue Grand Sport Heritage Center Stripe"
+          "option_name": "Admiral Blue Center Stripe"
         },
         {
           "option_id": "opt_dmy_001",
           "rpo": "DMY",
-          "option_name": "Red Mist Grand Sport Heritage Center Stripe"
+          "option_name": "Red Mist Center Stripe"
         },
         {
           "option_id": "opt_17a_001",
           "rpo": "17A",
-          "option_name": "Blade Silver Grand Sport Heritage Hash Marks"
+          "option_name": "Blade Silver Hash Marks"
         },
         {
           "option_id": "opt_20a_001",
           "rpo": "20A",
-          "option_name": "Admiral Blue Grand Sport Heritage Hash Marks"
+          "option_name": "Admiral Blue Hash Marks"
         },
         {
           "option_id": "opt_55a_001",
           "rpo": "55A",
-          "option_name": "Competition Yellow Grand Sport Heritage Hash Marks"
+          "option_name": "Competition Yellow Hash Marks."
         },
         {
           "option_id": "opt_75a_001",
           "rpo": "75A",
-          "option_name": "Torch Red Grand Sport Heritage Hash Marks"
+          "option_name": "Torch Red Hash Marks"
         },
         {
           "option_id": "opt_97a_001",
           "rpo": "97A",
-          "option_name": "Carbon Flash Grand Sport Heritage Hash Marks"
+          "option_name": "Vcarbon Flash Hash Marks"
         },
         {
           "option_id": "opt_dx4_001",
           "rpo": "DX4",
-          "option_name": "Red Mist Grand Sport Heritage Hash Marks"
+          "option_name": "Red Mist Hash Marks"
         },
         {
           "option_id": "opt_z15_001",
@@ -11836,12 +11835,12 @@
         {
           "option_id": "opt_sht_001",
           "rpo": "SHT",
-          "option_name": "LPO, Jake Hood Graphic"
+          "option_name": "Tech Bronze Jake Hood Graphic"
         },
         {
           "option_id": "opt_vpo_001",
           "rpo": "VPO",
-          "option_name": "LPO, Jake C8.R Rear Hash Graphic"
+          "option_name": "Tech Bronze Jake C8.R Rear Hash Graphic"
         }
       ],
       "Z25": [

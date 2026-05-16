@@ -6,7 +6,7 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-05-15T20:32:24+00:00",
+    "generated_at": "2026-05-16T17:08:49+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
@@ -21,7 +21,7 @@
     "skippedRequiresReview": 3,
     "unresolvedRpoMentions": 4,
     "exclusiveGroups": 9,
-    "exclusiveGroupMembers": 27,
+    "exclusiveGroupMembers": 28,
     "ruleGroups": 1,
     "ruleGroupMembers": 18,
     "groupedExclusionPairs": 18,
@@ -4121,20 +4121,6 @@
         "detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package."
       },
       {
-        "option_id": "opt_fey_001",
-        "rpo": "FEY",
-        "mentioned_rpos": [],
-        "detail_raw": ""
-      },
-      {
-        "option_id": "opt_j57_001",
-        "rpo": "J57",
-        "mentioned_rpos": [
-          "FEY"
-        ],
-        "detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
-      },
-      {
         "option_id": "opt_t0f_001",
         "rpo": "T0F",
         "mentioned_rpos": [
@@ -4149,6 +4135,20 @@
           "FEY"
         ],
         "detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
+      },
+      {
+        "option_id": "opt_j57_001",
+        "rpo": "J57",
+        "mentioned_rpos": [
+          "FEY"
+        ],
+        "detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
+      },
+      {
+        "option_id": "opt_fey_001",
+        "rpo": "FEY",
+        "mentioned_rpos": [],
+        "detail_raw": ""
       },
       {
         "option_id": "opt_719_001",
@@ -4291,8 +4291,8 @@
           "opt_t0e_001"
         ],
         "same_rpo_option_ids": [
-          "opt_t0e_002",
-          "opt_t0e_001"
+          "opt_t0e_001",
+          "opt_t0e_002"
         ],
         "source_id": "opt_sig_001",
         "rule_type": "requires",
@@ -4332,7 +4332,7 @@
         "field": "source_id",
         "option_id": "opt_prb_001",
         "rpo": "PRB",
-        "label": "PRB Three Years OnStar One (Standalone)",
+        "label": "PRB Three-Year OnStar One Standalone Plan",
         "canonical_active_option_ids": [],
         "same_rpo_option_ids": [
           "opt_prb_001"

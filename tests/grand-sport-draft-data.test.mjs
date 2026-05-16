@@ -382,9 +382,11 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
     "D84 should keep the roof-option description"
   );
   assert.equal(
-    centerStripeChoices.every((choice) => choice.description === "When D84 is selected, the roof will not include the stripe."),
+    centerStripeChoices.every(
+      (choice) => choice.description === "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe."
+    ),
     true,
-    "Grand Sport center stripes should carry the workbook-authored D84 disclosure"
+    "Grand Sport center stripes should carry the workbook-authored Z15/D84 disclosure"
   );
 });
 
@@ -455,8 +457,8 @@ test("Grand Sport draft includes model-scoped LT interiors with EL9 launch editi
 test("Grand Sport draft keeps normalized display fields and raw rule evidence", () => {
   const cfl = draft.choices.find((choice) => choice.choice_id === "1lt_e07__opt_cfl_001");
   assert.ok(cfl, "CFL should be present in the draft");
-  assert.equal(cfl.label, "New Extended Front Splitter Ground Effects");
-  assert.equal(cfl.source_option_name, "NEW! Extended Front Splitter Ground Effects");
+  assert.equal(cfl.label, "Extended Front Splitter, Carbon Flash");
+  assert.equal(cfl.source_option_name, "Extended Front Splitter, Carbon Flash");
   assert.equal(cfl.source_detail_raw, "1. Not available with (CFV/CFZ) ground effects.");
   assert.equal(cfl.step_key, "packages_performance");
 });

@@ -250,6 +250,11 @@ const expectedAccessoryExclusiveGroups = [
     rpos: ["SXB", "SXR", "SXT"],
     optionIds: ["opt_sxb_001", "opt_sxr_001", "opt_sxt_001"],
   },
+  {
+    groupId: "excl_ext_accents",
+    rpos: ["EFR", "EFY", "EDU"],
+    optionIds: ["opt_efr_001", "opt_efy_001", "opt_edu_001"],
+  },
 ];
 
 function activeSelectableOptionIdsForRpo(rpo) {

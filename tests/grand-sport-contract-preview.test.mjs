@@ -78,9 +78,9 @@ test("filled Grand Sport source sections do not require blank-section config", (
 test("customer-facing text is cleaned while raw source fields stay intact", () => {
   const cfl = preview.choices.find((choice) => choice.option_id === "opt_cfl_001");
   assert.ok(cfl, "CFL should be present in Grand Sport preview choices");
-  assert.equal(cfl.label, "New Extended Front Splitter Ground Effects");
-  assert.equal(cfl.source_option_name, "NEW! Extended Front Splitter Ground Effects");
-  assert.deepEqual(cfl.text_cleanup_notes, ["label:normalized_new_prefix"]);
+  assert.equal(cfl.label, "Extended Front Splitter, Carbon Flash");
+  assert.equal(cfl.source_option_name, "Extended Front Splitter, Carbon Flash");
+  assert.deepEqual(cfl.text_cleanup_notes, []);
 });
 
 test("rule/detail hot spot buckets are preserved for later phases", () => {
@@ -88,14 +88,14 @@ test("rule/detail hot spot buckets are preserved for later phases", () => {
   assert.equal(preview.ruleDetailHotSpots.counts.requires, 36);
   assert.equal(preview.ruleDetailHotSpots.counts.not_available, 49);
   assert.equal(preview.ruleDetailHotSpots.counts.included_with, 17);
-  assert.equal(preview.ruleDetailHotSpots.counts.includes, 53);
+  assert.equal(preview.ruleDetailHotSpots.counts.includes, 46);
   assert.equal(
     preview.ruleDetailHotSpots.rows.some(
       (row) => ["DMU", "DMV", "DMW", "DMX", "DMY"].includes(row.rpo) && /Requires \(D84\)/.test(row.detail_raw)
     ),
     false
   );
-  assert.equal(preview.ruleDetailHotSpots.counts.only, 19);
+  assert.equal(preview.ruleDetailHotSpots.counts.only, 26);
   assert.equal(preview.ruleDetailHotSpots.counts.not_recommended, 4);
   assert.equal(preview.ruleDetailHotSpots.counts.except, 2);
   assert.equal(preview.ruleDetailHotSpots.counts.special_package_review, 26);

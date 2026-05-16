@@ -224,6 +224,10 @@ const expectedStingrayExclusiveGroups = [
     groupId: "excl_suede_trunk_liner",
     optionIds: ["opt_sxb_001", "opt_sxr_001", "opt_sxt_001"],
   },
+  {
+    groupId: "excl_ext_accents",
+    optionIds: ["opt_efr_001", "opt_efy_001", "opt_edu_001"],
+  },
 ];
 
 test("generated app data exposes a multi-model registry with Stingray compatibility alias", () => {
@@ -352,7 +356,10 @@ test("Grand Sport heritage hash marks auto-add Z15 and leave only center stripes
   assert.equal(convertibleD84.description, "Painted nacelles and roof");
   runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_17a_001"));
   const convertibleCenterStripe = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_dmu_001");
-  assert.equal(convertibleCenterStripe.description, "When D84 is selected, the roof will not include the stripe.");
+  assert.equal(
+    convertibleCenterStripe.description,
+    "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe."
+  );
   runtime.handleChoice(convertibleCenterStripe);
   assert.equal(runtime.state.selected.has("opt_dmu_001"), true, "center stripe should not require D84 on convertible");
   assert.equal(runtime.state.selected.has("opt_d84_001"), false, "center stripe should not auto-select D84");

@@ -203,7 +203,7 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
   assert.deepEqual(z52Members.map((row) => row.option_id), ["opt_feb_001", "opt_fey_001"]);
 
   const brakeMembers = workbookExclusiveMembers.filter((row) => row.group_id === "gs_excl_performance_brakes");
-  assert.deepEqual(brakeMembers.map((row) => row.option_id), ["opt_j56_001", "opt_j57_001"]);
+  assert.deepEqual(brakeMembers.map((row) => row.option_id), ["opt_j56_001", "opt_j57_001", "opt_jx6_001"]);
 });
 
 test("Grand Sport rule audit highlights risky duplicate RPO and special package surfaces", () => {
