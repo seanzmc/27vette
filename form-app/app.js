@@ -320,6 +320,19 @@ function getEntityLabel(id) {
   return id;
 }
 
+function removeDuplicatedEntityRpo(reason, entityId) {
+  const option = optionsById.get(entityId);
+  const rpo = option?.rpo?.trim();
+  const label = option?.label?.trim();
+  if (!reason || !rpo || !label || !label.toLowerCase().startsWith(`${rpo.toLowerCase()} `)) return reason;
+  return reason.split(`${rpo} ${label}`).join(label);
+}
+
+function includedWithReason(rule) {
+  const reason = rule.disabled_reason || `Included with ${getEntityLabel(rule.source_id)}.`;
+  return removeDuplicatedEntityRpo(reason, rule.source_id);
+}
+
 function selectedExcludesTarget(targetId, selectedIds) {
   for (const sourceId of selectedIds) {
     const rules = ruleTargetsBySource.get(sourceId) || [];
@@ -405,7 +418,7 @@ function computeAutoAdded() {
         !shouldSuppressIncludedDefault(rule) &&
         !userSelectedExclusiveGroupPeer(rule.target_id, selectedIds)
       ) {
-        autoAdded.set(rule.target_id, rule.disabled_reason || `Included with ${getEntityLabel(sourceId)}.`);
+        autoAdded.set(rule.target_id, includedWithReason(rule));
       }
     }
   }
@@ -444,6 +457,12 @@ function disableReasonForChoice(choice) {
       if (rule.runtime_action === "replace") return rule.disabled_reason || `${getEntityLabel(rule.source_id)} removes this default.`;
       return rule.disabled_reason || `Blocked by ${getEntityLabel(rule.source_id)}.`;
     }
+    if (
+      rule.rule_type === "includes" &&
+      ruleAppliesToCurrentVariant(rule) &&
+      choice.selectable !== "True" &&
+      choice.status !== "standard"
+    ) return includedWithReason(rule);
   }
 
   const sourceRules = ruleTargetsBySource.get(choice.option_id) || [];

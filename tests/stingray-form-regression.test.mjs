@@ -179,6 +179,7 @@ window.__testApi = {
   reconcileSelections,
   handleChoice,
   computeAutoAdded,
+  disableReasonForChoice,
   lineItems,
   currentOrder,
   render,
@@ -1203,6 +1204,21 @@ test("replaceable suspension and exhaust defaults are encoded", () => {
   assert.match(appSource, /selectedOptionByRpo\("NWI"\)/);
   assert.match(appSource, /deleteSelectedRpo\("NGA"\)/);
   assert.match(appSource, /addDefaultRpo\("NGA"\)/);
+});
+
+test("FE3 disabled tile explains that Z51 includes it without duplicating the RPO", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+
+  const fe3 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_fe3_001");
+  assert.ok(fe3, "FE3 should exist for the current variant");
+  assert.equal(runtime.disableReasonForChoice(fe3), "Included with Z51 Performance Package.");
+
+  const z51 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_z51_001");
+  assert.ok(z51, "Z51 should exist for the current variant");
+  runtime.handleChoice(z51);
+  assert.equal(runtime.computeAutoAdded().get("opt_fe3_001"), "Included with Z51 Performance Package.");
 });
 
 test("FE1 default selection prefers the visible suspension tile", () => {
