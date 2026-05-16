@@ -1027,7 +1027,7 @@ test("plain text order summary renders compact order data for emails and review"
   assert.doesNotMatch(summary, /Base MSRP/);
   assert.match(summary, /<p><strong><u>Exterior Paint<\/u><\/strong><\/p><ul><li>GBA Black: \$0<\/li>/);
   assert.match(summary, /<p><strong><u>Seats &amp; Interior<\/u><\/strong><\/p><ul>[\s\S]*<li>AQ9 GT1 Bucket Seats: \$0<\/li>[\s\S]*<li>HTA Jet Black: \$0<\/li>/);
-  assert.match(summary, /<p><strong><u>Auto-Added \/ Required<\/u><\/strong><\/p><ul>[\s\S]*<li>FE3 Z51 performance suspension: \$0<\/li>/);
+  assert.match(summary, /<p><strong><u>Auto-Added \/ Required<\/u><\/strong><\/p><ul>[\s\S]*<li>FE3 Z51 Performance Suspension: \$0<\/li>/);
   assert.doesNotMatch(summary, /STANDARD & INCLUDED/);
   assert.match(summary, /<p><strong>Total MSRP: \$\d/);
   assert.doesNotMatch(summary, /(?:^|\n)(?:Vehicle|Exterior Paint|Seats & Interior|Auto-Added \/ Required)(?:\n|$)/);
