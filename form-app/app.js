@@ -64,6 +64,7 @@ const els = {
   openSummaryDrawerButton: document.querySelector("#openSummaryDrawerButton"),
   closeSummaryDrawerButton: document.querySelector("#closeSummaryDrawerButton"),
   mobileDrawerBackdrop: document.querySelector("#mobileDrawerBackdrop"),
+  mobileSummaryButton: document.querySelector("#mobileSummaryButton"),
   mobileSummaryTotal: document.querySelector("#mobileSummaryTotal"),
   mobileSummarySelected: document.querySelector("#mobileSummarySelected"),
   mobileSummaryMissing: document.querySelector("#mobileSummaryMissing"),
@@ -241,6 +242,7 @@ function setMobileDrawer(drawerName = "") {
   if (els.mobileDrawerBackdrop) els.mobileDrawerBackdrop.hidden = !drawerName;
   setButtonExpanded(els.openStepDrawerButton, drawerName === "steps");
   setButtonExpanded(els.openSummaryDrawerButton, drawerName === "summary");
+  setButtonExpanded(els.mobileSummaryButton, drawerName === "summary");
 }
 
 function closeMobileDrawers() {
@@ -1912,6 +1914,7 @@ function init() {
   els.openStepDrawerButton?.addEventListener("click", () => setMobileDrawer("steps"));
   els.closeStepDrawerButton?.addEventListener("click", closeMobileDrawers);
   els.openSummaryDrawerButton?.addEventListener("click", () => setMobileDrawer("summary"));
+  els.mobileSummaryButton?.addEventListener("click", () => setMobileDrawer("summary"));
   els.closeSummaryDrawerButton?.addEventListener("click", closeMobileDrawers);
   els.mobileDrawerBackdrop?.addEventListener("click", closeMobileDrawers);
   document.addEventListener?.("keydown", handleMobileDrawerKeydown);

@@ -29,7 +29,10 @@
               <option value="grandSport">Grand Sport</option>
             </select>
           </label>
-          <button id="resetButton" type="button" class="ghost-button">Reset</button>
+          <button id="resetButton" type="button" class="ghost-button">
+            <span class="reset-icon" aria-hidden="true">↻</span>
+            <span class="reset-label">Reset</span>
+          </button>
           <button id="downloadBuildButton" type="button">Download Build</button>
           <button id="submitDealerButton" type="button">Submit to Dealer</button>
         </div>
@@ -52,14 +55,14 @@
 
       <section id="alertRegion" class="alert-region" aria-live="polite"></section>
 
-      <section class="mobile-summary-bar" aria-label="Current build summary">
+      <button id="mobileSummaryButton" class="mobile-summary-bar" type="button" aria-controls="summaryDrawer" aria-expanded="false" aria-label="Open build summary">
         <span class="mobile-summary-total-block">
           <small class="mobile-summary-label">Current Build</small>
           <strong id="mobileSummaryTotal">$0</strong>
           <small id="mobileSummarySelected">No selections yet</small>
         </span>
         <span id="mobileSummaryMissing">Complete required choices</span>
-      </section>
+      </button>
 
       <div class="workspace">
         <section id="mobileProgress" class="mobile-progress" aria-label="Mobile step progress">

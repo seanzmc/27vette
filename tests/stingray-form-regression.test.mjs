@@ -523,7 +523,9 @@ test("app runtime has the requested navigation and filtering hooks", () => {
 
 test("mobile shell exposes compact progress and summary targets", () => {
   assert.doesNotMatch(htmlSource, /id="mobileSummaryToggle"/);
+  assert.doesNotMatch(appSource, /download\/send/);
   assert.match(htmlSource, /Current Build/);
+  assert.match(htmlSource, /id="mobileSummaryButton"/);
   assert.match(htmlSource, /id="mobileSummaryTotal"/);
   assert.match(htmlSource, /id="mobileSummaryMissing"/);
   assert.match(htmlSource, /id="mobileProgress"/);
@@ -531,6 +533,7 @@ test("mobile shell exposes compact progress and summary targets", () => {
   assert.match(htmlSource, /id="mobileNextStep"/);
   assert.match(htmlSource, /id="openStepDrawerButton"/);
   assert.match(htmlSource, /id="openSummaryDrawerButton"/);
+  assert.match(htmlSource, /class="reset-icon"/);
   assert.match(htmlSource, /id="mobileDrawerBackdrop"/);
   assert.match(htmlSource, /id="stepRailDrawer"/);
   assert.match(htmlSource, /id="summaryDrawer"/);
@@ -580,6 +583,7 @@ test("mobile drawers expose route and summary state without changing form logic"
   runtime.setMobileDrawer("summary");
   assert.equal(runtime.elements.get(".app-shell").dataset.mobileDrawer, "summary");
   assert.equal(runtime.elements.get("#openSummaryDrawerButton").getAttribute("aria-expanded"), "true");
+  assert.equal(runtime.elements.get("#mobileSummaryButton").getAttribute("aria-expanded"), "true");
   runtime.closeMobileDrawers();
   assert.equal(runtime.elements.get(".app-shell").dataset.mobileDrawer, undefined);
 });

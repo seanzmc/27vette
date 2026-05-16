@@ -135,6 +135,10 @@ button:disabled {
   background: #f6e5e7;
 }
 
+.reset-icon {
+  display: none;
+}
+
 .vehicle-bar {
   display: grid;
   grid-template-columns: repeat(3, minmax(160px, 1fr));
@@ -774,7 +778,8 @@ textarea {
 
   .toolbar {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 42px repeat(2, minmax(0, 1fr));
+    gap: 8px;
     justify-content: stretch;
   }
 
@@ -784,33 +789,65 @@ textarea {
 
   .toolbar button {
     width: 100%;
-    padding: 0 10px;
+    padding: 0 8px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .toolbar #resetButton {
+    display: inline-grid;
+    place-items: center;
+    width: 42px;
+    padding: 0;
+  }
+
+  .reset-icon {
+    display: inline;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .reset-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 
   .vehicle-bar {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    padding: 16px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: 8px;
+    padding: 12px 14px;
     border-top: 1px solid var(--line);
     border-radius: 8px;
   }
 
   .vehicle-price {
-    grid-column: 1 / -1;
     align-content: start;
     justify-items: start;
     gap: 2px;
-    border-top: 1px solid var(--line);
-    margin-top: 2px;
-    padding-top: 12px;
+    min-width: 0;
+  }
+
+  .vehicle-context-item,
+  .vehicle-price {
+    min-width: 0;
+  }
+
+  .vehicle-context-item span,
+  .vehicle-price span {
+    font-size: 11px;
   }
 
   .vehicle-context-item strong {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .vehicle-price strong {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .mobile-summary-bar {
@@ -818,11 +855,14 @@ textarea {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    width: 100%;
+    min-height: 0;
     border: 1px solid var(--line);
     border-radius: 8px;
     padding: 16px;
     background: var(--panel);
     color: var(--ink);
+    text-align: left;
   }
 
   .mobile-summary-total-block {
