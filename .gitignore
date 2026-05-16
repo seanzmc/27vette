@@ -4,3 +4,4 @@ __pycache__/
 build/
 backups/*.xlsx
 ~$*.xlsx
+archived/docs
