@@ -32,6 +32,46 @@ The workbook already has paired model source sheets for the main business-rule s
 
 Implementation specs should first check these existing paired sheets before proposing new columns, new sheets, or model-specific code paths. If a needed capability exists on Grand Sport but not Stingray, extend Stingray to use the same workbook contract. If a capability exists on neither model, add the smallest shared/model-scoped workbook surface that can support both models consistently.
 
+## Pass 1 Verification Snapshot
+
+Verified on 2026-05-16 against `stingray_master.xlsx`. This was an audit-only pass; the workbook was not mutated.
+
+Workbook package validation:
+
+```text
+status = valid
+issue_count = 0
+```
+
+Source sheet contract counts:
+
+| Sheet | Populated rows | Active rows | Selectable rows | Header status |
+| --- | ---: | ---: | ---: | --- |
+| `stingray_options` | 270 | 255 | 166 | matches `grandSport_options` |
+| `grandSport_options` | 269 | 230 | 162 | matches `stingray_options` |
+| `stingray_ovs` | 1620 | n/a | n/a | matches `grandSport_ovs` |
+| `grandSport_ovs` | 1614 | n/a | n/a | matches `stingray_ovs` |
+| `rule_mapping` | 235 | n/a | n/a | same first 16 headers as `grandSport_rule_mapping`, plus 7 trailing blank Excel headers |
+| `grandSport_rule_mapping` | 328 | n/a | n/a | clean 16-header rule contract |
+| `price_rules` | 42 | n/a | n/a | matches `grandSport_price_rules` |
+| `grandSport_price_rules` | 45 | n/a | n/a | matches `price_rules` |
+| `rule_groups` | 2 | 2 | n/a | matches `grandSport_rule_groups` |
+| `grandSport_rule_groups` | 1 | 1 | n/a | matches `rule_groups` |
+| `rule_group_members` | 5 | 5 | n/a | matches `grandSport_rule_group_members` |
+| `grandSport_rule_group_members` | 18 | 18 | n/a | matches `rule_group_members` |
+| `exclusive_groups` | 7 | 7 | n/a | matches `grandSport_exclusive_groups` |
+| `grandSport_exclusive_groups` | 9 | 9 | n/a | matches `exclusive_groups` |
+| `exclusive_group_members` | 25 | 25 | n/a | matches `grandSport_exclusive_members` |
+| `grandSport_exclusive_members` | 28 | 24 | n/a | matches `exclusive_group_members` |
+| `section_master` | 42 | n/a | n/a | shared source |
+
+Pass 1 conclusions:
+
+- The paired source-sheet structure is already in place for options, variant statuses, price rules, rule groups, and exclusive groups.
+- `rule_mapping` should eventually be cleaned to the same 16-header shape as `grandSport_rule_mapping`; that is a workbook cleanup item and should not be solved by adding a new rule sheet or teaching code to depend on blank headers.
+- The active duplicate-RPO diagnosis below is still current and should be the first high-risk workbook implementation pass.
+- Later passes now tie back to a diagnosis item in this document. If a future implementation pass discovers a new code-owned branch or source-data issue, add that finding here before implementing the change.
+
 ## Current Findings
 
 ### Duplicate RPOs In `stingray_options`
