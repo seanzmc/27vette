@@ -12,6 +12,7 @@ function loadData() {
 const data = loadData();
 const appSource = fs.readFileSync("form-app/app.js", "utf8");
 const htmlSource = fs.readFileSync("form-app/index.html", "utf8");
+const stylesSource = fs.readFileSync("form-app/styles.css", "utf8");
 const interiorReferenceSource = fs.readFileSync("architectureAudit/stingray_interiors_refactor.csv", "utf8");
 
 function parseCsv(source) {
@@ -60,9 +61,16 @@ function makeElement() {
     value: "",
     dataset: {},
     hidden: false,
+    attributes: {},
     listeners: {},
     addEventListener(type, listener) {
       this.listeners[type] = listener;
+    },
+    setAttribute(name, value) {
+      this.attributes[name] = String(value);
+    },
+    getAttribute(name) {
+      return this.attributes[name];
     },
     focus() {},
     querySelectorAll() {
@@ -182,6 +190,9 @@ window.__testApi = {
   lineItems,
   currentOrder,
   render,
+  activateStep: typeof activateStep === "function" ? activateStep : undefined,
+  setMobileDrawer: typeof setMobileDrawer === "function" ? setMobileDrawer : undefined,
+  closeMobileDrawers: typeof closeMobileDrawers === "function" ? closeMobileDrawers : undefined,
   currentStepSummary: typeof currentStepSummary === "function" ? currentStepSummary : undefined,
   renderMobileProgress: typeof renderMobileProgress === "function" ? renderMobileProgress : undefined,
   compactOrder: typeof compactOrder === "function" ? compactOrder : undefined,
@@ -511,13 +522,20 @@ test("app runtime has the requested navigation and filtering hooks", () => {
 });
 
 test("mobile shell exposes compact progress and summary targets", () => {
-  assert.match(htmlSource, /id="mobileSummaryToggle"/);
+  assert.doesNotMatch(htmlSource, /id="mobileSummaryToggle"/);
   assert.match(htmlSource, /Current Build/);
   assert.match(htmlSource, /id="mobileSummaryTotal"/);
   assert.match(htmlSource, /id="mobileSummaryMissing"/);
   assert.match(htmlSource, /id="mobileProgress"/);
   assert.match(htmlSource, /id="mobilePrevStep"/);
   assert.match(htmlSource, /id="mobileNextStep"/);
+  assert.match(htmlSource, /id="openStepDrawerButton"/);
+  assert.match(htmlSource, /id="openSummaryDrawerButton"/);
+  assert.match(htmlSource, /id="mobileDrawerBackdrop"/);
+  assert.match(htmlSource, /id="stepRailDrawer"/);
+  assert.match(htmlSource, /id="summaryDrawer"/);
+  assert.ok(stylesSource.indexOf("#requirementsCard") < stylesSource.indexOf("#selectedRposCard"));
+  assert.ok(stylesSource.indexOf("#selectedRposCard") < stylesSource.indexOf("#autoAddedCard"));
 });
 
 test("mobile progress and compact summary update from runtime state", () => {
@@ -543,6 +561,27 @@ test("mobile progress and compact summary update from runtime state", () => {
   assert.equal(runtime.elements.get("#mobilePrevStep").textContent, "Back");
   assert.equal(runtime.elements.get("#mobilePrevStep").title, "Back: Body Style");
   assert.equal(runtime.elements.get("#mobileProgress").dataset.hasPrevious, "true");
+});
+
+test("mobile drawers expose route and summary state without changing form logic", () => {
+  const runtime = loadRuntime();
+  runtime.render();
+
+  runtime.setMobileDrawer("steps");
+  assert.equal(runtime.elements.get(".app-shell").dataset.mobileDrawer, "steps");
+  assert.equal(runtime.elements.get("#mobileDrawerBackdrop").hidden, false);
+  assert.equal(runtime.elements.get("#openStepDrawerButton").getAttribute("aria-expanded"), "true");
+
+  runtime.activateStep("trim_level", { closeDrawer: true });
+  assert.equal(runtime.state.activeStep, "trim_level");
+  assert.equal(runtime.elements.get(".app-shell").dataset.mobileDrawer, undefined);
+  assert.equal(runtime.elements.get("#mobileDrawerBackdrop").hidden, true);
+
+  runtime.setMobileDrawer("summary");
+  assert.equal(runtime.elements.get(".app-shell").dataset.mobileDrawer, "summary");
+  assert.equal(runtime.elements.get("#openSummaryDrawerButton").getAttribute("aria-expanded"), "true");
+  runtime.closeMobileDrawers();
+  assert.equal(runtime.elements.get(".app-shell").dataset.mobileDrawer, undefined);
 });
 
 test("body style choices put coupe before convertible", () => {

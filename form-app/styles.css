@@ -214,6 +214,12 @@ textarea {
   display: none;
 }
 
+.mobile-drawer-button,
+.mobile-drawer-header,
+.mobile-drawer-backdrop {
+  display: none;
+}
+
 .workspace {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr) 340px;
@@ -718,6 +724,8 @@ textarea {
 
 @media (max-width: 760px) {
   .app-shell {
+    display: grid;
+    gap: 10px;
     width: min(100% - 20px, 1680px);
     padding-top: 10px;
   }
@@ -729,8 +737,34 @@ textarea {
   }
 
   .topbar {
+    position: relative;
     gap: 14px;
-    padding: 16px;
+    padding: 52px 16px 16px;
+    border-radius: 8px;
+  }
+
+  .mobile-drawer-button {
+    position: absolute;
+    top: 14px;
+    z-index: 1;
+    display: inline-grid;
+    place-items: center;
+    width: 36px;
+    min-height: 36px;
+    padding: 0;
+    border-color: var(--line);
+    background: var(--panel-strong);
+    color: var(--accent-dark);
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .mobile-drawer-button-left {
+    left: 16px;
+  }
+
+  .mobile-drawer-button-right {
+    right: 16px;
   }
 
   h1 {
@@ -757,6 +791,8 @@ textarea {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
     padding: 16px;
+    border-top: 1px solid var(--line);
+    border-radius: 8px;
   }
 
   .vehicle-price {
@@ -782,13 +818,11 @@ textarea {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 10px;
     border: 1px solid var(--line);
     border-radius: 8px;
     padding: 16px;
     background: var(--panel);
     color: var(--ink);
-    cursor: pointer;
   }
 
   .mobile-summary-total-block {
@@ -866,49 +900,116 @@ textarea {
   }
 
   .step-rail {
-    order: 3;
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 30;
+    width: min(86vw, 320px);
+    max-width: 320px;
     border: 0;
-    border-top: 1px solid var(--line);
-    padding: 10px;
-    overflow-x: auto;
+    border-right: 1px solid var(--line);
+    padding: 16px;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 180ms ease;
   }
 
   #stepRail {
-    display: flex;
-    gap: 8px;
-    min-width: max-content;
+    display: grid;
+    gap: 6px;
+    min-width: 0;
   }
 
   .step-link {
-    width: auto;
-    min-width: 76px;
-    min-height: 40px;
-    grid-template-columns: 1fr;
-    justify-items: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    grid-template-columns: 28px 1fr;
+    justify-items: stretch;
     margin-bottom: 0;
-    padding: 6px 8px;
-    font-size: 11px;
-    text-align: center;
-  }
-
-  .step-link span:last-child {
-    display: none;
+    padding: 0 14px;
+    font-size: 14px;
+    text-align: left;
   }
 
   .summary-panel {
-    display: none;
-    order: 4;
+    position: fixed;
+    inset: 0 0 0 auto;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    width: min(88vw, 360px);
+    max-width: 360px;
     border: 0;
-    border-top: 1px solid var(--line);
-    padding: 12px;
+    border-left: 1px solid var(--line);
+    padding: 16px;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 180ms ease;
   }
 
-  .mobile-summary-toggle:checked ~ .workspace .summary-panel {
+  .app-shell[data-mobile-drawer="steps"] .step-rail,
+  .app-shell[data-mobile-drawer="summary"] .summary-panel {
+    transform: translateX(0);
+    box-shadow: var(--shadow);
+  }
+
+  .mobile-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .mobile-drawer-header h2 {
+    font-size: 20px;
+  }
+
+  .mobile-drawer-backdrop:not([hidden]) {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
     display: block;
+    background: rgba(23, 32, 38, 0.32);
+  }
+
+  #requirementsCard {
+    order: 1;
+  }
+
+  #selectedRposCard {
+    order: 2;
+  }
+
+  #autoAddedCard {
+    order: 3;
+  }
+
+  #summaryOverviewCard {
+    order: 4;
+  }
+
+  .summary-card[data-requirements-status="complete"] {
+    border-color: rgba(31, 122, 77, 0.35);
+    background: #f1f8f2;
   }
 
   .choice-panel {
     padding: 16px;
+  }
+
+  .workspace {
+    min-height: 0;
+    border-radius: 8px;
+    overflow: visible;
+  }
+
+  .alert-region {
+    margin: 0;
+  }
+
+  .alert-region:empty {
+    display: none;
   }
 
   .step-header,

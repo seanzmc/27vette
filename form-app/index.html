@@ -11,6 +11,12 @@
   <body>
     <main class="app-shell">
       <header class="topbar">
+        <button id="openStepDrawerButton" class="mobile-drawer-button mobile-drawer-button-left" type="button" aria-controls="stepRailDrawer" aria-expanded="false" aria-label="Open steps">
+          <span aria-hidden="true">☰</span>
+        </button>
+        <button id="openSummaryDrawerButton" class="mobile-drawer-button mobile-drawer-button-right" type="button" aria-controls="summaryDrawer" aria-expanded="false" aria-label="Open build summary">
+          <span aria-hidden="true">$</span>
+        </button>
         <div>
           <p class="eyebrow">2027 Corvette</p>
           <h1 id="appTitle">Stingray Order Form</h1>
@@ -46,15 +52,14 @@
 
       <section id="alertRegion" class="alert-region" aria-live="polite"></section>
 
-      <input id="mobileSummaryToggle" class="mobile-summary-toggle" type="checkbox" hidden>
-      <label class="mobile-summary-bar" for="mobileSummaryToggle" aria-label="Toggle order summary">
+      <section class="mobile-summary-bar" aria-label="Current build summary">
         <span class="mobile-summary-total-block">
           <small class="mobile-summary-label">Current Build</small>
           <strong id="mobileSummaryTotal">$0</strong>
           <small id="mobileSummarySelected">No selections yet</small>
         </span>
         <span id="mobileSummaryMissing">Complete required choices</span>
-      </label>
+      </section>
 
       <div class="workspace">
         <section id="mobileProgress" class="mobile-progress" aria-label="Mobile step progress">
@@ -65,14 +70,22 @@
           </div>
           <button id="mobileNextStep" type="button">Next</button>
         </section>
-        <nav class="step-rail" aria-label="Form steps">
+        <nav id="stepRailDrawer" class="step-rail" aria-label="Form steps">
+          <div class="mobile-drawer-header">
+            <h2>Steps</h2>
+            <button id="closeStepDrawerButton" class="modal-close-button" type="button" aria-label="Close steps">×</button>
+          </div>
           <div id="stepRail"></div>
         </nav>
         <section class="choice-panel" aria-label="Current choices">
           <div id="stepContent"></div>
         </section>
-        <aside class="summary-panel" aria-label="Order summary">
-          <div class="summary-card">
+        <aside id="summaryDrawer" class="summary-panel" aria-label="Order summary">
+          <div class="mobile-drawer-header">
+            <h2>Build</h2>
+            <button id="closeSummaryDrawerButton" class="modal-close-button" type="button" aria-label="Close build summary">×</button>
+          </div>
+          <div id="summaryOverviewCard" class="summary-card">
             <p class="eyebrow">Summary</p>
             <h2 id="variantName">Stingray</h2>
             <dl class="total-list">
@@ -81,21 +94,22 @@
               <div><dt>Total MSRP</dt><dd id="summaryTotal">$0</dd></div>
             </dl>
           </div>
-          <div class="summary-card">
+          <div id="selectedRposCard" class="summary-card">
             <h3>Selected RPOs</h3>
             <ul id="selectedList" class="summary-list"></ul>
             <div id="selectedStandardEquipmentList" class="standard-equipment-list compact-standard-equipment"></div>
           </div>
-          <div class="summary-card">
+          <div id="autoAddedCard" class="summary-card">
             <h3>Auto-added RPOs</h3>
             <ul id="autoList" class="summary-list"></ul>
           </div>
-          <div class="summary-card">
+          <div id="requirementsCard" class="summary-card">
             <h3>Open Requirements</h3>
             <ul id="missingList" class="summary-list"></ul>
           </div>
         </aside>
       </div>
+      <div id="mobileDrawerBackdrop" class="mobile-drawer-backdrop" hidden></div>
     </main>
 
     <div id="dealerSubmitModal" class="modal-backdrop" hidden>

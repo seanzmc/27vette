@@ -44,6 +44,7 @@ const state = {
 };
 
 const els = {
+  appShell: document.querySelector(".app-shell"),
   currentBody: document.querySelector("#currentBody"),
   currentTrim: document.querySelector("#currentTrim"),
   basePrice: document.querySelector("#basePrice"),
@@ -58,6 +59,11 @@ const els = {
   mobileStepName: document.querySelector("#mobileStepName"),
   mobilePrevStep: document.querySelector("#mobilePrevStep"),
   mobileNextStep: document.querySelector("#mobileNextStep"),
+  openStepDrawerButton: document.querySelector("#openStepDrawerButton"),
+  closeStepDrawerButton: document.querySelector("#closeStepDrawerButton"),
+  openSummaryDrawerButton: document.querySelector("#openSummaryDrawerButton"),
+  closeSummaryDrawerButton: document.querySelector("#closeSummaryDrawerButton"),
+  mobileDrawerBackdrop: document.querySelector("#mobileDrawerBackdrop"),
   mobileSummaryTotal: document.querySelector("#mobileSummaryTotal"),
   mobileSummarySelected: document.querySelector("#mobileSummarySelected"),
   mobileSummaryMissing: document.querySelector("#mobileSummaryMissing"),
@@ -65,6 +71,7 @@ const els = {
   selectedStandardEquipmentList: document.querySelector("#selectedStandardEquipmentList"),
   autoList: document.querySelector("#autoList"),
   missingList: document.querySelector("#missingList"),
+  requirementsCard: document.querySelector("#requirementsCard"),
   alertRegion: document.querySelector("#alertRegion"),
   resetButton: document.querySelector("#resetButton"),
   downloadBuildButton: document.querySelector("#downloadBuildButton"),
@@ -219,11 +226,42 @@ function nextStep() {
   return index >= 0 ? runtimeSteps[index + 1] : null;
 }
 
+function setButtonExpanded(button, expanded) {
+  button?.setAttribute?.("aria-expanded", expanded ? "true" : "false");
+}
+
+function setMobileDrawer(drawerName = "") {
+  if (els.appShell) {
+    if (drawerName) {
+      els.appShell.dataset.mobileDrawer = drawerName;
+    } else {
+      delete els.appShell.dataset.mobileDrawer;
+    }
+  }
+  if (els.mobileDrawerBackdrop) els.mobileDrawerBackdrop.hidden = !drawerName;
+  setButtonExpanded(els.openStepDrawerButton, drawerName === "steps");
+  setButtonExpanded(els.openSummaryDrawerButton, drawerName === "summary");
+}
+
+function closeMobileDrawers() {
+  setMobileDrawer("");
+}
+
+function handleMobileDrawerKeydown(event) {
+  if (event.key === "Escape") closeMobileDrawers();
+}
+
+function activateStep(stepKey, { closeDrawer = false } = {}) {
+  if (!stepKey) return;
+  state.activeStep = stepKey;
+  render({ resetScroll: true });
+  if (closeDrawer) closeMobileDrawers();
+}
+
 function goToNextStep() {
   const step = nextStep();
   if (!step) return;
-  state.activeStep = step.step_key;
-  render({ resetScroll: true });
+  activateStep(step.step_key);
 }
 
 function activeChoiceRows() {
@@ -897,8 +935,7 @@ function currentStepSummary() {
 function goToPreviousStep() {
   const { previous } = currentStepSummary();
   if (!previous) return;
-  state.activeStep = previous.step_key;
-  render({ resetScroll: true });
+  activateStep(previous.step_key);
 }
 
 function renderMobileProgress() {
@@ -932,8 +969,7 @@ function renderStepRail() {
     .join("");
   els.stepRail.querySelectorAll(".step-link").forEach((button) => {
     button.addEventListener("click", () => {
-      state.activeStep = button.dataset.step;
-      render({ resetScroll: true });
+      activateStep(button.dataset.step, { closeDrawer: true });
     });
   });
 }
@@ -1288,7 +1324,10 @@ function renderSummary() {
     autoItems.map((item) => `<li><strong>${item.rpo || item.id}</strong> ${item.label} - ${formatMoney(item.price)}<br>${item.reason || ""}</li>`).join("") ||
     "<li class=\"empty\">No auto-added RPOs.</li>";
   const missing = missingRequired();
-  els.missingList.innerHTML = missing.map((item) => `<li>${item}</li>`).join("") || "<li class=\"empty\">No open required choices.</li>";
+  if (els.requirementsCard) els.requirementsCard.dataset.requirementsStatus = missing.length ? "open" : "complete";
+  els.missingList.innerHTML =
+    missing.map((item) => `<li>${item}</li>`).join("") ||
+    "<li class=\"empty positive\">Build requirements complete. You can keep exploring options or download/send when ready.</li>";
   els.downloadBuildButton.disabled = missing.length > 0;
   els.downloadBuildButton.title = missing.length ? "Complete required selections before downloading your build." : "";
   if (els.submitDealerButton) {
@@ -1302,7 +1341,7 @@ function renderSummary() {
   }
   if (els.mobileSummaryMissing) {
     els.mobileSummaryMissing.textContent =
-      missing.length === 0 ? "Ready to download or submit" : `${missing.length} required choice${missing.length === 1 ? "" : "s"} left`;
+      missing.length === 0 ? "Requirements complete" : `${missing.length} required choice${missing.length === 1 ? "" : "s"} left`;
   }
   renderStandardEquipment();
 
@@ -1870,6 +1909,12 @@ function init() {
   els.submitDealerButton?.addEventListener("click", openDealerSubmitModal);
   els.mobilePrevStep?.addEventListener("click", goToPreviousStep);
   els.mobileNextStep?.addEventListener("click", goToNextStep);
+  els.openStepDrawerButton?.addEventListener("click", () => setMobileDrawer("steps"));
+  els.closeStepDrawerButton?.addEventListener("click", closeMobileDrawers);
+  els.openSummaryDrawerButton?.addEventListener("click", () => setMobileDrawer("summary"));
+  els.closeSummaryDrawerButton?.addEventListener("click", closeMobileDrawers);
+  els.mobileDrawerBackdrop?.addEventListener("click", closeMobileDrawers);
+  document.addEventListener?.("keydown", handleMobileDrawerKeydown);
   els.dealerSubmitForm?.addEventListener("submit", submitDealerBuild);
   els.dealerSubmitCloseButton?.addEventListener("click", closeDealerSubmitModal);
   els.dealerSubmitCancelButton?.addEventListener("click", closeDealerSubmitModal);
