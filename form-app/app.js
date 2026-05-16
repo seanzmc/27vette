@@ -1327,7 +1327,7 @@ function renderSummary() {
   if (els.requirementsCard) els.requirementsCard.dataset.requirementsStatus = missing.length ? "open" : "complete";
   els.missingList.innerHTML =
     missing.map((item) => `<li>${item}</li>`).join("") ||
-    "<li class=\"empty positive\">Build requirements complete. You can keep exploring options or download/send when ready.</li>";
+    "<li class=\"empty positive\">Build requirements complete. You can keep exploring options or download/submit when ready.</li>";
   els.downloadBuildButton.disabled = missing.length > 0;
   els.downloadBuildButton.title = missing.length ? "Complete required selections before downloading your build." : "";
   if (els.submitDealerButton) {
