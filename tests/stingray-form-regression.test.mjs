@@ -187,6 +187,7 @@ window.__testApi = {
   reconcileSelections,
   handleChoice,
   computeAutoAdded,
+  disableReasonForChoice,
   lineItems,
   currentOrder,
   render,
@@ -876,6 +877,41 @@ test("download build exports customer-facing Markdown", () => {
   assert.equal(markdownDownload.content.includes("option_id"), false);
 });
 
+test("final step mirrors customer action buttons", () => {
+  assert.match(appSource, /function renderFinalStepActions/);
+  assert.match(appSource, /data-final-download/);
+  assert.match(appSource, /data-final-submit/);
+  assert.match(appSource, /querySelector\("\[data-final-download\]"\)\?\.addEventListener\("click", downloadBuild\)/);
+  assert.match(appSource, /querySelector\("\[data-final-submit\]"\)\?\.addEventListener\("click", openDealerSubmitModal\)/);
+
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.state.activeStep = "delivery";
+  runtime.render();
+
+  const stepContent = runtime.elements.get("#stepContent").innerHTML;
+  assert.match(stepContent, /class="step-footer final-step-actions"/);
+  assert.match(stepContent, /data-final-download disabled title="Complete required selections before downloading your build\."/);
+  assert.match(stepContent, /data-final-submit disabled title="Complete required selections before submitting your build\."/);
+  assert.doesNotMatch(stepContent, /data-next-step/);
+
+  const paint = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001");
+  runtime.handleChoice(paint);
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+  runtime.reconcileSelections();
+  runtime.state.activeStep = "delivery";
+  runtime.render();
+
+  const completedStepContent = runtime.elements.get("#stepContent").innerHTML;
+  assert.match(completedStepContent, /data-final-download\s+ title="">Download Build<\/button>/);
+  assert.match(completedStepContent, /data-final-submit\s+ title="">Submit to Dealer<\/button>/);
+  assert.doesNotMatch(completedStepContent, /data-final-download disabled/);
+  assert.doesNotMatch(completedStepContent, /data-final-submit disabled/);
+});
+
 test("submit to dealer modal posts a validated dealer payload", async () => {
   assert.match(htmlSource, /id="submitDealerButton"[\s\S]*Submit to Dealer/);
   assert.match(htmlSource, /id="dealerSubmitModal"/);
@@ -1106,7 +1142,7 @@ test("plain text order summary renders compact order data for emails and review"
   assert.doesNotMatch(summary, /Base MSRP/);
   assert.match(summary, /<p><strong><u>Exterior Paint<\/u><\/strong><\/p><ul><li>GBA Black: \$0<\/li>/);
   assert.match(summary, /<p><strong><u>Seats &amp; Interior<\/u><\/strong><\/p><ul>[\s\S]*<li>AQ9 GT1 Bucket Seats: \$0<\/li>[\s\S]*<li>HTA Jet Black: \$0<\/li>/);
-  assert.match(summary, /<p><strong><u>Auto-Added \/ Required<\/u><\/strong><\/p><ul>[\s\S]*<li>FE3 Z51 performance suspension: \$0<\/li>/);
+  assert.match(summary, /<p><strong><u>Auto-Added \/ Required<\/u><\/strong><\/p><ul>[\s\S]*<li>FE3 Z51 Performance Suspension: \$0<\/li>/);
   assert.doesNotMatch(summary, /STANDARD & INCLUDED/);
   assert.match(summary, /<p><strong>Total MSRP: \$\d/);
   assert.doesNotMatch(summary, /(?:^|\n)(?:Vehicle|Exterior Paint|Seats & Interior|Auto-Added \/ Required)(?:\n|$)/);
@@ -1283,6 +1319,29 @@ test("replaceable suspension and exhaust defaults are encoded", () => {
   assert.match(appSource, /selectedOptionByRpo\("NWI"\)/);
   assert.match(appSource, /deleteSelectedRpo\("NGA"\)/);
   assert.match(appSource, /addDefaultRpo\("NGA"\)/);
+});
+
+test("FE3 disabled tile explains that Z51 includes it without duplicating the RPO", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+
+  const fe3 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_fe3_001");
+  assert.ok(fe3, "FE3 should exist for the current variant");
+  assert.equal(runtime.disableReasonForChoice(fe3), "Included with Z51 Performance Package.");
+
+  const fe4 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_fe4_001");
+  assert.ok(fe4, "FE4 should exist for the current variant");
+  assert.equal(runtime.disableReasonForChoice(fe4), "Requires Z51 Performance Package.");
+
+  const t0a = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0a_001");
+  assert.ok(t0a, "T0A should exist for the current variant");
+  assert.equal(runtime.disableReasonForChoice(t0a), "Requires Z51 Performance Package.");
+
+  const z51 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_z51_001");
+  assert.ok(z51, "Z51 should exist for the current variant");
+  runtime.handleChoice(z51);
+  assert.equal(runtime.computeAutoAdded().get("opt_fe3_001"), "Included with Z51 Performance Package.");
 });
 
 test("FE1 default selection prefers the visible suspension tile", () => {

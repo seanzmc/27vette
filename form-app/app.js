@@ -368,6 +368,24 @@ function getEntityLabel(id) {
   return id;
 }
 
+function removeDuplicatedEntityRpo(reason, entityId) {
+  const option = optionsById.get(entityId);
+  const rpo = option?.rpo?.trim();
+  const label = option?.label?.trim();
+  if (!reason || !rpo || !label || !label.toLowerCase().startsWith(`${rpo.toLowerCase()} `)) return reason;
+  return reason.split(`${rpo} ${label}`).join(label);
+}
+
+function includedWithReason(rule) {
+  const reason = rule.disabled_reason || `Included with ${getEntityLabel(rule.source_id)}.`;
+  return removeDuplicatedEntityRpo(reason, rule.source_id);
+}
+
+function requiresReason(rule) {
+  const reason = rule.disabled_reason || `Requires ${getEntityLabel(rule.target_id)}.`;
+  return removeDuplicatedEntityRpo(reason, rule.target_id);
+}
+
 function selectedExcludesTarget(targetId, selectedIds) {
   for (const sourceId of selectedIds) {
     const rules = ruleTargetsBySource.get(sourceId) || [];
@@ -453,7 +471,7 @@ function computeAutoAdded() {
         !shouldSuppressIncludedDefault(rule) &&
         !userSelectedExclusiveGroupPeer(rule.target_id, selectedIds)
       ) {
-        autoAdded.set(rule.target_id, rule.disabled_reason || `Included with ${getEntityLabel(sourceId)}.`);
+        autoAdded.set(rule.target_id, includedWithReason(rule));
       }
     }
   }
@@ -492,13 +510,19 @@ function disableReasonForChoice(choice) {
       if (rule.runtime_action === "replace") return rule.disabled_reason || `${getEntityLabel(rule.source_id)} removes this default.`;
       return rule.disabled_reason || `Blocked by ${getEntityLabel(rule.source_id)}.`;
     }
+    if (
+      rule.rule_type === "includes" &&
+      ruleAppliesToCurrentVariant(rule) &&
+      choice.selectable !== "True" &&
+      choice.status !== "standard"
+    ) return includedWithReason(rule);
   }
 
   const sourceRules = ruleTargetsBySource.get(choice.option_id) || [];
   for (const rule of sourceRules) {
     if (!ruleAppliesToCurrentVariant(rule)) continue;
     if (rule.rule_type === "requires" && !selectedIds.has(rule.target_id)) {
-      return rule.disabled_reason || `Requires ${getEntityLabel(rule.target_id)}.`;
+      return requiresReason(rule);
     }
     if (rule.rule_type === "excludes" && selectedIds.has(rule.target_id)) {
       if (rule.runtime_action === "replace") continue;
@@ -1206,6 +1230,19 @@ function restoreScrollPosition(position) {
   window.scrollTo({ top: position.windowY, left: position.windowX });
 }
 
+function renderFinalStepActions() {
+  const missing = missingRequired();
+  const downloadTitle = missing.length ? "Complete required selections before downloading your build." : "";
+  const submitTitle = missing.length ? "Complete required selections before submitting your build." : "";
+  const disabled = missing.length ? "disabled" : "";
+  return `
+    <footer class="step-footer final-step-actions" aria-label="Build actions">
+      <button type="button" data-final-download ${disabled} title="${downloadTitle}">Download Build</button>
+      <button type="button" data-final-submit ${disabled} title="${submitTitle}">Submit to Dealer</button>
+    </footer>
+  `;
+}
+
 function renderStepContent({ resetScroll = false } = {}) {
   const step = runtimeSteps.find((item) => item.step_key === state.activeStep);
   const autoAdded = computeAutoAdded();
@@ -1279,7 +1316,7 @@ function renderStepContent({ resetScroll = false } = {}) {
     ${
       next
         ? `<footer class="step-footer"><button type="button" data-next-step="${next.step_key}">Next: ${next.step_label}</button></footer>`
-        : ""
+        : renderFinalStepActions()
     }
   `;
   if (resetScroll) resetStepScroll();
@@ -1303,6 +1340,8 @@ function renderStepContent({ resetScroll = false } = {}) {
     });
   });
   els.stepContent.querySelector("[data-next-step]")?.addEventListener("click", goToNextStep);
+  els.stepContent.querySelector("[data-final-download]")?.addEventListener("click", downloadBuild);
+  els.stepContent.querySelector("[data-final-submit]")?.addEventListener("click", openDealerSubmitModal);
 }
 
 function renderSummary() {

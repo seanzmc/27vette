@@ -297,9 +297,15 @@ textarea {
 .step-footer {
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
   margin-top: 22px;
   padding-top: 18px;
   border-top: 1px solid var(--line);
+}
+
+.final-step-actions {
+  justify-content: flex-start;
 }
 
 .section-title {
