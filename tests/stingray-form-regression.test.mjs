@@ -797,6 +797,41 @@ test("download build exports customer-facing Markdown", () => {
   assert.equal(markdownDownload.content.includes("option_id"), false);
 });
 
+test("final step mirrors customer action buttons", () => {
+  assert.match(appSource, /function renderFinalStepActions/);
+  assert.match(appSource, /data-final-download/);
+  assert.match(appSource, /data-final-submit/);
+  assert.match(appSource, /querySelector\("\[data-final-download\]"\)\?\.addEventListener\("click", downloadBuild\)/);
+  assert.match(appSource, /querySelector\("\[data-final-submit\]"\)\?\.addEventListener\("click", openDealerSubmitModal\)/);
+
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.state.activeStep = "delivery";
+  runtime.render();
+
+  const stepContent = runtime.elements.get("#stepContent").innerHTML;
+  assert.match(stepContent, /class="step-footer final-step-actions"/);
+  assert.match(stepContent, /data-final-download disabled title="Complete required selections before downloading your build\."/);
+  assert.match(stepContent, /data-final-submit disabled title="Complete required selections before submitting your build\."/);
+  assert.doesNotMatch(stepContent, /data-next-step/);
+
+  const paint = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001");
+  runtime.handleChoice(paint);
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+  runtime.reconcileSelections();
+  runtime.state.activeStep = "delivery";
+  runtime.render();
+
+  const completedStepContent = runtime.elements.get("#stepContent").innerHTML;
+  assert.match(completedStepContent, /data-final-download\s+ title="">Download Build<\/button>/);
+  assert.match(completedStepContent, /data-final-submit\s+ title="">Submit to Dealer<\/button>/);
+  assert.doesNotMatch(completedStepContent, /data-final-download disabled/);
+  assert.doesNotMatch(completedStepContent, /data-final-submit disabled/);
+});
+
 test("submit to dealer modal posts a validated dealer payload", async () => {
   assert.match(htmlSource, /id="submitDealerButton"[\s\S]*Submit to Dealer/);
   assert.match(htmlSource, /id="dealerSubmitModal"/);

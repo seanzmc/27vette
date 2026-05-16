@@ -1144,6 +1144,19 @@ function restoreScrollPosition(position) {
   window.scrollTo({ top: position.windowY, left: position.windowX });
 }
 
+function renderFinalStepActions() {
+  const missing = missingRequired();
+  const downloadTitle = missing.length ? "Complete required selections before downloading your build." : "";
+  const submitTitle = missing.length ? "Complete required selections before submitting your build." : "";
+  const disabled = missing.length ? "disabled" : "";
+  return `
+    <footer class="step-footer final-step-actions" aria-label="Build actions">
+      <button type="button" data-final-download ${disabled} title="${downloadTitle}">Download Build</button>
+      <button type="button" data-final-submit ${disabled} title="${submitTitle}">Submit to Dealer</button>
+    </footer>
+  `;
+}
+
 function renderStepContent({ resetScroll = false } = {}) {
   const step = runtimeSteps.find((item) => item.step_key === state.activeStep);
   const autoAdded = computeAutoAdded();
@@ -1217,7 +1230,7 @@ function renderStepContent({ resetScroll = false } = {}) {
     ${
       next
         ? `<footer class="step-footer"><button type="button" data-next-step="${next.step_key}">Next: ${next.step_label}</button></footer>`
-        : ""
+        : renderFinalStepActions()
     }
   `;
   if (resetScroll) resetStepScroll();
@@ -1241,6 +1254,8 @@ function renderStepContent({ resetScroll = false } = {}) {
     });
   });
   els.stepContent.querySelector("[data-next-step]")?.addEventListener("click", goToNextStep);
+  els.stepContent.querySelector("[data-final-download]")?.addEventListener("click", downloadBuild);
+  els.stepContent.querySelector("[data-final-submit]")?.addEventListener("click", openDealerSubmitModal);
 }
 
 function renderSummary() {
