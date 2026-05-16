@@ -53,6 +53,13 @@ const els = {
   variantName: document.querySelector("#variantName"),
   stepRail: document.querySelector("#stepRail"),
   stepContent: document.querySelector("#stepContent"),
+  mobileStepCount: document.querySelector("#mobileStepCount"),
+  mobileStepName: document.querySelector("#mobileStepName"),
+  mobilePrevStep: document.querySelector("#mobilePrevStep"),
+  mobileNextStep: document.querySelector("#mobileNextStep"),
+  mobileSummaryTotal: document.querySelector("#mobileSummaryTotal"),
+  mobileSummarySelected: document.querySelector("#mobileSummarySelected"),
+  mobileSummaryMissing: document.querySelector("#mobileSummaryMissing"),
   selectedList: document.querySelector("#selectedList"),
   selectedStandardEquipmentList: document.querySelector("#selectedStandardEquipmentList"),
   autoList: document.querySelector("#autoList"),
@@ -875,6 +882,40 @@ function renderVehicleContext() {
   els.currentTrim.textContent = state.trimLevel || "";
 }
 
+function currentStepSummary() {
+  const index = Math.max(0, currentStepIndex());
+  return {
+    index,
+    total: runtimeSteps.length,
+    step: runtimeSteps[index],
+    previous: runtimeSteps[index - 1],
+    next: runtimeSteps[index + 1],
+  };
+}
+
+function goToPreviousStep() {
+  const { previous } = currentStepSummary();
+  if (!previous) return;
+  state.activeStep = previous.step_key;
+  render({ resetScroll: true });
+}
+
+function renderMobileProgress() {
+  const { index, total, step, previous, next } = currentStepSummary();
+  if (els.mobileStepCount) els.mobileStepCount.textContent = `Step ${index + 1} of ${total || 1}`;
+  if (els.mobileStepName) els.mobileStepName.textContent = step?.step_label || "Step";
+  if (els.mobilePrevStep) {
+    els.mobilePrevStep.disabled = !previous;
+    els.mobilePrevStep.textContent = previous ? "Back" : "Previous";
+    els.mobilePrevStep.title = previous ? `Back: ${previous.step_label}` : "";
+  }
+  if (els.mobileNextStep) {
+    els.mobileNextStep.disabled = !next;
+    els.mobileNextStep.textContent = next ? "Next" : "Review";
+    els.mobileNextStep.title = next ? `Next: ${next.step_label}` : "";
+  }
+}
+
 function renderStepRail() {
   els.stepRail.innerHTML = runtimeSteps
     .map(
@@ -1088,8 +1129,12 @@ function trimEquipmentRows() {
   return standardEquipmentRows().filter((item) => /LT Equipment$/.test(item.section_name || ""));
 }
 
+function isMobileViewport() {
+  return Boolean(window.matchMedia?.("(max-width: 760px)").matches);
+}
+
 function renderTrimStandardEquipment() {
-  const openGroupName = `${state.trimLevel} Equipment`;
+  const openGroupName = isMobileViewport() ? "" : `${state.trimLevel} Equipment`;
   return `
     <section class="section-block trim-standard-equipment">
       <div class="section-title"><h3>Standard & Included</h3><span>Trim equipment</span></div>
@@ -1246,6 +1291,15 @@ function renderSummary() {
   if (els.submitDealerButton) {
     els.submitDealerButton.disabled = missing.length > 0;
     els.submitDealerButton.title = missing.length ? "Complete required selections before submitting your build." : "";
+  }
+  if (els.mobileSummaryTotal) els.mobileSummaryTotal.textContent = formatMoney(total);
+  if (els.mobileSummarySelected) {
+    els.mobileSummarySelected.textContent =
+      selectedItems.length === 1 ? "1 selected item" : `${selectedItems.length} selected items`;
+  }
+  if (els.mobileSummaryMissing) {
+    els.mobileSummaryMissing.textContent =
+      missing.length === 0 ? "Ready to download or submit" : `${missing.length} required choice${missing.length === 1 ? "" : "s"} left`;
   }
   renderStandardEquipment();
 
@@ -1735,6 +1789,7 @@ function render({ resetScroll = false, preserveScroll = false } = {}) {
   renderVehicleContext();
   renderStepRail();
   renderStepContent({ resetScroll });
+  renderMobileProgress();
   renderSummary();
   restoreScrollPosition(scrollPosition);
 }
@@ -1810,6 +1865,8 @@ function init() {
   els.resetButton.addEventListener("click", requestResetBuild);
   els.downloadBuildButton.addEventListener("click", downloadBuild);
   els.submitDealerButton?.addEventListener("click", openDealerSubmitModal);
+  els.mobilePrevStep?.addEventListener("click", goToPreviousStep);
+  els.mobileNextStep?.addEventListener("click", goToNextStep);
   els.dealerSubmitForm?.addEventListener("submit", submitDealerBuild);
   els.dealerSubmitCloseButton?.addEventListener("click", closeDealerSubmitModal);
   els.dealerSubmitCancelButton?.addEventListener("click", closeDealerSubmitModal);

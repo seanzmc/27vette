@@ -209,6 +209,11 @@ textarea {
   font-weight: 650;
 }
 
+.mobile-summary-bar,
+.mobile-progress {
+  display: none;
+}
+
 .workspace {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr) 340px;
@@ -718,42 +723,240 @@ textarea {
   }
 
   .topbar,
-  .vehicle-bar,
   .workspace {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    gap: 14px;
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 28px;
+    line-height: 1.05;
+  }
+
+  .toolbar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: stretch;
+  }
+
+  .model-picker {
+    grid-column: 1 / -1;
+  }
+
+  .toolbar button {
+    width: 100%;
+    padding: 0 10px;
+  }
+
+  .vehicle-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 12px 16px;
+  }
+
+  .vehicle-price {
+    grid-column: 1 / -1;
+  }
+
+  .vehicle-context-item strong {
+    font-size: 18px;
+  }
+
+  .vehicle-price strong {
+    font-size: 20px;
   }
 
   .vehicle-price {
     justify-items: start;
   }
 
-  .step-rail,
-  .summary-panel {
-    border: 0;
+  .mobile-summary-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    background: var(--panel);
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .mobile-summary-bar strong,
+  .mobile-summary-bar small {
+    display: block;
+  }
+
+  .mobile-summary-bar strong {
+    font-size: 20px;
+  }
+
+  .mobile-summary-bar small,
+  .mobile-summary-bar > span:last-child {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .mobile-progress {
+    display: grid;
+    grid-template-columns: minmax(74px, 0.8fr) minmax(0, 1.4fr) minmax(74px, 0.8fr);
+    align-items: center;
+    gap: 10px;
+    order: 1;
+    border-bottom: 1px solid var(--line);
+    padding: 14px 16px;
+    background: #efe8dc;
+  }
+
+  .mobile-progress div {
+    display: grid;
+    gap: 3px;
+  }
+
+  .mobile-progress span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .mobile-progress strong {
+    font-size: 18px;
+  }
+
+  .mobile-progress button {
+    width: 100%;
   }
 
   .choice-panel {
-    order: 1;
-  }
-
-  .step-rail {
     order: 2;
   }
 
-  .summary-panel {
+  .step-rail {
     order: 3;
+    border: 0;
+    border-top: 1px solid var(--line);
+    padding: 10px;
+    overflow-x: auto;
+  }
+
+  #stepRail {
+    display: flex;
+    gap: 8px;
+    min-width: max-content;
+  }
+
+  .step-link {
+    width: auto;
+    min-width: 76px;
+    min-height: 40px;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    margin-bottom: 0;
+    padding: 6px 8px;
+    font-size: 11px;
+    text-align: center;
+  }
+
+  .step-link span:last-child {
+    display: none;
+  }
+
+  .summary-panel {
+    display: none;
+    order: 4;
+    border: 0;
+    border-top: 1px solid var(--line);
+    padding: 12px;
+  }
+
+  .mobile-summary-toggle:checked ~ .workspace .summary-panel {
+    display: block;
   }
 
   .choice-panel {
     padding: 16px;
   }
 
+  .step-header,
+  .section-title,
+  .interior-group-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .choice-grid,
+  .interior-choice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .choice-card {
+    min-height: 0;
+    padding: 12px;
+  }
+
+  .choice-card .topline {
+    align-items: flex-start;
+  }
+
+  .choice-note,
+  .disabled-reason,
+  .auto-reason,
+  .standard-group .summary-list small {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .choice-card:focus-visible .choice-note,
+  .choice-card:focus-visible .disabled-reason,
+  .choice-card:focus-visible .auto-reason {
+    -webkit-line-clamp: unset;
+  }
+
+  .trim-standard-equipment .standard-group:not([open]) .summary-list,
+  .compact-standard-equipment .standard-group:not([open]) .nested-standard-equipment {
+    display: none;
+  }
+
+  .step-footer {
+    position: sticky;
+    bottom: 0;
+    justify-content: stretch;
+    margin-right: -16px;
+    margin-left: -16px;
+    padding: 12px 16px;
+    background: var(--panel);
+  }
+
+  .step-footer button {
+    width: 100%;
+  }
+
   .customer-field-grid {
     grid-template-columns: 1fr;
   }
 
-  .toolbar {
-    justify-content: start;
+  .modal-backdrop {
+    padding: 10px;
+  }
+
+  .modal-header,
+  .modal-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .modal-actions button {
+    width: 100%;
   }
 }

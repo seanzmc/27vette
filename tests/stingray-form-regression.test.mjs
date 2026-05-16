@@ -182,6 +182,8 @@ window.__testApi = {
   lineItems,
   currentOrder,
   render,
+  currentStepSummary: typeof currentStepSummary === "function" ? currentStepSummary : undefined,
+  renderMobileProgress: typeof renderMobileProgress === "function" ? renderMobileProgress : undefined,
   compactOrder: typeof compactOrder === "function" ? compactOrder : undefined,
   plainTextOrderSummary: typeof plainTextOrderSummary === "function" ? plainTextOrderSummary : undefined,
   buildMarkdown: typeof buildMarkdown === "function" ? buildMarkdown : undefined,
@@ -506,6 +508,36 @@ test("app runtime has the requested navigation and filtering hooks", () => {
   assert.match(appSource, /data-next-step/);
   assert.match(appSource, /renderTrimStandardEquipment/);
   assert.doesNotMatch(appSource, /state\.activeStep === "customer_info"/);
+});
+
+test("mobile shell exposes compact progress and summary targets", () => {
+  assert.match(htmlSource, /id="mobileSummaryToggle"/);
+  assert.match(htmlSource, /id="mobileSummaryTotal"/);
+  assert.match(htmlSource, /id="mobileSummaryMissing"/);
+  assert.match(htmlSource, /id="mobileProgress"/);
+  assert.match(htmlSource, /id="mobilePrevStep"/);
+  assert.match(htmlSource, /id="mobileNextStep"/);
+});
+
+test("mobile progress and compact summary update from runtime state", () => {
+  const runtime = loadRuntime();
+  runtime.render();
+
+  assert.equal(runtime.elements.get("#mobileStepCount").textContent, "Step 1 of 13");
+  assert.equal(runtime.elements.get("#mobileStepName").textContent, "Body Style");
+  assert.equal(runtime.elements.get("#mobilePrevStep").disabled, true);
+  assert.equal(runtime.elements.get("#mobileNextStep").textContent, "Next");
+  assert.equal(runtime.elements.get("#mobileNextStep").title, "Next: Trim Level");
+  assert.match(runtime.elements.get("#mobileSummaryTotal").textContent, /^\$/);
+  assert.match(runtime.elements.get("#mobileSummarySelected").textContent, /selected item/);
+  assert.match(runtime.elements.get("#mobileSummaryMissing").textContent, /required choice/);
+
+  runtime.state.activeStep = "trim_level";
+  runtime.render();
+  assert.equal(runtime.elements.get("#mobileStepCount").textContent, "Step 2 of 13");
+  assert.equal(runtime.elements.get("#mobileStepName").textContent, "Trim Level");
+  assert.equal(runtime.elements.get("#mobilePrevStep").textContent, "Back");
+  assert.equal(runtime.elements.get("#mobilePrevStep").title, "Back: Body Style");
 });
 
 test("body style choices put coupe before convertible", () => {

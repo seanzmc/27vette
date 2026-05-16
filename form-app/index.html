@@ -46,7 +46,24 @@
 
       <section id="alertRegion" class="alert-region" aria-live="polite"></section>
 
+      <input id="mobileSummaryToggle" class="mobile-summary-toggle" type="checkbox" hidden>
+      <label class="mobile-summary-bar" for="mobileSummaryToggle" aria-label="Toggle order summary">
+        <span>
+          <strong id="mobileSummaryTotal">$0</strong>
+          <small id="mobileSummarySelected">No selections yet</small>
+        </span>
+        <span id="mobileSummaryMissing">Complete required choices</span>
+      </label>
+
       <div class="workspace">
+        <section id="mobileProgress" class="mobile-progress" aria-label="Mobile step progress">
+          <button id="mobilePrevStep" class="ghost-button" type="button">Previous</button>
+          <div>
+            <span id="mobileStepCount">Step 1 of 1</span>
+            <strong id="mobileStepName">Body Style</strong>
+          </div>
+          <button id="mobileNextStep" type="button">Next</button>
+        </section>
         <nav class="step-rail" aria-label="Form steps">
           <div id="stepRail"></div>
         </nav>
