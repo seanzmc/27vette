@@ -1065,6 +1065,11 @@ textarea {
     flex-direction: column;
   }
 
+  #stepContent .step-header,
+  #stepContent[data-step-kind="context"] .context-step-section .section-title {
+    display: none;
+  }
+
   .choice-grid,
   .interior-choice-grid {
     grid-template-columns: 1fr;

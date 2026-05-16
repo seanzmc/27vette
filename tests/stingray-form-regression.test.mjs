@@ -572,6 +572,20 @@ test("mobile progress and compact summary update from runtime state", () => {
   assert.equal(runtime.elements.get("#mobileProgress").dataset.hasPrevious, "true");
 });
 
+test("context steps expose mobile readability hooks without changing step content", () => {
+  const runtime = loadRuntime();
+  runtime.render();
+
+  assert.equal(runtime.elements.get("#stepContent").dataset.activeStep, "body_style");
+  assert.equal(runtime.elements.get("#stepContent").dataset.stepKind, "context");
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /context-step-section/);
+
+  runtime.state.activeStep = "paint";
+  runtime.render();
+  assert.equal(runtime.elements.get("#stepContent").dataset.activeStep, "paint");
+  assert.equal(runtime.elements.get("#stepContent").dataset.stepKind, "option");
+});
+
 test("mobile drawers expose route and summary state without changing form logic", () => {
   const runtime = loadRuntime();
   runtime.render();

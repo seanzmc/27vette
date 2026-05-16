@@ -1246,16 +1246,17 @@ function renderFinalStepActions() {
 function renderStepContent({ resetScroll = false } = {}) {
   const step = runtimeSteps.find((item) => item.step_key === state.activeStep);
   const autoAdded = computeAutoAdded();
+  const isContextStep = state.activeStep === "body_style" || state.activeStep === "trim_level";
   let body = "";
 
-  if (state.activeStep === "body_style" || state.activeStep === "trim_level") {
+  if (isContextStep) {
     const contextChoices = data.contextChoices
       .filter((choice) => choice.step_key === state.activeStep)
       .filter((choice) => choice.context_type !== "trim_level" || choice.body_style === state.bodyStyle)
       .sort((a, b) => Number(a.display_order || 0) - Number(b.display_order || 0));
     const section = sectionsById.get(state.activeStep === "body_style" ? "sec_context_body_style" : "sec_context_trim_level");
     body = `
-      <section class="section-block">
+      <section class="section-block context-step-section">
         <div class="section-title"><h3>${section?.section_name || step?.step_label}</h3><span>${renderModeLabel(section)}</span></div>
         <div class="choice-grid">${contextChoices.map(renderContextCard).join("")}</div>
       </section>
@@ -1304,6 +1305,8 @@ function renderStepContent({ resetScroll = false } = {}) {
   }
 
   const next = nextStep();
+  els.stepContent.dataset.activeStep = state.activeStep;
+  els.stepContent.dataset.stepKind = isContextStep ? "context" : "option";
   els.stepContent.innerHTML = `
     <header class="step-header">
       <div>
