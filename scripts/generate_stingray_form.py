@@ -437,6 +437,58 @@ def truncate_reason(text: str, limit: int = 180) -> str:
     return text[: limit - 1].rstrip() + "..."
 
 
+def standard_equipment_key(choice: dict[str, Any]) -> tuple[str, str]:
+    rpo = clean(choice.get("rpo", ""))
+    return choice["variant_id"], rpo or choice["option_id"]
+
+
+def standard_equipment_preference(choice: dict[str, Any], index: int) -> tuple[int, int]:
+    option_id = clean(choice.get("option_id", ""))
+    section_id = clean(choice.get("section_id", ""))
+    is_canonical = option_id.endswith("_001")
+    if is_canonical and section_id != "sec_stan_002":
+        rank = 0
+    elif section_id != "sec_stan_002":
+        rank = 1
+    else:
+        rank = 2
+    return rank, index
+
+
+def standard_equipment_row(choice: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "equipment_id": f"std_{choice['variant_id']}__{choice['option_id']}",
+        "variant_id": choice["variant_id"],
+        "body_style": choice["body_style"],
+        "trim_level": choice["trim_level"],
+        "option_id": choice["option_id"],
+        "rpo": choice["rpo"],
+        "label": choice["label"],
+        "description": choice["description"],
+        "section_id": choice["section_id"],
+        "section_name": choice["section_name"],
+        "display_order": choice["display_order"],
+        "source_detail_raw": choice["source_detail_raw"],
+    }
+
+
+def build_standard_equipment(choices: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    selected: dict[tuple[str, str], tuple[int, dict[str, Any]]] = {}
+    key_order: list[tuple[str, str]] = []
+    for index, choice in enumerate(choices):
+        if choice["status"] != "standard":
+            continue
+        key = standard_equipment_key(choice)
+        if key not in selected:
+            selected[key] = (index, choice)
+            key_order.append(key)
+            continue
+        existing_index, existing_choice = selected[key]
+        if standard_equipment_preference(choice, index) < standard_equipment_preference(existing_choice, existing_index):
+            selected[key] = (index, choice)
+    return [standard_equipment_row(selected[key][1]) for key in key_order]
+
+
 def main() -> None:
     loaded_mtime_ns = WORKBOOK_PATH.stat().st_mtime_ns
     wb = load_workbook(WORKBOOK_PATH)
@@ -952,24 +1004,7 @@ def main() -> None:
                 )
 
     status_counts = Counter(row["status"] for row in choices)
-    standard_equipment = [
-        {
-            "equipment_id": f"std_{choice['variant_id']}__{choice['option_id']}",
-            "variant_id": choice["variant_id"],
-            "body_style": choice["body_style"],
-            "trim_level": choice["trim_level"],
-            "option_id": choice["option_id"],
-            "rpo": choice["rpo"],
-            "label": choice["label"],
-            "description": choice["description"],
-            "section_id": choice["section_id"],
-            "section_name": choice["section_name"],
-            "display_order": choice["display_order"],
-            "source_detail_raw": choice["source_detail_raw"],
-        }
-        for choice in choices
-        if choice["status"] == "standard" and (choice["step_key"] == "standard_equipment" or choice["selectable"] != "True")
-    ]
+    standard_equipment = build_standard_equipment(choices)
     validation_rows.extend(
         [
             {

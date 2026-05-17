@@ -1434,6 +1434,43 @@ test("Stingray workbook default-selected standard choices seed every variant", (
   }
 });
 
+test("standard equipment is sourced from canonical standard-status choices", () => {
+  const expectedByVariant = new Map([
+    ["1lt_c07", ["opt_719_001", "opt_cf7_001", "opt_efr_001", "opt_eyt_001", "opt_fe1_001", "opt_j6a_001", "opt_nga_001", "opt_qeb_001"]],
+    ["2lt_c07", ["opt_719_001", "opt_cf7_001", "opt_efr_001", "opt_eyt_001", "opt_fe1_001", "opt_j6a_001", "opt_nga_001", "opt_qeb_001"]],
+    ["3lt_c07", ["opt_719_001", "opt_cf7_001", "opt_efr_001", "opt_eyt_001", "opt_fe1_001", "opt_j6a_001", "opt_nga_001", "opt_qeb_001"]],
+    ["1lt_c67", ["opt_719_001", "opt_cm9_001", "opt_efr_001", "opt_eyt_001", "opt_fe1_001", "opt_j6a_001", "opt_nga_001", "opt_qeb_001"]],
+    ["2lt_c67", ["opt_719_001", "opt_cm9_001", "opt_efr_001", "opt_eyt_001", "opt_fe1_001", "opt_j6a_001", "opt_nga_001", "opt_qeb_001"]],
+    ["3lt_c67", ["opt_719_001", "opt_cm9_001", "opt_efr_001", "opt_eyt_001", "opt_fe1_001", "opt_j6a_001", "opt_nga_001", "opt_qeb_001"]],
+  ]);
+
+  for (const [variantId, optionIds] of expectedByVariant) {
+    const rows = data.standardEquipment.filter((item) => item.variant_id === variantId);
+    for (const optionId of optionIds) {
+      assert.ok(
+        rows.some((item) => item.option_id === optionId),
+        `${variantId} standard equipment should include canonical ${optionId}`
+      );
+    }
+  }
+});
+
+test("standard equipment dedupes mirrored RPO rows and does not require default_selected", () => {
+  for (const variant of data.variants) {
+    const byRpo = new Map();
+    for (const item of data.standardEquipment.filter((row) => row.variant_id === variant.variant_id && row.rpo)) {
+      assert.equal(byRpo.has(item.rpo), false, `${variant.variant_id} should emit one standard row for ${item.rpo}`);
+      byRpo.set(item.rpo, item);
+    }
+
+    assert.equal(byRpo.get("EFR")?.option_id, "opt_efr_001");
+    assert.equal(byRpo.get("719")?.option_id, "opt_719_001");
+    assert.equal(byRpo.get("J6A")?.option_id, "opt_j6a_001", "J6A has no default_selected flag but is standard");
+    assert.equal(byRpo.get("QEB")?.option_id, "opt_qeb_001", "QEB has no default_selected flag but is standard");
+    assert.equal(byRpo.get("FE1")?.option_id, "opt_fe1_001");
+  }
+});
+
 test("coupe defaults include BC7 engine appearance", () => {
   assert.match(appSource, /defaultRpo of \["FE1", "NGA", "BC7"\]/);
   assert.match(appSource, /defaultChoice\.body_style === "coupe"/);
