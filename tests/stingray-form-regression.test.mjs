@@ -1369,9 +1369,10 @@ test("FE1 default selection prefers the visible suspension tile", () => {
     fe1Rows.some((choice) => choice.option_id === "opt_fe1_001" && choice.section_id === "sec_susp_001" && choice.selectable === "True"),
     "FE1 should have a visible selectable suspension choice"
   );
-  assert.ok(
-    fe1Rows.some((choice) => choice.option_id === "opt_fe1_002" && choice.step_key === "standard_equipment"),
-    "FE1 also has a standard-equipment duplicate, which must not win default lookup"
+  assert.equal(
+    fe1Rows.some((choice) => choice.option_id === "opt_fe1_002"),
+    false,
+    "FE1 standard-equipment mirror should no longer be emitted"
   );
 
   const helper = appSource.match(/function defaultChoiceForRpo\(rpo\) \{[\s\S]*?\n\}/)?.[0] || "";

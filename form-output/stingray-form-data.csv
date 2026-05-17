@@ -647,12 +647,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_fe1_001,opt_fe1_001,FE1,Corvette Standard Suspension,sec_susp_001,packages_performance,1lt_c67,convertible,1LT,standard,True,0
 2lt_c67__opt_fe1_001,opt_fe1_001,FE1,Corvette Standard Suspension,sec_susp_001,packages_performance,2lt_c67,convertible,2LT,standard,True,0
 3lt_c67__opt_fe1_001,opt_fe1_001,FE1,Corvette Standard Suspension,sec_susp_001,packages_performance,3lt_c67,convertible,3LT,standard,True,0
-1lt_c07__opt_fe1_002,opt_fe1_002,FE1,Corvette Standard Suspension,sec_stan_002,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
-2lt_c07__opt_fe1_002,opt_fe1_002,FE1,Corvette Standard Suspension,sec_stan_002,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
-3lt_c07__opt_fe1_002,opt_fe1_002,FE1,Corvette Standard Suspension,sec_stan_002,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
-1lt_c67__opt_fe1_002,opt_fe1_002,FE1,Corvette Standard Suspension,sec_stan_002,standard_equipment,1lt_c67,convertible,1LT,standard,False,0
-2lt_c67__opt_fe1_002,opt_fe1_002,FE1,Corvette Standard Suspension,sec_stan_002,standard_equipment,2lt_c67,convertible,2LT,standard,False,0
-3lt_c67__opt_fe1_002,opt_fe1_002,FE1,Corvette Standard Suspension,sec_stan_002,standard_equipment,3lt_c67,convertible,3LT,standard,False,0
 1lt_c07__opt_fe2_001,opt_fe2_001,FE2,Magnetic Selective Ride Control Suspension,sec_susp_001,packages_performance,1lt_c07,coupe,1LT,available,True,1895
 2lt_c07__opt_fe2_001,opt_fe2_001,FE2,Magnetic Selective Ride Control Suspension,sec_susp_001,packages_performance,2lt_c07,coupe,2LT,available,True,1895
 3lt_c07__opt_fe2_001,opt_fe2_001,FE2,Magnetic Selective Ride Control Suspension,sec_susp_001,packages_performance,3lt_c07,coupe,3LT,available,True,1895
