@@ -239,12 +239,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_719_001,opt_719_001,719,Black Seat Belt Color,sec_seat_001,seat_belt,1lt_c67,convertible,1LT,standard,True,0
 2lt_c67__opt_719_001,opt_719_001,719,Black Seat Belt Color,sec_seat_001,seat_belt,2lt_c67,convertible,2LT,standard,True,0
 3lt_c67__opt_719_001,opt_719_001,719,Black Seat Belt Color,sec_seat_001,seat_belt,3lt_c67,convertible,3LT,standard,True,0
-1lt_c07__opt_719_002,opt_719_002,719,Black Seat Belt Color,sec_stan_002,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
-2lt_c07__opt_719_002,opt_719_002,719,Black Seat Belt Color,sec_stan_002,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
-3lt_c07__opt_719_002,opt_719_002,719,Black Seat Belt Color,sec_stan_002,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
-1lt_c67__opt_719_002,opt_719_002,719,Black Seat Belt Color,sec_stan_002,standard_equipment,1lt_c67,convertible,1LT,standard,False,0
-2lt_c67__opt_719_002,opt_719_002,719,Black Seat Belt Color,sec_stan_002,standard_equipment,2lt_c67,convertible,2LT,standard,False,0
-3lt_c67__opt_719_002,opt_719_002,719,Black Seat Belt Color,sec_stan_002,standard_equipment,3lt_c67,convertible,3LT,standard,False,0
 1lt_c07__opt_a2x_001,opt_a2x_001,A2X,Driver 8-Way Power Seat Adjuster,sec_stan_001,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
 2lt_c07__opt_a2x_001,opt_a2x_001,A2X,Driver 8-Way Power Seat Adjuster,sec_stan_001,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
 3lt_c07__opt_a2x_001,opt_a2x_001,A2X,Driver 8-Way Power Seat Adjuster,sec_stan_001,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
@@ -437,12 +431,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_cf7_001,opt_cf7_001,CF7,Body-Color Removable Roof Panel,sec_roof_001,exterior_appearance,1lt_c67,convertible,1LT,unavailable,True,0
 2lt_c67__opt_cf7_001,opt_cf7_001,CF7,Body-Color Removable Roof Panel,sec_roof_001,exterior_appearance,2lt_c67,convertible,2LT,unavailable,True,0
 3lt_c67__opt_cf7_001,opt_cf7_001,CF7,Body-Color Removable Roof Panel,sec_roof_001,exterior_appearance,3lt_c67,convertible,3LT,unavailable,True,0
-1lt_c07__opt_cf7_002,opt_cf7_002,CF7,Body-Color Removable Roof Panel,sec_stan_002,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
-2lt_c07__opt_cf7_002,opt_cf7_002,CF7,Body-Color Removable Roof Panel,sec_stan_002,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
-3lt_c07__opt_cf7_002,opt_cf7_002,CF7,Body-Color Removable Roof Panel,sec_stan_002,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
-1lt_c67__opt_cf7_002,opt_cf7_002,CF7,Body-Color Removable Roof Panel,sec_stan_002,standard_equipment,1lt_c67,convertible,1LT,unavailable,False,0
-2lt_c67__opt_cf7_002,opt_cf7_002,CF7,Body-Color Removable Roof Panel,sec_stan_002,standard_equipment,2lt_c67,convertible,2LT,unavailable,False,0
-3lt_c67__opt_cf7_002,opt_cf7_002,CF7,Body-Color Removable Roof Panel,sec_stan_002,standard_equipment,3lt_c67,convertible,3LT,unavailable,False,0
 1lt_c07__opt_cfx_001,opt_cfx_001,CFX,Personalized Corvette Museum Plaque,sec_incl_001,standard_equipment,1lt_c07,coupe,1LT,available,False,0
 2lt_c07__opt_cfx_001,opt_cfx_001,CFX,Personalized Corvette Museum Plaque,sec_incl_001,standard_equipment,2lt_c07,coupe,2LT,available,False,0
 3lt_c07__opt_cfx_001,opt_cfx_001,CFX,Personalized Corvette Museum Plaque,sec_incl_001,standard_equipment,3lt_c07,coupe,3LT,available,False,0
@@ -461,12 +449,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_cm9_001,opt_cm9_001,CM9,Body-Color Power-Folding Retractable Hardtop,sec_roof_001,exterior_appearance,1lt_c67,convertible,1LT,standard,True,0
 2lt_c67__opt_cm9_001,opt_cm9_001,CM9,Body-Color Power-Folding Retractable Hardtop,sec_roof_001,exterior_appearance,2lt_c67,convertible,2LT,standard,True,0
 3lt_c67__opt_cm9_001,opt_cm9_001,CM9,Body-Color Power-Folding Retractable Hardtop,sec_roof_001,exterior_appearance,3lt_c67,convertible,3LT,standard,True,0
-1lt_c07__opt_cm9_002,opt_cm9_002,CM9,Body-Color Power-Folding Retractable Hardtop,sec_stan_002,standard_equipment,1lt_c07,coupe,1LT,unavailable,False,0
-2lt_c07__opt_cm9_002,opt_cm9_002,CM9,Body-Color Power-Folding Retractable Hardtop,sec_stan_002,standard_equipment,2lt_c07,coupe,2LT,unavailable,False,0
-3lt_c07__opt_cm9_002,opt_cm9_002,CM9,Body-Color Power-Folding Retractable Hardtop,sec_stan_002,standard_equipment,3lt_c07,coupe,3LT,unavailable,False,0
-1lt_c67__opt_cm9_002,opt_cm9_002,CM9,Body-Color Power-Folding Retractable Hardtop,sec_stan_002,standard_equipment,1lt_c67,convertible,1LT,standard,False,0
-2lt_c67__opt_cm9_002,opt_cm9_002,CM9,Body-Color Power-Folding Retractable Hardtop,sec_stan_002,standard_equipment,2lt_c67,convertible,2LT,standard,False,0
-3lt_c67__opt_cm9_002,opt_cm9_002,CM9,Body-Color Power-Folding Retractable Hardtop,sec_stan_002,standard_equipment,3lt_c67,convertible,3LT,standard,False,0
 1lt_c07__opt_d30_001,opt_d30_001,D30,Color Combination Override,sec_colo_001,interior_trim,1lt_c07,coupe,1LT,available,False,1495
 2lt_c07__opt_d30_001,opt_d30_001,D30,Color Combination Override,sec_colo_001,interior_trim,2lt_c07,coupe,2LT,available,False,1495
 3lt_c07__opt_d30_001,opt_d30_001,D30,Color Combination Override,sec_colo_001,interior_trim,3lt_c07,coupe,3LT,available,False,1495
@@ -629,12 +611,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_efr_001,opt_efr_001,EFR,Carbon Flash Exterior Accents,sec_exte_001,exterior_appearance,1lt_c67,convertible,1LT,standard,True,0
 2lt_c67__opt_efr_001,opt_efr_001,EFR,Carbon Flash Exterior Accents,sec_exte_001,exterior_appearance,2lt_c67,convertible,2LT,standard,True,0
 3lt_c67__opt_efr_001,opt_efr_001,EFR,Carbon Flash Exterior Accents,sec_exte_001,exterior_appearance,3lt_c67,convertible,3LT,standard,True,0
-1lt_c07__opt_efr_002,opt_efr_002,EFR,Carbon Flash Exterior Accents,sec_stan_002,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
-2lt_c07__opt_efr_002,opt_efr_002,EFR,Carbon Flash Exterior Accents,sec_stan_002,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
-3lt_c07__opt_efr_002,opt_efr_002,EFR,Carbon Flash Exterior Accents,sec_stan_002,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
-1lt_c67__opt_efr_002,opt_efr_002,EFR,Carbon Flash Exterior Accents,sec_stan_002,standard_equipment,1lt_c67,convertible,1LT,standard,False,0
-2lt_c67__opt_efr_002,opt_efr_002,EFR,Carbon Flash Exterior Accents,sec_stan_002,standard_equipment,2lt_c67,convertible,2LT,standard,False,0
-3lt_c67__opt_efr_002,opt_efr_002,EFR,Carbon Flash Exterior Accents,sec_stan_002,standard_equipment,3lt_c67,convertible,3LT,standard,False,0
 1lt_c07__opt_efy_001,opt_efy_001,EFY,Body-Color Exterior Accents,sec_exte_001,exterior_appearance,1lt_c07,coupe,1LT,available,True,995
 2lt_c07__opt_efy_001,opt_efy_001,EFY,Body-Color Exterior Accents,sec_exte_001,exterior_appearance,2lt_c07,coupe,2LT,available,True,995
 3lt_c07__opt_efy_001,opt_efy_001,EFY,Body-Color Exterior Accents,sec_exte_001,exterior_appearance,3lt_c07,coupe,3LT,available,True,995
@@ -659,12 +635,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_eyt_001,opt_eyt_001,EYT,Carbon Flash Exterior Badge Package,sec_badg_001,exterior_appearance,1lt_c67,convertible,1LT,standard,True,0
 2lt_c67__opt_eyt_001,opt_eyt_001,EYT,Carbon Flash Exterior Badge Package,sec_badg_001,exterior_appearance,2lt_c67,convertible,2LT,standard,True,0
 3lt_c67__opt_eyt_001,opt_eyt_001,EYT,Carbon Flash Exterior Badge Package,sec_badg_001,exterior_appearance,3lt_c67,convertible,3LT,standard,True,0
-1lt_c07__opt_eyt_002,opt_eyt_002,EYT,Carbon Flash Exterior Badge Package,sec_stan_002,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
-2lt_c07__opt_eyt_002,opt_eyt_002,EYT,Carbon Flash Exterior Badge Package,sec_stan_002,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
-3lt_c07__opt_eyt_002,opt_eyt_002,EYT,Carbon Flash Exterior Badge Package,sec_stan_002,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
-1lt_c67__opt_eyt_002,opt_eyt_002,EYT,Carbon Flash Exterior Badge Package,sec_stan_002,standard_equipment,1lt_c67,convertible,1LT,standard,False,0
-2lt_c67__opt_eyt_002,opt_eyt_002,EYT,Carbon Flash Exterior Badge Package,sec_stan_002,standard_equipment,2lt_c67,convertible,2LT,standard,False,0
-3lt_c67__opt_eyt_002,opt_eyt_002,EYT,Carbon Flash Exterior Badge Package,sec_stan_002,standard_equipment,3lt_c67,convertible,3LT,standard,False,0
 1lt_c07__opt_fa5_001,opt_fa5_001,FA5,Interior Carbon Fiber Trim,sec_inte_001,interior_trim,1lt_c07,coupe,1LT,unavailable,True,1795
 2lt_c07__opt_fa5_001,opt_fa5_001,FA5,Interior Carbon Fiber Trim,sec_inte_001,interior_trim,2lt_c07,coupe,2LT,available,True,1795
 3lt_c07__opt_fa5_001,opt_fa5_001,FA5,Interior Carbon Fiber Trim,sec_inte_001,interior_trim,3lt_c07,coupe,3LT,available,True,1795
@@ -803,12 +773,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_j6a_001,opt_j6a_001,J6A,Black Painted Brake Calipers,sec_cali_001,wheels,1lt_c67,convertible,1LT,standard,True,0
 2lt_c67__opt_j6a_001,opt_j6a_001,J6A,Black Painted Brake Calipers,sec_cali_001,wheels,2lt_c67,convertible,2LT,standard,True,0
 3lt_c67__opt_j6a_001,opt_j6a_001,J6A,Black Painted Brake Calipers,sec_cali_001,wheels,3lt_c67,convertible,3LT,standard,True,0
-1lt_c07__opt_j6a_002,opt_j6a_002,J6A,Black Painted Brake Calipers,sec_stan_002,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
-2lt_c07__opt_j6a_002,opt_j6a_002,J6A,Black Painted Brake Calipers,sec_stan_002,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
-3lt_c07__opt_j6a_002,opt_j6a_002,J6A,Black Painted Brake Calipers,sec_stan_002,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
-1lt_c67__opt_j6a_002,opt_j6a_002,J6A,Black Painted Brake Calipers,sec_stan_002,standard_equipment,1lt_c67,convertible,1LT,standard,False,0
-2lt_c67__opt_j6a_002,opt_j6a_002,J6A,Black Painted Brake Calipers,sec_stan_002,standard_equipment,2lt_c67,convertible,2LT,standard,False,0
-3lt_c67__opt_j6a_002,opt_j6a_002,J6A,Black Painted Brake Calipers,sec_stan_002,standard_equipment,3lt_c67,convertible,3LT,standard,False,0
 1lt_c07__opt_j6b_001,opt_j6b_001,J6B,Blue Painted Brake Calipers,sec_cali_001,wheels,1lt_c07,coupe,1LT,available,True,795
 2lt_c07__opt_j6b_001,opt_j6b_001,J6B,Blue Painted Brake Calipers,sec_cali_001,wheels,2lt_c07,coupe,2LT,available,True,795
 3lt_c07__opt_j6b_001,opt_j6b_001,J6B,Blue Painted Brake Calipers,sec_cali_001,wheels,3lt_c07,coupe,3LT,available,True,795
@@ -893,12 +857,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_nga_001,opt_nga_001,NGA,Black Exhaust Tips,sec_exha_001,packages_performance,1lt_c67,convertible,1LT,standard,True,0
 2lt_c67__opt_nga_001,opt_nga_001,NGA,Black Exhaust Tips,sec_exha_001,packages_performance,2lt_c67,convertible,2LT,standard,True,0
 3lt_c67__opt_nga_001,opt_nga_001,NGA,Black Exhaust Tips,sec_exha_001,packages_performance,3lt_c67,convertible,3LT,standard,True,0
-1lt_c07__opt_nga_002,opt_nga_002,NGA,Black Exhaust Tips,sec_stan_002,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
-2lt_c07__opt_nga_002,opt_nga_002,NGA,Black Exhaust Tips,sec_stan_002,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
-3lt_c07__opt_nga_002,opt_nga_002,NGA,Black Exhaust Tips,sec_stan_002,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
-1lt_c67__opt_nga_002,opt_nga_002,NGA,Black Exhaust Tips,sec_stan_002,standard_equipment,1lt_c67,convertible,1LT,standard,False,0
-2lt_c67__opt_nga_002,opt_nga_002,NGA,Black Exhaust Tips,sec_stan_002,standard_equipment,2lt_c67,convertible,2LT,standard,False,0
-3lt_c67__opt_nga_002,opt_nga_002,NGA,Black Exhaust Tips,sec_stan_002,standard_equipment,3lt_c67,convertible,3LT,standard,False,0
 1lt_c07__opt_nk4_001,opt_nk4_001,NK4,Leather-Wrapped Steering Wheel,sec_stan_002,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
 2lt_c07__opt_nk4_001,opt_nk4_001,NK4,Leather-Wrapped Steering Wheel,sec_stan_002,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
 3lt_c07__opt_nk4_001,opt_nk4_001,NK4,Leather-Wrapped Steering Wheel,sec_stan_002,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
@@ -995,12 +953,6 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_qeb_001,opt_qeb_001,QEB,Pearl Nickel 5-Split-Spoke Forged Aluminum Wheels,sec_whee_002,wheels,1lt_c67,convertible,1LT,standard,True,0
 2lt_c67__opt_qeb_001,opt_qeb_001,QEB,Pearl Nickel 5-Split-Spoke Forged Aluminum Wheels,sec_whee_002,wheels,2lt_c67,convertible,2LT,standard,True,0
 3lt_c67__opt_qeb_001,opt_qeb_001,QEB,Pearl Nickel 5-Split-Spoke Forged Aluminum Wheels,sec_whee_002,wheels,3lt_c67,convertible,3LT,standard,True,0
-1lt_c07__opt_qeb_002,opt_qeb_002,QEB,Pearl Nickel 5-Split-Spoke Forged Aluminum Wheels,sec_stan_002,standard_equipment,1lt_c07,coupe,1LT,standard,False,0
-2lt_c07__opt_qeb_002,opt_qeb_002,QEB,Pearl Nickel 5-Split-Spoke Forged Aluminum Wheels,sec_stan_002,standard_equipment,2lt_c07,coupe,2LT,standard,False,0
-3lt_c07__opt_qeb_002,opt_qeb_002,QEB,Pearl Nickel 5-Split-Spoke Forged Aluminum Wheels,sec_stan_002,standard_equipment,3lt_c07,coupe,3LT,standard,False,0
-1lt_c67__opt_qeb_002,opt_qeb_002,QEB,Pearl Nickel 5-Split-Spoke Forged Aluminum Wheels,sec_stan_002,standard_equipment,1lt_c67,convertible,1LT,standard,False,0
-2lt_c67__opt_qeb_002,opt_qeb_002,QEB,Pearl Nickel 5-Split-Spoke Forged Aluminum Wheels,sec_stan_002,standard_equipment,2lt_c67,convertible,2LT,standard,False,0
-3lt_c67__opt_qeb_002,opt_qeb_002,QEB,Pearl Nickel 5-Split-Spoke Forged Aluminum Wheels,sec_stan_002,standard_equipment,3lt_c67,convertible,3LT,standard,False,0
 1lt_c07__opt_qtu_001,opt_qtu_001,QTU,High-Performance Blackwall Tires,sec_incl_001,standard_equipment,1lt_c07,coupe,1LT,available,False,0
 2lt_c07__opt_qtu_001,opt_qtu_001,QTU,High-Performance Blackwall Tires,sec_incl_001,standard_equipment,2lt_c07,coupe,2LT,available,False,0
 3lt_c07__opt_qtu_001,opt_qtu_001,QTU,High-Performance Blackwall Tires,sec_incl_001,standard_equipment,3lt_c07,coupe,3LT,available,False,0

@@ -1,6 +1,6 @@
 # Stingray Duplicate RPO Phase 1A Standard-Mirror Deactivation Spec
 
-Spec only. Do not implement until approved.
+Approved and implemented on 2026-05-17.
 
 ## Diagnosis
 
@@ -23,9 +23,15 @@ Evidence from Phase 0:
 - `exclusive_group_members` uses canonical `opt_efr_001`, not duplicate `opt_efr_002`.
 - Canonical and mirror rows have matching `stingray_ovs` statuses for the scoped RPOs.
 
+Generator prerequisite status:
+
+- The canonical standard-equipment generator pass is complete.
+- `scripts/generate_stingray_form.py` now emits `standardEquipment` from active choices where `stingray_ovs.status=standard`, dedupes duplicate mirror/canonical rows by variant/RPO, and prefers canonical non-`sec_stan_002` rows.
+- The approved generator pass proved the Phase 1A canonical rows are already present in `standardEquipment` before any mirror rows are deactivated.
+
 Change type: data-only workbook source edit, followed by generated artifact refresh and focused test updates only if generated parity requires them.
 
-Risk level: Medium. The workbook edit is simple, but standard/included equipment output can change if the generator currently depends on mirror rows instead of canonical standard rows.
+Risk level: Medium-low. The workbook edit is simple and the prior generator blocker has been removed, but generated output still needs verification because this pass writes workbook source data and refreshes generated artifacts.
 
 ## Exact Scope
 
@@ -85,7 +91,7 @@ For each mirror row:
 4. Run `scripts/generate_stingray_form.py`.
 5. Inspect generated diffs for unintended changes.
 6. Run focused regression gates.
-7. If standard/included equipment output drops a canonical RPO, stop and diagnose generator ownership before broadening the change.
+7. If standard/included equipment output drops a canonical RPO, stop, roll back only the affected workbook source cells, and diagnose the canonical row data before broadening the change.
 
 ## Validation Plan
 
@@ -145,7 +151,7 @@ What happened:
 
 Conclusion:
 
-The current generator still depends on these `sec_stan_002` mirror rows to populate Standard & Included equipment. Deactivating the mirror rows alone is not behavior-preserving.
+At the time of this attempt, the generator still depended on these `sec_stan_002` mirror rows to populate Standard & Included equipment. Deactivating the mirror rows alone was not behavior-preserving.
 
 Rollback:
 
@@ -153,12 +159,41 @@ Rollback:
 - Reopened the workbook and verified the eight mirror rows are back to `active=TRUE`.
 - Re-ran workbook package validation; result was `status=valid`, `issue_count=0`.
 
-Next required spec:
+Follow-up completed:
 
-- Before retrying this pass, update the generator so standard equipment can be emitted from canonical selectable rows when their `stingray_ovs.status=standard`.
-- The generator change must preserve current Standard & Included behavior before any mirror row is deactivated.
-- Do not rerun this Phase 1A workbook edit unchanged.
+- `spec-review/stingray-standard-equipment-canonical-status-spec.md` was approved and implemented.
+- The generator now emits Standard & Included equipment from canonical `stingray_ovs.status=standard` rows and no longer requires `sec_stan_002` mirror rows for this output.
+- Revised Phase 1A may now be rerun with the same eight-row scope, still excluding `FE1`, `AE4`, `AH2`, `AQ9`, and `UQT`.
+
+## 2026-05-17 Revised Phase 1A Execution Result
+
+Implemented successfully after the canonical standard-equipment generator prerequisite.
+
+What changed:
+
+- Set `stingray_options.active=FALSE` for the eight scoped `sec_stan_002` mirror rows:
+  - `opt_719_002`
+  - `opt_cf7_002`
+  - `opt_cm9_002`
+  - `opt_efr_002`
+  - `opt_eyt_002`
+  - `opt_j6a_002`
+  - `opt_nga_002`
+  - `opt_qeb_002`
+- Left the canonical `_001` rows active.
+- Left `stingray_ovs` rows intact.
+- Regenerated the Stingray form artifacts.
+
+Validation result:
+
+- Workbook package validation returned `status=valid`, `issue_count=0`.
+- `scripts/generate_stingray_form.py` completed with `validation_errors=0`.
+- Generated `choices` dropped from `1512` to `1464`, matching eight inactive mirror rows across six variants.
+- Generated `standardEquipment` remained `467`.
+- Focused generated-data inspection found no generated choice rows for the eight inactive `_002` IDs.
+- Focused generated-data inspection found no duplicate nonblank `(variant_id, rpo)` rows in `standardEquipment`.
+- Canonical rows remained present in `standardEquipment` for the scoped RPOs.
 
 ## Approval Gate
 
-Do not implement until approved. Approval should explicitly confirm Phase 1A scope excludes `FE1`, `AE4`, `AH2`, `AQ9`, and `UQT`.
+Phase 1A was approved and implemented. The completed scope excludes `FE1`, `AE4`, `AH2`, `AQ9`, and `UQT`.
