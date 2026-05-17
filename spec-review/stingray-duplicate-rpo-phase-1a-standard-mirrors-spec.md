@@ -133,6 +133,32 @@ If generated output loses required standard-equipment behavior:
 - regenerate;
 - document the generator dependency before attempting a different source-data fix.
 
+## 2026-05-17 Execution Result
+
+Attempted implementation and rolled back.
+
+What happened:
+
+- The workbook edit itself succeeded: the eight mirror rows were set to `active=FALSE` and verified on disk.
+- `scripts/generate_stingray_form.py` completed with `validation_errors=0`.
+- The generated invariant check failed: `standardEquipment` no longer contained the affected RPOs through the canonical rows.
+
+Conclusion:
+
+The current generator still depends on these `sec_stan_002` mirror rows to populate Standard & Included equipment. Deactivating the mirror rows alone is not behavior-preserving.
+
+Rollback:
+
+- Restored `stingray_master.xlsx`, `form-output/stingray-form-data.json`, `form-output/stingray-form-data.csv`, and `form-app/data.js` with `git restore`.
+- Reopened the workbook and verified the eight mirror rows are back to `active=TRUE`.
+- Re-ran workbook package validation; result was `status=valid`, `issue_count=0`.
+
+Next required spec:
+
+- Before retrying this pass, update the generator so standard equipment can be emitted from canonical selectable rows when their `stingray_ovs.status=standard`.
+- The generator change must preserve current Standard & Included behavior before any mirror row is deactivated.
+- Do not rerun this Phase 1A workbook edit unchanged.
+
 ## Approval Gate
 
 Do not implement until approved. Approval should explicitly confirm Phase 1A scope excludes `FE1`, `AE4`, `AH2`, `AQ9`, and `UQT`.
