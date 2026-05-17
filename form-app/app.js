@@ -72,6 +72,7 @@ const els = {
   selectedStandardEquipmentList: document.querySelector("#selectedStandardEquipmentList"),
   autoList: document.querySelector("#autoList"),
   missingList: document.querySelector("#missingList"),
+  summaryDrawer: document.querySelector("#summaryDrawer"),
   requirementsCard: document.querySelector("#requirementsCard"),
   alertRegion: document.querySelector("#alertRegion"),
   resetButton: document.querySelector("#resetButton"),
@@ -208,6 +209,76 @@ function escapeHtml(value) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function renderInfoTooltip(content, label = "More information", { focusable = true, icon = true, triggerText = "" } = {}) {
+  if (!content) return "";
+  const safeContent = escapeHtml(content);
+  const safeLabel = escapeHtml(label);
+  return `
+    <span class="info-tooltip" ${focusable ? "tabindex=\"0\"" : ""} aria-label="${safeLabel}: ${safeContent}">
+      ${triggerText ? `<span class="tooltip-trigger-text">${escapeHtml(triggerText)}</span>` : ""}
+      ${icon ? `<span class="info-icon" aria-hidden="true">i</span>` : ""}
+      <span class="tooltip-panel" role="tooltip">${safeContent}</span>
+    </span>
+  `;
+}
+
+function descriptiveTooltipText(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  const normalized = text.toLowerCase().replace(/[.。]+$/g, "");
+  if (["available", "selected", "current selection", "select to continue"].includes(normalized)) return "";
+  return text;
+}
+
+function renderStatePill(label, className, tooltip) {
+  if (tooltip) {
+    const safeLabel = escapeHtml(label);
+    const safeTooltip = escapeHtml(tooltip);
+    return `
+      <span class="choice-state ${className} info-tooltip" aria-label="${safeLabel} details: ${safeTooltip}">
+        <span class="tooltip-trigger-text">${safeLabel}</span>
+        <span class="tooltip-panel" role="tooltip">${safeTooltip}</span>
+      </span>
+    `;
+  }
+  return `
+    <span class="choice-state ${className}"><span>${escapeHtml(label)}</span></span>
+  `;
+}
+
+function positionTooltip(trigger) {
+  const panel = trigger?.querySelector(".tooltip-panel");
+  if (!panel) return;
+  const margin = 10;
+  panel.style.left = "";
+  panel.style.right = "";
+  panel.style.top = "";
+  panel.style.bottom = "";
+  const triggerRect = trigger.getBoundingClientRect();
+  const panelRect = panel.getBoundingClientRect();
+  const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+
+  let left = triggerRect.right - panelRect.width;
+  left = Math.min(Math.max(left, margin), viewportWidth - panelRect.width - margin);
+  let top = triggerRect.bottom + 8;
+  if (top + panelRect.height > viewportHeight - margin) {
+    top = triggerRect.top - panelRect.height - 8;
+  }
+  top = Math.min(Math.max(top, margin), viewportHeight - panelRect.height - margin);
+
+  panel.style.left = `${Math.round(left - triggerRect.left)}px`;
+  panel.style.top = `${Math.round(top - triggerRect.top)}px`;
+}
+
+function bindTooltips(root = document) {
+  if (!root?.querySelectorAll) return;
+  root.querySelectorAll(".info-tooltip").forEach((trigger) => {
+    trigger.addEventListener("mouseenter", () => positionTooltip(trigger));
+    trigger.addEventListener("focus", () => positionTooltip(trigger));
+  });
 }
 
 function currentVariant() {
@@ -674,7 +745,7 @@ function lineItems() {
   return rows;
 }
 
-function missingRequired() {
+function missingRequirementDetails() {
   const rows = activeChoiceRows();
   const sections = new Map();
   const selectedIds = selectedContextIds();
@@ -683,15 +754,35 @@ function missingRequired() {
     if (!section || section.selection_mode !== "single_select_req") continue;
     if (choice.step_key === "base_interior") continue;
     if (shouldHideChoice(choice)) continue;
-    if (!sections.has(choice.section_id)) sections.set(choice.section_id, section);
+    if (!sections.has(choice.section_id)) sections.set(choice.section_id, { section, choices: [] });
+    sections.get(choice.section_id).choices.push(choice);
   }
   const missing = [];
-  for (const [sectionId, section] of sections) {
+  for (const [sectionId, { section, choices }] of sections) {
     const hasSelection = [...selectedIds].some((id) => optionSectionId(id) === sectionId);
-    if (!hasSelection) missing.push(section.section_name);
+    if (!hasSelection) {
+      const step = runtimeSteps.find((item) => item.step_key === choices[0]?.step_key);
+      missing.push({
+        label: section.section_name,
+        hasOptions: choices.some((choice) => choice.selectable === "True"),
+        stepKey: choices[0]?.step_key || "",
+        detail: `Choose one ${step?.step_label ? `in ${step.step_label}` : "required option"} from ${section.section_name}.`,
+      });
+    }
   }
-  if (!state.selectedInterior) missing.push("Interior Color");
+  if (!state.selectedInterior) {
+    missing.push({
+      label: "Interior Color",
+      hasOptions: validInteriorsForSelectedSeat().length > 0,
+      stepKey: "base_interior",
+      detail: "Choose an interior color compatible with the selected seat and trim.",
+    });
+  }
   return missing;
+}
+
+function missingRequired() {
+  return missingRequirementDetails().map((item) => item.label);
 }
 
 function resetDefaults() {
@@ -1005,17 +1096,17 @@ function renderChoiceCard(choice, autoAdded) {
   const autoReason = autoAdded.get(choice.option_id);
   const disabledReason = autoReason ? "" : disableReasonForChoice(choice);
   const disabled = Boolean(disabledReason || autoReason);
+  const detail = descriptiveTooltipText(choice.description) || descriptiveTooltipText(choice.status_label);
   const classes = ["choice-card"];
   if (selected) classes.push("selected");
   if (disabledReason) classes.push("disabled");
   if (autoReason) classes.push("auto");
   return `
-    <button class="${classes.join(" ")}" type="button" data-option="${choice.option_id}" ${disabled ? "aria-disabled=\"true\" disabled" : ""}>
-      <span class="topline"><span class="rpo">${choice.rpo || choice.option_id}</span><span class="price">${formatMoney(choiceDisplayPrice(choice))}</span></span>
-      <p class="choice-name">${choice.label}</p>
-      <p class="choice-note">${choice.description || choice.status_label}</p>
-      ${disabledReason ? `<p class="disabled-reason">${disabledReason}</p>` : ""}
-      ${autoReason ? `<p class="auto-reason">${autoReason}</p>` : ""}
+    <button class="${classes.join(" ")}" type="button" data-option="${choice.option_id}" ${disabled ? "aria-disabled=\"true\"" : ""}>
+      <span class="topline"><span class="rpo">${escapeHtml(choice.rpo || choice.option_id)}</span><span class="price">${formatMoney(choiceDisplayPrice(choice))}</span></span>
+      <span class="choice-name"><span>${escapeHtml(choice.label)}</span>${renderInfoTooltip(detail, "Option details", { focusable: false })}</span>
+      ${disabledReason ? renderStatePill("Unavailable", "disabled-reason", disabledReason) : ""}
+      ${autoReason ? renderStatePill("Auto-added", "auto-reason", autoReason) : ""}
     </button>
   `;
 }
@@ -1030,13 +1121,12 @@ function renderInteriorCard(interior) {
   const classes = ["choice-card"];
   if (selected) classes.push("selected");
   if (disabledReason) classes.push("disabled");
-  const detail = [interior.interior_material_family || interior.material, interior.source_note].filter(Boolean).join(" ");
+  const detail = descriptiveTooltipText([interior.interior_material_family || interior.material, interior.source_note].filter(Boolean).join(" "));
   return `
     <button class="${classes.join(" ")}" type="button" data-interior="${interior.interior_id}" ${disabledReason ? "aria-disabled=\"true\"" : ""}>
       <span class="topline"><span class="rpo">${interior.interior_code}</span><span class="price">${formatMoney(adjustedInteriorDisplayPrice(interior))}</span></span>
-      <p class="choice-name">${escapeHtml(interior.interior_leaf_label || interior.interior_name)}</p>
-      <p class="choice-note">${escapeHtml(detail || interior.interior_id)}</p>
-      ${disabledReason ? `<p class="disabled-reason">${disabledReason}</p>` : ""}
+      <span class="choice-name"><span>${escapeHtml(interior.interior_leaf_label || interior.interior_name)}</span>${renderInfoTooltip(detail || interior.interior_id, "Interior details", { focusable: false })}</span>
+      ${disabledReason ? renderStatePill("Unavailable", "disabled-reason", disabledReason) : ""}
     </button>
   `;
 }
@@ -1108,10 +1198,9 @@ function renderContextCard(choice) {
   const price = choice.base_price ? formatMoney(choice.base_price) : "";
   return `
     <button class="${classes.join(" ")}" type="button" data-context-choice="${choice.context_choice_id}" ${disabled ? "aria-disabled=\"true\"" : ""}>
-      <span class="topline"><span class="rpo">${choice.label}</span><span class="price">${price}</span></span>
-      <p class="choice-name">${choice.description}</p>
-      <p class="choice-note">${selected ? "Current selection" : "Select to continue"}</p>
-      ${disabled ? `<p class="disabled-reason">Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} body style first.</p>` : ""}
+      <span class="topline"><span class="rpo">${escapeHtml(choice.label)}</span><span class="price">${price}</span></span>
+      <span class="choice-name"><span>${escapeHtml(choice.description)}</span></span>
+      ${disabled ? renderStatePill(`Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} first`, "disabled-reason", `Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} body style first.`) : ""}
     </button>
   `;
 }
@@ -1172,7 +1261,7 @@ function renderStandardEquipmentGroups(rows, initiallyOpen = false, openGroupNam
               ${items
                 .map(
                   (item) =>
-                    `<li><span>${escapeHtml(item.label)}</span>${item.description ? `<small>${escapeHtml(item.description)}</small>` : ""}</li>`
+                    `<li><span>${escapeHtml(item.label)}</span>${renderInfoTooltip(item.description, "Equipment details")}</li>`
                 )
                 .join("")}
             </ul>
@@ -1345,6 +1434,7 @@ function renderStepContent({ resetScroll = false } = {}) {
   els.stepContent.querySelector("[data-next-step]")?.addEventListener("click", goToNextStep);
   els.stepContent.querySelector("[data-final-download]")?.addEventListener("click", downloadBuild);
   els.stepContent.querySelector("[data-final-submit]")?.addEventListener("click", openDealerSubmitModal);
+  bindTooltips(els.stepContent);
 }
 
 function renderSummary() {
@@ -1362,15 +1452,22 @@ function renderSummary() {
   const selectedItems = items.filter((item) => item.type !== "auto_added");
   const autoItems = items.filter((item) => item.type === "auto_added");
   els.selectedList.innerHTML =
-    selectedItems.map((item) => `<li><strong>${item.rpo || item.id}</strong> ${item.label} - ${formatMoney(item.price)}</li>`).join("") ||
+    selectedItems.map((item) => `<li><strong>${escapeHtml(item.rpo || item.id)}</strong> ${escapeHtml(item.label)} - ${formatMoney(item.price)}</li>`).join("") ||
     "<li class=\"empty\">No selections yet.</li>";
   els.autoList.innerHTML =
-    autoItems.map((item) => `<li><strong>${item.rpo || item.id}</strong> ${item.label} - ${formatMoney(item.price)}<br>${item.reason || ""}</li>`).join("") ||
+    autoItems.map((item) => `<li><strong>${escapeHtml(item.rpo || item.id)}</strong> ${escapeHtml(item.label)} - ${formatMoney(item.price)}${renderInfoTooltip(item.reason, "Auto-added reason")}</li>`).join("") ||
     "<li class=\"empty\">No auto-added RPOs.</li>";
-  const missing = missingRequired();
+  const missingDetails = missingRequirementDetails();
+  const missing = missingDetails.map((item) => item.label);
   if (els.requirementsCard) els.requirementsCard.dataset.requirementsStatus = missing.length ? "open" : "complete";
   els.missingList.innerHTML =
-    missing.map((item) => `<li>${item}</li>`).join("") ||
+    missingDetails
+      .map(
+        (item) => `
+          <li class="requirement-item"><span>${escapeHtml(item.label)}</span></li>
+        `
+      )
+      .join("") ||
     "<li class=\"empty positive\">Build requirements complete. You can keep exploring options or download/submit when ready.</li>";
   els.downloadBuildButton.disabled = missing.length > 0;
   els.downloadBuildButton.title = missing.length ? "Complete required selections before downloading your build." : "";
@@ -1391,6 +1488,7 @@ function renderSummary() {
 
   const dataWarnings = (data.validation || []).filter((item) => item.severity === "error");
   els.alertRegion.innerHTML = dataWarnings.map((item) => `<div class="alert">${item.message}</div>`).join("");
+  bindTooltips(els.summaryDrawer);
 }
 
 function customerInformation() {

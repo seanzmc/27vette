@@ -654,7 +654,8 @@ test("custom stitch choices are removed from the selectable runtime", () => {
 
 test("auto-added included options render as locked selections without duplicate manual selection", () => {
   assert.match(appSource, /const disabled = Boolean\(disabledReason \|\| autoReason\)/);
-  assert.match(appSource, /aria-disabled=\\"true\\" disabled/);
+  assert.match(appSource, /aria-disabled=\\"true\\"/);
+  assert.doesNotMatch(appSource, /data-option="\$\{choice\.option_id\}" \$\{disabled \? "aria-disabled=\\"true\\" disabled"/);
   assert.match(appSource, /if \(autoAdded\.has\(choice\.option_id\)\) return/);
 });
 

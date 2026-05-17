@@ -11,6 +11,11 @@
   --ok: #1f7a4d;
   --warn: #a15c00;
   --disabled: #a5a099;
+  --choice-bg: rgb(254, 254, 254);
+  --choice-hover: #fffdf9;
+  --choice-selected: #eff8f2;
+  --choice-hover-shadow: 4px 4px 0 rgba(217, 209, 196, 0.9);
+  --control-hover: #f4ddd8;
   --shadow: 0 18px 48px rgba(41, 35, 28, 0.12);
 }
 
@@ -114,6 +119,7 @@ button {
   color: white;
   cursor: pointer;
   font-weight: 750;
+  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease;
 }
 
 button:hover {
@@ -250,6 +256,7 @@ textarea {
   background: transparent;
   color: var(--ink);
   text-align: left;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
 }
 
 .step-link:hover,
@@ -260,6 +267,10 @@ textarea {
 
 .step-link.active {
   color: var(--accent-dark);
+}
+
+.step-link:hover {
+  background: #f7efe4;
 }
 
 .step-index {
@@ -391,23 +402,34 @@ textarea {
 }
 
 .choice-card {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  width: 100%;
   min-height: 116px;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 13px;
-  background: var(--panel-strong);
+  background: var(--choice-bg);
   text-align: left;
   color: var(--ink);
+  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
 }
 
 .choice-card:hover {
   border-color: #b8a995;
-  background: #fffdf8;
+  background: var(--choice-bg);
+  box-shadow: var(--choice-hover-shadow);
 }
 
 .choice-card.selected {
   border-color: var(--accent);
+  background: var(--choice-bg);
   box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.choice-card.selected:hover {
+  background: var(--choice-bg);
 }
 
 .choice-card.disabled {
@@ -418,7 +440,13 @@ textarea {
 
 .choice-card.auto {
   border-color: var(--ok);
-  background: #eff8f2;
+  background: var(--choice-selected);
+}
+
+.choice-card.selected.auto {
+  border-color: var(--ok);
+  background: var(--choice-selected);
+  box-shadow: inset 0 0 0 1px var(--ok);
 }
 
 .context-choice-card {
@@ -429,7 +457,6 @@ textarea {
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 8px;
 }
 
 .rpo {
@@ -443,7 +470,11 @@ textarea {
 }
 
 .choice-name {
-  margin: 0 0 7px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
   font-weight: 750;
 }
 
@@ -456,10 +487,39 @@ textarea {
 
 .disabled-reason,
 .auto-reason {
-  margin-top: 8px;
   color: var(--warn);
   font-size: 12px;
   font-weight: 750;
+}
+
+.choice-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  justify-self: start;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 2px 7px;
+  background: rgba(255, 255, 255, 0.56);
+  line-height: 1.2;
+}
+
+.choice-state.info-tooltip {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  height: auto;
+  color: inherit;
+}
+
+.choice-state.info-tooltip:hover,
+.choice-state.info-tooltip:focus-visible {
+  background: currentColor;
+}
+
+.choice-state.info-tooltip:hover .tooltip-trigger-text,
+.choice-state.info-tooltip:focus-visible .tooltip-trigger-text {
+  color: var(--panel-strong);
 }
 
 .auto-reason {
@@ -467,6 +527,8 @@ textarea {
 }
 
 .summary-panel {
+  display: flex;
+  flex-direction: column;
   border-left: 1px solid var(--line);
   background: #f8f3ea;
   padding: 16px;
@@ -478,6 +540,19 @@ textarea {
   margin-bottom: 12px;
   padding: 14px;
   background: var(--panel);
+  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.summary-card:hover {
+  border-color: #c7b7a2;
+  background: var(--choice-hover);
+}
+
+.summary-card h3 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .customer-card {
@@ -657,6 +732,106 @@ textarea {
   font-size: 13px;
 }
 
+#requirementsCard {
+  order: 1;
+}
+
+#selectedRposCard {
+  order: 2;
+}
+
+#autoAddedCard {
+  order: 3;
+}
+
+#summaryOverviewCard {
+  order: 4;
+}
+
+.summary-card[data-requirements-status="complete"] {
+  border-color: rgba(31, 122, 77, 0.35);
+  background: #f1f8f2;
+}
+
+.requirement-item {
+  color: var(--muted);
+}
+
+.info-tooltip {
+  position: relative;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  color: var(--accent-dark);
+  line-height: 1;
+  vertical-align: middle;
+  z-index: 1;
+}
+
+.info-tooltip:hover,
+.info-tooltip:focus-visible {
+  z-index: 80;
+}
+
+.info-tooltip:focus-visible {
+  outline: 2px solid rgba(178, 34, 52, 0.42);
+  outline-offset: 2px;
+}
+
+.info-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  font-weight: 850;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.info-tooltip:hover .info-icon,
+.info-tooltip:focus-visible .info-icon {
+  background: var(--accent-dark);
+  color: white;
+}
+
+.tooltip-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: auto;
+  right: 0;
+  z-index: 90;
+  width: max-content;
+  max-width: min(280px, 72vw);
+  border: 1px solid rgba(23, 32, 38, 0.16);
+  border-radius: 6px;
+  padding: 9px 10px;
+  background: #172026;
+  color: white;
+  box-shadow: 0 14px 34px rgba(23, 32, 38, 0.18);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+  opacity: 0;
+  pointer-events: none;
+  text-transform: none;
+  transform: translateY(-2px);
+  transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease;
+  visibility: hidden;
+  white-space: normal;
+}
+
+.info-tooltip:hover .tooltip-panel,
+.info-tooltip:focus-visible .tooltip-panel {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
 .standard-equipment-list {
   display: grid;
   gap: 8px;
@@ -691,8 +866,10 @@ textarea {
 }
 
 .standard-group .summary-list li {
-  display: grid;
-  gap: 3px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .standard-group .summary-list small {
@@ -767,6 +944,14 @@ textarea {
     color: var(--accent-dark);
     font-size: 18px;
     line-height: 1;
+  }
+
+  .mobile-drawer-button:hover,
+  .mobile-drawer-button:focus-visible,
+  .mobile-drawer-button[aria-expanded="true"] {
+    border-color: #d0ada4;
+    background: var(--control-hover);
+    color: var(--accent-dark);
   }
 
   .mobile-drawer-button-left {
@@ -1135,5 +1320,16 @@ textarea {
 
   .modal-actions button {
     width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button,
+  .step-link,
+  .choice-card,
+  .summary-card,
+  .info-icon,
+  .tooltip-panel {
+    transition: none;
   }
 }
