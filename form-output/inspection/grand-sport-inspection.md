@@ -1,6 +1,6 @@
 # Grand Sport Inspection
 
-Generated: `2026-05-16T17:08:49+00:00`
+Generated: `2026-05-18T20:01:48+00:00`
 Source sheet: `grandSport_options`
 Status: `inspection_generated`
 
@@ -19,8 +19,8 @@ Status: `inspection_generated`
 - Candidate choice rows with available/standard status: 1380
 - Candidate standard equipment cells: 455
 - Candidate standard option rows: 90
-- Active option rows with available/standard status: 225
-- Inactive option rows all unavailable/blank: 44
+- Active option rows with available/standard status: 226
+- Inactive option rows all unavailable/blank: 43
 - Selectable counts: `{"False": 107, "True": 162}`
 - Status counts: `{"available": 879, "standard": 547, "unavailable": 188}`
 - Missing status cells: 0
@@ -51,6 +51,9 @@ Status: `inspection_generated`
 | `R8C` | Corvette Museum Delivery | `sec_cust_001` | not_available, includes, only |  |
 | `PIN` | Customer VIN Ending Reservation | `sec_cust_001` | not_available, only |  |
 | `BV4` | Personalized Specification Plaque | `sec_cust_001` | only |  |
+| `38S` | Adrenaline Red Custom Leather Stitching | `sec_cust_002` | requires |  |
+| `36S` | Competition Yellow Custom Leather Stitching | `sec_cust_002` | requires |  |
+| `37S` | Santorini Blue Custom Leather Stitching | `sec_cust_002` | requires |  |
 | `B6P` | Coupe Engine Appearance Package | `sec_engi_001` | includes |  |
 | `ZZ3` | Convertible Engine Appearance Package | `sec_engi_001` | includes |  |
 | `D3V` | Engine Lighting | `sec_engi_001` | included_with |  |
@@ -59,6 +62,9 @@ Status: `inspection_generated`
 | `BCP` | Edge Red LS6 Engine Cover | `sec_engi_001` | includes |  |
 | `BCS` | Sterling Silver LS6 Engine Cover | `sec_engi_001` | includes |  |
 | `BC4` | Blue LS6 Engine Cover | `sec_engi_001` | includes |  |
+| `BCP` | Edge Red LS6 Engine Cover | `sec_engi_001` | requires, includes |  |
+| `BCS` | Sterling Silver LS6 Engine Cover | `sec_engi_001` | requires, includes |  |
+| `BC4` | Blue LS6 Engine Cover | `sec_engi_001` | requires, includes |  |
 | `WUB` | Quad Center Exit Exhaust | `sec_exha_001` | included_with | FEY |
 | `NWI` | Bright Chrome Exhaust Tips | `sec_exha_001` | requires |  |
 | `EFR` | Carbon Flash Painted Accents | `sec_exte_001` | includes |  |
@@ -75,12 +81,6 @@ Status: `inspection_generated`
 | `97A` | Vcarbon Flash Hash Marks | `sec_gsha_001` | requires | Z15 |
 | `DX4` | Red Mist Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
 | `DRG` | Carbon Flash Outside Mirrors | `sec_incl_001` | only |  |
-| `TR7` | Automatic Leveling Headlamp Control | `sec_incl_001` | only |  |
-| `CFX` | Personalized Corvette Museum Plaque | `sec_incl_001` | includes, only |  |
-| `XFR` | High Performance Tires | `sec_incl_001` | only |  |
-| `XFS` | Michelin Pilot Sport Cup 2 R Tires | `sec_incl_001` | only | FEY |
-| `SFZ` | Dark Stealth Crossed Flags Emblems | `sec_lpoe_001` | not_available |  |
-| `R88` | Front Illuminated Crossed Flags Emblem | `sec_lpoe_001` | not_available |  |
 | ... | 89 additional rows in JSON artifact |  |  |  |
 
 ## Warnings

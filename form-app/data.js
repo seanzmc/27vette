@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-18T16:37:11+00:00"
+          "generated_at": "2026-05-18T19:56:38+00:00"
         },
         "variants": [
           {
@@ -54081,7 +54081,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-05-16T17:08:50+00:00",
+          "generated_at": "2026-05-18T19:56:17+00:00",
           "status": "draft_not_runtime_active"
         },
         "variants": [
@@ -58883,7 +58883,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_eyt_001",
             "rpo": "EYT",
             "label": "Carbon Flash Exterior Badge Package",
-            "description": "",
+            "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "section_id": "sec_badg_001",
             "section_name": "Badges",
             "step_key": "exterior_appearance",
@@ -58902,7 +58902,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Carbon Flash Exterior Badge Package",
-            "source_description": "",
+            "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "text_cleanup_notes": []
           },
           {
@@ -58910,7 +58910,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_eyt_001",
             "rpo": "EYT",
             "label": "Carbon Flash Exterior Badge Package",
-            "description": "",
+            "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "section_id": "sec_badg_001",
             "section_name": "Badges",
             "step_key": "exterior_appearance",
@@ -58929,7 +58929,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Carbon Flash Exterior Badge Package",
-            "source_description": "",
+            "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "text_cleanup_notes": []
           },
           {
@@ -58937,7 +58937,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_eyt_001",
             "rpo": "EYT",
             "label": "Carbon Flash Exterior Badge Package",
-            "description": "",
+            "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "section_id": "sec_badg_001",
             "section_name": "Badges",
             "step_key": "exterior_appearance",
@@ -58956,7 +58956,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Carbon Flash Exterior Badge Package",
-            "source_description": "",
+            "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "text_cleanup_notes": []
           },
           {
@@ -58964,7 +58964,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_eyt_001",
             "rpo": "EYT",
             "label": "Carbon Flash Exterior Badge Package",
-            "description": "",
+            "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "section_id": "sec_badg_001",
             "section_name": "Badges",
             "step_key": "exterior_appearance",
@@ -58983,7 +58983,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Carbon Flash Exterior Badge Package",
-            "source_description": "",
+            "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "text_cleanup_notes": []
           },
           {
@@ -58991,7 +58991,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_eyt_001",
             "rpo": "EYT",
             "label": "Carbon Flash Exterior Badge Package",
-            "description": "",
+            "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "section_id": "sec_badg_001",
             "section_name": "Badges",
             "step_key": "exterior_appearance",
@@ -59010,7 +59010,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Carbon Flash Exterior Badge Package",
-            "source_description": "",
+            "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "text_cleanup_notes": []
           },
           {
@@ -59018,7 +59018,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_eyt_001",
             "rpo": "EYT",
             "label": "Carbon Flash Exterior Badge Package",
-            "description": "",
+            "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "section_id": "sec_badg_001",
             "section_name": "Badges",
             "step_key": "exterior_appearance",
@@ -59037,7 +59037,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Carbon Flash Exterior Badge Package",
-            "source_description": "",
+            "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "text_cleanup_notes": []
           },
           {
@@ -72005,7 +72005,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g8g_001",
             "rpo": "G8G",
             "label": "Arctic White",
-            "description": "Number WA-9567",
+            "description": "Touch-Up Paint Number WA-9567",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72024,7 +72024,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Arctic White",
-            "source_description": "Number WA-9567",
+            "source_description": "Touch-Up Paint Number WA-9567",
             "text_cleanup_notes": []
           },
           {
@@ -72032,7 +72032,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g8g_001",
             "rpo": "G8G",
             "label": "Arctic White",
-            "description": "Number WA-9567",
+            "description": "Touch-Up Paint Number WA-9567",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72051,7 +72051,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Arctic White",
-            "source_description": "Number WA-9567",
+            "source_description": "Touch-Up Paint Number WA-9567",
             "text_cleanup_notes": []
           },
           {
@@ -72059,7 +72059,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g8g_001",
             "rpo": "G8G",
             "label": "Arctic White",
-            "description": "Number WA-9567",
+            "description": "Touch-Up Paint Number WA-9567",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72078,7 +72078,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Arctic White",
-            "source_description": "Number WA-9567",
+            "source_description": "Touch-Up Paint Number WA-9567",
             "text_cleanup_notes": []
           },
           {
@@ -72086,7 +72086,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g8g_001",
             "rpo": "G8G",
             "label": "Arctic White",
-            "description": "Number WA-9567",
+            "description": "Touch-Up Paint Number WA-9567",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72105,7 +72105,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Arctic White",
-            "source_description": "Number WA-9567",
+            "source_description": "Touch-Up Paint Number WA-9567",
             "text_cleanup_notes": []
           },
           {
@@ -72113,7 +72113,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g8g_001",
             "rpo": "G8G",
             "label": "Arctic White",
-            "description": "Number WA-9567",
+            "description": "Touch-Up Paint Number WA-9567",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72132,7 +72132,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Arctic White",
-            "source_description": "Number WA-9567",
+            "source_description": "Touch-Up Paint Number WA-9567",
             "text_cleanup_notes": []
           },
           {
@@ -72140,7 +72140,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g8g_001",
             "rpo": "G8G",
             "label": "Arctic White",
-            "description": "Number WA-9567",
+            "description": "Touch-Up Paint Number WA-9567",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72159,7 +72159,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Arctic White",
-            "source_description": "Number WA-9567",
+            "source_description": "Touch-Up Paint Number WA-9567",
             "text_cleanup_notes": []
           },
           {
@@ -72167,7 +72167,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gba_001",
             "rpo": "GBA",
             "label": "Black",
-            "description": "Number WA-8555",
+            "description": "Touch-Up Paint Number WA-8555",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72186,7 +72186,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 20,
             "source_detail_raw": "",
             "source_option_name": "Black",
-            "source_description": "Number WA-8555",
+            "source_description": "Touch-Up Paint Number WA-8555",
             "text_cleanup_notes": []
           },
           {
@@ -72194,7 +72194,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gba_001",
             "rpo": "GBA",
             "label": "Black",
-            "description": "Number WA-8555",
+            "description": "Touch-Up Paint Number WA-8555",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72213,7 +72213,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 20,
             "source_detail_raw": "",
             "source_option_name": "Black",
-            "source_description": "Number WA-8555",
+            "source_description": "Touch-Up Paint Number WA-8555",
             "text_cleanup_notes": []
           },
           {
@@ -72221,7 +72221,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gba_001",
             "rpo": "GBA",
             "label": "Black",
-            "description": "Number WA-8555",
+            "description": "Touch-Up Paint Number WA-8555",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72240,7 +72240,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 20,
             "source_detail_raw": "",
             "source_option_name": "Black",
-            "source_description": "Number WA-8555",
+            "source_description": "Touch-Up Paint Number WA-8555",
             "text_cleanup_notes": []
           },
           {
@@ -72248,7 +72248,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gba_001",
             "rpo": "GBA",
             "label": "Black",
-            "description": "Number WA-8555",
+            "description": "Touch-Up Paint Number WA-8555",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72267,7 +72267,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 20,
             "source_detail_raw": "",
             "source_option_name": "Black",
-            "source_description": "Number WA-8555",
+            "source_description": "Touch-Up Paint Number WA-8555",
             "text_cleanup_notes": []
           },
           {
@@ -72275,7 +72275,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gba_001",
             "rpo": "GBA",
             "label": "Black",
-            "description": "Number WA-8555",
+            "description": "Touch-Up Paint Number WA-8555",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72294,7 +72294,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 20,
             "source_detail_raw": "",
             "source_option_name": "Black",
-            "source_description": "Number WA-8555",
+            "source_description": "Touch-Up Paint Number WA-8555",
             "text_cleanup_notes": []
           },
           {
@@ -72302,7 +72302,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gba_001",
             "rpo": "GBA",
             "label": "Black",
-            "description": "Number WA-8555",
+            "description": "Touch-Up Paint Number WA-8555",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72321,7 +72321,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 20,
             "source_detail_raw": "",
             "source_option_name": "Black",
-            "source_description": "Number WA-8555",
+            "source_description": "Touch-Up Paint Number WA-8555",
             "text_cleanup_notes": []
           },
           {
@@ -72329,7 +72329,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gka_001",
             "rpo": "GKA",
             "label": "Blade Silver Metallic",
-            "description": "Number WA-240K",
+            "description": "Touch-Up Paint Number WA-240K",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72348,7 +72348,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 30,
             "source_detail_raw": "",
             "source_option_name": "Blade Silver Metallic",
-            "source_description": "Number WA-240K",
+            "source_description": "Touch-Up Paint Number WA-240K",
             "text_cleanup_notes": []
           },
           {
@@ -72356,7 +72356,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gka_001",
             "rpo": "GKA",
             "label": "Blade Silver Metallic",
-            "description": "Number WA-240K",
+            "description": "Touch-Up Paint Number WA-240K",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72375,7 +72375,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 30,
             "source_detail_raw": "",
             "source_option_name": "Blade Silver Metallic",
-            "source_description": "Number WA-240K",
+            "source_description": "Touch-Up Paint Number WA-240K",
             "text_cleanup_notes": []
           },
           {
@@ -72383,7 +72383,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gka_001",
             "rpo": "GKA",
             "label": "Blade Silver Metallic",
-            "description": "Number WA-240K",
+            "description": "Touch-Up Paint Number WA-240K",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72402,7 +72402,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 30,
             "source_detail_raw": "",
             "source_option_name": "Blade Silver Metallic",
-            "source_description": "Number WA-240K",
+            "source_description": "Touch-Up Paint Number WA-240K",
             "text_cleanup_notes": []
           },
           {
@@ -72410,7 +72410,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gka_001",
             "rpo": "GKA",
             "label": "Blade Silver Metallic",
-            "description": "Number WA-240K",
+            "description": "Touch-Up Paint Number WA-240K",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72429,7 +72429,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 30,
             "source_detail_raw": "",
             "source_option_name": "Blade Silver Metallic",
-            "source_description": "Number WA-240K",
+            "source_description": "Touch-Up Paint Number WA-240K",
             "text_cleanup_notes": []
           },
           {
@@ -72437,7 +72437,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gka_001",
             "rpo": "GKA",
             "label": "Blade Silver Metallic",
-            "description": "Number WA-240K",
+            "description": "Touch-Up Paint Number WA-240K",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72456,7 +72456,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 30,
             "source_detail_raw": "",
             "source_option_name": "Blade Silver Metallic",
-            "source_description": "Number WA-240K",
+            "source_description": "Touch-Up Paint Number WA-240K",
             "text_cleanup_notes": []
           },
           {
@@ -72464,7 +72464,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gka_001",
             "rpo": "GKA",
             "label": "Blade Silver Metallic",
-            "description": "Number WA-240K",
+            "description": "Touch-Up Paint Number WA-240K",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72483,7 +72483,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 30,
             "source_detail_raw": "",
             "source_option_name": "Blade Silver Metallic",
-            "source_description": "Number WA-240K",
+            "source_description": "Touch-Up Paint Number WA-240K",
             "text_cleanup_notes": []
           },
           {
@@ -72491,7 +72491,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gbk_001",
             "rpo": "GBK",
             "label": "Competition Yellow Tintcoat Metallic",
-            "description": "Number WA-233K",
+            "description": "Touch-Up Paint Number WA-233K",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72510,7 +72510,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 40,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Competition Yellow Tintcoat Metallic",
-            "source_description": "Number WA-233K",
+            "source_description": "Touch-Up Paint Number WA-233K",
             "text_cleanup_notes": []
           },
           {
@@ -72518,7 +72518,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gbk_001",
             "rpo": "GBK",
             "label": "Competition Yellow Tintcoat Metallic",
-            "description": "Number WA-233K",
+            "description": "Touch-Up Paint Number WA-233K",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72537,7 +72537,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 40,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Competition Yellow Tintcoat Metallic",
-            "source_description": "Number WA-233K",
+            "source_description": "Touch-Up Paint Number WA-233K",
             "text_cleanup_notes": []
           },
           {
@@ -72545,7 +72545,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gbk_001",
             "rpo": "GBK",
             "label": "Competition Yellow Tintcoat Metallic",
-            "description": "Number WA-233K",
+            "description": "Touch-Up Paint Number WA-233K",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72564,7 +72564,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 40,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Competition Yellow Tintcoat Metallic",
-            "source_description": "Number WA-233K",
+            "source_description": "Touch-Up Paint Number WA-233K",
             "text_cleanup_notes": []
           },
           {
@@ -72572,7 +72572,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gbk_001",
             "rpo": "GBK",
             "label": "Competition Yellow Tintcoat Metallic",
-            "description": "Number WA-233K",
+            "description": "Touch-Up Paint Number WA-233K",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72591,7 +72591,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 40,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Competition Yellow Tintcoat Metallic",
-            "source_description": "Number WA-233K",
+            "source_description": "Touch-Up Paint Number WA-233K",
             "text_cleanup_notes": []
           },
           {
@@ -72599,7 +72599,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gbk_001",
             "rpo": "GBK",
             "label": "Competition Yellow Tintcoat Metallic",
-            "description": "Number WA-233K",
+            "description": "Touch-Up Paint Number WA-233K",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72618,7 +72618,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 40,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Competition Yellow Tintcoat Metallic",
-            "source_description": "Number WA-233K",
+            "source_description": "Touch-Up Paint Number WA-233K",
             "text_cleanup_notes": []
           },
           {
@@ -72626,7 +72626,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gbk_001",
             "rpo": "GBK",
             "label": "Competition Yellow Tintcoat Metallic",
-            "description": "Number WA-233K",
+            "description": "Touch-Up Paint Number WA-233K",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72645,7 +72645,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 40,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Competition Yellow Tintcoat Metallic",
-            "source_description": "Number WA-233K",
+            "source_description": "Touch-Up Paint Number WA-233K",
             "text_cleanup_notes": []
           },
           {
@@ -72653,7 +72653,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gtr_001",
             "rpo": "GTR",
             "label": "Admiral Blue Metallic",
-            "description": "New for 2027. Number WA-705U",
+            "description": "New for 2027. Touch-Up Paint Number WA-705U.",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72672,7 +72672,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 50,
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Admiral Blue Metallic",
-            "source_description": "New for 2027. Number WA-705U",
+            "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
             "text_cleanup_notes": []
           },
           {
@@ -72680,7 +72680,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gtr_001",
             "rpo": "GTR",
             "label": "Admiral Blue Metallic",
-            "description": "New for 2027. Number WA-705U",
+            "description": "New for 2027. Touch-Up Paint Number WA-705U.",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72699,7 +72699,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 50,
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Admiral Blue Metallic",
-            "source_description": "New for 2027. Number WA-705U",
+            "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
             "text_cleanup_notes": []
           },
           {
@@ -72707,7 +72707,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gtr_001",
             "rpo": "GTR",
             "label": "Admiral Blue Metallic",
-            "description": "New for 2027. Number WA-705U",
+            "description": "New for 2027. Touch-Up Paint Number WA-705U.",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72726,7 +72726,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 50,
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Admiral Blue Metallic",
-            "source_description": "New for 2027. Number WA-705U",
+            "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
             "text_cleanup_notes": []
           },
           {
@@ -72734,7 +72734,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gtr_001",
             "rpo": "GTR",
             "label": "Admiral Blue Metallic",
-            "description": "New for 2027. Number WA-705U",
+            "description": "New for 2027. Touch-Up Paint Number WA-705U.",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72753,7 +72753,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 50,
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Admiral Blue Metallic",
-            "source_description": "New for 2027. Number WA-705U",
+            "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
             "text_cleanup_notes": []
           },
           {
@@ -72761,7 +72761,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gtr_001",
             "rpo": "GTR",
             "label": "Admiral Blue Metallic",
-            "description": "New for 2027. Number WA-705U",
+            "description": "New for 2027. Touch-Up Paint Number WA-705U.",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72780,7 +72780,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 50,
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Admiral Blue Metallic",
-            "source_description": "New for 2027. Number WA-705U",
+            "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
             "text_cleanup_notes": []
           },
           {
@@ -72788,7 +72788,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gtr_001",
             "rpo": "GTR",
             "label": "Admiral Blue Metallic",
-            "description": "New for 2027. Number WA-705U",
+            "description": "New for 2027. Touch-Up Paint Number WA-705U.",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72807,7 +72807,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 50,
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Admiral Blue Metallic",
-            "source_description": "New for 2027. Number WA-705U",
+            "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
             "text_cleanup_notes": []
           },
           {
@@ -72815,7 +72815,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gec_001",
             "rpo": "GEC",
             "label": "Pitch Gray Metallic",
-            "description": "New for 2027. Number WA-243F",
+            "description": "New for 2027. Touch-Up Paint Number WA-243F.",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72834,7 +72834,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 60,
             "source_detail_raw": "",
             "source_option_name": "Pitch Gray Metallic",
-            "source_description": "New for 2027. Number WA-243F",
+            "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
             "text_cleanup_notes": []
           },
           {
@@ -72842,7 +72842,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gec_001",
             "rpo": "GEC",
             "label": "Pitch Gray Metallic",
-            "description": "New for 2027. Number WA-243F",
+            "description": "New for 2027. Touch-Up Paint Number WA-243F.",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72861,7 +72861,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 60,
             "source_detail_raw": "",
             "source_option_name": "Pitch Gray Metallic",
-            "source_description": "New for 2027. Number WA-243F",
+            "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
             "text_cleanup_notes": []
           },
           {
@@ -72869,7 +72869,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gec_001",
             "rpo": "GEC",
             "label": "Pitch Gray Metallic",
-            "description": "New for 2027. Number WA-243F",
+            "description": "New for 2027. Touch-Up Paint Number WA-243F.",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72888,7 +72888,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 60,
             "source_detail_raw": "",
             "source_option_name": "Pitch Gray Metallic",
-            "source_description": "New for 2027. Number WA-243F",
+            "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
             "text_cleanup_notes": []
           },
           {
@@ -72896,7 +72896,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gec_001",
             "rpo": "GEC",
             "label": "Pitch Gray Metallic",
-            "description": "New for 2027. Number WA-243F",
+            "description": "New for 2027. Touch-Up Paint Number WA-243F.",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72915,7 +72915,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 60,
             "source_detail_raw": "",
             "source_option_name": "Pitch Gray Metallic",
-            "source_description": "New for 2027. Number WA-243F",
+            "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
             "text_cleanup_notes": []
           },
           {
@@ -72923,7 +72923,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gec_001",
             "rpo": "GEC",
             "label": "Pitch Gray Metallic",
-            "description": "New for 2027. Number WA-243F",
+            "description": "New for 2027. Touch-Up Paint Number WA-243F.",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72942,7 +72942,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 60,
             "source_detail_raw": "",
             "source_option_name": "Pitch Gray Metallic",
-            "source_description": "New for 2027. Number WA-243F",
+            "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
             "text_cleanup_notes": []
           },
           {
@@ -72950,7 +72950,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gec_001",
             "rpo": "GEC",
             "label": "Pitch Gray Metallic",
-            "description": "New for 2027. Number WA-243F",
+            "description": "New for 2027. Touch-Up Paint Number WA-243F.",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72969,7 +72969,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 60,
             "source_detail_raw": "",
             "source_option_name": "Pitch Gray Metallic",
-            "source_description": "New for 2027. Number WA-243F",
+            "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
             "text_cleanup_notes": []
           },
           {
@@ -72977,7 +72977,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gph_001",
             "rpo": "GPH",
             "label": "Red Mist Metallic Tintcoat",
-            "description": "Number WA-245F",
+            "description": "Touch-Up Paint Number WA-245F",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -72996,7 +72996,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 70,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Red Mist Metallic Tintcoat",
-            "source_description": "Number WA-245F",
+            "source_description": "Touch-Up Paint Number WA-245F",
             "text_cleanup_notes": []
           },
           {
@@ -73004,7 +73004,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gph_001",
             "rpo": "GPH",
             "label": "Red Mist Metallic Tintcoat",
-            "description": "Number WA-245F",
+            "description": "Touch-Up Paint Number WA-245F",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73023,7 +73023,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 70,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Red Mist Metallic Tintcoat",
-            "source_description": "Number WA-245F",
+            "source_description": "Touch-Up Paint Number WA-245F",
             "text_cleanup_notes": []
           },
           {
@@ -73031,7 +73031,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gph_001",
             "rpo": "GPH",
             "label": "Red Mist Metallic Tintcoat",
-            "description": "Number WA-245F",
+            "description": "Touch-Up Paint Number WA-245F",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73050,7 +73050,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 70,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Red Mist Metallic Tintcoat",
-            "source_description": "Number WA-245F",
+            "source_description": "Touch-Up Paint Number WA-245F",
             "text_cleanup_notes": []
           },
           {
@@ -73058,7 +73058,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gph_001",
             "rpo": "GPH",
             "label": "Red Mist Metallic Tintcoat",
-            "description": "Number WA-245F",
+            "description": "Touch-Up Paint Number WA-245F",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73077,7 +73077,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 70,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Red Mist Metallic Tintcoat",
-            "source_description": "Number WA-245F",
+            "source_description": "Touch-Up Paint Number WA-245F",
             "text_cleanup_notes": []
           },
           {
@@ -73085,7 +73085,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gph_001",
             "rpo": "GPH",
             "label": "Red Mist Metallic Tintcoat",
-            "description": "Number WA-245F",
+            "description": "Touch-Up Paint Number WA-245F",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73104,7 +73104,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 70,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Red Mist Metallic Tintcoat",
-            "source_description": "Number WA-245F",
+            "source_description": "Touch-Up Paint Number WA-245F",
             "text_cleanup_notes": []
           },
           {
@@ -73112,7 +73112,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gph_001",
             "rpo": "GPH",
             "label": "Red Mist Metallic Tintcoat",
-            "description": "Number WA-245F",
+            "description": "Touch-Up Paint Number WA-245F",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73131,7 +73131,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 70,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Red Mist Metallic Tintcoat",
-            "source_description": "Number WA-245F",
+            "source_description": "Touch-Up Paint Number WA-245F",
             "text_cleanup_notes": []
           },
           {
@@ -73139,7 +73139,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g4z_001",
             "rpo": "G4Z",
             "label": "Roswell Green Metallic",
-            "description": "Number WA-247L",
+            "description": "Touch-Up Paint Number WA-247L",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73158,7 +73158,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 80,
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Roswell Green Metallic",
-            "source_description": "Number WA-247L",
+            "source_description": "Touch-Up Paint Number WA-247L",
             "text_cleanup_notes": []
           },
           {
@@ -73166,7 +73166,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g4z_001",
             "rpo": "G4Z",
             "label": "Roswell Green Metallic",
-            "description": "Number WA-247L",
+            "description": "Touch-Up Paint Number WA-247L",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73185,7 +73185,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 80,
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Roswell Green Metallic",
-            "source_description": "Number WA-247L",
+            "source_description": "Touch-Up Paint Number WA-247L",
             "text_cleanup_notes": []
           },
           {
@@ -73193,7 +73193,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g4z_001",
             "rpo": "G4Z",
             "label": "Roswell Green Metallic",
-            "description": "Number WA-247L",
+            "description": "Touch-Up Paint Number WA-247L",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73212,7 +73212,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 80,
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Roswell Green Metallic",
-            "source_description": "Number WA-247L",
+            "source_description": "Touch-Up Paint Number WA-247L",
             "text_cleanup_notes": []
           },
           {
@@ -73220,7 +73220,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g4z_001",
             "rpo": "G4Z",
             "label": "Roswell Green Metallic",
-            "description": "Number WA-247L",
+            "description": "Touch-Up Paint Number WA-247L",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73239,7 +73239,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 80,
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Roswell Green Metallic",
-            "source_description": "Number WA-247L",
+            "source_description": "Touch-Up Paint Number WA-247L",
             "text_cleanup_notes": []
           },
           {
@@ -73247,7 +73247,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g4z_001",
             "rpo": "G4Z",
             "label": "Roswell Green Metallic",
-            "description": "Number WA-247L",
+            "description": "Touch-Up Paint Number WA-247L",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73266,7 +73266,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 80,
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Roswell Green Metallic",
-            "source_description": "Number WA-247L",
+            "source_description": "Touch-Up Paint Number WA-247L",
             "text_cleanup_notes": []
           },
           {
@@ -73274,7 +73274,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g4z_001",
             "rpo": "G4Z",
             "label": "Roswell Green Metallic",
-            "description": "Number WA-247L",
+            "description": "Touch-Up Paint Number WA-247L",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73293,7 +73293,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 80,
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Roswell Green Metallic",
-            "source_description": "Number WA-247L",
+            "source_description": "Touch-Up Paint Number WA-247L",
             "text_cleanup_notes": []
           },
           {
@@ -73301,7 +73301,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g26_001",
             "rpo": "G26",
             "label": "Sebring Orange Tintcoat",
-            "description": "Number WA-418C",
+            "description": "Touch-Up Paint Number WA-418C",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73320,7 +73320,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 90,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Sebring Orange Tintcoat",
-            "source_description": "Number WA-418C",
+            "source_description": "Touch-Up Paint Number WA-418C",
             "text_cleanup_notes": []
           },
           {
@@ -73328,7 +73328,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g26_001",
             "rpo": "G26",
             "label": "Sebring Orange Tintcoat",
-            "description": "Number WA-418C",
+            "description": "Touch-Up Paint Number WA-418C",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73347,7 +73347,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 90,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Sebring Orange Tintcoat",
-            "source_description": "Number WA-418C",
+            "source_description": "Touch-Up Paint Number WA-418C",
             "text_cleanup_notes": []
           },
           {
@@ -73355,7 +73355,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g26_001",
             "rpo": "G26",
             "label": "Sebring Orange Tintcoat",
-            "description": "Number WA-418C",
+            "description": "Touch-Up Paint Number WA-418C",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73374,7 +73374,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 90,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Sebring Orange Tintcoat",
-            "source_description": "Number WA-418C",
+            "source_description": "Touch-Up Paint Number WA-418C",
             "text_cleanup_notes": []
           },
           {
@@ -73382,7 +73382,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g26_001",
             "rpo": "G26",
             "label": "Sebring Orange Tintcoat",
-            "description": "Number WA-418C",
+            "description": "Touch-Up Paint Number WA-418C",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73401,7 +73401,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 90,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Sebring Orange Tintcoat",
-            "source_description": "Number WA-418C",
+            "source_description": "Touch-Up Paint Number WA-418C",
             "text_cleanup_notes": []
           },
           {
@@ -73409,7 +73409,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g26_001",
             "rpo": "G26",
             "label": "Sebring Orange Tintcoat",
-            "description": "Number WA-418C",
+            "description": "Touch-Up Paint Number WA-418C",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73428,7 +73428,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 90,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Sebring Orange Tintcoat",
-            "source_description": "Number WA-418C",
+            "source_description": "Touch-Up Paint Number WA-418C",
             "text_cleanup_notes": []
           },
           {
@@ -73436,7 +73436,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_g26_001",
             "rpo": "G26",
             "label": "Sebring Orange Tintcoat",
-            "description": "Number WA-418C",
+            "description": "Touch-Up Paint Number WA-418C",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73455,7 +73455,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 90,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Sebring Orange Tintcoat",
-            "source_description": "Number WA-418C",
+            "source_description": "Touch-Up Paint Number WA-418C",
             "text_cleanup_notes": []
           },
           {
@@ -73463,7 +73463,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gkz_001",
             "rpo": "GKZ",
             "label": "Torch Red",
-            "description": "Number WA-9075",
+            "description": "Touch-Up Paint Number WA-9075",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73482,7 +73482,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 100,
             "source_detail_raw": "",
             "source_option_name": "Torch Red",
-            "source_description": "Number WA-9075",
+            "source_description": "Touch-Up Paint Number WA-9075",
             "text_cleanup_notes": []
           },
           {
@@ -73490,7 +73490,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gkz_001",
             "rpo": "GKZ",
             "label": "Torch Red",
-            "description": "Number WA-9075",
+            "description": "Touch-Up Paint Number WA-9075",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73509,7 +73509,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 100,
             "source_detail_raw": "",
             "source_option_name": "Torch Red",
-            "source_description": "Number WA-9075",
+            "source_description": "Touch-Up Paint Number WA-9075",
             "text_cleanup_notes": []
           },
           {
@@ -73517,7 +73517,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gkz_001",
             "rpo": "GKZ",
             "label": "Torch Red",
-            "description": "Number WA-9075",
+            "description": "Touch-Up Paint Number WA-9075",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73536,7 +73536,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 100,
             "source_detail_raw": "",
             "source_option_name": "Torch Red",
-            "source_description": "Number WA-9075",
+            "source_description": "Touch-Up Paint Number WA-9075",
             "text_cleanup_notes": []
           },
           {
@@ -73544,7 +73544,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gkz_001",
             "rpo": "GKZ",
             "label": "Torch Red",
-            "description": "Number WA-9075",
+            "description": "Touch-Up Paint Number WA-9075",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73563,7 +73563,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 100,
             "source_detail_raw": "",
             "source_option_name": "Torch Red",
-            "source_description": "Number WA-9075",
+            "source_description": "Touch-Up Paint Number WA-9075",
             "text_cleanup_notes": []
           },
           {
@@ -73571,7 +73571,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gkz_001",
             "rpo": "GKZ",
             "label": "Torch Red",
-            "description": "Number WA-9075",
+            "description": "Touch-Up Paint Number WA-9075",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73590,7 +73590,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 100,
             "source_detail_raw": "",
             "source_option_name": "Torch Red",
-            "source_description": "Number WA-9075",
+            "source_description": "Touch-Up Paint Number WA-9075",
             "text_cleanup_notes": []
           },
           {
@@ -73598,7 +73598,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_gkz_001",
             "rpo": "GKZ",
             "label": "Torch Red",
-            "description": "Number WA-9075",
+            "description": "Touch-Up Paint Number WA-9075",
             "section_id": "sec_pain_001",
             "section_name": "Paint",
             "step_key": "paint",
@@ -73617,7 +73617,7 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 100,
             "source_detail_raw": "",
             "source_option_name": "Torch Red",
-            "source_description": "Number WA-9075",
+            "source_description": "Touch-Up Paint Number WA-9075",
             "text_cleanup_notes": []
           },
           {
@@ -74107,6 +74107,168 @@ window.CORVETTE_FORM_DATA = {
             "text_cleanup_notes": []
           },
           {
+            "choice_id": "1lt_e07__opt_j56_001",
+            "option_id": "opt_j56_001",
+            "rpo": "J56",
+            "label": "Performance Disc Brakes",
+            "description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
+            "section_id": "sec_perf_brake_001",
+            "section_name": "Performance Brakes",
+            "step_key": "packages_performance",
+            "variant_id": "1lt_e07",
+            "body_style": "coupe",
+            "trim_level": "1LT",
+            "status": "available",
+            "status_label": "Available",
+            "selectable": "False",
+            "active": "True",
+            "choice_mode": "single",
+            "selection_mode": "single_select_req",
+            "selection_mode_label": "Required single choice",
+            "base_price": 0,
+            "display_behavior": "display_only",
+            "display_order": 10,
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
+            "source_option_name": "Performance Disc Brakes",
+            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
+            "text_cleanup_notes": []
+          },
+          {
+            "choice_id": "2lt_e07__opt_j56_001",
+            "option_id": "opt_j56_001",
+            "rpo": "J56",
+            "label": "Performance Disc Brakes",
+            "description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
+            "section_id": "sec_perf_brake_001",
+            "section_name": "Performance Brakes",
+            "step_key": "packages_performance",
+            "variant_id": "2lt_e07",
+            "body_style": "coupe",
+            "trim_level": "2LT",
+            "status": "available",
+            "status_label": "Available",
+            "selectable": "False",
+            "active": "True",
+            "choice_mode": "single",
+            "selection_mode": "single_select_req",
+            "selection_mode_label": "Required single choice",
+            "base_price": 0,
+            "display_behavior": "display_only",
+            "display_order": 10,
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
+            "source_option_name": "Performance Disc Brakes",
+            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
+            "text_cleanup_notes": []
+          },
+          {
+            "choice_id": "3lt_e07__opt_j56_001",
+            "option_id": "opt_j56_001",
+            "rpo": "J56",
+            "label": "Performance Disc Brakes",
+            "description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
+            "section_id": "sec_perf_brake_001",
+            "section_name": "Performance Brakes",
+            "step_key": "packages_performance",
+            "variant_id": "3lt_e07",
+            "body_style": "coupe",
+            "trim_level": "3LT",
+            "status": "available",
+            "status_label": "Available",
+            "selectable": "False",
+            "active": "True",
+            "choice_mode": "single",
+            "selection_mode": "single_select_req",
+            "selection_mode_label": "Required single choice",
+            "base_price": 0,
+            "display_behavior": "display_only",
+            "display_order": 10,
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
+            "source_option_name": "Performance Disc Brakes",
+            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
+            "text_cleanup_notes": []
+          },
+          {
+            "choice_id": "1lt_e67__opt_j56_001",
+            "option_id": "opt_j56_001",
+            "rpo": "J56",
+            "label": "Performance Disc Brakes",
+            "description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
+            "section_id": "sec_perf_brake_001",
+            "section_name": "Performance Brakes",
+            "step_key": "packages_performance",
+            "variant_id": "1lt_e67",
+            "body_style": "convertible",
+            "trim_level": "1LT",
+            "status": "available",
+            "status_label": "Available",
+            "selectable": "False",
+            "active": "True",
+            "choice_mode": "single",
+            "selection_mode": "single_select_req",
+            "selection_mode_label": "Required single choice",
+            "base_price": 0,
+            "display_behavior": "display_only",
+            "display_order": 10,
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
+            "source_option_name": "Performance Disc Brakes",
+            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
+            "text_cleanup_notes": []
+          },
+          {
+            "choice_id": "2lt_e67__opt_j56_001",
+            "option_id": "opt_j56_001",
+            "rpo": "J56",
+            "label": "Performance Disc Brakes",
+            "description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
+            "section_id": "sec_perf_brake_001",
+            "section_name": "Performance Brakes",
+            "step_key": "packages_performance",
+            "variant_id": "2lt_e67",
+            "body_style": "convertible",
+            "trim_level": "2LT",
+            "status": "available",
+            "status_label": "Available",
+            "selectable": "False",
+            "active": "True",
+            "choice_mode": "single",
+            "selection_mode": "single_select_req",
+            "selection_mode_label": "Required single choice",
+            "base_price": 0,
+            "display_behavior": "display_only",
+            "display_order": 10,
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
+            "source_option_name": "Performance Disc Brakes",
+            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
+            "text_cleanup_notes": []
+          },
+          {
+            "choice_id": "3lt_e67__opt_j56_001",
+            "option_id": "opt_j56_001",
+            "rpo": "J56",
+            "label": "Performance Disc Brakes",
+            "description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
+            "section_id": "sec_perf_brake_001",
+            "section_name": "Performance Brakes",
+            "step_key": "packages_performance",
+            "variant_id": "3lt_e67",
+            "body_style": "convertible",
+            "trim_level": "3LT",
+            "status": "available",
+            "status_label": "Available",
+            "selectable": "False",
+            "active": "True",
+            "choice_mode": "single",
+            "selection_mode": "single_select_req",
+            "selection_mode_label": "Required single choice",
+            "base_price": 0,
+            "display_behavior": "display_only",
+            "display_order": 10,
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
+            "source_option_name": "Performance Disc Brakes",
+            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
+            "text_cleanup_notes": []
+          },
+          {
             "choice_id": "1lt_e07__opt_jx6_001",
             "option_id": "opt_jx6_001",
             "rpo": "JX6",
@@ -74265,168 +74427,6 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 5,
             "source_detail_raw": "",
             "source_option_name": "Low-Dust Touring Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
-          },
-          {
-            "choice_id": "1lt_e07__opt_j56_001",
-            "option_id": "opt_j56_001",
-            "rpo": "J56",
-            "label": "Performance Disc Brakes",
-            "description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "section_id": "sec_perf_brake_001",
-            "section_name": "Performance Brakes",
-            "step_key": "packages_performance",
-            "variant_id": "1lt_e07",
-            "body_style": "coupe",
-            "trim_level": "1LT",
-            "status": "unavailable",
-            "status_label": "Not Available",
-            "selectable": "False",
-            "active": "False",
-            "choice_mode": "single",
-            "selection_mode": "single_select_req",
-            "selection_mode_label": "Required single choice",
-            "base_price": 0,
-            "display_behavior": "auto_only",
-            "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "Performance Disc Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
-          },
-          {
-            "choice_id": "2lt_e07__opt_j56_001",
-            "option_id": "opt_j56_001",
-            "rpo": "J56",
-            "label": "Performance Disc Brakes",
-            "description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "section_id": "sec_perf_brake_001",
-            "section_name": "Performance Brakes",
-            "step_key": "packages_performance",
-            "variant_id": "2lt_e07",
-            "body_style": "coupe",
-            "trim_level": "2LT",
-            "status": "unavailable",
-            "status_label": "Not Available",
-            "selectable": "False",
-            "active": "False",
-            "choice_mode": "single",
-            "selection_mode": "single_select_req",
-            "selection_mode_label": "Required single choice",
-            "base_price": 0,
-            "display_behavior": "auto_only",
-            "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "Performance Disc Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
-          },
-          {
-            "choice_id": "3lt_e07__opt_j56_001",
-            "option_id": "opt_j56_001",
-            "rpo": "J56",
-            "label": "Performance Disc Brakes",
-            "description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "section_id": "sec_perf_brake_001",
-            "section_name": "Performance Brakes",
-            "step_key": "packages_performance",
-            "variant_id": "3lt_e07",
-            "body_style": "coupe",
-            "trim_level": "3LT",
-            "status": "unavailable",
-            "status_label": "Not Available",
-            "selectable": "False",
-            "active": "False",
-            "choice_mode": "single",
-            "selection_mode": "single_select_req",
-            "selection_mode_label": "Required single choice",
-            "base_price": 0,
-            "display_behavior": "auto_only",
-            "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "Performance Disc Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
-          },
-          {
-            "choice_id": "1lt_e67__opt_j56_001",
-            "option_id": "opt_j56_001",
-            "rpo": "J56",
-            "label": "Performance Disc Brakes",
-            "description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "section_id": "sec_perf_brake_001",
-            "section_name": "Performance Brakes",
-            "step_key": "packages_performance",
-            "variant_id": "1lt_e67",
-            "body_style": "convertible",
-            "trim_level": "1LT",
-            "status": "unavailable",
-            "status_label": "Not Available",
-            "selectable": "False",
-            "active": "False",
-            "choice_mode": "single",
-            "selection_mode": "single_select_req",
-            "selection_mode_label": "Required single choice",
-            "base_price": 0,
-            "display_behavior": "auto_only",
-            "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "Performance Disc Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
-          },
-          {
-            "choice_id": "2lt_e67__opt_j56_001",
-            "option_id": "opt_j56_001",
-            "rpo": "J56",
-            "label": "Performance Disc Brakes",
-            "description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "section_id": "sec_perf_brake_001",
-            "section_name": "Performance Brakes",
-            "step_key": "packages_performance",
-            "variant_id": "2lt_e67",
-            "body_style": "convertible",
-            "trim_level": "2LT",
-            "status": "unavailable",
-            "status_label": "Not Available",
-            "selectable": "False",
-            "active": "False",
-            "choice_mode": "single",
-            "selection_mode": "single_select_req",
-            "selection_mode_label": "Required single choice",
-            "base_price": 0,
-            "display_behavior": "auto_only",
-            "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "Performance Disc Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
-          },
-          {
-            "choice_id": "3lt_e67__opt_j56_001",
-            "option_id": "opt_j56_001",
-            "rpo": "J56",
-            "label": "Performance Disc Brakes",
-            "description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "section_id": "sec_perf_brake_001",
-            "section_name": "Performance Brakes",
-            "step_key": "packages_performance",
-            "variant_id": "3lt_e67",
-            "body_style": "convertible",
-            "trim_level": "3LT",
-            "status": "unavailable",
-            "status_label": "Not Available",
-            "selectable": "False",
-            "active": "False",
-            "choice_mode": "single",
-            "selection_mode": "single_select_req",
-            "selection_mode_label": "Required single choice",
-            "base_price": 0,
-            "display_behavior": "auto_only",
-            "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "Performance Disc Brakes",
             "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
             "text_cleanup_notes": []
           },
@@ -93330,7 +93330,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_eyt_001",
             "rpo": "EYT",
             "label": "Carbon Flash Exterior Badge Package",
-            "description": "",
+            "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "section_id": "sec_badg_001",
             "section_name": "Badges",
             "display_order": 10,
@@ -93344,7 +93344,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_eyt_001",
             "rpo": "EYT",
             "label": "Carbon Flash Exterior Badge Package",
-            "description": "",
+            "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "section_id": "sec_badg_001",
             "section_name": "Badges",
             "display_order": 10,
@@ -93358,7 +93358,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_eyt_001",
             "rpo": "EYT",
             "label": "Carbon Flash Exterior Badge Package",
-            "description": "",
+            "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "section_id": "sec_badg_001",
             "section_name": "Badges",
             "display_order": 10,
@@ -93372,7 +93372,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_eyt_001",
             "rpo": "EYT",
             "label": "Carbon Flash Exterior Badge Package",
-            "description": "",
+            "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "section_id": "sec_badg_001",
             "section_name": "Badges",
             "display_order": 10,
@@ -93386,7 +93386,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_eyt_001",
             "rpo": "EYT",
             "label": "Carbon Flash Exterior Badge Package",
-            "description": "",
+            "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "section_id": "sec_badg_001",
             "section_name": "Badges",
             "display_order": 10,
@@ -93400,7 +93400,7 @@ window.CORVETTE_FORM_DATA = {
             "option_id": "opt_eyt_001",
             "rpo": "EYT",
             "label": "Carbon Flash Exterior Badge Package",
-            "description": "",
+            "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
             "section_id": "sec_badg_001",
             "section_name": "Badges",
             "display_order": 10,
@@ -98632,6 +98632,25 @@ window.CORVETTE_FORM_DATA = {
             "review_flag": "False"
           },
           {
+            "rule_id": "gs_rule_opt_j57_001_includes_opt_j6d_001",
+            "source_id": "opt_j57_001",
+            "rule_type": "includes",
+            "target_id": "opt_j6d_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_perf_brake_001",
+            "target_section": "sec_cali_001",
+            "source_selection_mode": "single_select_req",
+            "target_selection_mode": "single_select_req",
+            "body_style_scope": "",
+            "disabled_reason": "Included with J57 Carbon Ceramic Brakes.",
+            "auto_add": "True",
+            "active": "True",
+            "runtime_action": "active",
+            "source_note": "1. Included and only available with (J57) carbon ceramic brakes.",
+            "review_flag": "False"
+          },
+          {
             "rule_id": "gs_copy_rule_opt_bv4_001_excludes_opt_r8c_001_opt_bv4_001_excludes_opt_r8c_001",
             "source_id": "opt_bv4_001",
             "rule_type": "excludes",
@@ -102277,6 +102296,63 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "runtime_action": "active",
             "source_note": "Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
+            "review_flag": "False"
+          },
+          {
+            "rule_id": "gs_rule_opt_feb_001_excludes_opt_jx6_001_replace",
+            "source_id": "opt_feb_001",
+            "rule_type": "excludes",
+            "target_id": "opt_jx6_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_perf_z52_001",
+            "target_section": "sec_perf_brake_001",
+            "source_selection_mode": "single_select_opt",
+            "target_selection_mode": "single_select_req",
+            "body_style_scope": "",
+            "disabled_reason": "FEB includes J56 performance disc brakes.",
+            "auto_add": "False",
+            "active": "True",
+            "runtime_action": "replace",
+            "source_note": "FEB Z52 Sport Performance Package includes J56 performance disc brakes and replaces JX6 low-dust touring brakes.",
+            "review_flag": "False"
+          },
+          {
+            "rule_id": "gs_rule_opt_fey_001_excludes_opt_jx6_001_replace",
+            "source_id": "opt_fey_001",
+            "rule_type": "excludes",
+            "target_id": "opt_jx6_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_perf_z52_001",
+            "target_section": "sec_perf_brake_001",
+            "source_selection_mode": "single_select_opt",
+            "target_selection_mode": "single_select_req",
+            "body_style_scope": "",
+            "disabled_reason": "FEY includes J57 carbon ceramic brakes.",
+            "auto_add": "False",
+            "active": "True",
+            "runtime_action": "replace",
+            "source_note": "FEY Z52 Track Performance Package includes J57 carbon ceramic brakes and replaces JX6 low-dust touring brakes.",
+            "review_flag": "False"
+          },
+          {
+            "rule_id": "gs_rule_opt_fey_001_excludes_opt_j56_001_replace",
+            "source_id": "opt_fey_001",
+            "rule_type": "excludes",
+            "target_id": "opt_j56_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_perf_z52_001",
+            "target_section": "sec_perf_brake_001",
+            "source_selection_mode": "single_select_opt",
+            "target_selection_mode": "single_select_req",
+            "body_style_scope": "",
+            "disabled_reason": "FEY includes J57 carbon ceramic brakes.",
+            "auto_add": "False",
+            "active": "True",
+            "runtime_action": "replace",
+            "source_note": "FEY Z52 Track Performance Package includes J57 carbon ceramic brakes and replaces J56 performance disc brakes.",
             "review_flag": "False"
           }
         ],
@@ -110865,7 +110941,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "194 active compatibility rules exported from grandSport_rule_mapping."
+            "message": "198 active compatibility rules exported from grandSport_rule_mapping."
           },
           {
             "check_id": "interior_contract",
@@ -111020,6 +111096,39 @@ window.CORVETTE_FORM_DATA = {
                 "detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
               },
               {
+                "option_id": "opt_38s_001",
+                "rpo": "38S",
+                "option_name": "Adrenaline Red Custom Leather Stitching",
+                "section_id": "sec_cust_002",
+                "matched_terms": [
+                  "requires"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior or (HU0/HXO) Adrenaline Red/Jet Black interior."
+              },
+              {
+                "option_id": "opt_36s_001",
+                "rpo": "36S",
+                "option_name": "Competition Yellow Custom Leather Stitching",
+                "section_id": "sec_cust_002",
+                "matched_terms": [
+                  "requires"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior."
+              },
+              {
+                "option_id": "opt_37s_001",
+                "rpo": "37S",
+                "option_name": "Santorini Blue Custom Leather Stitching",
+                "section_id": "sec_cust_002",
+                "matched_terms": [
+                  "requires"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior."
+              },
+              {
                 "option_id": "opt_b6p_001",
                 "rpo": "B6P",
                 "option_name": "Coupe Engine Appearance Package",
@@ -111106,6 +111215,42 @@ window.CORVETTE_FORM_DATA = {
                 ],
                 "special_mentions": [],
                 "detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
+              },
+              {
+                "option_id": "opt_bcp_001",
+                "rpo": "BCP",
+                "option_name": "Edge Red LS6 Engine Cover",
+                "section_id": "sec_engi_001",
+                "matched_terms": [
+                  "requires",
+                  "includes"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package."
+              },
+              {
+                "option_id": "opt_bcs_001",
+                "rpo": "BCS",
+                "option_name": "Sterling Silver LS6 Engine Cover",
+                "section_id": "sec_engi_001",
+                "matched_terms": [
+                  "requires",
+                  "includes"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package."
+              },
+              {
+                "option_id": "opt_bc4_001",
+                "rpo": "BC4",
+                "option_name": "Blue LS6 Engine Cover",
+                "section_id": "sec_engi_001",
+                "matched_terms": [
+                  "requires",
+                  "includes"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Includes (D3V) engine lighting. Requires (B6P) on Coupe\n2. Requires (ZZ3) Convertible Engine Appearance Package."
               },
               {
                 "option_id": "opt_wub_001",
@@ -111388,6 +111533,28 @@ window.CORVETTE_FORM_DATA = {
                 "detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package."
               },
               {
+                "option_id": "opt_n26_001",
+                "rpo": "N26",
+                "option_name": "Sueded Microfiber-Wrapped Steering Wheel",
+                "section_id": "sec_inte_001",
+                "matched_terms": [
+                  "requires"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Requires (HTJ) Jet Black interior.\n2. Requires leather seating surfaces with perforated sueded microfiber inserts interior: HTP, HU6, HU7, HTQ.\n3. Requires leather seating surfaces with perforated sueded microfiber inserts interiors: HTT, HU9, HUA, HTG, HUF, HMO, HVT, HXO, HZP, HUX, EPX, HUB."
+              },
+              {
+                "option_id": "opt_tu7_001",
+                "rpo": "TU7",
+                "option_name": "Two-Tone Seats",
+                "section_id": "sec_inte_001",
+                "matched_terms": [
+                  "requires"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Requires (AH2) GT2 seats. Available with (HUK/HU6) Sky Cool Gray, (HUL/HU7) Adrenaline Red, (HTN/HTQ) Natural interiors.\n2. Requires (AH2) GT2 seats. Available with (HU1/HU9) Sky Cool Gray, (HU2/HUA) Adrenaline Red, (HUE/HTG) Natural, (HMO/HVV) Jet Black/Sky Cool Gray, (HU0/HXO) Jet Black/Adrenaline Red interiors."
+              },
+              {
                 "option_id": "opt_sfz_001",
                 "rpo": "SFZ",
                 "option_name": "Dark Stealth Crossed Flags Emblems",
@@ -111475,6 +111642,17 @@ window.CORVETTE_FORM_DATA = {
                 ],
                 "special_mentions": [],
                 "detail_raw": ""
+              },
+              {
+                "option_id": "opt_rz9_001",
+                "rpo": "RZ9",
+                "option_name": "Visible Carbon Fiber Grille Insert",
+                "section_id": "sec_lpoe_001",
+                "matched_terms": [
+                  "not_available"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Not available at this time."
               },
               {
                 "option_id": "opt_rin_001",
@@ -111587,6 +111765,114 @@ window.CORVETTE_FORM_DATA = {
                 "detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
               },
               {
+                "option_id": "opt_v8x_001",
+                "rpo": "V8X",
+                "option_name": "Visible Carbon Fiber Sill Plates",
+                "section_id": "sec_lpoi_001",
+                "matched_terms": [
+                  "not_available"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Not available at this time."
+              },
+              {
+                "option_id": "opt_r9w_001",
+                "rpo": "R9W",
+                "option_name": "Deleted Mobile Service Plus",
+                "section_id": "sec_onst_001",
+                "matched_terms": [
+                  "requires"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Requires a dealer with a BFU of 284. Requires TRE, SRE or Fleet order types."
+              },
+              {
+                "option_id": "opt_r6p_001",
+                "rpo": "R6P",
+                "option_name": "Three-Year SiriusXM Subscription",
+                "section_id": "sec_onst_001",
+                "matched_terms": [
+                  "requires",
+                  "not_available",
+                  "includes"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Requires SiriusXM. Not available with a FGO order type. SiriusXM Extended Service subscription will stop at the end of the applicable subscription period unless you decide to continue service. Plan is non-transferable and non-refundable. Service subject to the SiriusXM Customer Agreement and Privacy Policy, visit siriusxm.com/terms to see complete terms and how to cancel which includes online methods or calling 1-866-635-2349. Some services, content and features are subject to device capabilities, an active data connection enabled in the vehicle and location availability. All fees, content and features are subject to change. Content varies by subscription plan. SiriusXM and related logos are trademarks of Sirius XM Radio Inc. and its respective subsidiaries."
+              },
+              {
+                "option_id": "opt_prb_001",
+                "rpo": "PRB",
+                "option_name": "Three-Year OnStar One Standalone Plan",
+                "section_id": "sec_onst_001",
+                "matched_terms": [
+                  "requires",
+                  "not_available"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Requires (UE1) OnStar and a Retail order type. Not available on vehicles being shipped to Puerto Rico, the Virgin Islands, or Guam. OnStar plan, working electrical system, cell reception and GPS signal required. OnStar links to emergency services. Not all vehicles may transmit all crash data. Service coverage varies with conditions and location. Service availability, features and functionality vary by device and software version. Subject to user terms. See onstar.com for details and limitations."
+              },
+              {
+                "option_id": "opt_r9y_001",
+                "rpo": "R9Y",
+                "option_name": "One-Year Mobile Service Plus",
+                "section_id": "sec_onst_001",
+                "matched_terms": [
+                  "requires",
+                  "not_available",
+                  "only",
+                  "except"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Required and only available for dealers who have a BFU of 284, except for orders with (R9W) Deleted Mobile Service Plus. Requires TRE, SRE, FBC, FNR or Fleet order types. Not available with (R9V) Mobile Service Plus for 3 years."
+              },
+              {
+                "option_id": "opt_r9v_001",
+                "rpo": "R9V",
+                "option_name": "Three-Year Mobile Service Plus",
+                "section_id": "sec_onst_001",
+                "matched_terms": [
+                  "requires",
+                  "not_available",
+                  "only",
+                  "except"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Required and only available for dealers who have a BFU of 284, except for orders with (R9W) Deleted Mobile Service Plus. Requires TRE, SRE or Fleet order types. Not available with (R9Y) Mobile Service Plus for 1 year."
+              },
+              {
+                "option_id": "opt_r9l_001",
+                "rpo": "R9L",
+                "option_name": "Removes OnStar Basics (OnStar Fleet Basics for Fleet)",
+                "section_id": "sec_onst_001",
+                "matched_terms": [
+                  "only"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Included and only available on vehicles being shipped to Puerto Rico, the Virgin Islands, or Guam. Will delete OnStar Services and OnStar standard equipment (OnStar Basics / Connected Access / EV Access / R9M Services i.e. OnStar One and OnStar One Super Cruise as equipped) for vehicles shipping to these territories."
+              },
+              {
+                "option_id": "opt_u2k_001",
+                "rpo": "U2K",
+                "option_name": "SiriusXM Trial Subscription",
+                "section_id": "sec_onst_001",
+                "matched_terms": [
+                  "includes"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. IMPORTANT: The SiriusXM trial subscription is not provided on vehicles that are ordered for Fleet Daily Rental (\"FDR\") use. Trial subscription is subject to the SiriusXM Customer Agreement and privacy policy, visit siriusxm.com which includes full terms and how to cancel. All fees, content, features, and availability are subject to change."
+              },
+              {
+                "option_id": "opt_009",
+                "rpo": "",
+                "option_name": "OnStar Basics (OnStar Fleet Basics for Fleet)",
+                "section_id": "sec_onst_001",
+                "matched_terms": [
+                  "requires"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Requires (UE1) OnStar. OnStar Basics is standard for 8 years; working electrical system, cell reception and GPS signal required. OnStar links to emergency services. Service coverage varies with conditions and location. Service availability, features and functionality vary by device and software version. Subject to user terms. See onstar.com for details and limitations. Removed with a ship-to of Guam, Puerto Rico or the Virgin Islands."
+              },
+              {
                 "option_id": "opt_t0e_001",
                 "rpo": "T0E",
                 "option_name": "Low Rear Spoiler",
@@ -111628,17 +111914,6 @@ window.CORVETTE_FORM_DATA = {
                 "detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
               },
               {
-                "option_id": "opt_jx6_001",
-                "rpo": "JX6",
-                "option_name": "Low-Dust Touring Brakes",
-                "section_id": "sec_perf_brake_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
                 "option_id": "opt_j56_001",
                 "rpo": "J56",
                 "option_name": "Performance Disc Brakes",
@@ -111649,6 +111924,17 @@ window.CORVETTE_FORM_DATA = {
                 ],
                 "special_mentions": [],
                 "detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
+              },
+              {
+                "option_id": "opt_jx6_001",
+                "rpo": "JX6",
+                "option_name": "Low-Dust Touring Brakes",
+                "section_id": "sec_perf_brake_001",
+                "matched_terms": [
+                  "includes"
+                ],
+                "special_mentions": [],
+                "detail_raw": ""
               },
               {
                 "option_id": "opt_j57_001",
@@ -111689,6 +111975,17 @@ window.CORVETTE_FORM_DATA = {
                 ],
                 "special_mentions": [],
                 "detail_raw": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package."
+              },
+              {
+                "option_id": "opt_cfv_001",
+                "rpo": "CFV",
+                "option_name": "Visible Carbon Fiber Ground Effects",
+                "section_id": "sec_perf_ground_001",
+                "matched_terms": [
+                  "not_available"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Not available at this time."
               },
               {
                 "option_id": "opt_e60_001",
@@ -111930,6 +112227,42 @@ window.CORVETTE_FORM_DATA = {
                 ],
                 "special_mentions": [],
                 "detail_raw": ""
+              },
+              {
+                "option_id": "opt_cm9_002",
+                "rpo": "CM9",
+                "option_name": "Body-Color Power Convertible Hardtop",
+                "section_id": "sec_stan_002",
+                "matched_terms": [
+                  "includes",
+                  "only"
+                ],
+                "special_mentions": [],
+                "detail_raw": ""
+              },
+              {
+                "option_id": "opt_efr_002",
+                "rpo": "EFR",
+                "option_name": "Carbon Flash Exterior Accents",
+                "section_id": "sec_stan_002",
+                "matched_terms": [
+                  "includes"
+                ],
+                "special_mentions": [],
+                "detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered."
+              },
+              {
+                "option_id": "opt_719_002",
+                "rpo": "719",
+                "option_name": "Black Seat Belt Color",
+                "section_id": "sec_stan_002",
+                "matched_terms": [
+                  "special_package_review"
+                ],
+                "special_mentions": [
+                  "EL9"
+                ],
+                "detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color."
               },
               {
                 "option_id": "opt_z15_001",
@@ -112194,263 +112527,6 @@ window.CORVETTE_FORM_DATA = {
                 ],
                 "special_mentions": [],
                 "detail_raw": "1. Requires (J57) carbon ceramic brakes."
-              },
-              {
-                "option_id": "opt_38s_001",
-                "rpo": "38S",
-                "option_name": "Adrenaline Red Custom Leather Stitching",
-                "section_id": "sec_cust_002",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior or (HU0/HXO) Adrenaline Red/Jet Black interior."
-              },
-              {
-                "option_id": "opt_36s_001",
-                "rpo": "36S",
-                "option_name": "Competition Yellow Custom Leather Stitching",
-                "section_id": "sec_cust_002",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior."
-              },
-              {
-                "option_id": "opt_37s_001",
-                "rpo": "37S",
-                "option_name": "Santorini Blue Custom Leather Stitching",
-                "section_id": "sec_cust_002",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior."
-              },
-              {
-                "option_id": "opt_bcp_001",
-                "rpo": "BCP",
-                "option_name": "Edge Red LS6 Engine Cover",
-                "section_id": "sec_engi_001",
-                "matched_terms": [
-                  "requires",
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package."
-              },
-              {
-                "option_id": "opt_bcs_001",
-                "rpo": "BCS",
-                "option_name": "Sterling Silver LS6 Engine Cover",
-                "section_id": "sec_engi_001",
-                "matched_terms": [
-                  "requires",
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package."
-              },
-              {
-                "option_id": "opt_bc4_001",
-                "rpo": "BC4",
-                "option_name": "Blue LS6 Engine Cover",
-                "section_id": "sec_engi_001",
-                "matched_terms": [
-                  "requires",
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Includes (D3V) engine lighting. Requires (B6P) on Coupe\n2. Requires (ZZ3) Convertible Engine Appearance Package."
-              },
-              {
-                "option_id": "opt_n26_001",
-                "rpo": "N26",
-                "option_name": "Sueded Microfiber-Wrapped Steering Wheel",
-                "section_id": "sec_inte_001",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (HTJ) Jet Black interior.\n2. Requires leather seating surfaces with perforated sueded microfiber inserts interior: HTP, HU6, HU7, HTQ.\n3. Requires leather seating surfaces with perforated sueded microfiber inserts interiors: HTT, HU9, HUA, HTG, HUF, HMO, HVT, HXO, HZP, HUX, EPX, HUB."
-              },
-              {
-                "option_id": "opt_tu7_001",
-                "rpo": "TU7",
-                "option_name": "Two-Tone Seats",
-                "section_id": "sec_inte_001",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (AH2) GT2 seats. Available with (HUK/HU6) Sky Cool Gray, (HUL/HU7) Adrenaline Red, (HTN/HTQ) Natural interiors.\n2. Requires (AH2) GT2 seats. Available with (HU1/HU9) Sky Cool Gray, (HU2/HUA) Adrenaline Red, (HUE/HTG) Natural, (HMO/HVV) Jet Black/Sky Cool Gray, (HU0/HXO) Jet Black/Adrenaline Red interiors."
-              },
-              {
-                "option_id": "opt_rz9_001",
-                "rpo": "RZ9",
-                "option_name": "Visible Carbon Fiber Grille Insert",
-                "section_id": "sec_lpoe_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available at this time."
-              },
-              {
-                "option_id": "opt_v8x_001",
-                "rpo": "V8X",
-                "option_name": "Visible Carbon Fiber Sill Plates",
-                "section_id": "sec_lpoi_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available at this time."
-              },
-              {
-                "option_id": "opt_r9w_001",
-                "rpo": "R9W",
-                "option_name": "Deleted Mobile Service Plus",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires a dealer with a BFU of 284. Requires TRE, SRE or Fleet order types."
-              },
-              {
-                "option_id": "opt_r6p_001",
-                "rpo": "R6P",
-                "option_name": "Three-Year SiriusXM Subscription",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available",
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires SiriusXM. Not available with a FGO order type. SiriusXM Extended Service subscription will stop at the end of the applicable subscription period unless you decide to continue service. Plan is non-transferable and non-refundable. Service subject to the SiriusXM Customer Agreement and Privacy Policy, visit siriusxm.com/terms to see complete terms and how to cancel which includes online methods or calling 1-866-635-2349. Some services, content and features are subject to device capabilities, an active data connection enabled in the vehicle and location availability. All fees, content and features are subject to change. Content varies by subscription plan. SiriusXM and related logos are trademarks of Sirius XM Radio Inc. and its respective subsidiaries."
-              },
-              {
-                "option_id": "opt_prb_001",
-                "rpo": "PRB",
-                "option_name": "Three-Year OnStar One Standalone Plan",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (UE1) OnStar and a Retail order type. Not available on vehicles being shipped to Puerto Rico, the Virgin Islands, or Guam. OnStar plan, working electrical system, cell reception and GPS signal required. OnStar links to emergency services. Not all vehicles may transmit all crash data. Service coverage varies with conditions and location. Service availability, features and functionality vary by device and software version. Subject to user terms. See onstar.com for details and limitations."
-              },
-              {
-                "option_id": "opt_r9y_001",
-                "rpo": "R9Y",
-                "option_name": "One-Year Mobile Service Plus",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available",
-                  "only",
-                  "except"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Required and only available for dealers who have a BFU of 284, except for orders with (R9W) Deleted Mobile Service Plus. Requires TRE, SRE, FBC, FNR or Fleet order types. Not available with (R9V) Mobile Service Plus for 3 years."
-              },
-              {
-                "option_id": "opt_r9v_001",
-                "rpo": "R9V",
-                "option_name": "Three-Year Mobile Service Plus",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available",
-                  "only",
-                  "except"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Required and only available for dealers who have a BFU of 284, except for orders with (R9W) Deleted Mobile Service Plus. Requires TRE, SRE or Fleet order types. Not available with (R9Y) Mobile Service Plus for 1 year."
-              },
-              {
-                "option_id": "opt_r9l_001",
-                "rpo": "R9L",
-                "option_name": "Removes OnStar Basics (OnStar Fleet Basics for Fleet)",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included and only available on vehicles being shipped to Puerto Rico, the Virgin Islands, or Guam. Will delete OnStar Services and OnStar standard equipment (OnStar Basics / Connected Access / EV Access / R9M Services i.e. OnStar One and OnStar One Super Cruise as equipped) for vehicles shipping to these territories."
-              },
-              {
-                "option_id": "opt_u2k_001",
-                "rpo": "U2K",
-                "option_name": "SiriusXM Trial Subscription",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. IMPORTANT: The SiriusXM trial subscription is not provided on vehicles that are ordered for Fleet Daily Rental (\"FDR\") use. Trial subscription is subject to the SiriusXM Customer Agreement and privacy policy, visit siriusxm.com which includes full terms and how to cancel. All fees, content, features, and availability are subject to change."
-              },
-              {
-                "option_id": "opt_009",
-                "rpo": "",
-                "option_name": "OnStar Basics (OnStar Fleet Basics for Fleet)",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (UE1) OnStar. OnStar Basics is standard for 8 years; working electrical system, cell reception and GPS signal required. OnStar links to emergency services. Service coverage varies with conditions and location. Service availability, features and functionality vary by device and software version. Subject to user terms. See onstar.com for details and limitations. Removed with a ship-to of Guam, Puerto Rico or the Virgin Islands."
-              },
-              {
-                "option_id": "opt_cfv_001",
-                "rpo": "CFV",
-                "option_name": "Visible Carbon Fiber Ground Effects",
-                "section_id": "sec_perf_ground_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available at this time."
-              },
-              {
-                "option_id": "opt_cm9_002",
-                "rpo": "CM9",
-                "option_name": "Body-Color Power Convertible Hardtop",
-                "section_id": "sec_stan_002",
-                "matched_terms": [
-                  "includes",
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_efr_002",
-                "rpo": "EFR",
-                "option_name": "Carbon Flash Exterior Accents",
-                "section_id": "sec_stan_002",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered."
-              },
-              {
-                "option_id": "opt_719_002",
-                "rpo": "719",
-                "option_name": "Black Seat Belt Color",
-                "section_id": "sec_stan_002",
-                "matched_terms": [
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "EL9"
-                ],
-                "detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color."
               }
             ],
             "special_mentions": {

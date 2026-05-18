@@ -140,9 +140,9 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
   );
   assert.equal(draft.choices.length, 1380);
   assert.equal(draft.standardEquipment.length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 757);
+  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 763);
   assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 168);
+  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 162);
 });
 
 test("Grand Sport standard equipment is preserved after standard mirror rows are inactive", () => {
@@ -409,8 +409,50 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
 
   const performanceBrakes = draft.choices.filter((choice) => choice.option_id === "opt_j56_001");
   assert.equal(performanceBrakes.length, 6);
-  assert.equal(performanceBrakes.every((choice) => choice.rpo === "J56" && choice.display_behavior === "auto_only"), true);
+  assert.equal(
+    performanceBrakes.every(
+      (choice) =>
+        choice.rpo === "J56" &&
+        choice.display_behavior === "display_only" &&
+        choice.status === "available" &&
+        choice.active === "True" &&
+        choice.selectable === "False"
+    ),
+    true
+  );
   assert.equal(draft.rules.some((rule) => rule.source_id === "opt_feb_001" && rule.rule_type === "includes" && rule.target_id === "opt_j56_001"), true);
+  assert.equal(
+    draft.rules.some(
+      (rule) =>
+        rule.source_id === "opt_feb_001" &&
+        rule.rule_type === "excludes" &&
+        rule.target_id === "opt_jx6_001" &&
+        rule.runtime_action === "replace"
+    ),
+    true
+  );
+  assert.equal(
+    draft.rules.some(
+      (rule) =>
+        rule.source_id === "opt_fey_001" &&
+        rule.rule_type === "excludes" &&
+        rule.target_id === "opt_jx6_001" &&
+        rule.runtime_action === "replace"
+    ),
+    true
+  );
+  assert.equal(
+    draft.rules.some(
+      (rule) =>
+        rule.source_id === "opt_fey_001" &&
+        rule.rule_type === "excludes" &&
+        rule.target_id === "opt_j56_001" &&
+        rule.runtime_action === "replace"
+    ),
+    true
+  );
+  assert.equal(draft.rules.some((rule) => rule.source_id === "opt_fey_001" && rule.rule_type === "includes" && rule.target_id === "opt_j57_001"), true);
+  assert.equal(draft.rules.some((rule) => rule.source_id === "opt_j57_001" && rule.rule_type === "includes" && rule.target_id === "opt_j6d_001"), true);
 
   const d30 = draft.choices.find((choice) => choice.option_id === "opt_d30_001");
   assert.equal(d30.active, "False");

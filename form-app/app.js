@@ -568,19 +568,27 @@ function computeAutoAdded() {
   const selectedIds = new Set(state.selected);
   if (state.selectedInterior) selectedIds.add(state.selectedInterior);
 
-  for (const sourceId of selectedIds) {
-    const rules = ruleTargetsBySource.get(sourceId) || [];
-    for (const rule of rules) {
-      if (
-        rule.rule_type === "includes" &&
-        ruleAppliesToCurrentVariant(rule) &&
-        !state.userSelected.has(rule.target_id) &&
-        !selectedExcludesTarget(rule.target_id, selectedIds) &&
-        !shouldSuppressIncludedDefault(rule) &&
-        includedTargetRequirementsMet(rule.target_id, selectedIds) &&
-        !userSelectedExclusiveGroupPeer(rule.target_id, selectedIds)
-      ) {
-        autoAdded.set(rule.target_id, includedWithReason(rule));
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const sourceId of [...selectedIds]) {
+      const rules = ruleTargetsBySource.get(sourceId) || [];
+      for (const rule of rules) {
+        if (
+          rule.rule_type === "includes" &&
+          ruleAppliesToCurrentVariant(rule) &&
+          !state.userSelected.has(rule.target_id) &&
+          !selectedExcludesTarget(rule.target_id, selectedIds) &&
+          !shouldSuppressIncludedDefault(rule) &&
+          includedTargetRequirementsMet(rule.target_id, selectedIds) &&
+          !userSelectedExclusiveGroupPeer(rule.target_id, selectedIds)
+        ) {
+          autoAdded.set(rule.target_id, includedWithReason(rule));
+          if (!selectedIds.has(rule.target_id)) {
+            selectedIds.add(rule.target_id);
+            changed = true;
+          }
+        }
       }
     }
   }
@@ -619,6 +627,8 @@ function disableReasonForChoice(choice) {
       if (rule.runtime_action === "replace") return rule.disabled_reason || `${getEntityLabel(rule.source_id)} removes this default.`;
       return rule.disabled_reason || `Blocked by ${getEntityLabel(rule.source_id)}.`;
     }
+  }
+  for (const rule of targetRules) {
     if (
       rule.rule_type === "includes" &&
       ruleAppliesToCurrentVariant(rule) &&

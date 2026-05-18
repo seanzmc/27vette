@@ -134,6 +134,8 @@ window.__testApi = {
   resetDefaults,
   reconcileSelections,
   handleChoice,
+  computeAutoAdded,
+  disableReasonForChoice,
   render,
   optionPrice,
   choiceDisplayPrice,
@@ -300,6 +302,7 @@ test("Grand Sport exclusive group selections remove peer options without runtime
     const activeGroupChoices = expected.optionIds
       .map((optionId) => runtime.activeChoiceRows().find((choice) => choice.option_id === optionId))
       .filter((choice) => choice?.display_behavior !== "auto_only")
+      .filter((choice) => choice?.selectable === "True")
       .filter(Boolean);
     assert.equal(activeGroupChoices.length >= 2, true, `${expected.groupId} should have at least two active Grand Sport choices`);
     const [firstChoice, secondChoice] = activeGroupChoices;
@@ -449,15 +452,57 @@ test("Grand Sport workbook default_selected rows seed and reconcile defaults gen
     assert.equal(runtime.state.selected.has(optionId), true, `${optionId} should be selected from display_behavior=default_selected`);
   }
 
+  const j56 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j56_001");
+  const j57 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j57_001");
+  assert.ok(j56, "J56 should render as a visible brake card");
+  assert.ok(j57, "J57 should render as a selectable brake card");
+  assert.equal(j56.active, "True");
+  assert.equal(j56.status, "available");
+  assert.equal(j56.selectable, "False");
+  assert.equal(j56.display_behavior, "display_only");
+  assert.equal(runtime.disableReasonForChoice(j56), "Included with FEB Z52 Sport Performance Package.");
+  assert.equal(runtime.disableReasonForChoice(j57), "");
+
+  const febRuntime = loadRuntime();
+  febRuntime.activateModel("grandSport");
+  febRuntime.state.bodyStyle = "coupe";
+  febRuntime.state.trimLevel = "1LT";
+  febRuntime.resetDefaults();
+  febRuntime.reconcileSelections();
+  const feb = febRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_feb_001");
+  febRuntime.handleChoice(feb);
+  assert.equal(febRuntime.state.selected.has("opt_feb_001"), true, "FEB should be selectable");
+  assert.equal(febRuntime.state.selected.has("opt_jx6_001"), false, "FEB should replace the default JX6 brake row");
+  assert.equal(febRuntime.computeAutoAdded().get("opt_j56_001"), "Included with FEB Z52 Sport Performance Package.");
+  assert.equal(febRuntime.disableReasonForChoice(febRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_jx6_001")), "FEB includes J56 performance disc brakes.");
+  assert.equal(febRuntime.disableReasonForChoice(febRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_j57_001")), "");
+
   const fey = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_fey_001");
   runtime.handleChoice(fey);
   assert.equal(runtime.state.selected.has("opt_fey_001"), true, "FEY should be selectable");
   assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "FEY should replace the default T0E aero row");
   assert.equal(runtime.state.selected.has("opt_jx6_001"), false, "FEY auto-added J57 should replace the default JX6 brake row");
   assert.equal(runtime.state.selected.has("opt_j56_001"), false, "FEY auto-added J57 should not leave J56 selected");
+  assert.equal(runtime.disableReasonForChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_jx6_001")), "FEY includes J57 carbon ceramic brakes.");
+  assert.equal(runtime.disableReasonForChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j56_001")), "FEY includes J57 carbon ceramic brakes.");
 
   const order = runtime.currentOrder();
   assert.equal(order.auto_added_options.some((item) => item.rpo === "J57"), true, "FEY should auto-add J57");
+  assert.equal(order.auto_added_options.some((item) => item.rpo === "J6D"), true, "FEY auto-added J57 should auto-add grey calipers");
+  assert.equal(order.selected_options.some((item) => item.rpo === "J6A"), false, "J57 should replace default black calipers");
+  assert.equal(runtime.optionPrice("opt_j57_001"), 0, "FEY should keep the J57 price override");
+
+  const redCaliperRuntime = loadRuntime();
+  redCaliperRuntime.activateModel("grandSport");
+  redCaliperRuntime.state.bodyStyle = "coupe";
+  redCaliperRuntime.state.trimLevel = "1LT";
+  redCaliperRuntime.resetDefaults();
+  redCaliperRuntime.reconcileSelections();
+  redCaliperRuntime.handleChoice(redCaliperRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_j6f_001"));
+  redCaliperRuntime.handleChoice(redCaliperRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_fey_001"));
+  const redCaliperOrder = redCaliperRuntime.currentOrder();
+  assert.equal(redCaliperOrder.selected_options.some((item) => item.rpo === "J6F"), true, "User-selected non-black calipers should be preserved");
+  assert.equal(redCaliperOrder.auto_added_options.some((item) => item.rpo === "J6D"), false, "Grey calipers should not override a user-selected caliper");
 });
 
 test("Grand Sport Pass 1 workbook rules drive engine, brake, ground-effect, and launch edition behavior", () => {
