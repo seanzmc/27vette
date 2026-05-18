@@ -8,10 +8,10 @@ Here is the amended version using the actual Nous Research Hermes Agent docs.
 
 My earlier answer treated "Hermes" as a generic orchestration layer. The official docs describe Hermes Agent as more than that: a self-improving autonomous agent with persistent memory, skills, terminal/file tools, web/browser tools, messaging gateways, MCP integrations, profiles, worktrees, checkpoints, and editor integration. The main adjustment is this:
 
-| | Framing |
-|---|---|
-| **Earlier framing** | Hermes = coordinator over Codex |
-| **Better framing** | Hermes = persistent local/remote agent environment; Codex = coding-specialized implementation/review tool |
+|                        | Framing                                                                                                                                                                                     |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Earlier framing**    | Hermes = coordinator over Codex                                                                                                                                                             |
+| **Better framing**     | Hermes = persistent local/remote agent environment; Codex = coding-specialized implementation/review tool                                                                                   |
 | **Best 27vette setup** | Hermes manages context, workflows, skills, recurring audits, mobile access, and repo orchestration; Codex handles high-signal implementation/review passes when you deliberately invoke it. |
 
 Hermes' docs explicitly position it as an agent that "creates skills from experience," improves skills during use, persists knowledge, and can run on a laptop, VPS, serverless sandbox, or messaging platform rather than being tied to an IDE.
@@ -72,13 +72,13 @@ Hermes skills are on-demand knowledge documents stored in `~/.hermes/skills/`. T
 
 This is a strong fit for your recurring workflows. I would create custom Hermes skills like:
 
-| Skill | Purpose |
-|---|---|
-| `/27vette-pass-plan` | Creates a spec-first migration pass with scope, files, risks, validation, and approval question. |
-| `/27vette-gate` | Runs the correct validation commands based on changed files. |
-| `/27vette-workbook-guard` | Checks whether a proposed fix belongs in workbook data, generator logic, runtime JS, or tests. |
-| `/27vette-image-audit` | Audits RPO image assets, duplicate filenames, missing RPO coverage, and unlinked image files. |
-| `/27vette-codex-prompt` | Writes a Codex prompt with recommended reasoning level and explicit report-only vs migration scope. |
+| Skill                     | Purpose                                                                                             |
+| ------------------------- | --------------------------------------------------------------------------------------------------- |
+| `/27vette-pass-plan`      | Creates a spec-first migration pass with scope, files, risks, validation, and approval question.    |
+| `/27vette-gate`           | Runs the correct validation commands based on changed files.                                        |
+| `/27vette-workbook-guard` | Checks whether a proposed fix belongs in workbook data, generator logic, runtime JS, or tests.      |
+| `/27vette-image-audit`    | Audits RPO image assets, duplicate filenames, missing RPO coverage, and unlinked image files.       |
+| `/27vette-codex-prompt`   | Writes a Codex prompt with recommended reasoning level and explicit report-only vs migration scope. |
 
 Hermes can also create or update skills after it discovers a working process; the docs describe agent-managed skills as procedural memory created after complex tasks, corrections, or non-trivial workflows.
 
@@ -163,11 +163,13 @@ I did not find an official Hermes doc that says Hermes directly "connects to Cod
 The practical setup is:
 
 **Hermes:**
+
 - persistent project agent
 - remembers your preferences and 27vette workflows
 - owns skills, checklists, audits, worktree orchestration, phone access, MCP tools
 
 **Codex:**
+
 - implementation/review coding agent
 - reads the same repo `AGENTS.md`
 - handles focused code changes, tests, and PR review
@@ -236,6 +238,7 @@ hermes tools
 For 27vette, enable only the useful surfaces at first:
 
 **Recommended:**
+
 - terminal
 - file
 - search
@@ -246,6 +249,7 @@ For 27vette, enable only the useful surfaces at first:
 - delegation only after you trust the setup
 
 **Avoid at first:**
+
 - messaging delivery
 - cronjob
 - home automation
@@ -383,7 +387,7 @@ Use this skill before any non-trivial 27vette change, especially when touching:
 ## Project Rules
 
 - Business rules belong in workbook-authored data when the workbook can represent them.
-- Do not edit generated form_* sheets directly.
+- Do not edit generated form\_\* sheets directly.
 - Do not change dealer submission endpoint, payload shape, or Turnstile behavior without explicit approval.
 - Keep passes small.
 - Evidence beats assumption.
@@ -696,6 +700,7 @@ Use Hermes:
 ```
 
 Expected output:
+
 - Diagnosis
 - Exact files/sheets/artifacts
 - Recommended first pass
@@ -753,6 +758,7 @@ Audit current generated contract and runtime rendering path for where option ima
 ## Recommended Division of Labor
 
 **Use Hermes for:**
+
 - remembering the project
 - creating 27vette skills
 - running checklist-style audits
@@ -763,6 +769,7 @@ Audit current generated contract and runtime rendering path for where option ima
 - maintaining process discipline
 
 **Use Codex for:**
+
 - focused code edits
 - subagent codebase audits
 - test-driven implementation
@@ -776,10 +783,186 @@ Audit current generated contract and runtime rendering path for where option ima
 
 Hermes background sessions and messaging access are powerful, but for 27vette I would not let any background/mobile workflow make unattended edits to the repo. The safe pattern is:
 
-| Mode | Role |
-|---|---|
-| **phone/mobile Hermes** | report-only, planning, audit, prompt generation |
-| **local Hermes/Codex in worktree** | implementation |
-| **GitHub PR + Codex review** | final review layer |
+| Mode                               | Role                                            |
+| ---------------------------------- | ----------------------------------------------- |
+| **phone/mobile Hermes**            | report-only, planning, audit, prompt generation |
+| **local Hermes/Codex in worktree** | implementation                                  |
+| **GitHub PR + Codex review**       | final review layer                              |
 
 That keeps the live order-form app, workbook, generated artifacts, and dealer submission path protected while still giving you the benefit of a persistent agent that can remember how this project works.
+
+---
+
+## Condensed Instruction
+
+Hermes can reference `spec-review/hermes-onboarding.md`, but it will not auto-load that file just because it exists. Hermes auto-loads project context files like `.hermes.md`, `HERMES.md`, or `AGENTS.md`; normal markdown files must be explicitly read or referenced in the prompt. Hermes treats `AGENTS.md` as the main project context file, and `.hermes.md`/`HERMES.md` have higher priority if present.
+
+### Do This First
+
+```bash
+cd ~/Projects/27vette
+git status
+hermes doctor
+```
+
+If `git status` is not clean, stop and decide whether to commit/stash first.
+
+### Create a Dedicated Hermes Profile for 27vette
+
+Hermes profiles are separate agent homes with their own config, memory, sessions, skills, and state.
+
+```bash
+hermes profile create vette-coder --clone
+vette-coder setup
+vette-coder config set terminal.cwd "$PWD"
+```
+
+Check it:
+
+```bash
+vette-coder doctor
+vette-coder profile
+```
+
+### Use Worktree Mode for Actual Repo Edits
+
+Hermes recommends worktrees so each agent session has its own branch/checkout.
+
+From the 27vette repo root:
+
+```bash
+cd ~/Projects/27vette
+vette-coder -w
+```
+
+For report-only setup work, normal mode is fine:
+
+```bash
+cd ~/Projects/27vette
+vette-coder chat
+```
+
+### Let Hermes Set Itself Up From Your Onboarding File
+
+Run this from the repo root:
+
+```bash
+cd ~/Projects/27vette
+vette-coder chat --checkpoints
+```
+
+Then paste this prompt:
+
+```
+Read these files first:
+
+- AGENTS.md
+- codex-context.md
+- spec-review/hermes-onboarding.md
+
+Task: Set up my Hermes workspace for 27vette.
+Report your plan first. Do not edit code files.
+
+Allowed setup changes:
+- Create or update Hermes skills under the vette-coder Hermes profile.
+- Create a concise 27vette Hermes memory note if appropriate.
+- Recommend, but do not create, any repo-level .hermes.md unless you explain why it is needed.
+- Do not change app code, workbook files, generated artifacts, form-output files, form-app/data.js, package/dependency files, or dealer submission behavior.
+
+Create these skills if appropriate:
+1. 27vette-pass-plan
+2. 27vette-workbook-guard
+3. 27vette-gate
+4. 27vette-codex-prompt
+5. 27vette-image-audit
+
+For each skill, keep it short and practical:
+- when to use
+- exact procedure
+- output format
+- validation/gate expectations
+
+After setup, show:
+- files created/changed
+- where the skills live
+- how to invoke each skill
+- anything you intentionally did not change
+```
+
+> Hermes checkpoints are useful here because they snapshot before file writes and allow rollback.
+
+### Manual Fallback: Create the Skills Yourself
+
+Hermes skills live under `~/.hermes/skills/` and become slash commands.
+
+Use this if you want to create only the essentials manually:
+
+```bash
+mkdir -p ~/.hermes/profiles/vette-coder/skills/dev/27vette-pass-plan
+nano ~/.hermes/profiles/vette-coder/skills/dev/27vette-pass-plan/SKILL.md
+```
+
+Paste:
+
+```markdown
+---
+name: 27vette-pass-plan
+description: Spec-first planning workflow for 27vette development passes.
+version: 1.0.0
+metadata:
+  hermes:
+    category: dev
+    tags: [27vette, corvette, workbook, planning]
+---
+
+# 27vette Pass Plan
+
+## When to Use
+
+Use before any non-trivial 27vette change.
+
+## Procedure
+
+1. Read AGENTS.md and codex-context.md.
+2. Determine scope: report-only, docs-only, workbook/data-only, generator-only, runtime-only, test-only, or mixed.
+3. Identify exact files, workbook sheets, generated artifacts, and tests.
+4. Decide whether the issue belongs in workbook data, generator logic, runtime logic, or tests.
+5. Reject hardcoded RPO/model exceptions unless explicitly approved.
+6. Produce a spec before edits.
+
+## Output
+
+- Diagnosis
+- Proposed scope
+- Files/sheets/artifacts affected
+- Risks and non-goals
+- Validation plan
+- Approval question
+
+## Hard Rules
+
+- Business rules belong in workbook-authored data when possible.
+- Do not edit generated form_* sheets directly.
+- Do not change dealer submission endpoint, payload shape, or Turnstile behavior without approval.
+- Keep passes small.
+```
+
+Invoke it:
+
+```
+/27vette-pass-plan Plan the next safe pass for cleaning up 27vette. Report-only.
+```
+
+### Recommended Skill List
+
+Create these only after the first one works:
+
+| Skill | Purpose |
+|---|---|
+| `/27vette-pass-plan` | Spec-first pass planning. |
+| `/27vette-workbook-guard` | Decide whether a fix belongs in workbook data, generator code, runtime JS, or tests. |
+| `/27vette-gate` | Choose and run the right validation commands. |
+| `/27vette-codex-prompt` | Write tight Codex prompts with recommended reasoning level. |
+| `/27vette-image-audit` | RPO image coverage, duplicates, missing images, and asset-map planning. |
+
+> **Important:** Do not add `.hermes.md` yet. Your repo already has `AGENTS.md`, and Hermes will load it automatically. Adding `.hermes.md` would outrank `AGENTS.md`, which could create conflicting instruction layers.
