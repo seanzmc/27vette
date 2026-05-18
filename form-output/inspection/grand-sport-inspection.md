@@ -1,6 +1,6 @@
 # Grand Sport Inspection
 
-Generated: `2026-05-18T20:01:48+00:00`
+Generated: `2026-05-18T20:15:14+00:00`
 Source sheet: `grandSport_options`
 Status: `inspection_generated`
 
@@ -78,7 +78,7 @@ Status: `inspection_generated`
 | `20A` | Admiral Blue Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
 | `55A` | Competition Yellow Hash Marks. | `sec_gsha_001` | requires, not_available | Z15 |
 | `75A` | Torch Red Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
-| `97A` | Vcarbon Flash Hash Marks | `sec_gsha_001` | requires | Z15 |
+| `97A` | Carbon Flash Hash Marks | `sec_gsha_001` | requires | Z15 |
 | `DX4` | Red Mist Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
 | `DRG` | Carbon Flash Outside Mirrors | `sec_incl_001` | only |  |
 | ... | 89 additional rows in JSON artifact |  |  |  |

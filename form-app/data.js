@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-18T19:56:38+00:00"
+          "generated_at": "2026-05-18T20:14:17+00:00"
         },
         "variants": [
           {
@@ -54081,7 +54081,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-05-18T19:56:17+00:00",
+          "generated_at": "2026-05-18T20:14:10+00:00",
           "status": "draft_not_runtime_active"
         },
         "variants": [
@@ -65362,7 +65362,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_id": "1lt_e07__opt_97a_001",
             "option_id": "opt_97a_001",
             "rpo": "97A",
-            "label": "Vcarbon Flash Hash Marks",
+            "label": "Carbon Flash Hash Marks",
             "description": "Adds Z15 Grand Sport Heritage Graphics $995",
             "section_id": "sec_gsha_001",
             "section_name": "Grand Sport Heritage Hash Marks",
@@ -65381,7 +65381,7 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Vcarbon Flash Hash Marks",
+            "source_option_name": "Carbon Flash Hash Marks",
             "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
             "text_cleanup_notes": []
           },
@@ -65389,7 +65389,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_id": "2lt_e07__opt_97a_001",
             "option_id": "opt_97a_001",
             "rpo": "97A",
-            "label": "Vcarbon Flash Hash Marks",
+            "label": "Carbon Flash Hash Marks",
             "description": "Adds Z15 Grand Sport Heritage Graphics $995",
             "section_id": "sec_gsha_001",
             "section_name": "Grand Sport Heritage Hash Marks",
@@ -65408,7 +65408,7 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Vcarbon Flash Hash Marks",
+            "source_option_name": "Carbon Flash Hash Marks",
             "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
             "text_cleanup_notes": []
           },
@@ -65416,7 +65416,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_id": "3lt_e07__opt_97a_001",
             "option_id": "opt_97a_001",
             "rpo": "97A",
-            "label": "Vcarbon Flash Hash Marks",
+            "label": "Carbon Flash Hash Marks",
             "description": "Adds Z15 Grand Sport Heritage Graphics $995",
             "section_id": "sec_gsha_001",
             "section_name": "Grand Sport Heritage Hash Marks",
@@ -65435,7 +65435,7 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Vcarbon Flash Hash Marks",
+            "source_option_name": "Carbon Flash Hash Marks",
             "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
             "text_cleanup_notes": []
           },
@@ -65443,7 +65443,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_id": "1lt_e67__opt_97a_001",
             "option_id": "opt_97a_001",
             "rpo": "97A",
-            "label": "Vcarbon Flash Hash Marks",
+            "label": "Carbon Flash Hash Marks",
             "description": "Adds Z15 Grand Sport Heritage Graphics $995",
             "section_id": "sec_gsha_001",
             "section_name": "Grand Sport Heritage Hash Marks",
@@ -65462,7 +65462,7 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Vcarbon Flash Hash Marks",
+            "source_option_name": "Carbon Flash Hash Marks",
             "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
             "text_cleanup_notes": []
           },
@@ -65470,7 +65470,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_id": "2lt_e67__opt_97a_001",
             "option_id": "opt_97a_001",
             "rpo": "97A",
-            "label": "Vcarbon Flash Hash Marks",
+            "label": "Carbon Flash Hash Marks",
             "description": "Adds Z15 Grand Sport Heritage Graphics $995",
             "section_id": "sec_gsha_001",
             "section_name": "Grand Sport Heritage Hash Marks",
@@ -65489,7 +65489,7 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Vcarbon Flash Hash Marks",
+            "source_option_name": "Carbon Flash Hash Marks",
             "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
             "text_cleanup_notes": []
           },
@@ -65497,7 +65497,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_id": "3lt_e67__opt_97a_001",
             "option_id": "opt_97a_001",
             "rpo": "97A",
-            "label": "Vcarbon Flash Hash Marks",
+            "label": "Carbon Flash Hash Marks",
             "description": "Adds Z15 Grand Sport Heritage Graphics $995",
             "section_id": "sec_gsha_001",
             "section_name": "Grand Sport Heritage Hash Marks",
@@ -65516,7 +65516,7 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Vcarbon Flash Hash Marks",
+            "source_option_name": "Carbon Flash Hash Marks",
             "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
             "text_cleanup_notes": []
           },
@@ -100562,7 +100562,7 @@ window.CORVETTE_FORM_DATA = {
             "source_selection_mode": "single_select_opt",
             "target_selection_mode": "single_select_opt",
             "body_style_scope": "",
-            "disabled_reason": "Included with 97A Vcarbon Flash Hash Marks.",
+            "disabled_reason": "Included with 97A Carbon Flash Hash Marks.",
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
@@ -111447,7 +111447,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "option_id": "opt_97a_001",
                 "rpo": "97A",
-                "option_name": "Vcarbon Flash Hash Marks",
+                "option_name": "Carbon Flash Hash Marks",
                 "section_id": "sec_gsha_001",
                 "matched_terms": [
                   "requires",
@@ -112638,7 +112638,7 @@ window.CORVETTE_FORM_DATA = {
                 {
                   "option_id": "opt_97a_001",
                   "rpo": "97A",
-                  "option_name": "Vcarbon Flash Hash Marks"
+                  "option_name": "Carbon Flash Hash Marks"
                 },
                 {
                   "option_id": "opt_dx4_001",

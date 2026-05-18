@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T20:01:48+00:00",
+  "generated_at": "2026-05-18T20:15:14+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -10647,7 +10647,7 @@
       {
         "option_id": "opt_97a_001",
         "rpo": "97A",
-        "option_name": "Vcarbon Flash Hash Marks",
+        "option_name": "Carbon Flash Hash Marks",
         "section_id": "sec_gsha_001",
         "matched_terms": [
           "requires"
@@ -11820,7 +11820,7 @@
         {
           "option_id": "opt_97a_001",
           "rpo": "97A",
-          "option_name": "Vcarbon Flash Hash Marks"
+          "option_name": "Carbon Flash Hash Marks"
         },
         {
           "option_id": "opt_dx4_001",
