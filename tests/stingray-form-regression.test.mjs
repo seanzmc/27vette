@@ -548,6 +548,21 @@ test("mobile shell exposes compact progress and summary targets", () => {
   assert.ok(stylesSource.indexOf("#selectedRposCard") < stylesSource.indexOf("#autoAddedCard"));
 });
 
+test("middle breakpoint makes summary off-canvas before step rail collapses", () => {
+  const middleStart = stylesSource.indexOf("@media (max-width: 1120px)");
+  const mobileStart = stylesSource.indexOf("@media (max-width: 760px)");
+  const reducedMotionStart = stylesSource.indexOf("@media (prefers-reduced-motion: reduce)");
+  const middleBreakpoint = stylesSource.slice(middleStart, mobileStart);
+  const mobileBreakpoint = stylesSource.slice(mobileStart, reducedMotionStart);
+
+  assert.match(middleBreakpoint, /grid-template-columns:\s*180px minmax\(0, 1fr\)/);
+  assert.match(middleBreakpoint, /\.mobile-summary-bar\s*\{[\s\S]*display:\s*flex/);
+  assert.match(middleBreakpoint, /\.summary-panel\s*\{[\s\S]*position:\s*fixed/);
+  assert.match(middleBreakpoint, /\.app-shell\[data-mobile-drawer="summary"\] \.summary-panel/);
+  assert.doesNotMatch(middleBreakpoint, /\.step-rail\s*\{[\s\S]*position:\s*fixed/);
+  assert.match(mobileBreakpoint, /\.step-rail\s*\{[\s\S]*position:\s*fixed/);
+});
+
 test("mobile progress and compact summary update from runtime state", () => {
   const runtime = loadRuntime();
   runtime.render();
@@ -580,6 +595,9 @@ test("context steps expose mobile readability hooks without changing step conten
   assert.equal(runtime.elements.get("#stepContent").dataset.activeStep, "model");
   assert.equal(runtime.elements.get("#stepContent").dataset.stepKind, "model");
   assert.match(runtime.elements.get("#stepContent").innerHTML, /model-step-section/);
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /<span class="rpo">Stingray<\/span>/);
+  assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /<span class="choice-name"><span>Corvette Stingray<\/span><\/span>/);
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /aria-label="Corvette Stingray, Coupe \/ Convertible, 1LT \/ 2LT \/ 3LT"/);
 
   runtime.state.activeStep = "body_style";
   runtime.render();

@@ -1226,10 +1226,10 @@ function renderModelCard(model) {
   const trimLevels = [...new Set(variants.map((variant) => variant.trim_level).filter(Boolean))].join(" / ");
   const classes = ["choice-card", "model-choice-card"];
   if (selected) classes.push("selected");
+  const descriptor = [model.modelName, bodyStyles, trimLevels].filter(Boolean).join(", ");
   return `
-    <button class="${classes.join(" ")}" type="button" data-model-choice="${escapeHtml(model.key)}" aria-pressed="${selected ? "true" : "false"}">
+    <button class="${classes.join(" ")}" type="button" data-model-choice="${escapeHtml(model.key)}" aria-pressed="${selected ? "true" : "false"}" aria-label="${escapeHtml(descriptor)}">
       <span class="topline"><span class="rpo">${escapeHtml(model.label)}</span><span class="price">${variants.length} variants</span></span>
-      <span class="choice-name"><span>${escapeHtml(model.modelName)}</span></span>
       <span class="choice-note">${escapeHtml([bodyStyles, trimLevels].filter(Boolean).join(" | "))}</span>
     </button>
   `;
