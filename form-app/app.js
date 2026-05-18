@@ -956,6 +956,29 @@ function selectedOrAutoInSection(sectionId, autoAdded = computeAutoAdded()) {
   );
 }
 
+function hasIncludedFallbackForRequiredChoice(choice) {
+  const section = sectionsById.get(choice.section_id);
+  if (!section || section.selection_mode !== "single_select_req") return false;
+  const selectedIds = new Set(state.selected);
+  selectedIds.delete(choice.option_id);
+  if (state.selectedInterior) selectedIds.add(state.selectedInterior);
+
+  for (const sourceId of selectedIds) {
+    const rules = ruleTargetsBySource.get(sourceId) || [];
+    for (const rule of rules) {
+      if (rule.rule_type !== "includes" || !ruleAppliesToCurrentVariant(rule)) continue;
+      if (rule.target_id === choice.option_id || optionSectionId(rule.target_id) !== choice.section_id) continue;
+      const targetChoice = choiceForCurrentVariant(rule.target_id);
+      if (!targetChoice || shouldHideChoice(targetChoice)) continue;
+      if (!includedTargetRequirementsMet(rule.target_id, selectedIds)) continue;
+      if (selectedExcludesTarget(rule.target_id, selectedIds)) continue;
+      if (userSelectedExclusiveGroupPeer(rule.target_id, selectedIds)) continue;
+      return true;
+    }
+  }
+  return false;
+}
+
 function validInteriorsForSelectedSeat() {
   const selectedSeat = selectedSeatChoice();
   return data.interiors.filter((interior) => {
@@ -1048,7 +1071,10 @@ function handleChoice(choice) {
   resetDealerSubmissionState();
   const section = sectionsById.get(choice.section_id);
   if (section?.choice_mode === "single") {
-    if (section.selection_mode === "single_select_opt" && state.selected.has(choice.option_id)) {
+    if (
+      state.selected.has(choice.option_id) &&
+      (section.selection_mode === "single_select_opt" || hasIncludedFallbackForRequiredChoice(choice))
+    ) {
       deleteSelectedOption(choice.option_id);
       reconcileSelections();
       render();

@@ -541,6 +541,12 @@ test("Grand Sport Pass 1 workbook rules drive engine, brake, ground-effect, and 
   order = runtime.currentOrder();
   assert.equal(runtime.state.selected.has("opt_j57_001"), true, "J57 should remain selectable after FEB");
   assert.equal(order.auto_added_options.some((item) => item.rpo === "J56"), false, "J57 should replace FEB auto-added J56");
+  runtime.handleChoice(j57);
+  order = runtime.currentOrder();
+  assert.equal(runtime.state.selected.has("opt_j57_001"), false, "J57 should be removable while FEB can refill the brake section");
+  assert.equal(order.auto_added_options.some((item) => item.rpo === "J56" && item.price === 0), true, "FEB should restore J56 after J57 is removed");
+  assert.equal(runtime.state.selected.has("opt_jx6_001"), false, "JX6 should remain unavailable with FEB selected");
+  runtime.handleChoice(j57);
   const t0f = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0f_001");
   const cfl = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_cfl_001");
   runtime.handleChoice(t0f);
