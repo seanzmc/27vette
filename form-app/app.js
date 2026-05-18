@@ -45,9 +45,6 @@ const state = {
 
 const els = {
   appShell: document.querySelector(".app-shell"),
-  currentBody: document.querySelector("#currentBody"),
-  currentTrim: document.querySelector("#currentTrim"),
-  basePrice: document.querySelector("#basePrice"),
   summaryBase: document.querySelector("#summaryBase"),
   summaryOptions: document.querySelector("#summaryOptions"),
   summaryTotal: document.querySelector("#summaryTotal"),
@@ -1036,11 +1033,6 @@ function handleInterior(interior) {
   render({ preserveScroll: true });
 }
 
-function renderVehicleContext() {
-  els.currentBody.textContent = state.bodyStyle ? state.bodyStyle[0].toUpperCase() + state.bodyStyle.slice(1) : "";
-  els.currentTrim.textContent = state.trimLevel || "";
-}
-
 function currentStepSummary() {
   const index = Math.max(0, currentStepIndex());
   return {
@@ -1486,7 +1478,6 @@ function renderSummary() {
   const base = Number(variant?.base_price || 0);
   const optionsTotal = items.reduce((sum, item) => sum + Number(item.price || 0), 0);
   const total = base + optionsTotal;
-  els.basePrice.textContent = formatMoney(base);
   els.summaryBase.textContent = formatMoney(base);
   els.summaryOptions.textContent = formatMoney(optionsTotal);
   els.summaryTotal.textContent = formatMoney(total);
@@ -2012,7 +2003,6 @@ function activateModel(modelKey, { preserveCustomer = true, shouldRender = true 
 function render({ resetScroll = false, preserveScroll = false } = {}) {
   const scrollPosition = preserveScroll ? captureScrollPosition() : null;
   renderModelChrome();
-  renderVehicleContext();
   renderStepRail();
   renderStepContent({ resetScroll });
   renderMobileProgress();

@@ -530,6 +530,11 @@ test("app runtime has the requested navigation and filtering hooks", () => {
 test("mobile shell exposes compact progress and summary targets", () => {
   assert.doesNotMatch(htmlSource, /id="mobileSummaryToggle"/);
   assert.doesNotMatch(appSource, /download\/send/);
+  assert.doesNotMatch(htmlSource, /class="vehicle-bar"/);
+  assert.doesNotMatch(htmlSource, /id="currentBody"/);
+  assert.doesNotMatch(htmlSource, /id="currentTrim"/);
+  assert.doesNotMatch(htmlSource, /id="basePrice"/);
+  assert.doesNotMatch(appSource, /renderVehicleContext/);
   assert.match(htmlSource, /Current Build/);
   assert.match(htmlSource, /id="mobileSummaryButton"/);
   assert.match(htmlSource, /id="mobileSummaryTotal"/);
@@ -548,6 +553,17 @@ test("mobile shell exposes compact progress and summary targets", () => {
   assert.ok(stylesSource.indexOf("#selectedRposCard") < stylesSource.indexOf("#autoAddedCard"));
 });
 
+test("shell containers share one spacing and radius rhythm", () => {
+  assert.match(stylesSource, /--shell-gap:\s*12px/);
+  assert.match(stylesSource, /--shell-radius:\s*8px/);
+  assert.match(stylesSource, /\.app-shell\s*\{[\s\S]*display:\s*grid;[\s\S]*gap:\s*var\(--shell-gap\)/);
+  assert.match(stylesSource, /\.topbar,\n\.workspace\s*\{[\s\S]*border-radius:\s*var\(--shell-radius\)/);
+  assert.match(stylesSource, /\.alert-region:empty\s*\{\s*display:\s*none;\s*\}/);
+  assert.doesNotMatch(stylesSource, /\.vehicle-bar/);
+  assert.doesNotMatch(stylesSource, /border-radius:\s*8px 8px 0 0/);
+  assert.doesNotMatch(stylesSource, /border-radius:\s*0 0 8px 8px/);
+});
+
 test("middle breakpoint makes summary off-canvas before step rail collapses", () => {
   const middleStart = stylesSource.indexOf("@media (max-width: 1120px)");
   const mobileStart = stylesSource.indexOf("@media (max-width: 760px)");
@@ -556,10 +572,12 @@ test("middle breakpoint makes summary off-canvas before step rail collapses", ()
   const mobileBreakpoint = stylesSource.slice(mobileStart, reducedMotionStart);
 
   assert.match(middleBreakpoint, /grid-template-columns:\s*180px minmax\(0, 1fr\)/);
-  assert.match(middleBreakpoint, /\.mobile-summary-bar\s*\{[\s\S]*display:\s*flex/);
+  assert.match(middleBreakpoint, /\.mobile-drawer-button-right\s*\{[\s\S]*display:\s*inline-grid/);
+  assert.match(middleBreakpoint, /\.mobile-summary-bar\s*\{[\s\S]*display:\s*none/);
   assert.match(middleBreakpoint, /\.summary-panel\s*\{[\s\S]*position:\s*fixed/);
   assert.match(middleBreakpoint, /\.app-shell\[data-mobile-drawer="summary"\] \.summary-panel/);
   assert.doesNotMatch(middleBreakpoint, /\.step-rail\s*\{[\s\S]*position:\s*fixed/);
+  assert.match(mobileBreakpoint, /\.mobile-summary-bar\s*\{[\s\S]*display:\s*flex/);
   assert.match(mobileBreakpoint, /\.step-rail\s*\{[\s\S]*position:\s*fixed/);
 });
 
