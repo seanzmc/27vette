@@ -737,15 +737,15 @@ textarea {
 }
 
 #requirementsCard {
-  order: 4;
-}
-
-#selectedRposCard {
   order: 2;
 }
 
-#autoAddedCard {
+#selectedRposCard {
   order: 3;
+}
+
+#autoAddedCard {
+  order: 4;
 }
 
 #summaryOverviewCard {
@@ -1293,15 +1293,15 @@ textarea {
   }
 
   #requirementsCard {
-    order: 4;
-  }
-
-  #selectedRposCard {
     order: 2;
   }
 
-  #autoAddedCard {
+  #selectedRposCard {
     order: 3;
+  }
+
+  #autoAddedCard {
+    order: 4;
   }
 
   #summaryOverviewCard {

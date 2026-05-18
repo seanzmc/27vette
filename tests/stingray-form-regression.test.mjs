@@ -560,9 +560,9 @@ test("mobile shell exposes compact progress and summary targets", () => {
   assert.match(stylesSource, /\.summary-panel\s*\{[\s\S]*padding:\s*8px;/);
   assert.match(stylesSource, /\.summary-card\s*\{[\s\S]*margin-bottom:\s*8px;[\s\S]*padding:\s*14px;/);
   assert.equal(cssOrderFor("#summaryOverviewCard"), 1);
-  assert.equal(cssOrderFor("#selectedRposCard"), 2);
-  assert.equal(cssOrderFor("#autoAddedCard"), 3);
-  assert.equal(cssOrderFor("#requirementsCard"), 4);
+  assert.equal(cssOrderFor("#requirementsCard"), 2);
+  assert.equal(cssOrderFor("#selectedRposCard"), 3);
+  assert.equal(cssOrderFor("#autoAddedCard"), 4);
 });
 
 test("shell containers share one spacing and radius rhythm", () => {
