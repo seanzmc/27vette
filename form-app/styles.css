@@ -428,6 +428,35 @@ textarea {
   min-height: 132px;
 }
 
+.choice-media {
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgba(217, 209, 196, 0.75);
+  border-radius: 6px;
+  background: #f1eee8;
+}
+
+.choice-media[data-fit="swatch"] {
+  aspect-ratio: 3 / 1;
+}
+
+.choice-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.choice-media[data-fit="contain"] img {
+  object-fit: contain;
+}
+
+.choice-media[data-fit="swatch"] img {
+  object-fit: cover;
+}
+
 .choice-card .topline {
   display: flex;
   justify-content: space-between;

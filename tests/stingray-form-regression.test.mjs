@@ -629,6 +629,41 @@ test("context steps expose mobile readability hooks without changing step conten
   assert.equal(runtime.elements.get("#stepContent").dataset.stepKind, "option");
 });
 
+test("card media support is optional and data-driven", () => {
+  const runtime = loadRuntime();
+  runtime.render();
+  assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /choice-media/);
+  assert.match(appSource, /function renderCardMedia/);
+  assert.match(stylesSource, /\.choice-media\s*\{[\s\S]*aspect-ratio:\s*16 \/ 9/);
+
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  const paint = runtime.activeChoiceRows().find((choice) => choice.step_key === "paint" && choice.selectable === "True");
+  assert.ok(paint, "paint choice should exist for synthetic card media test");
+  paint.image_url = "./assets/cards/black&trim.webp";
+  paint.image_alt = "Black \"paint\" preview";
+  paint.image_fit = "contain";
+  paint.image_position = "50% 40%";
+
+  runtime.state.activeStep = "paint";
+  runtime.render();
+  let html = runtime.elements.get("#stepContent").innerHTML;
+  assert.match(html, /class="choice-card has-media/);
+  assert.match(html, /<span class="choice-media" data-fit="contain">/);
+  assert.match(html, /src="\.\/assets\/cards\/black&amp;trim\.webp"/);
+  assert.match(html, /alt="Black &quot;paint&quot; preview"/);
+  assert.match(html, /object-position: 50% 40%;/);
+
+  paint.image_fit = "stretch";
+  paint.image_position = "url(javascript:bad)";
+  runtime.render();
+  html = runtime.elements.get("#stepContent").innerHTML;
+  assert.match(html, /<span class="choice-media" data-fit="cover">/);
+  assert.match(html, /object-position: center;/);
+});
+
 test("mobile drawers expose route and summary state without changing form logic", () => {
   const runtime = loadRuntime();
   runtime.render();

@@ -248,6 +248,33 @@ function renderStatePill(label, className, tooltip) {
   `;
 }
 
+function cardImageFit(value) {
+  return ["cover", "contain", "swatch"].includes(value) ? value : "cover";
+}
+
+function cardImagePosition(value) {
+  const position = String(value || "center").trim();
+  if (!position || !/^[\w\s.%/-]+$/.test(position)) return "center";
+  return position;
+}
+
+function cardHasMedia(row = {}) {
+  return Boolean(String(row.image_url || "").trim());
+}
+
+function renderCardMedia(row = {}, fallbackAlt = "") {
+  const imageUrl = String(row.image_url || "").trim();
+  if (!imageUrl) return "";
+  const imageAlt = String(row.image_alt || fallbackAlt || "").trim();
+  const imageFit = cardImageFit(row.image_fit);
+  const imagePosition = cardImagePosition(row.image_position);
+  return `
+    <span class="choice-media" data-fit="${escapeHtml(imageFit)}">
+      <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}" loading="lazy" style="object-position: ${escapeHtml(imagePosition)};">
+    </span>
+  `;
+}
+
 function positionTooltip(trigger) {
   const panel = trigger?.querySelector(".tooltip-panel");
   if (!panel) return;
@@ -1093,11 +1120,13 @@ function renderChoiceCard(choice, autoAdded) {
   const disabled = Boolean(disabledReason || autoReason);
   const detail = descriptiveTooltipText(choice.description) || descriptiveTooltipText(choice.status_label);
   const classes = ["choice-card"];
+  if (cardHasMedia(choice)) classes.push("has-media");
   if (selected) classes.push("selected");
   if (disabledReason) classes.push("disabled");
   if (autoReason) classes.push("auto");
   return `
     <button class="${classes.join(" ")}" type="button" data-option="${choice.option_id}" ${disabled ? "aria-disabled=\"true\"" : ""}>
+      ${renderCardMedia(choice, choice.label)}
       <span class="topline"><span class="rpo">${escapeHtml(choice.rpo || choice.option_id)}</span><span class="price">${formatMoney(choiceDisplayPrice(choice))}</span></span>
       <span class="choice-name"><span>${escapeHtml(choice.label)}</span>${renderInfoTooltip(detail, "Option details", { focusable: false })}</span>
       ${disabledReason ? renderStatePill("Unavailable", "disabled-reason", disabledReason) : ""}
@@ -1114,13 +1143,16 @@ function renderInteriorCard(interior) {
   const selected = state.selectedInterior === interior.interior_id;
   const disabledReason = disableReasonForInterior(interior);
   const classes = ["choice-card"];
+  if (cardHasMedia(interior)) classes.push("has-media");
   if (selected) classes.push("selected");
   if (disabledReason) classes.push("disabled");
   const detail = descriptiveTooltipText([interior.interior_material_family || interior.material, interior.source_note].filter(Boolean).join(" "));
+  const label = interior.interior_leaf_label || interior.interior_name;
   return `
     <button class="${classes.join(" ")}" type="button" data-interior="${interior.interior_id}" ${disabledReason ? "aria-disabled=\"true\"" : ""}>
+      ${renderCardMedia(interior, label)}
       <span class="topline"><span class="rpo">${interior.interior_code}</span><span class="price">${formatMoney(adjustedInteriorDisplayPrice(interior))}</span></span>
-      <span class="choice-name"><span>${escapeHtml(interior.interior_leaf_label || interior.interior_name)}</span>${renderInfoTooltip(detail || interior.interior_id, "Interior details", { focusable: false })}</span>
+      <span class="choice-name"><span>${escapeHtml(label)}</span>${renderInfoTooltip(detail || interior.interior_id, "Interior details", { focusable: false })}</span>
       ${disabledReason ? renderStatePill("Unavailable", "disabled-reason", disabledReason) : ""}
     </button>
   `;
@@ -1188,11 +1220,13 @@ function renderContextCard(choice) {
     (choice.context_type === "trim_level" && choice.body_style === state.bodyStyle && choice.trim_level === state.trimLevel);
   const disabled = choice.context_type === "trim_level" && choice.body_style !== state.bodyStyle;
   const classes = ["choice-card", "context-choice-card"];
+  if (cardHasMedia(choice)) classes.push("has-media");
   if (selected) classes.push("selected");
   if (disabled) classes.push("disabled");
   const price = choice.base_price ? formatMoney(choice.base_price) : "";
   return `
     <button class="${classes.join(" ")}" type="button" data-context-choice="${choice.context_choice_id}" ${disabled ? "aria-disabled=\"true\"" : ""}>
+      ${renderCardMedia(choice, choice.description || choice.label)}
       <span class="topline"><span class="rpo">${escapeHtml(choice.label)}</span><span class="price">${price}</span></span>
       <span class="choice-name"><span>${escapeHtml(choice.description)}</span></span>
       ${disabled ? renderStatePill(`Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} first`, "disabled-reason", `Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} body style first.`) : ""}
@@ -1206,6 +1240,10 @@ function modelEntries() {
     label: model.label || key,
     modelName: model.modelName || model.label || key,
     data: model.data,
+    image_url: model.image_url || "",
+    image_alt: model.image_alt || "",
+    image_fit: model.image_fit || "",
+    image_position: model.image_position || "",
   }));
 }
 
@@ -1217,10 +1255,12 @@ function renderModelCard(model) {
     .join(" / ");
   const trimLevels = [...new Set(variants.map((variant) => variant.trim_level).filter(Boolean))].join(" / ");
   const classes = ["choice-card", "model-choice-card"];
+  if (cardHasMedia(model)) classes.push("has-media");
   if (selected) classes.push("selected");
   const descriptor = [model.modelName, bodyStyles, trimLevels].filter(Boolean).join(", ");
   return `
     <button class="${classes.join(" ")}" type="button" data-model-choice="${escapeHtml(model.key)}" aria-pressed="${selected ? "true" : "false"}" aria-label="${escapeHtml(descriptor)}">
+      ${renderCardMedia(model, model.modelName || model.label)}
       <span class="topline"><span class="rpo">${escapeHtml(model.label)}</span><span class="price">${variants.length} variants</span></span>
       <span class="choice-note">${escapeHtml([bodyStyles, trimLevels].filter(Boolean).join(" | "))}</span>
     </button>
