@@ -535,13 +535,13 @@ textarea {
   flex-direction: column;
   border-left: 1px solid var(--line);
   background: #f8f3ea;
-  padding: 16px;
+  padding: 8px;
 }
 
 .summary-card {
   border: 1px solid var(--line);
   border-radius: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   padding: 14px;
   background: var(--panel);
   transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
@@ -737,7 +737,7 @@ textarea {
 }
 
 #requirementsCard {
-  order: 1;
+  order: 4;
 }
 
 #selectedRposCard {
@@ -749,7 +749,7 @@ textarea {
 }
 
 #summaryOverviewCard {
-  order: 4;
+  order: 1;
 }
 
 .summary-card[data-requirements-status="complete"] {
@@ -1293,7 +1293,7 @@ textarea {
   }
 
   #requirementsCard {
-    order: 1;
+    order: 4;
   }
 
   #selectedRposCard {
@@ -1305,7 +1305,7 @@ textarea {
   }
 
   #summaryOverviewCard {
-    order: 4;
+    order: 1;
   }
 
   .summary-card[data-requirements-status="complete"] {

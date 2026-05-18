@@ -15,6 +15,12 @@ const htmlSource = fs.readFileSync("form-app/index.html", "utf8");
 const stylesSource = fs.readFileSync("form-app/styles.css", "utf8");
 const interiorReferenceSource = fs.readFileSync("architectureAudit/stingray_interiors_refactor.csv", "utf8");
 
+function cssOrderFor(selector, source = stylesSource) {
+  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = source.match(new RegExp(`${escapedSelector}\\s*\\{[\\s\\S]*?order:\\s*(\\d+)`));
+  return match ? Number(match[1]) : Number.NaN;
+}
+
 function parseCsv(source) {
   const rows = [];
   let row = [];
@@ -549,8 +555,14 @@ test("mobile shell exposes compact progress and summary targets", () => {
   assert.match(htmlSource, /id="mobileDrawerBackdrop"/);
   assert.match(htmlSource, /id="stepRailDrawer"/);
   assert.match(htmlSource, /id="summaryDrawer"/);
-  assert.ok(stylesSource.indexOf("#requirementsCard") < stylesSource.indexOf("#selectedRposCard"));
-  assert.ok(stylesSource.indexOf("#selectedRposCard") < stylesSource.indexOf("#autoAddedCard"));
+  assert.match(htmlSource, /<h3 id="variantName">Stingray<\/h3>/);
+  assert.doesNotMatch(htmlSource, /<h2 id="variantName"/);
+  assert.match(stylesSource, /\.summary-panel\s*\{[\s\S]*padding:\s*8px;/);
+  assert.match(stylesSource, /\.summary-card\s*\{[\s\S]*margin-bottom:\s*8px;[\s\S]*padding:\s*14px;/);
+  assert.equal(cssOrderFor("#summaryOverviewCard"), 1);
+  assert.equal(cssOrderFor("#selectedRposCard"), 2);
+  assert.equal(cssOrderFor("#autoAddedCard"), 3);
+  assert.equal(cssOrderFor("#requirementsCard"), 4);
 });
 
 test("shell containers share one spacing and radius rhythm", () => {

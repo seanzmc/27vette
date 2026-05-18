@@ -23,11 +23,17 @@ Every handoff must report:
 - Gate results: typecheck, lint, tests, generator runs, workbook validation, or `not run` with a reason.
 - Manual verification still pending, residual risks, and follow-up work.
 
+## Using This File
+
+Treat this file as the current operating guide, not a freeze on the repo's implementation. Safety rules, source-of-truth rules, generated-file ownership, dealer submission boundaries, and validation gates are strict. Current architecture notes, active sheet lists, named workflow paths, and expected outputs are checkpoints to verify against the repo before acting.
+
+If a task intentionally migrates away from a documented workflow, call that out in the spec, inspect the current scripts/tests/artifacts first, and update this file only when the new workflow is proven.
+
 ## Current Architecture
 
-The live customer app is a static Corvette order-form runtime for Stingray and Grand Sport. It is deployed at `order.stingraychevroletcorvette.com` and supports active dealer submissions.
+The live customer app is currently a static Corvette order-form runtime for Stingray and Grand Sport. It is deployed at `order.stingraychevroletcorvette.com` and supports active dealer submissions.
 
-The architecture is:
+The current default architecture is:
 
 ```text
 stingray_master.xlsx
@@ -40,9 +46,9 @@ stingray_master.xlsx
   -> build download / dealer submission
 ```
 
-`form-app/data.js` exposes `window.CORVETTE_FORM_DATA` with model entries for Stingray and Grand Sport. `window.STINGRAY_FORM_DATA` remains as a compatibility alias.
+`form-app/data.js` currently exposes `window.CORVETTE_FORM_DATA` with model entries for Stingray and Grand Sport. `window.STINGRAY_FORM_DATA` remains as a compatibility alias.
 
-The project is transitioning to workbook-owned business logic. Grand Sport is further along in model-scoped workbook tables; Stingray still has some transitional generator/runtime logic. Do not expand those transitional seams unless explicitly approved.
+The project is transitioning to workbook-owned business logic. Some model-specific migration status may drift as work lands, so verify the current workbook sheets, generator code, runtime registry, and tests before assuming one model's workflow applies to another. Do not expand transitional generator/runtime seams unless explicitly approved.
 
 ## Business Rule Philosophy
 
@@ -72,7 +78,7 @@ If a proposed change requires hardcoded model-specific business logic, flag it b
 
 The canonical workbook is `stingray_master.xlsx`.
 
-Shared or Stingray-facing sheets include:
+Current shared or Stingray-facing sheets include:
 
 - `variant_master`
 - `category_master`
@@ -90,7 +96,7 @@ Shared or Stingray-facing sheets include:
 - `LZ_Interiors`
 - `PriceRef`
 
-Grand Sport model-scoped sheets include:
+Current Grand Sport model-scoped sheets include:
 
 - `grandSport_options`
 - `grandSport_ovs`
@@ -102,7 +108,7 @@ Grand Sport model-scoped sheets include:
 - `grandSport_exclusive_members`
 - `grandSport_variant_overrides`
 
-Generated sheets are written by the generator and should not be edited manually:
+Current generated sheets are written by the generator and should not be edited manually:
 
 - `form_steps`
 - `form_context_choices`
@@ -153,7 +159,7 @@ Do not run workbook generators with bare system Python. Use `.venv/bin/python` o
 
 ## Workbook Update Workflow
 
-Use this workflow for workbook data edits:
+Use this current default workflow for workbook data edits:
 
 1. Identify the business decision and the workbook sheet that should own it.
 2. Inspect existing rows, headers, generator consumers, and tests before editing.
@@ -170,14 +176,14 @@ Do not edit generated `form_*` sheets directly. Change source sheets, then regen
 
 ## Stingray Generator Workflow
 
-Run from the repo root:
+Current default command from the repo root:
 
 ```sh
 cd <repo-root>
 .venv/bin/python scripts/generate_stingray_form.py
 ```
 
-Expected outputs:
+Current expected outputs:
 
 - generated `form_*` sheets in `stingray_master.xlsx`
 - `form-output/stingray-form-data.json`
@@ -195,14 +201,14 @@ If the generator reports validation errors, stop and inspect `form_validation` a
 
 ## Grand Sport Generator Workflow
 
-Run from the repo root:
+Current default command from the repo root:
 
 ```sh
 cd <repo-root>
 .venv/bin/python scripts/generate_grand_sport_form.py
 ```
 
-Expected outputs under `form-output/inspection/`:
+Current expected outputs under `form-output/inspection/`:
 
 - `grand-sport-inspection.json`
 - `grand-sport-inspection.md`
@@ -211,7 +217,7 @@ Expected outputs under `form-output/inspection/`:
 - `grand-sport-form-data-draft.json`
 - `grand-sport-form-data-draft.md`
 
-This script is intentionally non-mutating for `form-app/data.js`. When a change is intended to update live app data, follow the production app-data generation path and verify the registry in `form-app/data.js`.
+This script is currently intentionally non-mutating for `form-app/data.js`. When a change is intended to update live app data, inspect the current production app-data generation path and verify the registry in `form-app/data.js`.
 
 Then run:
 
@@ -226,7 +232,7 @@ Some Grand Sport artifact names and metadata still reflect the inspection/draft 
 
 ## Static App Workflow
 
-The app has no package install or frontend build step.
+The app currently has no package install or frontend build step.
 
 Serve it locally with:
 
@@ -259,6 +265,8 @@ https://stingraychevroletcorvette.com/wp-json/corvette-build/v1/submit
 Do not change endpoint, payload shape, or Turnstile behavior without explicit approval.
 
 ## Validation Gates
+
+Use these as current default gates. If the relevant scripts, tests, or artifacts have changed, identify the replacement gates in the spec and explain why they supersede the commands below.
 
 Docs-only changes:
 
