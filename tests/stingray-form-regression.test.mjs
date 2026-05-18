@@ -400,7 +400,7 @@ test("spoilers are treated as an exclusive selection group", () => {
 
 test("spoiler exclusive group removes other selected spoiler options", () => {
   const spoilerIds = ["opt_t0a_001", "opt_tvs_001", "opt_5zz_001", "opt_5zu_001"];
-  for (const targetId of spoilerIds) {
+  for (const targetId of ["opt_tvs_001", "opt_5zz_001", "opt_5zu_001"]) {
     const runtime = loadRuntime();
     runtime.state.bodyStyle = "coupe";
     runtime.state.trimLevel = "1LT";
@@ -519,7 +519,10 @@ test("BC7, N26/TU7, and ZF1/T0A visibility follow the QA contract", () => {
     );
   }
 
-  assert.equal(data.choices.some((choice) => choice.rpo === "ZF1" && choice.active === "True"), false, "ZF1 should not render");
+  const zf1Rows = uniqueChoicesByRpo("ZF1");
+  assert.equal(zf1Rows.length, 1, "ZF1 should use one body-style-neutral option id");
+  assert.equal(zf1Rows[0].selectable, "True");
+  assert.equal(zf1Rows[0].step_key, "packages_performance");
   const t0a = uniqueChoicesByRpo("T0A")[0];
   assert.ok(t0a, "T0A should exist");
   assert.equal(t0a.selectable, "True");
@@ -1454,6 +1457,56 @@ test("FE3 disabled tile explains that Z51 includes it without duplicating the RP
   assert.equal(runtime.computeAutoAdded().get("opt_fe3_001"), "Included with Z51 Performance Package.");
 });
 
+test("ZF1 requires Z51, replaces T0A, and is auto-added by high wing spoilers only with Z51", () => {
+  for (const sourceId of ["opt_5zz_001", "opt_5zu_001", "opt_5zw_001"]) {
+    const rule = data.rules.find((item) => item.source_id === sourceId && item.target_id === "opt_zf1_001");
+    assert.ok(rule, `${sourceId} should include ZF1`);
+    assert.equal(rule.rule_type, "includes");
+    assert.equal(rule.auto_add, "True");
+  }
+
+  const zf1RequiresZ51 = data.rules.find((rule) => rule.source_id === "opt_zf1_001" && rule.target_id === "opt_z51_001");
+  assert.ok(zf1RequiresZ51, "ZF1 should require Z51");
+  assert.equal(zf1RequiresZ51.rule_type, "requires");
+
+  const zf1ReplacesT0a = data.rules.find((rule) => rule.source_id === "opt_zf1_001" && rule.target_id === "opt_t0a_001");
+  assert.ok(zf1ReplacesT0a, "ZF1 should remove T0A");
+  assert.equal(zf1ReplacesT0a.runtime_action, "replace");
+
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const zf1 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_zf1_001");
+  const z51 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_z51_001");
+  const fiveZz = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_5zz_001");
+  assert.ok(zf1, "ZF1 should exist for the current variant");
+  assert.ok(z51, "Z51 should exist for the current variant");
+  assert.ok(fiveZz, "5ZZ should exist for the current variant");
+
+  assert.equal(runtime.disableReasonForChoice(zf1), "Requires Z51 Performance Package.");
+
+  runtime.handleChoice(fiveZz);
+  assert.equal(runtime.computeAutoAdded().has("opt_zf1_001"), false, "5ZZ should not auto-add ZF1 without Z51");
+
+  runtime.handleChoice(z51);
+  assert.equal(runtime.disableReasonForChoice(zf1), "");
+  assert.equal(runtime.computeAutoAdded().get("opt_zf1_001"), "Included with 5ZZ Carbon Flash Metallic High Wing Spoiler.");
+  assert.equal(runtime.computeAutoAdded().has("opt_t0a_001"), false, "5ZZ should replace the Z51 T0A default");
+
+  const manualRuntime = loadRuntime();
+  manualRuntime.state.bodyStyle = "coupe";
+  manualRuntime.state.trimLevel = "1LT";
+  manualRuntime.resetDefaults();
+  manualRuntime.reconcileSelections();
+  manualRuntime.handleChoice(manualRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_z51_001"));
+  manualRuntime.handleChoice(manualRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_zf1_001"));
+  assert.equal(manualRuntime.state.selected.has("opt_zf1_001"), true, "ZF1 should be manually selectable once Z51 is selected");
+  assert.equal(manualRuntime.computeAutoAdded().has("opt_t0a_001"), false, "selected ZF1 should keep T0A removed");
+});
+
 test("FE1 default selection prefers the visible suspension tile", () => {
   const fe1Rows = data.choices.filter((choice) => choice.variant_id === "1lt_c07" && choice.rpo === "FE1");
   assert.ok(
@@ -1683,7 +1736,7 @@ test("BC7 has a convertible-only ZZ3 requirement", () => {
 test("spoiler replacement rules preserve ZYC and replace T0A without blocking TVS/5ZZ/5ZU", () => {
   const spoilerSection = data.sections.find((section) => section.section_id === "sec_spoi_001");
   assert.equal(spoilerSection.selection_mode, "multi_select_opt");
-  for (const sourceId of ["opt_tvs_001", "opt_5zz_001", "opt_5zu_001"]) {
+  for (const sourceId of ["opt_tvs_001", "opt_5zz_001", "opt_5zu_001", "opt_5zw_001", "opt_zf1_001"]) {
     const rule = data.rules.find((item) => item.source_id === sourceId && item.target_id === "opt_t0a_001");
     assert.ok(rule, `${sourceId} should remove T0A`);
     assert.equal(rule.runtime_action, "replace");
