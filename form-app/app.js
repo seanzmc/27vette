@@ -29,7 +29,7 @@ const state = {
   selected: new Set(),
   userSelected: new Set(),
   selectedInterior: "",
-  activeStep: "body_style",
+  activeStep: "model",
   customer: {
     name: "",
     address: "",
@@ -94,10 +94,13 @@ const els = {
   confirmActionMessage: document.querySelector("#confirmActionMessage"),
   confirmActionCancelButton: document.querySelector("#confirmActionCancelButton"),
   confirmActionConfirmButton: document.querySelector("#confirmActionConfirmButton"),
-  modelSelect: document.querySelector("#modelSelect"),
   appTitle: document.querySelector("#appTitle"),
 };
 
+const modelStep = {
+  step_key: "model",
+  step_label: "Model",
+};
 let runtimeSteps = [];
 let variants = [];
 let pendingConfirmationAction = null;
@@ -142,7 +145,7 @@ const stepOrderSectionKeys = new Map([
 ]);
 
 function rebuildDataIndexes() {
-  runtimeSteps = (data.steps || []).filter((step) => step.step_key !== "summary");
+  runtimeSteps = [modelStep, ...(data.steps || []).filter((step) => step.step_key !== "summary")];
   variants = [...(data.variants || [])].sort((a, b) => a.display_order - b.display_order);
   choicesByOption.clear();
   sectionsById.clear();
@@ -1205,6 +1208,33 @@ function renderContextCard(choice) {
   `;
 }
 
+function modelEntries() {
+  return Object.entries(registry.models || {}).map(([key, model]) => ({
+    key,
+    label: model.label || key,
+    modelName: model.modelName || model.label || key,
+    data: model.data,
+  }));
+}
+
+function renderModelCard(model) {
+  const selected = model.key === activeModelKey;
+  const variants = model.data?.variants || [];
+  const bodyStyles = [...new Set(variants.map((variant) => variant.body_style).filter(Boolean))]
+    .map((bodyStyle) => bodyStyle[0].toUpperCase() + bodyStyle.slice(1))
+    .join(" / ");
+  const trimLevels = [...new Set(variants.map((variant) => variant.trim_level).filter(Boolean))].join(" / ");
+  const classes = ["choice-card", "model-choice-card"];
+  if (selected) classes.push("selected");
+  return `
+    <button class="${classes.join(" ")}" type="button" data-model-choice="${escapeHtml(model.key)}" aria-pressed="${selected ? "true" : "false"}">
+      <span class="topline"><span class="rpo">${escapeHtml(model.label)}</span><span class="price">${variants.length} variants</span></span>
+      <span class="choice-name"><span>${escapeHtml(model.modelName)}</span></span>
+      <span class="choice-note">${escapeHtml([bodyStyles, trimLevels].filter(Boolean).join(" | "))}</span>
+    </button>
+  `;
+}
+
 function renderCustomerForm() {
   return `
     <form id="customerForm" class="customer-step-form">
@@ -1336,9 +1366,17 @@ function renderStepContent({ resetScroll = false } = {}) {
   const step = runtimeSteps.find((item) => item.step_key === state.activeStep);
   const autoAdded = computeAutoAdded();
   const isContextStep = state.activeStep === "body_style" || state.activeStep === "trim_level";
+  const isModelStep = state.activeStep === "model";
   let body = "";
 
-  if (isContextStep) {
+  if (isModelStep) {
+    body = `
+      <section class="section-block model-step-section">
+        <div class="section-title"><h3>Corvette Model</h3><span>${modelEntries().length} choices</span></div>
+        <div class="choice-grid">${modelEntries().map(renderModelCard).join("")}</div>
+      </section>
+    `;
+  } else if (isContextStep) {
     const contextChoices = data.contextChoices
       .filter((choice) => choice.step_key === state.activeStep)
       .filter((choice) => choice.context_type !== "trim_level" || choice.body_style === state.bodyStyle)
@@ -1395,7 +1433,7 @@ function renderStepContent({ resetScroll = false } = {}) {
 
   const next = nextStep();
   els.stepContent.dataset.activeStep = state.activeStep;
-  els.stepContent.dataset.stepKind = isContextStep ? "context" : "option";
+  els.stepContent.dataset.stepKind = isModelStep ? "model" : isContextStep ? "context" : "option";
   els.stepContent.innerHTML = `
     <header class="step-header">
       <div>
@@ -1429,6 +1467,11 @@ function renderStepContent({ resetScroll = false } = {}) {
     button.addEventListener("click", () => {
       const choice = data.contextChoices.find((item) => item.context_choice_id === button.dataset.contextChoice);
       if (choice && !(choice.context_type === "trim_level" && choice.body_style !== state.bodyStyle)) handleContextChoice(choice);
+    });
+  });
+  els.stepContent.querySelectorAll("[data-model-choice]").forEach((button) => {
+    button.addEventListener("click", () => {
+      requestModelChange(button.dataset.modelChoice);
     });
   });
   els.stepContent.querySelector("[data-next-step]")?.addEventListener("click", goToNextStep);
@@ -1942,14 +1985,13 @@ function resetModelScopedState() {
   state.selected.clear();
   state.userSelected.clear();
   state.selectedInterior = "";
-  state.activeStep = "body_style";
+  state.activeStep = "model";
 }
 
 function renderModelChrome() {
   const title = `${activeModel.label || "Stingray"} Order Form`;
   if (els.appTitle) els.appTitle.textContent = title;
   document.title = title;
-  if (els.modelSelect && els.modelSelect.value !== activeModelKey) els.modelSelect.value = activeModelKey;
 }
 
 function activateModel(modelKey, { preserveCustomer = true, shouldRender = true } = {}) {
@@ -1979,7 +2021,7 @@ function render({ resetScroll = false, preserveScroll = false } = {}) {
 }
 
 function buildHasResettableChanges() {
-  return state.userSelected.size > 0 || Boolean(state.selectedInterior) || state.activeStep !== "body_style";
+  return state.userSelected.size > 0 || Boolean(state.selectedInterior) || state.activeStep !== "model";
 }
 
 function closeConfirmActionModal() {
@@ -2005,7 +2047,7 @@ function confirmPendingAction() {
 function resetBuild() {
   resetDefaults();
   resetCustomerInformation();
-  state.activeStep = "body_style";
+  state.activeStep = "model";
   reconcileSelections();
   render({ resetScroll: true });
 }
@@ -2029,7 +2071,6 @@ function requestModelChange(modelKey) {
     activateModel(modelKey);
     return;
   }
-  if (els.modelSelect) els.modelSelect.value = activeModelKey;
   openConfirmActionModal({
     title: "Change Model",
     message: "Changing models will reset all selected options. Are you sure?",
@@ -2040,12 +2081,6 @@ function requestModelChange(modelKey) {
 
 function init() {
   activateModel(activeModelKey, { shouldRender: false });
-  if (els.modelSelect) {
-    els.modelSelect.value = activeModelKey;
-    els.modelSelect.addEventListener("change", () => {
-      requestModelChange(els.modelSelect.value);
-    });
-  }
   els.resetButton.addEventListener("click", requestResetBuild);
   els.downloadBuildButton.addEventListener("click", downloadBuild);
   els.submitDealerButton?.addEventListener("click", openDealerSubmitModal);

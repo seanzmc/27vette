@@ -539,6 +539,7 @@ test("mobile shell exposes compact progress and summary targets", () => {
   assert.match(htmlSource, /id="mobileNextStep"/);
   assert.match(htmlSource, /id="openStepDrawerButton"/);
   assert.match(htmlSource, /id="openSummaryDrawerButton"/);
+  assert.doesNotMatch(htmlSource, /id="modelSelect"/);
   assert.match(htmlSource, /class="reset-icon"/);
   assert.match(htmlSource, /id="mobileDrawerBackdrop"/);
   assert.match(htmlSource, /id="stepRailDrawer"/);
@@ -551,20 +552,20 @@ test("mobile progress and compact summary update from runtime state", () => {
   const runtime = loadRuntime();
   runtime.render();
 
-  assert.equal(runtime.elements.get("#mobileStepCount").textContent, "Step 1 of 13");
-  assert.equal(runtime.elements.get("#mobileStepName").textContent, "Body Style");
+  assert.equal(runtime.elements.get("#mobileStepCount").textContent, "Step 1 of 14");
+  assert.equal(runtime.elements.get("#mobileStepName").textContent, "Model");
   assert.equal(runtime.elements.get("#mobilePrevStep").disabled, true);
   assert.equal(runtime.elements.get("#mobilePrevStep").hidden, true);
   assert.equal(runtime.elements.get("#mobileProgress").dataset.hasPrevious, "false");
   assert.equal(runtime.elements.get("#mobileNextStep").textContent, "Next");
-  assert.equal(runtime.elements.get("#mobileNextStep").title, "Next: Trim Level");
+  assert.equal(runtime.elements.get("#mobileNextStep").title, "Next: Body Style");
   assert.match(runtime.elements.get("#mobileSummaryTotal").textContent, /^\$/);
   assert.match(runtime.elements.get("#mobileSummarySelected").textContent, /selected item/);
   assert.match(runtime.elements.get("#mobileSummaryMissing").textContent, /required choice/);
 
   runtime.state.activeStep = "trim_level";
   runtime.render();
-  assert.equal(runtime.elements.get("#mobileStepCount").textContent, "Step 2 of 13");
+  assert.equal(runtime.elements.get("#mobileStepCount").textContent, "Step 3 of 14");
   assert.equal(runtime.elements.get("#mobileStepName").textContent, "Trim Level");
   assert.equal(runtime.elements.get("#mobilePrevStep").hidden, false);
   assert.equal(runtime.elements.get("#mobilePrevStep").textContent, "Back");
@@ -576,6 +577,12 @@ test("context steps expose mobile readability hooks without changing step conten
   const runtime = loadRuntime();
   runtime.render();
 
+  assert.equal(runtime.elements.get("#stepContent").dataset.activeStep, "model");
+  assert.equal(runtime.elements.get("#stepContent").dataset.stepKind, "model");
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /model-step-section/);
+
+  runtime.state.activeStep = "body_style";
+  runtime.render();
   assert.equal(runtime.elements.get("#stepContent").dataset.activeStep, "body_style");
   assert.equal(runtime.elements.get("#stepContent").dataset.stepKind, "context");
   assert.match(runtime.elements.get("#stepContent").innerHTML, /context-step-section/);
@@ -1126,7 +1133,7 @@ test("reset button confirms dirty builds and returns to step one", () => {
   assert.equal(runtime.state.selected.has("opt_z51_001"), false, "confirmed reset should clear selected options");
   assert.equal(runtime.state.userSelected.size, 0);
   assert.equal(runtime.state.selectedInterior, "");
-  assert.equal(runtime.state.activeStep, "body_style");
+  assert.equal(runtime.state.activeStep, "model");
 });
 
 test("plain text order summary renders compact order data for emails and review", () => {

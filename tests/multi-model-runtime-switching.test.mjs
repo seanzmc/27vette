@@ -130,6 +130,7 @@ window.__testApi = {
   get data() { return typeof data === "undefined" ? undefined : data; },
   activeChoiceRows,
   activateModel: typeof activateModel === "function" ? activateModel : undefined,
+  requestModelChange: typeof requestModelChange === "function" ? requestModelChange : undefined,
   resetDefaults,
   reconcileSelections,
   handleChoice,
@@ -531,14 +532,10 @@ test("runtime defaults to Stingray and switches models with a clean build reset"
   runtime.handleChoice(stingrayPaint);
   assert.equal(runtime.state.selected.has("opt_gba_001"), true);
 
-  const modelSelect = runtime.elements.get("#modelSelect");
-  assert.ok(modelSelect, "model picker element should be wired");
-  modelSelect.value = "grandSport";
-  modelSelect.change();
+  runtime.requestModelChange("grandSport");
   assert.equal(runtime.elements.get("#confirmActionModal").hidden, false, "dirty model switch should prompt");
   assert.equal(runtime.elements.get("#confirmActionMessage").textContent, "Changing models will reset all selected options. Are you sure?");
   assert.equal(runtime.elements.get("#confirmActionConfirmButton").textContent, "Yes, Change Model");
-  assert.equal(modelSelect.value, "stingray", "cancelable model change should restore the current select value before confirmation");
   assert.equal(runtime.activeModelKey, "stingray");
 
   runtime.elements.get("#confirmActionCancelButton").click();
@@ -546,8 +543,7 @@ test("runtime defaults to Stingray and switches models with a clean build reset"
   assert.equal(runtime.activeModelKey, "stingray");
   assert.equal(runtime.state.selected.has("opt_gba_001"), true, "canceling model switch should preserve current selections");
 
-  modelSelect.value = "grandSport";
-  modelSelect.change();
+  runtime.requestModelChange("grandSport");
   runtime.elements.get("#confirmActionConfirmButton").click();
 
   assert.equal(runtime.activeModelKey, "grandSport");
@@ -558,7 +554,7 @@ test("runtime defaults to Stingray and switches models with a clean build reset"
   );
   assert.equal(runtime.state.bodyStyle, "coupe");
   assert.equal(runtime.state.trimLevel, "1LT");
-  assert.equal(runtime.state.activeStep, "body_style");
+  assert.equal(runtime.state.activeStep, "model");
   assert.equal(runtime.state.selected.has("opt_gba_001"), false, "Stingray selected option should not survive model switch");
   assert.equal(runtime.state.selectedInterior, "");
   assert.equal(runtime.state.customer.name, "Ada Buyer");
@@ -569,8 +565,7 @@ test("runtime defaults to Stingray and switches models with a clean build reset"
   assert.equal(grandSportOrder.title, "2027 Corvette Grand Sport");
   assert.doesNotMatch(runtime.plainTextOrderSummary(), /^<p>2027 Corvette Grand Sport<\/p>/);
 
-  modelSelect.value = "stingray";
-  modelSelect.change();
+  runtime.requestModelChange("stingray");
   assert.equal(runtime.elements.get("#confirmActionModal").hidden, true, "clean model switch should not prompt");
   assert.equal(runtime.activeModelKey, "stingray");
   assert.equal(runtime.state.selected.has("opt_gba_001"), false, "Grand Sport reset should not recreate prior user selections");
