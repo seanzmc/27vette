@@ -183,7 +183,7 @@ Use a compatibility-first migration:
 
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-## 3. Phase 0 — Safety Baseline
+## 3. Done Phase 0 — Safety Baseline
 
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -218,7 +218,7 @@ Use a compatibility-first migration:
 
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-## 4. Phase 1 — Add Workbook Metadata Tables
+## 4. Done Phase 1 — Add Workbook Metadata Tables
 
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -739,11 +739,18 @@ Use a compatibility-first migration:
 
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+# RESUME HERE
+
+```bash
+hermes --resume 20260519_153906_36dd4b
+hermes -c "Hermes Workspace Setup for 27vette #6"
+```
+
     Risk: High
     Fixes findings:
     - Runtime RPO conflicts/replacements/defaults
-    - Runtime R6X/D30 price waiver
     - Runtime order-summary grouping
+    Done - Runtime R6X/D30 price waiver
 
     Workbook rows to add:
 
