@@ -153,6 +153,7 @@ window.__testApi = {
     turnstileCalls,
     exportJson,
   exportCsv,
+  renderChoiceCard,
   renderContextCard,
   downloads: window.__downloads,
   elements,
@@ -240,6 +241,19 @@ const expectedTrimTooltips = {
   "3LT": "3LT is the utmost in luxury performance, with a leather-wrapped interior.",
 };
 
+const expectedPaintImages = {
+  GEC: ["opt_gec_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png", "Pitch Gray Metallic"],
+  GPH: ["opt_gph_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png", "Red Mist Metallic Tintcoat"],
+  G26: ["opt_g26_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png", "Sebring Orange Tintcoat"],
+  GBK: ["opt_gbk_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png", "Competition Yellow Tintcoat Metallic"],
+  G4Z: ["opt_g4z_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png", "Roswell Green Metallic"],
+  GKA: ["opt_gka_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png", "Blade Silver Metallic"],
+  GBA: ["opt_gba_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png", "Black"],
+  G8G: ["opt_g8g_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png", "Arctic White"],
+  GKZ: ["opt_gkz_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png", "Torch Red"],
+  GTR: ["opt_gtr_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png", "Admiral Blue Metallic"],
+};
+
 test("generated app data exposes a multi-model registry with Stingray compatibility alias", () => {
   const dataWindow = loadDataWindow();
   const registry = dataWindow.CORVETTE_FORM_DATA;
@@ -303,6 +317,35 @@ test("generated context choices apply workbook-owned trim tooltips to both model
       assert.equal(choice.description.includes(choice.value), true);
     }
   }
+});
+
+test("generated Stingray paint choices apply active image assets from asset_map", () => {
+  const dataWindow = loadDataWindow();
+  const paintChoices = dataWindow.CORVETTE_FORM_DATA.models.stingray.data.choices.filter(
+    (choice) => choice.variant_id === "1lt_c07" && choice.section_id === "sec_pain_001"
+  );
+
+  assert.equal(paintChoices.length, Object.keys(expectedPaintImages).length);
+  for (const choice of paintChoices) {
+    const [optionId, imageUrl, imageAlt] = expectedPaintImages[choice.rpo];
+    assert.equal(choice.option_id, optionId);
+    assert.equal(choice.image_url, imageUrl);
+    assert.equal(choice.image_alt, imageAlt);
+    assert.equal(choice.image_fit, "cover");
+    assert.equal(choice.image_position, "center");
+  }
+});
+
+test("runtime renders Stingray paint image media from generated choice data", () => {
+  const runtime = loadRuntime();
+  const paintChoice = runtime.data.choices.find(
+    (choice) => choice.variant_id === "1lt_c07" && choice.option_id === "opt_g8g_001"
+  );
+
+  const html = runtime.renderChoiceCard(paintChoice, new Map());
+  assert.match(html, /choice-media/);
+  assert.match(html, /expt_262_g8g\.png/);
+  assert.match(html, /Arctic White/);
 });
 
 test("runtime renders context choice tooltips without replacing visible trim descriptions", () => {

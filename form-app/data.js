@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-19T16:31:10+00:00"
+          "generated_at": "2026-05-19T16:43:21+00:00"
         },
         "variants": [
           {
@@ -10652,7 +10652,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 1,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
+            "image_alt": "Arctic White",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c07__opt_g8g_001",
@@ -10675,7 +10679,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 1,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
+            "image_alt": "Arctic White",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c07__opt_g8g_001",
@@ -10698,7 +10706,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 1,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
+            "image_alt": "Arctic White",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c67__opt_g8g_001",
@@ -10721,7 +10733,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 1,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
+            "image_alt": "Arctic White",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c67__opt_g8g_001",
@@ -10744,7 +10760,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 1,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
+            "image_alt": "Arctic White",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c67__opt_g8g_001",
@@ -10767,7 +10787,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 1,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
+            "image_alt": "Arctic White",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c07__opt_gba_001",
@@ -10790,7 +10814,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 2,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
+            "image_alt": "Black",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c07__opt_gba_001",
@@ -10813,7 +10841,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 2,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
+            "image_alt": "Black",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c07__opt_gba_001",
@@ -10836,7 +10868,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 2,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
+            "image_alt": "Black",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c67__opt_gba_001",
@@ -10859,7 +10895,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 2,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
+            "image_alt": "Black",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c67__opt_gba_001",
@@ -10882,7 +10922,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 2,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
+            "image_alt": "Black",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c67__opt_gba_001",
@@ -10905,7 +10949,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 2,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
+            "image_alt": "Black",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c07__opt_gka_001",
@@ -10928,7 +10976,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 3,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
+            "image_alt": "Blade Silver Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c07__opt_gka_001",
@@ -10951,7 +11003,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 3,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
+            "image_alt": "Blade Silver Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c07__opt_gka_001",
@@ -10974,7 +11030,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 3,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
+            "image_alt": "Blade Silver Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c67__opt_gka_001",
@@ -10997,7 +11057,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 3,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
+            "image_alt": "Blade Silver Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c67__opt_gka_001",
@@ -11020,7 +11084,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 3,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
+            "image_alt": "Blade Silver Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c67__opt_gka_001",
@@ -11043,7 +11111,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 3,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
+            "image_alt": "Blade Silver Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c07__opt_gbk_001",
@@ -11066,7 +11138,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 4,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
+            "image_alt": "Competition Yellow Tintcoat Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c07__opt_gbk_001",
@@ -11089,7 +11165,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 4,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
+            "image_alt": "Competition Yellow Tintcoat Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c07__opt_gbk_001",
@@ -11112,7 +11192,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 4,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
+            "image_alt": "Competition Yellow Tintcoat Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c67__opt_gbk_001",
@@ -11135,7 +11219,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 4,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
+            "image_alt": "Competition Yellow Tintcoat Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c67__opt_gbk_001",
@@ -11158,7 +11246,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 4,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
+            "image_alt": "Competition Yellow Tintcoat Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c67__opt_gbk_001",
@@ -11181,7 +11273,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 4,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
+            "image_alt": "Competition Yellow Tintcoat Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c07__opt_gtr_001",
@@ -11204,7 +11300,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 500,
             "display_order": 5,
-            "source_detail_raw": "Additional charge - premium color."
+            "source_detail_raw": "Additional charge - premium color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
+            "image_alt": "Admiral Blue Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c07__opt_gtr_001",
@@ -11227,7 +11327,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 500,
             "display_order": 5,
-            "source_detail_raw": "Additional charge - premium color."
+            "source_detail_raw": "Additional charge - premium color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
+            "image_alt": "Admiral Blue Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c07__opt_gtr_001",
@@ -11250,7 +11354,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 500,
             "display_order": 5,
-            "source_detail_raw": "Additional charge - premium color."
+            "source_detail_raw": "Additional charge - premium color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
+            "image_alt": "Admiral Blue Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c67__opt_gtr_001",
@@ -11273,7 +11381,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 500,
             "display_order": 5,
-            "source_detail_raw": "Additional charge - premium color."
+            "source_detail_raw": "Additional charge - premium color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
+            "image_alt": "Admiral Blue Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c67__opt_gtr_001",
@@ -11296,7 +11408,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 500,
             "display_order": 5,
-            "source_detail_raw": "Additional charge - premium color."
+            "source_detail_raw": "Additional charge - premium color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
+            "image_alt": "Admiral Blue Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c67__opt_gtr_001",
@@ -11319,7 +11435,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 500,
             "display_order": 5,
-            "source_detail_raw": "Additional charge - premium color."
+            "source_detail_raw": "Additional charge - premium color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
+            "image_alt": "Admiral Blue Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c07__opt_gec_001",
@@ -11342,7 +11462,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 6,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
+            "image_alt": "Pitch Gray Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c07__opt_gec_001",
@@ -11365,7 +11489,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 6,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
+            "image_alt": "Pitch Gray Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c07__opt_gec_001",
@@ -11388,7 +11516,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 6,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
+            "image_alt": "Pitch Gray Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c67__opt_gec_001",
@@ -11411,7 +11543,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 6,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
+            "image_alt": "Pitch Gray Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c67__opt_gec_001",
@@ -11434,7 +11570,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 6,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
+            "image_alt": "Pitch Gray Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c67__opt_gec_001",
@@ -11457,7 +11597,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 6,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
+            "image_alt": "Pitch Gray Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c07__opt_gph_001",
@@ -11480,7 +11624,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 7,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
+            "image_alt": "Red Mist Metallic Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c07__opt_gph_001",
@@ -11503,7 +11651,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 7,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
+            "image_alt": "Red Mist Metallic Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c07__opt_gph_001",
@@ -11526,7 +11678,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 7,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
+            "image_alt": "Red Mist Metallic Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c67__opt_gph_001",
@@ -11549,7 +11705,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 7,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
+            "image_alt": "Red Mist Metallic Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c67__opt_gph_001",
@@ -11572,7 +11732,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 7,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
+            "image_alt": "Red Mist Metallic Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c67__opt_gph_001",
@@ -11595,7 +11759,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 7,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
+            "image_alt": "Red Mist Metallic Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c07__opt_g4z_001",
@@ -11618,7 +11786,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 500,
             "display_order": 8,
-            "source_detail_raw": "Additional charge - premium color."
+            "source_detail_raw": "Additional charge - premium color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
+            "image_alt": "Roswell Green Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c07__opt_g4z_001",
@@ -11641,7 +11813,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 500,
             "display_order": 8,
-            "source_detail_raw": "Additional charge - premium color."
+            "source_detail_raw": "Additional charge - premium color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
+            "image_alt": "Roswell Green Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c07__opt_g4z_001",
@@ -11664,7 +11840,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 500,
             "display_order": 8,
-            "source_detail_raw": "Additional charge - premium color."
+            "source_detail_raw": "Additional charge - premium color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
+            "image_alt": "Roswell Green Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c67__opt_g4z_001",
@@ -11687,7 +11867,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 500,
             "display_order": 8,
-            "source_detail_raw": "Additional charge - premium color."
+            "source_detail_raw": "Additional charge - premium color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
+            "image_alt": "Roswell Green Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c67__opt_g4z_001",
@@ -11710,7 +11894,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 500,
             "display_order": 8,
-            "source_detail_raw": "Additional charge - premium color."
+            "source_detail_raw": "Additional charge - premium color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
+            "image_alt": "Roswell Green Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c67__opt_g4z_001",
@@ -11733,7 +11921,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 500,
             "display_order": 8,
-            "source_detail_raw": "Additional charge - premium color."
+            "source_detail_raw": "Additional charge - premium color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
+            "image_alt": "Roswell Green Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c07__opt_g26_001",
@@ -11756,7 +11948,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 9,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
+            "image_alt": "Sebring Orange Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c07__opt_g26_001",
@@ -11779,7 +11975,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 9,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
+            "image_alt": "Sebring Orange Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c07__opt_g26_001",
@@ -11802,7 +12002,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 9,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
+            "image_alt": "Sebring Orange Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c67__opt_g26_001",
@@ -11825,7 +12029,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 9,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
+            "image_alt": "Sebring Orange Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c67__opt_g26_001",
@@ -11848,7 +12056,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 9,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
+            "image_alt": "Sebring Orange Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c67__opt_g26_001",
@@ -11871,7 +12083,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 995,
             "display_order": 9,
-            "source_detail_raw": "Additional charge - premium tintcoat color."
+            "source_detail_raw": "Additional charge - premium tintcoat color.",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
+            "image_alt": "Sebring Orange Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c07__opt_gkz_001",
@@ -11894,7 +12110,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 10,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
+            "image_alt": "Torch Red",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c07__opt_gkz_001",
@@ -11917,7 +12137,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 10,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
+            "image_alt": "Torch Red",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c07__opt_gkz_001",
@@ -11940,7 +12164,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 10,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
+            "image_alt": "Torch Red",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c67__opt_gkz_001",
@@ -11963,7 +12191,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 10,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
+            "image_alt": "Torch Red",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c67__opt_gkz_001",
@@ -11986,7 +12218,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 10,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
+            "image_alt": "Torch Red",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c67__opt_gkz_001",
@@ -12009,7 +12245,11 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Required single choice",
             "base_price": 0,
             "display_order": 10,
-            "source_detail_raw": ""
+            "source_detail_raw": "",
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
+            "image_alt": "Torch Red",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c07__opt_eri_001",
@@ -54093,7 +54333,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-05-19T16:31:08+00:00",
+          "generated_at": "2026-05-19T16:31:23+00:00",
           "status": "draft_not_runtime_active"
         },
         "variants": [

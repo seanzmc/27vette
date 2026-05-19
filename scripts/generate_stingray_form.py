@@ -72,6 +72,36 @@ def workbook_truthy(value: Any) -> bool:
     return clean(value).lower() in {"true", "yes", "1", "y"}
 
 
+ASSET_IMAGE_FIELDS = ("image_url", "image_alt", "image_fit", "image_position")
+
+
+def asset_fields(row: dict[str, Any]) -> dict[str, str]:
+    return {
+        "image_url": clean(row.get("image_url")),
+        "image_alt": clean(row.get("image_alt")),
+        "image_fit": clean(row.get("image_fit")),
+        "image_position": clean(row.get("image_position")),
+    }
+
+
+def load_asset_map(wb, model_key: str, target_type: str) -> dict[str, dict[str, str]]:
+    if "asset_map" not in wb.sheetnames:
+        return {}
+    assets: dict[str, dict[str, str]] = {}
+    for row in rows_from_sheet(wb, "asset_map"):
+        if not workbook_truthy(row.get("active")):
+            continue
+        if clean(row.get("model_key")) != model_key:
+            continue
+        if clean(row.get("target_type")) != target_type:
+            continue
+        target_id = clean(row.get("target_id"))
+        fields = asset_fields(row)
+        if target_id and fields["image_url"]:
+            assets[target_id] = fields
+    return assets
+
+
 def load_model_asset_map() -> dict[str, dict[str, str]]:
     if not WORKBOOK_PATH.exists():
         return {}
@@ -87,15 +117,10 @@ def load_model_asset_map() -> dict[str, dict[str, str]]:
                 continue
             model_key = clean(row.get("model_key"))
             target_id = clean(row.get("target_id")) or registry_model_key(model_key)
-            image_url = clean(row.get("image_url"))
-            if not target_id or not image_url:
+            fields = asset_fields(row)
+            if not target_id or not fields["image_url"]:
                 continue
-            assets[target_id] = {
-                "image_url": image_url,
-                "image_alt": clean(row.get("image_alt")),
-                "image_fit": clean(row.get("image_fit")),
-                "image_position": clean(row.get("image_position")),
-            }
+            assets[target_id] = fields
         return assets
     finally:
         wb.close()
@@ -609,6 +634,7 @@ def main() -> None:
     color_overrides_raw = rows_from_sheet(wb, "color_overrides")
     rule_groups = load_rule_groups(wb)
     exclusive_groups = load_exclusive_groups(wb)
+    option_asset_map = load_asset_map(wb, MODEL_CONFIG.model_key, "option")
     grouped_requires = grouped_requirement_pairs(rule_groups)
     interior_reference_by_id, interior_reference_rows = read_interior_reference()
 
@@ -817,6 +843,8 @@ def main() -> None:
             }
             if option["display_behavior"]:
                 choice["display_behavior"] = option["display_behavior"]
+            if asset := option_asset_map.get(option_id):
+                choice.update(asset)
             choices.append(choice)
 
     interiors: list[dict[str, Any]] = []
@@ -1197,6 +1225,7 @@ def main() -> None:
             "display_behavior",
             "display_order",
             "source_detail_raw",
+            *ASSET_IMAGE_FIELDS,
         ],
         choices,
     )
@@ -1385,6 +1414,7 @@ def main() -> None:
                 "status",
                 "selectable",
                 "base_price",
+                *ASSET_IMAGE_FIELDS,
             ],
         )
         writer.writeheader()
