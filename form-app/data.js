@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-18T20:14:17+00:00"
+          "generated_at": "2026-05-19T05:58:10+00:00"
         },
         "variants": [
           {
@@ -54081,7 +54081,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-05-18T20:14:10+00:00",
+          "generated_at": "2026-05-19T05:58:05+00:00",
           "status": "draft_not_runtime_active"
         },
         "variants": [
@@ -59227,7 +59227,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Black Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_304_j6a.png",
+            "image_alt": "Black Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_j6a_001",
@@ -59254,7 +59258,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Black Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_304_j6a.png",
+            "image_alt": "Black Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_j6a_001",
@@ -59281,7 +59289,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Black Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_304_j6a.png",
+            "image_alt": "Black Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_j6a_001",
@@ -59308,7 +59320,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Black Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_304_j6a.png",
+            "image_alt": "Black Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_j6a_001",
@@ -59335,7 +59351,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Black Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_304_j6a.png",
+            "image_alt": "Black Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_j6a_001",
@@ -59362,7 +59382,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Black Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_304_j6a.png",
+            "image_alt": "Black Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_j6d_001",
@@ -59389,7 +59413,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Included and only available with (J57) carbon ceramic brakes.",
             "source_option_name": "Dark Gray Metallic-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_303_j6d.png",
+            "image_alt": "Dark Gray Metallic-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_j6d_001",
@@ -59416,7 +59444,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Included and only available with (J57) carbon ceramic brakes.",
             "source_option_name": "Dark Gray Metallic-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_303_j6d.png",
+            "image_alt": "Dark Gray Metallic-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_j6d_001",
@@ -59443,7 +59475,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Included and only available with (J57) carbon ceramic brakes.",
             "source_option_name": "Dark Gray Metallic-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_303_j6d.png",
+            "image_alt": "Dark Gray Metallic-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_j6d_001",
@@ -59470,7 +59506,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Included and only available with (J57) carbon ceramic brakes.",
             "source_option_name": "Dark Gray Metallic-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_303_j6d.png",
+            "image_alt": "Dark Gray Metallic-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_j6d_001",
@@ -59497,7 +59537,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Included and only available with (J57) carbon ceramic brakes.",
             "source_option_name": "Dark Gray Metallic-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_303_j6d.png",
+            "image_alt": "Dark Gray Metallic-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_j6d_001",
@@ -59524,7 +59568,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Included and only available with (J57) carbon ceramic brakes.",
             "source_option_name": "Dark Gray Metallic-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_303_j6d.png",
+            "image_alt": "Dark Gray Metallic-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_j6f_001",
@@ -59551,7 +59599,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Bright Red-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_298_j6f.png",
+            "image_alt": "Bright Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_j6f_001",
@@ -59578,7 +59630,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Bright Red-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_298_j6f.png",
+            "image_alt": "Bright Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_j6f_001",
@@ -59605,7 +59661,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Bright Red-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_298_j6f.png",
+            "image_alt": "Bright Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_j6f_001",
@@ -59632,7 +59692,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Bright Red-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_298_j6f.png",
+            "image_alt": "Bright Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_j6f_001",
@@ -59659,7 +59723,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Bright Red-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_298_j6f.png",
+            "image_alt": "Bright Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_j6f_001",
@@ -59686,7 +59754,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Bright Red-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_298_j6f.png",
+            "image_alt": "Bright Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_j6e_001",
@@ -59713,7 +59785,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Velocity Yellow-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_301_j6e.png",
+            "image_alt": "Velocity Yellow-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_j6e_001",
@@ -59740,7 +59816,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Velocity Yellow-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_301_j6e.png",
+            "image_alt": "Velocity Yellow-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_j6e_001",
@@ -59767,7 +59847,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Velocity Yellow-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_301_j6e.png",
+            "image_alt": "Velocity Yellow-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_j6e_001",
@@ -59794,7 +59878,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Velocity Yellow-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_301_j6e.png",
+            "image_alt": "Velocity Yellow-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_j6e_001",
@@ -59821,7 +59909,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Velocity Yellow-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_301_j6e.png",
+            "image_alt": "Velocity Yellow-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_j6e_001",
@@ -59848,7 +59940,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Velocity Yellow-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_301_j6e.png",
+            "image_alt": "Velocity Yellow-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_j6n_001",
@@ -59875,7 +59971,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Edge Red-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_300_j6n.png",
+            "image_alt": "Edge Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_j6n_001",
@@ -59902,7 +60002,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Edge Red-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_300_j6n.png",
+            "image_alt": "Edge Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_j6n_001",
@@ -59929,7 +60033,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Edge Red-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_300_j6n.png",
+            "image_alt": "Edge Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_j6n_001",
@@ -59956,7 +60064,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Edge Red-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_300_j6n.png",
+            "image_alt": "Edge Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_j6n_001",
@@ -59983,7 +60095,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Edge Red-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_300_j6n.png",
+            "image_alt": "Edge Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_j6n_001",
@@ -60010,7 +60126,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Edge Red-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_300_j6n.png",
+            "image_alt": "Edge Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_j6b_001",
@@ -60037,7 +60157,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Blue-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_299_j6b.png",
+            "image_alt": "Blue-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_j6b_001",
@@ -60064,7 +60188,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Blue-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_299_j6b.png",
+            "image_alt": "Blue-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_j6b_001",
@@ -60091,7 +60219,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Blue-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_299_j6b.png",
+            "image_alt": "Blue-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_j6b_001",
@@ -60118,7 +60250,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Blue-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_299_j6b.png",
+            "image_alt": "Blue-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_j6b_001",
@@ -60145,7 +60281,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Blue-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_299_j6b.png",
+            "image_alt": "Blue-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_j6b_001",
@@ -60172,7 +60312,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Blue-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_299_j6b.png",
+            "image_alt": "Blue-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_j6l_001",
@@ -60199,7 +60343,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
             "source_option_name": "Orange-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_302_j6l.png",
+            "image_alt": "Orange-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_j6l_001",
@@ -60226,7 +60374,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
             "source_option_name": "Orange-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_302_j6l.png",
+            "image_alt": "Orange-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_j6l_001",
@@ -60253,7 +60405,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
             "source_option_name": "Orange-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_302_j6l.png",
+            "image_alt": "Orange-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_j6l_001",
@@ -60280,7 +60436,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
             "source_option_name": "Orange-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_302_j6l.png",
+            "image_alt": "Orange-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_j6l_001",
@@ -60307,7 +60467,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
             "source_option_name": "Orange-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_302_j6l.png",
+            "image_alt": "Orange-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_j6l_001",
@@ -60334,7 +60498,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
             "source_option_name": "Orange-Painted Calipers",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_302_j6l.png",
+            "image_alt": "Orange-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_d30_001",
@@ -72025,7 +72193,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Arctic White",
             "source_description": "Touch-Up Paint Number WA-9567",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
+            "image_alt": "Arctic White",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_g8g_001",
@@ -72052,7 +72224,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Arctic White",
             "source_description": "Touch-Up Paint Number WA-9567",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
+            "image_alt": "Arctic White",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_g8g_001",
@@ -72079,7 +72255,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Arctic White",
             "source_description": "Touch-Up Paint Number WA-9567",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
+            "image_alt": "Arctic White",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_g8g_001",
@@ -72106,7 +72286,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Arctic White",
             "source_description": "Touch-Up Paint Number WA-9567",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
+            "image_alt": "Arctic White",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_g8g_001",
@@ -72133,7 +72317,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Arctic White",
             "source_description": "Touch-Up Paint Number WA-9567",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
+            "image_alt": "Arctic White",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_g8g_001",
@@ -72160,7 +72348,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Arctic White",
             "source_description": "Touch-Up Paint Number WA-9567",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
+            "image_alt": "Arctic White",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_gba_001",
@@ -72187,7 +72379,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Black",
             "source_description": "Touch-Up Paint Number WA-8555",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
+            "image_alt": "Black",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_gba_001",
@@ -72214,7 +72410,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Black",
             "source_description": "Touch-Up Paint Number WA-8555",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
+            "image_alt": "Black",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_gba_001",
@@ -72241,7 +72441,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Black",
             "source_description": "Touch-Up Paint Number WA-8555",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
+            "image_alt": "Black",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_gba_001",
@@ -72268,7 +72472,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Black",
             "source_description": "Touch-Up Paint Number WA-8555",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
+            "image_alt": "Black",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_gba_001",
@@ -72295,7 +72503,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Black",
             "source_description": "Touch-Up Paint Number WA-8555",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
+            "image_alt": "Black",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_gba_001",
@@ -72322,7 +72534,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Black",
             "source_description": "Touch-Up Paint Number WA-8555",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
+            "image_alt": "Black",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_gka_001",
@@ -72349,7 +72565,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Blade Silver Metallic",
             "source_description": "Touch-Up Paint Number WA-240K",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
+            "image_alt": "Blade Silver Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_gka_001",
@@ -72376,7 +72596,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Blade Silver Metallic",
             "source_description": "Touch-Up Paint Number WA-240K",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
+            "image_alt": "Blade Silver Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_gka_001",
@@ -72403,7 +72627,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Blade Silver Metallic",
             "source_description": "Touch-Up Paint Number WA-240K",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
+            "image_alt": "Blade Silver Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_gka_001",
@@ -72430,7 +72658,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Blade Silver Metallic",
             "source_description": "Touch-Up Paint Number WA-240K",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
+            "image_alt": "Blade Silver Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_gka_001",
@@ -72457,7 +72689,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Blade Silver Metallic",
             "source_description": "Touch-Up Paint Number WA-240K",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
+            "image_alt": "Blade Silver Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_gka_001",
@@ -72484,7 +72720,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Blade Silver Metallic",
             "source_description": "Touch-Up Paint Number WA-240K",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
+            "image_alt": "Blade Silver Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_gbk_001",
@@ -72511,7 +72751,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Competition Yellow Tintcoat Metallic",
             "source_description": "Touch-Up Paint Number WA-233K",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
+            "image_alt": "Competition Yellow Tintcoat Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_gbk_001",
@@ -72538,7 +72782,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Competition Yellow Tintcoat Metallic",
             "source_description": "Touch-Up Paint Number WA-233K",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
+            "image_alt": "Competition Yellow Tintcoat Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_gbk_001",
@@ -72565,7 +72813,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Competition Yellow Tintcoat Metallic",
             "source_description": "Touch-Up Paint Number WA-233K",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
+            "image_alt": "Competition Yellow Tintcoat Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_gbk_001",
@@ -72592,7 +72844,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Competition Yellow Tintcoat Metallic",
             "source_description": "Touch-Up Paint Number WA-233K",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
+            "image_alt": "Competition Yellow Tintcoat Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_gbk_001",
@@ -72619,7 +72875,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Competition Yellow Tintcoat Metallic",
             "source_description": "Touch-Up Paint Number WA-233K",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
+            "image_alt": "Competition Yellow Tintcoat Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_gbk_001",
@@ -72646,7 +72906,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Competition Yellow Tintcoat Metallic",
             "source_description": "Touch-Up Paint Number WA-233K",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
+            "image_alt": "Competition Yellow Tintcoat Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_gtr_001",
@@ -72673,7 +72937,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Admiral Blue Metallic",
             "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
+            "image_alt": "Admiral Blue Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_gtr_001",
@@ -72700,7 +72968,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Admiral Blue Metallic",
             "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
+            "image_alt": "Admiral Blue Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_gtr_001",
@@ -72727,7 +72999,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Admiral Blue Metallic",
             "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
+            "image_alt": "Admiral Blue Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_gtr_001",
@@ -72754,7 +73030,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Admiral Blue Metallic",
             "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
+            "image_alt": "Admiral Blue Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_gtr_001",
@@ -72781,7 +73061,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Admiral Blue Metallic",
             "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
+            "image_alt": "Admiral Blue Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_gtr_001",
@@ -72808,7 +73092,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Admiral Blue Metallic",
             "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
+            "image_alt": "Admiral Blue Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_gec_001",
@@ -72835,7 +73123,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Pitch Gray Metallic",
             "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
+            "image_alt": "Pitch Gray Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_gec_001",
@@ -72862,7 +73154,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Pitch Gray Metallic",
             "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
+            "image_alt": "Pitch Gray Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_gec_001",
@@ -72889,7 +73185,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Pitch Gray Metallic",
             "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
+            "image_alt": "Pitch Gray Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_gec_001",
@@ -72916,7 +73216,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Pitch Gray Metallic",
             "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
+            "image_alt": "Pitch Gray Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_gec_001",
@@ -72943,7 +73247,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Pitch Gray Metallic",
             "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
+            "image_alt": "Pitch Gray Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_gec_001",
@@ -72970,7 +73278,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Pitch Gray Metallic",
             "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
+            "image_alt": "Pitch Gray Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_gph_001",
@@ -72997,7 +73309,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Red Mist Metallic Tintcoat",
             "source_description": "Touch-Up Paint Number WA-245F",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
+            "image_alt": "Red Mist Metallic Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_gph_001",
@@ -73024,7 +73340,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Red Mist Metallic Tintcoat",
             "source_description": "Touch-Up Paint Number WA-245F",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
+            "image_alt": "Red Mist Metallic Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_gph_001",
@@ -73051,7 +73371,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Red Mist Metallic Tintcoat",
             "source_description": "Touch-Up Paint Number WA-245F",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
+            "image_alt": "Red Mist Metallic Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_gph_001",
@@ -73078,7 +73402,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Red Mist Metallic Tintcoat",
             "source_description": "Touch-Up Paint Number WA-245F",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
+            "image_alt": "Red Mist Metallic Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_gph_001",
@@ -73105,7 +73433,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Red Mist Metallic Tintcoat",
             "source_description": "Touch-Up Paint Number WA-245F",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
+            "image_alt": "Red Mist Metallic Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_gph_001",
@@ -73132,7 +73464,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Red Mist Metallic Tintcoat",
             "source_description": "Touch-Up Paint Number WA-245F",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
+            "image_alt": "Red Mist Metallic Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_g4z_001",
@@ -73159,7 +73495,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Roswell Green Metallic",
             "source_description": "Touch-Up Paint Number WA-247L",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
+            "image_alt": "Roswell Green Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_g4z_001",
@@ -73186,7 +73526,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Roswell Green Metallic",
             "source_description": "Touch-Up Paint Number WA-247L",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
+            "image_alt": "Roswell Green Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_g4z_001",
@@ -73213,7 +73557,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Roswell Green Metallic",
             "source_description": "Touch-Up Paint Number WA-247L",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
+            "image_alt": "Roswell Green Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_g4z_001",
@@ -73240,7 +73588,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Roswell Green Metallic",
             "source_description": "Touch-Up Paint Number WA-247L",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
+            "image_alt": "Roswell Green Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_g4z_001",
@@ -73267,7 +73619,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Roswell Green Metallic",
             "source_description": "Touch-Up Paint Number WA-247L",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
+            "image_alt": "Roswell Green Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_g4z_001",
@@ -73294,7 +73650,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium color.",
             "source_option_name": "Roswell Green Metallic",
             "source_description": "Touch-Up Paint Number WA-247L",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
+            "image_alt": "Roswell Green Metallic",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_g26_001",
@@ -73321,7 +73681,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Sebring Orange Tintcoat",
             "source_description": "Touch-Up Paint Number WA-418C",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
+            "image_alt": "Sebring Orange Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_g26_001",
@@ -73348,7 +73712,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Sebring Orange Tintcoat",
             "source_description": "Touch-Up Paint Number WA-418C",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
+            "image_alt": "Sebring Orange Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_g26_001",
@@ -73375,7 +73743,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Sebring Orange Tintcoat",
             "source_description": "Touch-Up Paint Number WA-418C",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
+            "image_alt": "Sebring Orange Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_g26_001",
@@ -73402,7 +73774,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Sebring Orange Tintcoat",
             "source_description": "Touch-Up Paint Number WA-418C",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
+            "image_alt": "Sebring Orange Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_g26_001",
@@ -73429,7 +73805,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Sebring Orange Tintcoat",
             "source_description": "Touch-Up Paint Number WA-418C",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
+            "image_alt": "Sebring Orange Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_g26_001",
@@ -73456,7 +73836,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "Additional charge - premium tintcoat color.",
             "source_option_name": "Sebring Orange Tintcoat",
             "source_description": "Touch-Up Paint Number WA-418C",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
+            "image_alt": "Sebring Orange Tintcoat",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_gkz_001",
@@ -73483,7 +73867,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Torch Red",
             "source_description": "Touch-Up Paint Number WA-9075",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
+            "image_alt": "Torch Red",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_gkz_001",
@@ -73510,7 +73898,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Torch Red",
             "source_description": "Touch-Up Paint Number WA-9075",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
+            "image_alt": "Torch Red",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_gkz_001",
@@ -73537,7 +73929,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Torch Red",
             "source_description": "Touch-Up Paint Number WA-9075",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
+            "image_alt": "Torch Red",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_gkz_001",
@@ -73564,7 +73960,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Torch Red",
             "source_description": "Touch-Up Paint Number WA-9075",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
+            "image_alt": "Torch Red",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_gkz_001",
@@ -73591,7 +73991,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Torch Red",
             "source_description": "Touch-Up Paint Number WA-9075",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
+            "image_alt": "Torch Red",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_gkz_001",
@@ -73618,7 +74022,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Torch Red",
             "source_description": "Touch-Up Paint Number WA-9075",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
+            "image_alt": "Torch Red",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_t0e_001",
@@ -78829,7 +79237,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
             "source_option_name": "Black Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+            "image_alt": "Black Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_719_001",
@@ -78856,7 +79268,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
             "source_option_name": "Black Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+            "image_alt": "Black Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_719_001",
@@ -78883,7 +79299,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
             "source_option_name": "Black Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+            "image_alt": "Black Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_719_001",
@@ -78910,7 +79330,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
             "source_option_name": "Black Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+            "image_alt": "Black Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_719_001",
@@ -78937,7 +79361,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
             "source_option_name": "Black Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+            "image_alt": "Black Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_719_001",
@@ -78964,7 +79392,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
             "source_option_name": "Black Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+            "image_alt": "Black Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_3n9_001",
@@ -78991,7 +79423,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Recommended with (HTA, HTJ) Jet Black interior.\n2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\n3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
             "source_option_name": "Natural Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+            "image_alt": "Natural Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_3n9_001",
@@ -79018,7 +79454,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Recommended with (HTA, HTJ) Jet Black interior.\n2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\n3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
             "source_option_name": "Natural Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+            "image_alt": "Natural Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_3n9_001",
@@ -79045,7 +79485,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Recommended with (HTA, HTJ) Jet Black interior.\n2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\n3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
             "source_option_name": "Natural Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+            "image_alt": "Natural Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_3n9_001",
@@ -79072,7 +79516,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Recommended with (HTA, HTJ) Jet Black interior.\n2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\n3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
             "source_option_name": "Natural Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+            "image_alt": "Natural Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_3n9_001",
@@ -79099,7 +79547,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Recommended with (HTA, HTJ) Jet Black interior.\n2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\n3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
             "source_option_name": "Natural Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+            "image_alt": "Natural Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_3n9_001",
@@ -79126,7 +79578,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Recommended with (HTA, HTJ) Jet Black interior.\n2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\n3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
             "source_option_name": "Natural Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+            "image_alt": "Natural Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_379_001",
@@ -79153,7 +79609,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior. Included with (HUW, HUX) Habanero interiors.",
             "source_option_name": "Orange Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+            "image_alt": "Orange Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_379_001",
@@ -79180,7 +79640,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior. Included with (HUW, HUX) Habanero interiors.",
             "source_option_name": "Orange Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+            "image_alt": "Orange Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_379_001",
@@ -79207,7 +79671,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior. Included with (HUW, HUX) Habanero interiors.",
             "source_option_name": "Orange Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+            "image_alt": "Orange Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_379_001",
@@ -79234,7 +79702,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior. Included with (HUW, HUX) Habanero interiors.",
             "source_option_name": "Orange Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+            "image_alt": "Orange Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_379_001",
@@ -79261,7 +79733,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior. Included with (HUW, HUX) Habanero interiors.",
             "source_option_name": "Orange Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+            "image_alt": "Orange Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_379_001",
@@ -79288,7 +79764,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior. Included with (HUW, HUX) Habanero interiors.",
             "source_option_name": "Orange Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+            "image_alt": "Orange Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_3a9_001",
@@ -79315,7 +79795,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
             "source_option_name": "Santorini Blue Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+            "image_alt": "Santorini Blue Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_3a9_001",
@@ -79342,7 +79826,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
             "source_option_name": "Santorini Blue Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+            "image_alt": "Santorini Blue Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_3a9_001",
@@ -79369,7 +79857,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
             "source_option_name": "Santorini Blue Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+            "image_alt": "Santorini Blue Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_3a9_001",
@@ -79396,7 +79888,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
             "source_option_name": "Santorini Blue Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+            "image_alt": "Santorini Blue Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_3a9_001",
@@ -79423,7 +79919,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
             "source_option_name": "Santorini Blue Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+            "image_alt": "Santorini Blue Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_3a9_001",
@@ -79450,7 +79950,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
             "source_option_name": "Santorini Blue Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+            "image_alt": "Santorini Blue Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_3f9_001",
@@ -79477,7 +79981,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
             "source_option_name": "Torch Red Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+            "image_alt": "Torch Red Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_3f9_001",
@@ -79504,7 +80012,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
             "source_option_name": "Torch Red Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+            "image_alt": "Torch Red Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_3f9_001",
@@ -79531,7 +80043,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
             "source_option_name": "Torch Red Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+            "image_alt": "Torch Red Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_3f9_001",
@@ -79558,7 +80074,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
             "source_option_name": "Torch Red Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+            "image_alt": "Torch Red Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_3f9_001",
@@ -79585,7 +80105,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
             "source_option_name": "Torch Red Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+            "image_alt": "Torch Red Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_3f9_001",
@@ -79612,7 +80136,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
             "source_option_name": "Torch Red Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+            "image_alt": "Torch Red Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_3m9_001",
@@ -79639,7 +80167,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior.",
             "source_option_name": "Yellow Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+            "image_alt": "Yellow Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_3m9_001",
@@ -79666,7 +80198,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior.",
             "source_option_name": "Yellow Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+            "image_alt": "Yellow Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_3m9_001",
@@ -79693,7 +80229,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior.",
             "source_option_name": "Yellow Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+            "image_alt": "Yellow Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_3m9_001",
@@ -79720,7 +80260,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior.",
             "source_option_name": "Yellow Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+            "image_alt": "Yellow Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_3m9_001",
@@ -79747,7 +80291,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior.",
             "source_option_name": "Yellow Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+            "image_alt": "Yellow Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_3m9_001",
@@ -79774,7 +80322,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior.",
             "source_option_name": "Yellow Seat Belt Color",
             "source_description": "",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+            "image_alt": "Yellow Seat Belt Color",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_aq9_001",
@@ -90979,7 +91531,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png",
+            "image_alt": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_swm_001",
@@ -91006,7 +91562,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png",
+            "image_alt": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_swm_001",
@@ -91033,7 +91593,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png",
+            "image_alt": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_swm_001",
@@ -91060,7 +91624,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png",
+            "image_alt": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_swm_001",
@@ -91087,7 +91655,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png",
+            "image_alt": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_swm_001",
@@ -91114,7 +91686,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png",
+            "image_alt": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_swn_001",
@@ -91141,7 +91717,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Gloss Black 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png",
+            "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_swn_001",
@@ -91168,7 +91748,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Gloss Black 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png",
+            "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_swn_001",
@@ -91195,7 +91779,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Gloss Black 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png",
+            "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_swn_001",
@@ -91222,7 +91810,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Gloss Black 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png",
+            "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_swn_001",
@@ -91249,7 +91841,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Gloss Black 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png",
+            "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_swn_001",
@@ -91276,7 +91872,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Gloss Black 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png",
+            "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_swo_001",
@@ -91303,7 +91903,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "High-Polished 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png",
+            "image_alt": "High-Polished 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_swo_001",
@@ -91330,7 +91934,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "High-Polished 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png",
+            "image_alt": "High-Polished 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_swo_001",
@@ -91357,7 +91965,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "High-Polished 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png",
+            "image_alt": "High-Polished 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_swo_001",
@@ -91384,7 +91996,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "High-Polished 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png",
+            "image_alt": "High-Polished 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_swo_001",
@@ -91411,7 +92027,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "High-Polished 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png",
+            "image_alt": "High-Polished 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_swo_001",
@@ -91438,7 +92058,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "High-Polished 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png",
+            "image_alt": "High-Polished 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_swp_001",
@@ -91465,7 +92089,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png",
+            "image_alt": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_swp_001",
@@ -91492,7 +92120,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png",
+            "image_alt": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_swp_001",
@@ -91519,7 +92151,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png",
+            "image_alt": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_swp_001",
@@ -91546,7 +92182,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png",
+            "image_alt": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_swp_001",
@@ -91573,7 +92213,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png",
+            "image_alt": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_swp_001",
@@ -91600,7 +92244,11 @@ window.CORVETTE_FORM_DATA = {
             "source_detail_raw": "",
             "source_option_name": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
             "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "text_cleanup_notes": [],
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png",
+            "image_alt": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_roy_001",

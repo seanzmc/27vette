@@ -43,6 +43,7 @@ INTERIOR_COMPONENT_LABELS = {
     "TU7": "Two-Tone",
     "R6X": "Custom Interior Trim and Seat Combination",
 }
+ASSET_IMAGE_FIELDS = ("image_url", "image_alt", "image_fit", "image_position")
 
 
 def normalize_status(value: Any) -> str:
@@ -57,6 +58,34 @@ def normalize_selectable(value: Any) -> str:
     if text in {"no", "false", "0", "n"}:
         return "False"
     return clean(value)
+
+
+def truthy_workbook_value(value: Any) -> bool:
+    return clean(value).lower() in {"true", "yes", "1", "y"}
+
+
+def load_asset_map(wb, model_key: str) -> dict[tuple[str, str], dict[str, str]]:
+    if "asset_map" not in wb.sheetnames:
+        return {}
+
+    assets: dict[tuple[str, str], dict[str, str]] = {}
+    for row in rows_from_sheet(wb, "asset_map"):
+        if not truthy_workbook_value(row.get("active")):
+            continue
+        if clean(row.get("model_key")) != model_key:
+            continue
+        target_type = clean(row.get("target_type"))
+        target_id = clean(row.get("target_id"))
+        image_url = clean(row.get("image_url"))
+        if not target_type or not target_id or not image_url:
+            continue
+        assets[(target_type, target_id)] = {
+            "image_url": image_url,
+            "image_alt": clean(row.get("image_alt")),
+            "image_fit": clean(row.get("image_fit")),
+            "image_position": clean(row.get("image_position")),
+        }
+    return assets
 
 
 def normalized_option_row(row: dict[str, str], config: ModelConfig) -> dict[str, Any]:
@@ -1413,6 +1442,9 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
     variants_by_id = {row["variant_id"]: row for row in preview["variants"]}
     sections_by_id = {row["section_id"]: row for row in preview["sections"]}
     interiors = build_grand_sport_interiors(config)
+    wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
+    asset_map = load_asset_map(wb, config.model_key)
+    wb.close()
     option_rows: dict[str, dict[str, Any]] = {}
     statuses_by_option: defaultdict[str, dict[str, str]] = defaultdict(dict)
     order_by_option: dict[str, int] = {}
@@ -1447,6 +1479,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
                     "text_cleanup_notes",
                 )
             }
+            option_rows[option_id].update(asset_map.get(("option", option_id), {}))
 
     draft_choices: list[dict[str, Any]] = []
     for option_id, option in sorted(option_rows.items(), key=lambda item: order_by_option[item[0]]):
@@ -1465,35 +1498,36 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
                     option.get("active", "True"),
                     option.get("display_behavior", ""),
                 )
-            draft_choices.append(
-                {
-                    "choice_id": f"{variant_id}__{option_id}",
-                    "option_id": option_id,
-                    "rpo": option["rpo"],
-                    "label": option["label"],
-                    "description": option["description"],
-                    "section_id": choice_source["section_id"],
-                    "section_name": choice_source["section_name"],
-                    "step_key": choice_source["step_key"],
-                    "variant_id": variant_id,
-                    "body_style": variant["body_style"],
-                    "trim_level": variant["trim_level"],
-                    "status": status,
-                    "status_label": status_to_label(status),
-                    "selectable": selectable,
-                    "active": active,
-                    "choice_mode": section.get("choice_mode", ""),
-                    "selection_mode": section.get("selection_mode", ""),
-                    "selection_mode_label": section.get("selection_mode_label", ""),
-                    "base_price": option["base_price"],
-                    "display_behavior": option.get("display_behavior", ""),
-                    "display_order": option.get("display_order") or order_by_option[option_id],
-                    "source_detail_raw": option["source_detail_raw"],
-                    "source_option_name": option["source_option_name"],
-                    "source_description": option["source_description"],
-                    "text_cleanup_notes": option["text_cleanup_notes"],
-                }
-            )
+            draft_choice = {
+                "choice_id": f"{variant_id}__{option_id}",
+                "option_id": option_id,
+                "rpo": option["rpo"],
+                "label": option["label"],
+                "description": option["description"],
+                "section_id": choice_source["section_id"],
+                "section_name": choice_source["section_name"],
+                "step_key": choice_source["step_key"],
+                "variant_id": variant_id,
+                "body_style": variant["body_style"],
+                "trim_level": variant["trim_level"],
+                "status": status,
+                "status_label": status_to_label(status),
+                "selectable": selectable,
+                "active": active,
+                "choice_mode": section.get("choice_mode", ""),
+                "selection_mode": section.get("selection_mode", ""),
+                "selection_mode_label": section.get("selection_mode_label", ""),
+                "base_price": option["base_price"],
+                "display_behavior": option.get("display_behavior", ""),
+                "display_order": option.get("display_order") or order_by_option[option_id],
+                "source_detail_raw": option["source_detail_raw"],
+                "source_option_name": option["source_option_name"],
+                "source_description": option["source_description"],
+                "text_cleanup_notes": option["text_cleanup_notes"],
+            }
+            if option.get("image_url"):
+                draft_choice.update({field: option.get(field, "") for field in ASSET_IMAGE_FIELDS})
+            draft_choices.append(draft_choice)
 
     standard_equipment = [
         {

@@ -505,6 +505,25 @@ test("Grand Sport draft keeps normalized display fields and raw rule evidence", 
   assert.equal(cfl.step_key, "packages_performance");
 });
 
+test("Grand Sport draft applies active option assets from asset_map", () => {
+  const brightRedCaliperChoices = draft.choices.filter((choice) => choice.option_id === "opt_j6f_001");
+  assert.equal(brightRedCaliperChoices.length, 6);
+  for (const choice of brightRedCaliperChoices) {
+    assert.equal(
+      choice.image_url,
+      "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_298_j6f.png"
+    );
+    assert.equal(choice.image_alt, "Bright Red-Painted Calipers");
+    assert.equal(choice.image_fit, "cover");
+    assert.equal(choice.image_position, "center");
+  }
+
+  const unmappedChoice = draft.choices.find((choice) => choice.option_id === "opt_cfl_001");
+  assert.ok(unmappedChoice, "unmapped choice should still be present");
+  assert.equal(Object.hasOwn(unmappedChoice, "image_url"), false);
+  assert.equal(Object.hasOwn(unmappedChoice, "image_alt"), false);
+});
+
 test("Grand Sport draft section placement follows section_master step_key", () => {
   const sectionById = new Map(draft.sections.map((section) => [section.section_id, section]));
   assert.equal(sectionById.get("sec_gsha_001")?.step_key, "aero_exhaust_stripes_accessories");
