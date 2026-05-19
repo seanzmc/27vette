@@ -5,3 +5,5 @@ build/
 backups/*.xlsx
 ~$*.xlsx
 archived/docs
+.worktrees/
+archive/workbook-backups/*.xlsx
