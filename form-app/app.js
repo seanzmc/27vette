@@ -734,8 +734,7 @@ function selectedInteriorReplacesSeat(interior) {
   return interiorComponents(interior).some((component) => ["seat", "r6x"].includes(component.component_type));
 }
 
-function interiorComponentPrice(component, autoAdded) {
-  if (component.rpo === "R6X" && autoAdded.has("opt_d30_001")) return 0;
+function interiorComponentPrice(component) {
   return Number(component.price || 0);
 }
 

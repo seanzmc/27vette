@@ -1373,7 +1373,7 @@ test("compact and plain text order output break selected interior into priced co
   }
 });
 
-test("R6X component order output uses PriceRef pricing and D30 only zeroes the R6X component", () => {
+test("R6X component order output uses PriceRef pricing and D30 does not alter it", () => {
   const ah2Runtime = configureInteriorOrder({ trimLevel: "3LT", interiorId: "3LT_R6X_AH2_HUU", seatRpo: "AH2" });
   assert.ok(
     compactSeatInteriorItems(ah2Runtime).some((item) => item.rpo === "R6X" && item.label === "Custom Interior Trim and Seat Combination" && item.price === 995),
@@ -1394,8 +1394,8 @@ test("R6X component order output uses PriceRef pricing and D30 only zeroes the R
   });
   assert.equal(d30Runtime.computeAutoAdded().has("opt_d30_001"), true, "D30 should be triggered by selected color/interior context");
   assert.ok(
-    compactSeatInteriorItems(d30Runtime).some((item) => item.rpo === "R6X" && item.label === "Custom Interior Trim and Seat Combination" && item.price === 0),
-    "D30-triggered R6X should remain visible at $0"
+    compactSeatInteriorItems(d30Runtime).some((item) => item.rpo === "R6X" && item.label === "Custom Interior Trim and Seat Combination" && item.price === 995),
+    "D30-triggered R6X should remain visible at its PriceRef component price"
   );
 });
 
@@ -1864,9 +1864,27 @@ test("R6X is auto-only and D30 is the only visible disabled color override card"
   assert.equal(data.choices.some((choice) => choice.rpo === "R6X" && choice.active === "True"), false);
   assert.ok(data.rules.some((rule) => rule.target_id === "opt_r6x_001" && rule.rule_type === "includes"), "R6X needs interior include rules");
   assert.equal(
-    data.priceRules.some((rule) => rule.condition_option_id === "opt_d30_001" && rule.target_option_id === "opt_r6x_001"),
+    data.priceRules.some(
+      (rule) =>
+        (rule.condition_option_id === "opt_d30_001" && rule.target_option_id === "opt_r6x_001") ||
+        (rule.condition_option_id === "opt_r6x_001" && rule.target_option_id === "opt_d30_001")
+    ),
     false,
-    "R6X pricing is carried by interior setup, not a D30 price override"
+    "R6X pricing is carried by interior setup, not a direct D30/R6X price override in either direction"
+  );
+  assert.equal(
+    data.rules.some(
+      (rule) =>
+        (rule.source_id === "opt_d30_001" && rule.target_id === "opt_r6x_001") ||
+        (rule.source_id === "opt_r6x_001" && rule.target_id === "opt_d30_001")
+    ),
+    false,
+    "R6X and D30 should not have direct include/require/exclude rules in either direction"
+  );
+  assert.doesNotMatch(
+    appSource,
+    /if\s*\(\s*component\.rpo\s*===\s*["']R6X["']\s*&&\s*autoAdded\.has\(\s*["']opt_d30_001["']\s*\)\s*\)\s*return\s+0\s*;/,
+    "runtime should not contain an R6X/D30 hardcoded component-pricing branch"
   );
   assert.ok(
     data.choices.some((choice) => choice.rpo === "D30" && choice.active === "True" && choice.selectable === "False"),
