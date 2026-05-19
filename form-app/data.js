@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-19T05:58:10+00:00"
+          "generated_at": "2026-05-19T15:10:44+00:00"
         },
         "variants": [
           {
@@ -54067,7 +54067,11 @@ window.CORVETTE_FORM_DATA = {
             "message": "247 active compatibility rules exported from 247 source rules."
           }
         ]
-      }
+      },
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/st-copy.png",
+      "image_alt": "Corvette Stingray",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     "grandSport": {
       "key": "grandSport",
@@ -54081,7 +54085,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-05-19T05:58:05+00:00",
+          "generated_at": "2026-05-19T05:58:35+00:00",
           "status": "draft_not_runtime_active"
         },
         "variants": [
@@ -113329,7 +113333,11 @@ window.CORVETTE_FORM_DATA = {
           "priceRuleSourceRows": 45,
           "deferredSurfaces": []
         }
-      }
+      },
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/gs-copy.png",
+      "image_alt": "Corvette Grand Sport",
+      "image_fit": "cover",
+      "image_position": "center"
     }
   }
 };

@@ -46,14 +46,59 @@ def export_slug(model_key: str) -> str:
     return model_key.replace("_", "-")
 
 
-def model_registry_entry(model_key: str, model_label: str, data: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "key": "grandSport" if model_key == "grand_sport" else model_key,
+def registry_model_key(model_key: str) -> str:
+    return "grandSport" if model_key == "grand_sport" else model_key
+
+
+def model_registry_entry(
+    model_key: str,
+    model_label: str,
+    data: dict[str, Any],
+    asset: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    entry = {
+        "key": registry_model_key(model_key),
         "label": model_label,
         "modelName": f"Corvette {model_label}",
         "exportSlug": export_slug(model_key),
         "data": data,
     }
+    if asset and asset.get("image_url"):
+        entry.update(asset)
+    return entry
+
+
+def workbook_truthy(value: Any) -> bool:
+    return clean(value).lower() in {"true", "yes", "1", "y"}
+
+
+def load_model_asset_map() -> dict[str, dict[str, str]]:
+    if not WORKBOOK_PATH.exists():
+        return {}
+    wb = load_workbook(WORKBOOK_PATH, read_only=True, data_only=True)
+    try:
+        if "asset_map" not in wb.sheetnames:
+            return {}
+        assets: dict[str, dict[str, str]] = {}
+        for row in rows_from_sheet(wb, "asset_map"):
+            if not workbook_truthy(row.get("active")):
+                continue
+            if clean(row.get("target_type")) != "model":
+                continue
+            model_key = clean(row.get("model_key"))
+            target_id = clean(row.get("target_id")) or registry_model_key(model_key)
+            image_url = clean(row.get("image_url"))
+            if not target_id or not image_url:
+                continue
+            assets[target_id] = {
+                "image_url": image_url,
+                "image_alt": clean(row.get("image_alt")),
+                "image_fit": clean(row.get("image_fit")),
+                "image_position": clean(row.get("image_position")),
+            }
+        return assets
+    finally:
+        wb.close()
 
 
 def load_grand_sport_registry_data() -> dict[str, Any] | None:
@@ -79,15 +124,24 @@ def refresh_grand_sport_registry_source() -> None:
 
 
 def build_app_data_registry(stingray_data: dict[str, Any]) -> dict[str, Any]:
+    model_assets = load_model_asset_map()
+    stingray_key = registry_model_key(MODEL_CONFIG.model_key)
     models = {
-        "stingray": model_registry_entry(MODEL_CONFIG.model_key, MODEL_CONFIG.model_label, stingray_data),
+        stingray_key: model_registry_entry(
+            MODEL_CONFIG.model_key,
+            MODEL_CONFIG.model_label,
+            stingray_data,
+            model_assets.get(stingray_key),
+        ),
     }
     grand_sport_data = load_grand_sport_registry_data()
     if grand_sport_data is not None:
-        models["grandSport"] = model_registry_entry(
+        grand_sport_key = registry_model_key(GRAND_SPORT_MODEL.model_key)
+        models[grand_sport_key] = model_registry_entry(
             GRAND_SPORT_MODEL.model_key,
             GRAND_SPORT_MODEL.model_label,
             grand_sport_data,
+            model_assets.get(grand_sport_key),
         )
     return {
         "defaultModelKey": "stingray",

@@ -261,6 +261,27 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
   );
 });
 
+test("generated app data applies active model assets from asset_map", () => {
+  const dataWindow = loadDataWindow();
+  const registry = dataWindow.CORVETTE_FORM_DATA;
+
+  assert.equal(
+    registry.models.stingray.image_url,
+    "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/st-copy.png"
+  );
+  assert.equal(registry.models.stingray.image_alt, "Corvette Stingray");
+  assert.equal(registry.models.stingray.image_fit, "cover");
+  assert.equal(registry.models.stingray.image_position, "center");
+
+  assert.equal(
+    registry.models.grandSport.image_url,
+    "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/gs-copy.png"
+  );
+  assert.equal(registry.models.grandSport.image_alt, "Corvette Grand Sport");
+  assert.equal(registry.models.grandSport.image_fit, "cover");
+  assert.equal(registry.models.grandSport.image_position, "center");
+});
+
 test("Grand Sport exclusive groups are model-scoped and Stingray groups are unchanged", () => {
   const dataWindow = loadDataWindow();
   const registry = dataWindow.CORVETTE_FORM_DATA;
