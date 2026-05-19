@@ -1376,10 +1376,12 @@ textarea {
   .step-footer {
     position: sticky;
     bottom: 0;
+    z-index: 5;
     justify-content: stretch;
     margin-right: -16px;
     margin-left: -16px;
     padding: 12px 16px;
+    border-top: 1px solid var(--line);
     background: var(--panel);
   }
 
