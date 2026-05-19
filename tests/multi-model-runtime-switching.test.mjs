@@ -153,6 +153,7 @@ window.__testApi = {
     turnstileCalls,
     exportJson,
   exportCsv,
+  renderContextCard,
   downloads: window.__downloads,
   elements,
 };
@@ -233,6 +234,12 @@ const expectedStingrayExclusiveGroups = [
   },
 ];
 
+const expectedTrimTooltips = {
+  "1LT": "1LT is the car for driving purists who want the lightest Corvette possible, but one that's still very well equipped.",
+  "2LT": "2LT adds a number of comfort and convenience features in addition to color-matched interior options.",
+  "3LT": "3LT is the utmost in luxury performance, with a leather-wrapped interior.",
+};
+
 test("generated app data exposes a multi-model registry with Stingray compatibility alias", () => {
   const dataWindow = loadDataWindow();
   const registry = dataWindow.CORVETTE_FORM_DATA;
@@ -280,6 +287,44 @@ test("generated app data applies active model assets from asset_map", () => {
   assert.equal(registry.models.grandSport.image_alt, "Corvette Grand Sport");
   assert.equal(registry.models.grandSport.image_fit, "cover");
   assert.equal(registry.models.grandSport.image_position, "center");
+});
+
+test("generated context choices apply workbook-owned trim tooltips to both models", () => {
+  const dataWindow = loadDataWindow();
+  const registry = dataWindow.CORVETTE_FORM_DATA;
+
+  for (const modelKey of ["stingray", "grandSport"]) {
+    const trimChoices = registry.models[modelKey].data.contextChoices.filter(
+      (choice) => choice.context_type === "trim_level"
+    );
+    assert.equal(trimChoices.length, 6);
+    for (const choice of trimChoices) {
+      assert.equal(choice.info_tooltip, expectedTrimTooltips[choice.value]);
+      assert.equal(choice.description.includes(choice.value), true);
+    }
+  }
+});
+
+test("runtime renders context choice tooltips without replacing visible trim descriptions", () => {
+  const runtime = loadRuntime();
+  const html = runtime.renderContextCard({
+    context_choice_id: "trim_level__coupe__1lt",
+    context_type: "trim_level",
+    value: "1LT",
+    label: "1LT",
+    description: "Corvette Stingray Coupe 1LT",
+    info_tooltip: expectedTrimTooltips["1LT"],
+    body_style: "coupe",
+    trim_level: "1LT",
+    variant_id: "1lt_c07",
+    base_price: 73495,
+    display_order: 1,
+  });
+
+  assert.match(html, /Corvette Stingray Coupe 1LT/);
+  assert.match(html, /info-tooltip/);
+  assert.match(html, /1LT details/);
+  assert.match(html, /driving purists/);
 });
 
 test("Grand Sport exclusive groups are model-scoped and Stingray groups are unchanged", () => {

@@ -101,6 +101,51 @@ def load_model_asset_map() -> dict[str, dict[str, str]]:
         wb.close()
 
 
+def context_choice_copy_rows(wb, model_key: str) -> list[dict[str, str]]:
+    if "context_choice_copy" not in wb.sheetnames:
+        return []
+    rows: list[dict[str, str]] = []
+    for row in rows_from_sheet(wb, "context_choice_copy"):
+        if not workbook_truthy(row.get("active")):
+            continue
+        row_model = clean(row.get("model_key")) or "*"
+        if row_model not in {"*", model_key}:
+            continue
+        if clean(row.get("info_tooltip")):
+            rows.append(row)
+    return rows
+
+
+def context_choice_info_tooltip(
+    copy_rows: list[dict[str, str]],
+    *,
+    model_key: str,
+    context_type: str,
+    value: str,
+    body_style: str = "",
+) -> str:
+    context_type_key = clean(context_type).lower()
+    value_key = clean(value).lower()
+    body_style_key = clean(body_style).lower()
+    best: tuple[int, str] = (-1, "")
+    for row in copy_rows:
+        row_context_type = clean(row.get("context_type")).lower()
+        row_value = clean(row.get("value")).lower()
+        row_model = clean(row.get("model_key")) or "*"
+        row_body_style = (clean(row.get("body_style")) or "*").lower()
+        if row_context_type != context_type_key or row_value != value_key:
+            continue
+        if row_model not in {"*", model_key}:
+            continue
+        if row_body_style not in {"*", body_style_key}:
+            continue
+        score = (2 if row_model == model_key else 0) + (1 if row_body_style == body_style_key else 0)
+        tooltip = clean(row.get("info_tooltip"))
+        if tooltip and score > best[0]:
+            best = (score, tooltip)
+    return best[1]
+
+
 def load_grand_sport_registry_data() -> dict[str, Any] | None:
     draft_path = OUTPUT_DIR / "inspection" / f"{GRAND_SPORT_MODEL.draft_artifact_prefix}.json"
     if draft_path.exists():
@@ -551,6 +596,7 @@ def main() -> None:
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
     options_raw = rows_from_sheet(wb, MODEL_CONFIG.source_option_sheet)
     statuses_raw = rows_from_sheet(wb, MODEL_CONFIG.status_sheet)
+    context_copy_rows = context_choice_copy_rows(wb, MODEL_CONFIG.model_key)
     rules_raw = rows_from_sheet(wb, MODEL_CONFIG.rule_mapping_sheet)
     price_rules_raw = rows_from_sheet(wb, "price_rules")
     d30_r6x_price_rules_raw = [row for row in price_rules_raw if row.get("price_rule_id") == "pr_d30_r6x_001"]
@@ -652,6 +698,13 @@ def main() -> None:
                 "value": body_style,
                 "label": body_style.title(),
                 "description": f"{len(body_variants)} trims available",
+                "info_tooltip": context_choice_info_tooltip(
+                    context_copy_rows,
+                    model_key=MODEL_CONFIG.model_key,
+                    context_type="body_style",
+                    value=body_style,
+                    body_style=body_style,
+                ),
                 "section_id": "sec_context_body_style",
                 "step_key": "body_style",
                 "body_style": body_style,
@@ -670,6 +723,13 @@ def main() -> None:
                 "value": variant["trim_level"],
                 "label": variant["trim_level"],
                 "description": variant["display_name"],
+                "info_tooltip": context_choice_info_tooltip(
+                    context_copy_rows,
+                    model_key=MODEL_CONFIG.model_key,
+                    context_type="trim_level",
+                    value=variant["trim_level"],
+                    body_style=variant["body_style"],
+                ),
                 "section_id": "sec_context_trim_level",
                 "step_key": "trim_level",
                 "body_style": variant["body_style"],
@@ -1100,6 +1160,7 @@ def main() -> None:
             "value",
             "label",
             "description",
+            "info_tooltip",
             "section_id",
             "step_key",
             "body_style",

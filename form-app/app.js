@@ -1275,7 +1275,7 @@ function renderContextCard(choice) {
     <button class="${classes.join(" ")}" type="button" data-context-choice="${choice.context_choice_id}" ${disabled ? "aria-disabled=\"true\"" : ""}>
       ${renderCardMedia(choice, choice.description || choice.label)}
       <span class="topline"><span class="rpo">${escapeHtml(choice.label)}</span><span class="price">${price}</span></span>
-      <span class="choice-name"><span>${escapeHtml(choice.description)}</span></span>
+      <span class="choice-name"><span>${escapeHtml(choice.description)}</span>${renderInfoTooltip(choice.info_tooltip, `${choice.label} details`)}</span>
       ${disabled ? renderStatePill(`Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} first`, "disabled-reason", `Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} body style first.`) : ""}
     </button>
   `;

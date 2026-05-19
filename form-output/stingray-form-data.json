@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-05-19T15:10:44+00:00"
+    "generated_at": "2026-05-19T16:31:10+00:00"
   },
   "variants": [
     {
@@ -697,6 +697,7 @@
       "value": "coupe",
       "label": "Coupe",
       "description": "3 trims available",
+      "info_tooltip": "",
       "section_id": "sec_context_body_style",
       "step_key": "body_style",
       "body_style": "coupe",
@@ -711,6 +712,7 @@
       "value": "convertible",
       "label": "Convertible",
       "description": "3 trims available",
+      "info_tooltip": "",
       "section_id": "sec_context_body_style",
       "step_key": "body_style",
       "body_style": "convertible",
@@ -725,6 +727,7 @@
       "value": "1LT",
       "label": "1LT",
       "description": "Corvette Stingray Coupe 1LT",
+      "info_tooltip": "1LT is the car for driving purists who want the lightest Corvette possible, but one that's still very well equipped.",
       "section_id": "sec_context_trim_level",
       "step_key": "trim_level",
       "body_style": "coupe",
@@ -739,6 +742,7 @@
       "value": "2LT",
       "label": "2LT",
       "description": "Corvette Stingray Coupe 2LT",
+      "info_tooltip": "2LT adds a number of comfort and convenience features in addition to color-matched interior options.",
       "section_id": "sec_context_trim_level",
       "step_key": "trim_level",
       "body_style": "coupe",
@@ -753,6 +757,7 @@
       "value": "3LT",
       "label": "3LT",
       "description": "Corvette Stingray Coupe 3LT",
+      "info_tooltip": "3LT is the utmost in luxury performance, with a leather-wrapped interior.",
       "section_id": "sec_context_trim_level",
       "step_key": "trim_level",
       "body_style": "coupe",
@@ -767,6 +772,7 @@
       "value": "1LT",
       "label": "1LT",
       "description": "Corvette Stingray Convertible 1LT",
+      "info_tooltip": "1LT is the car for driving purists who want the lightest Corvette possible, but one that's still very well equipped.",
       "section_id": "sec_context_trim_level",
       "step_key": "trim_level",
       "body_style": "convertible",
@@ -781,6 +787,7 @@
       "value": "2LT",
       "label": "2LT",
       "description": "Corvette Stingray Convertible 2LT",
+      "info_tooltip": "2LT adds a number of comfort and convenience features in addition to color-matched interior options.",
       "section_id": "sec_context_trim_level",
       "step_key": "trim_level",
       "body_style": "convertible",
@@ -795,6 +802,7 @@
       "value": "3LT",
       "label": "3LT",
       "description": "Corvette Stingray Convertible 3LT",
+      "info_tooltip": "3LT is the utmost in luxury performance, with a leather-wrapped interior.",
       "section_id": "sec_context_trim_level",
       "step_key": "trim_level",
       "body_style": "convertible",

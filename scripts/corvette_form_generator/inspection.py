@@ -88,6 +88,51 @@ def load_asset_map(wb, model_key: str) -> dict[tuple[str, str], dict[str, str]]:
     return assets
 
 
+def context_choice_copy_rows(wb, model_key: str) -> list[dict[str, str]]:
+    if "context_choice_copy" not in wb.sheetnames:
+        return []
+    rows: list[dict[str, str]] = []
+    for row in rows_from_sheet(wb, "context_choice_copy"):
+        if not truthy_workbook_value(row.get("active")):
+            continue
+        row_model = clean(row.get("model_key")) or "*"
+        if row_model not in {"*", model_key}:
+            continue
+        if clean(row.get("info_tooltip")):
+            rows.append(row)
+    return rows
+
+
+def context_choice_info_tooltip(
+    copy_rows: list[dict[str, str]],
+    *,
+    model_key: str,
+    context_type: str,
+    value: str,
+    body_style: str = "",
+) -> str:
+    context_type_key = clean(context_type).lower()
+    value_key = clean(value).lower()
+    body_style_key = clean(body_style).lower()
+    best: tuple[int, str] = (-1, "")
+    for row in copy_rows:
+        row_context_type = clean(row.get("context_type")).lower()
+        row_value = clean(row.get("value")).lower()
+        row_model = clean(row.get("model_key")) or "*"
+        row_body_style = (clean(row.get("body_style")) or "*").lower()
+        if row_context_type != context_type_key or row_value != value_key:
+            continue
+        if row_model not in {"*", model_key}:
+            continue
+        if row_body_style not in {"*", body_style_key}:
+            continue
+        score = (2 if row_model == model_key else 0) + (1 if row_body_style == body_style_key else 0)
+        tooltip = clean(row.get("info_tooltip"))
+        if tooltip and score > best[0]:
+            best = (score, tooltip)
+    return best[1]
+
+
 def normalized_option_row(row: dict[str, str], config: ModelConfig) -> dict[str, Any]:
     option_id = clean(row.get("option_id", ""))
     original_section_id = clean(row.get("section_id", ""))
@@ -1108,6 +1153,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     rows = [normalized_option_row(row, config) for row in raw_rows]
     apply_status_lookup(rows, status_lookup_from_sheet(wb, config), config)
     variant_option_overrides = load_variant_option_overrides(wb, config)
+    context_copy_rows = context_choice_copy_rows(wb, config.model_key)
 
     variant_source_rows = {row["variant_id"]: row for row in variants_raw if row.get("variant_id", "") in config.variant_ids}
     variants: list[dict[str, Any]] = []
@@ -1142,6 +1188,13 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
                 "value": body_style,
                 "label": body_style.title(),
                 "description": f"{len(body_variants)} trims available",
+                "info_tooltip": context_choice_info_tooltip(
+                    context_copy_rows,
+                    model_key=config.model_key,
+                    context_type="body_style",
+                    value=body_style,
+                    body_style=body_style,
+                ),
                 "section_id": "sec_context_body_style",
                 "step_key": "body_style",
                 "body_style": body_style,
@@ -1158,6 +1211,13 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             "value": variant["trim_level"],
             "label": variant["trim_level"],
             "description": variant["display_name"],
+            "info_tooltip": context_choice_info_tooltip(
+                context_copy_rows,
+                model_key=config.model_key,
+                context_type="trim_level",
+                value=variant["trim_level"],
+                body_style=variant["body_style"],
+            ),
             "section_id": "sec_context_trim_level",
             "step_key": "trim_level",
             "body_style": variant["body_style"],
