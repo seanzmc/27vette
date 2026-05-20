@@ -22,6 +22,7 @@ from corvette_form_generator.model_configs import GRAND_SPORT_MODEL, STINGRAY_MO
 from corvette_form_generator.output import write_app_data_registry, write_json_output
 from corvette_form_generator.runtime_metadata import (
     load_default_selection_rules,
+    load_interior_components,
     load_order_summary_metadata,
     load_runtime_rule_exceptions,
     load_section_presentation,
@@ -470,6 +471,33 @@ def interior_component_metadata(
     return [component for component in components if component["price"] or component["rpo"] == "R6X"]
 
 
+def workbook_interior_component_metadata(
+    row: dict[str, str],
+    workbook_components_by_interior_id: dict[str, list[dict[str, Any]]],
+    price_ref: dict[tuple[str, str, str], int],
+) -> list[dict[str, Any]]:
+    interior_id = clean(row.get("interior_id", "") or row.get("ID", ""))
+    component_rows = workbook_components_by_interior_id.get(interior_id, [])
+    if not component_rows:
+        return []
+    trim = clean(row.get("Trim", ""))
+    components: list[dict[str, Any]] = []
+    for component in component_rows:
+        price_ref_type = clean(component.get("price_ref_type"))
+        price_ref_code = clean(component.get("price_ref_code")) or clean(component.get("rpo"))
+        price_trim_scope = clean(component.get("price_trim_scope")) or trim
+        price = price_ref_component_price(price_ref, price_ref_type, price_ref_code, price_trim_scope)
+        normalized = {
+            "rpo": clean(component.get("rpo")),
+            "label": clean(component.get("label")),
+            "price": price,
+            "component_type": clean(component.get("component_type")),
+        }
+        if normalized["price"] or normalized["rpo"] == "R6X":
+            components.append(normalized)
+    return components
+
+
 def clean_reference_label(value: str) -> str:
     label = clean(value)
     if " - " in label:
@@ -649,6 +677,7 @@ def main() -> None:
         (row["option_id"], row["variant_id"]): row
         for row in variant_option_override_rows
     }
+    workbook_components_by_interior_id = load_interior_components(wb, MODEL_CONFIG.model_key)
     option_asset_map = load_asset_map(wb, MODEL_CONFIG.model_key, "option")
     grouped_requires = grouped_requirement_pairs(rule_groups)
     interior_reference_by_id, interior_reference_rows = read_interior_reference()
@@ -898,7 +927,19 @@ def main() -> None:
                     "message": "R6X interior requires included_option_id in lt_interiors.",
                 }
             )
-        components = interior_component_metadata(row, interior_component_price_ref)
+        components = workbook_interior_component_metadata(row, workbook_components_by_interior_id, interior_component_price_ref)
+        if not active_for_stingray and not components:
+            components = interior_component_metadata(row, interior_component_price_ref)
+        if active_for_stingray and not components and interior_component_metadata(row, interior_component_price_ref):
+            validation_rows.append(
+                {
+                    "check_id": f"missing_workbook_components_{interior_id}",
+                    "severity": "error",
+                    "entity_type": "interior",
+                    "entity_id": interior_id,
+                    "message": "Active Stingray interior has component-bearing legacy output but no active interior_components workbook rows.",
+                }
+            )
         interiors.append(
             {
                 "interior_id": interior_id,
@@ -923,7 +964,9 @@ def main() -> None:
             }
         )
     for row in lz_interiors_raw:
-        components = interior_component_metadata(row, interior_component_price_ref)
+        components = workbook_interior_component_metadata(row, workbook_components_by_interior_id, interior_component_price_ref)
+        if not components:
+            components = interior_component_metadata(row, interior_component_price_ref)
         interiors.append(
             {
                 "interior_id": row.get("ID", ""),

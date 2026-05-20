@@ -95,6 +95,20 @@ const priceRuleHeaders = [
   "review_flag",
   "notes",
 ];
+const interiorComponentHeaders = [
+  "model_key",
+  "interior_id",
+  "rpo",
+  "component_type",
+  "label",
+  "price_ref_type",
+  "price_ref_code",
+  "price_trim_scope",
+  "display_order",
+  "active",
+  "notes",
+];
+const modelInteriorScopeHeaders = ["model_key", "interior_id", "trim_level", "active", "requires_option_id", "notes"];
 const requiredGrandSportPriceRuleIds = [
   "gs_pr_fey_j57_001",
   "gs_pr_fey_t0f_001",
@@ -286,6 +300,55 @@ test("Stingray Phase 4 availability rules are workbook-owned", () => {
   assert.doesNotMatch(generatorSource, /HIDDEN_SECTION_IDS/);
   assert.doesNotMatch(generatorSource, /opt_r6x_001["']\s+if\s+active_for_stingray\s+and\s+requires_r6x/);
   assert.match(generatorSource, /missing_r6x_included_option_/);
+});
+
+test("Stingray Phase 5 interior components are workbook-owned", () => {
+  assert.deepEqual(workbookHeaders("interior_components"), interiorComponentHeaders);
+  assert.deepEqual(workbookHeaders("model_interior_scope"), modelInteriorScopeHeaders);
+
+  const activeComponents = workbookRows("interior_components").filter(
+    (row) => row.model_key === "stingray" && row.active === "True"
+  );
+  assert.ok(activeComponents.length > 0, "expected active Stingray interior component rows");
+  assert.equal(
+    new Set(activeComponents.map((row) => `${row.model_key}::${row.interior_id}::${row.rpo}::${row.component_type}`)).size,
+    activeComponents.length,
+    "active Stingray interior component keys should be unique"
+  );
+  for (const row of activeComponents) {
+    assert.ok(row.interior_id, "active component row should include interior_id");
+    assert.ok(row.rpo, "active component row should include rpo");
+    assert.ok(row.component_type, "active component row should include component_type");
+    assert.ok(row.label, "active component row should include label");
+    assert.ok(row.price_ref_type, `${row.interior_id} ${row.rpo} should include price_ref_type`);
+    assert.ok(row.price_ref_code, `${row.interior_id} ${row.rpo} should include price_ref_code`);
+  }
+
+  const componentsByInterior = new Map();
+  for (const row of activeComponents) {
+    const rows = componentsByInterior.get(row.interior_id) || [];
+    rows.push(row);
+    componentsByInterior.set(row.interior_id, rows);
+  }
+  const activeGeneratedInteriors = jsonData.interiors.filter((interior) => interior.active_for_stingray === true);
+  const componentBearingInteriors = activeGeneratedInteriors.filter((interior) => interior.interior_components.length > 0);
+  assert.ok(componentBearingInteriors.length > 0, "expected component-bearing generated interiors");
+  for (const interior of componentBearingInteriors) {
+    const workbookRowsForInterior = componentsByInterior.get(interior.interior_id) || [];
+    assert.ok(workbookRowsForInterior.length > 0, `${interior.interior_id} should have active workbook component rows`);
+    const workbookLabels = new Map(workbookRowsForInterior.map((row) => [`${row.rpo}::${row.component_type}`, row.label]));
+    for (const component of interior.interior_components) {
+      assert.equal(
+        component.label,
+        workbookLabels.get(`${component.rpo}::${component.component_type}`),
+        `${interior.interior_id} ${component.rpo} label should come from interior_components`
+      );
+    }
+  }
+
+  assert.match(generatorSource, /load_interior_components/);
+  assert.match(generatorSource, /workbook_interior_component_metadata/);
+  assert.match(generatorSource, /missing_workbook_components_/);
 });
 
 test("section_master owns section step placement without category", () => {

@@ -298,6 +298,47 @@ def load_component_price_rules(wb: Any, model_key: str) -> list[dict[str, Any]]:
     return rules
 
 
+def load_interior_components(wb: Any, model_key: str) -> dict[str, list[dict[str, Any]]]:
+    """Load workbook-owned interior component rows grouped by interior_id."""
+
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    seen: set[tuple[str, str, str]] = set()
+    for row in active_rows(wb, "interior_components", model_key):
+        interior_id = clean(row.get("interior_id"))
+        rpo = clean(row.get("rpo"))
+        component_type = clean(row.get("component_type"))
+        label = clean(row.get("label"))
+        if not interior_id or not rpo or not component_type or not label:
+            raise ValueError(
+                "Active interior_components row is missing required fields "
+                f"for model {model_key}: interior_id={interior_id!r}, rpo={rpo!r}, "
+                f"component_type={component_type!r}, label={label!r}"
+            )
+        key = (interior_id, rpo, component_type)
+        if key in seen:
+            raise ValueError(
+                "Duplicate active interior_components row for "
+                f"model {model_key}: interior_id={interior_id}, rpo={rpo}, component_type={component_type}"
+            )
+        seen.add(key)
+        grouped.setdefault(interior_id, []).append(
+            {
+                "interior_id": interior_id,
+                "rpo": rpo,
+                "component_type": component_type,
+                "label": label,
+                "price_ref_type": clean(row.get("price_ref_type")),
+                "price_ref_code": clean(row.get("price_ref_code")) or rpo,
+                "price_trim_scope": clean(row.get("price_trim_scope")),
+                "display_order": intish(row.get("display_order"), len(grouped.get(interior_id, [])) + 1),
+                "notes": clean(row.get("notes")),
+            }
+        )
+    for rows in grouped.values():
+        rows.sort(key=lambda item: (item["display_order"], item["rpo"], item["component_type"]))
+    return grouped
+
+
 def load_model_interior_scope(wb: Any, model_key: str) -> list[dict[str, Any]]:
     scope: list[dict[str, Any]] = []
     for row in active_rows(wb, "model_interior_scope", model_key):
@@ -313,6 +354,16 @@ def load_model_interior_scope(wb: Any, model_key: str) -> list[dict[str, Any]]:
             }
         )
     return scope
+
+
+def load_model_interior_scope_map(wb: Any, model_key: str) -> dict[str, dict[str, Any]]:
+    scope_map: dict[str, dict[str, Any]] = {}
+    for row in load_model_interior_scope(wb, model_key):
+        interior_id = row["interior_id"]
+        if interior_id in scope_map:
+            raise ValueError(f"Duplicate active model_interior_scope row for model {model_key}: interior_id={interior_id}")
+        scope_map[interior_id] = row
+    return scope_map
 
 
 def load_model_metadata(wb: Any, model_key: str) -> dict[str, Any]:

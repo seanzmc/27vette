@@ -13,6 +13,7 @@ from openpyxl import load_workbook
 
 from corvette_form_generator.mapping import best_status, normalize_mode, selection_mode_label, status_to_label, step_for_section
 from corvette_form_generator.model_config import ModelConfig
+from corvette_form_generator.runtime_metadata import load_interior_components, load_model_interior_scope_map
 from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet
 
 
@@ -345,6 +346,33 @@ def interior_component_metadata(
     return [component for component in components if component["price"] or component["rpo"] == "R6X"]
 
 
+def workbook_interior_component_metadata(
+    row: dict[str, str],
+    workbook_components_by_interior_id: dict[str, list[dict[str, Any]]],
+    price_ref: dict[tuple[str, str, str], int],
+) -> list[dict[str, Any]]:
+    interior_id = clean(row.get("interior_id", "") or row.get("ID", ""))
+    component_rows = workbook_components_by_interior_id.get(interior_id, [])
+    if not component_rows:
+        return []
+    trim = clean(row.get("Trim", ""))
+    components: list[dict[str, Any]] = []
+    for component in component_rows:
+        price_ref_type = clean(component.get("price_ref_type"))
+        price_ref_code = clean(component.get("price_ref_code")) or clean(component.get("rpo"))
+        price_trim_scope = clean(component.get("price_trim_scope")) or trim
+        price = price_ref_component_price(price_ref, price_ref_type, price_ref_code, price_trim_scope)
+        normalized = {
+            "rpo": clean(component.get("rpo")),
+            "label": clean(component.get("label")),
+            "price": price,
+            "component_type": clean(component.get("component_type")),
+        }
+        if normalized["price"] or normalized["rpo"] == "R6X":
+            components.append(normalized)
+    return components
+
+
 def clean_reference_label(value: str) -> str:
     label = clean(value)
     if " - " in label:
@@ -442,6 +470,8 @@ def build_grand_sport_interiors(config: ModelConfig) -> list[dict[str, Any]]:
     }
     interior_price_ref = price_ref_prices(price_ref_rows)
     interior_component_price_ref = price_ref_component_prices(price_ref_rows)
+    workbook_components_by_interior_id = load_interior_components(wb, config.model_key)
+    model_interior_scope = load_model_interior_scope_map(wb, config.model_key)
     reference_by_id, reference_rows = read_interior_reference(config)
     reference_order_by_id = {
         row["interior_id"]: index
@@ -452,17 +482,30 @@ def build_grand_sport_interiors(config: ModelConfig) -> list[dict[str, Any]]:
 
     for row in lt_interiors_raw:
         trim = clean(row.get("Trim", ""))
-        if trim not in {"1LT", "2LT", "3LT", "3LT_R6X"}:
-            continue
         interior_id = clean(row.get("interior_id", ""))
-        components = interior_component_metadata(row, interior_component_price_ref)
+        scope_row = model_interior_scope.get(interior_id)
+        if model_interior_scope:
+            if not scope_row:
+                continue
+        elif trim not in {"1LT", "2LT", "3LT", "3LT_R6X"}:
+            continue
+        components = workbook_interior_component_metadata(row, workbook_components_by_interior_id, interior_component_price_ref)
+        legacy_components = interior_component_metadata(row, interior_component_price_ref)
+        if not components and legacy_components:
+            if model_interior_scope:
+                raise ValueError(
+                    f"Grand Sport interior {interior_id} has component-bearing legacy output but no active interior_components workbook rows."
+                )
+            components = legacy_components
+        trim_level = clean(scope_row.get("trim_level")) if scope_row else ""
+        requires_option_id = clean(scope_row.get("requires_option_id")) if scope_row else ""
         interior = {
             "interior_id": interior_id,
             "source_sheet": "lt_interiors",
             "active_for_stingray": False,
             "active_for_grand_sport": True,
-            "requires_z25": "True" if interior_id in z25_interior_ids else "False",
-            "trim_level": trim.replace("_R6X", ""),
+            "requires_z25": "True" if requires_option_id == "opt_z25_001" or interior_id in z25_interior_ids else "False",
+            "trim_level": trim_level or trim.replace("_R6X", ""),
             "requires_r6x": "True" if "_R6X" in trim or interior_id.endswith("_R6X") else "False",
             "seat_code": clean(row.get("Seat", "")),
             "interior_code": clean(row.get("Interior Code", "")),

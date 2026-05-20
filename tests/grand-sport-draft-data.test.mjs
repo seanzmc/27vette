@@ -20,7 +20,32 @@ function generateDraftWithoutAppMutation() {
   return JSON.parse(fs.readFileSync(draftPath, "utf8"));
 }
 
+function workbookRows(sheetName) {
+  const output = execFileSync(
+    ".venv/bin/python",
+    [
+      "-c",
+      [
+        "import json",
+        "from openpyxl import load_workbook",
+        "wb = load_workbook('stingray_master.xlsx', read_only=True, data_only=True)",
+        `ws = wb['${sheetName}']`,
+        "headers = [ws.cell(1, col).value for col in range(1, ws.max_column + 1)]",
+        "rows = []",
+        "for raw in ws.iter_rows(min_row=2, values_only=True):",
+        "    record = {header: value for header, value in zip(headers, raw) if header and value is not None}",
+        "    if record:",
+        "        rows.append(record)",
+        "print(json.dumps(rows))",
+      ].join("\n"),
+    ],
+    { encoding: "utf8" }
+  );
+  return JSON.parse(output);
+}
+
 const draft = generateDraftWithoutAppMutation();
+const inspectionSource = fs.readFileSync("scripts/corvette_form_generator/inspection.py", "utf8");
 const heritageHashOptionIds = ["opt_17a_001", "opt_20a_001", "opt_55a_001", "opt_75a_001", "opt_97a_001", "opt_dx4_001"];
 const heritageCenterStripeOptionIds = ["opt_dmu_001", "opt_dmv_001", "opt_dmw_001", "opt_dmx_001", "opt_dmy_001"];
 const nonCenterStripeOptionIds = [
@@ -473,6 +498,28 @@ test("Grand Sport draft includes model-scoped LT interiors with EL9 launch editi
   assert.equal(draft.interiors.length, 132);
   assert.equal(draft.interiors.every((interior) => interior.active_for_grand_sport === true), true);
   assert.equal(draft.interiors.every((interior) => interior.active_for_stingray === false), true);
+
+  const scopeRows = workbookRows("model_interior_scope").filter(
+    (row) => row.model_key === "grand_sport" && row.active === "True"
+  );
+  assert.equal(scopeRows.length, draft.interiors.length);
+  assert.deepEqual(
+    draft.interiors.map((interior) => interior.interior_id).sort(),
+    scopeRows.map((row) => row.interior_id).sort()
+  );
+  const componentRows = workbookRows("interior_components").filter(
+    (row) => row.model_key === "grand_sport" && row.active === "True"
+  );
+  assert.ok(componentRows.length > 0, "expected active Grand Sport interior component rows");
+  assert.equal(
+    new Set(componentRows.map((row) => `${row.model_key}::${row.interior_id}::${row.rpo}::${row.component_type}`)).size,
+    componentRows.length,
+    "active Grand Sport interior component keys should be unique"
+  );
+  assert.match(inspectionSource, /load_model_interior_scope_map/);
+  assert.match(inspectionSource, /load_interior_components/);
+  assert.match(inspectionSource, /if model_interior_scope:/);
+  assert.match(inspectionSource, /elif trim not in \{["']1LT["'], ["']2LT["'], ["']3LT["'], ["']3LT_R6X["']\}/);
 
   const byId = new Map(draft.interiors.map((interior) => [interior.interior_id, interior]));
   for (const interiorId of ["3LT_AE4_EL9", "3LT_AH2_EL9"]) {
