@@ -213,10 +213,10 @@ def _load_rule_rows(wb: Any, sheet_name: str, model_key: str, *, id_field: str) 
         if "priority" in record:
             record["priority"] = intish(record["priority"], 0)
         rules.append(record)
-    return rules
+    return sorted(rules, key=lambda row: (row.get("priority", 0), row.get(id_field, "")))
 
 
-def load_order_summary_metadata(wb: Any, model_key: str) -> dict[str, list[dict[str, Any]]]:
+def load_order_summary_metadata(wb: Any, model_key: str) -> dict[str, Any]:
     sections: list[dict[str, Any]] = []
     for row in active_rows(wb, "order_summary_sections", model_key):
         section_key = clean(row.get("section_key"))
@@ -231,16 +231,16 @@ def load_order_summary_metadata(wb: Any, model_key: str) -> dict[str, list[dict[
             }
         )
 
-    step_map: list[dict[str, Any]] = []
+    step_map: dict[str, str] = {}
     for row in active_rows(wb, "step_order_summary_map", model_key):
         step_key = clean(row.get("step_key"))
         section_key = clean(row.get("section_key"))
         if step_key and section_key:
-            step_map.append({"step_key": step_key, "section_key": section_key, "notes": clean(row.get("notes"))})
+            step_map[step_key] = section_key
 
     return {
         "sections": sorted(sections, key=lambda row: (row["display_order"], row["section_key"])),
-        "step_map": step_map,
+        "stepMap": step_map,
     }
 
 

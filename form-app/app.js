@@ -387,8 +387,50 @@ function ruleAppliesToCurrentVariant(rule) {
 }
 
 function scopeMatches(scope, value) {
-  if (!scope) return true;
-  return String(scope).split("|").includes(value);
+  const entries = String(scope || "")
+    .split("|")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  if (!entries.length || entries.includes("*")) return true;
+  return entries.includes(value);
+}
+
+function generatedDefaultRules() {
+  return Array.isArray(data.defaultSelectionRules) ? data.defaultSelectionRules : [];
+}
+
+function generatedRuleExceptions() {
+  return Array.isArray(data.runtimeRuleExceptions) ? data.runtimeRuleExceptions : [];
+}
+
+function exceptionApplies(exception) {
+  if (!scopeMatches(exception.body_style_scope, state.bodyStyle)) return false;
+  if (!scopeMatches(exception.trim_level_scope, state.trimLevel)) return false;
+  if (!scopeMatches(exception.variant_scope, currentVariantId())) return false;
+  return true;
+}
+
+function selectedOptionForException(optionId) {
+  return state.selected.has(optionId);
+}
+
+function runtimeExceptionForTarget(targetOptionId) {
+  return generatedRuleExceptions().find(
+    (exception) =>
+      exception.exception_type === "remove_target_when_source_selected" &&
+      exception.target_option_id === targetOptionId &&
+      exceptionApplies(exception) &&
+      selectedOptionForException(exception.source_option_id)
+  );
+}
+
+function removeRuntimeExceptionTargets(sourceOptionId = "") {
+  for (const exception of generatedRuleExceptions()) {
+    if (exception.exception_type !== "remove_target_when_source_selected") continue;
+    if (!exceptionApplies(exception)) continue;
+    if (sourceOptionId && exception.source_option_id !== sourceOptionId) continue;
+    if (state.selected.has(exception.source_option_id)) deleteSelectedOption(exception.target_option_id);
+  }
 }
 
 function ruleGroupAppliesToCurrentVariant(group) {
@@ -610,9 +652,9 @@ function computeAutoAdded() {
 function disableReasonForChoice(choice) {
   if (choice.active !== "True") return "Inactive in the source workbook.";
   if (choice.status === "unavailable") return "Not available for this body and trim.";
-  if (choice.rpo === "FE1" && selectedOptionByRpo("Z51")) return "Replaced by FE3 Z51 performance suspension.";
-  if (choice.rpo === "FE2" && selectedOptionByRpo("Z51")) return "Not available with Z51 Performance Package.";
-  if (choice.rpo === "NGA" && selectedOptionByRpo("NWI")) return "Replaced by NWI center exhaust.";
+
+  const exception = runtimeExceptionForTarget(choice.option_id);
+  if (exception) return exception.disabled_reason || `Blocked by ${getEntityLabel(exception.source_option_id)}.`;
 
   const selectedIds = selectedContextIds();
   const groupedReason = requiresAnyReason(choice, selectedIds);
@@ -687,13 +729,32 @@ function choiceDisplayPrice(choice) {
   return optionPrice(choice.option_id, [choice.option_id]);
 }
 
+function orderSummarySections() {
+  const generated = data.orderSummary?.sections;
+  if (Array.isArray(generated) && generated.length) return generated;
+  return orderSectionDefinitions.map(([section_key, section_label], display_order) => ({
+    section_key,
+    section_label,
+    display_order,
+  }));
+}
+
+function orderSummaryStepMap() {
+  return data.orderSummary?.stepMap || Object.fromEntries(stepOrderSectionKeys);
+}
+
+function orderSummarySectionOrder() {
+  return new Map(orderSummarySections().map((section, index) => [section.section_key, Number(section.display_order || index)]));
+}
+
 function sectionKeyForStep(stepKey, type = "") {
   if (type === "auto_added") return "auto_added_required";
-  return stepOrderSectionKeys.get(stepKey) || stepKey || "vehicle";
+  return orderSummaryStepMap()[stepKey] || stepKey || "vehicle";
 }
 
 function sectionLabelForKey(sectionKey) {
-  return orderSectionLabels.get(sectionKey) || sectionKey;
+  const section = orderSummarySections().find((row) => row.section_key === sectionKey);
+  return section?.section_label || sectionKey;
 }
 
 function lineItemFromOption(option, type, price, extra = {}) {
@@ -849,14 +910,7 @@ function resetDefaults() {
     if (choices.length === 1) state.selected.add(choices[0].option_id);
   }
   addWorkbookDefaultChoices({ restoreSingleRequiredOnly: false });
-  for (const defaultRpo of ["FE1", "NGA", "BC7"]) {
-    const defaultChoice = rows.find((choice) => choice.rpo === defaultRpo && choice.active === "True" && choice.status !== "unavailable");
-    if (defaultRpo === "BC7") {
-      if (defaultChoice && defaultChoice.body_style === "coupe") state.selected.add(defaultChoice.option_id);
-      continue;
-    }
-    if (defaultChoice) state.selected.add(defaultChoice.option_id);
-  }
+  addGeneratedDefaultChoices(computeAutoAdded());
 }
 
 function addWorkbookDefaultChoices({ restoreSingleRequiredOnly = true } = {}) {
@@ -939,6 +993,11 @@ function addDefaultRpo(rpo) {
   if (choice && !disableReasonForChoice(choice)) state.selected.add(choice.option_id);
 }
 
+function addDefaultOption(optionId) {
+  const choice = choiceForCurrentVariant(optionId) || optionsById.get(optionId);
+  if (choice && !disableReasonForChoice(choice)) state.selected.add(choice.option_id);
+}
+
 function removeReplaceRuleTargets(sourceId) {
   const rules = ruleTargetsBySource.get(sourceId) || [];
   for (const rule of rules) {
@@ -953,6 +1012,19 @@ function selectedOrAutoInSection(sectionId, autoAdded = computeAutoAdded()) {
     selectedOptionIdsInSection(sectionId).length > 0 ||
     [...autoAdded.keys()].some((id) => optionSectionId(id) === sectionId)
   );
+}
+
+function addGeneratedDefaultChoices(autoAdded = computeAutoAdded()) {
+  for (const rule of generatedDefaultRules()) {
+    if (!scopeMatches(rule.body_style_scope, state.bodyStyle)) continue;
+    if (!scopeMatches(rule.trim_level_scope, state.trimLevel)) continue;
+    if (!scopeMatches(rule.variant_scope, currentVariantId())) continue;
+
+    if (rule.condition_type === "unless_selected_rpo" && selectedOptionByRpo(rule.condition_id)) continue;
+    if (rule.condition_type === "unless_selected_section" && selectedOrAutoInSection(rule.condition_id, autoAdded)) continue;
+
+    addDefaultOption(rule.target_option_id);
+  }
 }
 
 function hasIncludedFallbackForRequiredChoice(choice) {
@@ -1010,15 +1082,8 @@ function removeAutoDefaultDuplicates(autoAdded) {
 }
 
 function reconcileSelections() {
-  if (selectedOptionByRpo("Z51")) {
-    deleteSelectedRpo("FE1");
-    deleteSelectedRpo("FE2");
-  }
-  if (selectedOptionByRpo("NWI")) {
-    deleteSelectedRpo("NGA");
-  }
-  if (selectedOptionByRpo("GBA")) {
-    deleteSelectedRpo("ZYC");
+  for (const id of [...state.selected]) {
+    removeRuntimeExceptionTargets(id);
   }
   for (const id of [...state.selected]) {
     removeReplaceRuleTargets(id);
@@ -1036,9 +1101,7 @@ function reconcileSelections() {
   removeAutoDefaultDuplicates(autoAdded);
   const refreshedAutoAdded = computeAutoAdded();
   addWorkbookDefaultChoices();
-  if (!selectedOptionByRpo("Z51") && !selectedOrAutoInSection("sec_susp_001", refreshedAutoAdded)) addDefaultRpo("FE1");
-  if (!selectedOptionByRpo("NWI") && !selectedOptionByRpo("NGA")) addDefaultRpo("NGA");
-  if (!selectedOrAutoInSection("sec_seat_001", refreshedAutoAdded)) addDefaultRpo("719");
+  addGeneratedDefaultChoices(refreshedAutoAdded);
   dedupeSelectedRpos();
 }
 
@@ -1092,7 +1155,7 @@ function handleChoice(choice) {
     state.userSelected.add(choice.option_id);
   }
   removeReplaceRuleTargets(choice.option_id);
-  if (choice.rpo === "GBA") deleteSelectedRpo("ZYC");
+  removeRuntimeExceptionTargets(choice.option_id);
   reconcileSelections();
   render({ preserveScroll: true });
 }
@@ -1664,8 +1727,9 @@ function standardEquipmentSummary(variant) {
 }
 
 function sectionedOrderRecap(items, pricing) {
+  const summarySections = orderSummarySections();
   const sections = new Map(
-    orderSectionDefinitions.map(([section_key, section_label]) => [
+    summarySections.map(({ section_key, section_label }) => [
       section_key,
       {
         section_key,
@@ -1691,13 +1755,14 @@ function sectionedOrderRecap(items, pricing) {
   }
   sections.get("vehicle").section_total = pricing.base_price;
   sections.get("pricing_summary").section_total = pricing.total_msrp;
+  const sectionOrder = orderSummarySectionOrder();
   return [...sections.values()]
     .filter(
       (section) =>
         section.items.length ||
         ["vehicle", "pricing_summary"].includes(section.section_key)
     )
-    .sort((a, b) => (orderSectionOrder.get(a.section_key) ?? 999) - (orderSectionOrder.get(b.section_key) ?? 999));
+    .sort((a, b) => (sectionOrder.get(a.section_key) ?? 999) - (sectionOrder.get(b.section_key) ?? 999));
 }
 
 function currentOrder() {

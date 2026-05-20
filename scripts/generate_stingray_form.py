@@ -20,6 +20,11 @@ from corvette_form_generator.mapping import (
 )
 from corvette_form_generator.model_configs import GRAND_SPORT_MODEL, STINGRAY_MODEL
 from corvette_form_generator.output import write_app_data_registry, write_json_output
+from corvette_form_generator.runtime_metadata import (
+    load_default_selection_rules,
+    load_order_summary_metadata,
+    load_runtime_rule_exceptions,
+)
 from corvette_form_generator.validation import validation_error_count
 from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet, save_workbook_safely, write_sheet
 
@@ -634,6 +639,9 @@ def main() -> None:
     color_overrides_raw = rows_from_sheet(wb, "color_overrides")
     rule_groups = load_rule_groups(wb)
     exclusive_groups = load_exclusive_groups(wb)
+    default_selection_rules = load_default_selection_rules(wb, MODEL_CONFIG.model_key)
+    runtime_rule_exceptions = load_runtime_rule_exceptions(wb, MODEL_CONFIG.model_key)
+    order_summary_metadata = load_order_summary_metadata(wb, MODEL_CONFIG.model_key)
     option_asset_map = load_asset_map(wb, MODEL_CONFIG.model_key, "option")
     grouped_requires = grouped_requirement_pairs(rule_groups)
     interior_reference_by_id, interior_reference_rows = read_interior_reference()
@@ -1385,6 +1393,9 @@ def main() -> None:
         "exclusiveGroups": exclusive_groups,
         "rules": [row for row in raw_rules if row["active"] == "True"],
         "priceRules": price_rules,
+        "defaultSelectionRules": default_selection_rules,
+        "runtimeRuleExceptions": runtime_rule_exceptions,
+        "orderSummary": order_summary_metadata,
         "interiors": [row for row in interiors if row["active_for_stingray"]],
         "colorOverrides": color_overrides,
         "validation": validation_rows,

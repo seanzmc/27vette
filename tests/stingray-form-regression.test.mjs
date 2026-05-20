@@ -841,6 +841,24 @@ test("current order section recap has predictable labels, one interior, and corr
   runtime.state.selectedInterior = "1LT_AQ9_HTA";
 
   const order = runtime.currentOrder();
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(data.orderSummary.sections.map((section) => [section.section_key, section.section_label]))),
+    [
+      ["vehicle", "Vehicle"],
+      ["exterior_paint", "Exterior Paint"],
+      ["exterior_appearance", "Exterior Appearance"],
+      ["wheels_brakes", "Wheels & Brakes"],
+      ["performance_mechanical", "Performance & Mechanical"],
+      ["stripes", "Stripes"],
+      ["seats_interior", "Seats & Interior"],
+      ["accessories", "Accessories"],
+      ["delivery", "Delivery"],
+      ["auto_added_required", "Auto-Added / Required"],
+      ["pricing_summary", "Pricing Summary"],
+    ]
+  );
+  assert.equal(data.orderSummary.stepMap.paint, "exterior_paint");
+  assert.equal(data.orderSummary.stepMap.base_interior, "seats_interior");
   const sectionLabels = order.sections.map((section) => section.section_label);
   assert.deepEqual(JSON.parse(JSON.stringify(sectionLabels)), [
     "Vehicle",
@@ -1403,11 +1421,20 @@ test("order summary helpers are exposed for browser debug inspection", () => {
   assert.match(appSource, /window\.__orderDebug\s*=\s*\{[\s\S]*currentOrder,[\s\S]*compactOrder,[\s\S]*plainTextOrderSummary,[\s\S]*buildMarkdown,[\s\S]*\}/);
 });
 
-test("replaceable suspension and exhaust defaults are encoded", () => {
-  assert.match(appSource, /for \(const defaultRpo of \["FE1", "NGA", "BC7"\]\)/);
-  assert.match(appSource, /selectedOptionByRpo\("Z51"\)/);
-  assert.match(appSource, /deleteSelectedRpo\("FE1"\)/);
-  assert.match(appSource, /deleteSelectedRpo\("FE2"\)/);
+test("runtime defaults and RPO exceptions are workbook-generated metadata", () => {
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(data.defaultSelectionRules.map((rule) => rule.rule_id).sort())),
+    ["default_719", "default_bc7", "default_fe1", "default_nga"]
+  );
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(data.runtimeRuleExceptions.map((exception) => exception.exception_id).sort())),
+    ["ex_gba_zyc", "ex_nwi_nga", "ex_z51_fe1", "ex_z51_fe2"]
+  );
+  assert.doesNotMatch(appSource, /for \(const defaultRpo of \["FE1", "NGA", "BC7"\]\)/);
+  assert.doesNotMatch(appSource, /deleteSelectedRpo\("FE1"\)/);
+  assert.doesNotMatch(appSource, /deleteSelectedRpo\("FE2"\)/);
+  assert.doesNotMatch(appSource, /deleteSelectedRpo\("NGA"\)/);
+  assert.doesNotMatch(appSource, /if \(choice\.rpo === "GBA"\) deleteSelectedRpo\("ZYC"\)/);
   assert.ok(
     data.rules.some((rule) => rule.source_id === "opt_z51_001" && rule.target_id === "opt_fe3_001" && rule.rule_type === "includes"),
     "Z51 should include FE3"
@@ -1429,9 +1456,6 @@ test("replaceable suspension and exhaust defaults are encoded", () => {
     data.rules.some((rule) => rule.source_id === "opt_fe4_001" && rule.target_id === "opt_z51_001" && rule.rule_type === "requires"),
     "FE4 should require Z51"
   );
-  assert.match(appSource, /selectedOptionByRpo\("NWI"\)/);
-  assert.match(appSource, /deleteSelectedRpo\("NGA"\)/);
-  assert.match(appSource, /addDefaultRpo\("NGA"\)/);
 });
 
 test("FE3 disabled tile explains that Z51 includes it without duplicating the RPO", () => {
@@ -1616,9 +1640,18 @@ test("standard equipment dedupes mirrored RPO rows and does not require default_
   }
 });
 
-test("coupe defaults include BC7 engine appearance", () => {
-  assert.match(appSource, /defaultRpo of \["FE1", "NGA", "BC7"\]/);
-  assert.match(appSource, /defaultChoice\.body_style === "coupe"/);
+test("coupe defaults include BC7 engine appearance from generated default rules", () => {
+  const bc7Rule = data.defaultSelectionRules.find((rule) => rule.rule_id === "default_bc7");
+  assert.equal(bc7Rule?.target_option_id, "opt_bc7_001");
+  assert.equal(bc7Rule?.body_style_scope, "coupe");
+  assert.equal(bc7Rule?.condition_type, "always");
+
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has("opt_bc7_001"), true, "coupe builds should default BC7 from generated rules");
 });
 
 test("5V7 can satisfy spoiler requirement with either 5ZU or 5ZZ", () => {
@@ -1742,9 +1775,12 @@ test("spoiler replacement rules preserve ZYC and replace T0A without blocking TV
     assert.equal(rule.runtime_action, "replace");
     assert.match(rule.disabled_reason, /Removes T0A when Z51 is selected/);
   }
-  assert.ok(data.rules.some((rule) => rule.source_id === "opt_zyc_001" && rule.target_id === "opt_gba_001"));
-  assert.equal(data.rules.some((rule) => rule.source_id === "opt_zyc_001" && ["opt_tvs_001", "opt_5zz_001", "opt_5zu_001"].includes(rule.target_id)), false);
-  assert.match(appSource, /if \(choice\.rpo === "GBA"\) deleteSelectedRpo\("ZYC"\)/);
+  const zycException = data.runtimeRuleExceptions.find(
+    (exception) => exception.source_option_id === "opt_gba_001" && exception.target_option_id === "opt_zyc_001"
+  );
+  assert.ok(zycException, "GBA should remove ZYC through generated runtime exceptions");
+  assert.equal(zycException.exception_type, "remove_target_when_source_selected");
+  assert.match(zycException.disabled_reason, /Black exterior paint is not available with body-color accents/);
 });
 
 test("step rendering resets scroll to the top after content replacement", () => {
@@ -1952,8 +1988,10 @@ test("single interior and included seatbelt defaults are handled in runtime", ()
   assert.match(appSource, /function reconcileInteriorSelection/);
   assert.match(appSource, /interiors\.length === 1/);
   assert.match(appSource, /function shouldSuppressIncludedDefault/);
-  assert.match(appSource, /removeAutoDefaultDuplicates/);
-  assert.match(appSource, /addDefaultRpo\("719"\)/);
+  const seatbeltDefault = data.defaultSelectionRules.find((rule) => rule.rule_id === "default_719");
+  assert.equal(seatbeltDefault?.target_option_id, "opt_719_001");
+  assert.equal(seatbeltDefault?.condition_type, "unless_selected_section");
+  assert.equal(seatbeltDefault?.condition_id, "sec_seat_001");
 });
 
 test("sidebar keeps one Standard & Included surface inside Selected RPOs", () => {

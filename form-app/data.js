@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-20T04:16:34+00:00"
+          "generated_at": "2026-05-20T04:38:51+00:00"
         },
         "variants": [
           {
@@ -46330,6 +46330,183 @@ window.CORVETTE_FORM_DATA = {
             "notes": "ZZ3 selected sets convertible LS6 engine cover price to 595"
           }
         ],
+        "defaultSelectionRules": [
+          {
+            "rule_id": "default_fe1",
+            "target_option_id": "opt_fe1_001",
+            "condition_type": "unless_selected_rpo",
+            "condition_id": "Z51",
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "priority": 10,
+            "notes": "Default standard suspension unless Z51 is selected."
+          },
+          {
+            "rule_id": "default_nga",
+            "target_option_id": "opt_nga_001",
+            "condition_type": "unless_selected_rpo",
+            "condition_id": "NWI",
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "priority": 20,
+            "notes": "Default black exhaust tips unless NWI center exhaust is selected."
+          },
+          {
+            "rule_id": "default_719",
+            "target_option_id": "opt_719_001",
+            "condition_type": "unless_selected_section",
+            "condition_id": "sec_seat_001",
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "priority": 30,
+            "notes": "Default black seat belt when no seat-belt option is selected or auto-added."
+          },
+          {
+            "rule_id": "default_bc7",
+            "target_option_id": "opt_bc7_001",
+            "condition_type": "always",
+            "condition_id": "",
+            "body_style_scope": "coupe",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "priority": 40,
+            "notes": "Default coupe black LS6 engine cover."
+          }
+        ],
+        "runtimeRuleExceptions": [
+          {
+            "exception_id": "ex_gba_zyc",
+            "source_option_id": "opt_gba_001",
+            "target_option_id": "opt_zyc_001",
+            "exception_type": "remove_target_when_source_selected",
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "disabled_reason": "Black exterior paint is not available with body-color accents.",
+            "notes": "Black paint removes body-color accents."
+          },
+          {
+            "exception_id": "ex_nwi_nga",
+            "source_option_id": "opt_nwi_001",
+            "target_option_id": "opt_nga_001",
+            "exception_type": "remove_target_when_source_selected",
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "disabled_reason": "Replaced by NWI center exhaust.",
+            "notes": "NWI replaces NGA exhaust tips."
+          },
+          {
+            "exception_id": "ex_z51_fe1",
+            "source_option_id": "opt_z51_001",
+            "target_option_id": "opt_fe1_001",
+            "exception_type": "remove_target_when_source_selected",
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "disabled_reason": "Replaced by FE3 Z51 performance suspension.",
+            "notes": "Z51 replaces FE1 standard suspension."
+          },
+          {
+            "exception_id": "ex_z51_fe2",
+            "source_option_id": "opt_z51_001",
+            "target_option_id": "opt_fe2_001",
+            "exception_type": "remove_target_when_source_selected",
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "disabled_reason": "Not available with Z51 Performance Package.",
+            "notes": "Z51 suppresses FE2."
+          }
+        ],
+        "orderSummary": {
+          "sections": [
+            {
+              "section_key": "vehicle",
+              "section_label": "Vehicle",
+              "display_order": 1,
+              "notes": "Runtime order summary grouping."
+            },
+            {
+              "section_key": "exterior_paint",
+              "section_label": "Exterior Paint",
+              "display_order": 2,
+              "notes": "Runtime order summary grouping."
+            },
+            {
+              "section_key": "exterior_appearance",
+              "section_label": "Exterior Appearance",
+              "display_order": 3,
+              "notes": "Runtime order summary grouping."
+            },
+            {
+              "section_key": "wheels_brakes",
+              "section_label": "Wheels & Brakes",
+              "display_order": 4,
+              "notes": "Runtime order summary grouping."
+            },
+            {
+              "section_key": "performance_mechanical",
+              "section_label": "Performance & Mechanical",
+              "display_order": 5,
+              "notes": "Runtime order summary grouping."
+            },
+            {
+              "section_key": "stripes",
+              "section_label": "Stripes",
+              "display_order": 6,
+              "notes": "Runtime order summary grouping."
+            },
+            {
+              "section_key": "seats_interior",
+              "section_label": "Seats & Interior",
+              "display_order": 7,
+              "notes": "Runtime order summary grouping."
+            },
+            {
+              "section_key": "accessories",
+              "section_label": "Accessories",
+              "display_order": 8,
+              "notes": "Runtime order summary grouping."
+            },
+            {
+              "section_key": "delivery",
+              "section_label": "Delivery",
+              "display_order": 9,
+              "notes": "Runtime order summary grouping."
+            },
+            {
+              "section_key": "auto_added_required",
+              "section_label": "Auto-Added / Required",
+              "display_order": 10,
+              "notes": "Runtime order summary grouping."
+            },
+            {
+              "section_key": "pricing_summary",
+              "section_label": "Pricing Summary",
+              "display_order": 11,
+              "notes": "Runtime order summary grouping."
+            }
+          ],
+          "stepMap": {
+            "body_style": "vehicle",
+            "trim_level": "vehicle",
+            "paint": "exterior_paint",
+            "exterior_appearance": "exterior_appearance",
+            "wheels": "wheels_brakes",
+            "packages_performance": "performance_mechanical",
+            "aero_exhaust_stripes_accessories": "stripes",
+            "seat": "seats_interior",
+            "base_interior": "seats_interior",
+            "seat_belt": "seats_interior",
+            "interior_trim": "seats_interior",
+            "accessories": "accessories",
+            "delivery": "delivery"
+          }
+        },
         "interiors": [
           {
             "interior_id": "1LT_AE4_HTJ_N26",
