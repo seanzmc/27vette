@@ -1860,9 +1860,13 @@ test("interior grouping preserves required 1LT, 2LT, and 3LT examples", () => {
   );
 });
 
-test("R6X is auto-only and D30 is the only visible disabled color override card", () => {
+test("R6X is component-priced and D30 is the only visible disabled color override card", () => {
   assert.equal(data.choices.some((choice) => choice.rpo === "R6X" && choice.active === "True"), false);
-  assert.ok(data.rules.some((rule) => rule.target_id === "opt_r6x_001" && rule.rule_type === "includes"), "R6X needs interior include rules");
+  assert.equal(
+    data.rules.some((rule) => rule.target_id === "opt_r6x_001" && rule.rule_type === "includes" && rule.active === true),
+    false,
+    "R6X should be charged only as an interior component, not as an auto-added include rule"
+  );
   assert.equal(
     data.priceRules.some(
       (rule) =>
@@ -1900,6 +1904,11 @@ test("generated R6X interiors include the PriceRef R6X price component", () => {
   const byId = new Map(activeInteriors.map((interior) => [interior.interior_id, interior]));
   const r6xInteriors = activeInteriors.filter((interior) => interior.interior_id.includes("R6X"));
   assert.ok(r6xInteriors.length > 0, "active R6X interiors should exist");
+  assert.equal(
+    r6xInteriors.every((interior) => interior.interior_components.some((component) => component.rpo === "R6X" && Number(component.price) > 0)),
+    true,
+    "active R6X interiors should carry R6X as a priced interior component"
+  );
   assert.equal(r6xInteriors.every((interior) => Number(interior.price) >= 995), true, "R6X interiors should include the $995 R6X component");
 
   assert.equal(Number(byId.get("3LT_R6X_AH2_HVV")?.price), 995);
@@ -1923,8 +1932,18 @@ test("R6X keeps normal price even when D30 is present in the selected context", 
   d30Runtime.state.bodyStyle = "coupe";
   d30Runtime.state.selectedInterior = "3LT_R6X_AH2_HZP_N26";
   d30Runtime.state.selected.add("opt_g26_001");
-  assert.equal(d30Runtime.computeAutoAdded().has("opt_d30_001"), true, "D30 should be auto-added by selected color/interior context");
+  const autoAdded = d30Runtime.computeAutoAdded();
+  assert.equal(autoAdded.has("opt_d30_001"), true, "D30 should be auto-added by selected color/interior context");
+  assert.equal(autoAdded.has("opt_r6x_001"), false, "R6X should not be auto-added when it is an interior component");
   assert.equal(d30Runtime.optionPrice("opt_r6x_001"), 995, "R6X should keep normal option price when D30 is present");
+
+  const order = d30Runtime.currentOrder();
+  const r6xLineItems = d30Runtime.lineItems().filter((item) => item.rpo === "R6X");
+  assert.equal(r6xLineItems.length, 1, "R6X should appear once in selected line items");
+  assert.equal(r6xLineItems[0].type, "interior_component", "R6X should be carried by the interior component row");
+  assert.equal(Number(r6xLineItems[0].price), 995, "R6X should be charged once at its component price");
+  assert.equal(order.metadata.selected_rpos.includes("R6X"), true, "selected RPO metadata should retain the R6X component");
+  assert.equal(order.metadata.auto_added_rpos.includes("R6X"), false, "auto-added RPO metadata should not duplicate R6X");
 });
 
 test("single interior and included seatbelt defaults are handled in runtime", () => {

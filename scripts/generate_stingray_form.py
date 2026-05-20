@@ -966,15 +966,19 @@ def main() -> None:
             row.update(grouping_fields_for_interior(row, reference, reference_order_by_id.get(row["interior_id"], fallback_order)))
 
     interiors_by_id = {row["interior_id"]: row for row in interiors if row["interior_id"]}
-    r6x_interior_ids = [
+    interior_include_ids = [
         (row["interior_id"], row.get("_included_option_id", ""))
         for row in interiors
-        if row["interior_id"] and row["active_for_stingray"] and row.get("_included_option_id", "")
+        if row["interior_id"]
+        and row["active_for_stingray"]
+        and row.get("_included_option_id", "")
+        and options_by_id.get(row.get("_included_option_id", ""), {}).get("rpo")
+        not in {component.get("rpo") for component in row.get("interior_components", [])}
     ]
 
     raw_rules: list[dict[str, Any]] = []
     manual_rules = []
-    for interior_id, included_option_id in r6x_interior_ids:
+    for interior_id, included_option_id in interior_include_ids:
         manual_rules.append(
             {
                 "rule_id": f"rule_{interior_id.lower()}_includes_{included_option_id}",
