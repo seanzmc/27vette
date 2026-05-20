@@ -1430,6 +1430,9 @@ test("runtime defaults and RPO exceptions are workbook-generated metadata", () =
     JSON.parse(JSON.stringify(data.runtimeRuleExceptions.map((exception) => exception.exception_id).sort())),
     ["ex_gba_zyc", "ex_nwi_nga", "ex_z51_fe1", "ex_z51_fe2"]
   );
+  const fe1Default = data.defaultSelectionRules.find((rule) => rule.rule_id === "default_fe1");
+  assert.equal(fe1Default.condition_type, "unless_selected_section");
+  assert.equal(fe1Default.condition_id, "sec_susp_001");
   assert.doesNotMatch(appSource, /for \(const defaultRpo of \["FE1", "NGA", "BC7"\]\)/);
   assert.doesNotMatch(appSource, /deleteSelectedRpo\("FE1"\)/);
   assert.doesNotMatch(appSource, /deleteSelectedRpo\("FE2"\)/);
@@ -1574,6 +1577,16 @@ test("initial selected FE1 state is de-duped to the visible suspension choice", 
   assert.equal(selectedRpos.includes("FE1"), false, "Z51 should remove FE1");
   assert.equal(selectedRpos.includes("FE2"), false, "Z51 should remove FE2");
   assert.equal(runtime.computeAutoAdded().has("opt_fe3_001"), true, "Z51 should still include FE3");
+
+  const fe2Runtime = loadRuntime();
+  fe2Runtime.state.bodyStyle = "coupe";
+  fe2Runtime.state.trimLevel = "1LT";
+  fe2Runtime.resetDefaults();
+  fe2Runtime.reconcileSelections();
+  fe2Runtime.handleChoice(fe2Runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_fe2_001"));
+  const fe2SelectedRpos = [...fe2Runtime.state.selected].map((id) => data.choices.find((choice) => choice.option_id === id)?.rpo);
+  assert.equal(fe2SelectedRpos.includes("FE2"), true, "FE2 should remain selected");
+  assert.equal(fe2SelectedRpos.includes("FE1"), false, "FE2 should suppress the FE1 default");
 });
 
 test("Stingray workbook default-selected standard choices seed every variant", () => {
@@ -1780,7 +1793,16 @@ test("spoiler replacement rules preserve ZYC and replace T0A without blocking TV
   );
   assert.ok(zycException, "GBA should remove ZYC through generated runtime exceptions");
   assert.equal(zycException.exception_type, "remove_target_when_source_selected");
-  assert.match(zycException.disabled_reason, /Black exterior paint is not available with body-color accents/);
+  assert.match(zycException.disabled_reason, /ZYC Body-Color Accents are not available with Black exterior paint/);
+
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001"));
+  const zyc = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_zyc_001");
+  assert.equal(runtime.disableReasonForChoice(zyc), "ZYC Body-Color Accents are not available with Black exterior paint.");
 });
 
 test("step rendering resets scroll to the top after content replacement", () => {

@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-20T04:38:51+00:00"
+          "generated_at": "2026-05-20T05:08:14+00:00"
         },
         "variants": [
           {
@@ -46334,13 +46334,13 @@ window.CORVETTE_FORM_DATA = {
           {
             "rule_id": "default_fe1",
             "target_option_id": "opt_fe1_001",
-            "condition_type": "unless_selected_rpo",
-            "condition_id": "Z51",
+            "condition_type": "unless_selected_section",
+            "condition_id": "sec_susp_001",
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "*",
             "priority": 10,
-            "notes": "Default standard suspension unless Z51 is selected."
+            "notes": "Default standard suspension unless another suspension option is selected or auto-added."
           },
           {
             "rule_id": "default_nga",
@@ -46385,8 +46385,8 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "*",
-            "disabled_reason": "Black exterior paint is not available with body-color accents.",
-            "notes": "Black paint removes body-color accents."
+            "disabled_reason": "ZYC Body-Color Accents are not available with Black exterior paint.",
+            "notes": "Black paint removes ZYC body-color accent availability."
           },
           {
             "exception_id": "ex_nwi_nga",
