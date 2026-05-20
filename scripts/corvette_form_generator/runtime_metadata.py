@@ -172,7 +172,17 @@ def load_variant_option_overrides(
     model_key: str,
     fallback_sheet: str = "",
 ) -> list[dict[str, Any]]:
-    rows = active_rows(wb, "variant_option_overrides", model_key)
+    # The workbook-owned variant_option_overrides sheet uses the ``active``
+    # column as the override value for the generated choice, not as row
+    # activation.  Do not read it through active_rows(), or rows that set a
+    # choice inactive would filter themselves out.
+    model = clean(model_key).lower()
+    allowed_model_keys = _GLOBAL_MODEL_KEYS | {model}
+    rows = [
+        row
+        for row in optional_rows(wb, "variant_option_overrides")
+        if clean(row.get("model_key", "")).lower() in allowed_model_keys
+    ]
     if not rows and fallback_sheet:
         rows = active_rows(wb, fallback_sheet, model_key=None)
     overrides: list[dict[str, Any]] = []
@@ -187,6 +197,7 @@ def load_variant_option_overrides(
                 "variant_id": variant_id,
                 "status": clean(row.get("status")),
                 "selectable": clean(row.get("selectable")),
+                "active": clean(row.get("active")),
                 "display_behavior": clean(row.get("display_behavior")),
                 "notes": clean(row.get("notes")),
             }

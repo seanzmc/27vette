@@ -24,6 +24,8 @@ from corvette_form_generator.runtime_metadata import (
     load_default_selection_rules,
     load_order_summary_metadata,
     load_runtime_rule_exceptions,
+    load_section_presentation,
+    load_variant_option_overrides,
 )
 from corvette_form_generator.validation import validation_error_count
 from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet, save_workbook_safely, write_sheet
@@ -43,8 +45,6 @@ SECTION_STEP_OVERRIDES = dict(MODEL_CONFIG.section_step_overrides)
 BODY_STYLE_DISPLAY_ORDER = dict(MODEL_CONFIG.body_style_display_order)
 SELECTION_MODE_LABELS = dict(MODEL_CONFIG.selection_mode_labels)
 STANDARD_SECTIONS = set(MODEL_CONFIG.standard_sections)
-
-HIDDEN_SECTION_IDS = {"sec_cust_002"}
 
 
 def export_slug(model_key: str) -> str:
@@ -642,6 +642,13 @@ def main() -> None:
     default_selection_rules = load_default_selection_rules(wb, MODEL_CONFIG.model_key)
     runtime_rule_exceptions = load_runtime_rule_exceptions(wb, MODEL_CONFIG.model_key)
     order_summary_metadata = load_order_summary_metadata(wb, MODEL_CONFIG.model_key)
+    section_presentation_rows = load_section_presentation(wb, MODEL_CONFIG.model_key)
+    section_presentation = {row["section_id"]: row for row in section_presentation_rows}
+    variant_option_override_rows = load_variant_option_overrides(wb, MODEL_CONFIG.model_key)
+    variant_option_overrides = {
+        (row["option_id"], row["variant_id"]): row
+        for row in variant_option_override_rows
+    }
     option_asset_map = load_asset_map(wb, MODEL_CONFIG.model_key, "option")
     grouped_requires = grouped_requirement_pairs(rule_groups)
     interior_reference_by_id, interior_reference_rows = read_interior_reference()
@@ -657,10 +664,15 @@ def main() -> None:
         if display_behavior == "hidden"
     }
     for option in options_raw:
-        display_behavior = display_behavior_by_option_id.get(option["option_id"], "")
+        option_display_behavior = display_behavior_by_option_id.get(option["option_id"], "")
+        section_display_behavior = clean(
+            section_presentation.get(option.get("section_id", ""), {}).get("display_behavior", "")
+        ).lower()
+        display_behavior = option_display_behavior or section_display_behavior
         option["_display_behavior"] = display_behavior
-        if display_behavior == "hidden" or option.get("section_id") in HIDDEN_SECTION_IDS:
+        if display_behavior == "hidden":
             option["active"] = "False"
+            hidden_option_ids.add(option["option_id"])
 
     price_rules_raw.extend(d30_r6x_price_rules_raw)
 
@@ -814,10 +826,15 @@ def main() -> None:
             selectable = option["selectable"]
             active = option["active"]
             display_behavior = option.get("display_behavior", "")
-            if option_id == "opt_uqt_002" and variant["trim_level"] != "1LT":
-                status = "unavailable"
-                selectable = "False"
-                active = "False"
+            override = variant_option_overrides.get((option_id, variant["variant_id"]), {})
+            if clean(override.get("status")):
+                status = clean(override["status"]).lower()
+            if clean(override.get("selectable")):
+                selectable = clean(override["selectable"])
+            if clean(override.get("active")):
+                active = clean(override["active"])
+            if clean(override.get("display_behavior")):
+                display_behavior = clean(override["display_behavior"]).lower()
             if display_behavior == "auto_only":
                 status = "unavailable"
                 selectable = "False"
@@ -849,12 +866,13 @@ def main() -> None:
                 "display_order": option["display_order"],
                 "source_detail_raw": option["source_detail_raw"],
             }
-            if option["display_behavior"]:
-                choice["display_behavior"] = option["display_behavior"]
+            if display_behavior:
+                choice["display_behavior"] = display_behavior
             if asset := option_asset_map.get(option_id):
                 choice.update(asset)
             choices.append(choice)
 
+    validation_rows: list[dict[str, Any]] = []
     interiors: list[dict[str, Any]] = []
     for row in lt_interiors_raw:
         trim = row.get("Trim", "")
@@ -869,7 +887,17 @@ def main() -> None:
             "requires_r6x",
             False,
         )
-        included_option_id = row.get("included_option_id", "") or ("opt_r6x_001" if active_for_stingray and requires_r6x else "")
+        included_option_id = clean(row.get("included_option_id", ""))
+        if active_for_stingray and requires_r6x and not included_option_id:
+            validation_rows.append(
+                {
+                    "check_id": f"missing_r6x_included_option_{interior_id}",
+                    "severity": "error",
+                    "entity_type": "interior",
+                    "entity_id": interior_id,
+                    "message": "R6X interior requires included_option_id in lt_interiors.",
+                }
+            )
         components = interior_component_metadata(row, interior_component_price_ref)
         interiors.append(
             {
@@ -918,7 +946,6 @@ def main() -> None:
                 "interior_components_json": json.dumps(components, separators=(",", ":")),
             }
         )
-    validation_rows: list[dict[str, Any]] = []
     reference_order_by_id = {
         row["interior_id"]: index
         for index, row in enumerate((row for row in interior_reference_rows if row["interior_id"]), start=1)

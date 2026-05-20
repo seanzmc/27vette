@@ -191,10 +191,12 @@ test("workbook package validation rejects duplicate worksheet AutoFilters on tab
         "tmp = path.with_suffix('.tmp.xlsx')",
         "ns = '{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'",
         "ET.register_namespace('', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main')",
+        "with ZipFile(path, 'r') as probe:",
+        "    target_sheet = next(name for name in probe.namelist() if name.startswith('xl/worksheets/sheet') and b'<tableParts' in probe.read(name))",
         "with ZipFile(path, 'r') as source, ZipFile(tmp, 'w', ZIP_DEFLATED) as target:",
         "    for item in source.infolist():",
         "        data = source.read(item.filename)",
-        "        if item.filename == 'xl/worksheets/sheet29.xml':",
+        "        if item.filename == target_sheet:",
         "            root = ET.fromstring(data)",
         "            if root.find(ns + 'autoFilter') is None:",
         "                auto_filter = ET.Element(ns + 'autoFilter', {'ref': 'A1:G5'})",
@@ -254,6 +256,36 @@ test("model option source sheets use the same normalized contract", () => {
   assert.deepEqual(workbookHeaders("grandSport_ovs"), optionVariantStatusHeaders);
   assertOptionVariantStatusCoverage("stingray_options", "stingray_ovs", stingrayVariantIds);
   assertOptionVariantStatusCoverage("grandSport_options", "grandSport_ovs", grandSportVariantIds);
+});
+
+test("Stingray Phase 4 availability rules are workbook-owned", () => {
+  const uqtOverrides = workbookRows("variant_option_overrides").filter(
+    (row) => row.model_key === "stingray" && row.option_id === "opt_uqt_002"
+  );
+  assert.deepEqual(
+    uqtOverrides.map((row) => row.variant_id).sort(),
+    ["2lt_c07", "2lt_c67", "3lt_c07", "3lt_c67"]
+  );
+  assert.equal(uqtOverrides.every((row) => row.status === "unavailable" && row.selectable === "False" && row.active === "False"), true);
+
+  const stitchPresentation = workbookRows("section_presentation").find(
+    (row) => row.model_key === "stingray" && row.section_id === "sec_cust_002"
+  );
+  assert.equal(stitchPresentation?.display_behavior, "hidden");
+  assert.equal(stitchPresentation?.step_key, "interior_trim");
+
+  const r6xInteriors = workbookRows("lt_interiors").filter(
+    (row) => row.active_for_stingray === "True" && row.requires_r6x === "True"
+  );
+  assert.ok(r6xInteriors.length > 0, "expected active Stingray R6X interiors");
+  assert.equal(r6xInteriors.every((row) => row.included_option_id === "opt_r6x_001"), true);
+
+  assert.match(generatorSource, /load_variant_option_overrides/);
+  assert.match(generatorSource, /load_section_presentation/);
+  assert.doesNotMatch(generatorSource, /option_id\s*==\s*["']opt_uqt_002["']/);
+  assert.doesNotMatch(generatorSource, /HIDDEN_SECTION_IDS/);
+  assert.doesNotMatch(generatorSource, /opt_r6x_001["']\s+if\s+active_for_stingray\s+and\s+requires_r6x/);
+  assert.match(generatorSource, /missing_r6x_included_option_/);
 });
 
 test("section_master owns section step placement without category", () => {
