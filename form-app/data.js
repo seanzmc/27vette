@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-20T17:09:57+00:00"
+          "generated_at": "2026-05-20T18:47:42+00:00"
         },
         "variants": [
           {
@@ -56158,7 +56158,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-05-20T17:08:57+00:00",
+          "generated_at": "2026-05-20T18:46:59+00:00",
           "status": "draft_not_runtime_active"
         },
         "variants": [
@@ -56346,7 +56346,8 @@ window.CORVETTE_FORM_DATA = {
             "standard_behavior": "user_selected",
             "section_display_order": 1,
             "step_key": "body_style",
-            "step_label": "Body Style"
+            "step_label": "Body Style",
+            "selection_mode_label": "Required single choice"
           },
           {
             "context_type": "trim_level",
@@ -56358,7 +56359,8 @@ window.CORVETTE_FORM_DATA = {
             "standard_behavior": "user_selected",
             "section_display_order": 2,
             "step_key": "trim_level",
-            "step_label": "Trim Level"
+            "step_label": "Trim Level",
+            "selection_mode_label": "Required single choice"
           },
           {
             "section_id": "sec_pain_001",

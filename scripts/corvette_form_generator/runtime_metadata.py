@@ -11,11 +11,24 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any, Iterable, Mapping
 
+from corvette_form_generator.model_config import ModelConfig
 from corvette_form_generator.workbook import clean, intish, rows_from_sheet
 
 _TRUE_VALUES = {"1", "true", "t", "yes", "y", "on", "active", "enabled"}
 _FALSE_VALUES = {"0", "false", "f", "no", "n", "off", "inactive", "disabled"}
 _GLOBAL_MODEL_KEYS = {"all", "shared", "*"}
+_MODEL_CONFIG_SOURCE_ROLES = {
+    "source_option_sheet",
+    "status_sheet",
+    "rule_mapping_sheet",
+    "price_rules_sheet",
+    "rule_groups_sheet",
+    "rule_group_members_sheet",
+    "exclusive_groups_sheet",
+    "exclusive_group_members_sheet",
+    "color_overrides_sheet",
+    "variant_option_overrides_sheet",
+}
 
 
 def truthy(value: Any, default: bool = False) -> bool:
@@ -420,3 +433,91 @@ def load_model_metadata(wb: Any, model_key: str) -> dict[str, Any]:
         "workbook_sources": sources,
         "variants": sorted(variants, key=lambda row: (row["display_order"], row["variant_id"])),
     }
+
+
+def _registry_model_key(model_key: str) -> str:
+    return "grandSport" if model_key == "grand_sport" else model_key
+
+
+def _duplicate_values(rows: Iterable[Mapping[str, Any]], field: str) -> list[str]:
+    seen: set[str] = set()
+    duplicates: set[str] = set()
+    for row in rows:
+        value = clean(row.get(field))
+        if not value:
+            continue
+        if value in seen:
+            duplicates.add(value)
+        seen.add(value)
+    return sorted(duplicates)
+
+
+def load_model_config_overrides(wb: Any, config: ModelConfig) -> ModelConfig:
+    """Return ``config`` with safe workbook-authored model metadata applied.
+
+    Missing or incomplete metadata falls back to the supplied Python constants.
+    Invalid active metadata fails fast so workbook drift cannot silently alter
+    generator wiring.
+    """
+
+    model_rows = active_rows(wb, "model_master", config.model_key)
+    if len(model_rows) > 1:
+        raise ValueError(f"Duplicate active model_master rows for model {config.model_key}")
+
+    metadata = load_model_metadata(wb, config.model_key)
+    model = metadata["model"]
+    source_rows = metadata["workbook_sources"]
+    variant_rows = metadata["variants"]
+
+    duplicate_roles = _duplicate_values(source_rows, "source_role")
+    if duplicate_roles:
+        raise ValueError(
+            f"Duplicate active model_workbook_sources roles for {config.model_key}: {', '.join(duplicate_roles)}"
+        )
+    sources = {row["source_role"]: row["sheet_name"] for row in source_rows}
+    unknown_roles = sorted(set(sources) - _MODEL_CONFIG_SOURCE_ROLES)
+    if unknown_roles:
+        raise ValueError(f"Unknown model_workbook_sources roles for {config.model_key}: {', '.join(unknown_roles)}")
+
+    duplicate_variants = _duplicate_values(variant_rows, "variant_id")
+    if duplicate_variants:
+        raise ValueError(
+            f"Duplicate active model_variants rows for {config.model_key}: {', '.join(duplicate_variants)}"
+        )
+
+    registry_key = clean(model.get("registry_key"))
+    expected_registry_key = _registry_model_key(config.model_key)
+    if registry_key and registry_key != expected_registry_key:
+        raise ValueError(
+            f"Model {config.model_key} registry_key {registry_key!r} does not match current registry key "
+            f"{expected_registry_key!r}."
+        )
+
+    expected_variant_count = intish(model.get("expected_variant_count"), config.expected_variant_count)
+    if not expected_variant_count:
+        expected_variant_count = config.expected_variant_count
+    resolved_variants = tuple(row["variant_id"] for row in variant_rows) or config.variant_ids
+    if expected_variant_count and len(resolved_variants) != expected_variant_count:
+        raise ValueError(
+            f"Model {config.model_key} expected {expected_variant_count} variants; "
+            f"found {len(resolved_variants)} active model_variants rows."
+        )
+
+    return config.with_overrides(
+        model_label=clean(model.get("model_label")) or config.model_label,
+        model_year=clean(model.get("model_year")) or config.model_year,
+        dataset_name=clean(model.get("dataset_name")) or config.dataset_name,
+        source_option_sheet=sources.get("source_option_sheet") or config.source_option_sheet,
+        status_sheet=sources.get("status_sheet") or config.status_sheet,
+        variant_ids=resolved_variants,
+        expected_variant_count=expected_variant_count,
+        rule_mapping_sheet=sources.get("rule_mapping_sheet") or config.rule_mapping_sheet,
+        price_rules_sheet=sources.get("price_rules_sheet") or config.price_rules_sheet,
+        rule_groups_sheet=sources.get("rule_groups_sheet") or config.rule_groups_sheet,
+        rule_group_members_sheet=sources.get("rule_group_members_sheet") or config.rule_group_members_sheet,
+        exclusive_groups_sheet=sources.get("exclusive_groups_sheet") or config.exclusive_groups_sheet,
+        exclusive_group_members_sheet=sources.get("exclusive_group_members_sheet") or config.exclusive_group_members_sheet,
+        color_overrides_sheet=sources.get("color_overrides_sheet") or config.color_overrides_sheet,
+        variant_option_overrides_sheet=sources.get("variant_option_overrides_sheet")
+        or config.variant_option_overrides_sheet,
+    )

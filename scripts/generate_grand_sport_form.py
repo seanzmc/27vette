@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import json
 
+from openpyxl import load_workbook
+
 from corvette_form_generator.inspection import (
     build_contract_preview,
     build_form_data_draft,
@@ -14,10 +16,15 @@ from corvette_form_generator.inspection import (
     write_inspection_artifacts,
 )
 from corvette_form_generator.model_configs import GRAND_SPORT_MODEL
+from corvette_form_generator.runtime_metadata import load_model_config_overrides
 
 
 def main() -> None:
-    config = GRAND_SPORT_MODEL
+    wb = load_workbook(GRAND_SPORT_MODEL.workbook_path, read_only=True, data_only=True)
+    try:
+        config = load_model_config_overrides(wb, GRAND_SPORT_MODEL)
+    finally:
+        wb.close()
     rule_audit_path = config.output_dir / "inspection" / "grand-sport-rule-audit.json"
     rule_audit_markdown_path = config.output_dir / "inspection" / "grand-sport-rule-audit.md"
     rule_audit_artifacts = {}

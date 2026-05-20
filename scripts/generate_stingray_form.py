@@ -24,6 +24,7 @@ from corvette_form_generator.runtime_metadata import (
     load_context_sections,
     load_default_selection_rules,
     load_interior_components,
+    load_model_config_overrides,
     load_order_summary_metadata,
     load_runtime_rule_exceptions,
     load_runtime_steps,
@@ -651,8 +652,11 @@ def build_standard_equipment(choices: list[dict[str, Any]]) -> list[dict[str, An
 
 
 def main() -> None:
+    global MODEL_CONFIG
+
     loaded_mtime_ns = WORKBOOK_PATH.stat().st_mtime_ns
     wb = load_workbook(WORKBOOK_PATH)
+    MODEL_CONFIG = load_model_config_overrides(wb, STINGRAY_MODEL)
 
     variants_raw = rows_from_sheet(wb, "variant_master")
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
@@ -660,7 +664,7 @@ def main() -> None:
     statuses_raw = rows_from_sheet(wb, MODEL_CONFIG.status_sheet)
     context_copy_rows = context_choice_copy_rows(wb, MODEL_CONFIG.model_key)
     rules_raw = rows_from_sheet(wb, MODEL_CONFIG.rule_mapping_sheet)
-    price_rules_raw = rows_from_sheet(wb, "price_rules")
+    price_rules_raw = rows_from_sheet(wb, MODEL_CONFIG.price_rules_sheet)
     d30_r6x_price_rules_raw = [row for row in price_rules_raw if row.get("price_rule_id") == "pr_d30_r6x_001"]
     price_rules_raw = [row for row in price_rules_raw if row.get("price_rule_id") != "pr_d30_r6x_001"]
     lt_interiors_raw = rows_from_sheet(wb, "lt_interiors")
@@ -668,7 +672,7 @@ def main() -> None:
     price_ref_rows = rows_from_sheet(wb, "PriceRef")
     price_ref = price_ref_prices(price_ref_rows)
     interior_component_price_ref = price_ref_component_prices(price_ref_rows)
-    color_overrides_raw = rows_from_sheet(wb, "color_overrides")
+    color_overrides_raw = rows_from_sheet(wb, MODEL_CONFIG.color_overrides_sheet)
     rule_groups = load_rule_groups(wb)
     exclusive_groups = load_exclusive_groups(wb)
     default_selection_rules = load_default_selection_rules(wb, MODEL_CONFIG.model_key)

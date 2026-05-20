@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -46,3 +46,9 @@ class ModelConfig:
     text_cleanup: Mapping[str, Any] = field(default_factory=dict)
     special_rule_review_rpos: tuple[str, ...] = ()
     notes: tuple[str, ...] = ()
+
+    def with_overrides(self, **changes: Any) -> "ModelConfig":
+        """Return a copy with non-None override values applied."""
+
+        clean_changes = {key: value for key, value in changes.items() if value is not None}
+        return replace(self, **clean_changes)
