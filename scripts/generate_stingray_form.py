@@ -21,12 +21,15 @@ from corvette_form_generator.mapping import (
 from corvette_form_generator.model_configs import GRAND_SPORT_MODEL, STINGRAY_MODEL
 from corvette_form_generator.output import write_app_data_registry, write_json_output
 from corvette_form_generator.runtime_metadata import (
+    load_context_sections,
     load_default_selection_rules,
     load_interior_components,
     load_order_summary_metadata,
     load_runtime_rule_exceptions,
+    load_runtime_steps,
     load_section_presentation,
     load_variant_option_overrides,
+    presentation_bool,
 )
 from corvette_form_generator.validation import validation_error_count
 from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet, save_workbook_safely, write_sheet
@@ -224,18 +227,18 @@ def build_app_data_registry(stingray_data: dict[str, Any]) -> dict[str, Any]:
         "models": models,
     }
 
-STINGRAY_SECTION_DISPLAY_ORDER_OVERRIDES = {
-    "sec_stri_001": 30,
-    "sec_gsha_001": 50,
-    "sec_gsce_001": 51,
-}
-
-def step_for_section(section_id: str, section_name: str, section_step_key: str = "") -> str:
+def step_for_section(
+    section_id: str,
+    section_name: str,
+    section_step_key: str = "",
+    *,
+    standard_sections: set[str] | frozenset[str] | None = None,
+) -> str:
     return shared_step_for_section(
         section_id,
         section_name,
         section_step_key=section_step_key,
-        standard_sections=STANDARD_SECTIONS,
+        standard_sections=standard_sections or STANDARD_SECTIONS,
         section_step_overrides=SECTION_STEP_OVERRIDES,
     )
 
@@ -624,6 +627,7 @@ def standard_equipment_row(choice: dict[str, Any]) -> dict[str, Any]:
         "description": choice["description"],
         "section_id": choice["section_id"],
         "section_name": choice["section_name"],
+        "standard_equipment_group_type": choice.get("standard_equipment_group_type", ""),
         "display_order": choice["display_order"],
         "source_detail_raw": choice["source_detail_raw"],
     }
@@ -670,8 +674,18 @@ def main() -> None:
     default_selection_rules = load_default_selection_rules(wb, MODEL_CONFIG.model_key)
     runtime_rule_exceptions = load_runtime_rule_exceptions(wb, MODEL_CONFIG.model_key)
     order_summary_metadata = load_order_summary_metadata(wb, MODEL_CONFIG.model_key)
+    runtime_steps = load_runtime_steps(wb, MODEL_CONFIG.model_key, MODEL_CONFIG.step_order, MODEL_CONFIG.step_labels)
+    context_sections = [
+        {**row, "selection_mode_label": selection_mode_label(row.get("selection_mode", ""))}
+        for row in load_context_sections(wb, MODEL_CONFIG.model_key, MODEL_CONFIG.context_sections)
+    ]
     section_presentation_rows = load_section_presentation(wb, MODEL_CONFIG.model_key)
     section_presentation = {row["section_id"]: row for row in section_presentation_rows}
+    standard_section_ids = {
+        section_id
+        for section_id, presentation in section_presentation.items()
+        if presentation_bool(presentation, "standard_equipment_bucket", default=False)
+    } or set(STANDARD_SECTIONS)
     variant_option_override_rows = load_variant_option_overrides(wb, MODEL_CONFIG.model_key)
     variant_option_overrides = {
         (row["option_id"], row["variant_id"]): row
@@ -720,18 +734,27 @@ def main() -> None:
     ]
     variant_by_id = {row["variant_id"]: row for row in active_variants}
 
-    section_rows: list[dict[str, Any]] = [dict(row) for row in CONTEXT_SECTIONS]
+    section_rows: list[dict[str, Any]] = [dict(row) for row in context_sections]
     for section_id, section in sections.items():
-        step_key = step_for_section(section_id, section.get("section_name", ""), section.get("step_key", ""))
-        selection_mode = section.get("selection_mode", "")
-        section_display_order = STINGRAY_SECTION_DISPLAY_ORDER_OVERRIDES.get(
+        presentation = section_presentation.get(section_id, {})
+        section_name = clean(presentation.get("display_label")) or section.get("section_name", "")
+        presentation_step_key = clean(presentation.get("step_key"))
+        step_key = step_for_section(
             section_id,
-            intish(section.get("display_order")),
+            section_name,
+            presentation_step_key or section.get("step_key", ""),
+            standard_sections=standard_section_ids,
+        )
+        selection_mode = section.get("selection_mode", "")
+        section_display_order = (
+            intish(presentation.get("section_display_order"))
+            if clean(presentation.get("section_display_order"))
+            else intish(section.get("display_order"))
         )
         section_rows.append(
             {
                 "section_id": section_id,
-                "section_name": section.get("section_name", ""),
+                "section_name": section_name,
                 "selection_mode": selection_mode,
                 "selection_mode_label": selection_mode_label(selection_mode),
                 "choice_mode": normalize_mode(selection_mode),
@@ -743,16 +766,7 @@ def main() -> None:
             }
         )
 
-    step_rows: list[dict[str, Any]] = [
-        {
-            "step_key": step_key,
-            "step_label": STEP_LABELS[step_key],
-            "runtime_order": idx + 1,
-            "source": "runtime",
-            "section_ids": "",
-        }
-        for idx, step_key in enumerate(STEP_ORDER)
-    ]
+    step_rows: list[dict[str, Any]] = [dict(row) for row in runtime_steps]
     section_ids_by_step: dict[str, list[str]] = defaultdict(list)
     for row in section_rows:
         section_ids_by_step[row["step_key"]].append(row["section_id"])
@@ -821,7 +835,15 @@ def main() -> None:
         if option["option_id"] in options_by_id and option.get("active") != "True":
             continue
         section = sections.get(option.get("section_id", ""), {})
-        step_key = step_for_section(option.get("section_id", ""), section.get("section_name", ""), section.get("step_key", ""))
+        presentation = section_presentation.get(option.get("section_id", ""), {})
+        section_name = clean(presentation.get("display_label")) or section.get("section_name", "")
+        presentation_step_key = clean(presentation.get("step_key"))
+        step_key = step_for_section(
+            option.get("section_id", ""),
+            section_name,
+            presentation_step_key or section.get("step_key", ""),
+            standard_sections=standard_section_ids,
+        )
         mode = section.get("selection_mode", "")
         options_by_id[option["option_id"]] = {
             "option_id": option["option_id"],
@@ -830,7 +852,8 @@ def main() -> None:
             "description": option.get("description", ""),
             "source_detail_raw": option.get("detail_raw", ""),
             "section_id": option.get("section_id", ""),
-            "section_name": section.get("section_name", ""),
+            "section_name": section_name,
+            "standard_equipment_group_type": clean(presentation.get("standard_equipment_group_type")),
             "step_key": step_key,
             "selection_mode": mode,
             "selection_mode_label": selection_mode_label(mode),
@@ -880,6 +903,7 @@ def main() -> None:
                 "description": option["description"],
                 "section_id": option["section_id"],
                 "section_name": option["section_name"],
+                "standard_equipment_group_type": option.get("standard_equipment_group_type", ""),
                 "step_key": option["step_key"],
                 "variant_id": variant["variant_id"],
                 "body_style": variant["body_style"],
@@ -1325,6 +1349,7 @@ def main() -> None:
             "description",
             "section_id",
             "section_name",
+            "standard_equipment_group_type",
             "display_order",
             "source_detail_raw",
         ],

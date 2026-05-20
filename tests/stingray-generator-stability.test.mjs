@@ -109,6 +109,71 @@ const interiorComponentHeaders = [
   "notes",
 ];
 const modelInteriorScopeHeaders = ["model_key", "interior_id", "trim_level", "active", "requires_option_id", "notes"];
+const runtimeStepHeaders = ["model_key", "step_key", "step_label", "runtime_order", "source", "active", "notes"];
+const contextSectionHeaders = [
+  "model_key",
+  "context_type",
+  "section_id",
+  "section_name",
+  "selection_mode",
+  "choice_mode",
+  "is_required",
+  "standard_behavior",
+  "section_display_order",
+  "step_key",
+  "step_label",
+  "active",
+  "notes",
+];
+const sectionPresentationHeaders = [
+  "model_key",
+  "section_id",
+  "display_label",
+  "step_key",
+  "presentation_bucket",
+  "display_behavior",
+  "section_display_order",
+  "standard_equipment_bucket",
+  "standard_equipment_group_type",
+  "active",
+  "notes",
+];
+const standardEquipmentGroupHeaders = [
+  "model_key",
+  "section_id",
+  "group_type",
+  "default_open",
+  "canonical_rank",
+  "duplicate_group_key",
+  "active",
+  "notes",
+];
+const expectedRuntimeStepKeys = [
+  "body_style",
+  "trim_level",
+  "paint",
+  "exterior_appearance",
+  "wheels",
+  "packages_performance",
+  "aero_exhaust_stripes_accessories",
+  "seat",
+  "base_interior",
+  "seat_belt",
+  "interior_trim",
+  "accessories",
+  "delivery",
+  "summary",
+];
+const expectedStandardSectionIds = [
+  "sec_1lte_001",
+  "sec_2lte_001",
+  "sec_3lte_001",
+  "sec_incl_001",
+  "sec_safe_001",
+  "sec_stan_001",
+  "sec_stan_002",
+  "sec_tech_001",
+];
 const requiredGrandSportPriceRuleIds = [
   "gs_pr_fey_j57_001",
   "gs_pr_fey_t0f_001",
@@ -358,6 +423,55 @@ test("section_master owns section step placement without category", () => {
     assert.ok(sectionStepKeys.has(row.step_key), `${row.section_id} has invalid step_key ${row.step_key}`);
     assert.equal(Object.hasOwn(row, "category"), false);
   }
+});
+
+test("Phase 6 step and presentation metadata are workbook-owned", () => {
+  assert.deepEqual(workbookHeaders("runtime_steps"), runtimeStepHeaders);
+  assert.deepEqual(workbookHeaders("context_section_master"), contextSectionHeaders);
+  assert.deepEqual(workbookHeaders("section_presentation"), sectionPresentationHeaders);
+  assert.deepEqual(workbookHeaders("standard_equipment_groups"), standardEquipmentGroupHeaders);
+
+  for (const modelKey of ["stingray", "grand_sport"]) {
+    const runtimeRows = workbookRows("runtime_steps")
+      .filter((row) => row.model_key === modelKey && row.active === "True")
+      .sort((a, b) => Number(a.runtime_order) - Number(b.runtime_order));
+    assert.deepEqual(runtimeRows.map((row) => row.step_key), expectedRuntimeStepKeys, `${modelKey} runtime_steps should own current step order`);
+
+    const contextRows = workbookRows("context_section_master").filter((row) => row.model_key === modelKey && row.active === "True");
+    assert.deepEqual(
+      contextRows.map((row) => row.section_id).sort(),
+      ["sec_context_body_style", "sec_context_trim_level"],
+      `${modelKey} context sections should be workbook-owned`
+    );
+
+    const standardRows = workbookRows("section_presentation").filter(
+      (row) => row.model_key === modelKey && row.active === "True" && row.standard_equipment_bucket === "True"
+    );
+    assert.deepEqual(
+      standardRows.map((row) => row.section_id).sort(),
+      expectedStandardSectionIds,
+      `${modelKey} standard-equipment buckets should be workbook-owned`
+    );
+    assert.deepEqual(
+      standardRows.filter((row) => row.standard_equipment_group_type === "trim_equipment").map((row) => row.section_id).sort(),
+      ["sec_1lte_001", "sec_2lte_001", "sec_3lte_001"],
+      `${modelKey} trim-equipment grouping should be workbook-owned`
+    );
+  }
+
+  const presentationByKey = new Map(workbookRows("section_presentation").map((row) => [`${row.model_key}::${row.section_id}`, row]));
+  assert.equal(presentationByKey.get("stingray::sec_stri_001")?.section_display_order, 30);
+  assert.equal(presentationByKey.get("stingray::sec_gsha_001")?.section_display_order, 50);
+  assert.equal(presentationByKey.get("stingray::sec_gsce_001")?.section_display_order, 51);
+  assert.equal(presentationByKey.get("grand_sport::sec_gsce_001")?.display_label, "Grand Sport Center Stripes");
+  assert.equal(presentationByKey.get("grand_sport::sec_gsha_001")?.display_label, "Grand Sport Heritage Hash Marks");
+  assert.equal(presentationByKey.get("grand_sport::sec_spec_001")?.display_label, "Special Edition");
+  assert.equal(presentationByKey.get("grand_sport::sec_colo_001")?.display_label, "Color Combination Override");
+
+  assert.match(generatorSource, /load_runtime_steps/);
+  assert.match(generatorSource, /load_context_sections/);
+  assert.match(generatorSource, /standard_equipment_group_type/);
+  assert.doesNotMatch(generatorSource, /STINGRAY_SECTION_DISPLAY_ORDER_OVERRIDES\s*=\s*\{/);
 });
 
 test("Grand Sport draft rule source sheets use workbook-backed contracts", () => {

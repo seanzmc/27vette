@@ -598,6 +598,12 @@ test("Grand Sport draft section placement follows section_master step_key", () =
   assert.equal(sectionById.get("sec_lpoi_001")?.step_key, "accessories");
 });
 
+test("Grand Sport draft standard equipment grouping is workbook-owned", () => {
+  const trimRows = draft.standardEquipment.filter((item) => item.standard_equipment_group_type === "trim_equipment");
+  assert.ok(trimRows.length > 0, "trim equipment rows should be tagged by generated workbook metadata");
+  assert.equal(trimRows.every((item) => ["sec_1lte_001", "sec_2lte_001", "sec_3lte_001"].includes(item.section_id)), true);
+});
+
 test("Grand Sport wheel choices use workbook display order by ascending price", () => {
   const wheels = draft.choices
     .filter((choice) => choice.variant_id === "1lt_e07" && choice.section_id === "sec_whee_002")

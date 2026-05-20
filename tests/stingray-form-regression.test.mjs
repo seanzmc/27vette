@@ -2021,3 +2021,11 @@ test("sidebar keeps one Standard & Included surface inside Selected RPOs", () =>
   assert.doesNotMatch(htmlSource, /standardEquipmentList/);
   assert.doesNotMatch(htmlSource, /standard-card/);
 });
+
+test("standard equipment grouping is data-driven by workbook metadata", () => {
+  const trimRows = data.standardEquipment.filter((item) => item.standard_equipment_group_type === "trim_equipment");
+  assert.ok(trimRows.length > 0, "trim equipment rows should be tagged by generated workbook metadata");
+  assert.equal(trimRows.every((item) => ["sec_1lte_001", "sec_2lte_001", "sec_3lte_001"].includes(item.section_id)), true);
+  assert.doesNotMatch(appSource, /LT Equipment\$\.test/);
+  assert.match(appSource, /standard_equipment_group_type === "trim_equipment"/);
+});

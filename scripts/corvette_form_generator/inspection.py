@@ -13,7 +13,14 @@ from openpyxl import load_workbook
 
 from corvette_form_generator.mapping import best_status, normalize_mode, selection_mode_label, status_to_label, step_for_section
 from corvette_form_generator.model_config import ModelConfig
-from corvette_form_generator.runtime_metadata import load_interior_components, load_model_interior_scope_map
+from corvette_form_generator.runtime_metadata import (
+    load_context_sections,
+    load_interior_components,
+    load_model_interior_scope_map,
+    load_runtime_steps,
+    load_section_presentation,
+    presentation_bool,
+)
 from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet
 
 
@@ -536,27 +543,55 @@ def resolved_step_key(
     section_id: str,
     sections: dict[str, dict[str, str]],
     config: ModelConfig,
+    section_presentation: dict[str, dict[str, Any]] | None = None,
 ) -> str:
     section = sections.get(section_id, {})
+    presentation = (section_presentation or {}).get(section_id, {})
+    presentation_step_key = clean(presentation.get("step_key"))
+    standard_sections = {
+        key
+        for key, row in (section_presentation or {}).items()
+        if presentation_bool(row, "standard_equipment_bucket", default=False)
+    } or config.standard_sections
     return step_for_section(
         section_id,
-        section.get("section_name", ""),
-        section_step_key=clean(section.get("step_key", "")),
-        standard_sections=config.standard_sections,
+        clean(presentation.get("display_label")) or section.get("section_name", ""),
+        section_step_key=presentation_step_key or clean(section.get("step_key", "")),
+        standard_sections=standard_sections,
         section_step_overrides=config.section_step_overrides,
     )
+
+
+def section_display_label(
+    section_id: str,
+    sections: dict[str, dict[str, str]],
+    section_presentation: dict[str, dict[str, Any]] | None = None,
+    config: ModelConfig | None = None,
+) -> str:
+    presentation = (section_presentation or {}).get(section_id, {})
+    if clean(presentation.get("display_label")):
+        return clean(presentation.get("display_label"))
+    if config and section_id in config.section_label_overrides:
+        return config.section_label_overrides[section_id]
+    return sections.get(section_id, {}).get("section_name", "")
 
 
 def section_step_resolution_source(
     section_id: str,
     sections: dict[str, dict[str, str]],
     config: ModelConfig,
+    section_presentation: dict[str, dict[str, Any]] | None = None,
 ) -> str:
+    presentation = (section_presentation or {}).get(section_id, {})
+    if clean(presentation.get("step_key")):
+        return "section_presentation"
     section = sections.get(section_id, {})
     if clean(section.get("step_key", "")):
         return "section_master"
     if section_id in config.section_step_overrides:
         return "model_config"
+    if presentation_bool(presentation, "standard_equipment_bucket", default=False):
+        return "section_presentation_standard_bucket"
     if section_id in config.standard_sections:
         return "standard_sections"
     return "heuristic"
@@ -973,6 +1008,8 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
     raw_rows = rows_from_sheet(wb, config.source_option_sheet)
     variants_raw = rows_from_sheet(wb, "variant_master")
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
+    section_presentation_rows = load_section_presentation(wb, config.model_key)
+    section_presentation = {row["section_id"]: row for row in section_presentation_rows}
     rows = [normalized_option_row(row, config) for row in raw_rows]
     status_lookup = status_lookup_from_sheet(wb, config)
     apply_status_lookup(rows, status_lookup, config)
@@ -1073,14 +1110,7 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
             missing_sections[row["option_id"]] += 1
         elif section_id not in sections:
             unknown_sections[section_id] += 1
-        section = sections.get(section_id, {})
-        step_key = step_for_section(
-            section_id,
-            section.get("section_name", ""),
-            section_step_key=clean(section.get("step_key", "")),
-            standard_sections=config.standard_sections,
-            section_step_overrides=config.section_step_overrides,
-        )
+        step_key = resolved_step_key(section_id, sections, config, section_presentation)
         section_mapping_rows.append(
             {
                 "option_id": row["option_id"],
@@ -1193,6 +1223,16 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     raw_rows = rows_from_sheet(wb, config.source_option_sheet)
     variants_raw = rows_from_sheet(wb, "variant_master")
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
+    section_presentation_rows = load_section_presentation(wb, config.model_key)
+    section_presentation = {row["section_id"]: row for row in section_presentation_rows}
+    runtime_steps = load_runtime_steps(wb, config.model_key, config.step_order, config.step_labels)
+    context_sections = [
+        {
+            **row,
+            "selection_mode_label": selection_mode_label(row.get("selection_mode", ""), config.selection_mode_labels),
+        }
+        for row in load_context_sections(wb, config.model_key, config.context_sections)
+    ]
     rows = [normalized_option_row(row, config) for row in raw_rows]
     apply_status_lookup(rows, status_lookup_from_sheet(wb, config), config)
     variant_option_overrides = load_variant_option_overrides(wb, config)
@@ -1328,7 +1368,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
         if row["active"] != "True":
             continue
         section_id = row["section_id"]
-        step_key = resolved_step_key(section_id, sections, config)
+        step_key = resolved_step_key(section_id, sections, config, section_presentation)
         if not section_id:
             issue = {
                 "issue_type": "unresolved_section",
@@ -1380,11 +1420,8 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             if choice_section_id not in sections:
                 continue
             choice_section = sections.get(choice_section_id, {})
-            choice_step_key = resolved_step_key(choice_section_id, sections, config)
-            choice_section_name = config.section_label_overrides.get(
-                choice_section_id,
-                choice_section.get("section_name", ""),
-            )
+            choice_step_key = resolved_step_key(choice_section_id, sections, config, section_presentation)
+            choice_section_name = section_display_label(choice_section_id, sections, section_presentation, config)
             status, selectable, active = display_behavior_status(
                 status,
                 choice_row["selectable"],
@@ -1400,6 +1437,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
                 "section_id": choice_section_id,
                 "resolved_section_id": choice_section_id,
                 "section_name": choice_section_name,
+                "standard_equipment_group_type": clean(section_presentation.get(choice_section_id, {}).get("standard_equipment_group_type")),
                 "step_key": choice_step_key,
                 "variant_id": variant_id,
                 "body_style": variant["body_style"],
@@ -1429,11 +1467,11 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             continue
         if step_key not in known_step_keys:
             continue
-        if section_step_resolution_source(section_id, sections, config) == "heuristic":
+        if section_step_resolution_source(section_id, sections, config, section_presentation) == "heuristic":
             issue = {
                 "issue_type": "heuristic_section_step_key",
                 "section_id": section_id,
-                "step_key": resolved_step_key(section_id, sections, config),
+                "step_key": resolved_step_key(section_id, sections, config, section_presentation),
                 "message": "Active Grand Sport choices fell back to heuristic step placement instead of workbook-owned placement.",
             }
             unresolved_issues.append(issue)
@@ -1443,29 +1481,31 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
 
     def section_sort_key(section_id: str) -> tuple[int, int, str]:
         section = sections.get(section_id, {})
-        step_key = resolved_step_key(section_id, sections, config)
+        presentation = section_presentation.get(section_id, {})
+        step_key = resolved_step_key(section_id, sections, config, section_presentation)
         return (
-            intish(section.get("display_order"), 9999),
+            intish(presentation.get("section_display_order"), intish(section.get("display_order"), 9999)),
             step_order_index.get(step_key, 9999),
             section_id,
         )
 
-    section_rows: list[dict[str, Any]] = [dict(section) for section in config.context_sections]
+    section_rows: list[dict[str, Any]] = [dict(section) for section in context_sections]
     for section_id in sorted(section_ids_with_choices, key=section_sort_key):
         section = sections.get(section_id, {})
-        step_key = resolved_step_key(section_id, sections, config)
+        presentation = section_presentation.get(section_id, {})
+        step_key = resolved_step_key(section_id, sections, config, section_presentation)
         selection_mode = section.get("selection_mode", "")
         section_rows.append(
             {
                 "section_id": section_id,
-                "section_name": config.section_label_overrides.get(section_id, section.get("section_name", "")),
+                "section_name": section_display_label(section_id, sections, section_presentation, config),
                 "source_section_name": section.get("section_name", ""),
                 "selection_mode": selection_mode,
                 "selection_mode_label": selection_mode_label(selection_mode, config.selection_mode_labels),
                 "choice_mode": normalize_mode(selection_mode),
                 "is_required": section.get("is_required", ""),
                 "standard_behavior": section.get("standard_behavior", ""),
-                "section_display_order": intish(section.get("display_order")),
+                "section_display_order": intish(presentation.get("section_display_order"), intish(section.get("display_order"))),
                 "step_key": step_key,
                 "step_label": config.step_labels.get(step_key, step_key.replace("_", " ").title()),
             }
@@ -1474,16 +1514,9 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     section_ids_by_step: dict[str, list[str]] = defaultdict(list)
     for row in section_rows:
         section_ids_by_step[row["step_key"]].append(row["section_id"])
-    step_rows = [
-        {
-            "step_key": step_key,
-            "step_label": config.step_labels[step_key],
-            "runtime_order": index + 1,
-            "source": "runtime",
-            "section_ids": "|".join(sorted(section_ids_by_step.get(step_key, []))),
-        }
-        for index, step_key in enumerate(config.step_order)
-    ]
+    step_rows = [dict(row) for row in runtime_steps]
+    for row in step_rows:
+        row["section_ids"] = "|".join(sorted(section_ids_by_step.get(row["step_key"], [])))
 
     blank_overrides = []
     for option_id, configured_section_id in config.blank_section_overrides.items():
@@ -1609,6 +1642,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
                 "description": option["description"],
                 "section_id": choice_source["section_id"],
                 "section_name": choice_source["section_name"],
+                "standard_equipment_group_type": choice_source.get("standard_equipment_group_type", ""),
                 "step_key": choice_source["step_key"],
                 "variant_id": variant_id,
                 "body_style": variant["body_style"],
@@ -1644,6 +1678,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
             "description": choice["description"],
             "section_id": choice["section_id"],
             "section_name": choice["section_name"],
+            "standard_equipment_group_type": choice.get("standard_equipment_group_type", ""),
             "display_order": choice["display_order"],
             "source_detail_raw": choice["source_detail_raw"],
         }

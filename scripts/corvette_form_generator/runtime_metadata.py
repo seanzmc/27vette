@@ -87,7 +87,6 @@ def load_runtime_steps(
                 "step_label": clean(fallback_labels.get(step_key, step_key)),
                 "runtime_order": index,
                 "source": "fallback_config",
-                "notes": "",
             }
             for index, step_key in enumerate(fallback_order, start=1)
             if clean(step_key)
@@ -103,8 +102,7 @@ def load_runtime_steps(
                 "step_key": step_key,
                 "step_label": clean(row.get("step_label")) or clean(fallback_labels.get(step_key, step_key)),
                 "runtime_order": intish(row.get("runtime_order"), len(steps) + 1),
-                "source": clean(row.get("source")),
-                "notes": clean(row.get("notes")),
+                "source": clean(row.get("source")) or "workbook",
             }
         )
     return sorted(steps, key=lambda row: (row["runtime_order"], row["step_key"]))
@@ -133,12 +131,11 @@ def load_context_sections(
                 "section_name": clean(row.get("section_name")),
                 "selection_mode": clean(row.get("selection_mode")),
                 "choice_mode": clean(row.get("choice_mode")),
-                "is_required": truthy(row.get("is_required"), default=False),
+                "is_required": clean(row.get("is_required")),
                 "standard_behavior": clean(row.get("standard_behavior")),
                 "section_display_order": intish(row.get("section_display_order"), len(sections) + 1),
                 "step_key": clean(row.get("step_key")),
                 "step_label": clean(row.get("step_label")),
-                "notes": clean(row.get("notes")),
             }
         )
     return sorted(sections, key=lambda row: (row["section_display_order"], row["section_id"]))
@@ -147,10 +144,14 @@ def load_context_sections(
 def load_section_presentation(wb: Any, model_key: str) -> list[dict[str, Any]]:
     rows = active_rows(wb, "section_presentation", model_key)
     presentations: list[dict[str, Any]] = []
+    seen: set[str] = set()
     for row in rows:
         section_id = clean(row.get("section_id"))
         if not section_id:
             continue
+        if section_id in seen:
+            raise ValueError(f"Duplicate active section_presentation row for model {model_key}: section_id={section_id}")
+        seen.add(section_id)
         presentations.append(
             {
                 "section_id": section_id,
@@ -158,13 +159,23 @@ def load_section_presentation(wb: Any, model_key: str) -> list[dict[str, Any]]:
                 "step_key": clean(row.get("step_key")),
                 "presentation_bucket": clean(row.get("presentation_bucket")),
                 "display_behavior": clean(row.get("display_behavior")),
-                "section_display_order": intish(row.get("section_display_order"), 0),
+                "section_display_order": clean(row.get("section_display_order")),
                 "standard_equipment_bucket": clean(row.get("standard_equipment_bucket")),
                 "standard_equipment_group_type": clean(row.get("standard_equipment_group_type")),
-                "notes": clean(row.get("notes")),
             }
         )
-    return sorted(presentations, key=lambda row: (row["section_display_order"], row["section_id"]))
+    return sorted(presentations, key=lambda row: (intish(row["section_display_order"], 0), row["section_id"]))
+
+
+def keyed_section_presentation(wb: Any, model_key: str) -> dict[str, dict[str, Any]]:
+    return {row["section_id"]: row for row in load_section_presentation(wb, model_key)}
+
+
+def presentation_bool(row: Mapping[str, Any], key: str, default: bool = False) -> bool:
+    value = clean(row.get(key))
+    if not value:
+        return default
+    return truthy(value, default=default)
 
 
 def load_variant_option_overrides(

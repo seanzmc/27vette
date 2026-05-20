@@ -1451,7 +1451,7 @@ function standardEquipmentRows() {
 }
 
 function trimEquipmentRows() {
-  return standardEquipmentRows().filter((item) => /LT Equipment$/.test(item.section_name || ""));
+  return standardEquipmentRows().filter((item) => item.standard_equipment_group_type === "trim_equipment");
 }
 
 function isMobileViewport() {
