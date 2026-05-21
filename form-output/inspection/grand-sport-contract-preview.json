@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-05-21T14:34:38+00:00",
+    "generated_at": "2026-05-21T14:46:37+00:00",
     "status": "read_only_preview"
   },
   "variants": [
@@ -6727,7 +6727,7 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -6754,7 +6754,7 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -6781,7 +6781,7 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -6808,7 +6808,7 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -6835,7 +6835,7 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -6862,7 +6862,7 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_wub_001",
@@ -37104,7 +37104,7 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -37131,7 +37131,7 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -37158,7 +37158,7 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -37185,7 +37185,7 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -37212,7 +37212,7 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -37239,7 +37239,7 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_efr_001",

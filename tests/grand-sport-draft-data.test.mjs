@@ -441,6 +441,11 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
   assert.equal(convertibleBc7Choices.length, 3);
   assert.equal(convertibleBc7Choices.every((choice) => choice.display_behavior !== "default_selected"), true);
 
+  const grandSportNgaDefaults = draft.choices.filter((choice) => choice.option_id === "opt_nga_001");
+  assert.equal(grandSportNgaDefaults.length, 6);
+  assert.equal(grandSportNgaDefaults.every((choice) => choice.rpo === "NGA" && choice.status === "standard"), true);
+  assert.equal(grandSportNgaDefaults.every((choice) => choice.display_behavior === "default_selected"), true);
+
   const performanceBrakes = draft.choices.filter((choice) => choice.option_id === "opt_j56_001");
   assert.equal(performanceBrakes.length, 6);
   assert.equal(

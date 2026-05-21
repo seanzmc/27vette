@@ -557,7 +557,7 @@ test("Grand Sport workbook default_selected rows seed and reconcile defaults gen
   runtime.resetDefaults();
   runtime.reconcileSelections();
 
-  for (const optionId of ["opt_efr_001", "opt_t0e_001", "opt_jx6_001", "opt_719_001", "opt_bc7_001"]) {
+  for (const optionId of ["opt_efr_001", "opt_t0e_001", "opt_jx6_001", "opt_719_001", "opt_bc7_001", "opt_nga_001"]) {
     assert.equal(runtime.state.selected.has(optionId), true, `${optionId} should be selected from display_behavior=default_selected`);
   }
 

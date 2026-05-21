@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-21T14:34:08+00:00"
+          "generated_at": "2026-05-21T14:46:26+00:00"
         },
         "variants": [
           {
@@ -56158,7 +56158,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-05-21T14:33:39+00:00",
+          "generated_at": "2026-05-21T14:46:24+00:00",
           "status": "draft_not_runtime_active"
         },
         "variants": [
@@ -65504,7 +65504,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
-            "display_behavior": "",
+            "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Black Exhaust Tips",
@@ -65532,7 +65532,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
-            "display_behavior": "",
+            "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Black Exhaust Tips",
@@ -65560,7 +65560,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
-            "display_behavior": "",
+            "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Black Exhaust Tips",
@@ -65588,7 +65588,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
-            "display_behavior": "",
+            "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Black Exhaust Tips",
@@ -65616,7 +65616,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
-            "display_behavior": "",
+            "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Black Exhaust Tips",
@@ -65644,7 +65644,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
-            "display_behavior": "",
+            "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": "",
             "source_option_name": "Black Exhaust Tips",
