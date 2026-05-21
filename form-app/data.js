@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-21T20:44:35+00:00"
+          "generated_at": "2026-05-21T21:22:19+00:00"
         },
         "variants": [
           {
@@ -56158,7 +56158,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-05-21T20:44:24+00:00",
+          "generated_at": "2026-05-21T21:22:16+00:00",
           "status": "draft_not_runtime_active"
         },
         "variants": [
@@ -103073,9 +103073,9 @@ window.CORVETTE_FORM_DATA = {
               "opt_bcp_002",
               "opt_bcs_002"
             ],
-            "selection_mode": "required_single_within_group",
+            "selection_mode": "single_within_group",
             "active": "True",
-            "notes": "Grand Sport engine cover choices require one active cover selection; selected default cannot be cleared without choosing another cover."
+            "notes": "Grand Sport LS6 engine covers are mutually exclusive radio peers; Engine Appearance is not an open required section because selected packages provide covers through workbook rules."
           },
           {
             "group_id": "gs_excl_center_caps",

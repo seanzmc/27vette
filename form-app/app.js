@@ -1396,22 +1396,22 @@ function groupInteriorsBy(interiors, key) {
 
 function renderInteriorGroups(interiors) {
   if (!interiors.length) return "<p class=\"empty\">Select a seat first.</p>";
+  const colorGroups = groupInteriorsBy(interiors.slice().sort(sortInteriorsByDisplayOrder), "interior_color_family");
+  const shouldCollapseGroups = colorGroups.some((group) => group.rows.length > 1);
   return `
     <div class="interior-layout">
-      ${groupInteriorsBy(interiors.slice().sort(sortInteriorsByDisplayOrder), "interior_color_family")
+      ${colorGroups
         .map((group) => {
           const materialGroups = groupInteriorsBy(group.rows, "interior_material_family");
           const materialSummary = [...new Set(group.rows.map((interior) => interior.interior_material_family).filter(Boolean))].join(" / ");
           const selectedInGroup = group.rows.some((interior) => interior.interior_id === state.selectedInterior);
-          return `
-            <details class="interior-group"${selectedInGroup ? " open" : ""}>
-              <summary class="interior-group-header">
+          const groupHeader = `
                 <span class="interior-group-heading">
                   <span class="interior-group-title">${escapeHtml(group.label)}</span>
                   ${materialSummary ? `<span class="interior-group-summary">${escapeHtml(materialSummary)}</span>` : ""}
                 </span>
-                <span class="interior-group-count">${group.rows.length === 1 ? "1 choice" : `${group.rows.length} choices`}</span>
-              </summary>
+                <span class="interior-group-count">${group.rows.length === 1 ? "1 choice" : `${group.rows.length} choices`}</span>`;
+          const groupBody = `
               <div class="interior-group-body">
                 ${materialGroups
                   .map(
@@ -1425,7 +1425,21 @@ function renderInteriorGroups(interiors) {
                     `
                   )
                   .join("")}
+              </div>`;
+          if (!shouldCollapseGroups) {
+            return `
+            <section class="interior-group">
+              <div class="interior-group-header">${groupHeader}
               </div>
+              ${groupBody}
+            </section>
+          `;
+          }
+          return `
+            <details class="interior-group"${selectedInGroup ? " open" : ""}>
+              <summary class="interior-group-header">${groupHeader}
+              </summary>
+              ${groupBody}
             </details>
           `;
         })

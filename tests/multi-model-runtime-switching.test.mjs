@@ -172,7 +172,7 @@ const expectedGrandSportExclusiveGroups = [
   {
     groupId: "gs_excl_ls6_engine_covers",
     optionIds: ["opt_bc7_001", "opt_bc4_002", "opt_bcp_002", "opt_bcs_002"],
-    selectionMode: "required_single_within_group",
+    selectionMode: "single_within_group",
   },
   {
     groupId: "gs_excl_center_caps",
@@ -693,6 +693,38 @@ test("Grand Sport workbook default_selected rows seed and reconcile defaults gen
   assert.equal(redCaliperOrder.auto_added_options.some((item) => item.rpo === "J6D"), false, "Grey calipers should not override a user-selected caliper");
 });
 
+test("Grand Sport engine covers are radio peers without an open Engine Appearance requirement", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "convertible";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  assert.equal(runtime.missingRequired().includes("Engine Appearance"), false, "Grand Sport convertible should not have an open Engine Appearance requirement");
+
+  const zz3 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_zz3_001");
+  assert.ok(zz3, "ZZ3 should remain selectable for Grand Sport convertible");
+  runtime.handleChoice(zz3);
+  assert.equal(runtime.computeAutoAdded().has("opt_bc7_001"), true, "ZZ3 should still provide BC7 through workbook auto-add rules");
+
+  runtime.state.bodyStyle = "coupe";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  const b6p = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_b6p_001");
+  const bc4 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_bc4_002");
+  const bcp = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_bcp_002");
+  assert.ok(b6p && bc4 && bcp, "Grand Sport coupe engine appearance and cover choices should be active");
+  runtime.handleChoice(b6p);
+  assert.equal(runtime.state.selected.has("opt_bc7_001"), true, "B6P path should seed BC7 as the default cover");
+  runtime.handleChoice(bc4);
+  assert.equal(runtime.state.selected.has("opt_bc4_002"), true, "paid LS6 cover should select");
+  assert.equal(runtime.state.selected.has("opt_bc7_001"), false, "paid LS6 cover should replace BC7");
+  runtime.handleChoice(bcp);
+  assert.equal(runtime.state.selected.has("opt_bcp_002"), true, "another paid LS6 cover should select");
+  assert.equal(runtime.state.selected.has("opt_bc4_002"), false, "paid LS6 covers should remain radio peers");
+});
+
 test("Grand Sport WUB enables NWI without replacing NGA; NWI replaces and restores NGA", () => {
   const runtime = loadRuntime();
   runtime.activateModel("grandSport");
@@ -750,6 +782,24 @@ test("Grand Sport J57 soft-defaults J6D into selected RPOs instead of auto-added
   order = runtime.currentOrder();
   assert.equal(order.selected_options.some((item) => item.rpo === "J6F"), true, "user-selected caliper should replace J6D");
   assert.equal(order.selected_options.some((item) => item.rpo === "J6D"), false, "J6D soft default should not override user caliper choice");
+});
+
+test("Grand Sport 1LT interior color groups stay expanded when each group has one option", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  const gt1 = runtime.activeChoiceRows().find((choice) => choice.rpo === "AQ9" && choice.step_key === "seat");
+  assert.ok(gt1, "Grand Sport 1LT GT1 seat should exist");
+  runtime.handleChoice(gt1);
+  const interiors = runtime.data.interiors.filter((interior) => interior.trim_level === "1LT" && interior.seat_code === "AQ9");
+  assert.equal(interiors.length > 1, true, "Grand Sport 1LT should expose multiple color groups");
+  const html = runtime.renderInteriorGroups(interiors);
+  assert.doesNotMatch(html, /<details class="interior-group"/, "single-option 1LT color groups should not be collapsed");
+  assert.match(html, /<section class="interior-group"/);
+  assert.match(html, /<button class="choice-card"/);
 });
 
 test("Grand Sport interior color groups render collapsed disclosure containers", () => {

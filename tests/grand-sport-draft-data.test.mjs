@@ -78,7 +78,7 @@ const expectedGrandSportExclusiveGroups = [
   {
     group_id: "gs_excl_ls6_engine_covers",
     option_ids: ["opt_bc7_001", "opt_bc4_002", "opt_bcp_002", "opt_bcs_002"],
-    selection_mode: "required_single_within_group",
+    selection_mode: "single_within_group",
   },
   {
     group_id: "gs_excl_center_caps",

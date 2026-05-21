@@ -571,6 +571,24 @@ test("Engine Appearance is not an open requirement for Stingray convertible with
   assert.equal(runtime.missingRequired?.().includes("Engine Appearance"), false, "ZZ3 cover behavior should not create an Engine Appearance open requirement");
 });
 
+test("1LT interior color groups stay expanded when each group has one option", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  const gt1 = runtime.activeChoiceRows().find((choice) => choice.rpo === "AQ9" && choice.step_key === "seat");
+  assert.ok(gt1, "GT1 seat should exist for 1LT");
+  runtime.handleChoice(gt1);
+  const interiors = runtime.data.interiors.filter((interior) => interior.trim_level === "1LT" && interior.seat_code === "AQ9");
+  assert.equal(interiors.length > 1, true, "1LT should expose multiple color groups");
+
+  const html = runtime.renderInteriorGroups(interiors);
+  assert.doesNotMatch(html, /<details class="interior-group"/, "single-option 1LT color groups should not be collapsed");
+  assert.match(html, /<section class="interior-group"/);
+  assert.match(html, /<button class="choice-card"/);
+});
+
 test("interior color groups render as collapsed disclosure containers without the rejected restyle", () => {
   const runtime = loadRuntime();
   runtime.state.bodyStyle = "coupe";
