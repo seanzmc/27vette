@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-21T14:46:26+00:00"
+          "generated_at": "2026-05-21T19:45:24+00:00"
         },
         "variants": [
           {
@@ -56158,7 +56158,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-05-21T14:46:24+00:00",
+          "generated_at": "2026-05-21T19:45:22+00:00",
           "status": "draft_not_runtime_active"
         },
         "variants": [
@@ -103073,9 +103073,9 @@ window.CORVETTE_FORM_DATA = {
               "opt_bcp_002",
               "opt_bcs_002"
             ],
-            "selection_mode": "single_within_group",
+            "selection_mode": "required_single_within_group",
             "active": "True",
-            "notes": "Grand Sport LS6 engine cover choices are mutually exclusive; duplicate generated option rows are preserved for a later cleanup pass."
+            "notes": "Grand Sport engine cover choices require one active cover selection; selected default cannot be cleared without choosing another cover."
           },
           {
             "group_id": "gs_excl_center_caps",
@@ -103146,9 +103146,9 @@ window.CORVETTE_FORM_DATA = {
               "opt_efr_001",
               "opt_edu_001"
             ],
-            "selection_mode": "single_within_group",
+            "selection_mode": "required_single_within_group",
             "active": "True",
-            "notes": "EFR and EDU are mutually exclusive; ZYC remains selectable independently."
+            "notes": "Grand Sport exterior accent choices require either EFR or EDU; selected default cannot be cleared without choosing the alternate accent package."
           },
           {
             "group_id": "gs_excl_performance_brakes",
@@ -103157,9 +103157,19 @@ window.CORVETTE_FORM_DATA = {
               "opt_j56_001",
               "opt_j57_001"
             ],
-            "selection_mode": "single_within_group",
+            "selection_mode": "required_single_within_group",
             "active": "True",
-            "notes": "JX6, J56, and J57 are mutually exclusive brake choices."
+            "notes": "Grand Sport brake choices require one active brake selection; selected default cannot be cleared without choosing another brake package."
+          },
+          {
+            "group_id": "gs_excl_exhaust_path",
+            "option_ids": [
+              "opt_nga_001",
+              "opt_wub_001"
+            ],
+            "selection_mode": "required_single_within_group",
+            "active": "True",
+            "notes": "Grand Sport exhaust path requires either standard NGA corner-exit exhaust tips or WUB quad center-exit exhaust; selected default cannot be cleared without choosing the alternate exhaust path."
           }
         ],
         "rules": [

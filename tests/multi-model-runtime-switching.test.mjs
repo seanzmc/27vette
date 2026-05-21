@@ -136,6 +136,8 @@ window.__testApi = {
   handleChoice,
   computeAutoAdded,
   disableReasonForChoice,
+  missingRequirementDetails,
+  missingRequired,
   render,
   optionPrice,
   choiceDisplayPrice,
@@ -169,6 +171,7 @@ const expectedGrandSportExclusiveGroups = [
   {
     groupId: "gs_excl_ls6_engine_covers",
     optionIds: ["opt_bc7_001", "opt_bc4_002", "opt_bcp_002", "opt_bcs_002"],
+    selectionMode: "required_single_within_group",
   },
   {
     groupId: "gs_excl_center_caps",
@@ -197,10 +200,17 @@ const expectedGrandSportExclusiveGroups = [
   {
     groupId: "gs_excl_exterior_accents",
     optionIds: ["opt_efr_001", "opt_edu_001"],
+    selectionMode: "required_single_within_group",
   },
   {
     groupId: "gs_excl_performance_brakes",
     optionIds: ["opt_jx6_001", "opt_j56_001", "opt_j57_001"],
+    selectionMode: "required_single_within_group",
+  },
+  {
+    groupId: "gs_excl_exhaust_path",
+    optionIds: ["opt_nga_001", "opt_wub_001"],
+    selectionMode: "required_single_within_group",
   },
 ];
 
@@ -348,6 +358,28 @@ test("runtime renders Stingray paint image media from generated choice data", ()
   assert.match(html, /Arctic White/);
 });
 
+test("runtime renders disabled media and active tooltip pills for disabled context choices", () => {
+  const runtime = loadRuntime();
+  const html = runtime.renderContextCard({
+    context_choice_id: "disabled_trim_for_test",
+    context_type: "trim_level",
+    value: "3LT",
+    label: "3LT",
+    description: "Corvette Grand Sport Convertible 3LT",
+    info_tooltip: "Trim tooltip",
+    body_style: "convertible",
+    trim_level: "3LT",
+    base_price: 0,
+    image_url: "https://example.test/trim.png",
+    image_alt: "Convertible 3LT",
+    image_fit: "cover",
+  });
+
+  assert.match(html, /choice-card context-choice-card has-media disabled/);
+  assert.match(html, /choice-media disabled/);
+  assert.match(html, /choice-state disabled-reason info-tooltip" tabindex="0"/);
+});
+
 test("runtime renders context choice tooltips without replacing visible trim descriptions", () => {
   const runtime = loadRuntime();
   const html = runtime.renderContextCard({
@@ -380,7 +412,7 @@ test("Grand Sport exclusive groups are model-scoped and Stingray groups are unch
   for (const expected of expectedGrandSportExclusiveGroups) {
     const group = grandSportGroups.find((item) => item.group_id === expected.groupId);
     assert.ok(group, `${expected.groupId} should be generated for Grand Sport`);
-    assert.equal(group.selection_mode, "single_within_group");
+    assert.equal(group.selection_mode, expected.selectionMode || "single_within_group");
     assert.deepEqual(JSON.parse(JSON.stringify(group.option_ids)), expected.optionIds);
   }
 
@@ -428,6 +460,55 @@ test("Grand Sport exclusive group selections remove peer options without runtime
     assert.equal(runtime.state.selected.has(firstId), false, `${firstId} should be removed from selected`);
     assert.equal(runtime.state.userSelected.has(firstId), false, `${firstId} should be removed from userSelected`);
   }
+});
+
+test("Grand Sport required exclusive groups cannot be left empty", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  for (const expected of expectedGrandSportExclusiveGroups.filter((group) => group.selectionMode === "required_single_within_group")) {
+    if (expected.groupId === "gs_excl_ls6_engine_covers") {
+      const coupeEngineAppearance = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_b6p_001");
+      assert.ok(coupeEngineAppearance, "B6P should be active before testing Grand Sport coupe LS6 engine covers");
+      runtime.handleChoice(coupeEngineAppearance);
+    }
+    const activeGroupChoices = expected.optionIds
+      .map((optionId) => runtime.activeChoiceRows().find((choice) => choice.option_id === optionId))
+      .filter((choice) => choice?.selectable === "True")
+      .filter(Boolean);
+    assert.equal(activeGroupChoices.length >= 2, true, `${expected.groupId} should have switchable required choices`);
+    const [defaultChoice, alternateChoice] = activeGroupChoices;
+
+    runtime.handleChoice(defaultChoice);
+    assert.equal(runtime.state.selected.has(defaultChoice.option_id), true, `${defaultChoice.option_id} should not unselect as the last required choice`);
+
+    runtime.handleChoice(alternateChoice);
+    assert.equal(runtime.state.selected.has(alternateChoice.option_id), true, `${alternateChoice.option_id} should be selected after switching`);
+    assert.equal(runtime.state.selected.has(defaultChoice.option_id), false, `${defaultChoice.option_id} should be removed after alternate selection`);
+
+    runtime.handleChoice(alternateChoice);
+    assert.equal(runtime.state.selected.has(alternateChoice.option_id), true, `${alternateChoice.option_id} should not unselect as the last required choice`);
+  }
+});
+
+test("Grand Sport required exclusive groups report missing choices when cleared", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  for (const optionId of ["opt_efr_001", "opt_edu_001"]) {
+    runtime.state.selected.delete(optionId);
+    runtime.state.userSelected.delete(optionId);
+  }
+
+  assert.equal(runtime.missingRequired().includes("Exterior Accents"), true, "EFR/EDU should require one exterior accent choice");
 });
 
 test("Grand Sport heritage hash marks auto-add Z15 and leave only center stripes compatible", () => {

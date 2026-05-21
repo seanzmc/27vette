@@ -211,6 +211,10 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;");
 }
 
+function truthyValue(value) {
+  return ["true", "1", "yes", "y"].includes(String(value || "").trim().toLowerCase());
+}
+
 function renderInfoTooltip(content, label = "More information", { focusable = true, icon = true, triggerText = "" } = {}) {
   if (!content) return "";
   const safeContent = escapeHtml(content);
@@ -237,7 +241,7 @@ function renderStatePill(label, className, tooltip) {
     const safeLabel = escapeHtml(label);
     const safeTooltip = escapeHtml(tooltip);
     return `
-      <span class="choice-state ${className} info-tooltip" aria-label="${safeLabel} details: ${safeTooltip}">
+      <span class="choice-state ${className} info-tooltip" tabindex="0" aria-label="${safeLabel} details: ${safeTooltip}">
         <span class="tooltip-trigger-text">${safeLabel}</span>
         <span class="tooltip-panel" role="tooltip">${safeTooltip}</span>
       </span>
@@ -262,17 +266,26 @@ function cardHasMedia(row = {}) {
   return Boolean(String(row.image_url || "").trim());
 }
 
-function renderCardMedia(row = {}, fallbackAlt = "") {
+function renderCardMedia(row = {}, fallbackAlt = "", { disabled = false } = {}) {
   const imageUrl = String(row.image_url || "").trim();
   if (!imageUrl) return "";
   const imageAlt = String(row.image_alt || fallbackAlt || "").trim();
   const imageFit = cardImageFit(row.image_fit);
   const imagePosition = cardImagePosition(row.image_position);
+  const classes = ["choice-media"];
+  if (disabled) classes.push("disabled");
   return `
-    <span class="choice-media" data-fit="${escapeHtml(imageFit)}">
+    <span class="${classes.join(" ")}" data-fit="${escapeHtml(imageFit)}">
       <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}" loading="lazy" style="object-position: ${escapeHtml(imagePosition)};">
     </span>
   `;
+}
+
+function closeTooltips(exceptTrigger = null) {
+  if (!document?.querySelectorAll) return;
+  document.querySelectorAll(".info-tooltip.is-open").forEach((trigger) => {
+    if (trigger !== exceptTrigger) trigger.classList?.remove("is-open");
+  });
 }
 
 function positionTooltip(trigger) {
@@ -303,8 +316,29 @@ function positionTooltip(trigger) {
 function bindTooltips(root = document) {
   if (!root?.querySelectorAll) return;
   root.querySelectorAll(".info-tooltip").forEach((trigger) => {
+    if (trigger.dataset?.tooltipBound === "true") return;
+    if (trigger.dataset) trigger.dataset.tooltipBound = "true";
     trigger.addEventListener("mouseenter", () => positionTooltip(trigger));
     trigger.addEventListener("focus", () => positionTooltip(trigger));
+    trigger.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const shouldOpen = !trigger.classList?.contains("is-open");
+      closeTooltips(trigger);
+      trigger.classList?.toggle("is-open", shouldOpen);
+      if (shouldOpen) positionTooltip(trigger);
+    });
+    trigger.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      trigger.classList?.remove("is-open");
+      event.stopPropagation();
+    });
+  });
+}
+
+if (document?.addEventListener) {
+  document.addEventListener("click", (event) => {
+    if (!event.target?.closest?.(".info-tooltip")) closeTooltips();
   });
 }
 
@@ -555,19 +589,19 @@ function includedTargetRequirementsMet(targetId, selectedIds) {
 
 function selectedExclusiveGroupPeer(optionId, selectedIds) {
   const group = optionExclusiveGroup(optionId);
-  if (!group || group.selection_mode !== "single_within_group") return false;
+  if (!exclusiveGroupAllowsSingleSelection(group)) return false;
   return (group.option_ids || []).some((id) => id !== optionId && selectedIds.has(id));
 }
 
 function userSelectedExclusiveGroupPeer(optionId, selectedIds) {
   const group = optionExclusiveGroup(optionId);
-  if (!group || group.selection_mode !== "single_within_group") return false;
+  if (!exclusiveGroupAllowsSingleSelection(group)) return false;
   return (group.option_ids || []).some((id) => id !== optionId && selectedIds.has(id) && state.userSelected.has(id));
 }
 
 function sameExclusiveGroupPeer(optionId, peerId) {
   const group = optionExclusiveGroup(optionId);
-  if (!group || group.selection_mode !== "single_within_group") return false;
+  if (!exclusiveGroupAllowsSingleSelection(group)) return false;
   return (group.option_ids || []).includes(peerId);
 }
 
@@ -857,19 +891,22 @@ function missingRequirementDetails() {
   const rows = activeChoiceRows();
   const sections = new Map();
   const selectedIds = selectedContextIds();
+  const autoAdded = computeAutoAdded();
   for (const choice of rows) {
     const section = sectionsById.get(choice.section_id);
-    if (!section || section.selection_mode !== "single_select_req") continue;
+    if (!section || !(section.selection_mode === "single_select_req" || truthyValue(section.is_required))) continue;
     if (choice.step_key === "base_interior") continue;
     if (shouldHideChoice(choice)) continue;
     if (!sections.has(choice.section_id)) sections.set(choice.section_id, { section, choices: [] });
     sections.get(choice.section_id).choices.push(choice);
   }
   const missing = [];
+  const missingSectionIds = new Set();
   for (const [sectionId, { section, choices }] of sections) {
     const hasSelection = [...selectedIds].some((id) => optionSectionId(id) === sectionId);
     if (!hasSelection) {
       const step = runtimeSteps.find((item) => item.step_key === choices[0]?.step_key);
+      missingSectionIds.add(sectionId);
       missing.push({
         label: section.section_name,
         hasOptions: choices.some((choice) => choice.selectable === "True"),
@@ -877,6 +914,19 @@ function missingRequirementDetails() {
         detail: `Choose one ${step?.step_label ? `in ${step.step_label}` : "required option"} from ${section.section_name}.`,
       });
     }
+  }
+  for (const group of requiredExclusiveGroups()) {
+    const choices = activeChoicesForExclusiveGroup(group);
+    if (!choices.length || selectedOrAutoInExclusiveGroup(group, autoAdded, selectedIds)) continue;
+    const section = sectionsById.get(choices[0].section_id);
+    if (section && missingSectionIds.has(section.section_id)) continue;
+    const step = runtimeSteps.find((item) => item.step_key === choices[0]?.step_key);
+    missing.push({
+      label: section?.section_name || group.group_id,
+      hasOptions: choices.some((choice) => choice.selectable === "True"),
+      stepKey: choices[0]?.step_key || "",
+      detail: `Choose one ${step?.step_label ? `in ${step.step_label}` : "required option"} from ${section?.section_name || group.group_id}.`,
+    });
   }
   if (!state.selectedInterior) {
     missing.push({
@@ -975,9 +1025,38 @@ function optionExclusiveGroup(optionId) {
   return exclusiveGroupByOption.get(optionId) || null;
 }
 
+function exclusiveGroupAllowsSingleSelection(group) {
+  return ["single_within_group", "required_single_within_group"].includes(group?.selection_mode);
+}
+
+function exclusiveGroupRequiresSelection(group) {
+  return group?.selection_mode === "required_single_within_group";
+}
+
+function activeChoicesForExclusiveGroup(group) {
+  if (!group) return [];
+  return (group.option_ids || [])
+    .map((optionId) => choiceForCurrentVariant(optionId))
+    .filter((choice) => choice && !shouldHideChoice(choice));
+}
+
+function selectedOrAutoInExclusiveGroup(group, autoAdded = computeAutoAdded(), ids = state.selected) {
+  if (!group) return false;
+  return (group.option_ids || []).some((id) => ids.has(id) || autoAdded.has(id));
+}
+
+function selectedOptionIdsInExclusiveGroup(group, ids = state.selected) {
+  if (!group) return [];
+  return (group.option_ids || []).filter((id) => ids.has(id));
+}
+
+function requiredExclusiveGroups() {
+  return (data.exclusiveGroups || []).filter((group) => group.active === "True" && exclusiveGroupRequiresSelection(group));
+}
+
 function removeOtherExclusiveGroupOptions(optionId) {
   const group = optionExclusiveGroup(optionId);
-  if (!group || group.selection_mode !== "single_within_group") return;
+  if (!exclusiveGroupAllowsSingleSelection(group)) return;
   for (const id of group.option_ids || []) {
     if (id !== optionId) deleteSelectedOption(id);
   }
@@ -1048,6 +1127,15 @@ function hasIncludedFallbackForRequiredChoice(choice) {
     }
   }
   return false;
+}
+
+function wouldClearRequiredExclusiveGroup(choice, autoAdded = computeAutoAdded()) {
+  const group = optionExclusiveGroup(choice.option_id);
+  if (!exclusiveGroupRequiresSelection(group)) return false;
+  if (hasIncludedFallbackForRequiredChoice(choice)) return false;
+  const selectedIds = new Set(state.selected);
+  selectedIds.delete(choice.option_id);
+  return !selectedOrAutoInExclusiveGroup(group, autoAdded, selectedIds);
 }
 
 function validInteriorsForSelectedSeat() {
@@ -1135,6 +1223,7 @@ function handleChoice(choice) {
   if (section?.choice_mode === "single") {
     if (
       state.selected.has(choice.option_id) &&
+      !wouldClearRequiredExclusiveGroup(choice, autoAdded) &&
       (section.selection_mode === "single_select_opt" || hasIncludedFallbackForRequiredChoice(choice))
     ) {
       deleteSelectedOption(choice.option_id);
@@ -1148,6 +1237,7 @@ function handleChoice(choice) {
     state.selected.add(choice.option_id);
     state.userSelected.add(choice.option_id);
   } else if (state.selected.has(choice.option_id)) {
+    if (wouldClearRequiredExclusiveGroup(choice, autoAdded)) return;
     deleteSelectedOption(choice.option_id);
   } else {
     removeOtherExclusiveGroupOptions(choice.option_id);
@@ -1235,7 +1325,7 @@ function renderChoiceCard(choice, autoAdded) {
   if (autoReason) classes.push("auto");
   return `
     <button class="${classes.join(" ")}" type="button" data-option="${choice.option_id}" ${disabled ? "aria-disabled=\"true\"" : ""}>
-      ${renderCardMedia(choice, choice.label)}
+      ${renderCardMedia(choice, choice.label, { disabled })}
       <span class="topline"><span class="rpo">${escapeHtml(choice.rpo || choice.option_id)}</span><span class="price">${formatMoney(choiceDisplayPrice(choice))}</span></span>
       <span class="choice-name"><span>${escapeHtml(choice.label)}</span>${renderInfoTooltip(detail, "Option details", { focusable: false })}</span>
       ${disabledReason ? renderStatePill("Unavailable", "disabled-reason", disabledReason) : ""}
@@ -1259,7 +1349,7 @@ function renderInteriorCard(interior) {
   const label = interior.interior_leaf_label || interior.interior_name;
   return `
     <button class="${classes.join(" ")}" type="button" data-interior="${interior.interior_id}" ${disabledReason ? "aria-disabled=\"true\"" : ""}>
-      ${renderCardMedia(interior, label)}
+      ${renderCardMedia(interior, label, { disabled: Boolean(disabledReason) })}
       <span class="topline"><span class="rpo">${interior.interior_code}</span><span class="price">${formatMoney(adjustedInteriorDisplayPrice(interior))}</span></span>
       <span class="choice-name"><span>${escapeHtml(label)}</span>${renderInfoTooltip(detail || interior.interior_id, "Interior details", { focusable: false })}</span>
       ${disabledReason ? renderStatePill("Unavailable", "disabled-reason", disabledReason) : ""}
@@ -1335,7 +1425,7 @@ function renderContextCard(choice) {
   const price = choice.base_price ? formatMoney(choice.base_price) : "";
   return `
     <button class="${classes.join(" ")}" type="button" data-context-choice="${choice.context_choice_id}" ${disabled ? "aria-disabled=\"true\"" : ""}>
-      ${renderCardMedia(choice, choice.description || choice.label)}
+      ${renderCardMedia(choice, choice.description || choice.label, { disabled })}
       <span class="topline"><span class="rpo">${escapeHtml(choice.label)}</span><span class="price">${price}</span></span>
       <span class="choice-name"><span>${escapeHtml(choice.description)}</span>${renderInfoTooltip(choice.info_tooltip, `${choice.label} details`)}</span>
       ${disabled ? renderStatePill(`Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} first`, "disabled-reason", `Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} body style first.`) : ""}
@@ -1534,9 +1624,9 @@ function renderStepContent({ resetScroll = false } = {}) {
     const interiors = validInteriorsForSelectedSeat();
     const selectedSeat = selectedSeatChoice();
     body = `
-      <section class="section-block">
+      <section class="section-block interior-color-section">
         <div class="section-title"><h3>Interior Color</h3><span>${interiors.length} choices</span></div>
-        ${selectedSeat ? `<p class="selected-seat-context">${escapeHtml(selectedSeat.rpo)} ${escapeHtml(selectedSeat.label)}</p>` : ""}
+        ${selectedSeat ? `<p class="selected-seat-context">Showing colors compatible with ${escapeHtml(selectedSeat.rpo)} ${escapeHtml(selectedSeat.label)}.</p>` : ""}
         ${renderInteriorGroups(interiors)}
       </section>
     `;

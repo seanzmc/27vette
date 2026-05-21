@@ -323,7 +323,13 @@ textarea {
 
 .interior-layout {
   display: grid;
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.interior-color-section {
+  background: linear-gradient(180deg, var(--panel-strong), var(--panel));
 }
 
 .interior-group {
@@ -457,6 +463,19 @@ textarea {
   object-fit: cover;
 }
 
+.choice-media.disabled {
+  opacity: 0.48;
+  filter: grayscale(0.7) saturate(0.65);
+}
+
+.choice-card.disabled .choice-media {
+  border-color: rgba(165, 160, 153, 0.5);
+}
+
+.choice-card.disabled:hover .choice-media.disabled {
+  opacity: 0.62;
+}
+
 .choice-card .topline {
   display: flex;
   justify-content: space-between;
@@ -517,12 +536,14 @@ textarea {
 }
 
 .choice-state.info-tooltip:hover,
-.choice-state.info-tooltip:focus-visible {
+.choice-state.info-tooltip:focus-visible,
+.choice-state.info-tooltip.is-open {
   background: currentColor;
 }
 
 .choice-state.info-tooltip:hover .tooltip-trigger-text,
-.choice-state.info-tooltip:focus-visible .tooltip-trigger-text {
+.choice-state.info-tooltip:focus-visible .tooltip-trigger-text,
+.choice-state.info-tooltip.is-open .tooltip-trigger-text {
   color: var(--panel-strong);
 }
 
@@ -775,7 +796,8 @@ textarea {
 }
 
 .info-tooltip:hover,
-.info-tooltip:focus-visible {
+.info-tooltip:focus-visible,
+.info-tooltip.is-open {
   z-index: 80;
 }
 
@@ -798,7 +820,8 @@ textarea {
 }
 
 .info-tooltip:hover .info-icon,
-.info-tooltip:focus-visible .info-icon {
+.info-tooltip:focus-visible .info-icon,
+.info-tooltip.is-open .info-icon {
   background: var(--accent-dark);
   color: white;
 }
@@ -830,7 +853,8 @@ textarea {
 }
 
 .info-tooltip:hover .tooltip-panel,
-.info-tooltip:focus-visible .tooltip-panel {
+.info-tooltip:focus-visible .tooltip-panel,
+.info-tooltip.is-open .tooltip-panel {
   opacity: 1;
   transform: translateY(0);
   visibility: visible;
@@ -1044,6 +1068,18 @@ textarea {
     position: relative;
     gap: 14px;
     padding: 52px 16px 16px;
+  }
+
+  .interior-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .interior-group {
+    padding: 10px;
+  }
+
+  .tooltip-panel {
+    max-width: min(320px, calc(100vw - 28px));
   }
 
   .mobile-summary-bar {

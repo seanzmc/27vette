@@ -78,6 +78,7 @@ const expectedGrandSportExclusiveGroups = [
   {
     group_id: "gs_excl_ls6_engine_covers",
     option_ids: ["opt_bc7_001", "opt_bc4_002", "opt_bcp_002", "opt_bcs_002"],
+    selection_mode: "required_single_within_group",
   },
   {
     group_id: "gs_excl_center_caps",
@@ -106,10 +107,17 @@ const expectedGrandSportExclusiveGroups = [
   {
     group_id: "gs_excl_exterior_accents",
     option_ids: ["opt_efr_001", "opt_edu_001"],
+    selection_mode: "required_single_within_group",
   },
   {
     group_id: "gs_excl_performance_brakes",
     option_ids: ["opt_jx6_001", "opt_j56_001", "opt_j57_001"],
+    selection_mode: "required_single_within_group",
+  },
+  {
+    group_id: "gs_excl_exhaust_path",
+    option_ids: ["opt_nga_001", "opt_wub_001"],
+    selection_mode: "required_single_within_group",
   },
 ];
 
@@ -311,7 +319,7 @@ test("Grand Sport draft emits the approved model-scoped exclusive groups", () =>
   for (const expected of expectedGrandSportExclusiveGroups) {
     const group = byId.get(expected.group_id);
     assert.ok(group, `${expected.group_id} should be generated`);
-    assert.equal(group.selection_mode, "single_within_group");
+    assert.equal(group.selection_mode, expected.selection_mode || "single_within_group");
     assert.equal(group.active, "True");
     assert.deepEqual(JSON.parse(JSON.stringify(group.option_ids)), expected.option_ids);
     for (const optionId of expected.option_ids) {
