@@ -17,6 +17,7 @@ from corvette_form_generator.runtime_metadata import (
     load_context_sections,
     load_interior_components,
     load_model_interior_scope_map,
+    load_rule_review_rpos,
     load_runtime_steps,
     load_section_presentation,
     presentation_bool,
@@ -605,11 +606,12 @@ def classify_rule_hot_spots(
     rows: list[dict[str, Any]],
     config: ModelConfig,
     include_special_bucket: bool = False,
+    special_review_rpos: set[str] | None = None,
 ) -> dict[str, Any]:
     rule_hot_spots = []
     hot_spot_counts: Counter[str] = Counter()
     special_mentions: defaultdict[str, list[dict[str, str]]] = defaultdict(list)
-    special_rpos = set(config.special_rule_review_rpos or tuple(SPECIAL_REVIEW_RPOS))
+    special_rpos = set(special_review_rpos if special_review_rpos is not None else config.special_rule_review_rpos or tuple(SPECIAL_REVIEW_RPOS))
     for row in rows:
         text = "\n".join(part for part in (row["detail_raw"], row["description"], row["option_name"]) if part)
         matched_terms = [name for name, pattern in RULE_HOT_SPOT_PATTERNS.items() if pattern.search(text)]
@@ -1010,6 +1012,7 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
     section_presentation_rows = load_section_presentation(wb, config.model_key)
     section_presentation = {row["section_id"]: row for row in section_presentation_rows}
+    special_review_rpos = load_rule_review_rpos(wb, config.model_key, config.special_rule_review_rpos)
     rows = [normalized_option_row(row, config) for row in raw_rows]
     status_lookup = status_lookup_from_sheet(wb, config)
     apply_status_lookup(rows, status_lookup, config)
@@ -1136,7 +1139,7 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
             }
         )
 
-    rule_hot_spots = classify_rule_hot_spots(rows, config)
+    rule_hot_spots = classify_rule_hot_spots(rows, config, special_review_rpos=special_review_rpos)
 
     warnings = []
     if len(variant_rows) != config.expected_variant_count:
@@ -1237,6 +1240,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     apply_status_lookup(rows, status_lookup_from_sheet(wb, config), config)
     variant_option_overrides = load_variant_option_overrides(wb, config)
     context_copy_rows = context_choice_copy_rows(wb, config.model_key)
+    special_review_rpos = load_rule_review_rpos(wb, config.model_key, config.special_rule_review_rpos)
 
     variant_source_rows = {row["variant_id"]: row for row in variants_raw if row.get("variant_id", "") in config.variant_ids}
     variants: list[dict[str, Any]] = []
@@ -1532,7 +1536,12 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             }
         )
 
-    rule_hot_spots = classify_rule_hot_spots(rows, config, include_special_bucket=True)
+    rule_hot_spots = classify_rule_hot_spots(
+        rows,
+        config,
+        include_special_bucket=True,
+        special_review_rpos=special_review_rpos,
+    )
     text_cleanup_summary = {
         "changed_fields": sum(text_cleanup_counter.values()),
         "notes": dict(sorted(text_cleanup_counter.items())),

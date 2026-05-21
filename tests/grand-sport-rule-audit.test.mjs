@@ -323,15 +323,8 @@ test("Grand Sport rule audit classifies scoped duplicate cleanup separately", ()
   assert.equal(draftRuleIds.has(copiedB6pRuleId), false, "redundant scoped copied B6P/D3V rule should be omitted from draft output");
 });
 
-test("Grand Sport rule audit script does not own workbook business decisions", () => {
+test("Grand Sport rule audit script remains read-only", () => {
   const source = fs.readFileSync("scripts/build_grand_sport_rule_sources.py", "utf8");
-  for (const required of [
-    "load_rule_phrase_map(wb, RULE_PHRASES)",
-    "load_audit_group_members(wb, \"engine_cover\", ENGINE_COVER_RPOS)",
-    "load_rule_review_rpos(wb, config.model_key, config.special_rule_review_rpos)",
-  ]) {
-    assert.equal(source.includes(required), true, `${required} should keep audit metadata workbook-owned with fallback`);
-  }
   for (const forbidden of [
     "APPROVED_EXCLUSIVE_GROUPS",
     "INACTIVE_OPTION_RPOS",

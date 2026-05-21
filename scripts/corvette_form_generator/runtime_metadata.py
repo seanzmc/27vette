@@ -398,15 +398,88 @@ def _split_phrase_list(value: Any) -> tuple[str, ...]:
     return tuple(part for part in (part.strip() for part in parts) if part)
 
 
-def load_rule_phrase_map(wb: Any, fallback_phrases: Iterable[str] = ()) -> list[dict[str, Any]]:
+_LEGACY_RULE_PHRASE_FALLBACKS: dict[str, dict[str, Any]] = {
+    "not available with": {
+        "rule_type": "excludes",
+        "direction": "source_to_mentioned",
+        "stop_phrases": (),
+        "review_flag_default": True,
+    },
+    "requires": {
+        "rule_type": "requires",
+        "direction": "source_to_mentioned",
+        "stop_phrases": (" or included with", " included with"),
+        "review_flag_default": True,
+    },
+    "includes": {
+        "rule_type": "includes",
+        "direction": "source_to_mentioned",
+        "stop_phrases": (" requires",),
+        "review_flag_default": True,
+    },
+    "included and only available with": {
+        "rule_type": "includes",
+        "direction": "mentioned_to_source",
+        "stop_phrases": (),
+        "review_flag_default": True,
+    },
+    "included with": {
+        "rule_type": "includes",
+        "direction": "mentioned_to_source",
+        "stop_phrases": (),
+        "review_flag_default": True,
+    },
+    "only available with": {
+        "rule_type": "requires",
+        "direction": "source_to_mentioned",
+        "stop_phrases": (),
+        "review_flag_default": True,
+    },
+}
+
+
+def _normalized_rule_phrase_row(row: Mapping[str, Any], *, fallback: bool = False) -> dict[str, Any]:
+    phrase = clean(row.get("phrase"))
+    return {
+        "phrase": phrase,
+        "rule_type": clean(row.get("rule_type")),
+        "direction": clean(row.get("direction")),
+        "stop_phrases": _split_phrase_list(row.get("stop_phrases")),
+        "review_flag_default": truthy(row.get("review_flag_default"), default=False),
+        "notes": clean(row.get("notes")) or ("fallback_config" if fallback else ""),
+    }
+
+
+def _fallback_rule_phrase_row(value: Any) -> dict[str, Any] | None:
+    if isinstance(value, Mapping):
+        row = _normalized_rule_phrase_row(value, fallback=True)
+        return row if row["phrase"] else None
+
+    phrase = clean(value)
+    if not phrase:
+        return None
+    legacy = _LEGACY_RULE_PHRASE_FALLBACKS.get(phrase.lower(), {})
+    return {
+        "phrase": phrase,
+        "rule_type": clean(legacy.get("rule_type")),
+        "direction": clean(legacy.get("direction")) or "review_only",
+        "stop_phrases": tuple(legacy.get("stop_phrases", ())),
+        "review_flag_default": bool(legacy.get("review_flag_default", False)),
+        "notes": "fallback_config",
+    }
+
+
+def load_rule_phrase_map(wb: Any, fallback_phrases: Iterable[Any] = ()) -> list[dict[str, Any]]:
     """Load workbook-authored rule phrase parser metadata.
 
-    Header-only workbooks fall back to the caller-provided phrases so existing
-    audit behavior remains available during migration.
+    Missing or header-only workbooks fall back to legacy-equivalent parser
+    metadata.  If the workbook sheet contains rows, active workbook rows are
+    authoritative; disabled rows do not silently re-enable Python fallbacks.
     """
 
-    rows = active_rows(wb, "rule_phrase_map")
-    if rows:
+    workbook_rows = optional_rows(wb, "rule_phrase_map")
+    rows = [row for row in workbook_rows if truthy(row.get("active", "True"), default=True)]
+    if workbook_rows:
         phrase_rows: list[dict[str, Any]] = []
         seen: set[str] = set()
         for row in rows:
@@ -417,31 +490,10 @@ def load_rule_phrase_map(wb: Any, fallback_phrases: Iterable[str] = ()) -> list[
             if phrase_key in seen:
                 raise ValueError(f"Duplicate active rule_phrase_map row: phrase={phrase}")
             seen.add(phrase_key)
-            phrase_rows.append(
-                {
-                    "phrase": phrase,
-                    "rule_type": clean(row.get("rule_type")),
-                    "direction": clean(row.get("direction")),
-                    "stop_phrases": _split_phrase_list(row.get("stop_phrases")),
-                    "review_flag_default": truthy(row.get("review_flag_default"), default=False),
-                    "notes": clean(row.get("notes")),
-                }
-            )
-        if phrase_rows:
-            return phrase_rows
+            phrase_rows.append(_normalized_rule_phrase_row(row))
+        return phrase_rows
 
-    return [
-        {
-            "phrase": clean(phrase),
-            "rule_type": "",
-            "direction": "review_only",
-            "stop_phrases": (),
-            "review_flag_default": False,
-            "notes": "fallback_config",
-        }
-        for phrase in fallback_phrases
-        if clean(phrase)
-    ]
+    return [row for row in (_fallback_rule_phrase_row(phrase) for phrase in fallback_phrases) if row]
 
 
 def load_audit_group_members(
@@ -449,13 +501,25 @@ def load_audit_group_members(
     group_id: str,
     fallback_rpos: Iterable[str] = (),
 ) -> dict[str, set[str]]:
-    """Load workbook-authored audit group members for a group_id."""
+    """Load workbook-authored audit group members for a group_id.
+
+    Group rows, when present, own whether the group is active.  Fallback RPOs
+    are used only when no workbook group/member metadata exists for the group.
+    """
 
     target_group = clean(group_id)
+    group_rows = [row for row in optional_rows(wb, "option_audit_groups") if clean(row.get("group_id")) == target_group]
+    member_rows = [row for row in optional_rows(wb, "option_audit_group_members") if clean(row.get("group_id")) == target_group]
+
+    if group_rows:
+        active_group_rows = [row for row in group_rows if truthy(row.get("active", "True"), default=True)]
+        if not active_group_rows:
+            return {"rpos": set(), "option_ids": set()}
+
     rpos: set[str] = set()
     option_ids: set[str] = set()
-    for row in active_rows(wb, "option_audit_group_members"):
-        if clean(row.get("group_id")) != target_group:
+    for row in member_rows:
+        if not truthy(row.get("active", "True"), default=True):
             continue
         rpo = clean(row.get("rpo"))
         option_id = clean(row.get("option_id"))
@@ -464,22 +528,33 @@ def load_audit_group_members(
         if option_id:
             option_ids.add(option_id)
 
-    if not rpos and not option_ids:
+    if not group_rows and not member_rows and not rpos and not option_ids:
         rpos = {clean(rpo) for rpo in fallback_rpos if clean(rpo)}
 
     return {"rpos": rpos, "option_ids": option_ids}
 
 
 def load_rule_review_rpos(wb: Any, model_key: str, fallback_rpos: Iterable[str] = ()) -> set[str]:
-    """Load workbook-authored special-review RPOs scoped by model."""
+    """Load workbook-authored special-review RPOs scoped by model.
 
-    rpos = {
-        clean(row.get("rpo"))
-        for row in active_rows(wb, "rule_review_groups", model_key)
-        if clean(row.get("rpo"))
-    }
-    if rpos:
-        return rpos
+    If model-scoped rows exist in the workbook, they are authoritative even
+    when inactive.  Fallback RPOs are used only when the sheet has no rows for
+    the requested model.
+    """
+
+    model = clean(model_key).lower()
+    allowed_model_keys = _GLOBAL_MODEL_KEYS | {model}
+    scoped_rows = [
+        row
+        for row in optional_rows(wb, "rule_review_groups")
+        if clean(row.get("model_key", "")).lower() in allowed_model_keys
+    ]
+    if scoped_rows:
+        return {
+            clean(row.get("rpo"))
+            for row in scoped_rows
+            if truthy(row.get("active", "True"), default=True) and clean(row.get("rpo"))
+        }
     return {clean(rpo) for rpo in fallback_rpos if clean(rpo)}
 
 
