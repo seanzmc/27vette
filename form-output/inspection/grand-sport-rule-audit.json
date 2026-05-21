@@ -6,35 +6,35 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-05-21T21:22:31+00:00",
+    "generated_at": "2026-05-21T22:04:03+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
-    "copiedRuleCandidates": 94,
-    "rawDetailRuleCandidates": 206,
-    "rawDetailCandidateKeys": 206,
-    "dedupedOrSelfReferenceCandidates": 1,
-    "finalWorkbookRuleRows": 332,
-    "expectedDraftRuntimeRules": 198,
+    "copiedRuleCandidates": 91,
+    "rawDetailRuleCandidates": 203,
+    "rawDetailCandidateKeys": 203,
+    "dedupedOrSelfReferenceCandidates": 2,
+    "finalWorkbookRuleRows": 321,
+    "expectedDraftRuntimeRules": 197,
     "omittedDuplicateExclusiveGroup": 8,
-    "omittedInactiveOrUnemitted": 126,
+    "omittedInactiveOrUnemitted": 116,
     "skippedRequiresReview": 3,
     "unresolvedRpoMentions": 4,
     "exclusiveGroups": 10,
-    "exclusiveGroupMembers": 30,
+    "exclusiveGroupMembers": 27,
     "ruleGroups": 1,
     "ruleGroupMembers": 18,
     "groupedExclusionPairs": 18,
     "duplicateSemanticRuleKeys": 1,
     "exactDuplicateRuleRows": 1,
-    "overlappingScopedRuleRows": 1,
+    "overlappingScopedRuleRows": 0,
     "redundantScopedRuleRows": 0,
     "missingOptionReferences": 0,
     "inactiveOptionReferences": 5,
-    "engineCoverRuleRows": 26,
+    "engineCoverRuleRows": 15,
     "engineCoverInactiveReferences": 0,
-    "workbookRulesMatchingDetailRaw": 76,
-    "workbookManualOrApprovedRules": 256
+    "workbookRulesMatchingDetailRaw": 73,
+    "workbookManualOrApprovedRules": 248
   },
   "sourceSheets": {
     "optionSheet": "grandSport_options",
@@ -86,15 +86,7 @@
       "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
     },
     {
-      "grand_sport_rule_id": "gs_copy_rule_opt_bc4_001_includes_opt_d3v_001_opt_bc4_001_includes_opt_d3v_001_coupe",
-      "source_id": "opt_bc4_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "coupe",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible",
+      "grand_sport_rule_id": "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_002_requires_opt_zz3_001_convertible",
       "source_id": "opt_bc4_002",
       "rule_type": "requires",
       "target_id": "opt_zz3_001",
@@ -110,15 +102,7 @@
       "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
     },
     {
-      "grand_sport_rule_id": "gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe",
-      "source_id": "opt_bcp_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "coupe",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible",
+      "grand_sport_rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_002_requires_opt_zz3_001_convertible",
       "source_id": "opt_bcp_002",
       "rule_type": "requires",
       "target_id": "opt_zz3_001",
@@ -126,15 +110,7 @@
       "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
     },
     {
-      "grand_sport_rule_id": "gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe",
-      "source_id": "opt_bcs_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "coupe",
-      "reason": "Workbook-authored Grand Sport rule id indicates a copied Stingray source."
-    },
-    {
-      "grand_sport_rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible",
+      "grand_sport_rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_002_requires_opt_zz3_001_convertible",
       "source_id": "opt_bcs_002",
       "rule_type": "requires",
       "target_id": "opt_zz3_001",
@@ -812,14 +788,6 @@
       "source_id": "opt_b6p_001",
       "rule_type": "includes",
       "target_id": "opt_d3v_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bc4_001_includes_opt_d3v_001",
-      "source_id": "opt_bc4_002",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
       "body_style_scope": "coupe",
       "matched_phrase": "workbook_matches_detail_raw"
     },
@@ -828,15 +796,7 @@
       "source_id": "opt_bc4_002",
       "rule_type": "includes",
       "target_id": "opt_d3v_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcp_001_includes_opt_d3v_001",
-      "source_id": "opt_bcp_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "",
+      "body_style_scope": "coupe",
       "matched_phrase": "workbook_matches_detail_raw"
     },
     {
@@ -852,15 +812,7 @@
       "source_id": "opt_bcp_002",
       "rule_type": "includes",
       "target_id": "opt_d3v_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcs_001_includes_opt_d3v_001",
-      "source_id": "opt_bcs_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "body_style_scope": "",
+      "body_style_scope": "coupe",
       "matched_phrase": "workbook_matches_detail_raw"
     },
     {
@@ -876,7 +828,7 @@
       "source_id": "opt_bcs_002",
       "rule_type": "includes",
       "target_id": "opt_d3v_001",
-      "body_style_scope": "",
+      "body_style_scope": "coupe",
       "matched_phrase": "workbook_matches_detail_raw"
     },
     {
@@ -1410,6 +1362,13 @@
   ],
   "omittedDeduped": [
     {
+      "source_id": "opt_b6p_001",
+      "rule_type": "includes",
+      "target_id": "opt_d3v_001",
+      "body_style_scope": "coupe",
+      "runtime_action": ""
+    },
+    {
       "source_id": "opt_bc4_002",
       "rule_type": "requires",
       "target_id": "opt_zz3_001",
@@ -1611,120 +1570,6 @@
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
-      "rule_id": "gs_copy_rule_opt_bc4_001_includes_opt_d3v_001_opt_bc4_001_includes_opt_d3v_001_coupe",
-      "source_id": "opt_bc4_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "target_type": "option",
-      "original_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-      "review_flag": "False",
-      "source_type": "option",
-      "target_selection_mode": "multi_select_opt",
-      "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_engi_001",
-      "source_section": "sec_engi_001",
-      "generation_action": "omit_inactive_duplicate_source",
-      "body_style_scope": "coupe",
-      "runtime_action": "",
-      "disabled_reason": "",
-      "_audit_origin": "workbook_copied_from_stingray"
-    },
-    {
-      "rule_id": "gs_rule_opt_bc4_001_requires_opt_b6p_001_coupe",
-      "source_id": "opt_bc4_001",
-      "rule_type": "requires",
-      "target_id": "opt_b6p_001",
-      "target_type": "option",
-      "original_detail_raw": "1. Includes (D3V) engine lighting. Requires (B6P) on Coupe\n2. Requires (ZZ3) Convertible Engine Appearance Package.",
-      "review_flag": "False",
-      "source_type": "option",
-      "target_selection_mode": "multi_select_opt",
-      "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_engi_001",
-      "source_section": "sec_engi_001",
-      "generation_action": "omit_inactive_duplicate_source",
-      "body_style_scope": "coupe",
-      "runtime_action": "",
-      "disabled_reason": "",
-      "_audit_origin": "workbook_manual_or_normalized"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcp_001_includes_opt_d3v_001",
-      "source_id": "opt_bcp_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "target_type": "option",
-      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package.",
-      "review_flag": "False",
-      "source_type": "option",
-      "target_selection_mode": "multi_select_opt",
-      "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_engi_001",
-      "source_section": "sec_engi_001",
-      "generation_action": "omit_inactive_duplicate_source",
-      "body_style_scope": "",
-      "runtime_action": "",
-      "disabled_reason": "",
-      "_audit_origin": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe",
-      "source_id": "opt_bcp_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "target_type": "option",
-      "original_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-      "review_flag": "False",
-      "source_type": "option",
-      "target_selection_mode": "multi_select_opt",
-      "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_engi_001",
-      "source_section": "sec_engi_001",
-      "generation_action": "omit_inactive_duplicate_source",
-      "body_style_scope": "coupe",
-      "runtime_action": "",
-      "disabled_reason": "",
-      "_audit_origin": "workbook_copied_from_stingray"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcp_001_requires_opt_b6p_001_coupe",
-      "source_id": "opt_bcp_001",
-      "rule_type": "requires",
-      "target_id": "opt_b6p_001",
-      "target_type": "option",
-      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package.",
-      "review_flag": "False",
-      "source_type": "option",
-      "target_selection_mode": "multi_select_opt",
-      "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_engi_001",
-      "source_section": "sec_engi_001",
-      "generation_action": "omit_inactive_duplicate_source",
-      "body_style_scope": "coupe",
-      "runtime_action": "",
-      "disabled_reason": "",
-      "_audit_origin": "workbook_manual_or_normalized"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcp_001_requires_opt_d3v_001_coupe",
-      "source_id": "opt_bcp_001",
-      "rule_type": "requires",
-      "target_id": "opt_d3v_001",
-      "target_type": "option",
-      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package.",
-      "review_flag": "False",
-      "source_type": "option",
-      "target_selection_mode": "multi_select_opt",
-      "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_engi_001",
-      "source_section": "sec_engi_001",
-      "generation_action": "omit_inactive_duplicate_source",
-      "body_style_scope": "coupe",
-      "runtime_action": "",
-      "disabled_reason": "",
-      "_audit_origin": "workbook_manual_or_normalized"
-    },
-    {
       "rule_id": "gs_rule_opt_bcp_002_includes_opt_b6p_001",
       "source_id": "opt_bcp_002",
       "rule_type": "includes",
@@ -1742,82 +1587,6 @@
       "runtime_action": "",
       "disabled_reason": "BCP/BCS include D3V directly; they do not include B6P.",
       "_audit_origin": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcs_001_includes_opt_d3v_001",
-      "source_id": "opt_bcs_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "target_type": "option",
-      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package.",
-      "review_flag": "False",
-      "source_type": "option",
-      "target_selection_mode": "multi_select_opt",
-      "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_engi_001",
-      "source_section": "sec_engi_001",
-      "generation_action": "omit_inactive_duplicate_source",
-      "body_style_scope": "",
-      "runtime_action": "",
-      "disabled_reason": "",
-      "_audit_origin": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe",
-      "source_id": "opt_bcs_001",
-      "rule_type": "includes",
-      "target_id": "opt_d3v_001",
-      "target_type": "option",
-      "original_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-      "review_flag": "False",
-      "source_type": "option",
-      "target_selection_mode": "multi_select_opt",
-      "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_engi_001",
-      "source_section": "sec_engi_001",
-      "generation_action": "omit_inactive_duplicate_source",
-      "body_style_scope": "coupe",
-      "runtime_action": "",
-      "disabled_reason": "",
-      "_audit_origin": "workbook_copied_from_stingray"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcs_001_requires_opt_b6p_001_coupe",
-      "source_id": "opt_bcs_001",
-      "rule_type": "requires",
-      "target_id": "opt_b6p_001",
-      "target_type": "option",
-      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package.",
-      "review_flag": "False",
-      "source_type": "option",
-      "target_selection_mode": "multi_select_opt",
-      "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_engi_001",
-      "source_section": "sec_engi_001",
-      "generation_action": "omit_inactive_duplicate_source",
-      "body_style_scope": "coupe",
-      "runtime_action": "",
-      "disabled_reason": "",
-      "_audit_origin": "workbook_manual_or_normalized"
-    },
-    {
-      "rule_id": "gs_rule_opt_bcs_001_requires_opt_d3v_001_coupe",
-      "source_id": "opt_bcs_001",
-      "rule_type": "requires",
-      "target_id": "opt_d3v_001",
-      "target_type": "option",
-      "original_detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package.",
-      "review_flag": "False",
-      "source_type": "option",
-      "target_selection_mode": "multi_select_opt",
-      "source_selection_mode": "multi_select_opt",
-      "target_section": "sec_engi_001",
-      "source_section": "sec_engi_001",
-      "generation_action": "omit_inactive_duplicate_source",
-      "body_style_scope": "coupe",
-      "runtime_action": "",
-      "disabled_reason": "",
-      "_audit_origin": "workbook_manual_or_normalized"
     },
     {
       "rule_id": "gs_rule_opt_bcs_002_includes_opt_b6p_001",
@@ -4225,11 +3994,11 @@
         "target_id": "opt_zz3_001",
         "body_style_scope": "convertible",
         "rule_ids": [
-          "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible",
+          "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_002_requires_opt_zz3_001_convertible",
           "gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible"
         ],
         "copied_rule_ids": [
-          "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible"
+          "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_002_requires_opt_zz3_001_convertible"
         ],
         "canonical_rule_id": "gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible",
         "recommended_action": "omit copied duplicate rows and keep canonical rule row",
@@ -4243,41 +4012,18 @@
         "target_id": "opt_zz3_001",
         "body_style_scope": "convertible",
         "rule_ids": [
-          "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible",
+          "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_002_requires_opt_zz3_001_convertible",
           "gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible"
         ],
         "copied_rule_ids": [
-          "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible"
+          "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_002_requires_opt_zz3_001_convertible"
         ],
         "canonical_rule_id": "gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible",
         "recommended_action": "omit copied duplicate rows and keep canonical rule row",
         "count": 2
       }
     ],
-    "overlappingScopedRuleRows": [
-      {
-        "source_id": "opt_bc4_002",
-        "source_rpo": "BC4",
-        "rule_type": "includes",
-        "target_id": "opt_d3v_001",
-        "target_rpo": "D3V",
-        "global_rule_ids": [
-          "gs_rule_opt_bc4_002_includes_opt_d3v_001"
-        ],
-        "scoped_rule_ids": [
-          "gs_rule_opt_bc4_001_includes_opt_d3v_001"
-        ],
-        "scopes": [
-          "coupe"
-        ],
-        "source_option_body_styles": [
-          "convertible",
-          "coupe"
-        ],
-        "classification": "scope_overlap_requires_review",
-        "recommended_action": "review before changing workbook rows"
-      }
-    ],
+    "overlappingScopedRuleRows": [],
     "redundantScopedRuleRows": [],
     "missingOptionReferences": [],
     "inactiveOptionReferences": [
@@ -4371,12 +4117,9 @@
       ],
       "option_ids": [
         "opt_b6p_001",
-        "opt_bc4_001",
         "opt_bc4_002",
         "opt_bc7_001",
-        "opt_bcp_001",
         "opt_bcp_002",
-        "opt_bcs_001",
         "opt_bcs_002",
         "opt_d3v_001",
         "opt_sl9_001",
@@ -4392,7 +4135,7 @@
           "target_id": "opt_d3v_001",
           "target_rpo": "D3V",
           "target_active": true,
-          "body_style_scope": "",
+          "body_style_scope": "coupe",
           "runtime_action": "",
           "generation_action": ""
         },
@@ -4423,46 +4166,7 @@
           "generation_action": ""
         },
         {
-          "rule_id": "gs_rule_opt_bc4_001_includes_opt_d3v_001",
-          "source_id": "opt_bc4_002",
-          "source_rpo": "BC4",
-          "source_active": true,
-          "rule_type": "includes",
-          "target_id": "opt_d3v_001",
-          "target_rpo": "D3V",
-          "target_active": true,
-          "body_style_scope": "coupe",
-          "runtime_action": "",
-          "generation_action": ""
-        },
-        {
-          "rule_id": "gs_copy_rule_opt_bc4_001_includes_opt_d3v_001_opt_bc4_001_includes_opt_d3v_001_coupe",
-          "source_id": "opt_bc4_001",
-          "source_rpo": "BC4",
-          "source_active": false,
-          "rule_type": "includes",
-          "target_id": "opt_d3v_001",
-          "target_rpo": "D3V",
-          "target_active": true,
-          "body_style_scope": "coupe",
-          "runtime_action": "",
-          "generation_action": "omit_inactive_duplicate_source"
-        },
-        {
-          "rule_id": "gs_rule_opt_bc4_001_requires_opt_b6p_001_coupe",
-          "source_id": "opt_bc4_001",
-          "source_rpo": "BC4",
-          "source_active": false,
-          "rule_type": "requires",
-          "target_id": "opt_b6p_001",
-          "target_rpo": "B6P",
-          "target_active": true,
-          "body_style_scope": "coupe",
-          "runtime_action": "",
-          "generation_action": "omit_inactive_duplicate_source"
-        },
-        {
-          "rule_id": "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible",
+          "rule_id": "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_002_requires_opt_zz3_001_convertible",
           "source_id": "opt_bc4_002",
           "source_rpo": "BC4",
           "source_active": true,
@@ -4483,7 +4187,7 @@
           "target_id": "opt_d3v_001",
           "target_rpo": "D3V",
           "target_active": true,
-          "body_style_scope": "",
+          "body_style_scope": "coupe",
           "runtime_action": "",
           "generation_action": ""
         },
@@ -4501,59 +4205,7 @@
           "generation_action": ""
         },
         {
-          "rule_id": "gs_rule_opt_bcp_001_includes_opt_d3v_001",
-          "source_id": "opt_bcp_001",
-          "source_rpo": "BCP",
-          "source_active": false,
-          "rule_type": "includes",
-          "target_id": "opt_d3v_001",
-          "target_rpo": "D3V",
-          "target_active": true,
-          "body_style_scope": "",
-          "runtime_action": "",
-          "generation_action": "omit_inactive_duplicate_source"
-        },
-        {
-          "rule_id": "gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe",
-          "source_id": "opt_bcp_001",
-          "source_rpo": "BCP",
-          "source_active": false,
-          "rule_type": "includes",
-          "target_id": "opt_d3v_001",
-          "target_rpo": "D3V",
-          "target_active": true,
-          "body_style_scope": "coupe",
-          "runtime_action": "",
-          "generation_action": "omit_inactive_duplicate_source"
-        },
-        {
-          "rule_id": "gs_rule_opt_bcp_001_requires_opt_b6p_001_coupe",
-          "source_id": "opt_bcp_001",
-          "source_rpo": "BCP",
-          "source_active": false,
-          "rule_type": "requires",
-          "target_id": "opt_b6p_001",
-          "target_rpo": "B6P",
-          "target_active": true,
-          "body_style_scope": "coupe",
-          "runtime_action": "",
-          "generation_action": "omit_inactive_duplicate_source"
-        },
-        {
-          "rule_id": "gs_rule_opt_bcp_001_requires_opt_d3v_001_coupe",
-          "source_id": "opt_bcp_001",
-          "source_rpo": "BCP",
-          "source_active": false,
-          "rule_type": "requires",
-          "target_id": "opt_d3v_001",
-          "target_rpo": "D3V",
-          "target_active": true,
-          "body_style_scope": "coupe",
-          "runtime_action": "",
-          "generation_action": "omit_inactive_duplicate_source"
-        },
-        {
-          "rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible",
+          "rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_002_requires_opt_zz3_001_convertible",
           "source_id": "opt_bcp_002",
           "source_rpo": "BCP",
           "source_active": true,
@@ -4587,64 +4239,12 @@
           "target_id": "opt_d3v_001",
           "target_rpo": "D3V",
           "target_active": true,
-          "body_style_scope": "",
+          "body_style_scope": "coupe",
           "runtime_action": "",
           "generation_action": ""
         },
         {
-          "rule_id": "gs_rule_opt_bcs_001_includes_opt_d3v_001",
-          "source_id": "opt_bcs_001",
-          "source_rpo": "BCS",
-          "source_active": false,
-          "rule_type": "includes",
-          "target_id": "opt_d3v_001",
-          "target_rpo": "D3V",
-          "target_active": true,
-          "body_style_scope": "",
-          "runtime_action": "",
-          "generation_action": "omit_inactive_duplicate_source"
-        },
-        {
-          "rule_id": "gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe",
-          "source_id": "opt_bcs_001",
-          "source_rpo": "BCS",
-          "source_active": false,
-          "rule_type": "includes",
-          "target_id": "opt_d3v_001",
-          "target_rpo": "D3V",
-          "target_active": true,
-          "body_style_scope": "coupe",
-          "runtime_action": "",
-          "generation_action": "omit_inactive_duplicate_source"
-        },
-        {
-          "rule_id": "gs_rule_opt_bcs_001_requires_opt_b6p_001_coupe",
-          "source_id": "opt_bcs_001",
-          "source_rpo": "BCS",
-          "source_active": false,
-          "rule_type": "requires",
-          "target_id": "opt_b6p_001",
-          "target_rpo": "B6P",
-          "target_active": true,
-          "body_style_scope": "coupe",
-          "runtime_action": "",
-          "generation_action": "omit_inactive_duplicate_source"
-        },
-        {
-          "rule_id": "gs_rule_opt_bcs_001_requires_opt_d3v_001_coupe",
-          "source_id": "opt_bcs_001",
-          "source_rpo": "BCS",
-          "source_active": false,
-          "rule_type": "requires",
-          "target_id": "opt_d3v_001",
-          "target_rpo": "D3V",
-          "target_active": true,
-          "body_style_scope": "coupe",
-          "runtime_action": "",
-          "generation_action": "omit_inactive_duplicate_source"
-        },
-        {
-          "rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible",
+          "rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_002_requires_opt_zz3_001_convertible",
           "source_id": "opt_bcs_002",
           "source_rpo": "BCS",
           "source_active": true,
@@ -4678,7 +4278,7 @@
           "target_id": "opt_d3v_001",
           "target_rpo": "D3V",
           "target_active": true,
-          "body_style_scope": "",
+          "body_style_scope": "coupe",
           "runtime_action": "",
           "generation_action": ""
         },

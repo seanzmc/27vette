@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-05-21T21:22:19+00:00"
+    "generated_at": "2026-05-21T22:02:49+00:00"
   },
   "variants": [
     {
@@ -2427,7 +2427,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 0,
       "display_order": 10,
-      "source_detail_raw": "Standard on Coupe"
+      "source_detail_raw": "Standard on Coupe",
+      "display_behavior": "default_selected"
     },
     {
       "choice_id": "2lt_c07__opt_bc7_001",
@@ -2451,7 +2452,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 0,
       "display_order": 10,
-      "source_detail_raw": "Standard on Coupe"
+      "source_detail_raw": "Standard on Coupe",
+      "display_behavior": "default_selected"
     },
     {
       "choice_id": "3lt_c07__opt_bc7_001",
@@ -2475,7 +2477,8 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 0,
       "display_order": 10,
-      "source_detail_raw": "Standard on Coupe"
+      "source_detail_raw": "Standard on Coupe",
+      "display_behavior": "default_selected"
     },
     {
       "choice_id": "1lt_c67__opt_bc7_001",
@@ -48288,17 +48291,6 @@
       "variant_scope": "*",
       "priority": 30,
       "notes": "Default black seat belt when no seat-belt option is selected or auto-added."
-    },
-    {
-      "rule_id": "default_bc7",
-      "target_option_id": "opt_bc7_001",
-      "condition_type": "always",
-      "condition_id": "",
-      "body_style_scope": "coupe",
-      "trim_level_scope": "*",
-      "variant_scope": "*",
-      "priority": 40,
-      "notes": "Default coupe black LS6 engine cover."
     }
   ],
   "runtimeRuleExceptions": [

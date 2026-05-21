@@ -1,6 +1,6 @@
 # Grand Sport Inspection
 
-Generated: `2026-05-21T21:22:31+00:00`
+Generated: `2026-05-21T22:04:03+00:00`
 Source sheet: `grandSport_options`
 Status: `inspection_generated`
 
@@ -13,16 +13,16 @@ Status: `inspection_generated`
 
 ## Counts
 
-- Option rows: 269
+- Option rows: 266
 - Unique RPOs: 223
-- Variant status cells: 1614
+- Variant status cells: 1596
 - Candidate choice rows with available/standard status: 1380
 - Candidate standard equipment cells: 455
 - Candidate standard option rows: 90
 - Active option rows with available/standard status: 226
-- Inactive option rows all unavailable/blank: 43
-- Selectable counts: `{"False": 107, "True": 162}`
-- Status counts: `{"available": 879, "standard": 547, "unavailable": 188}`
+- Inactive option rows all unavailable/blank: 40
+- Selectable counts: `{"False": 107, "True": 159}`
+- Status counts: `{"available": 861, "standard": 547, "unavailable": 188}`
 - Missing status cells: 0
 - Unknown status cells: 0
 
@@ -36,8 +36,8 @@ Status: `inspection_generated`
 
 ## Rule/Detail Hot Spots
 
-- Hot spot counts: `{"except": 2, "included_with": 17, "includes": 46, "not_available": 49, "not_recommended": 4, "only": 26, "requires": 36}`
-- Rows requiring later rule review: 129
+- Hot spot counts: `{"except": 2, "included_with": 17, "includes": 43, "not_available": 49, "not_recommended": 4, "only": 26, "requires": 33}`
+- Rows requiring later rule review: 126
 
 | RPO | Option | Section | Matched Terms | Special Mentions |
 | --- | --- | --- | --- | --- |
@@ -62,9 +62,6 @@ Status: `inspection_generated`
 | `BCP` | Edge Red LS6 Engine Cover | `sec_engi_001` | includes |  |
 | `BCS` | Sterling Silver LS6 Engine Cover | `sec_engi_001` | includes |  |
 | `BC4` | Blue LS6 Engine Cover | `sec_engi_001` | includes |  |
-| `BCP` | Edge Red LS6 Engine Cover | `sec_engi_001` | requires, includes |  |
-| `BCS` | Sterling Silver LS6 Engine Cover | `sec_engi_001` | requires, includes |  |
-| `BC4` | Blue LS6 Engine Cover | `sec_engi_001` | requires, includes |  |
 | `WUB` | Quad Center Exit Exhaust | `sec_exha_001` | included_with | FEY |
 | `NWI` | Bright Chrome Exhaust Tips | `sec_exha_001` | requires |  |
 | `EFR` | Carbon Flash Painted Accents | `sec_exte_001` | includes |  |
@@ -81,7 +78,10 @@ Status: `inspection_generated`
 | `97A` | Carbon Flash Hash Marks | `sec_gsha_001` | requires | Z15 |
 | `DX4` | Red Mist Hash Marks | `sec_gsha_001` | requires, not_available | Z15 |
 | `DRG` | Carbon Flash Outside Mirrors | `sec_incl_001` | only |  |
-| ... | 89 additional rows in JSON artifact |  |  |  |
+| `TR7` | Automatic Leveling Headlamp Control | `sec_incl_001` | only |  |
+| `CFX` | Personalized Corvette Museum Plaque | `sec_incl_001` | includes, only |  |
+| `XFR` | High Performance Tires | `sec_incl_001` | only |  |
+| ... | 86 additional rows in JSON artifact |  |  |  |
 
 ## Warnings
 

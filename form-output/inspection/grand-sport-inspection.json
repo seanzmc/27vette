@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T21:22:31+00:00",
+  "generated_at": "2026-05-21T22:04:03+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -98,52 +98,52 @@
     ]
   },
   "counts": {
-    "option_rows": 269,
+    "option_rows": 266,
     "unique_rpos": 223,
-    "variant_status_cells": 1614,
-    "status_source_rows": 1614,
+    "variant_status_cells": 1596,
+    "status_source_rows": 1596,
     "candidate_choice_rows_available_or_standard": 1380,
     "candidate_standard_equipment_cells": 455,
     "candidate_standard_option_rows": 90,
     "selectable_counts": {
       "False": 107,
-      "True": 162
+      "True": 159
     },
     "active_option_rows_available_or_standard": 226,
-    "inactive_option_rows_all_unavailable_or_blank": 43,
+    "inactive_option_rows_all_unavailable_or_blank": 40,
     "status_counts": {
-      "available": 879,
+      "available": 861,
       "standard": 547,
       "unavailable": 188
     },
     "status_counts_by_variant": {
       "1lt_e07": {
-        "available": 142,
+        "available": 139,
         "standard": 79,
         "unavailable": 48
       },
       "2lt_e07": {
-        "available": 152,
+        "available": 149,
         "standard": 98,
         "unavailable": 19
       },
       "3lt_e07": {
-        "available": 154,
+        "available": 151,
         "standard": 98,
         "unavailable": 17
       },
       "1lt_e67": {
-        "available": 137,
+        "available": 134,
         "standard": 78,
         "unavailable": 54
       },
       "2lt_e67": {
-        "available": 146,
+        "available": 143,
         "standard": 97,
         "unavailable": 26
       },
       "3lt_e67": {
-        "available": 148,
+        "available": 145,
         "standard": 97,
         "unavailable": 24
       }
@@ -1121,48 +1121,6 @@
     },
     {
       "option_id": "opt_bc4_002",
-      "rpo": "BC4",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_bcp_001",
-      "rpo": "BCP",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_bcs_001",
-      "rpo": "BCS",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_bc4_001",
       "rpo": "BC4",
       "effective_status": "available",
       "effective_status_label": "Available",
@@ -10184,11 +10142,11 @@
     "counts": {
       "except": 2,
       "included_with": 17,
-      "includes": 46,
+      "includes": 43,
       "not_available": 49,
       "not_recommended": 4,
       "only": 26,
-      "requires": 36
+      "requires": 33
     },
     "rows": [
       {
@@ -10425,42 +10383,6 @@
         ],
         "special_mentions": [],
         "detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
-      },
-      {
-        "option_id": "opt_bcp_001",
-        "rpo": "BCP",
-        "option_name": "Edge Red LS6 Engine Cover",
-        "section_id": "sec_engi_001",
-        "matched_terms": [
-          "requires",
-          "includes"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package."
-      },
-      {
-        "option_id": "opt_bcs_001",
-        "rpo": "BCS",
-        "option_name": "Sterling Silver LS6 Engine Cover",
-        "section_id": "sec_engi_001",
-        "matched_terms": [
-          "requires",
-          "includes"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package."
-      },
-      {
-        "option_id": "opt_bc4_001",
-        "rpo": "BC4",
-        "option_name": "Blue LS6 Engine Cover",
-        "section_id": "sec_engi_001",
-        "matched_terms": [
-          "requires",
-          "includes"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Includes (D3V) engine lighting. Requires (B6P) on Coupe\n2. Requires (ZZ3) Convertible Engine Appearance Package."
       },
       {
         "option_id": "opt_wub_001",

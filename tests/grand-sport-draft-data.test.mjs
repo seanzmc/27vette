@@ -264,6 +264,11 @@ test("Grand Sport draft emits color overrides and workbook-backed package price 
   for (const expectedRule of requiredPackagePriceRules) {
     assert.ok(priceRuleKeys.has(expectedRule.join("::")), `${expectedRule[0]} should be emitted from grandSport_price_rules`);
   }
+  for (const priceRuleId of ["gs_pr_bcp_d3v_001", "gs_pr_bcs_d3v_001", "gs_pr_bc4_d3v_001"]) {
+    const rule = draft.priceRules.find((candidate) => candidate.price_rule_id === priceRuleId);
+    assert.ok(rule, `${priceRuleId} should be emitted from grandSport_price_rules`);
+    assert.equal(rule.body_style_scope, "coupe", `${priceRuleId} should be scoped to coupe like Stingray D3V pricing`);
+  }
   assert.deepEqual(
     JSON.parse(
       JSON.stringify(
@@ -319,12 +324,14 @@ test("Grand Sport draft emits the approved model-scoped exclusive groups", () =>
     assert.equal(group.active, "True");
     assert.deepEqual(JSON.parse(JSON.stringify(group.option_ids)), expected.option_ids);
     for (const optionId of expected.option_ids) {
-      if (!["opt_bc4_001", "opt_bcp_001", "opt_bcs_001"].includes(optionId)) {
-        assert.equal(choiceOptionIds.has(optionId), true, `${optionId} should exist in Grand Sport choices`);
-      }
+      assert.equal(choiceOptionIds.has(optionId), true, `${optionId} should exist in Grand Sport choices`);
     }
   }
   assert.equal([...byId.values()].some((group) => (group.option_ids || []).includes("opt_jxa_001")), false);
+  for (const legacyOptionId of ["opt_bc4_001", "opt_bcp_001", "opt_bcs_001"]) {
+    assert.equal(choiceOptionIds.has(legacyOptionId), false, `${legacyOptionId} legacy engine cover row should not be emitted`);
+    assert.equal([...byId.values()].some((group) => (group.option_ids || []).includes(legacyOptionId)), false, `${legacyOptionId} should not appear in generated exclusive groups`);
+  }
 });
 
 test("Grand Sport draft emits deterministic option rules from copied Stingray rows and raw detail", () => {
@@ -356,8 +363,19 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
     "3LT_AH2_HZN::includes::opt_3n9_001::::active",
     "3LT_AH2_H8T::includes::opt_3a9_001::::active",
     "3LT_AH2_HUW::includes::opt_379_001::::active",
+    "opt_bc4_002::includes::opt_d3v_001::coupe::active",
+    "opt_bcp_002::includes::opt_d3v_001::coupe::active",
+    "opt_bcs_002::includes::opt_d3v_001::coupe::active",
   ]) {
     assert.ok(ruleKeys.has(key), `${key} should be generated`);
+  }
+
+  for (const legacyOptionId of ["opt_bc4_001", "opt_bcp_001", "opt_bcs_001"]) {
+    assert.equal(
+      draft.rules.some((rule) => rule.source_id === legacyOptionId || rule.target_id === legacyOptionId),
+      false,
+      `${legacyOptionId} should not appear in generated Grand Sport rules`
+    );
   }
 
   const groundEffectsGroup = draft.exclusiveGroups.find((group) => group.group_id === "gs_excl_ground_effects");
@@ -654,7 +672,7 @@ test("Grand Sport wheel choices use workbook display order by ascending price", 
 test("Grand Sport draft preserves rule hot spots and normalization metadata for later phases", () => {
   assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1242);
   assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1380);
-  assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 129);
+  assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 126);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 26);
   assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);
   assert.equal(draft.draftMetadata.priceRuleSourceRows, draft.priceRules.length);

@@ -1532,7 +1532,7 @@ test("order summary helpers are exposed for browser debug inspection", () => {
 test("runtime defaults and RPO exceptions are workbook-generated metadata", () => {
   assert.deepEqual(
     JSON.parse(JSON.stringify(data.defaultSelectionRules.map((rule) => rule.rule_id).sort())),
-    ["default_719", "default_bc7", "default_fe1", "default_nga"]
+    ["default_719", "default_fe1", "default_nga"]
   );
   assert.deepEqual(
     JSON.parse(JSON.stringify(data.runtimeRuleExceptions.map((exception) => exception.exception_id).sort())),
@@ -1761,18 +1761,25 @@ test("standard equipment dedupes mirrored RPO rows and does not require default_
   }
 });
 
-test("coupe defaults include BC7 engine appearance from generated default rules", () => {
+test("coupe defaults include BC7 engine appearance from workbook-authored choice metadata", () => {
   const bc7Rule = data.defaultSelectionRules.find((rule) => rule.rule_id === "default_bc7");
-  assert.equal(bc7Rule?.target_option_id, "opt_bc7_001");
-  assert.equal(bc7Rule?.body_style_scope, "coupe");
-  assert.equal(bc7Rule?.condition_type, "always");
+  assert.equal(bc7Rule, undefined, "BC7 should no longer use a generated default selection rule");
+
+  const coupeBc7Choices = data.choices.filter((choice) => choice.option_id === "opt_bc7_001" && choice.body_style === "coupe");
+  assert.equal(coupeBc7Choices.length, 3);
+  assert.equal(coupeBc7Choices.every((choice) => choice.status === "standard"), true);
+  assert.equal(coupeBc7Choices.every((choice) => choice.display_behavior === "default_selected"), true);
+
+  const convertibleBc7Choices = data.choices.filter((choice) => choice.option_id === "opt_bc7_001" && choice.body_style === "convertible");
+  assert.equal(convertibleBc7Choices.length, 3);
+  assert.equal(convertibleBc7Choices.every((choice) => choice.display_behavior !== "default_selected"), true);
 
   const runtime = loadRuntime();
   runtime.state.bodyStyle = "coupe";
   runtime.state.trimLevel = "1LT";
   runtime.resetDefaults();
   runtime.reconcileSelections();
-  assert.equal(runtime.state.selected.has("opt_bc7_001"), true, "coupe builds should default BC7 from generated rules");
+  assert.equal(runtime.state.selected.has("opt_bc7_001"), true, "coupe builds should default BC7 from workbook metadata");
 });
 
 test("5V7 can satisfy spoiler requirement with either 5ZU or 5ZZ", () => {

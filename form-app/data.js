@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-21T21:22:19+00:00"
+          "generated_at": "2026-05-21T22:02:49+00:00"
         },
         "variants": [
           {
@@ -2435,7 +2435,8 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
             "display_order": 10,
-            "source_detail_raw": "Standard on Coupe"
+            "source_detail_raw": "Standard on Coupe",
+            "display_behavior": "default_selected"
           },
           {
             "choice_id": "2lt_c07__opt_bc7_001",
@@ -2459,7 +2460,8 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
             "display_order": 10,
-            "source_detail_raw": "Standard on Coupe"
+            "source_detail_raw": "Standard on Coupe",
+            "display_behavior": "default_selected"
           },
           {
             "choice_id": "3lt_c07__opt_bc7_001",
@@ -2483,7 +2485,8 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
             "display_order": 10,
-            "source_detail_raw": "Standard on Coupe"
+            "source_detail_raw": "Standard on Coupe",
+            "display_behavior": "default_selected"
           },
           {
             "choice_id": "1lt_c67__opt_bc7_001",
@@ -48296,17 +48299,6 @@ window.CORVETTE_FORM_DATA = {
             "variant_scope": "*",
             "priority": 30,
             "notes": "Default black seat belt when no seat-belt option is selected or auto-added."
-          },
-          {
-            "rule_id": "default_bc7",
-            "target_option_id": "opt_bc7_001",
-            "condition_type": "always",
-            "condition_id": "",
-            "body_style_scope": "coupe",
-            "trim_level_scope": "*",
-            "variant_scope": "*",
-            "priority": 40,
-            "notes": "Default coupe black LS6 engine cover."
           }
         ],
         "runtimeRuleExceptions": [
@@ -56158,7 +56150,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-05-21T21:22:16+00:00",
+          "generated_at": "2026-05-21T22:02:47+00:00",
           "status": "draft_not_runtime_active"
         },
         "variants": [
@@ -103231,7 +103223,7 @@ window.CORVETTE_FORM_DATA = {
             "target_section": "sec_engi_001",
             "source_selection_mode": "multi_select_opt",
             "target_selection_mode": "multi_select_opt",
-            "body_style_scope": "",
+            "body_style_scope": "coupe",
             "disabled_reason": "Included with B6P Coupe Engine Appearance Package.",
             "auto_add": "True",
             "active": "True",
@@ -103259,26 +103251,7 @@ window.CORVETTE_FORM_DATA = {
             "review_flag": "False"
           },
           {
-            "rule_id": "gs_rule_opt_bc4_001_includes_opt_d3v_001",
-            "source_id": "opt_bc4_002",
-            "rule_type": "includes",
-            "target_id": "opt_d3v_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_engi_001",
-            "target_section": "sec_engi_001",
-            "source_selection_mode": "multi_select_opt",
-            "target_selection_mode": "multi_select_opt",
-            "body_style_scope": "coupe",
-            "disabled_reason": "Included with BC4 Blue LS6 Engine Cover.",
-            "auto_add": "True",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": "1. Includes (D3V) engine lighting. Requires (B6P) on Coupe",
-            "review_flag": "False"
-          },
-          {
-            "rule_id": "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible",
+            "rule_id": "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_002_requires_opt_zz3_001_convertible",
             "source_id": "opt_bc4_002",
             "rule_type": "requires",
             "target_id": "opt_zz3_001",
@@ -103307,7 +103280,7 @@ window.CORVETTE_FORM_DATA = {
             "target_section": "sec_engi_001",
             "source_selection_mode": "multi_select_opt",
             "target_selection_mode": "multi_select_opt",
-            "body_style_scope": "",
+            "body_style_scope": "coupe",
             "disabled_reason": "Included with BC4 Blue LS6 Engine Cover.",
             "auto_add": "True",
             "active": "True",
@@ -103335,7 +103308,7 @@ window.CORVETTE_FORM_DATA = {
             "review_flag": "False"
           },
           {
-            "rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible",
+            "rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_002_requires_opt_zz3_001_convertible",
             "source_id": "opt_bcp_002",
             "rule_type": "requires",
             "target_id": "opt_zz3_001",
@@ -103364,7 +103337,7 @@ window.CORVETTE_FORM_DATA = {
             "target_section": "sec_engi_001",
             "source_selection_mode": "multi_select_opt",
             "target_selection_mode": "multi_select_opt",
-            "body_style_scope": "",
+            "body_style_scope": "coupe",
             "disabled_reason": "Included with BCP Edge Red LS6 Engine Cover.",
             "auto_add": "True",
             "active": "True",
@@ -103373,7 +103346,7 @@ window.CORVETTE_FORM_DATA = {
             "review_flag": "False"
           },
           {
-            "rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible",
+            "rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_002_requires_opt_zz3_001_convertible",
             "source_id": "opt_bcs_002",
             "rule_type": "requires",
             "target_id": "opt_zz3_001",
@@ -103402,7 +103375,7 @@ window.CORVETTE_FORM_DATA = {
             "target_section": "sec_engi_001",
             "source_selection_mode": "multi_select_opt",
             "target_selection_mode": "multi_select_opt",
-            "body_style_scope": "",
+            "body_style_scope": "coupe",
             "disabled_reason": "Included with BCS Sterling Silver LS6 Engine Cover.",
             "auto_add": "True",
             "active": "True",
@@ -107353,7 +107326,7 @@ window.CORVETTE_FORM_DATA = {
             "target_option_id": "opt_d3v_001",
             "price_rule_type": "override",
             "price_value": 0,
-            "body_style_scope": "",
+            "body_style_scope": "coupe",
             "trim_level_scope": "",
             "variant_scope": "",
             "review_flag": "False",
@@ -107365,7 +107338,7 @@ window.CORVETTE_FORM_DATA = {
             "target_option_id": "opt_d3v_001",
             "price_rule_type": "override",
             "price_value": 0,
-            "body_style_scope": "",
+            "body_style_scope": "coupe",
             "trim_level_scope": "",
             "variant_scope": "",
             "review_flag": "False",
@@ -107377,7 +107350,7 @@ window.CORVETTE_FORM_DATA = {
             "target_option_id": "opt_d3v_001",
             "price_rule_type": "override",
             "price_value": 0,
-            "body_style_scope": "",
+            "body_style_scope": "coupe",
             "trim_level_scope": "",
             "variant_scope": "",
             "review_flag": "False",
@@ -115535,7 +115508,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "198 active compatibility rules exported from grandSport_rule_mapping."
+            "message": "197 active compatibility rules exported from grandSport_rule_mapping."
           },
           {
             "check_id": "interior_contract",
@@ -115567,11 +115540,11 @@ window.CORVETTE_FORM_DATA = {
             "counts": {
               "except": 2,
               "included_with": 17,
-              "includes": 46,
+              "includes": 43,
               "not_available": 49,
               "not_recommended": 4,
               "only": 26,
-              "requires": 36,
+              "requires": 33,
               "special_package_review": 26
             },
             "rows": [
@@ -115809,42 +115782,6 @@ window.CORVETTE_FORM_DATA = {
                 ],
                 "special_mentions": [],
                 "detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
-              },
-              {
-                "option_id": "opt_bcp_001",
-                "rpo": "BCP",
-                "option_name": "Edge Red LS6 Engine Cover",
-                "section_id": "sec_engi_001",
-                "matched_terms": [
-                  "requires",
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package."
-              },
-              {
-                "option_id": "opt_bcs_001",
-                "rpo": "BCS",
-                "option_name": "Sterling Silver LS6 Engine Cover",
-                "section_id": "sec_engi_001",
-                "matched_terms": [
-                  "requires",
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting.\n2. Requires (ZZ3) Convertible Engine Appearance Package."
-              },
-              {
-                "option_id": "opt_bc4_001",
-                "rpo": "BC4",
-                "option_name": "Blue LS6 Engine Cover",
-                "section_id": "sec_engi_001",
-                "matched_terms": [
-                  "requires",
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Includes (D3V) engine lighting. Requires (B6P) on Coupe\n2. Requires (ZZ3) Convertible Engine Appearance Package."
               },
               {
                 "option_id": "opt_wub_001",

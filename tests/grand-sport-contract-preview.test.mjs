@@ -84,11 +84,11 @@ test("customer-facing text is cleaned while raw source fields stay intact", () =
 });
 
 test("rule/detail hot spot buckets are preserved for later phases", () => {
-  assert.equal(preview.ruleDetailHotSpots.rows.length, 129);
-  assert.equal(preview.ruleDetailHotSpots.counts.requires, 36);
+  assert.equal(preview.ruleDetailHotSpots.rows.length, 126);
+  assert.equal(preview.ruleDetailHotSpots.counts.requires, 33);
   assert.equal(preview.ruleDetailHotSpots.counts.not_available, 49);
   assert.equal(preview.ruleDetailHotSpots.counts.included_with, 17);
-  assert.equal(preview.ruleDetailHotSpots.counts.includes, 46);
+  assert.equal(preview.ruleDetailHotSpots.counts.includes, 43);
   assert.equal(
     preview.ruleDetailHotSpots.rows.some(
       (row) => ["DMU", "DMV", "DMW", "DMX", "DMY"].includes(row.rpo) && /Requires \(D84\)/.test(row.detail_raw)

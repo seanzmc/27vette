@@ -1,21 +1,21 @@
 # Grand Sport Rule Audit
 
-Generated: `2026-05-21T21:22:31+00:00`
+Generated: `2026-05-21T22:04:03+00:00`
 Status: `rule_audit_generated`
 
 ## Summary
 
-- Workbook rule rows: 332
-- Expected draft runtime rules: 198
+- Workbook rule rows: 321
+- Expected draft runtime rules: 197
 - Omitted duplicate exclusive-group rules: 8
-- Raw detail candidate keys: 206
-- Workbook rules matching detail raw: 76
-- Workbook manual/approved/copied rules: 256
+- Raw detail candidate keys: 203
+- Workbook rules matching detail raw: 73
+- Workbook manual/approved/copied rules: 248
 - Skipped/review rows: 3
 - Unresolved non-interior RPO mentions: 4
 - Duplicate semantic rule keys: 1
 - Exact duplicate rule rows: 1
-- Overlapping scoped rule rows: 1
+- Overlapping scoped rule rows: 0
 - Redundant scoped rule rows: 0
 - Missing option references: 0
 - Inactive option references: 5
@@ -28,13 +28,10 @@ Status: `rule_audit_generated`
 - `gs_copy_rule_opt_bv4_001_excludes_opt_r8c_001_opt_bv4_001_excludes_opt_r8c_001`: opt_bv4_001 excludes opt_r8c_001
 - `gs_copy_rule_opt_b6p_001_includes_opt_d3v_001_opt_b6p_001_includes_opt_d3v_001_coupe`: opt_b6p_001 includes opt_d3v_001
 - `gs_copy_rule_opt_b6p_001_includes_opt_sl9_001_opt_b6p_001_includes_opt_sl9_001`: opt_b6p_001 includes opt_sl9_001
-- `gs_copy_rule_opt_bc4_001_includes_opt_d3v_001_opt_bc4_001_includes_opt_d3v_001_coupe`: opt_bc4_001 includes opt_d3v_001
-- `gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible`: opt_bc4_002 requires opt_zz3_001
+- `gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_002_requires_opt_zz3_001_convertible`: opt_bc4_002 requires opt_zz3_001
 - `gs_copy_rule_opt_bc7_001_requires_opt_zz3_001_convertible_opt_bc7_001_requires_opt_zz3_001_convertible`: opt_bc7_001 requires opt_zz3_001
-- `gs_copy_rule_opt_bcp_001_includes_opt_d3v_001_opt_bcp_001_includes_opt_d3v_001_coupe`: opt_bcp_001 includes opt_d3v_001
-- `gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_001_requires_opt_zz3_001_convertible`: opt_bcp_002 requires opt_zz3_001
-- `gs_copy_rule_opt_bcs_001_includes_opt_d3v_001_opt_bcs_001_includes_opt_d3v_001_coupe`: opt_bcs_001 includes opt_d3v_001
-- `gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_001_requires_opt_zz3_001_convertible`: opt_bcs_002 requires opt_zz3_001
+- `gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_002_requires_opt_zz3_001_convertible`: opt_bcp_002 requires opt_zz3_001
+- `gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_002_requires_opt_zz3_001_convertible`: opt_bcs_002 requires opt_zz3_001
 - `gs_copy_rule_opt_zz3_001_includes_opt_bc7_002_opt_zz3_001_includes_opt_bc7_001`: opt_zz3_001 includes opt_bc7_001
 - `gs_copy_rule_opt_zz3_001_includes_opt_sl9_001_opt_zz3_001_includes_opt_sl9_001`: opt_zz3_001 includes opt_sl9_001
 - `gs_copy_rule_opt_nwi_001_requires_opt_wub_001_opt_nwi_001_requires_opt_wub_001`: opt_nwi_001 requires opt_wub_001
@@ -48,20 +45,20 @@ Status: `rule_audit_generated`
 - `gs_copy_rule_opt_rin_001_excludes_opt_rik_001_opt_rin_001_excludes_opt_rik_001`: opt_rin_001 excludes opt_rik_001
 - `gs_copy_rule_opt_rin_001_excludes_opt_sl8_001_opt_rin_001_excludes_opt_sl8_001`: opt_rin_001 excludes opt_sl8_001
 - `gs_copy_rule_opt_sl8_001_excludes_opt_rik_001_opt_sl8_001_excludes_opt_rik_001`: opt_sl8_001 excludes opt_rik_001
-- ... 69 more
+- `gs_copy_rule_opt_sl8_001_excludes_opt_rin_001_opt_sl8_001_excludes_opt_rin_001`: opt_sl8_001 excludes opt_rin_001
+- `gs_copy_rule_opt_pdy_001_includes_opt_ryt_001_opt_pdy_001_includes_opt_ryt_001`: opt_pdy_001 includes opt_ryt_001
+- `gs_copy_rule_opt_pdy_001_includes_opt_s08_001_opt_pdy_001_includes_opt_s08_001`: opt_pdy_001 includes opt_s08_001
+- ... 66 more
 
 ## Workbook Rules Matching Detail Raw
 
 - `gs_rule_opt_j57_001_includes_opt_j6d_001`: opt_j57_001 includes opt_j6d_001
-- `gs_rule_opt_b6p_001_includes_opt_d3v_001`: opt_b6p_001 includes opt_d3v_001
-- `gs_rule_opt_bc4_001_includes_opt_d3v_001`: opt_bc4_002 includes opt_d3v_001 [coupe]
-- `gs_rule_opt_bc4_002_includes_opt_d3v_001`: opt_bc4_002 includes opt_d3v_001
-- `gs_rule_opt_bcp_001_includes_opt_d3v_001`: opt_bcp_001 includes opt_d3v_001
+- `gs_rule_opt_b6p_001_includes_opt_d3v_001`: opt_b6p_001 includes opt_d3v_001 [coupe]
+- `gs_rule_opt_bc4_002_includes_opt_d3v_001`: opt_bc4_002 includes opt_d3v_001 [coupe]
 - `gs_rule_opt_bcp_002_includes_opt_b6p_001`: opt_bcp_002 includes opt_b6p_001
-- `gs_rule_opt_bcp_002_includes_opt_d3v_001`: opt_bcp_002 includes opt_d3v_001
-- `gs_rule_opt_bcs_001_includes_opt_d3v_001`: opt_bcs_001 includes opt_d3v_001
+- `gs_rule_opt_bcp_002_includes_opt_d3v_001`: opt_bcp_002 includes opt_d3v_001 [coupe]
 - `gs_rule_opt_bcs_002_includes_opt_b6p_001`: opt_bcs_002 includes opt_b6p_001
-- `gs_rule_opt_bcs_002_includes_opt_d3v_001`: opt_bcs_002 includes opt_d3v_001
+- `gs_rule_opt_bcs_002_includes_opt_d3v_001`: opt_bcs_002 includes opt_d3v_001 [coupe]
 - `gs_rule_opt_fey_001_includes_opt_wub_001`: opt_fey_001 includes opt_wub_001
 - `gs_rule_opt_cf8_001_excludes_opt_dmu_001`: opt_cf8_001 excludes opt_dmu_001
 - `gs_rule_opt_cf8_001_excludes_opt_dmv_001`: opt_cf8_001 excludes opt_dmv_001
@@ -87,7 +84,10 @@ Status: `rule_audit_generated`
 - `gs_rule_opt_dx4_001_excludes_opt_gkz_001`: opt_dx4_001 excludes opt_gkz_001
 - `gs_rule_opt_dx4_001_excludes_opt_gph_001`: opt_dx4_001 excludes opt_gph_001
 - `gs_rule_opt_j6l_001_requires_opt_j57_001`: opt_j6l_001 requires opt_j57_001
-- ... 41 more
+- `gs_rule_opt_cfl_001_excludes_opt_cfz_001`: opt_cfl_001 excludes opt_cfz_001
+- `gs_rule_opt_fey_001_includes_opt_j57_001`: opt_fey_001 includes opt_j57_001
+- `gs_rule_opt_fey_001_includes_opt_t0f_001`: opt_fey_001 includes opt_t0f_001
+- ... 38 more
 
 ## Omitted Duplicate Exclusive Group Rules
 
@@ -120,15 +120,15 @@ Status: `rule_audit_generated`
 
 ## Duplicate Semantic Rule Keys
 
-- opt_bc4_002 requires opt_zz3_001 [convertible]: gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible, gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible
+- opt_bc4_002 requires opt_zz3_001 [convertible]: gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_002_requires_opt_zz3_001_convertible, gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible
 
 ## Exact Duplicate Rule Rows
 
-- opt_bc4_002 requires opt_zz3_001 [convertible]: keep `gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible`; rows: gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_001_requires_opt_zz3_001_convertible, gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible
+- opt_bc4_002 requires opt_zz3_001 [convertible]: keep `gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible`; rows: gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_002_requires_opt_zz3_001_convertible, gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible
 
 ## Overlapping Scoped Rule Rows
 
-- opt_bc4_002 includes opt_d3v_001: scopes coupe; source body styles convertible, coupe; scope_overlap_requires_review
+- none
 
 ## Redundant Scoped Rule Rows
 
@@ -148,5 +148,5 @@ Status: `rule_audit_generated`
 
 ## Engine Cover Rule Focus
 
-- Engine-cover rule rows: 26
+- Engine-cover rule rows: 15
 - Engine-cover inactive references: 0
