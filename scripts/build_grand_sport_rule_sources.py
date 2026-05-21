@@ -12,6 +12,11 @@ from typing import Any
 from openpyxl import load_workbook
 
 from corvette_form_generator.model_configs import GRAND_SPORT_MODEL
+from corvette_form_generator.runtime_metadata import (
+    load_audit_group_members,
+    load_rule_phrase_map,
+    load_rule_review_rpos,
+)
 from corvette_form_generator.workbook import clean, rows_from_sheet
 
 
@@ -179,10 +184,24 @@ def ids_for_text(text: str, option_ids_by_rpo: dict[str, list[str]]) -> list[str
     return ids_for_codes(referenced_rpo_codes(text, option_ids_by_rpo), option_ids_by_rpo)
 
 
+def phrase_row_applies(row: dict[str, Any], lower_fragment: str) -> bool:
+    phrase = clean(row.get("phrase")).lower()
+    if not phrase or phrase not in lower_fragment:
+        return False
+    # Preserve legacy parser guardrails while sourcing the phrase list and
+    # rule direction/type from workbook metadata.
+    if phrase == "includes" and "included with" in lower_fragment:
+        return False
+    if phrase == "only available with" and "included" in lower_fragment:
+        return False
+    return True
+
+
 def candidate_rule_keys(
     options: list[dict[str, str]],
     option_ids_by_rpo: dict[str, list[str]],
     interior_codes: set[str],
+    rule_phrase_rows: list[dict[str, Any]],
 ) -> tuple[set[tuple[str, str, str]], list[dict[str, Any]], list[dict[str, Any]]]:
     candidates: set[tuple[str, str, str]] = set()
     review_rows: list[dict[str, Any]] = []
@@ -210,26 +229,30 @@ def candidate_rule_keys(
                         }
                     )
             before_count = len(candidates)
-            if "not available with" in lower:
-                for target_id in ids_for_text(phrase_tail(fragment, "not available with"), option_ids_by_rpo):
-                    candidates.add((source_id, "excludes", target_id))
-            if "requires" in lower:
-                tail = phrase_tail(fragment, "requires", (" or included with", " included with"))
-                for target_id in ids_for_text(tail, option_ids_by_rpo):
-                    candidates.add((source_id, "requires", target_id))
-            if "includes" in lower and "included with" not in lower:
-                for target_id in ids_for_text(phrase_tail(fragment, "includes", (" requires",)), option_ids_by_rpo):
-                    candidates.add((source_id, "includes", target_id))
-            if "included and only available with" in lower:
-                for including_source_id in ids_for_text(phrase_tail(fragment, "included and only available with"), option_ids_by_rpo):
-                    candidates.add((including_source_id, "includes", source_id))
-            if "included with" in lower:
-                for including_source_id in ids_for_text(phrase_tail(fragment, "included with"), option_ids_by_rpo):
-                    candidates.add((including_source_id, "includes", source_id))
-            if "only available with" in lower and "included" not in lower:
-                for target_id in ids_for_text(phrase_tail(fragment, "only available with"), option_ids_by_rpo):
-                    candidates.add((source_id, "requires", target_id))
-            if len(candidates) == before_count and any(phrase in lower for phrase in RULE_PHRASES):
+            matched_review_phrase = False
+            for phrase_row in rule_phrase_rows:
+                phrase = clean(phrase_row.get("phrase"))
+                if not phrase_row_applies(phrase_row, lower):
+                    continue
+                if phrase_row.get("review_flag_default"):
+                    matched_review_phrase = True
+                rule_type = clean(phrase_row.get("rule_type")).lower()
+                direction = clean(phrase_row.get("direction")).lower()
+                if not rule_type or direction == "review_only":
+                    continue
+                target_ids = ids_for_text(
+                    phrase_tail(fragment, phrase, tuple(phrase_row.get("stop_phrases") or ())),
+                    option_ids_by_rpo,
+                )
+                if direction == "source_to_mentioned":
+                    for target_id in target_ids:
+                        candidates.add((source_id, rule_type, target_id))
+                elif direction == "mentioned_to_source":
+                    for including_source_id in target_ids:
+                        candidates.add((including_source_id, rule_type, source_id))
+                else:
+                    raise ValueError(f"Unsupported rule_phrase_map direction for {phrase!r}: {direction!r}")
+            if len(candidates) == before_count and matched_review_phrase:
                 if mentioned_codes and mentioned_codes <= interior_codes:
                     continue
                 review_rows.append(
@@ -472,11 +495,13 @@ def engine_cover_rule_audit(
     workbook_rules: list[dict[str, str]],
     options_by_id: dict[str, dict[str, str]],
     inactive_references: list[dict[str, Any]],
+    audit_group_members: dict[str, set[str]],
 ) -> dict[str, Any]:
-    engine_cover_option_ids = {
+    focus_rpos = set(audit_group_members.get("rpos", set()))
+    engine_cover_option_ids = set(audit_group_members.get("option_ids", set())) | {
         option_id
         for option_id, option in options_by_id.items()
-        if option.get("rpo", "") in ENGINE_COVER_RPOS
+        if option.get("rpo", "") in focus_rpos
     }
     rows = []
     for row in workbook_rules:
@@ -502,12 +527,12 @@ def engine_cover_rule_audit(
     inactive_engine_cover_refs = [
         row
         for row in inactive_references
-        if row.get("rpo", "") in ENGINE_COVER_RPOS
+        if row.get("rpo", "") in focus_rpos
         or row.get("source_id", "") in engine_cover_option_ids
         or row.get("target_id", "") in engine_cover_option_ids
     ]
     return {
-        "rpos": sorted(ENGINE_COVER_RPOS),
+        "rpos": sorted(focus_rpos),
         "option_ids": sorted(engine_cover_option_ids),
         "rules": rows,
         "inactiveReferences": inactive_engine_cover_refs,
@@ -773,6 +798,8 @@ def write_rule_audit(
     exclusive_group_members: list[dict[str, str]],
     rule_groups: list[dict[str, str]],
     rule_group_members: list[dict[str, str]],
+    engine_cover_group_members: dict[str, set[str]],
+    special_review_rpos: set[str],
 ) -> dict[str, str]:
     exclusive_group_excludes = exclusive_group_pairs(exclusive_groups, exclusive_group_members)
     rule_group_excludes = rule_group_pairs(rule_groups, rule_group_members, "excludes_any")
@@ -785,7 +812,7 @@ def write_rule_audit(
             all_option_ids_by_rpo[row.get("rpo", "")].append(row.get("option_id", ""))
     duplicate_semantic_rule_keys = focused_duplicate_rule_rows(workbook_rules)
     missing_references, inactive_references = rule_reference_issues(workbook_rules, options_by_id, all_option_ids_by_rpo)
-    engine_cover_rules = engine_cover_rule_audit(workbook_rules, options_by_id, inactive_references)
+    engine_cover_rules = engine_cover_rule_audit(workbook_rules, options_by_id, inactive_references, engine_cover_group_members)
     body_styles_by_option = option_body_style_coverage(status_rows, variant_rows, tuple(config.variant_ids))
     overlapping_scoped_rule_rows, redundant_scoped_rule_rows = scoped_rule_dedupe_audit(
         workbook_rules,
@@ -871,7 +898,7 @@ def write_rule_audit(
         "omittedInactiveOrUnemitted": omitted_inactive_or_unemitted,
         "skippedRequiresReview": review_rows,
         "unresolvedRpoMentions": unresolved_mentions,
-        "reviewHotSpots": review_hot_spots(options, option_ids_by_rpo, tuple(config.special_rule_review_rpos)),
+        "reviewHotSpots": review_hot_spots(options, option_ids_by_rpo, tuple(sorted(special_review_rpos))),
         "focusedReview": {
             "duplicateSemanticRuleKeys": duplicate_semantic_rule_keys,
             "exactDuplicateRuleRows": duplicate_semantic_rule_keys,
@@ -901,7 +928,15 @@ def main() -> None:
     _, active_option_ids_by_rpo = option_indexes(grand_sport_options)
     _, all_option_ids_by_rpo = option_indexes(all_grand_sport_options)
     interior_codes = interior_combination_codes(wb)
-    candidate_keys, review_rows, unresolved_mentions = candidate_rule_keys(grand_sport_options, all_option_ids_by_rpo, interior_codes)
+    rule_phrase_rows = load_rule_phrase_map(wb, RULE_PHRASES)
+    engine_cover_group_members = load_audit_group_members(wb, "engine_cover", ENGINE_COVER_RPOS)
+    special_review_rpos = load_rule_review_rpos(wb, config.model_key, config.special_rule_review_rpos)
+    candidate_keys, review_rows, unresolved_mentions = candidate_rule_keys(
+        grand_sport_options,
+        all_option_ids_by_rpo,
+        interior_codes,
+        rule_phrase_rows,
+    )
     workbook_rules = rows_from_sheet(wb, config.rule_mapping_sheet)
     exclusive_groups = rows_from_sheet(wb, config.exclusive_groups_sheet)
     exclusive_group_members = rows_from_sheet(wb, config.exclusive_group_members_sheet)
@@ -922,6 +957,8 @@ def main() -> None:
         exclusive_group_members,
         rule_groups,
         rule_group_members,
+        engine_cover_group_members,
+        special_review_rpos,
     )
 
     print(

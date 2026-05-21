@@ -390,6 +390,99 @@ def load_model_interior_scope_map(wb: Any, model_key: str) -> dict[str, dict[str
     return scope_map
 
 
+def _split_phrase_list(value: Any) -> tuple[str, ...]:
+    text = clean(value)
+    if not text:
+        return ()
+    parts = text.split("|") if "|" in text else text.split(",")
+    return tuple(part for part in (part.strip() for part in parts) if part)
+
+
+def load_rule_phrase_map(wb: Any, fallback_phrases: Iterable[str] = ()) -> list[dict[str, Any]]:
+    """Load workbook-authored rule phrase parser metadata.
+
+    Header-only workbooks fall back to the caller-provided phrases so existing
+    audit behavior remains available during migration.
+    """
+
+    rows = active_rows(wb, "rule_phrase_map")
+    if rows:
+        phrase_rows: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for row in rows:
+            phrase = clean(row.get("phrase"))
+            if not phrase:
+                continue
+            phrase_key = phrase.lower()
+            if phrase_key in seen:
+                raise ValueError(f"Duplicate active rule_phrase_map row: phrase={phrase}")
+            seen.add(phrase_key)
+            phrase_rows.append(
+                {
+                    "phrase": phrase,
+                    "rule_type": clean(row.get("rule_type")),
+                    "direction": clean(row.get("direction")),
+                    "stop_phrases": _split_phrase_list(row.get("stop_phrases")),
+                    "review_flag_default": truthy(row.get("review_flag_default"), default=False),
+                    "notes": clean(row.get("notes")),
+                }
+            )
+        if phrase_rows:
+            return phrase_rows
+
+    return [
+        {
+            "phrase": clean(phrase),
+            "rule_type": "",
+            "direction": "review_only",
+            "stop_phrases": (),
+            "review_flag_default": False,
+            "notes": "fallback_config",
+        }
+        for phrase in fallback_phrases
+        if clean(phrase)
+    ]
+
+
+def load_audit_group_members(
+    wb: Any,
+    group_id: str,
+    fallback_rpos: Iterable[str] = (),
+) -> dict[str, set[str]]:
+    """Load workbook-authored audit group members for a group_id."""
+
+    target_group = clean(group_id)
+    rpos: set[str] = set()
+    option_ids: set[str] = set()
+    for row in active_rows(wb, "option_audit_group_members"):
+        if clean(row.get("group_id")) != target_group:
+            continue
+        rpo = clean(row.get("rpo"))
+        option_id = clean(row.get("option_id"))
+        if rpo:
+            rpos.add(rpo)
+        if option_id:
+            option_ids.add(option_id)
+
+    if not rpos and not option_ids:
+        rpos = {clean(rpo) for rpo in fallback_rpos if clean(rpo)}
+
+    return {"rpos": rpos, "option_ids": option_ids}
+
+
+def load_rule_review_rpos(wb: Any, model_key: str, fallback_rpos: Iterable[str] = ()) -> set[str]:
+    """Load workbook-authored special-review RPOs scoped by model."""
+
+    rpos = {
+        clean(row.get("rpo"))
+        for row in active_rows(wb, "rule_review_groups", model_key)
+        if clean(row.get("rpo"))
+    }
+    if rpos:
+        return rpos
+    return {clean(rpo) for rpo in fallback_rpos if clean(rpo)}
+
+
 def load_model_metadata(wb: Any, model_key: str) -> dict[str, Any]:
     """Load model registry/source/variant metadata from optional model sheets."""
 

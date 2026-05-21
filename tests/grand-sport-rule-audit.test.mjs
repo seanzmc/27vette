@@ -51,6 +51,30 @@ const generateOutput = JSON.parse(
 const audit = JSON.parse(fs.readFileSync(auditPath, "utf8"));
 const draft = JSON.parse(fs.readFileSync(draftPath, "utf8"));
 
+test("Grand Sport audit metadata is workbook-owned", () => {
+  const phraseRows = workbookRows("rule_phrase_map");
+  const auditGroupRows = workbookRows("option_audit_groups");
+  const auditGroupMemberRows = workbookRows("option_audit_group_members");
+  const reviewRows = workbookRows("rule_review_groups");
+
+  assert.ok(
+    phraseRows.some((row) => row.phrase === "not available with" && normalizedBool(row.active) === "true"),
+    "rule phrase metadata should be populated from workbook rows"
+  );
+  assert.ok(
+    auditGroupRows.some((row) => row.group_id === "engine_cover" && normalizedBool(row.active) === "true"),
+    "engine-cover audit group should be workbook-authored"
+  );
+  assert.ok(
+    auditGroupMemberRows.some((row) => row.group_id === "engine_cover" && row.rpo === "B6P" && normalizedBool(row.active) === "true"),
+    "engine-cover RPO members should be workbook-authored"
+  );
+  assert.ok(
+    reviewRows.some((row) => row.model_key === "grand_sport" && row.rpo === "Z25" && normalizedBool(row.active) === "true"),
+    "special-review RPOs should be workbook-authored"
+  );
+});
+
 test("Grand Sport rule audit artifacts are generated and linked", () => {
   assert.ok(fs.existsSync(auditPath), "rule audit JSON should exist");
   assert.ok(fs.existsSync(auditMarkdownPath), "rule audit Markdown should exist");
@@ -301,6 +325,13 @@ test("Grand Sport rule audit classifies scoped duplicate cleanup separately", ()
 
 test("Grand Sport rule audit script does not own workbook business decisions", () => {
   const source = fs.readFileSync("scripts/build_grand_sport_rule_sources.py", "utf8");
+  for (const required of [
+    "load_rule_phrase_map(wb, RULE_PHRASES)",
+    "load_audit_group_members(wb, \"engine_cover\", ENGINE_COVER_RPOS)",
+    "load_rule_review_rpos(wb, config.model_key, config.special_rule_review_rpos)",
+  ]) {
+    assert.equal(source.includes(required), true, `${required} should keep audit metadata workbook-owned with fallback`);
+  }
   for (const forbidden of [
     "APPROVED_EXCLUSIVE_GROUPS",
     "INACTIVE_OPTION_RPOS",
