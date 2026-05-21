@@ -1664,7 +1664,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
                 "selection_mode": section.get("selection_mode", ""),
                 "selection_mode_label": section.get("selection_mode_label", ""),
                 "base_price": option["base_price"],
-                "display_behavior": option.get("display_behavior", ""),
+                "display_behavior": choice_source.get("display_behavior", ""),
                 "display_order": option.get("display_order") or order_by_option[option_id],
                 "source_detail_raw": option["source_detail_raw"],
                 "source_option_name": option["source_option_name"],

@@ -432,6 +432,15 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
   assert.equal(defaultBrakes.every((choice) => choice.rpo === "JX6" && choice.status === "standard"), true);
   assert.equal(defaultBrakes.every((choice) => choice.display_behavior === "default_selected"), true);
 
+  const coupeBc7Defaults = draft.choices.filter((choice) => choice.option_id === "opt_bc7_001" && choice.body_style === "coupe");
+  assert.equal(coupeBc7Defaults.length, 3);
+  assert.equal(coupeBc7Defaults.every((choice) => choice.rpo === "BC7" && choice.status === "standard"), true);
+  assert.equal(coupeBc7Defaults.every((choice) => choice.display_behavior === "default_selected"), true);
+
+  const convertibleBc7Choices = draft.choices.filter((choice) => choice.option_id === "opt_bc7_001" && choice.body_style === "convertible");
+  assert.equal(convertibleBc7Choices.length, 3);
+  assert.equal(convertibleBc7Choices.every((choice) => choice.display_behavior !== "default_selected"), true);
+
   const performanceBrakes = draft.choices.filter((choice) => choice.option_id === "opt_j56_001");
   assert.equal(performanceBrakes.length, 6);
   assert.equal(
