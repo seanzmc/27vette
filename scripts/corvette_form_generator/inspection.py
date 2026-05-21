@@ -15,6 +15,7 @@ from corvette_form_generator.mapping import best_status, normalize_mode, selecti
 from corvette_form_generator.model_config import ModelConfig
 from corvette_form_generator.runtime_metadata import (
     load_context_sections,
+    load_default_selection_rules,
     load_interior_components,
     load_model_interior_scope_map,
     load_rule_review_rpos,
@@ -1708,6 +1709,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
         grouped_requirement_pairs(rule_groups),
         grouped_exclusion_pairs(rule_groups) | exclusive_group_pairs(exclusive_groups),
     )
+    default_selection_rules = load_default_selection_rules(wb, config.model_key)
     price_rules, price_rule_validation, price_rule_source_rows = build_draft_price_rules(
         wb,
         config,
@@ -1806,6 +1808,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
         "priceRules": price_rules,
         "interiors": interiors,
         "colorOverrides": color_overrides,
+        "defaultSelectionRules": default_selection_rules,
         "validation": validation,
         "draftMetadata": {
             "sourcePreviewStatus": preview["dataset"]["status"],

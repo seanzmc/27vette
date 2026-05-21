@@ -329,14 +329,13 @@ textarea {
 }
 
 .interior-color-section {
-  background: linear-gradient(180deg, var(--panel-strong), var(--panel));
+  background: var(--panel);
 }
 
 .interior-group {
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fbfaf7;
-  padding: 12px;
+  background: transparent;
 }
 
 .interior-group-header {
@@ -344,26 +343,54 @@ textarea {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 10px;
+  padding: 12px;
+  cursor: pointer;
 }
 
-.interior-group-header h4 {
-  margin: 0;
+.interior-group-header::-webkit-details-marker {
+  display: none;
+}
+
+.interior-group-header::before {
+  content: "▸";
+  flex: 0 0 auto;
+  color: var(--accent-dark);
+  font-size: 13px;
+  font-weight: 850;
+  transform: translateY(1px);
+}
+
+.interior-group[open] .interior-group-header::before {
+  content: "▾";
+}
+
+.interior-group-heading {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.interior-group-title {
+  color: var(--ink);
   font-size: 17px;
+  font-weight: 850;
 }
 
-.interior-group-header p {
-  margin: 4px 0 0;
+.interior-group-summary {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.35;
 }
 
-.interior-group-header span {
+.interior-group-count {
   flex: 0 0 auto;
   color: var(--accent-dark);
   font-size: 12px;
   font-weight: 850;
+}
+
+.interior-group-body {
+  padding: 0 12px 12px;
 }
 
 .interior-material-group + .interior-material-group {

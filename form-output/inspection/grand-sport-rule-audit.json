@@ -6,7 +6,7 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-05-21T19:46:31+00:00",
+    "generated_at": "2026-05-21T20:45:39+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
@@ -14,10 +14,10 @@
     "rawDetailRuleCandidates": 206,
     "rawDetailCandidateKeys": 206,
     "dedupedOrSelfReferenceCandidates": 1,
-    "finalWorkbookRuleRows": 331,
+    "finalWorkbookRuleRows": 332,
     "expectedDraftRuntimeRules": 198,
     "omittedDuplicateExclusiveGroup": 8,
-    "omittedInactiveOrUnemitted": 125,
+    "omittedInactiveOrUnemitted": 126,
     "skippedRequiresReview": 3,
     "unresolvedRpoMentions": 4,
     "exclusiveGroups": 10,
@@ -34,7 +34,7 @@
     "engineCoverRuleRows": 26,
     "engineCoverInactiveReferences": 0,
     "workbookRulesMatchingDetailRaw": 76,
-    "workbookManualOrApprovedRules": 255
+    "workbookManualOrApprovedRules": 256
   },
   "sourceSheets": {
     "optionSheet": "grandSport_options",
@@ -1572,6 +1572,25 @@
     }
   ],
   "omittedInactiveOrUnemitted": [
+    {
+      "rule_id": "gs_rule_opt_j57_001_includes_opt_j6d_001",
+      "source_id": "opt_j57_001",
+      "rule_type": "includes",
+      "target_id": "opt_j6d_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Included and only available with (J57) carbon ceramic brakes.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "single_select_req",
+      "source_selection_mode": "multi_select_opt",
+      "target_section": "sec_cali_001",
+      "source_section": "sec_perf_brake_001",
+      "generation_action": "omit_soft_defaulted_caliper",
+      "body_style_scope": "",
+      "runtime_action": "",
+      "disabled_reason": "J57 soft-defaults J6D as a customer-selected caliper choice rather than a hard auto-add.",
+      "_audit_origin": "workbook_matches_detail_raw"
+    },
     {
       "rule_id": "gs_copy_rule_opt_b6p_001_includes_opt_d3v_001_opt_b6p_001_includes_opt_d3v_001_coupe",
       "source_id": "opt_b6p_001",

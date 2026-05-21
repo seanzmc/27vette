@@ -114,11 +114,6 @@ const expectedGrandSportExclusiveGroups = [
     option_ids: ["opt_jx6_001", "opt_j56_001", "opt_j57_001"],
     selection_mode: "required_single_within_group",
   },
-  {
-    group_id: "gs_excl_exhaust_path",
-    option_ids: ["opt_nga_001", "opt_wub_001"],
-    selection_mode: "required_single_within_group",
-  },
 ];
 
 test("Grand Sport draft preserves the live generated-data top-level contract", () => {
@@ -136,6 +131,7 @@ test("Grand Sport draft preserves the live generated-data top-level contract", (
     "priceRules",
     "interiors",
     "colorOverrides",
+    "defaultSelectionRules",
     "validation",
   ]) {
     assert.ok(Object.hasOwn(draft, key), `draft is missing ${key}`);
@@ -346,6 +342,7 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
     "opt_5jr_001::includes::opt_drg_001::::active",
     "opt_j6l_001::requires::opt_j57_001::::active",
     "opt_j6d_001::requires::opt_j57_001::::active",
+    "opt_nwi_001::excludes::opt_nga_001::::replace",
     "opt_t0f_001::requires::opt_j57_001::::active",
     "opt_j57_001::excludes::opt_j6a_001::::replace",
     "opt_fey_001::excludes::opt_t0e_001::::replace",
@@ -499,7 +496,18 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
     true
   );
   assert.equal(draft.rules.some((rule) => rule.source_id === "opt_fey_001" && rule.rule_type === "includes" && rule.target_id === "opt_j57_001"), true);
-  assert.equal(draft.rules.some((rule) => rule.source_id === "opt_j57_001" && rule.rule_type === "includes" && rule.target_id === "opt_j6d_001"), true);
+  assert.equal(draft.rules.some((rule) => rule.source_id === "opt_j57_001" && rule.rule_type === "includes" && rule.target_id === "opt_j6d_001"), false);
+  assert.equal(
+    draft.defaultSelectionRules.some(
+      (rule) =>
+        rule.rule_id === "gs_default_j6d_with_j57" &&
+        rule.target_option_id === "opt_j6d_001" &&
+        rule.condition_type === "when_selected_unless_selected_section" &&
+        rule.condition_id === "opt_j57_001"
+    ),
+    true,
+    "J57 should soft-default J6D through workbook-authored default metadata"
+  );
 
   const d30 = draft.choices.find((choice) => choice.option_id === "opt_d30_001");
   assert.equal(d30.active, "False");

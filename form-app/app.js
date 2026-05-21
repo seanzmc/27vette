@@ -593,6 +593,12 @@ function selectedExclusiveGroupPeer(optionId, selectedIds) {
   return (group.option_ids || []).some((id) => id !== optionId && selectedIds.has(id));
 }
 
+function selectedOrAutoExclusiveGroupPeer(optionId, selectedIds, autoAdded = computeAutoAdded()) {
+  const group = optionExclusiveGroup(optionId);
+  if (!exclusiveGroupAllowsSingleSelection(group)) return false;
+  return (group.option_ids || []).some((id) => id !== optionId && (selectedIds.has(id) || autoAdded.has(id)));
+}
+
 function userSelectedExclusiveGroupPeer(optionId, selectedIds) {
   const group = optionExclusiveGroup(optionId);
   if (!exclusiveGroupAllowsSingleSelection(group)) return false;
@@ -964,6 +970,7 @@ function resetDefaults() {
 }
 
 function addWorkbookDefaultChoices({ restoreSingleRequiredOnly = true } = {}) {
+  const autoAdded = computeAutoAdded();
   const rows = activeChoiceRows()
     .filter(
       (choice) =>
@@ -978,6 +985,7 @@ function addWorkbookDefaultChoices({ restoreSingleRequiredOnly = true } = {}) {
     if (!section) continue;
     if (restoreSingleRequiredOnly && section.selection_mode !== "single_select_req") continue;
     if (section.choice_mode === "single" && selectedOrAutoInSection(choice.section_id)) continue;
+    if (selectedOrAutoExclusiveGroupPeer(choice.option_id, state.selected, autoAdded)) continue;
     if (disableReasonForChoice(choice)) continue;
     state.selected.add(choice.option_id);
   }
@@ -1099,8 +1107,18 @@ function addGeneratedDefaultChoices(autoAdded = computeAutoAdded()) {
     if (!scopeMatches(rule.trim_level_scope, state.trimLevel)) continue;
     if (!scopeMatches(rule.variant_scope, currentVariantId())) continue;
 
+    const targetChoice = choiceForCurrentVariant(rule.target_option_id) || optionsById.get(rule.target_option_id);
+    const targetSectionId = targetChoice?.section_id || optionSectionId(rule.target_option_id);
+    const selectedIds = new Set(state.selected);
+    const conditionSelected = selectedIds.has(rule.condition_id) || autoAdded.has(rule.condition_id);
+
     if (rule.condition_type === "unless_selected_rpo" && selectedOptionByRpo(rule.condition_id)) continue;
     if (rule.condition_type === "unless_selected_section" && selectedOrAutoInSection(rule.condition_id, autoAdded)) continue;
+    if (rule.condition_type === "when_selected_unless_selected_section") {
+      if (!conditionSelected) continue;
+      if (targetSectionId && userSelectedInSection(targetSectionId, rule.target_option_id)) continue;
+    }
+    if (selectedOrAutoExclusiveGroupPeer(rule.target_option_id, selectedIds, autoAdded)) continue;
 
     addDefaultOption(rule.target_option_id);
   }
@@ -1384,28 +1402,31 @@ function renderInteriorGroups(interiors) {
         .map((group) => {
           const materialGroups = groupInteriorsBy(group.rows, "interior_material_family");
           const materialSummary = [...new Set(group.rows.map((interior) => interior.interior_material_family).filter(Boolean))].join(" / ");
+          const selectedInGroup = group.rows.some((interior) => interior.interior_id === state.selectedInterior);
           return `
-            <section class="interior-group">
-              <div class="interior-group-header">
-                <div>
-                  <h4>${escapeHtml(group.label)}</h4>
-                  ${materialSummary ? `<p>${escapeHtml(materialSummary)}</p>` : ""}
-                </div>
-                <span>${group.rows.length === 1 ? "1 choice" : `${group.rows.length} choices`}</span>
-              </div>
-              ${materialGroups
-                .map(
-                  (materialGroup) => `
-                    <div class="interior-material-group">
-                      ${materialGroups.length > 1 ? `<h5>${escapeHtml(materialGroup.label)}</h5>` : ""}
-                      <div class="choice-grid interior-choice-grid">
-                        ${materialGroup.rows.map(renderInteriorCard).join("")}
+            <details class="interior-group"${selectedInGroup ? " open" : ""}>
+              <summary class="interior-group-header">
+                <span class="interior-group-heading">
+                  <span class="interior-group-title">${escapeHtml(group.label)}</span>
+                  ${materialSummary ? `<span class="interior-group-summary">${escapeHtml(materialSummary)}</span>` : ""}
+                </span>
+                <span class="interior-group-count">${group.rows.length === 1 ? "1 choice" : `${group.rows.length} choices`}</span>
+              </summary>
+              <div class="interior-group-body">
+                ${materialGroups
+                  .map(
+                    (materialGroup) => `
+                      <div class="interior-material-group">
+                        ${materialGroups.length > 1 ? `<h5>${escapeHtml(materialGroup.label)}</h5>` : ""}
+                        <div class="choice-grid interior-choice-grid">
+                          ${materialGroup.rows.map(renderInteriorCard).join("")}
+                        </div>
                       </div>
-                    </div>
-                  `
-                )
-                .join("")}
-            </section>
+                    `
+                  )
+                  .join("")}
+              </div>
+            </details>
           `;
         })
         .join("")}

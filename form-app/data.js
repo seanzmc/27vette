@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-21T19:45:24+00:00"
+          "generated_at": "2026-05-21T20:44:35+00:00"
         },
         "variants": [
           {
@@ -43342,9 +43342,9 @@ window.CORVETTE_FORM_DATA = {
               "opt_efy_001",
               "opt_edu_001"
             ],
-            "selection_mode": "single_within_group",
+            "selection_mode": "required_single_within_group",
             "active": "True",
-            "notes": "Exterior Accent options are mutually exclusive"
+            "notes": "Exterior Accent options require one active accent selection; selected default cannot be cleared without choosing another accent package."
           }
         ],
         "rules": [
@@ -56158,7 +56158,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-05-21T19:45:22+00:00",
+          "generated_at": "2026-05-21T20:44:24+00:00",
           "status": "draft_not_runtime_active"
         },
         "variants": [
@@ -103160,16 +103160,6 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "required_single_within_group",
             "active": "True",
             "notes": "Grand Sport brake choices require one active brake selection; selected default cannot be cleared without choosing another brake package."
-          },
-          {
-            "group_id": "gs_excl_exhaust_path",
-            "option_ids": [
-              "opt_nga_001",
-              "opt_wub_001"
-            ],
-            "selection_mode": "required_single_within_group",
-            "active": "True",
-            "notes": "Grand Sport exhaust path requires either standard NGA corner-exit exhaust tips or WUB quad center-exit exhaust; selected default cannot be cleared without choosing the alternate exhaust path."
           }
         ],
         "rules": [
@@ -103209,25 +103199,6 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "runtime_action": "active",
             "source_note": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-            "review_flag": "False"
-          },
-          {
-            "rule_id": "gs_rule_opt_j57_001_includes_opt_j6d_001",
-            "source_id": "opt_j57_001",
-            "rule_type": "includes",
-            "target_id": "opt_j6d_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_perf_brake_001",
-            "target_section": "sec_cali_001",
-            "source_selection_mode": "single_select_req",
-            "target_selection_mode": "single_select_req",
-            "body_style_scope": "",
-            "disabled_reason": "Included with J57 Carbon Ceramic Brakes.",
-            "auto_add": "True",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": "1. Included and only available with (J57) carbon ceramic brakes.",
             "review_flag": "False"
           },
           {
@@ -106933,6 +106904,25 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "runtime_action": "replace",
             "source_note": "FEY Z52 Track Performance Package includes J57 carbon ceramic brakes and replaces J56 performance disc brakes.",
+            "review_flag": "False"
+          },
+          {
+            "rule_id": "gs_rule_opt_nwi_001_excludes_opt_nga_001_replace",
+            "source_id": "opt_nwi_001",
+            "rule_type": "excludes",
+            "target_id": "opt_nga_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_exha_001",
+            "target_section": "sec_exha_001",
+            "source_selection_mode": "multi_select_opt",
+            "target_selection_mode": "multi_select_opt",
+            "body_style_scope": "",
+            "disabled_reason": "NWI replaces standard NGA black exhaust tips.",
+            "auto_add": "False",
+            "active": "True",
+            "runtime_action": "replace",
+            "source_note": "NWI bright chrome exhaust tips replace standard NGA black exhaust tips when selected.",
             "review_flag": "False"
           }
         ],
@@ -115492,6 +115482,30 @@ window.CORVETTE_FORM_DATA = {
             "rule_type": "requires",
             "adds_rpo": "opt_d30_001",
             "notes": "Exterior/interior pairing requires the listed override RPO."
+          }
+        ],
+        "defaultSelectionRules": [
+          {
+            "rule_id": "gs_default_nga_unless_nwi",
+            "target_option_id": "opt_nga_001",
+            "condition_type": "unless_selected_rpo",
+            "condition_id": "NWI",
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "priority": 20,
+            "notes": "Default Grand Sport standard NGA exhaust tips unless NWI bright chrome tips are selected."
+          },
+          {
+            "rule_id": "gs_default_j6d_with_j57",
+            "target_option_id": "opt_j6d_001",
+            "condition_type": "when_selected_unless_selected_section",
+            "condition_id": "opt_j57_001",
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "priority": 50,
+            "notes": "When J57 carbon ceramic brakes are selected or included, preselect J6D calipers as a customer-visible soft default unless the caliper section already has a user-selected choice."
           }
         ],
         "validation": [

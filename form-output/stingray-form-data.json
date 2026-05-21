@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-05-21T14:46:26+00:00"
+    "generated_at": "2026-05-21T20:44:35+00:00"
   },
   "variants": [
     {
@@ -43334,9 +43334,9 @@
         "opt_efy_001",
         "opt_edu_001"
       ],
-      "selection_mode": "single_within_group",
+      "selection_mode": "required_single_within_group",
       "active": "True",
-      "notes": "Exterior Accent options are mutually exclusive"
+      "notes": "Exterior Accent options require one active accent selection; selected default cannot be cleared without choosing another accent package."
     }
   ],
   "rules": [

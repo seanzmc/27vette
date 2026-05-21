@@ -157,6 +157,7 @@ window.__testApi = {
   exportCsv,
   renderChoiceCard,
   renderContextCard,
+  renderInteriorGroups: typeof renderInteriorGroups === "function" ? renderInteriorGroups : undefined,
   downloads: window.__downloads,
   elements,
 };
@@ -207,11 +208,6 @@ const expectedGrandSportExclusiveGroups = [
     optionIds: ["opt_jx6_001", "opt_j56_001", "opt_j57_001"],
     selectionMode: "required_single_within_group",
   },
-  {
-    groupId: "gs_excl_exhaust_path",
-    optionIds: ["opt_nga_001", "opt_wub_001"],
-    selectionMode: "required_single_within_group",
-  },
 ];
 
 const expectedStingrayExclusiveGroups = [
@@ -242,6 +238,7 @@ const expectedStingrayExclusiveGroups = [
   {
     groupId: "excl_ext_accents",
     optionIds: ["opt_efr_001", "opt_efy_001", "opt_edu_001"],
+    selectionMode: "required_single_within_group",
   },
 ];
 
@@ -420,7 +417,7 @@ test("Grand Sport exclusive groups are model-scoped and Stingray groups are unch
   for (const expected of expectedStingrayExclusiveGroups) {
     const group = stingrayGroups.find((item) => item.group_id === expected.groupId);
     assert.ok(group, `${expected.groupId} should remain generated for Stingray`);
-    assert.equal(group.selection_mode, "single_within_group");
+    assert.equal(group.selection_mode, expected.selectionMode || "single_within_group");
     assert.deepEqual(JSON.parse(JSON.stringify(group.option_ids)), expected.optionIds);
   }
 });
@@ -678,7 +675,8 @@ test("Grand Sport workbook default_selected rows seed and reconcile defaults gen
 
   const order = runtime.currentOrder();
   assert.equal(order.auto_added_options.some((item) => item.rpo === "J57"), true, "FEY should auto-add J57");
-  assert.equal(order.auto_added_options.some((item) => item.rpo === "J6D"), true, "FEY auto-added J57 should auto-add grey calipers");
+  assert.equal(order.selected_options.some((item) => item.rpo === "J6D"), true, "FEY auto-added J57 should soft-default grey calipers into selected RPOs");
+  assert.equal(order.auto_added_options.some((item) => item.rpo === "J6D"), false, "grey calipers should not be hard auto-added");
   assert.equal(order.selected_options.some((item) => item.rpo === "J6A"), false, "J57 should replace default black calipers");
   assert.equal(runtime.optionPrice("opt_j57_001"), 0, "FEY should keep the J57 price override");
 
@@ -693,6 +691,83 @@ test("Grand Sport workbook default_selected rows seed and reconcile defaults gen
   const redCaliperOrder = redCaliperRuntime.currentOrder();
   assert.equal(redCaliperOrder.selected_options.some((item) => item.rpo === "J6F"), true, "User-selected non-black calipers should be preserved");
   assert.equal(redCaliperOrder.auto_added_options.some((item) => item.rpo === "J6D"), false, "Grey calipers should not override a user-selected caliper");
+});
+
+test("Grand Sport WUB enables NWI without replacing NGA; NWI replaces and restores NGA", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const wub = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_wub_001");
+  const nwi = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_nwi_001");
+  assert.ok(wub && nwi, "WUB and NWI should be active Grand Sport exhaust choices");
+  assert.equal(runtime.state.selected.has("opt_nga_001"), true, "NGA should seed as the default exhaust tip");
+  assert.match(runtime.disableReasonForChoice(nwi), /WUB|Quad Center Exit/i, "NWI should require WUB before WUB is selected");
+
+  runtime.handleChoice(wub);
+  assert.equal(runtime.state.selected.has("opt_wub_001"), true, "WUB should be selected");
+  assert.equal(runtime.state.selected.has("opt_nga_001"), true, "WUB alone should not remove NGA");
+  assert.equal(runtime.disableReasonForChoice(nwi), "", "WUB should make NWI selectable");
+
+  runtime.handleChoice(nwi);
+  assert.equal(runtime.state.selected.has("opt_nwi_001"), true, "NWI should be selected");
+  assert.equal(runtime.state.selected.has("opt_nga_001"), false, "NWI should replace NGA");
+
+  runtime.handleChoice(nwi);
+  assert.equal(runtime.state.selected.has("opt_nwi_001"), false, "NWI should be removable");
+  assert.equal(runtime.state.selected.has("opt_nga_001"), true, "removing NWI should restore NGA");
+
+  runtime.handleChoice(nwi);
+  runtime.handleChoice(wub);
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has("opt_wub_001"), false, "WUB should be removable");
+  assert.equal(runtime.state.selected.has("opt_nwi_001"), false, "removing WUB should remove invalid NWI");
+  assert.equal(runtime.state.selected.has("opt_nga_001"), true, "removing WUB from the NWI path should restore NGA");
+});
+
+test("Grand Sport J57 soft-defaults J6D into selected RPOs instead of auto-added RPOs", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const j57 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j57_001");
+  assert.ok(j57, "J57 should be selectable");
+  runtime.handleChoice(j57);
+  let order = runtime.currentOrder();
+  assert.equal(order.selected_options.some((item) => item.rpo === "J57"), true, "J57 should be selected");
+  assert.equal(order.selected_options.some((item) => item.rpo === "J6D"), true, "J6D should land in selected options as a soft default");
+  assert.equal(order.auto_added_options.some((item) => item.rpo === "J6D"), false, "J6D should not be a hard auto-add");
+
+  const redCaliper = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j6f_001");
+  assert.ok(redCaliper, "red calipers should be selectable");
+  runtime.handleChoice(redCaliper);
+  order = runtime.currentOrder();
+  assert.equal(order.selected_options.some((item) => item.rpo === "J6F"), true, "user-selected caliper should replace J6D");
+  assert.equal(order.selected_options.some((item) => item.rpo === "J6D"), false, "J6D soft default should not override user caliper choice");
+});
+
+test("Grand Sport interior color groups render collapsed disclosure containers", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "2LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  const gt2 = runtime.activeChoiceRows().find((choice) => choice.rpo === "AH2" && choice.step_key === "seat");
+  assert.ok(gt2, "Grand Sport 2LT GT2 seat should exist");
+  runtime.handleChoice(gt2);
+  const interiors = runtime.data.interiors.filter((interior) => interior.trim_level === "2LT" && interior.seat_code === "AH2");
+  assert.equal(interiors.length > 3, true, "Grand Sport 2LT GT2 should expose multiple interior colors");
+  const html = runtime.renderInteriorGroups(interiors);
+  assert.match(html, /<details class="interior-group"/);
+  assert.match(html, /<summary class="interior-group-header">/);
+  assert.doesNotMatch(html, /<details class="interior-group"[^>]*\sopen(?:\s|>)/, "Grand Sport interior groups should be collapsed by default");
 });
 
 test("Grand Sport Pass 1 workbook rules drive engine, brake, ground-effect, and launch edition behavior", () => {

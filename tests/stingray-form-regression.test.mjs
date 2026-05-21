@@ -188,15 +188,19 @@ function loadRuntime({ fetchImpl, turnstileAvailable = true } = {}) {
     `
 window.__testApi = {
   state,
+  get data() { return data; },
   activeChoiceRows,
   resetDefaults,
   reconcileSelections,
   handleChoice,
   computeAutoAdded,
   disableReasonForChoice,
+  missingRequired,
   lineItems,
   currentOrder,
   render,
+  renderChoiceCard,
+  renderInteriorGroups: typeof renderInteriorGroups === "function" ? renderInteriorGroups : undefined,
   activateStep: typeof activateStep === "function" ? activateStep : undefined,
   setMobileDrawer: typeof setMobileDrawer === "function" ? setMobileDrawer : undefined,
   closeMobileDrawers: typeof closeMobileDrawers === "function" ? closeMobileDrawers : undefined,
@@ -260,6 +264,7 @@ const expectedAccessoryExclusiveGroups = [
     groupId: "excl_ext_accents",
     rpos: ["EFR", "EFY", "EDU"],
     optionIds: ["opt_efr_001", "opt_efy_001", "opt_edu_001"],
+    selectionMode: "required_single_within_group",
   },
 ];
 
@@ -431,7 +436,11 @@ test("accessory exclusive groups are generated from the expected active RPOs", (
   for (const expectedGroup of expectedAccessoryExclusiveGroups) {
     const group = data.exclusiveGroups.find((item) => item.group_id === expectedGroup.groupId);
     assert.ok(group, `${expectedGroup.groupId} should be generated`);
-    assert.equal(group.selection_mode, "single_within_group", `${expectedGroup.groupId} should use generic single-choice behavior`);
+    assert.equal(
+      group.selection_mode,
+      expectedGroup.selectionMode || "single_within_group",
+      `${expectedGroup.groupId} should use expected workbook-owned single-choice behavior`
+    );
     assert.deepEqual(JSON.parse(JSON.stringify(group.option_ids)), expectedGroup.optionIds);
 
     const resolvedIdsByRpo = expectedGroup.rpos.map((rpo) => activeSelectableOptionIdsForRpo(rpo));
@@ -499,6 +508,87 @@ test("exclusive group selection replaces ZZ3 default BC7 engine cover", () => {
   assert.equal(runtime.computeAutoAdded().has("opt_bc7_001"), false, "BC7 should not remain auto-added after group replacement");
   assert.equal(lineItemRpos.includes("BCP"), true, "new engine cover should appear in line items");
   assert.equal(lineItemRpos.includes("BC7"), false, "replaced default BC7 should not appear in line items");
+});
+
+test("Stingray required exterior accents cannot be cleared but can be switched", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const efr = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_efr_001");
+  const efy = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_efy_001");
+  const edu = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_edu_001");
+  assert.ok(efr && efy && edu, "Stingray exterior accent choices should be active");
+  assert.equal(runtime.state.selected.has("opt_efr_001"), true, "EFR should seed as the default exterior accent");
+
+  runtime.handleChoice(efr);
+  assert.equal(runtime.state.selected.has("opt_efr_001"), true, "clicking the only selected required accent should not clear it");
+
+  runtime.handleChoice(efy);
+  assert.equal(runtime.state.selected.has("opt_efy_001"), true, "EFY should be selectable");
+  assert.equal(runtime.state.selected.has("opt_efr_001"), false, "EFY should replace EFR");
+
+  runtime.handleChoice(edu);
+  assert.equal(runtime.state.selected.has("opt_edu_001"), true, "EDU should be selectable");
+  assert.equal(runtime.state.selected.has("opt_efy_001"), false, "EDU should replace EFY");
+});
+
+test("Stingray coupe engine covers switch BC7 and paid covers as radio peers", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const bc7 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_bc7_001");
+  const bcp = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_bcp_001");
+  assert.ok(bc7 && bcp, "BC7 and BCP should be active on Stingray coupe");
+  assert.equal(runtime.state.selected.has("opt_bc7_001"), true, "BC7 should seed as the coupe default cover");
+
+  runtime.handleChoice(bcp);
+  assert.equal(runtime.state.selected.has("opt_bcp_001"), true, "BCP should select");
+  assert.equal(runtime.state.selected.has("opt_bc7_001"), false, "BCP should remove default BC7");
+
+  runtime.handleChoice(bc7);
+  assert.equal(runtime.state.selected.has("opt_bc7_001"), true, "BC7 should be selectable again");
+  assert.equal(runtime.state.selected.has("opt_bcp_001"), false, "BC7 should replace BCP");
+});
+
+test("Engine Appearance is not an open requirement for Stingray convertible without ZZ3", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "convertible";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  assert.equal(runtime.missingRequired?.().includes("Engine Appearance"), false, "Engine Appearance should not block a convertible build by itself");
+  const zz3 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_zz3_001");
+  assert.ok(zz3, "ZZ3 should be active for convertible builds");
+  runtime.handleChoice(zz3);
+  assert.equal(runtime.computeAutoAdded().has("opt_bc7_001"), true, "ZZ3 should provide the required BC7 cover path");
+  assert.equal(runtime.missingRequired?.().includes("Engine Appearance"), false, "ZZ3 cover behavior should not create an Engine Appearance open requirement");
+});
+
+test("interior color groups render as collapsed disclosure containers without the rejected restyle", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "2LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  const gt2 = runtime.activeChoiceRows().find((choice) => choice.rpo === "AH2" && choice.step_key === "seat");
+  assert.ok(gt2, "GT2 seat should exist for 2LT");
+  runtime.handleChoice(gt2);
+  const interiors = runtime.data.interiors.filter((interior) => interior.trim_level === "2LT" && interior.seat_code === "AH2");
+  assert.equal(interiors.length > 3, true, "2LT GT2 should expose multiple interior colors");
+
+  const html = runtime.renderInteriorGroups(interiors);
+  assert.match(html, /<details class="interior-group"/);
+  assert.match(html, /<summary class="interior-group-header">/);
+  assert.doesNotMatch(html, /<details class="interior-group"[^>]*\sopen(?:\s|>)/, "groups should be collapsed by default without a selection");
+  assert.doesNotMatch(stylesSource, /\.interior-color-section\s*\{[\s\S]*background:\s*linear-gradient/);
+  assert.doesNotMatch(stylesSource, /\.interior-group\s*\{[\s\S]*background:\s*#fbfaf7/);
 });
 
 test("option selections preserve the current viewport instead of resetting to the page top", () => {
