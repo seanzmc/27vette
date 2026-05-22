@@ -1125,11 +1125,12 @@ function includeRulesForChoice(choice) {
   );
 }
 
-function relationshipBadgesForChoice(choice) {
+function relationshipBadgesForChoice(choice, { disabled = false } = {}) {
   const badges = [];
   const group = optionExclusiveGroup(choice.option_id);
   if (group && exclusiveGroupAllowsSingleSelection(group)) {
     badges.push({
+      type: "exclusive",
       className: exclusiveGroupRequiresSelection(group) ? "required" : "exclusive",
       label: exclusiveGroupVisualLabel(group),
       dataAttribute: `data-exclusive-group="${escapeHtml(group.group_id)}"`,
@@ -1137,30 +1138,51 @@ function relationshipBadgesForChoice(choice) {
   }
   const includeRules = includeRulesForChoice(choice);
   if (includeRules.length) {
-    const includedLabels = includeRules.map((rule) => getEntityLabel(rule.target_id)).join("; ");
     badges.push({
-      className: "includes",
+      type: "includes",
+      className: `includes${disabled ? " disabled" : ""}`,
       label: `Includes ${includeRules.length} item${includeRules.length === 1 ? "" : "s"}`,
-      tooltip: includedLabels ? `Workbook includes: ${includedLabels}.` : "Workbook-defined included items.",
+      includedItems: includeRules.map((rule) => getEntityLabel(rule.target_id)),
     });
   }
   return badges;
 }
 
-function renderChoiceRelationshipBadges(choice) {
-  const badges = relationshipBadgesForChoice(choice);
+function renderIncludedItemsTooltip(items = []) {
+  const rows = items.filter(Boolean);
+  if (!rows.length) return "Included items.";
+  return `
+    <span class="tooltip-content structured">
+      <ul class="tooltip-list">
+        ${rows.map((item) => `<li><span>${escapeHtml(item)}</span></li>`).join("")}
+      </ul>
+    </span>
+  `;
+}
+
+function renderRelationshipBadge(badge) {
+  if (badge.type === "includes") {
+    const ariaContent = escapeHtml([badge.label, ...badge.includedItems].join(": "));
+    return `
+      <span class="choice-relationship-badge ${badge.className} info-tooltip" tabindex="0" aria-label="${ariaContent}">
+        <span class="tooltip-trigger-text">${escapeHtml(badge.label)}</span>
+        <span class="tooltip-panel" role="tooltip">${renderIncludedItemsTooltip(badge.includedItems)}</span>
+      </span>
+    `;
+  }
+  return `
+    <span class="choice-relationship-badge ${badge.className}" ${badge.dataAttribute || ""}>
+      <span>${escapeHtml(badge.label)}</span>
+    </span>
+  `;
+}
+
+function renderChoiceRelationshipBadges(choice, { disabled = false } = {}) {
+  const badges = relationshipBadgesForChoice(choice, { disabled });
   if (!badges.length) return "";
   return `
     <span class="choice-relationship-badges">
-      ${badges
-        .map(
-          (badge) => `
-            <span class="choice-relationship-badge ${badge.className}" ${badge.dataAttribute || ""}>
-              <span>${escapeHtml(badge.label)}</span>${badge.tooltip ? renderInfoTooltip(badge.tooltip, badge.label, { focusable: false, icon: true }) : ""}
-            </span>
-          `
-        )
-        .join("")}
+      ${badges.map(renderRelationshipBadge).join("")}
     </span>
   `;
 }
@@ -1449,7 +1471,7 @@ function renderChoiceCard(choice, autoAdded) {
       ${renderCardMedia(choice, choice.label, { disabled })}
       <span class="topline"><span class="rpo">${escapeHtml(choice.rpo || choice.option_id)}</span><span class="price">${formatMoney(choiceDisplayPrice(choice))}</span></span>
       <span class="choice-name"><span>${escapeHtml(choice.label)}</span>${renderInfoTooltip(detail, "Option details", { focusable: false })}</span>
-      ${renderChoiceRelationshipBadges(choice)}
+      ${renderChoiceRelationshipBadges(choice, { disabled })}
       ${disabledReason ? renderStatePill("Unavailable", "disabled-reason", disabledReason) : ""}
       ${autoReason ? renderStatePill("Auto-added", "auto-reason", autoReason) : ""}
     </button>
@@ -1457,7 +1479,14 @@ function renderChoiceCard(choice, autoAdded) {
 }
 
 function renderModeLabel(section) {
-  return section?.selection_mode_label || section?.selection_mode || "";
+  const label = section?.selection_mode_label || section?.selection_mode || "";
+  const friendlyLabels = {
+    "Required single choice": "Choose one",
+    "Optional single choice": "Choose up to one",
+    "Optional multiple choice": "Choose any that apply",
+    "Required multiple choice": "Choose required options",
+  };
+  return friendlyLabels[label] || label;
 }
 
 function renderInteriorCard(interior) {
@@ -1739,7 +1768,7 @@ function renderChoiceGrid(choices, autoAdded) {
 
 function customerSafeGroupNote(group) {
   const note = String(group?.notes || "").trim();
-  if (!note || /\b(option_ids?|group_id|runtime|workbook|radio peers?)\b/i.test(note)) return "";
+  if (!note || /\b(option_ids?|group_id|runtime|workbook|radio peers?|inactive|source|draft|reactivation|output|selected default|cannot be cleared)\b/i.test(note)) return "";
   return note;
 }
 
@@ -1749,11 +1778,9 @@ function renderChoiceRelationGroup(group, choices, autoAdded) {
     <div class="choice-relation-group" data-choice-relation-group="${escapeHtml(group.group_id)}">
       <div class="choice-relation-heading">
         <div>
-          <p class="choice-relation-eyebrow">Related choices</p>
-          <h4 class="choice-relation-title">${escapeHtml(exclusiveGroupHeading(group))}</h4>
+          <h4 class="choice-relation-title">Related options</h4>
           ${note ? `<p class="choice-relation-note">${escapeHtml(note)}</p>` : ""}
         </div>
-        <span class="choice-relation-count">${choices.length} options</span>
       </div>
       ${renderChoiceGrid(choices, autoAdded)}
     </div>
@@ -1929,7 +1956,6 @@ function renderSectionedSummaryItems(items, pricing) {
         <li class="summary-rpo-section">
           <div class="summary-section-heading">
             <span>${escapeHtml(section.section_label)}</span>
-            <span>${formatMoney(section.section_total)}</span>
           </div>
           <ul class="summary-rpo-rows">
             ${section.items.map((item) => renderSummaryRpoRow(item)).join("")}

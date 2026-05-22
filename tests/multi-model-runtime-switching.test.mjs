@@ -440,7 +440,17 @@ test("runtime renders customer-facing relationship badges on exclusive and packa
 
   const stingrayPackage = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_pdv_001");
   html = runtime.renderChoiceCard(stingrayPackage, new Map());
-  assert.match(html, /Includes \d+ items/);
+  assert.match(html, /choice-relationship-badge includes info-tooltip/);
+  assert.match(html, /Includes 2 items/);
+  assert.match(html, /<span class="tooltip-trigger-text">Includes 2 items<\/span>/);
+  assert.match(html, /SB7 Corvette Racing Themed Jake and Stingray R Graphics Package/);
+  assert.match(html, /VWD Stingray R Logo Wheel Center Caps/);
+  assert.doesNotMatch(html, /Workbook includes|Workbook-defined/);
+  assert.doesNotMatch(html, /choice-relationship-badge includes[\s\S]*info-icon/);
+
+  const disabledIncludesChoice = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_fe4_001");
+  html = runtime.renderChoiceCard(disabledIncludesChoice, new Map());
+  assert.match(html, /choice-relationship-badge includes disabled info-tooltip/);
 
   runtime.activateModel("grandSport");
   const requiredBrake = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j57_001");
@@ -457,11 +467,16 @@ test("runtime groups visible exclusive-group peers within option sections", () =
 
   const html = runtime.elements.get("#stepContent").innerHTML;
   assert.match(html, /choice-relation-group/);
-  assert.match(html, /Choose one required option/);
+  assert.match(html, /Related options/);
+  assert.doesNotMatch(html, /Choose one required option|Choose one of these related options/);
+  assert.doesNotMatch(html, /choice-relation-count/);
   assert.match(html, /data-choice-relation-group="gs_excl_performance_brakes"/);
   assert.match(html, /data-option="opt_jx6_001"/);
   assert.match(html, /data-option="opt_j56_001"/);
   assert.match(html, /data-option="opt_j57_001"/);
+  assert.match(html, /Choose one/);
+  assert.match(html, /Choose any that apply/);
+  assert.doesNotMatch(html, /Required single choice|Optional multiple choice/);
 });
 
 test("runtime renders selected RPO summary as sectioned rows matching export sections", () => {
@@ -481,6 +496,9 @@ test("runtime renders selected RPO summary as sectioned rows matching export sec
   assert.ok(exportedSections.includes("Exterior Paint"));
   assert.match(selectedHtml, /summary-section-heading/);
   assert.match(selectedHtml, /Exterior Paint/);
+  const sectionHeadings = [...selectedHtml.matchAll(/<div class="summary-section-heading">[\s\S]*?<\/div>/g)].map((match) => match[0]);
+  assert.ok(sectionHeadings.length > 0);
+  assert.ok(sectionHeadings.every((heading) => !/\$[0-9]/.test(heading)));
   assert.match(selectedHtml, /summary-rpo-code/);
   assert.match(selectedHtml, /summary-rpo-label/);
   assert.match(selectedHtml, /summary-rpo-price/);

@@ -324,10 +324,10 @@ textarea {
 .choice-relation-group {
   display: grid;
   gap: 12px;
-  border: 1px solid rgba(178, 34, 52, 0.18);
-  border-radius: 10px;
-  padding: 14px;
-  background: linear-gradient(135deg, rgba(255, 247, 243, 0.92), rgba(255, 253, 249, 0.92));
+  border: 1px solid rgba(217, 209, 196, 0.72);
+  border-radius: 8px;
+  padding: 10px 12px 12px;
+  background: rgba(255, 255, 255, 0.32);
 }
 
 .choice-relation-group + .choice-grid,
@@ -358,9 +358,11 @@ textarea {
 }
 
 .choice-relation-title {
-  margin-top: 2px;
-  color: var(--ink);
-  font-size: 15px;
+  color: #766f66;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .choice-relation-note {
@@ -598,7 +600,7 @@ textarea {
 
 .disabled-reason,
 .auto-reason {
-  color: var(--warn);
+  color: #7f4700;
   font-size: 12px;
   font-weight: 750;
 }
@@ -646,20 +648,20 @@ textarea {
   align-items: center;
   gap: 5px;
   justify-self: start;
-  border: 1px solid rgba(178, 34, 52, 0.28);
+  border: 1px solid rgba(123, 112, 98, 0.22);
   border-radius: 999px;
   padding: 3px 8px;
-  background: #fff7f3;
-  color: var(--accent-dark);
+  background: rgba(255, 255, 255, 0.58);
+  color: #625a51;
   font-size: 11px;
-  font-weight: 850;
+  font-weight: 800;
   letter-spacing: 0.01em;
 }
 
 .choice-relationship-badge.required {
-  border-color: rgba(161, 92, 0, 0.36);
-  background: #fff7e8;
-  color: var(--warn);
+  border-color: rgba(161, 92, 0, 0.26);
+  background: rgba(255, 247, 232, 0.72);
+  color: #7f4700;
 }
 
 .choice-relationship-badge.includes {
@@ -668,16 +670,35 @@ textarea {
   color: var(--ok);
 }
 
-.choice-relationship-badge .info-tooltip {
-  width: 16px;
-  height: 16px;
-  color: inherit;
+.choice-relationship-badge.includes.disabled {
+  border-color: rgba(165, 160, 153, 0.52);
+  background: rgba(255, 255, 255, 0.5);
+  color: #77716a;
 }
 
-.choice-relationship-badge .info-icon {
-  width: 15px;
-  height: 15px;
-  font-size: 9px;
+.choice-relationship-badge.info-tooltip {
+  display: inline-flex;
+  width: auto;
+  height: auto;
+  color: var(--ok);
+}
+
+.choice-relationship-badge.info-tooltip:hover,
+.choice-relationship-badge.info-tooltip:focus-visible,
+.choice-relationship-badge.info-tooltip.is-open {
+  background: currentColor;
+}
+
+.choice-relationship-badge.info-tooltip:hover .tooltip-trigger-text,
+.choice-relationship-badge.info-tooltip:focus-visible .tooltip-trigger-text,
+.choice-relationship-badge.info-tooltip.is-open .tooltip-trigger-text {
+  color: var(--panel-strong);
+}
+
+.choice-relationship-badge.includes.disabled.info-tooltip:hover,
+.choice-relationship-badge.includes.disabled.info-tooltip:focus-visible,
+.choice-relationship-badge.includes.disabled.info-tooltip.is-open {
+  color: #77716a;
 }
 
 .auto-reason {
