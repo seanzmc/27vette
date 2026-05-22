@@ -54,10 +54,9 @@ The runtime should render and evaluate the generated contract. It should not inf
 
 The active workbook source surfaces include shared/Stingray sheets, Grand Sport model-scoped sheets, workbook-owned runtime metadata sheets, and generated output sheets.
 
-Shared or Stingray-facing source sheets include:
+Current shared or Stingray-facing sheets include:
 
 - `variant_master`
-- `category_master`
 - `section_master`
 - `stingray_options`
 - `stingray_ovs`
@@ -71,6 +70,8 @@ Shared or Stingray-facing source sheets include:
 - `lt_interiors`
 - `LZ_Interiors`
 - `PriceRef`
+
+`archive_category_master` is retained as historical evidence only; `category_master` is not an active source sheet.
 
 Grand Sport model-scoped source sheets include:
 

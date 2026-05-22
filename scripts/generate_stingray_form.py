@@ -83,6 +83,19 @@ def workbook_truthy(value: Any) -> bool:
 
 
 ASSET_IMAGE_FIELDS = ("image_url", "image_alt", "image_fit", "image_position")
+DRAFT_ONLY_TOP_LEVEL_FIELDS = ("draftMetadata",)
+DRAFT_ONLY_CHOICE_FIELDS = ("source_option_name", "source_description", "text_cleanup_notes")
+
+
+def live_contract_data(data: dict[str, Any]) -> dict[str, Any]:
+    """Strip inspection-only provenance fields before embedding live app data."""
+    cleaned = json.loads(json.dumps(data))
+    for field in DRAFT_ONLY_TOP_LEVEL_FIELDS:
+        cleaned.pop(field, None)
+    for choice in cleaned.get("choices", []):
+        for field in DRAFT_ONLY_CHOICE_FIELDS:
+            choice.pop(field, None)
+    return cleaned
 
 
 def asset_fields(row: dict[str, Any]) -> dict[str, str]:
@@ -216,6 +229,7 @@ def build_app_data_registry(stingray_data: dict[str, Any]) -> dict[str, Any]:
     }
     grand_sport_data = load_grand_sport_registry_data()
     if grand_sport_data is not None:
+        grand_sport_data = live_contract_data(grand_sport_data)
         grand_sport_key = registry_model_key(GRAND_SPORT_MODEL.model_key)
         models[grand_sport_key] = model_registry_entry(
             GRAND_SPORT_MODEL.model_key,
@@ -257,6 +271,15 @@ def workbook_bool(row: dict[str, str], field: str, fallback: bool) -> bool:
 
 def active_source_row(row: dict[str, str]) -> bool:
     return clean(row.get("active", "True")) == "True"
+
+
+def runtime_authored_rule(row: dict[str, str]) -> bool:
+    status = clean(row.get("normalization_status", "")).lower()
+    if status in {"omitted", "replaced"}:
+        return False
+    if status == "preserved":
+        return True
+    return not clean(row.get("generation_action", "")).lower().startswith("omit")
 
 
 def rows_from_optional_sheet(wb, sheet_name: str) -> list[dict[str, str]]:
@@ -668,7 +691,6 @@ def main() -> None:
     d30_r6x_price_rules_raw = [row for row in price_rules_raw if row.get("price_rule_id") == "pr_d30_r6x_001"]
     price_rules_raw = [row for row in price_rules_raw if row.get("price_rule_id") != "pr_d30_r6x_001"]
     lt_interiors_raw = rows_from_sheet(wb, "lt_interiors")
-    lz_interiors_raw = rows_from_sheet(wb, "LZ_Interiors")
     price_ref_rows = rows_from_sheet(wb, "PriceRef")
     price_ref = price_ref_prices(price_ref_rows)
     interior_component_price_ref = price_ref_component_prices(price_ref_rows)
@@ -991,32 +1013,6 @@ def main() -> None:
                 "interior_components_json": json.dumps(components, separators=(",", ":")),
             }
         )
-    for row in lz_interiors_raw:
-        components = workbook_interior_component_metadata(row, workbook_components_by_interior_id, interior_component_price_ref)
-        if not components:
-            components = interior_component_metadata(row, interior_component_price_ref)
-        interiors.append(
-            {
-                "interior_id": row.get("ID", ""),
-                "source_sheet": "LZ_Interiors",
-                "active_for_stingray": False,
-                "trim_level": row.get("Trim", "").replace("_R6X", ""),
-                "requires_r6x": "True" if "_R6X" in row.get("Trim", "") or row.get("ID", "").endswith("_R6X") else "False",
-                "seat_code": row.get("Seat", ""),
-                "interior_code": row.get("Interior Code", ""),
-                "interior_name": row.get("Interior Name", ""),
-                "material": row.get("Material", ""),
-                "price": generated_interior_price(row, price_ref),
-                "suede": row.get("Suede", ""),
-                "stitch": row.get("Stitch", ""),
-                "two_tone": row.get("Two Tone", ""),
-                "section_id": "",
-                "color_overrides_raw": row.get("Color Overrides", ""),
-                "source_note": row.get("Detail from Disclosure", ""),
-                "interior_components": components,
-                "interior_components_json": json.dumps(components, separators=(",", ":")),
-            }
-        )
     reference_order_by_id = {
         row["interior_id"]: index
         for index, row in enumerate((row for row in interior_reference_rows if row["interior_id"]), start=1)
@@ -1107,7 +1103,7 @@ def main() -> None:
         rule_type = rule.get("rule_type", "").lower()
         source_id = rule.get("source_id", "")
         target_id = rule.get("target_id", "")
-        if rule.get("generation_action", "").startswith("omit"):
+        if not runtime_authored_rule(rule):
             continue
         if rule_type == "requires" and (source_id, target_id) in grouped_requires:
             continue

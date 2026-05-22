@@ -298,6 +298,11 @@ def grand_sport_rule_exact_key(row: dict[str, Any]) -> tuple[str, str, str, str]
 
 
 def runtime_authored_rule(row: dict[str, Any]) -> bool:
+    status = clean(row.get("normalization_status", "")).lower()
+    if status in {"omitted", "replaced"}:
+        return False
+    if status == "preserved":
+        return True
     return not clean(row.get("generation_action", "")).lower().startswith("omit")
 
 

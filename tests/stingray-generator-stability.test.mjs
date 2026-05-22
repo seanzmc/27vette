@@ -83,6 +83,10 @@ const ruleMappingHeaders = [
   "body_style_scope",
   "runtime_action",
   "disabled_reason",
+  "normalization_status",
+  "normalization_reason",
+  "replacement_group_id",
+  "replacement_rule_id",
 ];
 const priceRuleHeaders = [
   "price_rule_id",
@@ -215,8 +219,10 @@ function workbookRows(sheetName) {
         `ws = wb['${sheetName}']`,
         "headers = [ws.cell(1, col).value for col in range(1, ws.max_column + 1)]",
         "rows = []",
+        "def legacy_value(value):",
+        "    return 'True' if value is True else 'False' if value is False else value",
         "for raw in ws.iter_rows(min_row=2, values_only=True):",
-        "    record = {header: value for header, value in zip(headers, raw) if header and value is not None}",
+        "    record = {header: legacy_value(value) for header, value in zip(headers, raw) if header and value is not None}",
         "    if record:",
         "        rows.append(record)",
         "print(json.dumps(rows))",

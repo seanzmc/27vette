@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-21T22:17:46+00:00"
+          "generated_at": "2026-05-22T04:55:20+00:00"
         },
         "variants": [
           {
@@ -56150,7 +56150,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-05-21T22:17:22+00:00",
+          "generated_at": "2026-05-22T04:54:21+00:00",
           "status": "draft_not_runtime_active"
         },
         "variants": [
@@ -56930,10 +56930,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "HD Rear Vision Camera",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_uvb_001",
@@ -56958,10 +56955,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "HD Rear Vision Camera",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_uvb_001",
@@ -56986,10 +56980,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "HD Rear Vision Camera",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_uvb_001",
@@ -57014,10 +57005,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "HD Rear Vision Camera",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_uvb_001",
@@ -57042,10 +57030,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "HD Rear Vision Camera",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_uvb_001",
@@ -57070,10 +57055,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "HD Rear Vision Camera",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_uqs_001",
@@ -57098,10 +57080,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Bose Premium 10-Speaker Audio System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_uqs_001",
@@ -57126,10 +57105,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Bose Premium 10-Speaker Audio System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_uqs_001",
@@ -57154,10 +57130,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Bose Premium 10-Speaker Audio System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_uqs_001",
@@ -57182,10 +57155,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Bose Premium 10-Speaker Audio System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_uqs_001",
@@ -57210,10 +57180,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Bose Premium 10-Speaker Audio System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_uqs_001",
@@ -57238,10 +57205,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Bose Premium 10-Speaker Audio System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_k7a_001",
@@ -57266,10 +57230,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Single Wireless Phone Charging Pad",
-            "source_description": "Center Console",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_k7a_001",
@@ -57294,10 +57255,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Single Wireless Phone Charging Pad",
-            "source_description": "Center Console",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_k7a_001",
@@ -57322,10 +57280,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Single Wireless Phone Charging Pad",
-            "source_description": "Center Console",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_k7a_001",
@@ -57350,10 +57305,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Single Wireless Phone Charging Pad",
-            "source_description": "Center Console",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_k7a_001",
@@ -57378,10 +57330,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Single Wireless Phone Charging Pad",
-            "source_description": "Center Console",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_k7a_001",
@@ -57406,10 +57355,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Single Wireless Phone Charging Pad",
-            "source_description": "Center Console",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_dwk_001",
@@ -57434,10 +57380,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Power-Adjustable Outside Mirrors",
-            "source_description": "Manual-folding with turn signal indicators",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_dwk_001",
@@ -57462,10 +57405,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Power-Adjustable Outside Mirrors",
-            "source_description": "Manual-folding with turn signal indicators",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_dwk_001",
@@ -57490,10 +57430,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Power-Adjustable Outside Mirrors",
-            "source_description": "Manual-folding with turn signal indicators",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_dwk_001",
@@ -57518,10 +57455,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Power-Adjustable Outside Mirrors",
-            "source_description": "Manual-folding with turn signal indicators",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_dwk_001",
@@ -57546,10 +57480,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Power-Adjustable Outside Mirrors",
-            "source_description": "Manual-folding with turn signal indicators",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_dwk_001",
@@ -57574,10 +57505,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Power-Adjustable Outside Mirrors",
-            "source_description": "Manual-folding with turn signal indicators",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_uv6_001",
@@ -57602,10 +57530,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Head-Up Display",
-            "source_description": "Color display with 3 modes: tour, sport, track; can display speed, gear, tachometer, paddle shift lights, turn signals, bright headlamps, turn-by-turn navigation, g-meter, speed limit",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_uv6_001",
@@ -57630,10 +57555,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Head-Up Display",
-            "source_description": "Color display with 3 modes: tour, sport, track; can display speed, gear, tachometer, paddle shift lights, turn signals, bright headlamps, turn-by-turn navigation, g-meter, speed limit",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_uv6_001",
@@ -57658,10 +57580,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Head-Up Display",
-            "source_description": "Color display with 3 modes: tour, sport, track; can display speed, gear, tachometer, paddle shift lights, turn signals, bright headlamps, turn-by-turn navigation, g-meter, speed limit",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_uv6_001",
@@ -57686,10 +57605,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Head-Up Display",
-            "source_description": "Color display with 3 modes: tour, sport, track; can display speed, gear, tachometer, paddle shift lights, turn signals, bright headlamps, turn-by-turn navigation, g-meter, speed limit",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_uv6_001",
@@ -57714,10 +57630,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Head-Up Display",
-            "source_description": "Color display with 3 modes: tour, sport, track; can display speed, gear, tachometer, paddle shift lights, turn signals, bright headlamps, turn-by-turn navigation, g-meter, speed limit",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_uv6_001",
@@ -57742,10 +57655,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Head-Up Display",
-            "source_description": "Color display with 3 modes: tour, sport, track; can display speed, gear, tachometer, paddle shift lights, turn signals, bright headlamps, turn-by-turn navigation, g-meter, speed limit",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_uqh_001",
@@ -57770,10 +57680,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Bose Performance Series Audio System",
-            "source_description": "Includes 14 speakers",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_uqh_001",
@@ -57798,10 +57705,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Bose Performance Series Audio System",
-            "source_description": "Includes 14 speakers",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_uqh_001",
@@ -57826,10 +57730,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Bose Performance Series Audio System",
-            "source_description": "Includes 14 speakers",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_uqh_001",
@@ -57854,10 +57755,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Bose Performance Series Audio System",
-            "source_description": "Includes 14 speakers",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_uqh_001",
@@ -57882,10 +57780,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Bose Performance Series Audio System",
-            "source_description": "Includes 14 speakers",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_uqh_001",
@@ -57910,10 +57805,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Bose Performance Series Audio System",
-            "source_description": "Includes 14 speakers",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_uva_001",
@@ -57938,10 +57830,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "HD Front and Rear Vision Cameras",
-            "source_description": "Front camera is curb view",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_uva_001",
@@ -57966,10 +57855,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "HD Front and Rear Vision Cameras",
-            "source_description": "Front camera is curb view",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_uva_001",
@@ -57994,10 +57880,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "HD Front and Rear Vision Cameras",
-            "source_description": "Front camera is curb view",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_uva_001",
@@ -58022,10 +57905,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "HD Front and Rear Vision Cameras",
-            "source_description": "Front camera is curb view",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_uva_001",
@@ -58050,10 +57930,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "HD Front and Rear Vision Cameras",
-            "source_description": "Front camera is curb view",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_uva_001",
@@ -58078,10 +57955,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "HD Front and Rear Vision Cameras",
-            "source_description": "Front camera is curb view",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_ufg_001",
@@ -58106,10 +57980,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Cross Traffic Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_ufg_001",
@@ -58134,10 +58005,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Cross Traffic Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_ufg_001",
@@ -58162,10 +58030,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Cross Traffic Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_ufg_001",
@@ -58190,10 +58055,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Cross Traffic Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_ufg_001",
@@ -58218,10 +58080,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Cross Traffic Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_ufg_001",
@@ -58246,10 +58105,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Cross Traffic Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_k7b_001",
@@ -58274,10 +58130,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Dual Wireless Phone Charging Pads",
-            "source_description": "Center Console and Seatback",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_k7b_001",
@@ -58302,10 +58155,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Dual Wireless Phone Charging Pads",
-            "source_description": "Center Console and Seatback",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_k7b_001",
@@ -58330,10 +58180,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Dual Wireless Phone Charging Pads",
-            "source_description": "Center Console and Seatback",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_k7b_001",
@@ -58358,10 +58205,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Dual Wireless Phone Charging Pads",
-            "source_description": "Center Console and Seatback",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_k7b_001",
@@ -58386,10 +58230,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Dual Wireless Phone Charging Pads",
-            "source_description": "Center Console and Seatback",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_k7b_001",
@@ -58414,10 +58255,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Dual Wireless Phone Charging Pads",
-            "source_description": "Center Console and Seatback",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_ug1_001",
@@ -58442,10 +58280,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Three-Channel Programmable Universal Home Remote",
-            "source_description": "Located on driver visor",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_ug1_001",
@@ -58470,10 +58305,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Three-Channel Programmable Universal Home Remote",
-            "source_description": "Located on driver visor",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_ug1_001",
@@ -58498,10 +58330,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Three-Channel Programmable Universal Home Remote",
-            "source_description": "Located on driver visor",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_ug1_001",
@@ -58526,10 +58355,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Three-Channel Programmable Universal Home Remote",
-            "source_description": "Located on driver visor",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_ug1_001",
@@ -58554,10 +58380,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Three-Channel Programmable Universal Home Remote",
-            "source_description": "Located on driver visor",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_ug1_001",
@@ -58582,10 +58405,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Three-Channel Programmable Universal Home Remote",
-            "source_description": "Located on driver visor",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_ki3_001",
@@ -58610,10 +58430,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Steering Wheel",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_ki3_001",
@@ -58638,10 +58455,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Steering Wheel",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_ki3_001",
@@ -58666,10 +58480,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Steering Wheel",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_ki3_001",
@@ -58694,10 +58505,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Steering Wheel",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_ki3_001",
@@ -58722,10 +58530,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Steering Wheel",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_ki3_001",
@@ -58750,10 +58555,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Steering Wheel",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_kqv_001",
@@ -58778,10 +58580,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Heated and Vented Seats",
-            "source_description": "Driver and Passenger",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_kqv_001",
@@ -58806,10 +58605,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Heated and Vented Seats",
-            "source_description": "Driver and Passenger",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_kqv_001",
@@ -58834,10 +58630,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Heated and Vented Seats",
-            "source_description": "Driver and Passenger",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_kqv_001",
@@ -58862,10 +58655,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Heated and Vented Seats",
-            "source_description": "Driver and Passenger",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_kqv_001",
@@ -58890,10 +58680,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Heated and Vented Seats",
-            "source_description": "Driver and Passenger",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_kqv_001",
@@ -58918,10 +58705,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Heated and Vented Seats",
-            "source_description": "Driver and Passenger",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_al9_001",
@@ -58946,10 +58730,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Power Lumbar Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_al9_001",
@@ -58974,10 +58755,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Power Lumbar Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_al9_001",
@@ -59002,10 +58780,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Power Lumbar Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_al9_001",
@@ -59030,10 +58805,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Power Lumbar Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_al9_001",
@@ -59058,10 +58830,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Power Lumbar Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_al9_001",
@@ -59086,10 +58855,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Power Lumbar Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_at9_001",
@@ -59114,10 +58880,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger Power Lumbar Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_at9_001",
@@ -59142,10 +58905,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger Power Lumbar Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_at9_001",
@@ -59170,10 +58930,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger Power Lumbar Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_at9_001",
@@ -59198,10 +58955,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger Power Lumbar Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_at9_001",
@@ -59226,10 +58980,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger Power Lumbar Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_at9_001",
@@ -59254,10 +59005,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger Power Lumbar Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_ahe_001",
@@ -59282,10 +59030,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Power Bolster Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_ahe_001",
@@ -59310,10 +59055,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Power Bolster Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_ahe_001",
@@ -59338,10 +59080,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Power Bolster Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_ahe_001",
@@ -59366,10 +59105,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Power Bolster Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_ahe_001",
@@ -59394,10 +59130,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Power Bolster Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_ahe_001",
@@ -59422,10 +59155,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Power Bolster Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_ahh_001",
@@ -59450,10 +59180,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 140,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger Power Bolster Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_ahh_001",
@@ -59478,10 +59205,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 140,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger Power Bolster Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_ahh_001",
@@ -59506,10 +59230,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 140,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger Power Bolster Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_ahh_001",
@@ -59534,10 +59255,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 140,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger Power Bolster Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_ahh_001",
@@ -59562,10 +59280,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 140,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger Power Bolster Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_ahh_001",
@@ -59590,10 +59305,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 140,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger Power Bolster Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_aqa_001",
@@ -59618,10 +59330,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "",
-            "source_option_name": "Memory Driver and Passenger Convenience Package",
-            "source_description": "Includes steering wheel and outside mirrors plus seat memory for both driver and passenger; key fob or door button activated",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_aqa_001",
@@ -59646,10 +59355,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "",
-            "source_option_name": "Memory Driver and Passenger Convenience Package",
-            "source_description": "Includes steering wheel and outside mirrors plus seat memory for both driver and passenger; key fob or door button activated",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_aqa_001",
@@ -59674,10 +59380,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "",
-            "source_option_name": "Memory Driver and Passenger Convenience Package",
-            "source_description": "Includes steering wheel and outside mirrors plus seat memory for both driver and passenger; key fob or door button activated",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_aqa_001",
@@ -59702,10 +59405,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "",
-            "source_option_name": "Memory Driver and Passenger Convenience Package",
-            "source_description": "Includes steering wheel and outside mirrors plus seat memory for both driver and passenger; key fob or door button activated",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_aqa_001",
@@ -59730,10 +59430,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "",
-            "source_option_name": "Memory Driver and Passenger Convenience Package",
-            "source_description": "Includes steering wheel and outside mirrors plus seat memory for both driver and passenger; key fob or door button activated",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_aqa_001",
@@ -59758,10 +59455,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "",
-            "source_option_name": "Memory Driver and Passenger Convenience Package",
-            "source_description": "Includes steering wheel and outside mirrors plus seat memory for both driver and passenger; key fob or door button activated",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_ap9_001",
@@ -59786,10 +59480,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Two Cargo Nets",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_ap9_001",
@@ -59814,10 +59505,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Two Cargo Nets",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_ap9_001",
@@ -59842,10 +59530,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Two Cargo Nets",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_ap9_001",
@@ -59870,10 +59555,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Two Cargo Nets",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_ap9_001",
@@ -59898,10 +59580,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Two Cargo Nets",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_ap9_001",
@@ -59926,10 +59605,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Two Cargo Nets",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_dyx_001",
@@ -59954,10 +59630,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Power-Folding Outside Mirrors",
-            "source_description": "Driver-side auto-dimming with turn signal indicators",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_dyx_001",
@@ -59982,10 +59655,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Power-Folding Outside Mirrors",
-            "source_description": "Driver-side auto-dimming with turn signal indicators",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_dyx_001",
@@ -60010,10 +59680,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Power-Folding Outside Mirrors",
-            "source_description": "Driver-side auto-dimming with turn signal indicators",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_dyx_001",
@@ -60038,10 +59705,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Power-Folding Outside Mirrors",
-            "source_description": "Driver-side auto-dimming with turn signal indicators",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_dyx_001",
@@ -60066,10 +59730,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Power-Folding Outside Mirrors",
-            "source_description": "Driver-side auto-dimming with turn signal indicators",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_dyx_001",
@@ -60094,10 +59755,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "",
-            "source_option_name": "Heated Power-Folding Outside Mirrors",
-            "source_description": "Driver-side auto-dimming with turn signal indicators",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_uft_001",
@@ -60122,10 +59780,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "",
-            "source_option_name": "Side Blind Zone Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_uft_001",
@@ -60150,10 +59805,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "",
-            "source_option_name": "Side Blind Zone Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_uft_001",
@@ -60178,10 +59830,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "",
-            "source_option_name": "Side Blind Zone Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_uft_001",
@@ -60206,10 +59855,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "",
-            "source_option_name": "Side Blind Zone Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_uft_001",
@@ -60234,10 +59880,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "",
-            "source_option_name": "Side Blind Zone Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_uft_001",
@@ -60262,10 +59905,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "",
-            "source_option_name": "Side Blind Zone Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_utj_001",
@@ -60290,10 +59930,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 190,
-            "source_detail_raw": "",
-            "source_option_name": "Electrical Theft-Deterrent System",
-            "source_description": "Unauthorized entry activates the horn",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_utj_001",
@@ -60318,10 +59955,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 190,
-            "source_detail_raw": "",
-            "source_option_name": "Electrical Theft-Deterrent System",
-            "source_description": "Unauthorized entry activates the horn",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_utj_001",
@@ -60346,10 +59980,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 190,
-            "source_detail_raw": "",
-            "source_option_name": "Electrical Theft-Deterrent System",
-            "source_description": "Unauthorized entry activates the horn",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_utj_001",
@@ -60374,10 +60005,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 190,
-            "source_detail_raw": "",
-            "source_option_name": "Electrical Theft-Deterrent System",
-            "source_description": "Unauthorized entry activates the horn",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_utj_001",
@@ -60402,10 +60030,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 190,
-            "source_detail_raw": "",
-            "source_option_name": "Electrical Theft-Deterrent System",
-            "source_description": "Unauthorized entry activates the horn",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_utj_001",
@@ -60430,10 +60055,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 190,
-            "source_detail_raw": "",
-            "source_option_name": "Electrical Theft-Deterrent System",
-            "source_description": "Unauthorized entry activates the horn",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_utv_001",
@@ -60458,10 +60080,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 200,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Interior Movement Theft Sensor",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_utv_001",
@@ -60486,10 +60105,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 200,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Interior Movement Theft Sensor",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_utv_001",
@@ -60514,10 +60130,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 200,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Interior Movement Theft Sensor",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_utv_001",
@@ -60542,10 +60155,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 200,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Interior Movement Theft Sensor",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_utv_001",
@@ -60570,10 +60180,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 200,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Interior Movement Theft Sensor",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_utv_001",
@@ -60598,10 +60205,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 200,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Interior Movement Theft Sensor",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_utu_001",
@@ -60626,10 +60230,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 210,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Inclination Theft Sensor",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_utu_001",
@@ -60654,10 +60255,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 210,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Inclination Theft Sensor",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_utu_001",
@@ -60682,10 +60280,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 210,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Inclination Theft Sensor",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_utu_001",
@@ -60710,10 +60305,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 210,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Inclination Theft Sensor",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_utu_001",
@@ -60738,10 +60330,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 210,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Inclination Theft Sensor",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_utu_001",
@@ -60766,10 +60355,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 210,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Inclination Theft Sensor",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_iwe_001",
@@ -60794,10 +60380,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Sueded Microfiber-Wrapped Upper Interior Trim Package",
-            "source_description": "Includes headliner, visors, trim above windshield and rear window, and A-pillar trim",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_iwe_001",
@@ -60822,10 +60405,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Sueded Microfiber-Wrapped Upper Interior Trim Package",
-            "source_description": "Includes headliner, visors, trim above windshield and rear window, and A-pillar trim",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_iwe_001",
@@ -60850,10 +60430,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Sueded Microfiber-Wrapped Upper Interior Trim Package",
-            "source_description": "Includes headliner, visors, trim above windshield and rear window, and A-pillar trim",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_iwe_001",
@@ -60878,10 +60455,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Sueded Microfiber-Wrapped Upper Interior Trim Package",
-            "source_description": "Includes headliner, visors, trim above windshield and rear window, and A-pillar trim",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_iwe_001",
@@ -60906,10 +60480,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Sueded Microfiber-Wrapped Upper Interior Trim Package",
-            "source_description": "Includes headliner, visors, trim above windshield and rear window, and A-pillar trim",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_iwe_001",
@@ -60934,10 +60505,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Sueded Microfiber-Wrapped Upper Interior Trim Package",
-            "source_description": "Includes headliner, visors, trim above windshield and rear window, and A-pillar trim",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_026",
@@ -60962,10 +60530,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. When (HUB/HUC) Ultimate Suede Jet Black is ordered, the instrument panel, door trim panels and console will be suede.",
-            "source_option_name": "Custom Leather Wrapped Interior Package",
-            "source_description": "Features leather-wrapped upper instrument panel, door trim panels and console",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. When (HUB/HUC) Ultimate Suede Jet Black is ordered, the instrument panel, door trim panels and console will be suede."
           },
           {
             "choice_id": "2lt_e07__opt_026",
@@ -60990,10 +60555,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. When (HUB/HUC) Ultimate Suede Jet Black is ordered, the instrument panel, door trim panels and console will be suede.",
-            "source_option_name": "Custom Leather Wrapped Interior Package",
-            "source_description": "Features leather-wrapped upper instrument panel, door trim panels and console",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. When (HUB/HUC) Ultimate Suede Jet Black is ordered, the instrument panel, door trim panels and console will be suede."
           },
           {
             "choice_id": "3lt_e07__opt_026",
@@ -61018,10 +60580,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. When (HUB/HUC) Ultimate Suede Jet Black is ordered, the instrument panel, door trim panels and console will be suede.",
-            "source_option_name": "Custom Leather Wrapped Interior Package",
-            "source_description": "Features leather-wrapped upper instrument panel, door trim panels and console",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. When (HUB/HUC) Ultimate Suede Jet Black is ordered, the instrument panel, door trim panels and console will be suede."
           },
           {
             "choice_id": "1lt_e67__opt_026",
@@ -61046,10 +60605,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. When (HUB/HUC) Ultimate Suede Jet Black is ordered, the instrument panel, door trim panels and console will be suede.",
-            "source_option_name": "Custom Leather Wrapped Interior Package",
-            "source_description": "Features leather-wrapped upper instrument panel, door trim panels and console",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. When (HUB/HUC) Ultimate Suede Jet Black is ordered, the instrument panel, door trim panels and console will be suede."
           },
           {
             "choice_id": "2lt_e67__opt_026",
@@ -61074,10 +60630,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. When (HUB/HUC) Ultimate Suede Jet Black is ordered, the instrument panel, door trim panels and console will be suede.",
-            "source_option_name": "Custom Leather Wrapped Interior Package",
-            "source_description": "Features leather-wrapped upper instrument panel, door trim panels and console",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. When (HUB/HUC) Ultimate Suede Jet Black is ordered, the instrument panel, door trim panels and console will be suede."
           },
           {
             "choice_id": "3lt_e67__opt_026",
@@ -61102,10 +60655,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. When (HUB/HUC) Ultimate Suede Jet Black is ordered, the instrument panel, door trim panels and console will be suede.",
-            "source_option_name": "Custom Leather Wrapped Interior Package",
-            "source_description": "Features leather-wrapped upper instrument panel, door trim panels and console",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. When (HUB/HUC) Ultimate Suede Jet Black is ordered, the instrument panel, door trim panels and console will be suede."
           },
           {
             "choice_id": "1lt_e07__opt_eyt_001",
@@ -61130,10 +60680,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Exterior Badge Package",
-            "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_eyt_001",
@@ -61158,10 +60705,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Exterior Badge Package",
-            "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_eyt_001",
@@ -61186,10 +60730,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Exterior Badge Package",
-            "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_eyt_001",
@@ -61214,10 +60755,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Exterior Badge Package",
-            "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_eyt_001",
@@ -61242,10 +60780,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Exterior Badge Package",
-            "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_eyt_001",
@@ -61270,10 +60805,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Exterior Badge Package",
-            "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_eyk_001",
@@ -61298,10 +60830,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Chrome Exterior Badge Package",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_eyk_001",
@@ -61326,10 +60855,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Chrome Exterior Badge Package",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_eyk_001",
@@ -61354,10 +60880,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Chrome Exterior Badge Package",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_eyk_001",
@@ -61382,10 +60905,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Chrome Exterior Badge Package",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_eyk_001",
@@ -61410,10 +60930,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Chrome Exterior Badge Package",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_eyk_001",
@@ -61438,10 +60955,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Chrome Exterior Badge Package",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_j6a_001",
@@ -61467,9 +60981,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Black Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_304_j6a.png",
             "image_alt": "Black Painted Calipers",
             "image_fit": "cover",
@@ -61499,9 +61010,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Black Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_304_j6a.png",
             "image_alt": "Black Painted Calipers",
             "image_fit": "cover",
@@ -61531,9 +61039,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Black Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_304_j6a.png",
             "image_alt": "Black Painted Calipers",
             "image_fit": "cover",
@@ -61563,9 +61068,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Black Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_304_j6a.png",
             "image_alt": "Black Painted Calipers",
             "image_fit": "cover",
@@ -61595,9 +61097,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Black Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_304_j6a.png",
             "image_alt": "Black Painted Calipers",
             "image_fit": "cover",
@@ -61627,9 +61126,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Black Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_304_j6a.png",
             "image_alt": "Black Painted Calipers",
             "image_fit": "cover",
@@ -61659,9 +61155,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 15,
             "source_detail_raw": "1. Included and only available with (J57) carbon ceramic brakes.",
-            "source_option_name": "Dark Gray Metallic-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_303_j6d.png",
             "image_alt": "Dark Gray Metallic-Painted Calipers",
             "image_fit": "cover",
@@ -61691,9 +61184,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 15,
             "source_detail_raw": "1. Included and only available with (J57) carbon ceramic brakes.",
-            "source_option_name": "Dark Gray Metallic-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_303_j6d.png",
             "image_alt": "Dark Gray Metallic-Painted Calipers",
             "image_fit": "cover",
@@ -61723,9 +61213,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 15,
             "source_detail_raw": "1. Included and only available with (J57) carbon ceramic brakes.",
-            "source_option_name": "Dark Gray Metallic-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_303_j6d.png",
             "image_alt": "Dark Gray Metallic-Painted Calipers",
             "image_fit": "cover",
@@ -61755,9 +61242,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 15,
             "source_detail_raw": "1. Included and only available with (J57) carbon ceramic brakes.",
-            "source_option_name": "Dark Gray Metallic-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_303_j6d.png",
             "image_alt": "Dark Gray Metallic-Painted Calipers",
             "image_fit": "cover",
@@ -61787,9 +61271,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 15,
             "source_detail_raw": "1. Included and only available with (J57) carbon ceramic brakes.",
-            "source_option_name": "Dark Gray Metallic-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_303_j6d.png",
             "image_alt": "Dark Gray Metallic-Painted Calipers",
             "image_fit": "cover",
@@ -61819,9 +61300,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 15,
             "source_detail_raw": "1. Included and only available with (J57) carbon ceramic brakes.",
-            "source_option_name": "Dark Gray Metallic-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_303_j6d.png",
             "image_alt": "Dark Gray Metallic-Painted Calipers",
             "image_fit": "cover",
@@ -61851,9 +61329,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Bright Red-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_298_j6f.png",
             "image_alt": "Bright Red-Painted Calipers",
             "image_fit": "cover",
@@ -61883,9 +61358,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Bright Red-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_298_j6f.png",
             "image_alt": "Bright Red-Painted Calipers",
             "image_fit": "cover",
@@ -61915,9 +61387,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Bright Red-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_298_j6f.png",
             "image_alt": "Bright Red-Painted Calipers",
             "image_fit": "cover",
@@ -61947,9 +61416,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Bright Red-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_298_j6f.png",
             "image_alt": "Bright Red-Painted Calipers",
             "image_fit": "cover",
@@ -61979,9 +61445,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Bright Red-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_298_j6f.png",
             "image_alt": "Bright Red-Painted Calipers",
             "image_fit": "cover",
@@ -62011,9 +61474,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Bright Red-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_298_j6f.png",
             "image_alt": "Bright Red-Painted Calipers",
             "image_fit": "cover",
@@ -62043,9 +61503,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "Velocity Yellow-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_301_j6e.png",
             "image_alt": "Velocity Yellow-Painted Calipers",
             "image_fit": "cover",
@@ -62075,9 +61532,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "Velocity Yellow-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_301_j6e.png",
             "image_alt": "Velocity Yellow-Painted Calipers",
             "image_fit": "cover",
@@ -62107,9 +61561,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "Velocity Yellow-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_301_j6e.png",
             "image_alt": "Velocity Yellow-Painted Calipers",
             "image_fit": "cover",
@@ -62139,9 +61590,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "Velocity Yellow-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_301_j6e.png",
             "image_alt": "Velocity Yellow-Painted Calipers",
             "image_fit": "cover",
@@ -62171,9 +61619,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "Velocity Yellow-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_301_j6e.png",
             "image_alt": "Velocity Yellow-Painted Calipers",
             "image_fit": "cover",
@@ -62203,9 +61648,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "Velocity Yellow-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_301_j6e.png",
             "image_alt": "Velocity Yellow-Painted Calipers",
             "image_fit": "cover",
@@ -62235,9 +61677,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "",
-            "source_option_name": "Edge Red-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_300_j6n.png",
             "image_alt": "Edge Red-Painted Calipers",
             "image_fit": "cover",
@@ -62267,9 +61706,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "",
-            "source_option_name": "Edge Red-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_300_j6n.png",
             "image_alt": "Edge Red-Painted Calipers",
             "image_fit": "cover",
@@ -62299,9 +61735,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "",
-            "source_option_name": "Edge Red-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_300_j6n.png",
             "image_alt": "Edge Red-Painted Calipers",
             "image_fit": "cover",
@@ -62331,9 +61764,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "",
-            "source_option_name": "Edge Red-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_300_j6n.png",
             "image_alt": "Edge Red-Painted Calipers",
             "image_fit": "cover",
@@ -62363,9 +61793,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "",
-            "source_option_name": "Edge Red-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_300_j6n.png",
             "image_alt": "Edge Red-Painted Calipers",
             "image_fit": "cover",
@@ -62395,9 +61822,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "",
-            "source_option_name": "Edge Red-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_300_j6n.png",
             "image_alt": "Edge Red-Painted Calipers",
             "image_fit": "cover",
@@ -62427,9 +61851,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "",
-            "source_option_name": "Blue-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_299_j6b.png",
             "image_alt": "Blue-Painted Calipers",
             "image_fit": "cover",
@@ -62459,9 +61880,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "",
-            "source_option_name": "Blue-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_299_j6b.png",
             "image_alt": "Blue-Painted Calipers",
             "image_fit": "cover",
@@ -62491,9 +61909,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "",
-            "source_option_name": "Blue-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_299_j6b.png",
             "image_alt": "Blue-Painted Calipers",
             "image_fit": "cover",
@@ -62523,9 +61938,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "",
-            "source_option_name": "Blue-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_299_j6b.png",
             "image_alt": "Blue-Painted Calipers",
             "image_fit": "cover",
@@ -62555,9 +61967,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "",
-            "source_option_name": "Blue-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_299_j6b.png",
             "image_alt": "Blue-Painted Calipers",
             "image_fit": "cover",
@@ -62587,9 +61996,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "",
-            "source_option_name": "Blue-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_299_j6b.png",
             "image_alt": "Blue-Painted Calipers",
             "image_fit": "cover",
@@ -62619,9 +62025,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Orange-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_302_j6l.png",
             "image_alt": "Orange-Painted Calipers",
             "image_fit": "cover",
@@ -62651,9 +62054,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Orange-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_302_j6l.png",
             "image_alt": "Orange-Painted Calipers",
             "image_fit": "cover",
@@ -62683,9 +62083,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Orange-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_302_j6l.png",
             "image_alt": "Orange-Painted Calipers",
             "image_fit": "cover",
@@ -62715,9 +62112,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Orange-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_302_j6l.png",
             "image_alt": "Orange-Painted Calipers",
             "image_fit": "cover",
@@ -62747,9 +62141,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Orange-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_302_j6l.png",
             "image_alt": "Orange-Painted Calipers",
             "image_fit": "cover",
@@ -62779,9 +62170,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Orange-Painted Calipers",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_302_j6l.png",
             "image_alt": "Orange-Painted Calipers",
             "image_fit": "cover",
@@ -62810,10 +62198,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1495,
             "display_behavior": "auto_only",
             "display_order": 10,
-            "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
-            "source_option_name": "Color Combination Override",
-            "source_description": "Provides the opportunity to individualize vehicle appearance by overriding recommended restrictions to exterior, interior and seat belt color combinations",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
           {
             "choice_id": "2lt_e07__opt_d30_001",
@@ -62838,10 +62223,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1495,
             "display_behavior": "auto_only",
             "display_order": 10,
-            "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
-            "source_option_name": "Color Combination Override",
-            "source_description": "Provides the opportunity to individualize vehicle appearance by overriding recommended restrictions to exterior, interior and seat belt color combinations",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
           {
             "choice_id": "3lt_e07__opt_d30_001",
@@ -62866,10 +62248,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1495,
             "display_behavior": "auto_only",
             "display_order": 10,
-            "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
-            "source_option_name": "Color Combination Override",
-            "source_description": "Provides the opportunity to individualize vehicle appearance by overriding recommended restrictions to exterior, interior and seat belt color combinations",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
           {
             "choice_id": "1lt_e67__opt_d30_001",
@@ -62894,10 +62273,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1495,
             "display_behavior": "auto_only",
             "display_order": 10,
-            "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
-            "source_option_name": "Color Combination Override",
-            "source_description": "Provides the opportunity to individualize vehicle appearance by overriding recommended restrictions to exterior, interior and seat belt color combinations",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
           {
             "choice_id": "2lt_e67__opt_d30_001",
@@ -62922,10 +62298,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1495,
             "display_behavior": "auto_only",
             "display_order": 10,
-            "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
-            "source_option_name": "Color Combination Override",
-            "source_description": "Provides the opportunity to individualize vehicle appearance by overriding recommended restrictions to exterior, interior and seat belt color combinations",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
           {
             "choice_id": "3lt_e67__opt_d30_001",
@@ -62950,10 +62323,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1495,
             "display_behavior": "auto_only",
             "display_order": 10,
-            "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
-            "source_option_name": "Color Combination Override",
-            "source_description": "Provides the opportunity to individualize vehicle appearance by overriding recommended restrictions to exterior, interior and seat belt color combinations",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
           {
             "choice_id": "1lt_e07__opt_r6x_001",
@@ -62978,10 +62348,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 20,
-            "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart.",
-            "source_option_name": "Custom Interior Trim and Seat Combination",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
           },
           {
             "choice_id": "2lt_e07__opt_r6x_001",
@@ -63006,10 +62373,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 20,
-            "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart.",
-            "source_option_name": "Custom Interior Trim and Seat Combination",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
           },
           {
             "choice_id": "3lt_e07__opt_r6x_001",
@@ -63034,10 +62398,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 20,
-            "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart.",
-            "source_option_name": "Custom Interior Trim and Seat Combination",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
           },
           {
             "choice_id": "1lt_e67__opt_r6x_001",
@@ -63062,10 +62423,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 20,
-            "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart.",
-            "source_option_name": "Custom Interior Trim and Seat Combination",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
           },
           {
             "choice_id": "2lt_e67__opt_r6x_001",
@@ -63090,10 +62448,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 20,
-            "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart.",
-            "source_option_name": "Custom Interior Trim and Seat Combination",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
           },
           {
             "choice_id": "3lt_e67__opt_r6x_001",
@@ -63118,10 +62473,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 20,
-            "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart.",
-            "source_option_name": "Custom Interior Trim and Seat Combination",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
           },
           {
             "choice_id": "1lt_e07__opt_r8c_001",
@@ -63146,10 +62498,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1695,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels.",
-            "source_option_name": "Corvette Museum Delivery",
-            "source_description": "Acknowledgement form required; includes (CFX) Corvette Museum logo plaque personalized with your name and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels."
           },
           {
             "choice_id": "2lt_e07__opt_r8c_001",
@@ -63174,10 +62523,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1695,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels.",
-            "source_option_name": "Corvette Museum Delivery",
-            "source_description": "Acknowledgement form required; includes (CFX) Corvette Museum logo plaque personalized with your name and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels."
           },
           {
             "choice_id": "3lt_e07__opt_r8c_001",
@@ -63202,10 +62548,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1695,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels.",
-            "source_option_name": "Corvette Museum Delivery",
-            "source_description": "Acknowledgement form required; includes (CFX) Corvette Museum logo plaque personalized with your name and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels."
           },
           {
             "choice_id": "1lt_e67__opt_r8c_001",
@@ -63230,10 +62573,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1695,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels.",
-            "source_option_name": "Corvette Museum Delivery",
-            "source_description": "Acknowledgement form required; includes (CFX) Corvette Museum logo plaque personalized with your name and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels."
           },
           {
             "choice_id": "2lt_e67__opt_r8c_001",
@@ -63258,10 +62598,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1695,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels.",
-            "source_option_name": "Corvette Museum Delivery",
-            "source_description": "Acknowledgement form required; includes (CFX) Corvette Museum logo plaque personalized with your name and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels."
           },
           {
             "choice_id": "3lt_e67__opt_r8c_001",
@@ -63286,10 +62623,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1695,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels.",
-            "source_option_name": "Corvette Museum Delivery",
-            "source_description": "Acknowledgement form required; includes (CFX) Corvette Museum logo plaque personalized with your name and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels."
           },
           {
             "choice_id": "1lt_e07__opt_pin_001",
@@ -63314,10 +62648,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 5495,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only.",
-            "source_option_name": "Customer VIN Ending Reservation",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only."
           },
           {
             "choice_id": "2lt_e07__opt_pin_001",
@@ -63342,10 +62673,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 5495,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only.",
-            "source_option_name": "Customer VIN Ending Reservation",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only."
           },
           {
             "choice_id": "3lt_e07__opt_pin_001",
@@ -63370,10 +62698,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 5495,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only.",
-            "source_option_name": "Customer VIN Ending Reservation",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only."
           },
           {
             "choice_id": "1lt_e67__opt_pin_001",
@@ -63398,10 +62723,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 5495,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only.",
-            "source_option_name": "Customer VIN Ending Reservation",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only."
           },
           {
             "choice_id": "2lt_e67__opt_pin_001",
@@ -63426,10 +62748,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 5495,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only.",
-            "source_option_name": "Customer VIN Ending Reservation",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only."
           },
           {
             "choice_id": "3lt_e67__opt_pin_001",
@@ -63454,10 +62773,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 5495,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only.",
-            "source_option_name": "Customer VIN Ending Reservation",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only."
           },
           {
             "choice_id": "1lt_e07__opt_bv4_001",
@@ -63482,10 +62798,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery.",
-            "source_option_name": "Personalized Specification Plaque",
-            "source_description": "Custom-made with your name or up to 24-character word or phrase limit and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
           },
           {
             "choice_id": "2lt_e07__opt_bv4_001",
@@ -63510,10 +62823,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery.",
-            "source_option_name": "Personalized Specification Plaque",
-            "source_description": "Custom-made with your name or up to 24-character word or phrase limit and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
           },
           {
             "choice_id": "3lt_e07__opt_bv4_001",
@@ -63538,10 +62848,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery.",
-            "source_option_name": "Personalized Specification Plaque",
-            "source_description": "Custom-made with your name or up to 24-character word or phrase limit and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
           },
           {
             "choice_id": "1lt_e67__opt_bv4_001",
@@ -63566,10 +62873,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery.",
-            "source_option_name": "Personalized Specification Plaque",
-            "source_description": "Custom-made with your name or up to 24-character word or phrase limit and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
           },
           {
             "choice_id": "2lt_e67__opt_bv4_001",
@@ -63594,10 +62898,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery.",
-            "source_option_name": "Personalized Specification Plaque",
-            "source_description": "Custom-made with your name or up to 24-character word or phrase limit and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
           },
           {
             "choice_id": "3lt_e67__opt_bv4_001",
@@ -63622,10 +62923,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery.",
-            "source_option_name": "Personalized Specification Plaque",
-            "source_description": "Custom-made with your name or up to 24-character word or phrase limit and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
           },
           {
             "choice_id": "1lt_e07__opt_b6p_001",
@@ -63650,10 +62948,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1895,
             "display_behavior": "",
             "display_order": 1,
-            "source_detail_raw": "",
-            "source_option_name": "Coupe Engine Appearance Package",
-            "source_description": "Includes carbon fiber trim, (D3V) engine lighting and (SL9) engine specification plaque, LPO",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_b6p_001",
@@ -63678,10 +62973,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1895,
             "display_behavior": "",
             "display_order": 1,
-            "source_detail_raw": "",
-            "source_option_name": "Coupe Engine Appearance Package",
-            "source_description": "Includes carbon fiber trim, (D3V) engine lighting and (SL9) engine specification plaque, LPO",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_b6p_001",
@@ -63706,10 +62998,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1895,
             "display_behavior": "",
             "display_order": 1,
-            "source_detail_raw": "",
-            "source_option_name": "Coupe Engine Appearance Package",
-            "source_description": "Includes carbon fiber trim, (D3V) engine lighting and (SL9) engine specification plaque, LPO",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_b6p_001",
@@ -63734,10 +63023,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1895,
             "display_behavior": "",
             "display_order": 1,
-            "source_detail_raw": "",
-            "source_option_name": "Coupe Engine Appearance Package",
-            "source_description": "Includes carbon fiber trim, (D3V) engine lighting and (SL9) engine specification plaque, LPO",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_b6p_001",
@@ -63762,10 +63048,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1895,
             "display_behavior": "",
             "display_order": 1,
-            "source_detail_raw": "",
-            "source_option_name": "Coupe Engine Appearance Package",
-            "source_description": "Includes carbon fiber trim, (D3V) engine lighting and (SL9) engine specification plaque, LPO",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_b6p_001",
@@ -63790,10 +63073,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1895,
             "display_behavior": "",
             "display_order": 1,
-            "source_detail_raw": "",
-            "source_option_name": "Coupe Engine Appearance Package",
-            "source_description": "Includes carbon fiber trim, (D3V) engine lighting and (SL9) engine specification plaque, LPO",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_zz3_001",
@@ -63818,10 +63098,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1195,
             "display_behavior": "",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Convertible Engine Appearance Package",
-            "source_description": "Includes window under tonneau cover, (BC7) Black LS6 engine cover and (SL9) engine specification plaque, LPO",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_zz3_001",
@@ -63846,10 +63123,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1195,
             "display_behavior": "",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Convertible Engine Appearance Package",
-            "source_description": "Includes window under tonneau cover, (BC7) Black LS6 engine cover and (SL9) engine specification plaque, LPO",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_zz3_001",
@@ -63874,10 +63148,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1195,
             "display_behavior": "",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Convertible Engine Appearance Package",
-            "source_description": "Includes window under tonneau cover, (BC7) Black LS6 engine cover and (SL9) engine specification plaque, LPO",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_zz3_001",
@@ -63902,10 +63173,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1195,
             "display_behavior": "",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Convertible Engine Appearance Package",
-            "source_description": "Includes window under tonneau cover, (BC7) Black LS6 engine cover and (SL9) engine specification plaque, LPO",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_zz3_001",
@@ -63930,10 +63198,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1195,
             "display_behavior": "",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Convertible Engine Appearance Package",
-            "source_description": "Includes window under tonneau cover, (BC7) Black LS6 engine cover and (SL9) engine specification plaque, LPO",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_zz3_001",
@@ -63958,10 +63223,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1195,
             "display_behavior": "",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Convertible Engine Appearance Package",
-            "source_description": "Includes window under tonneau cover, (BC7) Black LS6 engine cover and (SL9) engine specification plaque, LPO",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_d3v_001",
@@ -63986,10 +63248,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-            "source_option_name": "Engine Lighting",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers."
           },
           {
             "choice_id": "2lt_e07__opt_d3v_001",
@@ -64014,10 +63273,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-            "source_option_name": "Engine Lighting",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers."
           },
           {
             "choice_id": "3lt_e07__opt_d3v_001",
@@ -64042,10 +63298,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-            "source_option_name": "Engine Lighting",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers."
           },
           {
             "choice_id": "1lt_e67__opt_d3v_001",
@@ -64070,10 +63323,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-            "source_option_name": "Engine Lighting",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers."
           },
           {
             "choice_id": "2lt_e67__opt_d3v_001",
@@ -64098,10 +63348,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-            "source_option_name": "Engine Lighting",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers."
           },
           {
             "choice_id": "3lt_e67__opt_d3v_001",
@@ -64126,10 +63373,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-            "source_option_name": "Engine Lighting",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers."
           },
           {
             "choice_id": "1lt_e07__opt_sl9_001",
@@ -64154,10 +63398,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 11,
-            "source_detail_raw": "1. Included with (B6P/ZZ3) Engine Appearance Package.",
-            "source_option_name": "Engine Specification Plaque",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (B6P/ZZ3) Engine Appearance Package."
           },
           {
             "choice_id": "2lt_e07__opt_sl9_001",
@@ -64182,10 +63423,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 11,
-            "source_detail_raw": "1. Included with (B6P/ZZ3) Engine Appearance Package.",
-            "source_option_name": "Engine Specification Plaque",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (B6P/ZZ3) Engine Appearance Package."
           },
           {
             "choice_id": "3lt_e07__opt_sl9_001",
@@ -64210,10 +63448,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 11,
-            "source_detail_raw": "1. Included with (B6P/ZZ3) Engine Appearance Package.",
-            "source_option_name": "Engine Specification Plaque",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (B6P/ZZ3) Engine Appearance Package."
           },
           {
             "choice_id": "1lt_e67__opt_sl9_001",
@@ -64238,10 +63473,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 11,
-            "source_detail_raw": "1. Included with (B6P/ZZ3) Engine Appearance Package.",
-            "source_option_name": "Engine Specification Plaque",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (B6P/ZZ3) Engine Appearance Package."
           },
           {
             "choice_id": "2lt_e67__opt_sl9_001",
@@ -64266,10 +63498,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 11,
-            "source_detail_raw": "1. Included with (B6P/ZZ3) Engine Appearance Package.",
-            "source_option_name": "Engine Specification Plaque",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (B6P/ZZ3) Engine Appearance Package."
           },
           {
             "choice_id": "3lt_e67__opt_sl9_001",
@@ -64294,10 +63523,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 11,
-            "source_detail_raw": "1. Included with (B6P/ZZ3) Engine Appearance Package.",
-            "source_option_name": "Engine Specification Plaque",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (B6P/ZZ3) Engine Appearance Package."
           },
           {
             "choice_id": "1lt_e07__opt_bc7_001",
@@ -64322,10 +63548,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 20,
-            "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package.",
-            "source_option_name": "Black LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
           },
           {
             "choice_id": "2lt_e07__opt_bc7_001",
@@ -64350,10 +63573,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 20,
-            "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package.",
-            "source_option_name": "Black LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
           },
           {
             "choice_id": "3lt_e07__opt_bc7_001",
@@ -64378,10 +63598,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 20,
-            "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package.",
-            "source_option_name": "Black LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
           },
           {
             "choice_id": "1lt_e67__opt_bc7_001",
@@ -64406,10 +63623,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package.",
-            "source_option_name": "Black LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
           },
           {
             "choice_id": "2lt_e67__opt_bc7_001",
@@ -64434,10 +63648,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package.",
-            "source_option_name": "Black LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
           },
           {
             "choice_id": "3lt_e67__opt_bc7_001",
@@ -64462,10 +63673,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package.",
-            "source_option_name": "Black LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
           },
           {
             "choice_id": "1lt_e07__opt_bcp_002",
@@ -64490,10 +63698,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Edge Red LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "2lt_e07__opt_bcp_002",
@@ -64518,10 +63723,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Edge Red LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "3lt_e07__opt_bcp_002",
@@ -64546,10 +63748,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Edge Red LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "1lt_e67__opt_bcp_002",
@@ -64574,10 +63773,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Edge Red LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "2lt_e67__opt_bcp_002",
@@ -64602,10 +63798,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Edge Red LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "3lt_e67__opt_bcp_002",
@@ -64630,10 +63823,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Edge Red LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "1lt_e07__opt_bcs_002",
@@ -64658,10 +63848,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 26,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Sterling Silver LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "2lt_e07__opt_bcs_002",
@@ -64686,10 +63873,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 26,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Sterling Silver LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "3lt_e07__opt_bcs_002",
@@ -64714,10 +63898,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 26,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Sterling Silver LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "1lt_e67__opt_bcs_002",
@@ -64742,10 +63923,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 26,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Sterling Silver LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "2lt_e67__opt_bcs_002",
@@ -64770,10 +63948,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 26,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Sterling Silver LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "3lt_e67__opt_bcs_002",
@@ -64798,10 +63973,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 26,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Sterling Silver LS6 Engine Cover",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "1lt_e07__opt_bc4_002",
@@ -64826,10 +63998,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 27,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Blue LS6 Engine Cover",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "2lt_e07__opt_bc4_002",
@@ -64854,10 +64023,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 27,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Blue LS6 Engine Cover",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "3lt_e07__opt_bc4_002",
@@ -64882,10 +64048,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 27,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Blue LS6 Engine Cover",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "1lt_e67__opt_bc4_002",
@@ -64910,10 +64073,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 27,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Blue LS6 Engine Cover",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "2lt_e67__opt_bc4_002",
@@ -64938,10 +64098,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 27,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Blue LS6 Engine Cover",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "3lt_e67__opt_bc4_002",
@@ -64966,10 +64123,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 27,
-            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "source_option_name": "Blue LS6 Engine Cover",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "choice_id": "1lt_e07__opt_slk_001",
@@ -64994,10 +64148,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1995,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Edge Red Rear Hatch Strut Bracket",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_slk_001",
@@ -65022,10 +64173,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1995,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Edge Red Rear Hatch Strut Bracket",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_slk_001",
@@ -65050,10 +64198,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1995,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Edge Red Rear Hatch Strut Bracket",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_slk_001",
@@ -65078,10 +64223,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1995,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Edge Red Rear Hatch Strut Bracket",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_slk_001",
@@ -65106,10 +64248,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1995,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Edge Red Rear Hatch Strut Bracket",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_slk_001",
@@ -65134,10 +64273,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1995,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Edge Red Rear Hatch Strut Bracket",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_sln_001",
@@ -65162,10 +64298,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2895,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Engine Cross Brace",
-            "source_description": "LPO. Features Jake Logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_sln_001",
@@ -65190,10 +64323,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2895,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Engine Cross Brace",
-            "source_description": "LPO. Features Jake Logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_sln_001",
@@ -65218,10 +64348,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2895,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Engine Cross Brace",
-            "source_description": "LPO. Features Jake Logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_sln_001",
@@ -65246,10 +64373,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2895,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Engine Cross Brace",
-            "source_description": "LPO. Features Jake Logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_sln_001",
@@ -65274,10 +64398,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2895,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Engine Cross Brace",
-            "source_description": "LPO. Features Jake Logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_sln_001",
@@ -65302,10 +64423,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2895,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Engine Cross Brace",
-            "source_description": "LPO. Features Jake Logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_vup_001",
@@ -65330,10 +64448,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 575,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Engine Bay Closeout Graphics",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_vup_001",
@@ -65358,10 +64473,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 575,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Engine Bay Closeout Graphics",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_vup_001",
@@ -65386,10 +64498,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 575,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Engine Bay Closeout Graphics",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_vup_001",
@@ -65414,10 +64523,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 575,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Engine Bay Closeout Graphics",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_vup_001",
@@ -65442,10 +64548,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 575,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Engine Bay Closeout Graphics",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_vup_001",
@@ -65470,10 +64573,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 575,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Engine Bay Closeout Graphics",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_nga_001",
@@ -65498,10 +64598,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Black Exhaust Tips",
-            "source_description": "Standard. Corner Exit",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_nga_001",
@@ -65526,10 +64623,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Black Exhaust Tips",
-            "source_description": "Standard. Corner Exit",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_nga_001",
@@ -65554,10 +64648,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Black Exhaust Tips",
-            "source_description": "Standard. Corner Exit",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_nga_001",
@@ -65582,10 +64673,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Black Exhaust Tips",
-            "source_description": "Standard. Corner Exit",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_nga_001",
@@ -65610,10 +64698,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Black Exhaust Tips",
-            "source_description": "Standard. Corner Exit",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_nga_001",
@@ -65638,10 +64723,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Black Exhaust Tips",
-            "source_description": "Standard. Corner Exit",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_wub_001",
@@ -65666,10 +64748,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Quad Center Exit Exhaust",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "2lt_e07__opt_wub_001",
@@ -65694,10 +64773,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Quad Center Exit Exhaust",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "3lt_e07__opt_wub_001",
@@ -65722,10 +64798,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Quad Center Exit Exhaust",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "1lt_e67__opt_wub_001",
@@ -65750,10 +64823,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Quad Center Exit Exhaust",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "2lt_e67__opt_wub_001",
@@ -65778,10 +64848,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Quad Center Exit Exhaust",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "3lt_e67__opt_wub_001",
@@ -65806,10 +64873,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Quad Center Exit Exhaust",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "1lt_e07__opt_nwi_001",
@@ -65834,10 +64898,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (WUB) quad center exit exhaust.",
-            "source_option_name": "Bright Chrome Exhaust Tips",
-            "source_description": "Quad Center Exit. New for 2027",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (WUB) quad center exit exhaust."
           },
           {
             "choice_id": "2lt_e07__opt_nwi_001",
@@ -65862,10 +64923,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (WUB) quad center exit exhaust.",
-            "source_option_name": "Bright Chrome Exhaust Tips",
-            "source_description": "Quad Center Exit. New for 2027",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (WUB) quad center exit exhaust."
           },
           {
             "choice_id": "3lt_e07__opt_nwi_001",
@@ -65890,10 +64948,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (WUB) quad center exit exhaust.",
-            "source_option_name": "Bright Chrome Exhaust Tips",
-            "source_description": "Quad Center Exit. New for 2027",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (WUB) quad center exit exhaust."
           },
           {
             "choice_id": "1lt_e67__opt_nwi_001",
@@ -65918,10 +64973,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (WUB) quad center exit exhaust.",
-            "source_option_name": "Bright Chrome Exhaust Tips",
-            "source_description": "Quad Center Exit. New for 2027",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (WUB) quad center exit exhaust."
           },
           {
             "choice_id": "2lt_e67__opt_nwi_001",
@@ -65946,10 +64998,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (WUB) quad center exit exhaust.",
-            "source_option_name": "Bright Chrome Exhaust Tips",
-            "source_description": "Quad Center Exit. New for 2027",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (WUB) quad center exit exhaust."
           },
           {
             "choice_id": "3lt_e67__opt_nwi_001",
@@ -65974,10 +65023,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (WUB) quad center exit exhaust.",
-            "source_option_name": "Bright Chrome Exhaust Tips",
-            "source_description": "Quad Center Exit. New for 2027",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (WUB) quad center exit exhaust."
           },
           {
             "choice_id": "1lt_e07__opt_efr_001",
@@ -66002,10 +65048,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.",
-            "source_option_name": "Carbon Flash Painted Accents",
-            "source_description": "Includes side vent, rocker, splitter, and grille accents. Includes tonneau grille with convertible. Rockers and splitters are not painted when CFV visible carbon fiber ground effects is ordered.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered."
           },
           {
             "choice_id": "2lt_e07__opt_efr_001",
@@ -66030,10 +65073,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.",
-            "source_option_name": "Carbon Flash Painted Accents",
-            "source_description": "Includes side vent, rocker, splitter, and grille accents. Includes tonneau grille with convertible. Rockers and splitters are not painted when CFV visible carbon fiber ground effects is ordered.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered."
           },
           {
             "choice_id": "3lt_e07__opt_efr_001",
@@ -66058,10 +65098,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.",
-            "source_option_name": "Carbon Flash Painted Accents",
-            "source_description": "Includes side vent, rocker, splitter, and grille accents. Includes tonneau grille with convertible. Rockers and splitters are not painted when CFV visible carbon fiber ground effects is ordered.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered."
           },
           {
             "choice_id": "1lt_e67__opt_efr_001",
@@ -66086,10 +65123,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.",
-            "source_option_name": "Carbon Flash Painted Accents",
-            "source_description": "Includes side vent, rocker, splitter, and grille accents. Includes tonneau grille with convertible. Rockers and splitters are not painted when CFV visible carbon fiber ground effects is ordered.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered."
           },
           {
             "choice_id": "2lt_e67__opt_efr_001",
@@ -66114,10 +65148,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.",
-            "source_option_name": "Carbon Flash Painted Accents",
-            "source_description": "Includes side vent, rocker, splitter, and grille accents. Includes tonneau grille with convertible. Rockers and splitters are not painted when CFV visible carbon fiber ground effects is ordered.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered."
           },
           {
             "choice_id": "3lt_e67__opt_efr_001",
@@ -66142,10 +65173,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.",
-            "source_option_name": "Carbon Flash Painted Accents",
-            "source_description": "Includes side vent, rocker, splitter, and grille accents. Includes tonneau grille with convertible. Rockers and splitters are not painted when CFV visible carbon fiber ground effects is ordered.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered."
           },
           {
             "choice_id": "1lt_e07__opt_edu_001",
@@ -66170,10 +65198,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.",
-            "source_option_name": "Body-Color and Carbon Flash Accents",
-            "source_description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered."
           },
           {
             "choice_id": "2lt_e07__opt_edu_001",
@@ -66198,10 +65223,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.",
-            "source_option_name": "Body-Color and Carbon Flash Accents",
-            "source_description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered."
           },
           {
             "choice_id": "3lt_e07__opt_edu_001",
@@ -66226,10 +65248,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.",
-            "source_option_name": "Body-Color and Carbon Flash Accents",
-            "source_description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered."
           },
           {
             "choice_id": "1lt_e67__opt_edu_001",
@@ -66254,10 +65273,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.",
-            "source_option_name": "Body-Color and Carbon Flash Accents",
-            "source_description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered."
           },
           {
             "choice_id": "2lt_e67__opt_edu_001",
@@ -66282,10 +65298,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.",
-            "source_option_name": "Body-Color and Carbon Flash Accents",
-            "source_description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered."
           },
           {
             "choice_id": "3lt_e67__opt_edu_001",
@@ -66310,10 +65323,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.",
-            "source_option_name": "Body-Color and Carbon Flash Accents",
-            "source_description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered."
           },
           {
             "choice_id": "1lt_e07__opt_zyc_001",
@@ -66338,10 +65348,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Carbon Flash Mirrors and Spoiler",
-            "source_description": "Includes (DRG) outside mirrors when equipped",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "2lt_e07__opt_zyc_001",
@@ -66366,10 +65373,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Carbon Flash Mirrors and Spoiler",
-            "source_description": "Includes (DRG) outside mirrors when equipped",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "3lt_e07__opt_zyc_001",
@@ -66394,10 +65398,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Carbon Flash Mirrors and Spoiler",
-            "source_description": "Includes (DRG) outside mirrors when equipped",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "1lt_e67__opt_zyc_001",
@@ -66422,10 +65423,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Carbon Flash Mirrors and Spoiler",
-            "source_description": "Includes (DRG) outside mirrors when equipped",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "2lt_e67__opt_zyc_001",
@@ -66450,10 +65448,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Carbon Flash Mirrors and Spoiler",
-            "source_description": "Includes (DRG) outside mirrors when equipped",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "3lt_e67__opt_zyc_001",
@@ -66478,10 +65473,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Carbon Flash Mirrors and Spoiler",
-            "source_description": "Includes (DRG) outside mirrors when equipped",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "1lt_e07__opt_dmu_001",
@@ -66506,10 +65498,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Carbon Flash Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "2lt_e07__opt_dmu_001",
@@ -66534,10 +65523,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Carbon Flash Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "3lt_e07__opt_dmu_001",
@@ -66562,10 +65548,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Carbon Flash Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "1lt_e67__opt_dmu_001",
@@ -66590,10 +65573,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Carbon Flash Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "2lt_e67__opt_dmu_001",
@@ -66618,10 +65598,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Carbon Flash Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "3lt_e67__opt_dmu_001",
@@ -66646,10 +65623,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Carbon Flash Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "1lt_e07__opt_dmv_001",
@@ -66674,10 +65648,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic.",
-            "source_option_name": "Blade Silver Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
           },
           {
             "choice_id": "2lt_e07__opt_dmv_001",
@@ -66702,10 +65673,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic.",
-            "source_option_name": "Blade Silver Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
           },
           {
             "choice_id": "3lt_e07__opt_dmv_001",
@@ -66730,10 +65698,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic.",
-            "source_option_name": "Blade Silver Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
           },
           {
             "choice_id": "1lt_e67__opt_dmv_001",
@@ -66758,10 +65723,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic.",
-            "source_option_name": "Blade Silver Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
           },
           {
             "choice_id": "2lt_e67__opt_dmv_001",
@@ -66786,10 +65748,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic.",
-            "source_option_name": "Blade Silver Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
           },
           {
             "choice_id": "3lt_e67__opt_dmv_001",
@@ -66814,10 +65773,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic.",
-            "source_option_name": "Blade Silver Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
           },
           {
             "choice_id": "1lt_e07__opt_dmw_001",
@@ -66842,10 +65798,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White.",
-            "source_option_name": "Arctic White Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White."
           },
           {
             "choice_id": "2lt_e07__opt_dmw_001",
@@ -66870,10 +65823,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White.",
-            "source_option_name": "Arctic White Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White."
           },
           {
             "choice_id": "3lt_e07__opt_dmw_001",
@@ -66898,10 +65848,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White.",
-            "source_option_name": "Arctic White Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White."
           },
           {
             "choice_id": "1lt_e67__opt_dmw_001",
@@ -66926,10 +65873,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White.",
-            "source_option_name": "Arctic White Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White."
           },
           {
             "choice_id": "2lt_e67__opt_dmw_001",
@@ -66954,10 +65898,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White.",
-            "source_option_name": "Arctic White Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White."
           },
           {
             "choice_id": "3lt_e67__opt_dmw_001",
@@ -66982,10 +65923,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White.",
-            "source_option_name": "Arctic White Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White."
           },
           {
             "choice_id": "1lt_e07__opt_dmx_001",
@@ -67010,10 +65948,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Admiral Blue Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "2lt_e07__opt_dmx_001",
@@ -67038,10 +65973,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Admiral Blue Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "3lt_e07__opt_dmx_001",
@@ -67066,10 +65998,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Admiral Blue Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "1lt_e67__opt_dmx_001",
@@ -67094,10 +66023,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Admiral Blue Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "2lt_e67__opt_dmx_001",
@@ -67122,10 +66048,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Admiral Blue Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "3lt_e67__opt_dmx_001",
@@ -67150,10 +66073,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Admiral Blue Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "1lt_e07__opt_dmy_001",
@@ -67178,10 +66098,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Red Mist Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "2lt_e07__opt_dmy_001",
@@ -67206,10 +66123,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Red Mist Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "3lt_e07__opt_dmy_001",
@@ -67234,10 +66148,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Red Mist Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "1lt_e67__opt_dmy_001",
@@ -67262,10 +66173,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Red Mist Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "2lt_e67__opt_dmy_001",
@@ -67290,10 +66198,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Red Mist Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "3lt_e67__opt_dmy_001",
@@ -67318,10 +66223,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Red Mist Center Stripe",
-            "source_description": "Only available with Z15 Heritage Hash Marks. When D84 is selected, the roof will not include stripe.",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "1lt_e07__opt_17a_001",
@@ -67346,10 +66248,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic.",
-            "source_option_name": "Blade Silver Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
           },
           {
             "choice_id": "2lt_e07__opt_17a_001",
@@ -67374,10 +66273,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic.",
-            "source_option_name": "Blade Silver Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
           },
           {
             "choice_id": "3lt_e07__opt_17a_001",
@@ -67402,10 +66298,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic.",
-            "source_option_name": "Blade Silver Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
           },
           {
             "choice_id": "1lt_e67__opt_17a_001",
@@ -67430,10 +66323,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic.",
-            "source_option_name": "Blade Silver Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
           },
           {
             "choice_id": "2lt_e67__opt_17a_001",
@@ -67458,10 +66348,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic.",
-            "source_option_name": "Blade Silver Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
           },
           {
             "choice_id": "3lt_e67__opt_17a_001",
@@ -67486,10 +66373,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic.",
-            "source_option_name": "Blade Silver Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
           },
           {
             "choice_id": "1lt_e07__opt_20a_001",
@@ -67514,10 +66398,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Admiral Blue Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "2lt_e07__opt_20a_001",
@@ -67542,10 +66423,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Admiral Blue Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "3lt_e07__opt_20a_001",
@@ -67570,10 +66448,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Admiral Blue Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "1lt_e67__opt_20a_001",
@@ -67598,10 +66473,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Admiral Blue Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "2lt_e67__opt_20a_001",
@@ -67626,10 +66498,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Admiral Blue Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "3lt_e67__opt_20a_001",
@@ -67654,10 +66523,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Admiral Blue Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "1lt_e07__opt_55a_001",
@@ -67682,10 +66548,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Competition Yellow Hash Marks.",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "2lt_e07__opt_55a_001",
@@ -67710,10 +66573,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Competition Yellow Hash Marks.",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "3lt_e07__opt_55a_001",
@@ -67738,10 +66598,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Competition Yellow Hash Marks.",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "1lt_e67__opt_55a_001",
@@ -67766,10 +66623,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Competition Yellow Hash Marks.",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "2lt_e67__opt_55a_001",
@@ -67794,10 +66648,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Competition Yellow Hash Marks.",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "3lt_e67__opt_55a_001",
@@ -67822,10 +66673,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Competition Yellow Hash Marks.",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "1lt_e07__opt_75a_001",
@@ -67850,10 +66698,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "source_option_name": "Torch Red Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "choice_id": "2lt_e07__opt_75a_001",
@@ -67878,10 +66723,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "source_option_name": "Torch Red Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "choice_id": "3lt_e07__opt_75a_001",
@@ -67906,10 +66748,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "source_option_name": "Torch Red Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "choice_id": "1lt_e67__opt_75a_001",
@@ -67934,10 +66773,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "source_option_name": "Torch Red Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "choice_id": "2lt_e67__opt_75a_001",
@@ -67962,10 +66798,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "source_option_name": "Torch Red Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "choice_id": "3lt_e67__opt_75a_001",
@@ -67990,10 +66823,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "source_option_name": "Torch Red Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "choice_id": "1lt_e07__opt_97a_001",
@@ -68018,10 +66848,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Carbon Flash Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "2lt_e07__opt_97a_001",
@@ -68046,10 +66873,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Carbon Flash Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "3lt_e07__opt_97a_001",
@@ -68074,10 +66898,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Carbon Flash Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "1lt_e67__opt_97a_001",
@@ -68102,10 +66923,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Carbon Flash Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "2lt_e67__opt_97a_001",
@@ -68130,10 +66948,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Carbon Flash Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "3lt_e67__opt_97a_001",
@@ -68158,10 +66973,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Carbon Flash Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "1lt_e07__opt_dx4_001",
@@ -68186,10 +66998,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "source_option_name": "Red Mist Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "choice_id": "2lt_e07__opt_dx4_001",
@@ -68214,10 +67023,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "source_option_name": "Red Mist Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "choice_id": "3lt_e07__opt_dx4_001",
@@ -68242,10 +67048,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "source_option_name": "Red Mist Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "choice_id": "1lt_e67__opt_dx4_001",
@@ -68270,10 +67073,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "source_option_name": "Red Mist Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "choice_id": "2lt_e67__opt_dx4_001",
@@ -68298,10 +67098,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "source_option_name": "Red Mist Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "choice_id": "3lt_e67__opt_dx4_001",
@@ -68326,10 +67123,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "source_option_name": "Red Mist Hash Marks",
-            "source_description": "Adds Z15 Grand Sport Heritage Graphics $995",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "choice_id": "1lt_e07__opt_drg_001",
@@ -68354,10 +67148,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (ZYC) Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped) or (5JR) outside mirror covers in visible Carbon Fiber, LPO.",
-            "source_option_name": "Carbon Flash Outside Mirrors",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (ZYC) Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped) or (5JR) outside mirror covers in visible Carbon Fiber, LPO."
           },
           {
             "choice_id": "2lt_e07__opt_drg_001",
@@ -68382,10 +67173,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (ZYC) Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped) or (5JR) outside mirror covers in visible Carbon Fiber, LPO.",
-            "source_option_name": "Carbon Flash Outside Mirrors",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (ZYC) Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped) or (5JR) outside mirror covers in visible Carbon Fiber, LPO."
           },
           {
             "choice_id": "3lt_e07__opt_drg_001",
@@ -68410,10 +67198,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (ZYC) Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped) or (5JR) outside mirror covers in visible Carbon Fiber, LPO.",
-            "source_option_name": "Carbon Flash Outside Mirrors",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (ZYC) Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped) or (5JR) outside mirror covers in visible Carbon Fiber, LPO."
           },
           {
             "choice_id": "1lt_e67__opt_drg_001",
@@ -68438,10 +67223,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (ZYC) Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped) or (5JR) outside mirror covers in visible Carbon Fiber, LPO.",
-            "source_option_name": "Carbon Flash Outside Mirrors",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (ZYC) Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped) or (5JR) outside mirror covers in visible Carbon Fiber, LPO."
           },
           {
             "choice_id": "2lt_e67__opt_drg_001",
@@ -68466,10 +67248,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (ZYC) Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped) or (5JR) outside mirror covers in visible Carbon Fiber, LPO.",
-            "source_option_name": "Carbon Flash Outside Mirrors",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (ZYC) Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped) or (5JR) outside mirror covers in visible Carbon Fiber, LPO."
           },
           {
             "choice_id": "3lt_e67__opt_drg_001",
@@ -68494,10 +67273,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (ZYC) Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped) or (5JR) outside mirror covers in visible Carbon Fiber, LPO.",
-            "source_option_name": "Carbon Flash Outside Mirrors",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (ZYC) Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped) or (5JR) outside mirror covers in visible Carbon Fiber, LPO."
           },
           {
             "choice_id": "1lt_e07__opt_tr7_001",
@@ -68522,10 +67298,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included and only available with (E60) front lift adjustable height.",
-            "source_option_name": "Automatic Leveling Headlamp Control",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (E60) front lift adjustable height."
           },
           {
             "choice_id": "2lt_e07__opt_tr7_001",
@@ -68550,10 +67323,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included and only available with (E60) front lift adjustable height.",
-            "source_option_name": "Automatic Leveling Headlamp Control",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (E60) front lift adjustable height."
           },
           {
             "choice_id": "3lt_e07__opt_tr7_001",
@@ -68578,10 +67348,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included and only available with (E60) front lift adjustable height.",
-            "source_option_name": "Automatic Leveling Headlamp Control",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (E60) front lift adjustable height."
           },
           {
             "choice_id": "1lt_e67__opt_tr7_001",
@@ -68606,10 +67373,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included and only available with (E60) front lift adjustable height.",
-            "source_option_name": "Automatic Leveling Headlamp Control",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (E60) front lift adjustable height."
           },
           {
             "choice_id": "2lt_e67__opt_tr7_001",
@@ -68634,10 +67398,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included and only available with (E60) front lift adjustable height.",
-            "source_option_name": "Automatic Leveling Headlamp Control",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (E60) front lift adjustable height."
           },
           {
             "choice_id": "3lt_e67__opt_tr7_001",
@@ -68662,10 +67423,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included and only available with (E60) front lift adjustable height.",
-            "source_option_name": "Automatic Leveling Headlamp Control",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (E60) front lift adjustable height."
           },
           {
             "choice_id": "1lt_e07__opt_cfx_001",
@@ -68690,10 +67448,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Included and only available with (R8C) Corvette Museum Delivery.",
-            "source_option_name": "Personalized Corvette Museum Plaque",
-            "source_description": "Includes Corvette Museum logo, your name and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (R8C) Corvette Museum Delivery."
           },
           {
             "choice_id": "2lt_e07__opt_cfx_001",
@@ -68718,10 +67473,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Included and only available with (R8C) Corvette Museum Delivery.",
-            "source_option_name": "Personalized Corvette Museum Plaque",
-            "source_description": "Includes Corvette Museum logo, your name and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (R8C) Corvette Museum Delivery."
           },
           {
             "choice_id": "3lt_e07__opt_cfx_001",
@@ -68746,10 +67498,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Included and only available with (R8C) Corvette Museum Delivery.",
-            "source_option_name": "Personalized Corvette Museum Plaque",
-            "source_description": "Includes Corvette Museum logo, your name and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (R8C) Corvette Museum Delivery."
           },
           {
             "choice_id": "1lt_e67__opt_cfx_001",
@@ -68774,10 +67523,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Included and only available with (R8C) Corvette Museum Delivery.",
-            "source_option_name": "Personalized Corvette Museum Plaque",
-            "source_description": "Includes Corvette Museum logo, your name and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (R8C) Corvette Museum Delivery."
           },
           {
             "choice_id": "2lt_e67__opt_cfx_001",
@@ -68802,10 +67548,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Included and only available with (R8C) Corvette Museum Delivery.",
-            "source_option_name": "Personalized Corvette Museum Plaque",
-            "source_description": "Includes Corvette Museum logo, your name and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (R8C) Corvette Museum Delivery."
           },
           {
             "choice_id": "3lt_e67__opt_cfx_001",
@@ -68830,10 +67573,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Included and only available with (R8C) Corvette Museum Delivery.",
-            "source_option_name": "Personalized Corvette Museum Plaque",
-            "source_description": "Includes Corvette Museum logo, your name and VIN",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (R8C) Corvette Museum Delivery."
           },
           {
             "choice_id": "1lt_e07__opt_xfr_001",
@@ -68858,10 +67598,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "High Performance Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
           },
           {
             "choice_id": "2lt_e07__opt_xfr_001",
@@ -68886,10 +67623,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "High Performance Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
           },
           {
             "choice_id": "3lt_e07__opt_xfr_001",
@@ -68914,10 +67648,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "High Performance Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
           },
           {
             "choice_id": "1lt_e67__opt_xfr_001",
@@ -68942,10 +67673,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "High Performance Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
           },
           {
             "choice_id": "2lt_e67__opt_xfr_001",
@@ -68970,10 +67698,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "High Performance Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
           },
           {
             "choice_id": "3lt_e67__opt_xfr_001",
@@ -68998,10 +67723,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "High Performance Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
           },
           {
             "choice_id": "1lt_e07__opt_xfs_001",
@@ -69026,10 +67748,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Michelin Pilot Sport Cup 2 R Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "2lt_e07__opt_xfs_001",
@@ -69054,10 +67773,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Michelin Pilot Sport Cup 2 R Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "3lt_e07__opt_xfs_001",
@@ -69082,10 +67798,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Michelin Pilot Sport Cup 2 R Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "1lt_e67__opt_xfs_001",
@@ -69110,10 +67823,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Michelin Pilot Sport Cup 2 R Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "2lt_e67__opt_xfs_001",
@@ -69138,10 +67848,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Michelin Pilot Sport Cup 2 R Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "3lt_e67__opt_xfs_001",
@@ -69166,10 +67873,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Michelin Pilot Sport Cup 2 R Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "1lt_e07__opt_uqt_001",
@@ -69194,10 +67898,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1495,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Performance Data and Video Recorder",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_uqt_001",
@@ -69222,10 +67923,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1495,
             "display_behavior": "display_only",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Performance Data and Video Recorder",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_uqt_001",
@@ -69250,10 +67948,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1495,
             "display_behavior": "display_only",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Performance Data and Video Recorder",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_uqt_001",
@@ -69278,10 +67973,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1495,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Performance Data and Video Recorder",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_uqt_001",
@@ -69306,10 +67998,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1495,
             "display_behavior": "display_only",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Performance Data and Video Recorder",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_uqt_001",
@@ -69334,10 +68023,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1495,
             "display_behavior": "display_only",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Performance Data and Video Recorder",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_baz_001",
@@ -69362,10 +68048,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Stealth Interior",
-            "source_description": "Dark Finish Aluminum Trim Package",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_baz_001",
@@ -69390,10 +68073,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Stealth Interior",
-            "source_description": "Dark Finish Aluminum Trim Package",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_baz_001",
@@ -69418,10 +68098,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Stealth Interior",
-            "source_description": "Dark Finish Aluminum Trim Package",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_baz_001",
@@ -69446,10 +68123,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Stealth Interior",
-            "source_description": "Dark Finish Aluminum Trim Package",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_baz_001",
@@ -69474,10 +68148,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Stealth Interior",
-            "source_description": "Dark Finish Aluminum Trim Package",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_baz_001",
@@ -69502,10 +68173,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Stealth Interior",
-            "source_description": "Dark Finish Aluminum Trim Package",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_fa5_001",
@@ -69530,10 +68198,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1795,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Fiber Interior Trim",
-            "source_description": "Cluster Surround and Switch Plate",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_fa5_001",
@@ -69558,10 +68223,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1795,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Fiber Interior Trim",
-            "source_description": "Cluster Surround and Switch Plate",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_fa5_001",
@@ -69586,10 +68248,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1795,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Fiber Interior Trim",
-            "source_description": "Cluster Surround and Switch Plate",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_fa5_001",
@@ -69614,10 +68273,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1795,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Fiber Interior Trim",
-            "source_description": "Cluster Surround and Switch Plate",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_fa5_001",
@@ -69642,10 +68298,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1795,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Fiber Interior Trim",
-            "source_description": "Cluster Surround and Switch Plate",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_fa5_001",
@@ -69670,10 +68323,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1795,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Fiber Interior Trim",
-            "source_description": "Cluster Surround and Switch Plate",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_sda_001",
@@ -69698,10 +68348,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Black Recovery Hook",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_sda_001",
@@ -69726,10 +68373,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Black Recovery Hook",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_sda_001",
@@ -69754,10 +68398,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Black Recovery Hook",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_sda_001",
@@ -69782,10 +68423,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Black Recovery Hook",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_sda_001",
@@ -69810,10 +68448,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Black Recovery Hook",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_sda_001",
@@ -69838,10 +68473,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Black Recovery Hook",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_sfz_001",
@@ -69866,10 +68498,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Dark Stealth Crossed Flags Emblems",
-            "source_description": "LPO. Front and rear on Grand Sport, Z06, ZR1 and ZR1X models. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "2lt_e07__opt_sfz_001",
@@ -69894,10 +68523,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Dark Stealth Crossed Flags Emblems",
-            "source_description": "LPO. Front and rear on Grand Sport, Z06, ZR1 and ZR1X models. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "3lt_e07__opt_sfz_001",
@@ -69922,10 +68548,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Dark Stealth Crossed Flags Emblems",
-            "source_description": "LPO. Front and rear on Grand Sport, Z06, ZR1 and ZR1X models. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "1lt_e67__opt_sfz_001",
@@ -69950,10 +68573,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Dark Stealth Crossed Flags Emblems",
-            "source_description": "LPO. Front and rear on Grand Sport, Z06, ZR1 and ZR1X models. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "2lt_e67__opt_sfz_001",
@@ -69978,10 +68598,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Dark Stealth Crossed Flags Emblems",
-            "source_description": "LPO. Front and rear on Grand Sport, Z06, ZR1 and ZR1X models. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "3lt_e67__opt_sfz_001",
@@ -70006,10 +68623,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Dark Stealth Crossed Flags Emblems",
-            "source_description": "LPO. Front and rear on Grand Sport, Z06, ZR1 and ZR1X models. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "1lt_e07__opt_r88_001",
@@ -70034,10 +68648,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 21,
-            "source_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Front Illuminated Crossed Flags Emblem",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "2lt_e07__opt_r88_001",
@@ -70062,10 +68673,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 21,
-            "source_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Front Illuminated Crossed Flags Emblem",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "3lt_e07__opt_r88_001",
@@ -70090,10 +68698,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 21,
-            "source_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Front Illuminated Crossed Flags Emblem",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "1lt_e67__opt_r88_001",
@@ -70118,10 +68723,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 21,
-            "source_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Front Illuminated Crossed Flags Emblem",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "2lt_e67__opt_r88_001",
@@ -70146,10 +68748,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 21,
-            "source_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Front Illuminated Crossed Flags Emblem",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "3lt_e67__opt_r88_001",
@@ -70174,10 +68773,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 695,
             "display_behavior": "",
             "display_order": 21,
-            "source_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Front Illuminated Crossed Flags Emblem",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "1lt_e07__opt_sup_001",
@@ -70202,10 +68798,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 295,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "",
-            "source_option_name": "Red Grand Sport Badges",
-            "source_description": "LPO.",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_sup_001",
@@ -70230,10 +68823,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 295,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "",
-            "source_option_name": "Red Grand Sport Badges",
-            "source_description": "LPO.",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_sup_001",
@@ -70258,10 +68848,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 295,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "",
-            "source_option_name": "Red Grand Sport Badges",
-            "source_description": "LPO.",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_sup_001",
@@ -70286,10 +68873,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 295,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "",
-            "source_option_name": "Red Grand Sport Badges",
-            "source_description": "LPO.",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_sup_001",
@@ -70314,10 +68898,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 295,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "",
-            "source_option_name": "Red Grand Sport Badges",
-            "source_description": "LPO.",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_sup_001",
@@ -70342,10 +68923,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 295,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "",
-            "source_option_name": "Red Grand Sport Badges",
-            "source_description": "LPO.",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_sbt_001",
@@ -70370,10 +68948,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2525,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (CC3) transparent, removable roof panel.",
-            "source_option_name": "Dual Roof Package",
-            "source_description": "LPO. Transparent roof panel; includes (SC7) roof panel storage pouch. Genuine Corvette Accessories",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (CC3) transparent, removable roof panel."
           },
           {
             "choice_id": "2lt_e07__opt_sbt_001",
@@ -70398,10 +68973,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2525,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (CC3) transparent, removable roof panel.",
-            "source_option_name": "Dual Roof Package",
-            "source_description": "LPO. Transparent roof panel; includes (SC7) roof panel storage pouch. Genuine Corvette Accessories",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (CC3) transparent, removable roof panel."
           },
           {
             "choice_id": "3lt_e07__opt_sbt_001",
@@ -70426,10 +68998,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2525,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (CC3) transparent, removable roof panel.",
-            "source_option_name": "Dual Roof Package",
-            "source_description": "LPO. Transparent roof panel; includes (SC7) roof panel storage pouch. Genuine Corvette Accessories",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (CC3) transparent, removable roof panel."
           },
           {
             "choice_id": "1lt_e67__opt_sbt_001",
@@ -70454,10 +69023,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2525,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (CC3) transparent, removable roof panel.",
-            "source_option_name": "Dual Roof Package",
-            "source_description": "LPO. Transparent roof panel; includes (SC7) roof panel storage pouch. Genuine Corvette Accessories",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (CC3) transparent, removable roof panel."
           },
           {
             "choice_id": "2lt_e67__opt_sbt_001",
@@ -70482,10 +69048,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2525,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (CC3) transparent, removable roof panel.",
-            "source_option_name": "Dual Roof Package",
-            "source_description": "LPO. Transparent roof panel; includes (SC7) roof panel storage pouch. Genuine Corvette Accessories",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (CC3) transparent, removable roof panel."
           },
           {
             "choice_id": "3lt_e67__opt_sbt_001",
@@ -70510,10 +69073,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2525,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (CC3) transparent, removable roof panel.",
-            "source_option_name": "Dual Roof Package",
-            "source_description": "LPO. Transparent roof panel; includes (SC7) roof panel storage pouch. Genuine Corvette Accessories",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (CC3) transparent, removable roof panel."
           },
           {
             "choice_id": "1lt_e07__opt_sc7_001",
@@ -70538,10 +69098,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 31,
-            "source_detail_raw": "1. Included with (SBT) dual roof, LPO.",
-            "source_option_name": "Roof Panel Storage Pouch",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (SBT) dual roof, LPO."
           },
           {
             "choice_id": "2lt_e07__opt_sc7_001",
@@ -70566,10 +69123,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 31,
-            "source_detail_raw": "1. Included with (SBT) dual roof, LPO.",
-            "source_option_name": "Roof Panel Storage Pouch",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (SBT) dual roof, LPO."
           },
           {
             "choice_id": "3lt_e07__opt_sc7_001",
@@ -70594,10 +69148,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 31,
-            "source_detail_raw": "1. Included with (SBT) dual roof, LPO.",
-            "source_option_name": "Roof Panel Storage Pouch",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (SBT) dual roof, LPO."
           },
           {
             "choice_id": "1lt_e67__opt_sc7_001",
@@ -70622,10 +69173,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 31,
-            "source_detail_raw": "1. Included with (SBT) dual roof, LPO.",
-            "source_option_name": "Roof Panel Storage Pouch",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (SBT) dual roof, LPO."
           },
           {
             "choice_id": "2lt_e67__opt_sc7_001",
@@ -70650,10 +69198,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 31,
-            "source_detail_raw": "1. Included with (SBT) dual roof, LPO.",
-            "source_option_name": "Roof Panel Storage Pouch",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (SBT) dual roof, LPO."
           },
           {
             "choice_id": "3lt_e67__opt_sc7_001",
@@ -70678,10 +69223,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 31,
-            "source_detail_raw": "1. Included with (SBT) dual roof, LPO.",
-            "source_option_name": "Roof Panel Storage Pouch",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (SBT) dual roof, LPO."
           },
           {
             "choice_id": "1lt_e07__opt_vtb_001",
@@ -70706,10 +69248,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Black Rear Fascia/Roof Protector",
-            "source_description": "LPO. Embroidered crossed flags logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_vtb_001",
@@ -70734,10 +69273,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Black Rear Fascia/Roof Protector",
-            "source_description": "LPO. Embroidered crossed flags logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_vtb_001",
@@ -70762,10 +69298,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Black Rear Fascia/Roof Protector",
-            "source_description": "LPO. Embroidered crossed flags logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_vtb_001",
@@ -70790,10 +69323,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Black Rear Fascia/Roof Protector",
-            "source_description": "LPO. Embroidered crossed flags logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_vtb_001",
@@ -70818,10 +69348,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Black Rear Fascia/Roof Protector",
-            "source_description": "LPO. Embroidered crossed flags logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_vtb_001",
@@ -70846,10 +69373,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Black Rear Fascia/Roof Protector",
-            "source_description": "LPO. Embroidered crossed flags logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_pcq_001",
@@ -70874,10 +69398,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1675,
             "display_behavior": "",
             "display_order": 45,
-            "source_detail_raw": "",
-            "source_option_name": "Grille Screen Protection Package",
-            "source_description": "LPO. Includes (VWE) front radiator grille screens and (VWT) insect protection grille screen. Genuine Corvette Accessories",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_pcq_001",
@@ -70902,10 +69423,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1675,
             "display_behavior": "",
             "display_order": 45,
-            "source_detail_raw": "",
-            "source_option_name": "Grille Screen Protection Package",
-            "source_description": "LPO. Includes (VWE) front radiator grille screens and (VWT) insect protection grille screen. Genuine Corvette Accessories",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_pcq_001",
@@ -70930,10 +69448,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1675,
             "display_behavior": "",
             "display_order": 45,
-            "source_detail_raw": "",
-            "source_option_name": "Grille Screen Protection Package",
-            "source_description": "LPO. Includes (VWE) front radiator grille screens and (VWT) insect protection grille screen. Genuine Corvette Accessories",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_pcq_001",
@@ -70958,10 +69473,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1675,
             "display_behavior": "",
             "display_order": 45,
-            "source_detail_raw": "",
-            "source_option_name": "Grille Screen Protection Package",
-            "source_description": "LPO. Includes (VWE) front radiator grille screens and (VWT) insect protection grille screen. Genuine Corvette Accessories",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_pcq_001",
@@ -70986,10 +69498,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1675,
             "display_behavior": "",
             "display_order": 45,
-            "source_detail_raw": "",
-            "source_option_name": "Grille Screen Protection Package",
-            "source_description": "LPO. Includes (VWE) front radiator grille screens and (VWT) insect protection grille screen. Genuine Corvette Accessories",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_pcq_001",
@@ -71014,10 +69523,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1675,
             "display_behavior": "",
             "display_order": 45,
-            "source_detail_raw": "",
-            "source_option_name": "Grille Screen Protection Package",
-            "source_description": "LPO. Includes (VWE) front radiator grille screens and (VWT) insect protection grille screen. Genuine Corvette Accessories",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_vwe_001",
@@ -71042,10 +69548,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 950,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "source_option_name": "Front Radiator Grille Screens",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "choice_id": "2lt_e07__opt_vwe_001",
@@ -71070,10 +69573,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 950,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "source_option_name": "Front Radiator Grille Screens",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "choice_id": "3lt_e07__opt_vwe_001",
@@ -71098,10 +69598,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 950,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "source_option_name": "Front Radiator Grille Screens",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "choice_id": "1lt_e67__opt_vwe_001",
@@ -71126,10 +69623,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 950,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "source_option_name": "Front Radiator Grille Screens",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "choice_id": "2lt_e67__opt_vwe_001",
@@ -71154,10 +69648,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 950,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "source_option_name": "Front Radiator Grille Screens",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "choice_id": "3lt_e67__opt_vwe_001",
@@ -71182,10 +69673,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 950,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "source_option_name": "Front Radiator Grille Screens",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "choice_id": "1lt_e07__opt_vwt_001",
@@ -71210,10 +69698,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 795,
             "display_behavior": "",
             "display_order": 55,
-            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "source_option_name": "Insect Protection Grille Screen",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "choice_id": "2lt_e07__opt_vwt_001",
@@ -71238,10 +69723,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 795,
             "display_behavior": "",
             "display_order": 55,
-            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "source_option_name": "Insect Protection Grille Screen",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "choice_id": "3lt_e07__opt_vwt_001",
@@ -71266,10 +69748,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 795,
             "display_behavior": "",
             "display_order": 55,
-            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "source_option_name": "Insect Protection Grille Screen",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "choice_id": "1lt_e67__opt_vwt_001",
@@ -71294,10 +69773,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 795,
             "display_behavior": "",
             "display_order": 55,
-            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "source_option_name": "Insect Protection Grille Screen",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "choice_id": "2lt_e67__opt_vwt_001",
@@ -71322,10 +69798,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 795,
             "display_behavior": "",
             "display_order": 55,
-            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "source_option_name": "Insect Protection Grille Screen",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "choice_id": "3lt_e67__opt_vwt_001",
@@ -71350,10 +69823,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 795,
             "display_behavior": "",
             "display_order": 55,
-            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "source_option_name": "Insect Protection Grille Screen",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "choice_id": "1lt_e07__opt_5jr_001",
@@ -71378,10 +69848,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1395,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Outside Mirror Covers",
-            "source_description": "LPO. Includes (DRG) Carbon Flash Metallic-painted outside mirrors. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_5jr_001",
@@ -71406,10 +69873,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1395,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Outside Mirror Covers",
-            "source_description": "LPO. Includes (DRG) Carbon Flash Metallic-painted outside mirrors. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_5jr_001",
@@ -71434,10 +69898,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1395,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Outside Mirror Covers",
-            "source_description": "LPO. Includes (DRG) Carbon Flash Metallic-painted outside mirrors. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_5jr_001",
@@ -71462,10 +69923,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1395,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Outside Mirror Covers",
-            "source_description": "LPO. Includes (DRG) Carbon Flash Metallic-painted outside mirrors. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_5jr_001",
@@ -71490,10 +69948,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1395,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Outside Mirror Covers",
-            "source_description": "LPO. Includes (DRG) Carbon Flash Metallic-painted outside mirrors. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_5jr_001",
@@ -71518,10 +69973,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1395,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Outside Mirror Covers",
-            "source_description": "LPO. Includes (DRG) Carbon Flash Metallic-painted outside mirrors. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_rwh_001",
@@ -71546,10 +69998,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Black Premium Indoor Car Cover",
-            "source_description": "LPO. Crossed flags logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_rwh_001",
@@ -71574,10 +70023,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Black Premium Indoor Car Cover",
-            "source_description": "LPO. Crossed flags logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_rwh_001",
@@ -71602,10 +70048,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Black Premium Indoor Car Cover",
-            "source_description": "LPO. Crossed flags logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_rwh_001",
@@ -71630,10 +70073,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Black Premium Indoor Car Cover",
-            "source_description": "LPO. Crossed flags logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_rwh_001",
@@ -71658,10 +70098,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Black Premium Indoor Car Cover",
-            "source_description": "LPO. Crossed flags logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_rwh_001",
@@ -71686,10 +70123,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Black Premium Indoor Car Cover",
-            "source_description": "LPO. Crossed flags logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_wkr_001",
@@ -71714,10 +70148,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1275,
             "display_behavior": "",
             "display_order": 71,
-            "source_detail_raw": "1. When ordered with (5ZV) Three-Stanchion high wing spoiler LPO or (T0F) Carbon Flash-painted Carbon Fiber Aero Package, High Wing version is provided.",
-            "source_option_name": "GT3.R Premium Indoor Car Cover",
-            "source_description": "LPO. Fully rendered. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. When ordered with (5ZV) Three-Stanchion high wing spoiler LPO or (T0F) Carbon Flash-painted Carbon Fiber Aero Package, High Wing version is provided."
           },
           {
             "choice_id": "2lt_e07__opt_wkr_001",
@@ -71742,10 +70173,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1275,
             "display_behavior": "",
             "display_order": 71,
-            "source_detail_raw": "1. When ordered with (5ZV) Three-Stanchion high wing spoiler LPO or (T0F) Carbon Flash-painted Carbon Fiber Aero Package, High Wing version is provided.",
-            "source_option_name": "GT3.R Premium Indoor Car Cover",
-            "source_description": "LPO. Fully rendered. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. When ordered with (5ZV) Three-Stanchion high wing spoiler LPO or (T0F) Carbon Flash-painted Carbon Fiber Aero Package, High Wing version is provided."
           },
           {
             "choice_id": "3lt_e07__opt_wkr_001",
@@ -71770,10 +70198,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1275,
             "display_behavior": "",
             "display_order": 71,
-            "source_detail_raw": "1. When ordered with (5ZV) Three-Stanchion high wing spoiler LPO or (T0F) Carbon Flash-painted Carbon Fiber Aero Package, High Wing version is provided.",
-            "source_option_name": "GT3.R Premium Indoor Car Cover",
-            "source_description": "LPO. Fully rendered. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. When ordered with (5ZV) Three-Stanchion high wing spoiler LPO or (T0F) Carbon Flash-painted Carbon Fiber Aero Package, High Wing version is provided."
           },
           {
             "choice_id": "1lt_e67__opt_wkr_001",
@@ -71798,10 +70223,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1275,
             "display_behavior": "",
             "display_order": 71,
-            "source_detail_raw": "1. When ordered with (5ZV) Three-Stanchion high wing spoiler LPO or (T0F) Carbon Flash-painted Carbon Fiber Aero Package, High Wing version is provided.",
-            "source_option_name": "GT3.R Premium Indoor Car Cover",
-            "source_description": "LPO. Fully rendered. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. When ordered with (5ZV) Three-Stanchion high wing spoiler LPO or (T0F) Carbon Flash-painted Carbon Fiber Aero Package, High Wing version is provided."
           },
           {
             "choice_id": "2lt_e67__opt_wkr_001",
@@ -71826,10 +70248,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1275,
             "display_behavior": "",
             "display_order": 71,
-            "source_detail_raw": "1. When ordered with (5ZV) Three-Stanchion high wing spoiler LPO or (T0F) Carbon Flash-painted Carbon Fiber Aero Package, High Wing version is provided.",
-            "source_option_name": "GT3.R Premium Indoor Car Cover",
-            "source_description": "LPO. Fully rendered. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. When ordered with (5ZV) Three-Stanchion high wing spoiler LPO or (T0F) Carbon Flash-painted Carbon Fiber Aero Package, High Wing version is provided."
           },
           {
             "choice_id": "3lt_e67__opt_wkr_001",
@@ -71854,10 +70273,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1275,
             "display_behavior": "",
             "display_order": 71,
-            "source_detail_raw": "1. When ordered with (5ZV) Three-Stanchion high wing spoiler LPO or (T0F) Carbon Flash-painted Carbon Fiber Aero Package, High Wing version is provided.",
-            "source_option_name": "GT3.R Premium Indoor Car Cover",
-            "source_description": "LPO. Fully rendered. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. When ordered with (5ZV) Three-Stanchion high wing spoiler LPO or (T0F) Carbon Flash-painted Carbon Fiber Aero Package, High Wing version is provided."
           },
           {
             "choice_id": "1lt_e07__opt_rwj_001",
@@ -71882,10 +70298,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
-            "source_detail_raw": "",
-            "source_option_name": "Gray Premium Outdoor Car Cover",
-            "source_description": "LPO. Crossed flags logo and Corvette silhouette. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_rwj_001",
@@ -71910,10 +70323,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
-            "source_detail_raw": "",
-            "source_option_name": "Gray Premium Outdoor Car Cover",
-            "source_description": "LPO. Crossed flags logo and Corvette silhouette. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_rwj_001",
@@ -71938,10 +70348,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
-            "source_detail_raw": "",
-            "source_option_name": "Gray Premium Outdoor Car Cover",
-            "source_description": "LPO. Crossed flags logo and Corvette silhouette. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_rwj_001",
@@ -71966,10 +70373,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
-            "source_detail_raw": "",
-            "source_option_name": "Gray Premium Outdoor Car Cover",
-            "source_description": "LPO. Crossed flags logo and Corvette silhouette. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_rwj_001",
@@ -71994,10 +70398,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
-            "source_detail_raw": "",
-            "source_option_name": "Gray Premium Outdoor Car Cover",
-            "source_description": "LPO. Crossed flags logo and Corvette silhouette. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_rwj_001",
@@ -72022,10 +70423,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
-            "source_detail_raw": "",
-            "source_option_name": "Gray Premium Outdoor Car Cover",
-            "source_description": "LPO. Crossed flags logo and Corvette silhouette. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_rin_001",
@@ -72050,10 +70448,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 440,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Not available with RIK, SL8.",
-            "source_option_name": "Arctic White Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIK, SL8."
           },
           {
             "choice_id": "2lt_e07__opt_rin_001",
@@ -72078,10 +70473,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 440,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Not available with RIK, SL8.",
-            "source_option_name": "Arctic White Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIK, SL8."
           },
           {
             "choice_id": "3lt_e07__opt_rin_001",
@@ -72106,10 +70498,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 440,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Not available with RIK, SL8.",
-            "source_option_name": "Arctic White Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIK, SL8."
           },
           {
             "choice_id": "1lt_e67__opt_rin_001",
@@ -72134,10 +70523,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 440,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Not available with RIK, SL8.",
-            "source_option_name": "Arctic White Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIK, SL8."
           },
           {
             "choice_id": "2lt_e67__opt_rin_001",
@@ -72162,10 +70548,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 440,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Not available with RIK, SL8.",
-            "source_option_name": "Arctic White Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIK, SL8."
           },
           {
             "choice_id": "3lt_e67__opt_rin_001",
@@ -72190,10 +70573,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 440,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Not available with RIK, SL8.",
-            "source_option_name": "Arctic White Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIK, SL8."
           },
           {
             "choice_id": "1lt_e07__opt_sl8_001",
@@ -72218,10 +70598,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 81,
-            "source_detail_raw": "1. Not available with RIK, RIN.",
-            "source_option_name": "Edge Red Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIK, RIN."
           },
           {
             "choice_id": "2lt_e07__opt_sl8_001",
@@ -72246,10 +70623,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 81,
-            "source_detail_raw": "1. Not available with RIK, RIN.",
-            "source_option_name": "Edge Red Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIK, RIN."
           },
           {
             "choice_id": "3lt_e07__opt_sl8_001",
@@ -72274,10 +70648,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 81,
-            "source_detail_raw": "1. Not available with RIK, RIN.",
-            "source_option_name": "Edge Red Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIK, RIN."
           },
           {
             "choice_id": "1lt_e67__opt_sl8_001",
@@ -72302,10 +70673,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 81,
-            "source_detail_raw": "1. Not available with RIK, RIN.",
-            "source_option_name": "Edge Red Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIK, RIN."
           },
           {
             "choice_id": "2lt_e67__opt_sl8_001",
@@ -72330,10 +70698,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 81,
-            "source_detail_raw": "1. Not available with RIK, RIN.",
-            "source_option_name": "Edge Red Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIK, RIN."
           },
           {
             "choice_id": "3lt_e67__opt_sl8_001",
@@ -72358,10 +70723,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 81,
-            "source_detail_raw": "1. Not available with RIK, RIN.",
-            "source_option_name": "Edge Red Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIK, RIN."
           },
           {
             "choice_id": "1lt_e07__opt_rik_001",
@@ -72386,10 +70748,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 82,
-            "source_detail_raw": "1. Not available with RIN, SL8.",
-            "source_option_name": "Torch Red Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIN, SL8."
           },
           {
             "choice_id": "2lt_e07__opt_rik_001",
@@ -72414,10 +70773,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 82,
-            "source_detail_raw": "1. Not available with RIN, SL8.",
-            "source_option_name": "Torch Red Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIN, SL8."
           },
           {
             "choice_id": "3lt_e07__opt_rik_001",
@@ -72442,10 +70798,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 82,
-            "source_detail_raw": "1. Not available with RIN, SL8.",
-            "source_option_name": "Torch Red Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIN, SL8."
           },
           {
             "choice_id": "1lt_e67__opt_rik_001",
@@ -72470,10 +70823,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 82,
-            "source_detail_raw": "1. Not available with RIN, SL8.",
-            "source_option_name": "Torch Red Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIN, SL8."
           },
           {
             "choice_id": "2lt_e67__opt_rik_001",
@@ -72498,10 +70848,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 82,
-            "source_detail_raw": "1. Not available with RIN, SL8.",
-            "source_option_name": "Torch Red Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIN, SL8."
           },
           {
             "choice_id": "3lt_e67__opt_rik_001",
@@ -72526,10 +70873,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 395,
             "display_behavior": "",
             "display_order": 82,
-            "source_detail_raw": "1. Not available with RIN, SL8.",
-            "source_option_name": "Torch Red Rear Corvette Script Badge",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RIN, SL8."
           },
           {
             "choice_id": "1lt_e07__opt_sig_001",
@@ -72554,10 +70898,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 425,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "1. Requires (T0E) rear spoiler.",
-            "source_option_name": "Clear Smoked Jake Logo Spoiler Extension",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (T0E) rear spoiler."
           },
           {
             "choice_id": "2lt_e07__opt_sig_001",
@@ -72582,10 +70923,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 425,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "1. Requires (T0E) rear spoiler.",
-            "source_option_name": "Clear Smoked Jake Logo Spoiler Extension",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (T0E) rear spoiler."
           },
           {
             "choice_id": "3lt_e07__opt_sig_001",
@@ -72610,10 +70948,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 425,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "1. Requires (T0E) rear spoiler.",
-            "source_option_name": "Clear Smoked Jake Logo Spoiler Extension",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (T0E) rear spoiler."
           },
           {
             "choice_id": "1lt_e67__opt_sig_001",
@@ -72638,10 +70973,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 425,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "1. Requires (T0E) rear spoiler.",
-            "source_option_name": "Clear Smoked Jake Logo Spoiler Extension",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (T0E) rear spoiler."
           },
           {
             "choice_id": "2lt_e67__opt_sig_001",
@@ -72666,10 +70998,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 425,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "1. Requires (T0E) rear spoiler.",
-            "source_option_name": "Clear Smoked Jake Logo Spoiler Extension",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (T0E) rear spoiler."
           },
           {
             "choice_id": "3lt_e67__opt_sig_001",
@@ -72694,10 +71023,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 425,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "1. Requires (T0E) rear spoiler.",
-            "source_option_name": "Clear Smoked Jake Logo Spoiler Extension",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (T0E) rear spoiler."
           },
           {
             "choice_id": "1lt_e07__opt_pdy_001",
@@ -72722,10 +71048,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Roadside Safety Package",
-            "source_description": "LPO. Includes (RYT) First Aid Kit and (S08) Highway Safety Kit. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_pdy_001",
@@ -72750,10 +71073,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Roadside Safety Package",
-            "source_description": "LPO. Includes (RYT) First Aid Kit and (S08) Highway Safety Kit. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_pdy_001",
@@ -72778,10 +71098,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Roadside Safety Package",
-            "source_description": "LPO. Includes (RYT) First Aid Kit and (S08) Highway Safety Kit. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_pdy_001",
@@ -72806,10 +71123,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Roadside Safety Package",
-            "source_description": "LPO. Includes (RYT) First Aid Kit and (S08) Highway Safety Kit. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_pdy_001",
@@ -72834,10 +71148,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Roadside Safety Package",
-            "source_description": "LPO. Includes (RYT) First Aid Kit and (S08) Highway Safety Kit. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_pdy_001",
@@ -72862,10 +71173,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 195,
             "display_behavior": "",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Roadside Safety Package",
-            "source_description": "LPO. Includes (RYT) First Aid Kit and (S08) Highway Safety Kit. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_ryt_001",
@@ -72890,10 +71198,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 60,
             "display_behavior": "",
             "display_order": 6,
-            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package.",
-            "source_option_name": "First Aid Kit",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "choice_id": "2lt_e07__opt_ryt_001",
@@ -72918,10 +71223,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 60,
             "display_behavior": "",
             "display_order": 6,
-            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package.",
-            "source_option_name": "First Aid Kit",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "choice_id": "3lt_e07__opt_ryt_001",
@@ -72946,10 +71248,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 60,
             "display_behavior": "",
             "display_order": 6,
-            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package.",
-            "source_option_name": "First Aid Kit",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "choice_id": "1lt_e67__opt_ryt_001",
@@ -72974,10 +71273,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 60,
             "display_behavior": "",
             "display_order": 6,
-            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package.",
-            "source_option_name": "First Aid Kit",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "choice_id": "2lt_e67__opt_ryt_001",
@@ -73002,10 +71298,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 60,
             "display_behavior": "",
             "display_order": 6,
-            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package.",
-            "source_option_name": "First Aid Kit",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "choice_id": "3lt_e67__opt_ryt_001",
@@ -73030,10 +71323,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 60,
             "display_behavior": "",
             "display_order": 6,
-            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package.",
-            "source_option_name": "First Aid Kit",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "choice_id": "1lt_e07__opt_s08_001",
@@ -73058,10 +71348,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 7,
-            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package.",
-            "source_option_name": "Highway Safety Kit",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "choice_id": "2lt_e07__opt_s08_001",
@@ -73086,10 +71373,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 7,
-            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package.",
-            "source_option_name": "Highway Safety Kit",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "choice_id": "3lt_e07__opt_s08_001",
@@ -73114,10 +71398,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 7,
-            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package.",
-            "source_option_name": "Highway Safety Kit",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "choice_id": "1lt_e67__opt_s08_001",
@@ -73142,10 +71423,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 7,
-            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package.",
-            "source_option_name": "Highway Safety Kit",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "choice_id": "2lt_e67__opt_s08_001",
@@ -73170,10 +71448,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 7,
-            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package.",
-            "source_option_name": "Highway Safety Kit",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "choice_id": "3lt_e67__opt_s08_001",
@@ -73198,10 +71473,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 150,
             "display_behavior": "",
             "display_order": 7,
-            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package.",
-            "source_option_name": "Highway Safety Kit",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "choice_id": "1lt_e07__opt_pef_001",
@@ -73226,10 +71498,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 475,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Jake Logo Contoured Liner Protection Package",
-            "source_description": "LPO. Includes (CAV) contoured cargo area liners and (RIA) all-weather floor liners. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_pef_001",
@@ -73254,10 +71523,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 475,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Jake Logo Contoured Liner Protection Package",
-            "source_description": "LPO. Includes (CAV) contoured cargo area liners and (RIA) all-weather floor liners. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_pef_001",
@@ -73282,10 +71548,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 475,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Jake Logo Contoured Liner Protection Package",
-            "source_description": "LPO. Includes (CAV) contoured cargo area liners and (RIA) all-weather floor liners. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_pef_001",
@@ -73310,10 +71573,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 475,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Jake Logo Contoured Liner Protection Package",
-            "source_description": "LPO. Includes (CAV) contoured cargo area liners and (RIA) all-weather floor liners. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_pef_001",
@@ -73338,10 +71598,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 475,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Jake Logo Contoured Liner Protection Package",
-            "source_description": "LPO. Includes (CAV) contoured cargo area liners and (RIA) all-weather floor liners. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_pef_001",
@@ -73366,10 +71623,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 475,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Jake Logo Contoured Liner Protection Package",
-            "source_description": "LPO. Includes (CAV) contoured cargo area liners and (RIA) all-weather floor liners. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_ria_001",
@@ -73394,10 +71648,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 265,
             "display_behavior": "",
             "display_order": 31,
-            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "source_option_name": "All-Weather Floor Liners",
-            "source_description": "LPO. Jake logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "choice_id": "2lt_e07__opt_ria_001",
@@ -73422,10 +71673,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 265,
             "display_behavior": "",
             "display_order": 31,
-            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "source_option_name": "All-Weather Floor Liners",
-            "source_description": "LPO. Jake logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "choice_id": "3lt_e07__opt_ria_001",
@@ -73450,10 +71698,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 265,
             "display_behavior": "",
             "display_order": 31,
-            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "source_option_name": "All-Weather Floor Liners",
-            "source_description": "LPO. Jake logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "choice_id": "1lt_e67__opt_ria_001",
@@ -73478,10 +71723,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 265,
             "display_behavior": "",
             "display_order": 31,
-            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "source_option_name": "All-Weather Floor Liners",
-            "source_description": "LPO. Jake logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "choice_id": "2lt_e67__opt_ria_001",
@@ -73506,10 +71748,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 265,
             "display_behavior": "",
             "display_order": 31,
-            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "source_option_name": "All-Weather Floor Liners",
-            "source_description": "LPO. Jake logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "choice_id": "3lt_e67__opt_ria_001",
@@ -73534,10 +71773,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 265,
             "display_behavior": "",
             "display_order": 31,
-            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "source_option_name": "All-Weather Floor Liners",
-            "source_description": "LPO. Jake logo. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "choice_id": "1lt_e07__opt_cav_001",
@@ -73562,10 +71798,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 230,
             "display_behavior": "",
             "display_order": 32,
-            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "source_option_name": "Contoured Cargo Area Liners",
-            "source_description": "LPO. Genuine Corvette Accessory Jake logo",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "choice_id": "2lt_e07__opt_cav_001",
@@ -73590,10 +71823,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 230,
             "display_behavior": "",
             "display_order": 32,
-            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "source_option_name": "Contoured Cargo Area Liners",
-            "source_description": "LPO. Genuine Corvette Accessory Jake logo",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "choice_id": "3lt_e07__opt_cav_001",
@@ -73618,10 +71848,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 230,
             "display_behavior": "",
             "display_order": 32,
-            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "source_option_name": "Contoured Cargo Area Liners",
-            "source_description": "LPO. Genuine Corvette Accessory Jake logo",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "choice_id": "1lt_e67__opt_cav_001",
@@ -73646,10 +71873,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 230,
             "display_behavior": "",
             "display_order": 32,
-            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "source_option_name": "Contoured Cargo Area Liners",
-            "source_description": "LPO. Genuine Corvette Accessory Jake logo",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "choice_id": "2lt_e67__opt_cav_001",
@@ -73674,10 +71898,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 230,
             "display_behavior": "",
             "display_order": 32,
-            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "source_option_name": "Contoured Cargo Area Liners",
-            "source_description": "LPO. Genuine Corvette Accessory Jake logo",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "choice_id": "3lt_e67__opt_cav_001",
@@ -73702,10 +71923,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 230,
             "display_behavior": "",
             "display_order": 32,
-            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "source_option_name": "Contoured Cargo Area Liners",
-            "source_description": "LPO. Genuine Corvette Accessory Jake logo",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "choice_id": "1lt_e07__opt_vyw_001",
@@ -73730,10 +71948,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 275,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Premium Carpeted Floor Mats",
-            "source_description": "LPO. Car silhouette logo on Stingray, Grand Sport, ZR1 and ZR1X models. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_vyw_001",
@@ -73758,10 +71973,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 275,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Premium Carpeted Floor Mats",
-            "source_description": "LPO. Car silhouette logo on Stingray, Grand Sport, ZR1 and ZR1X models. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_vyw_001",
@@ -73786,10 +71998,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 275,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Premium Carpeted Floor Mats",
-            "source_description": "LPO. Car silhouette logo on Stingray, Grand Sport, ZR1 and ZR1X models. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_vyw_001",
@@ -73814,10 +72023,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 275,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Premium Carpeted Floor Mats",
-            "source_description": "LPO. Car silhouette logo on Stingray, Grand Sport, ZR1 and ZR1X models. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_vyw_001",
@@ -73842,10 +72048,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 275,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Premium Carpeted Floor Mats",
-            "source_description": "LPO. Car silhouette logo on Stingray, Grand Sport, ZR1 and ZR1X models. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_vyw_001",
@@ -73870,10 +72073,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 275,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Premium Carpeted Floor Mats",
-            "source_description": "LPO. Car silhouette logo on Stingray, Grand Sport, ZR1 and ZR1X models. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_rwu_001",
@@ -73898,10 +72098,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 175,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Collapsible Cargo Area Organizer",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_rwu_001",
@@ -73926,10 +72123,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 175,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Collapsible Cargo Area Organizer",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_rwu_001",
@@ -73954,10 +72148,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 175,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Collapsible Cargo Area Organizer",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_rwu_001",
@@ -73982,10 +72173,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 175,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Collapsible Cargo Area Organizer",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_rwu_001",
@@ -74010,10 +72198,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 175,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Collapsible Cargo Area Organizer",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_rwu_001",
@@ -74038,10 +72223,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 175,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Collapsible Cargo Area Organizer",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_w2d_001",
@@ -74066,10 +72248,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Cargo Net Set",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_w2d_001",
@@ -74094,10 +72273,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Cargo Net Set",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_w2d_001",
@@ -74122,10 +72298,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Cargo Net Set",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_w2d_001",
@@ -74150,10 +72323,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Cargo Net Set",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_w2d_001",
@@ -74178,10 +72348,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Cargo Net Set",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_w2d_001",
@@ -74206,10 +72373,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Cargo Net Set",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_s2l_001",
@@ -74234,10 +72398,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1695,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Premium Leather Weekend/Travel Bag Set",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_s2l_001",
@@ -74262,10 +72423,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1695,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Premium Leather Weekend/Travel Bag Set",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_s2l_001",
@@ -74290,10 +72448,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1695,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Premium Leather Weekend/Travel Bag Set",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_s2l_001",
@@ -74318,10 +72473,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1695,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Premium Leather Weekend/Travel Bag Set",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_s2l_001",
@@ -74346,10 +72498,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1695,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Premium Leather Weekend/Travel Bag Set",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_s2l_001",
@@ -74374,10 +72523,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1695,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Premium Leather Weekend/Travel Bag Set",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_sxb_001",
@@ -74402,10 +72548,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2095,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Black Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_sxb_001",
@@ -74430,10 +72573,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2095,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Black Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_sxb_001",
@@ -74458,10 +72598,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2095,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Black Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_sxb_001",
@@ -74486,10 +72623,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2095,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Black Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_sxb_001",
@@ -74514,10 +72648,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2095,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Black Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_sxb_001",
@@ -74542,10 +72673,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2095,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Black Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_sxr_001",
@@ -74570,10 +72698,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2095,
             "display_behavior": "",
             "display_order": 81,
-            "source_detail_raw": "",
-            "source_option_name": "Adrenaline Red Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_sxr_001",
@@ -74598,10 +72723,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2095,
             "display_behavior": "",
             "display_order": 81,
-            "source_detail_raw": "",
-            "source_option_name": "Adrenaline Red Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_sxr_001",
@@ -74626,10 +72748,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2095,
             "display_behavior": "",
             "display_order": 81,
-            "source_detail_raw": "",
-            "source_option_name": "Adrenaline Red Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_sxr_001",
@@ -74654,10 +72773,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2095,
             "display_behavior": "",
             "display_order": 81,
-            "source_detail_raw": "",
-            "source_option_name": "Adrenaline Red Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_sxr_001",
@@ -74682,10 +72798,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2095,
             "display_behavior": "",
             "display_order": 81,
-            "source_detail_raw": "",
-            "source_option_name": "Adrenaline Red Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_sxr_001",
@@ -74710,10 +72823,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2095,
             "display_behavior": "",
             "display_order": 81,
-            "source_detail_raw": "",
-            "source_option_name": "Adrenaline Red Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_sxt_001",
@@ -74738,10 +72848,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2695,
             "display_behavior": "",
             "display_order": 82,
-            "source_detail_raw": "",
-            "source_option_name": "Natural Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_sxt_001",
@@ -74766,10 +72873,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2695,
             "display_behavior": "",
             "display_order": 82,
-            "source_detail_raw": "",
-            "source_option_name": "Natural Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_sxt_001",
@@ -74794,10 +72898,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2695,
             "display_behavior": "",
             "display_order": 82,
-            "source_detail_raw": "",
-            "source_option_name": "Natural Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_sxt_001",
@@ -74822,10 +72923,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2695,
             "display_behavior": "",
             "display_order": 82,
-            "source_detail_raw": "",
-            "source_option_name": "Natural Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_sxt_001",
@@ -74850,10 +72948,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2695,
             "display_behavior": "",
             "display_order": 82,
-            "source_detail_raw": "",
-            "source_option_name": "Natural Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_sxt_001",
@@ -74878,10 +72973,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2695,
             "display_behavior": "",
             "display_order": 82,
-            "source_detail_raw": "",
-            "source_option_name": "Natural Suede Frunk and Trunk Liner",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_g8g_001",
@@ -74907,9 +72999,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Arctic White",
-            "source_description": "Touch-Up Paint Number WA-9567",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
             "image_alt": "Arctic White",
             "image_fit": "cover",
@@ -74939,9 +73028,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Arctic White",
-            "source_description": "Touch-Up Paint Number WA-9567",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
             "image_alt": "Arctic White",
             "image_fit": "cover",
@@ -74971,9 +73057,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Arctic White",
-            "source_description": "Touch-Up Paint Number WA-9567",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
             "image_alt": "Arctic White",
             "image_fit": "cover",
@@ -75003,9 +73086,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Arctic White",
-            "source_description": "Touch-Up Paint Number WA-9567",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
             "image_alt": "Arctic White",
             "image_fit": "cover",
@@ -75035,9 +73115,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Arctic White",
-            "source_description": "Touch-Up Paint Number WA-9567",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
             "image_alt": "Arctic White",
             "image_fit": "cover",
@@ -75067,9 +73144,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Arctic White",
-            "source_description": "Touch-Up Paint Number WA-9567",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png",
             "image_alt": "Arctic White",
             "image_fit": "cover",
@@ -75099,9 +73173,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Black",
-            "source_description": "Touch-Up Paint Number WA-8555",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
             "image_alt": "Black",
             "image_fit": "cover",
@@ -75131,9 +73202,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Black",
-            "source_description": "Touch-Up Paint Number WA-8555",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
             "image_alt": "Black",
             "image_fit": "cover",
@@ -75163,9 +73231,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Black",
-            "source_description": "Touch-Up Paint Number WA-8555",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
             "image_alt": "Black",
             "image_fit": "cover",
@@ -75195,9 +73260,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Black",
-            "source_description": "Touch-Up Paint Number WA-8555",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
             "image_alt": "Black",
             "image_fit": "cover",
@@ -75227,9 +73289,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Black",
-            "source_description": "Touch-Up Paint Number WA-8555",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
             "image_alt": "Black",
             "image_fit": "cover",
@@ -75259,9 +73318,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Black",
-            "source_description": "Touch-Up Paint Number WA-8555",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png",
             "image_alt": "Black",
             "image_fit": "cover",
@@ -75291,9 +73347,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "Blade Silver Metallic",
-            "source_description": "Touch-Up Paint Number WA-240K",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
             "image_alt": "Blade Silver Metallic",
             "image_fit": "cover",
@@ -75323,9 +73376,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "Blade Silver Metallic",
-            "source_description": "Touch-Up Paint Number WA-240K",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
             "image_alt": "Blade Silver Metallic",
             "image_fit": "cover",
@@ -75355,9 +73405,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "Blade Silver Metallic",
-            "source_description": "Touch-Up Paint Number WA-240K",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
             "image_alt": "Blade Silver Metallic",
             "image_fit": "cover",
@@ -75387,9 +73434,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "Blade Silver Metallic",
-            "source_description": "Touch-Up Paint Number WA-240K",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
             "image_alt": "Blade Silver Metallic",
             "image_fit": "cover",
@@ -75419,9 +73463,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "Blade Silver Metallic",
-            "source_description": "Touch-Up Paint Number WA-240K",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
             "image_alt": "Blade Silver Metallic",
             "image_fit": "cover",
@@ -75451,9 +73492,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "Blade Silver Metallic",
-            "source_description": "Touch-Up Paint Number WA-240K",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png",
             "image_alt": "Blade Silver Metallic",
             "image_fit": "cover",
@@ -75483,9 +73521,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Competition Yellow Tintcoat Metallic",
-            "source_description": "Touch-Up Paint Number WA-233K",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
             "image_alt": "Competition Yellow Tintcoat Metallic",
             "image_fit": "cover",
@@ -75515,9 +73550,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Competition Yellow Tintcoat Metallic",
-            "source_description": "Touch-Up Paint Number WA-233K",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
             "image_alt": "Competition Yellow Tintcoat Metallic",
             "image_fit": "cover",
@@ -75547,9 +73579,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Competition Yellow Tintcoat Metallic",
-            "source_description": "Touch-Up Paint Number WA-233K",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
             "image_alt": "Competition Yellow Tintcoat Metallic",
             "image_fit": "cover",
@@ -75579,9 +73608,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Competition Yellow Tintcoat Metallic",
-            "source_description": "Touch-Up Paint Number WA-233K",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
             "image_alt": "Competition Yellow Tintcoat Metallic",
             "image_fit": "cover",
@@ -75611,9 +73637,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Competition Yellow Tintcoat Metallic",
-            "source_description": "Touch-Up Paint Number WA-233K",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
             "image_alt": "Competition Yellow Tintcoat Metallic",
             "image_fit": "cover",
@@ -75643,9 +73666,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Competition Yellow Tintcoat Metallic",
-            "source_description": "Touch-Up Paint Number WA-233K",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png",
             "image_alt": "Competition Yellow Tintcoat Metallic",
             "image_fit": "cover",
@@ -75675,9 +73695,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Additional charge - premium color.",
-            "source_option_name": "Admiral Blue Metallic",
-            "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
             "image_alt": "Admiral Blue Metallic",
             "image_fit": "cover",
@@ -75707,9 +73724,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Additional charge - premium color.",
-            "source_option_name": "Admiral Blue Metallic",
-            "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
             "image_alt": "Admiral Blue Metallic",
             "image_fit": "cover",
@@ -75739,9 +73753,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Additional charge - premium color.",
-            "source_option_name": "Admiral Blue Metallic",
-            "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
             "image_alt": "Admiral Blue Metallic",
             "image_fit": "cover",
@@ -75771,9 +73782,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Additional charge - premium color.",
-            "source_option_name": "Admiral Blue Metallic",
-            "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
             "image_alt": "Admiral Blue Metallic",
             "image_fit": "cover",
@@ -75803,9 +73811,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Additional charge - premium color.",
-            "source_option_name": "Admiral Blue Metallic",
-            "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
             "image_alt": "Admiral Blue Metallic",
             "image_fit": "cover",
@@ -75835,9 +73840,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Additional charge - premium color.",
-            "source_option_name": "Admiral Blue Metallic",
-            "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png",
             "image_alt": "Admiral Blue Metallic",
             "image_fit": "cover",
@@ -75867,9 +73869,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "",
-            "source_option_name": "Pitch Gray Metallic",
-            "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
             "image_alt": "Pitch Gray Metallic",
             "image_fit": "cover",
@@ -75899,9 +73898,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "",
-            "source_option_name": "Pitch Gray Metallic",
-            "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
             "image_alt": "Pitch Gray Metallic",
             "image_fit": "cover",
@@ -75931,9 +73927,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "",
-            "source_option_name": "Pitch Gray Metallic",
-            "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
             "image_alt": "Pitch Gray Metallic",
             "image_fit": "cover",
@@ -75963,9 +73956,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "",
-            "source_option_name": "Pitch Gray Metallic",
-            "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
             "image_alt": "Pitch Gray Metallic",
             "image_fit": "cover",
@@ -75995,9 +73985,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "",
-            "source_option_name": "Pitch Gray Metallic",
-            "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
             "image_alt": "Pitch Gray Metallic",
             "image_fit": "cover",
@@ -76027,9 +74014,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "",
-            "source_option_name": "Pitch Gray Metallic",
-            "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png",
             "image_alt": "Pitch Gray Metallic",
             "image_fit": "cover",
@@ -76059,9 +74043,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Red Mist Metallic Tintcoat",
-            "source_description": "Touch-Up Paint Number WA-245F",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
             "image_alt": "Red Mist Metallic Tintcoat",
             "image_fit": "cover",
@@ -76091,9 +74072,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Red Mist Metallic Tintcoat",
-            "source_description": "Touch-Up Paint Number WA-245F",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
             "image_alt": "Red Mist Metallic Tintcoat",
             "image_fit": "cover",
@@ -76123,9 +74101,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Red Mist Metallic Tintcoat",
-            "source_description": "Touch-Up Paint Number WA-245F",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
             "image_alt": "Red Mist Metallic Tintcoat",
             "image_fit": "cover",
@@ -76155,9 +74130,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Red Mist Metallic Tintcoat",
-            "source_description": "Touch-Up Paint Number WA-245F",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
             "image_alt": "Red Mist Metallic Tintcoat",
             "image_fit": "cover",
@@ -76187,9 +74159,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Red Mist Metallic Tintcoat",
-            "source_description": "Touch-Up Paint Number WA-245F",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
             "image_alt": "Red Mist Metallic Tintcoat",
             "image_fit": "cover",
@@ -76219,9 +74188,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Red Mist Metallic Tintcoat",
-            "source_description": "Touch-Up Paint Number WA-245F",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png",
             "image_alt": "Red Mist Metallic Tintcoat",
             "image_fit": "cover",
@@ -76251,9 +74217,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Additional charge - premium color.",
-            "source_option_name": "Roswell Green Metallic",
-            "source_description": "Touch-Up Paint Number WA-247L",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
             "image_alt": "Roswell Green Metallic",
             "image_fit": "cover",
@@ -76283,9 +74246,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Additional charge - premium color.",
-            "source_option_name": "Roswell Green Metallic",
-            "source_description": "Touch-Up Paint Number WA-247L",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
             "image_alt": "Roswell Green Metallic",
             "image_fit": "cover",
@@ -76315,9 +74275,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Additional charge - premium color.",
-            "source_option_name": "Roswell Green Metallic",
-            "source_description": "Touch-Up Paint Number WA-247L",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
             "image_alt": "Roswell Green Metallic",
             "image_fit": "cover",
@@ -76347,9 +74304,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Additional charge - premium color.",
-            "source_option_name": "Roswell Green Metallic",
-            "source_description": "Touch-Up Paint Number WA-247L",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
             "image_alt": "Roswell Green Metallic",
             "image_fit": "cover",
@@ -76379,9 +74333,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Additional charge - premium color.",
-            "source_option_name": "Roswell Green Metallic",
-            "source_description": "Touch-Up Paint Number WA-247L",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
             "image_alt": "Roswell Green Metallic",
             "image_fit": "cover",
@@ -76411,9 +74362,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Additional charge - premium color.",
-            "source_option_name": "Roswell Green Metallic",
-            "source_description": "Touch-Up Paint Number WA-247L",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png",
             "image_alt": "Roswell Green Metallic",
             "image_fit": "cover",
@@ -76443,9 +74391,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Sebring Orange Tintcoat",
-            "source_description": "Touch-Up Paint Number WA-418C",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
             "image_alt": "Sebring Orange Tintcoat",
             "image_fit": "cover",
@@ -76475,9 +74420,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Sebring Orange Tintcoat",
-            "source_description": "Touch-Up Paint Number WA-418C",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
             "image_alt": "Sebring Orange Tintcoat",
             "image_fit": "cover",
@@ -76507,9 +74449,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Sebring Orange Tintcoat",
-            "source_description": "Touch-Up Paint Number WA-418C",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
             "image_alt": "Sebring Orange Tintcoat",
             "image_fit": "cover",
@@ -76539,9 +74478,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Sebring Orange Tintcoat",
-            "source_description": "Touch-Up Paint Number WA-418C",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
             "image_alt": "Sebring Orange Tintcoat",
             "image_fit": "cover",
@@ -76571,9 +74507,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Sebring Orange Tintcoat",
-            "source_description": "Touch-Up Paint Number WA-418C",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
             "image_alt": "Sebring Orange Tintcoat",
             "image_fit": "cover",
@@ -76603,9 +74536,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Additional charge - premium tintcoat color.",
-            "source_option_name": "Sebring Orange Tintcoat",
-            "source_description": "Touch-Up Paint Number WA-418C",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png",
             "image_alt": "Sebring Orange Tintcoat",
             "image_fit": "cover",
@@ -76635,9 +74565,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": "",
-            "source_option_name": "Torch Red",
-            "source_description": "Touch-Up Paint Number WA-9075",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
             "image_alt": "Torch Red",
             "image_fit": "cover",
@@ -76667,9 +74594,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": "",
-            "source_option_name": "Torch Red",
-            "source_description": "Touch-Up Paint Number WA-9075",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
             "image_alt": "Torch Red",
             "image_fit": "cover",
@@ -76699,9 +74623,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": "",
-            "source_option_name": "Torch Red",
-            "source_description": "Touch-Up Paint Number WA-9075",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
             "image_alt": "Torch Red",
             "image_fit": "cover",
@@ -76731,9 +74652,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": "",
-            "source_option_name": "Torch Red",
-            "source_description": "Touch-Up Paint Number WA-9075",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
             "image_alt": "Torch Red",
             "image_fit": "cover",
@@ -76763,9 +74681,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": "",
-            "source_option_name": "Torch Red",
-            "source_description": "Touch-Up Paint Number WA-9075",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
             "image_alt": "Torch Red",
             "image_fit": "cover",
@@ -76795,9 +74710,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": "",
-            "source_option_name": "Torch Red",
-            "source_description": "Touch-Up Paint Number WA-9075",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png",
             "image_alt": "Torch Red",
             "image_fit": "cover",
@@ -76826,10 +74738,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Low Rear Spoiler",
-            "source_description": "Standard for wide body. Includes street and track wicker end caps",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_t0e_001",
@@ -76854,10 +74763,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Low Rear Spoiler",
-            "source_description": "Standard for wide body. Includes street and track wicker end caps",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_t0e_001",
@@ -76882,10 +74788,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Low Rear Spoiler",
-            "source_description": "Standard for wide body. Includes street and track wicker end caps",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_t0e_001",
@@ -76910,10 +74813,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Low Rear Spoiler",
-            "source_description": "Standard for wide body. Includes street and track wicker end caps",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_t0e_001",
@@ -76938,10 +74838,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Low Rear Spoiler",
-            "source_description": "Standard for wide body. Includes street and track wicker end caps",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_t0e_001",
@@ -76966,10 +74863,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Low Rear Spoiler",
-            "source_description": "Standard for wide body. Includes street and track wicker end caps",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_t0f_001",
@@ -76994,10 +74888,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 8995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Flash-Painted Carbon Fiber Aero Package",
-            "source_description": "Includes high wing, dive planes and (CFZ) Carbon Flash-painted carbon fiber ground effects",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "2lt_e07__opt_t0f_001",
@@ -77022,10 +74913,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 8995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Flash-Painted Carbon Fiber Aero Package",
-            "source_description": "Includes high wing, dive planes and (CFZ) Carbon Flash-painted carbon fiber ground effects",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "3lt_e07__opt_t0f_001",
@@ -77050,10 +74938,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 8995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Flash-Painted Carbon Fiber Aero Package",
-            "source_description": "Includes high wing, dive planes and (CFZ) Carbon Flash-painted carbon fiber ground effects",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "1lt_e67__opt_t0f_001",
@@ -77078,10 +74963,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 8995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Flash-Painted Carbon Fiber Aero Package",
-            "source_description": "Includes high wing, dive planes and (CFZ) Carbon Flash-painted carbon fiber ground effects",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "2lt_e67__opt_t0f_001",
@@ -77106,10 +74988,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 8995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Flash-Painted Carbon Fiber Aero Package",
-            "source_description": "Includes high wing, dive planes and (CFZ) Carbon Flash-painted carbon fiber ground effects",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "3lt_e67__opt_t0f_001",
@@ -77134,10 +75013,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 8995,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Flash-Painted Carbon Fiber Aero Package",
-            "source_description": "Includes high wing, dive planes and (CFZ) Carbon Flash-painted carbon fiber ground effects",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "1lt_e07__opt_5zv_001",
@@ -77162,10 +75038,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2075,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Flash Metallic Three-Stanchion High Wing Spoiler",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "2lt_e07__opt_5zv_001",
@@ -77190,10 +75063,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2075,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Flash Metallic Three-Stanchion High Wing Spoiler",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "3lt_e07__opt_5zv_001",
@@ -77218,10 +75088,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2075,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Flash Metallic Three-Stanchion High Wing Spoiler",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "1lt_e67__opt_5zv_001",
@@ -77246,10 +75113,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2075,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Flash Metallic Three-Stanchion High Wing Spoiler",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "2lt_e67__opt_5zv_001",
@@ -77274,10 +75138,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2075,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Flash Metallic Three-Stanchion High Wing Spoiler",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "3lt_e67__opt_5zv_001",
@@ -77302,10 +75163,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2075,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Flash Metallic Three-Stanchion High Wing Spoiler",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "1lt_e07__opt_j56_001",
@@ -77330,10 +75188,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "display_only",
             "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "Performance Disc Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
           },
           {
             "choice_id": "2lt_e07__opt_j56_001",
@@ -77358,10 +75213,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "display_only",
             "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "Performance Disc Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
           },
           {
             "choice_id": "3lt_e07__opt_j56_001",
@@ -77386,10 +75238,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "display_only",
             "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "Performance Disc Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
           },
           {
             "choice_id": "1lt_e67__opt_j56_001",
@@ -77414,10 +75263,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "display_only",
             "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "Performance Disc Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
           },
           {
             "choice_id": "2lt_e67__opt_j56_001",
@@ -77442,10 +75288,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "display_only",
             "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "Performance Disc Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
           },
           {
             "choice_id": "3lt_e67__opt_j56_001",
@@ -77470,10 +75313,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "display_only",
             "display_order": 10,
-            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "source_option_name": "Performance Disc Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
           },
           {
             "choice_id": "1lt_e07__opt_jx6_001",
@@ -77498,10 +75338,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Low-Dust Touring Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_jx6_001",
@@ -77526,10 +75363,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Low-Dust Touring Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_jx6_001",
@@ -77554,10 +75388,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Low-Dust Touring Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_jx6_001",
@@ -77582,10 +75413,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Low-Dust Touring Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_jx6_001",
@@ -77610,10 +75438,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Low-Dust Touring Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_jx6_001",
@@ -77638,10 +75463,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "default_selected",
             "display_order": 5,
-            "source_detail_raw": "",
-            "source_option_name": "Low-Dust Touring Brakes",
-            "source_description": "Includes 4-wheel antilock disc, 6-piston front and 4-piston rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_j57_001",
@@ -77666,10 +75488,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 6000,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Ceramic Brakes",
-            "source_description": "Includes 4-wheel antilock disc and Dark Gray Metallic calipers",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "2lt_e07__opt_j57_001",
@@ -77694,10 +75513,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 6000,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Ceramic Brakes",
-            "source_description": "Includes 4-wheel antilock disc and Dark Gray Metallic calipers",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "3lt_e07__opt_j57_001",
@@ -77722,10 +75538,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 6000,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Ceramic Brakes",
-            "source_description": "Includes 4-wheel antilock disc and Dark Gray Metallic calipers",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "1lt_e67__opt_j57_001",
@@ -77750,10 +75563,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 6000,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Ceramic Brakes",
-            "source_description": "Includes 4-wheel antilock disc and Dark Gray Metallic calipers",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "2lt_e67__opt_j57_001",
@@ -77778,10 +75588,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 6000,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Ceramic Brakes",
-            "source_description": "Includes 4-wheel antilock disc and Dark Gray Metallic calipers",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "3lt_e67__opt_j57_001",
@@ -77806,10 +75613,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 6000,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package.",
-            "source_option_name": "Carbon Ceramic Brakes",
-            "source_description": "Includes 4-wheel antilock disc and Dark Gray Metallic calipers",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
           },
           {
             "choice_id": "1lt_e07__opt_cfl_001",
@@ -77834,10 +75638,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (CFV/CFZ) ground effects.",
-            "source_option_name": "Extended Front Splitter, Carbon Flash",
-            "source_description": "New for 2027. Includes modified front splitter only",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (CFV/CFZ) ground effects."
           },
           {
             "choice_id": "2lt_e07__opt_cfl_001",
@@ -77862,10 +75663,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (CFV/CFZ) ground effects.",
-            "source_option_name": "Extended Front Splitter, Carbon Flash",
-            "source_description": "New for 2027. Includes modified front splitter only",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (CFV/CFZ) ground effects."
           },
           {
             "choice_id": "3lt_e07__opt_cfl_001",
@@ -77890,10 +75688,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (CFV/CFZ) ground effects.",
-            "source_option_name": "Extended Front Splitter, Carbon Flash",
-            "source_description": "New for 2027. Includes modified front splitter only",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (CFV/CFZ) ground effects."
           },
           {
             "choice_id": "1lt_e67__opt_cfl_001",
@@ -77918,10 +75713,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (CFV/CFZ) ground effects.",
-            "source_option_name": "Extended Front Splitter, Carbon Flash",
-            "source_description": "New for 2027. Includes modified front splitter only",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (CFV/CFZ) ground effects."
           },
           {
             "choice_id": "2lt_e67__opt_cfl_001",
@@ -77946,10 +75738,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (CFV/CFZ) ground effects.",
-            "source_option_name": "Extended Front Splitter, Carbon Flash",
-            "source_description": "New for 2027. Includes modified front splitter only",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (CFV/CFZ) ground effects."
           },
           {
             "choice_id": "3lt_e67__opt_cfl_001",
@@ -77974,10 +75763,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (CFV/CFZ) ground effects.",
-            "source_option_name": "Extended Front Splitter, Carbon Flash",
-            "source_description": "New for 2027. Includes modified front splitter only",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (CFV/CFZ) ground effects."
           },
           {
             "choice_id": "1lt_e07__opt_cfz_001",
@@ -78002,10 +75788,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3495,
             "display_behavior": "",
             "display_order": 35,
-            "source_detail_raw": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package.",
-            "source_option_name": "Carbon Flash Carbon Fiber Ground Effects",
-            "source_description": "Includes aggressive front splitter and side rockers painted Carbon Flash",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package."
           },
           {
             "choice_id": "2lt_e07__opt_cfz_001",
@@ -78030,10 +75813,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3495,
             "display_behavior": "",
             "display_order": 35,
-            "source_detail_raw": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package.",
-            "source_option_name": "Carbon Flash Carbon Fiber Ground Effects",
-            "source_description": "Includes aggressive front splitter and side rockers painted Carbon Flash",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package."
           },
           {
             "choice_id": "3lt_e07__opt_cfz_001",
@@ -78058,10 +75838,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3495,
             "display_behavior": "",
             "display_order": 35,
-            "source_detail_raw": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package.",
-            "source_option_name": "Carbon Flash Carbon Fiber Ground Effects",
-            "source_description": "Includes aggressive front splitter and side rockers painted Carbon Flash",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package."
           },
           {
             "choice_id": "1lt_e67__opt_cfz_001",
@@ -78086,10 +75863,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3495,
             "display_behavior": "",
             "display_order": 35,
-            "source_detail_raw": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package.",
-            "source_option_name": "Carbon Flash Carbon Fiber Ground Effects",
-            "source_description": "Includes aggressive front splitter and side rockers painted Carbon Flash",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package."
           },
           {
             "choice_id": "2lt_e67__opt_cfz_001",
@@ -78114,10 +75888,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3495,
             "display_behavior": "",
             "display_order": 35,
-            "source_detail_raw": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package.",
-            "source_option_name": "Carbon Flash Carbon Fiber Ground Effects",
-            "source_description": "Includes aggressive front splitter and side rockers painted Carbon Flash",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package."
           },
           {
             "choice_id": "3lt_e67__opt_cfz_001",
@@ -78142,10 +75913,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3495,
             "display_behavior": "",
             "display_order": 35,
-            "source_detail_raw": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package.",
-            "source_option_name": "Carbon Flash Carbon Fiber Ground Effects",
-            "source_description": "Includes aggressive front splitter and side rockers painted Carbon Flash",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package."
           },
           {
             "choice_id": "1lt_e07__opt_eri_001",
@@ -78170,10 +75938,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 100,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Battery Protection Package",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_eri_001",
@@ -78198,10 +75963,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 100,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Battery Protection Package",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_eri_001",
@@ -78226,10 +75988,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 100,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Battery Protection Package",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_eri_001",
@@ -78254,10 +76013,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 100,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Battery Protection Package",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_eri_001",
@@ -78282,10 +76038,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 100,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Battery Protection Package",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_eri_001",
@@ -78310,10 +76063,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 100,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Battery Protection Package",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_e60_001",
@@ -78338,10 +76088,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2995,
             "display_behavior": "",
             "display_order": 15,
-            "source_detail_raw": "",
-            "source_option_name": "Front Lift Adjustable Height",
-            "source_description": "With memory. Includes (TR7) automatic headlamp leveling system",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_e60_001",
@@ -78366,10 +76113,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2995,
             "display_behavior": "",
             "display_order": 15,
-            "source_detail_raw": "",
-            "source_option_name": "Front Lift Adjustable Height",
-            "source_description": "With memory. Includes (TR7) automatic headlamp leveling system",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_e60_001",
@@ -78394,10 +76138,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2995,
             "display_behavior": "",
             "display_order": 15,
-            "source_detail_raw": "",
-            "source_option_name": "Front Lift Adjustable Height",
-            "source_description": "With memory. Includes (TR7) automatic headlamp leveling system",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_e60_001",
@@ -78422,10 +76163,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2995,
             "display_behavior": "",
             "display_order": 15,
-            "source_detail_raw": "",
-            "source_option_name": "Front Lift Adjustable Height",
-            "source_description": "With memory. Includes (TR7) automatic headlamp leveling system",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_e60_001",
@@ -78450,10 +76188,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2995,
             "display_behavior": "",
             "display_order": 15,
-            "source_detail_raw": "",
-            "source_option_name": "Front Lift Adjustable Height",
-            "source_description": "With memory. Includes (TR7) automatic headlamp leveling system",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_e60_001",
@@ -78478,10 +76213,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2995,
             "display_behavior": "",
             "display_order": 15,
-            "source_detail_raw": "",
-            "source_option_name": "Front Lift Adjustable Height",
-            "source_description": "With memory. Includes (TR7) automatic headlamp leveling system",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_feb_001",
@@ -78506,10 +76238,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3500,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Z52 Sport Performance Package",
-            "source_description": "Includes (J56) 6-piston front and 4-piston rear performance brakes and (XFR) 275/30ZR20 front and 345/25ZR21 rear, summer only, high performance tires",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_feb_001",
@@ -78534,10 +76263,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3500,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Z52 Sport Performance Package",
-            "source_description": "Includes (J56) 6-piston front and 4-piston rear performance brakes and (XFR) 275/30ZR20 front and 345/25ZR21 rear, summer only, high performance tires",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_feb_001",
@@ -78562,10 +76288,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3500,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Z52 Sport Performance Package",
-            "source_description": "Includes (J56) 6-piston front and 4-piston rear performance brakes and (XFR) 275/30ZR20 front and 345/25ZR21 rear, summer only, high performance tires",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_feb_001",
@@ -78590,10 +76313,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3500,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Z52 Sport Performance Package",
-            "source_description": "Includes (J56) 6-piston front and 4-piston rear performance brakes and (XFR) 275/30ZR20 front and 345/25ZR21 rear, summer only, high performance tires",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_feb_001",
@@ -78618,10 +76338,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3500,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Z52 Sport Performance Package",
-            "source_description": "Includes (J56) 6-piston front and 4-piston rear performance brakes and (XFR) 275/30ZR20 front and 345/25ZR21 rear, summer only, high performance tires",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_feb_001",
@@ -78646,10 +76363,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3500,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Z52 Sport Performance Package",
-            "source_description": "Includes (J56) 6-piston front and 4-piston rear performance brakes and (XFR) 275/30ZR20 front and 345/25ZR21 rear, summer only, high performance tires",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_fey_001",
@@ -78674,10 +76388,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 20695,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Z52 Track Performance Package",
-            "source_description": "Includes (J57) carbon ceramic brakes with (J6D) Dark Gray Metallic-painted calipers, (XFS) 275/30ZR20 front and 345/25ZR21 rear, blackwall, Michelin Pilot Sport Cup 2 R ultra performance tires, (WUB) quad center exit exhaust, and (T0F) Carbon Flash-painted Carbon Fiber Aero Package with (CFZ) Carbon Flash-painted carbon fiber ground effects",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_fey_001",
@@ -78702,10 +76413,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 20695,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Z52 Track Performance Package",
-            "source_description": "Includes (J57) carbon ceramic brakes with (J6D) Dark Gray Metallic-painted calipers, (XFS) 275/30ZR20 front and 345/25ZR21 rear, blackwall, Michelin Pilot Sport Cup 2 R ultra performance tires, (WUB) quad center exit exhaust, and (T0F) Carbon Flash-painted Carbon Fiber Aero Package with (CFZ) Carbon Flash-painted carbon fiber ground effects",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_fey_001",
@@ -78730,10 +76438,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 20695,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Z52 Track Performance Package",
-            "source_description": "Includes (J57) carbon ceramic brakes with (J6D) Dark Gray Metallic-painted calipers, (XFS) 275/30ZR20 front and 345/25ZR21 rear, blackwall, Michelin Pilot Sport Cup 2 R ultra performance tires, (WUB) quad center exit exhaust, and (T0F) Carbon Flash-painted Carbon Fiber Aero Package with (CFZ) Carbon Flash-painted carbon fiber ground effects",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_fey_001",
@@ -78758,10 +76463,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 20695,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Z52 Track Performance Package",
-            "source_description": "Includes (J57) carbon ceramic brakes with (J6D) Dark Gray Metallic-painted calipers, (XFS) 275/30ZR20 front and 345/25ZR21 rear, blackwall, Michelin Pilot Sport Cup 2 R ultra performance tires, (WUB) quad center exit exhaust, and (T0F) Carbon Flash-painted Carbon Fiber Aero Package with (CFZ) Carbon Flash-painted carbon fiber ground effects",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_fey_001",
@@ -78786,10 +76488,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 20695,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Z52 Track Performance Package",
-            "source_description": "Includes (J57) carbon ceramic brakes with (J6D) Dark Gray Metallic-painted calipers, (XFS) 275/30ZR20 front and 345/25ZR21 rear, blackwall, Michelin Pilot Sport Cup 2 R ultra performance tires, (WUB) quad center exit exhaust, and (T0F) Carbon Flash-painted Carbon Fiber Aero Package with (CFZ) Carbon Flash-painted carbon fiber ground effects",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_fey_001",
@@ -78814,10 +76513,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 20695,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Z52 Track Performance Package",
-            "source_description": "Includes (J57) carbon ceramic brakes with (J6D) Dark Gray Metallic-painted calipers, (XFS) 275/30ZR20 front and 345/25ZR21 rear, blackwall, Michelin Pilot Sport Cup 2 R ultra performance tires, (WUB) quad center exit exhaust, and (T0F) Carbon Flash-painted Carbon Fiber Aero Package with (CFZ) Carbon Flash-painted carbon fiber ground effects",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_cf7_001",
@@ -78842,10 +76538,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Body-Color Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_cf7_001",
@@ -78870,10 +76563,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Body-Color Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_cf7_001",
@@ -78898,10 +76588,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Body-Color Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_cf7_001",
@@ -78926,10 +76613,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Body-Color Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_cf7_001",
@@ -78954,10 +76638,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Body-Color Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_cf7_001",
@@ -78982,10 +76663,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Body-Color Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_cm9_001",
@@ -79010,10 +76688,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Body-Color Power Convertible Hardtop",
-            "source_description": "Retractable with remote control (down only), includes power glass rear window with integral defogger",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_cm9_001",
@@ -79038,10 +76713,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Body-Color Power Convertible Hardtop",
-            "source_description": "Retractable with remote control (down only), includes power glass rear window with integral defogger",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_cm9_001",
@@ -79066,10 +76738,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Body-Color Power Convertible Hardtop",
-            "source_description": "Retractable with remote control (down only), includes power glass rear window with integral defogger",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_cm9_001",
@@ -79094,10 +76763,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Body-Color Power Convertible Hardtop",
-            "source_description": "Retractable with remote control (down only), includes power glass rear window with integral defogger",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_cm9_001",
@@ -79122,10 +76788,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Body-Color Power Convertible Hardtop",
-            "source_description": "Retractable with remote control (down only), includes power glass rear window with integral defogger",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_cm9_001",
@@ -79150,10 +76813,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Body-Color Power Convertible Hardtop",
-            "source_description": "Retractable with remote control (down only), includes power glass rear window with integral defogger",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_c2z_001",
@@ -79178,10 +76838,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2595,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Roof Panel",
-            "source_description": "Removable with body-color surround",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_c2z_001",
@@ -79206,10 +76863,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2595,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Roof Panel",
-            "source_description": "Removable with body-color surround",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_c2z_001",
@@ -79234,10 +76888,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2595,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Roof Panel",
-            "source_description": "Removable with body-color surround",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_c2z_001",
@@ -79262,10 +76913,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2595,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Roof Panel",
-            "source_description": "Removable with body-color surround",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_c2z_001",
@@ -79290,10 +76938,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2595,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Roof Panel",
-            "source_description": "Removable with body-color surround",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_c2z_001",
@@ -79318,10 +76963,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 2595,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Visible Carbon Fiber Roof Panel",
-            "source_description": "Removable with body-color surround",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_cc3_001",
@@ -79346,10 +76988,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Transparent Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_cc3_001",
@@ -79374,10 +77013,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Transparent Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_cc3_001",
@@ -79402,10 +77038,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Transparent Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_cc3_001",
@@ -79430,10 +77063,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Transparent Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_cc3_001",
@@ -79458,10 +77088,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Transparent Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_cc3_001",
@@ -79486,10 +77113,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Transparent Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_cf8_001",
@@ -79514,10 +77138,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3500,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Electrochromic Dimming Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "2lt_e07__opt_cf8_001",
@@ -79542,10 +77163,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3500,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Electrochromic Dimming Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "3lt_e07__opt_cf8_001",
@@ -79570,10 +77188,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3500,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Electrochromic Dimming Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "1lt_e67__opt_cf8_001",
@@ -79598,10 +77213,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3500,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Electrochromic Dimming Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "2lt_e67__opt_cf8_001",
@@ -79626,10 +77238,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3500,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Electrochromic Dimming Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "3lt_e67__opt_cf8_001",
@@ -79654,10 +77263,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 3500,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-            "source_option_name": "Electrochromic Dimming Roof Panel",
-            "source_description": "Removable",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
           },
           {
             "choice_id": "1lt_e07__opt_d84_001",
@@ -79682,10 +77288,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Carbon Flash Convertible Top",
-            "source_description": "Painted nacelles and roof",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "2lt_e07__opt_d84_001",
@@ -79710,10 +77313,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Carbon Flash Convertible Top",
-            "source_description": "Painted nacelles and roof",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "3lt_e07__opt_d84_001",
@@ -79738,10 +77338,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Carbon Flash Convertible Top",
-            "source_description": "Painted nacelles and roof",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "1lt_e67__opt_d84_001",
@@ -79766,10 +77363,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Carbon Flash Convertible Top",
-            "source_description": "Painted nacelles and roof",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "2lt_e67__opt_d84_001",
@@ -79794,10 +77388,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Carbon Flash Convertible Top",
-            "source_description": "Painted nacelles and roof",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "3lt_e67__opt_d84_001",
@@ -79822,10 +77413,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Carbon Flash Convertible Top",
-            "source_description": "Painted nacelles and roof",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "1lt_e07__opt_d86_001",
@@ -79850,10 +77438,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Body-Color Roof, Carbon Flash-painted Nacelles",
-            "source_description": "Retractable convertible hardtop",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "2lt_e07__opt_d86_001",
@@ -79878,10 +77463,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Body-Color Roof, Carbon Flash-painted Nacelles",
-            "source_description": "Retractable convertible hardtop",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "3lt_e07__opt_d86_001",
@@ -79906,10 +77488,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Body-Color Roof, Carbon Flash-painted Nacelles",
-            "source_description": "Retractable convertible hardtop",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "1lt_e67__opt_d86_001",
@@ -79934,10 +77513,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Body-Color Roof, Carbon Flash-painted Nacelles",
-            "source_description": "Retractable convertible hardtop",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "2lt_e67__opt_d86_001",
@@ -79962,10 +77538,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Body-Color Roof, Carbon Flash-painted Nacelles",
-            "source_description": "Retractable convertible hardtop",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "3lt_e67__opt_d86_001",
@@ -79990,10 +77563,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Not available with exterior color (GBA) Black.",
-            "source_option_name": "Body-Color Roof, Carbon Flash-painted Nacelles",
-            "source_description": "Retractable convertible hardtop",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBA) Black."
           },
           {
             "choice_id": "1lt_e07__opt_aj7_001",
@@ -80018,10 +77588,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Always use seat belts and child restraints. Never place an infant or child restraint seat in the front seat, even if the airbag is off. See the Owner's Manual for more information.",
-            "source_option_name": "Frontal and Side-Impact Airbags",
-            "source_description": "Driver and passenger with Passenger Sensing System",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Always use seat belts and child restraints. Never place an infant or child restraint seat in the front seat, even if the airbag is off. See the Owner's Manual for more information."
           },
           {
             "choice_id": "2lt_e07__opt_aj7_001",
@@ -80046,10 +77613,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Always use seat belts and child restraints. Never place an infant or child restraint seat in the front seat, even if the airbag is off. See the Owner's Manual for more information.",
-            "source_option_name": "Frontal and Side-Impact Airbags",
-            "source_description": "Driver and passenger with Passenger Sensing System",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Always use seat belts and child restraints. Never place an infant or child restraint seat in the front seat, even if the airbag is off. See the Owner's Manual for more information."
           },
           {
             "choice_id": "3lt_e07__opt_aj7_001",
@@ -80074,10 +77638,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Always use seat belts and child restraints. Never place an infant or child restraint seat in the front seat, even if the airbag is off. See the Owner's Manual for more information.",
-            "source_option_name": "Frontal and Side-Impact Airbags",
-            "source_description": "Driver and passenger with Passenger Sensing System",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Always use seat belts and child restraints. Never place an infant or child restraint seat in the front seat, even if the airbag is off. See the Owner's Manual for more information."
           },
           {
             "choice_id": "1lt_e67__opt_aj7_001",
@@ -80102,10 +77663,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Always use seat belts and child restraints. Never place an infant or child restraint seat in the front seat, even if the airbag is off. See the Owner's Manual for more information.",
-            "source_option_name": "Frontal and Side-Impact Airbags",
-            "source_description": "Driver and passenger with Passenger Sensing System",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Always use seat belts and child restraints. Never place an infant or child restraint seat in the front seat, even if the airbag is off. See the Owner's Manual for more information."
           },
           {
             "choice_id": "2lt_e67__opt_aj7_001",
@@ -80130,10 +77688,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Always use seat belts and child restraints. Never place an infant or child restraint seat in the front seat, even if the airbag is off. See the Owner's Manual for more information.",
-            "source_option_name": "Frontal and Side-Impact Airbags",
-            "source_description": "Driver and passenger with Passenger Sensing System",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Always use seat belts and child restraints. Never place an infant or child restraint seat in the front seat, even if the airbag is off. See the Owner's Manual for more information."
           },
           {
             "choice_id": "3lt_e67__opt_aj7_001",
@@ -80158,10 +77713,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Always use seat belts and child restraints. Never place an infant or child restraint seat in the front seat, even if the airbag is off. See the Owner's Manual for more information.",
-            "source_option_name": "Frontal and Side-Impact Airbags",
-            "source_description": "Driver and passenger with Passenger Sensing System",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Always use seat belts and child restraints. Never place an infant or child restraint seat in the front seat, even if the airbag is off. See the Owner's Manual for more information."
           },
           {
             "choice_id": "1lt_e07__opt_uhy_001",
@@ -80186,10 +77738,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Automatic Emergency Braking",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_uhy_001",
@@ -80214,10 +77763,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Automatic Emergency Braking",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_uhy_001",
@@ -80242,10 +77788,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Automatic Emergency Braking",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_uhy_001",
@@ -80270,10 +77813,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Automatic Emergency Braking",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_uhy_001",
@@ -80298,10 +77838,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Automatic Emergency Braking",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_uhy_001",
@@ -80326,10 +77863,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Automatic Emergency Braking",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_ueu_001",
@@ -80354,10 +77888,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Forward Collision Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_ueu_001",
@@ -80382,10 +77913,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Forward Collision Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_ueu_001",
@@ -80410,10 +77938,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Forward Collision Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_ueu_001",
@@ -80438,10 +77963,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Forward Collision Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_ueu_001",
@@ -80466,10 +77988,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Forward Collision Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_ueu_001",
@@ -80494,10 +78013,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Forward Collision Alert",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_ukt_001",
@@ -80522,10 +78038,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Front Pedestrian and Bicyclist Braking",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_ukt_001",
@@ -80550,10 +78063,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Front Pedestrian and Bicyclist Braking",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_ukt_001",
@@ -80578,10 +78088,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Front Pedestrian and Bicyclist Braking",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_ukt_001",
@@ -80606,10 +78113,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Front Pedestrian and Bicyclist Braking",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_ukt_001",
@@ -80634,10 +78138,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Front Pedestrian and Bicyclist Braking",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_ukt_001",
@@ -80662,10 +78163,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "Front Pedestrian and Bicyclist Braking",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_tq5_001",
@@ -80690,10 +78188,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "IntelliBeam Auto High Beam",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_tq5_001",
@@ -80718,10 +78213,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "IntelliBeam Auto High Beam",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_tq5_001",
@@ -80746,10 +78238,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "IntelliBeam Auto High Beam",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_tq5_001",
@@ -80774,10 +78263,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "IntelliBeam Auto High Beam",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_tq5_001",
@@ -80802,10 +78288,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "IntelliBeam Auto High Beam",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_tq5_001",
@@ -80830,10 +78313,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "IntelliBeam Auto High Beam",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_uhx_001",
@@ -80858,10 +78338,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Lane Keep Assist",
-            "source_description": "With Lane Departure Warning",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_uhx_001",
@@ -80886,10 +78363,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Lane Keep Assist",
-            "source_description": "With Lane Departure Warning",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_uhx_001",
@@ -80914,10 +78388,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Lane Keep Assist",
-            "source_description": "With Lane Departure Warning",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_uhx_001",
@@ -80942,10 +78413,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Lane Keep Assist",
-            "source_description": "With Lane Departure Warning",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_uhx_001",
@@ -80970,10 +78438,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Lane Keep Assist",
-            "source_description": "With Lane Departure Warning",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_uhx_001",
@@ -80998,10 +78463,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Lane Keep Assist",
-            "source_description": "With Lane Departure Warning",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_drz_001",
@@ -81026,10 +78488,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Auto-Dimming Rear Camera Mirror",
-            "source_description": "Inside rearview with full camera display",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_drz_001",
@@ -81054,10 +78513,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Auto-Dimming Rear Camera Mirror",
-            "source_description": "Inside rearview with full camera display",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_drz_001",
@@ -81082,10 +78538,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Auto-Dimming Rear Camera Mirror",
-            "source_description": "Inside rearview with full camera display",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_drz_001",
@@ -81110,10 +78563,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Auto-Dimming Rear Camera Mirror",
-            "source_description": "Inside rearview with full camera display",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_drz_001",
@@ -81138,10 +78588,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Auto-Dimming Rear Camera Mirror",
-            "source_description": "Inside rearview with full camera display",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_drz_001",
@@ -81166,10 +78613,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Auto-Dimming Rear Camera Mirror",
-            "source_description": "Inside rearview with full camera display",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_ud7_001",
@@ -81194,10 +78638,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Park Assist",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_ud7_001",
@@ -81222,10 +78663,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Park Assist",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_ud7_001",
@@ -81250,10 +78688,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Park Assist",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_ud7_001",
@@ -81278,10 +78713,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Park Assist",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_ud7_001",
@@ -81306,10 +78738,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Park Assist",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_ud7_001",
@@ -81334,10 +78763,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Park Assist",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_tdm_001",
@@ -81362,10 +78788,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Teen Driver",
-            "source_description": "A configurable feature that lets you activate customizable vehicle settings associated with a key fob, to help encourage safe driving behavior. It can limit certain available vehicle features, and it prevents certain safety systems from being turned off. An in-vehicle report card gives you information on driving habits and helps you to continue to coach your new driver",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_tdm_001",
@@ -81390,10 +78813,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Teen Driver",
-            "source_description": "A configurable feature that lets you activate customizable vehicle settings associated with a key fob, to help encourage safe driving behavior. It can limit certain available vehicle features, and it prevents certain safety systems from being turned off. An in-vehicle report card gives you information on driving habits and helps you to continue to coach your new driver",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_tdm_001",
@@ -81418,10 +78838,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Teen Driver",
-            "source_description": "A configurable feature that lets you activate customizable vehicle settings associated with a key fob, to help encourage safe driving behavior. It can limit certain available vehicle features, and it prevents certain safety systems from being turned off. An in-vehicle report card gives you information on driving habits and helps you to continue to coach your new driver",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_tdm_001",
@@ -81446,10 +78863,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Teen Driver",
-            "source_description": "A configurable feature that lets you activate customizable vehicle settings associated with a key fob, to help encourage safe driving behavior. It can limit certain available vehicle features, and it prevents certain safety systems from being turned off. An in-vehicle report card gives you information on driving habits and helps you to continue to coach your new driver",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_tdm_001",
@@ -81474,10 +78888,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Teen Driver",
-            "source_description": "A configurable feature that lets you activate customizable vehicle settings associated with a key fob, to help encourage safe driving behavior. It can limit certain available vehicle features, and it prevents certain safety systems from being turned off. An in-vehicle report card gives you information on driving habits and helps you to continue to coach your new driver",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_tdm_001",
@@ -81502,10 +78913,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Teen Driver",
-            "source_description": "A configurable feature that lets you activate customizable vehicle settings associated with a key fob, to help encourage safe driving behavior. It can limit certain available vehicle features, and it prevents certain safety systems from being turned off. An in-vehicle report card gives you information on driving habits and helps you to continue to coach your new driver",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_012",
@@ -81530,10 +78938,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Theft-Deterrent System",
-            "source_description": "Push button start, immobilizer and audible visual alarm",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_012",
@@ -81558,10 +78963,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Theft-Deterrent System",
-            "source_description": "Push button start, immobilizer and audible visual alarm",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_012",
@@ -81586,10 +78988,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Theft-Deterrent System",
-            "source_description": "Push button start, immobilizer and audible visual alarm",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_012",
@@ -81614,10 +79013,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Theft-Deterrent System",
-            "source_description": "Push button start, immobilizer and audible visual alarm",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_012",
@@ -81642,10 +79038,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Theft-Deterrent System",
-            "source_description": "Push button start, immobilizer and audible visual alarm",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_012",
@@ -81670,10 +79063,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Theft-Deterrent System",
-            "source_description": "Push button start, immobilizer and audible visual alarm",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_019",
@@ -81698,10 +79088,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "Active Handling Stability Control",
-            "source_description": "Improves traction and enhances vehicle stability",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_019",
@@ -81726,10 +79113,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "Active Handling Stability Control",
-            "source_description": "Improves traction and enhances vehicle stability",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_019",
@@ -81754,10 +79138,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "Active Handling Stability Control",
-            "source_description": "Improves traction and enhances vehicle stability",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_019",
@@ -81782,10 +79163,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "Active Handling Stability Control",
-            "source_description": "Improves traction and enhances vehicle stability",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_019",
@@ -81810,10 +79188,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "Active Handling Stability Control",
-            "source_description": "Improves traction and enhances vehicle stability",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_019",
@@ -81838,10 +79213,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "Active Handling Stability Control",
-            "source_description": "Improves traction and enhances vehicle stability",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_020",
@@ -81866,10 +79238,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Intersection Automatic Emergency Braking",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_020",
@@ -81894,10 +79263,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Intersection Automatic Emergency Braking",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_020",
@@ -81922,10 +79288,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Intersection Automatic Emergency Braking",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_020",
@@ -81950,10 +79313,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Intersection Automatic Emergency Braking",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_020",
@@ -81978,10 +79338,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Intersection Automatic Emergency Braking",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_020",
@@ -82006,10 +79363,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Intersection Automatic Emergency Braking",
-            "source_description": "New for 2027.",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_025",
@@ -82034,10 +79388,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "All-Speed Traction Control",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_025",
@@ -82062,10 +79413,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "All-Speed Traction Control",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_025",
@@ -82090,10 +79438,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "All-Speed Traction Control",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_025",
@@ -82118,10 +79463,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "All-Speed Traction Control",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_025",
@@ -82146,10 +79488,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "All-Speed Traction Control",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_025",
@@ -82174,10 +79513,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "All-Speed Traction Control",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_719_001",
@@ -82203,9 +79539,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
-            "source_option_name": "Black Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
             "image_alt": "Black Seat Belt Color",
             "image_fit": "cover",
@@ -82235,9 +79568,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
-            "source_option_name": "Black Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
             "image_alt": "Black Seat Belt Color",
             "image_fit": "cover",
@@ -82267,9 +79597,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
-            "source_option_name": "Black Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
             "image_alt": "Black Seat Belt Color",
             "image_fit": "cover",
@@ -82299,9 +79626,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
-            "source_option_name": "Black Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
             "image_alt": "Black Seat Belt Color",
             "image_fit": "cover",
@@ -82331,9 +79655,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
-            "source_option_name": "Black Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
             "image_alt": "Black Seat Belt Color",
             "image_fit": "cover",
@@ -82363,9 +79684,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
-            "source_option_name": "Black Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
             "image_alt": "Black Seat Belt Color",
             "image_fit": "cover",
@@ -82395,9 +79713,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "1. Recommended with (HTA, HTJ) Jet Black interior.\n2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\n3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
-            "source_option_name": "Natural Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
             "image_alt": "Natural Seat Belt Color",
             "image_fit": "cover",
@@ -82427,9 +79742,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "1. Recommended with (HTA, HTJ) Jet Black interior.\n2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\n3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
-            "source_option_name": "Natural Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
             "image_alt": "Natural Seat Belt Color",
             "image_fit": "cover",
@@ -82459,9 +79771,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "1. Recommended with (HTA, HTJ) Jet Black interior.\n2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\n3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
-            "source_option_name": "Natural Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
             "image_alt": "Natural Seat Belt Color",
             "image_fit": "cover",
@@ -82491,9 +79800,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "1. Recommended with (HTA, HTJ) Jet Black interior.\n2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\n3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
-            "source_option_name": "Natural Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
             "image_alt": "Natural Seat Belt Color",
             "image_fit": "cover",
@@ -82523,9 +79829,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "1. Recommended with (HTA, HTJ) Jet Black interior.\n2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\n3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
-            "source_option_name": "Natural Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
             "image_alt": "Natural Seat Belt Color",
             "image_fit": "cover",
@@ -82555,9 +79858,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "1. Recommended with (HTA, HTJ) Jet Black interior.\n2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\n3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
-            "source_option_name": "Natural Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
             "image_alt": "Natural Seat Belt Color",
             "image_fit": "cover",
@@ -82587,9 +79887,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior. Included with (HUW, HUX) Habanero interiors.",
-            "source_option_name": "Orange Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
             "image_alt": "Orange Seat Belt Color",
             "image_fit": "cover",
@@ -82619,9 +79916,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior. Included with (HUW, HUX) Habanero interiors.",
-            "source_option_name": "Orange Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
             "image_alt": "Orange Seat Belt Color",
             "image_fit": "cover",
@@ -82651,9 +79945,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior. Included with (HUW, HUX) Habanero interiors.",
-            "source_option_name": "Orange Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
             "image_alt": "Orange Seat Belt Color",
             "image_fit": "cover",
@@ -82683,9 +79974,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior. Included with (HUW, HUX) Habanero interiors.",
-            "source_option_name": "Orange Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
             "image_alt": "Orange Seat Belt Color",
             "image_fit": "cover",
@@ -82715,9 +80003,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior. Included with (HUW, HUX) Habanero interiors.",
-            "source_option_name": "Orange Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
             "image_alt": "Orange Seat Belt Color",
             "image_fit": "cover",
@@ -82747,9 +80032,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior. Included with (HUW, HUX) Habanero interiors.",
-            "source_option_name": "Orange Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
             "image_alt": "Orange Seat Belt Color",
             "image_fit": "cover",
@@ -82779,9 +80061,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "source_option_name": "Santorini Blue Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
             "image_alt": "Santorini Blue Seat Belt Color",
             "image_fit": "cover",
@@ -82811,9 +80090,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "source_option_name": "Santorini Blue Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
             "image_alt": "Santorini Blue Seat Belt Color",
             "image_fit": "cover",
@@ -82843,9 +80119,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "source_option_name": "Santorini Blue Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
             "image_alt": "Santorini Blue Seat Belt Color",
             "image_fit": "cover",
@@ -82875,9 +80148,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "source_option_name": "Santorini Blue Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
             "image_alt": "Santorini Blue Seat Belt Color",
             "image_fit": "cover",
@@ -82907,9 +80177,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "source_option_name": "Santorini Blue Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
             "image_alt": "Santorini Blue Seat Belt Color",
             "image_fit": "cover",
@@ -82939,9 +80206,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "source_option_name": "Santorini Blue Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
             "image_alt": "Santorini Blue Seat Belt Color",
             "image_fit": "cover",
@@ -82971,9 +80235,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
-            "source_option_name": "Torch Red Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
             "image_alt": "Torch Red Seat Belt Color",
             "image_fit": "cover",
@@ -83003,9 +80264,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
-            "source_option_name": "Torch Red Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
             "image_alt": "Torch Red Seat Belt Color",
             "image_fit": "cover",
@@ -83035,9 +80293,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
-            "source_option_name": "Torch Red Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
             "image_alt": "Torch Red Seat Belt Color",
             "image_fit": "cover",
@@ -83067,9 +80322,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
-            "source_option_name": "Torch Red Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
             "image_alt": "Torch Red Seat Belt Color",
             "image_fit": "cover",
@@ -83099,9 +80351,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
-            "source_option_name": "Torch Red Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
             "image_alt": "Torch Red Seat Belt Color",
             "image_fit": "cover",
@@ -83131,9 +80380,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
-            "source_option_name": "Torch Red Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
             "image_alt": "Torch Red Seat Belt Color",
             "image_fit": "cover",
@@ -83163,9 +80409,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior.",
-            "source_option_name": "Yellow Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
             "image_alt": "Yellow Seat Belt Color",
             "image_fit": "cover",
@@ -83195,9 +80438,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior.",
-            "source_option_name": "Yellow Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
             "image_alt": "Yellow Seat Belt Color",
             "image_fit": "cover",
@@ -83227,9 +80467,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior.",
-            "source_option_name": "Yellow Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
             "image_alt": "Yellow Seat Belt Color",
             "image_fit": "cover",
@@ -83259,9 +80496,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior.",
-            "source_option_name": "Yellow Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
             "image_alt": "Yellow Seat Belt Color",
             "image_fit": "cover",
@@ -83291,9 +80525,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior.",
-            "source_option_name": "Yellow Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
             "image_alt": "Yellow Seat Belt Color",
             "image_fit": "cover",
@@ -83323,9 +80554,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior.",
-            "source_option_name": "Yellow Seat Belt Color",
-            "source_description": "",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
             "image_alt": "Yellow Seat Belt Color",
             "image_fit": "cover",
@@ -83354,10 +80582,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "Not Available with 3LT",
-            "source_option_name": "GT1 Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Not Available with 3LT"
           },
           {
             "choice_id": "2lt_e07__opt_aq9_001",
@@ -83382,10 +80607,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "Not Available with 3LT",
-            "source_option_name": "GT1 Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Not Available with 3LT"
           },
           {
             "choice_id": "3lt_e07__opt_aq9_001",
@@ -83410,10 +80632,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "Not Available with 3LT",
-            "source_option_name": "GT1 Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Not Available with 3LT"
           },
           {
             "choice_id": "1lt_e67__opt_aq9_001",
@@ -83438,10 +80657,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "Not Available with 3LT",
-            "source_option_name": "GT1 Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Not Available with 3LT"
           },
           {
             "choice_id": "2lt_e67__opt_aq9_001",
@@ -83466,10 +80682,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "Not Available with 3LT",
-            "source_option_name": "GT1 Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Not Available with 3LT"
           },
           {
             "choice_id": "3lt_e67__opt_aq9_001",
@@ -83494,10 +80707,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "Not Available with 3LT",
-            "source_option_name": "GT1 Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Not Available with 3LT"
           },
           {
             "choice_id": "1lt_e07__opt_ah2_001",
@@ -83522,10 +80732,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "Not Available with 1LT",
-            "source_option_name": "GT2 Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Not Available with 1LT"
           },
           {
             "choice_id": "2lt_e07__opt_ah2_001",
@@ -83550,10 +80757,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "Not Available with 1LT",
-            "source_option_name": "GT2 Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Not Available with 1LT"
           },
           {
             "choice_id": "3lt_e07__opt_ah2_001",
@@ -83578,10 +80782,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "Not Available with 1LT",
-            "source_option_name": "GT2 Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Not Available with 1LT"
           },
           {
             "choice_id": "1lt_e67__opt_ah2_001",
@@ -83606,10 +80807,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "Not Available with 1LT",
-            "source_option_name": "GT2 Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Not Available with 1LT"
           },
           {
             "choice_id": "2lt_e67__opt_ah2_001",
@@ -83634,10 +80832,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "Not Available with 1LT",
-            "source_option_name": "GT2 Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Not Available with 1LT"
           },
           {
             "choice_id": "3lt_e67__opt_ah2_001",
@@ -83662,10 +80857,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 25,
-            "source_detail_raw": "Not Available with 1LT",
-            "source_option_name": "GT2 Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Not Available with 1LT"
           },
           {
             "choice_id": "1lt_e07__opt_ae4_002",
@@ -83690,10 +80882,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1095,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "Available on all trim levels",
-            "source_option_name": "Competition Sport Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Available on all trim levels"
           },
           {
             "choice_id": "2lt_e07__opt_ae4_002",
@@ -83718,10 +80907,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1095,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "Available on all trim levels",
-            "source_option_name": "Competition Sport Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Available on all trim levels"
           },
           {
             "choice_id": "3lt_e07__opt_ae4_002",
@@ -83746,10 +80932,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1095,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "Available on all trim levels",
-            "source_option_name": "Competition Sport Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Available on all trim levels"
           },
           {
             "choice_id": "1lt_e67__opt_ae4_002",
@@ -83774,10 +80957,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1095,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "Available on all trim levels",
-            "source_option_name": "Competition Sport Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Available on all trim levels"
           },
           {
             "choice_id": "2lt_e67__opt_ae4_002",
@@ -83802,10 +80982,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1095,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "Available on all trim levels",
-            "source_option_name": "Competition Sport Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Available on all trim levels"
           },
           {
             "choice_id": "3lt_e67__opt_ae4_002",
@@ -83830,10 +81007,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1095,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "Available on all trim levels",
-            "source_option_name": "Competition Sport Bucket Seats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "Available on all trim levels"
           },
           {
             "choice_id": "1lt_e07__opt_aup_001",
@@ -83858,10 +81032,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 350,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "source_option_name": "Asymmetrical Seats",
-            "source_description": "Competition Driver Seat, GT2 Passenger Seat",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "choice_id": "2lt_e07__opt_aup_001",
@@ -83886,10 +81057,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 350,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "source_option_name": "Asymmetrical Seats",
-            "source_description": "Competition Driver Seat, GT2 Passenger Seat",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "choice_id": "3lt_e07__opt_aup_001",
@@ -83914,10 +81082,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 350,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "source_option_name": "Asymmetrical Seats",
-            "source_description": "Competition Driver Seat, GT2 Passenger Seat",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "choice_id": "1lt_e67__opt_aup_001",
@@ -83942,10 +81107,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 350,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "source_option_name": "Asymmetrical Seats",
-            "source_description": "Competition Driver Seat, GT2 Passenger Seat",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "choice_id": "2lt_e67__opt_aup_001",
@@ -83970,10 +81132,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 350,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "source_option_name": "Asymmetrical Seats",
-            "source_description": "Competition Driver Seat, GT2 Passenger Seat",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "choice_id": "3lt_e67__opt_aup_001",
@@ -83998,10 +81157,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 350,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "source_option_name": "Asymmetrical Seats",
-            "source_description": "Competition Driver Seat, GT2 Passenger Seat",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "choice_id": "1lt_e07__opt_z25_001",
@@ -84026,10 +81182,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "auto_only",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Grand Sport Launch Edition",
-            "source_description": "Includes (EL9) Santorini Blue Dipped interior with Torch Red accents and special quilting, (3F9) Torch Red seat belts, unique floor mats with Corvette silhouette, embossed headrests, and waterfall plaque with \"Launch Edition\"",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_z25_001",
@@ -84054,10 +81207,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "auto_only",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Grand Sport Launch Edition",
-            "source_description": "Includes (EL9) Santorini Blue Dipped interior with Torch Red accents and special quilting, (3F9) Torch Red seat belts, unique floor mats with Corvette silhouette, embossed headrests, and waterfall plaque with \"Launch Edition\"",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_z25_001",
@@ -84082,10 +81232,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "auto_only",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Grand Sport Launch Edition",
-            "source_description": "Includes (EL9) Santorini Blue Dipped interior with Torch Red accents and special quilting, (3F9) Torch Red seat belts, unique floor mats with Corvette silhouette, embossed headrests, and waterfall plaque with \"Launch Edition\"",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_z25_001",
@@ -84110,10 +81257,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "auto_only",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Grand Sport Launch Edition",
-            "source_description": "Includes (EL9) Santorini Blue Dipped interior with Torch Red accents and special quilting, (3F9) Torch Red seat belts, unique floor mats with Corvette silhouette, embossed headrests, and waterfall plaque with \"Launch Edition\"",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_z25_001",
@@ -84138,10 +81282,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "auto_only",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Grand Sport Launch Edition",
-            "source_description": "Includes (EL9) Santorini Blue Dipped interior with Torch Red accents and special quilting, (3F9) Torch Red seat belts, unique floor mats with Corvette silhouette, embossed headrests, and waterfall plaque with \"Launch Edition\"",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_z25_001",
@@ -84166,10 +81307,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "auto_only",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Grand Sport Launch Edition",
-            "source_description": "Includes (EL9) Santorini Blue Dipped interior with Torch Red accents and special quilting, (3F9) Torch Red seat belts, unique floor mats with Corvette silhouette, embossed headrests, and waterfall plaque with \"Launch Edition\"",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_cj2_001",
@@ -84194,10 +81332,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Dual-Zone Automatic Climate Control",
-            "source_description": "Individual climate settings for driver and passenger, with outside temperature display",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_cj2_001",
@@ -84222,10 +81357,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Dual-Zone Automatic Climate Control",
-            "source_description": "Individual climate settings for driver and passenger, with outside temperature display",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_cj2_001",
@@ -84250,10 +81382,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Dual-Zone Automatic Climate Control",
-            "source_description": "Individual climate settings for driver and passenger, with outside temperature display",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_cj2_001",
@@ -84278,10 +81407,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Dual-Zone Automatic Climate Control",
-            "source_description": "Individual climate settings for driver and passenger, with outside temperature display",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_cj2_001",
@@ -84306,10 +81432,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Dual-Zone Automatic Climate Control",
-            "source_description": "Individual climate settings for driver and passenger, with outside temperature display",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_cj2_001",
@@ -84334,10 +81457,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Dual-Zone Automatic Climate Control",
-            "source_description": "Individual climate settings for driver and passenger, with outside temperature display",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_u80_001",
@@ -84362,10 +81482,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Digital Compass",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_u80_001",
@@ -84390,10 +81507,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Digital Compass",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_u80_001",
@@ -84418,10 +81532,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Digital Compass",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_u80_001",
@@ -84446,10 +81557,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Digital Compass",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_u80_001",
@@ -84474,10 +81582,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Digital Compass",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_u80_001",
@@ -84502,10 +81607,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Digital Compass",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_npp_001",
@@ -84530,10 +81632,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Mode-Variable Performance Exhaust",
-            "source_description": "Aggressive sound varies with selected driver mode",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_npp_001",
@@ -84558,10 +81657,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Mode-Variable Performance Exhaust",
-            "source_description": "Aggressive sound varies with selected driver mode",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_npp_001",
@@ -84586,10 +81682,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Mode-Variable Performance Exhaust",
-            "source_description": "Aggressive sound varies with selected driver mode",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_npp_001",
@@ -84614,10 +81707,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Mode-Variable Performance Exhaust",
-            "source_description": "Aggressive sound varies with selected driver mode",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_npp_001",
@@ -84642,10 +81732,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Mode-Variable Performance Exhaust",
-            "source_description": "Aggressive sound varies with selected driver mode",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_npp_001",
@@ -84670,10 +81757,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Driver Mode-Variable Performance Exhaust",
-            "source_description": "Aggressive sound varies with selected driver mode",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_t4l_001",
@@ -84698,10 +81782,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "LED Headlamps",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_t4l_001",
@@ -84726,10 +81807,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "LED Headlamps",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_t4l_001",
@@ -84754,10 +81832,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "LED Headlamps",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_t4l_001",
@@ -84782,10 +81857,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "LED Headlamps",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_t4l_001",
@@ -84810,10 +81882,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "LED Headlamps",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_t4l_001",
@@ -84838,10 +81907,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "",
-            "source_option_name": "LED Headlamps",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_ls6_001",
@@ -84866,10 +81932,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "6.7L V8 Engine",
-            "source_description": "New for 2027. DI, high-output, Variable Valve Timing (VVT), Active Fuel Management (AFM)",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_ls6_001",
@@ -84894,10 +81957,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "6.7L V8 Engine",
-            "source_description": "New for 2027. DI, high-output, Variable Valve Timing (VVT), Active Fuel Management (AFM)",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_ls6_001",
@@ -84922,10 +81982,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "6.7L V8 Engine",
-            "source_description": "New for 2027. DI, high-output, Variable Valve Timing (VVT), Active Fuel Management (AFM)",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_ls6_001",
@@ -84950,10 +82007,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "6.7L V8 Engine",
-            "source_description": "New for 2027. DI, high-output, Variable Valve Timing (VVT), Active Fuel Management (AFM)",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_ls6_001",
@@ -84978,10 +82032,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "6.7L V8 Engine",
-            "source_description": "New for 2027. DI, high-output, Variable Valve Timing (VVT), Active Fuel Management (AFM)",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_ls6_001",
@@ -85006,10 +82057,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "6.7L V8 Engine",
-            "source_description": "New for 2027. DI, high-output, Variable Valve Timing (VVT), Active Fuel Management (AFM)",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_a2x_001",
@@ -85034,10 +82082,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Driver 8-Way Power Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_a2x_001",
@@ -85062,10 +82107,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Driver 8-Way Power Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_a2x_001",
@@ -85090,10 +82132,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Driver 8-Way Power Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_a2x_001",
@@ -85118,10 +82157,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Driver 8-Way Power Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_a2x_001",
@@ -85146,10 +82182,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Driver 8-Way Power Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_a2x_001",
@@ -85174,10 +82207,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Driver 8-Way Power Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_a7k_001",
@@ -85202,10 +82232,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger 8-Way Power Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_a7k_001",
@@ -85230,10 +82257,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger 8-Way Power Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_a7k_001",
@@ -85258,10 +82282,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger 8-Way Power Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_a7k_001",
@@ -85286,10 +82307,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger 8-Way Power Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_a7k_001",
@@ -85314,10 +82332,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger 8-Way Power Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_a7k_001",
@@ -85342,10 +82357,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Passenger 8-Way Power Seat Adjuster",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_n38_001",
@@ -85370,10 +82382,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Power Tilt and Telescopic Steering Column",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_n38_001",
@@ -85398,10 +82407,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Power Tilt and Telescopic Steering Column",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_n38_001",
@@ -85426,10 +82432,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Power Tilt and Telescopic Steering Column",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_n38_001",
@@ -85454,10 +82457,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Power Tilt and Telescopic Steering Column",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_n38_001",
@@ -85482,10 +82482,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Power Tilt and Telescopic Steering Column",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_n38_001",
@@ -85510,10 +82507,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Power Tilt and Telescopic Steering Column",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_vhm_001",
@@ -85538,10 +82532,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Health Management",
-            "source_description": "Provides advanced warning of vehicle issues",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_vhm_001",
@@ -85566,10 +82557,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Health Management",
-            "source_description": "Provides advanced warning of vehicle issues",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_vhm_001",
@@ -85594,10 +82582,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Health Management",
-            "source_description": "Provides advanced warning of vehicle issues",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_vhm_001",
@@ -85622,10 +82607,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Health Management",
-            "source_description": "Provides advanced warning of vehicle issues",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_vhm_001",
@@ -85650,10 +82632,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Health Management",
-            "source_description": "Provides advanced warning of vehicle issues",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_vhm_001",
@@ -85678,10 +82657,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Vehicle Health Management",
-            "source_description": "Provides advanced warning of vehicle issues",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_v08_001",
@@ -85706,10 +82682,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Heavy-Duty Cooling System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_v08_001",
@@ -85734,10 +82707,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Heavy-Duty Cooling System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_v08_001",
@@ -85762,10 +82732,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Heavy-Duty Cooling System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_v08_001",
@@ -85790,10 +82757,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Heavy-Duty Cooling System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_v08_001",
@@ -85818,10 +82782,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Heavy-Duty Cooling System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_v08_001",
@@ -85846,10 +82807,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Heavy-Duty Cooling System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_m1n_001",
@@ -85874,10 +82832,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "8-Speed Dual Clutch Transmission",
-            "source_description": "New for 2027. Includes manual and auto modes",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_m1n_001",
@@ -85902,10 +82857,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "8-Speed Dual Clutch Transmission",
-            "source_description": "New for 2027. Includes manual and auto modes",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_m1n_001",
@@ -85930,10 +82882,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "8-Speed Dual Clutch Transmission",
-            "source_description": "New for 2027. Includes manual and auto modes",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_m1n_001",
@@ -85958,10 +82907,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "8-Speed Dual Clutch Transmission",
-            "source_description": "New for 2027. Includes manual and auto modes",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_m1n_001",
@@ -85986,10 +82932,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "8-Speed Dual Clutch Transmission",
-            "source_description": "New for 2027. Includes manual and auto modes",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_m1n_001",
@@ -86014,10 +82957,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "",
-            "source_option_name": "8-Speed Dual Clutch Transmission",
-            "source_description": "New for 2027. Includes manual and auto modes",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_g0k_001",
@@ -86042,10 +82982,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Axle 5.56 Ratio",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_g0k_001",
@@ -86070,10 +83007,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Axle 5.56 Ratio",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_g0k_001",
@@ -86098,10 +83032,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Axle 5.56 Ratio",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_g0k_001",
@@ -86126,10 +83057,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Axle 5.56 Ratio",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_g0k_001",
@@ -86154,10 +83082,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Axle 5.56 Ratio",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_g0k_001",
@@ -86182,10 +83107,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "",
-            "source_option_name": "Rear Axle 5.56 Ratio",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_b4z_001",
@@ -86210,10 +83132,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "Performance Traction Management",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_b4z_001",
@@ -86238,10 +83157,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "Performance Traction Management",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_b4z_001",
@@ -86266,10 +83182,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "Performance Traction Management",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_b4z_001",
@@ -86294,10 +83207,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "Performance Traction Management",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_b4z_001",
@@ -86322,10 +83232,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "Performance Traction Management",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_b4z_001",
@@ -86350,10 +83257,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "",
-            "source_option_name": "Performance Traction Management",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_xft_001",
@@ -86378,10 +83282,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "",
-            "source_option_name": "All-Season Performance Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_xft_001",
@@ -86406,10 +83307,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "",
-            "source_option_name": "All-Season Performance Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_xft_001",
@@ -86434,10 +83332,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "",
-            "source_option_name": "All-Season Performance Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_xft_001",
@@ -86462,10 +83357,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "",
-            "source_option_name": "All-Season Performance Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_xft_001",
@@ -86490,10 +83382,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "",
-            "source_option_name": "All-Season Performance Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_xft_001",
@@ -86518,10 +83407,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "",
-            "source_option_name": "All-Season Performance Tires",
-            "source_description": "Size: 275/30ZR20 front and 345/25ZR21 rear, blackwall",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_001",
@@ -86546,10 +83432,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Air Filtration System",
-            "source_description": "With pollen filter",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_001",
@@ -86574,10 +83457,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Air Filtration System",
-            "source_description": "With pollen filter",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_001",
@@ -86602,10 +83482,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Air Filtration System",
-            "source_description": "With pollen filter",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_001",
@@ -86630,10 +83507,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Air Filtration System",
-            "source_description": "With pollen filter",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_001",
@@ -86658,10 +83532,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Air Filtration System",
-            "source_description": "With pollen filter",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_001",
@@ -86686,10 +83557,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Air Filtration System",
-            "source_description": "With pollen filter",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_002",
@@ -86714,10 +83582,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "",
-            "source_option_name": "Floor Console",
-            "source_description": "Includes 2 cup holders, auxiliary power outlet, 3 USB ports (2 Type-C, 1 Type-A), passenger grab handle and lockable storage",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_002",
@@ -86742,10 +83607,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "",
-            "source_option_name": "Floor Console",
-            "source_description": "Includes 2 cup holders, auxiliary power outlet, 3 USB ports (2 Type-C, 1 Type-A), passenger grab handle and lockable storage",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_002",
@@ -86770,10 +83632,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "",
-            "source_option_name": "Floor Console",
-            "source_description": "Includes 2 cup holders, auxiliary power outlet, 3 USB ports (2 Type-C, 1 Type-A), passenger grab handle and lockable storage",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_002",
@@ -86798,10 +83657,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "",
-            "source_option_name": "Floor Console",
-            "source_description": "Includes 2 cup holders, auxiliary power outlet, 3 USB ports (2 Type-C, 1 Type-A), passenger grab handle and lockable storage",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_002",
@@ -86826,10 +83682,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "",
-            "source_option_name": "Floor Console",
-            "source_description": "Includes 2 cup holders, auxiliary power outlet, 3 USB ports (2 Type-C, 1 Type-A), passenger grab handle and lockable storage",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_002",
@@ -86854,10 +83707,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "",
-            "source_option_name": "Floor Console",
-            "source_description": "Includes 2 cup holders, auxiliary power outlet, 3 USB ports (2 Type-C, 1 Type-A), passenger grab handle and lockable storage",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_003",
@@ -86882,10 +83732,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "",
-            "source_option_name": "Electronic Cruise Control",
-            "source_description": "Set and resume speed",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_003",
@@ -86910,10 +83757,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "",
-            "source_option_name": "Electronic Cruise Control",
-            "source_description": "Set and resume speed",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_003",
@@ -86938,10 +83782,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "",
-            "source_option_name": "Electronic Cruise Control",
-            "source_description": "Set and resume speed",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_003",
@@ -86966,10 +83807,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "",
-            "source_option_name": "Electronic Cruise Control",
-            "source_description": "Set and resume speed",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_003",
@@ -86994,10 +83832,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "",
-            "source_option_name": "Electronic Cruise Control",
-            "source_description": "Set and resume speed",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_003",
@@ -87022,10 +83857,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "",
-            "source_option_name": "Electronic Cruise Control",
-            "source_description": "Set and resume speed",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_004",
@@ -87050,10 +83882,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 190,
-            "source_detail_raw": "",
-            "source_option_name": "Power Programmable Door Locks",
-            "source_description": "With lockout protection",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_004",
@@ -87078,10 +83907,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 190,
-            "source_detail_raw": "",
-            "source_option_name": "Power Programmable Door Locks",
-            "source_description": "With lockout protection",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_004",
@@ -87106,10 +83932,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 190,
-            "source_detail_raw": "",
-            "source_option_name": "Power Programmable Door Locks",
-            "source_description": "With lockout protection",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_004",
@@ -87134,10 +83957,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 190,
-            "source_detail_raw": "",
-            "source_option_name": "Power Programmable Door Locks",
-            "source_description": "With lockout protection",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_004",
@@ -87162,10 +83982,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 190,
-            "source_detail_raw": "",
-            "source_option_name": "Power Programmable Door Locks",
-            "source_description": "With lockout protection",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_004",
@@ -87190,10 +84007,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 190,
-            "source_detail_raw": "",
-            "source_option_name": "Power Programmable Door Locks",
-            "source_description": "With lockout protection",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_005",
@@ -87218,10 +84032,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 200,
-            "source_detail_raw": "",
-            "source_option_name": "Carpeted Floor Mats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_005",
@@ -87246,10 +84057,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 200,
-            "source_detail_raw": "",
-            "source_option_name": "Carpeted Floor Mats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_005",
@@ -87274,10 +84082,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 200,
-            "source_detail_raw": "",
-            "source_option_name": "Carpeted Floor Mats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_005",
@@ -87302,10 +84107,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 200,
-            "source_detail_raw": "",
-            "source_option_name": "Carpeted Floor Mats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_005",
@@ -87330,10 +84132,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 200,
-            "source_detail_raw": "",
-            "source_option_name": "Carpeted Floor Mats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_005",
@@ -87358,10 +84157,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 200,
-            "source_detail_raw": "",
-            "source_option_name": "Carpeted Floor Mats",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_006",
@@ -87386,10 +84182,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 210,
-            "source_detail_raw": "",
-            "source_option_name": "Push Button Hatch Release",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_006",
@@ -87414,10 +84207,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 210,
-            "source_detail_raw": "",
-            "source_option_name": "Push Button Hatch Release",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_006",
@@ -87442,10 +84232,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 210,
-            "source_detail_raw": "",
-            "source_option_name": "Push Button Hatch Release",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_006",
@@ -87470,10 +84257,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 210,
-            "source_detail_raw": "",
-            "source_option_name": "Push Button Hatch Release",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_006",
@@ -87498,10 +84282,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 210,
-            "source_detail_raw": "",
-            "source_option_name": "Push Button Hatch Release",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_006",
@@ -87526,10 +84307,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 210,
-            "source_detail_raw": "",
-            "source_option_name": "Push Button Hatch Release",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_007",
@@ -87554,10 +84332,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 220,
-            "source_detail_raw": "",
-            "source_option_name": "Keyless Open and Start",
-            "source_description": "Includes 2 remote transmitters that enable automatic door unlock and open by touching door switch",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_007",
@@ -87582,10 +84357,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 220,
-            "source_detail_raw": "",
-            "source_option_name": "Keyless Open and Start",
-            "source_description": "Includes 2 remote transmitters that enable automatic door unlock and open by touching door switch",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_007",
@@ -87610,10 +84382,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 220,
-            "source_detail_raw": "",
-            "source_option_name": "Keyless Open and Start",
-            "source_description": "Includes 2 remote transmitters that enable automatic door unlock and open by touching door switch",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_007",
@@ -87638,10 +84407,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 220,
-            "source_detail_raw": "",
-            "source_option_name": "Keyless Open and Start",
-            "source_description": "Includes 2 remote transmitters that enable automatic door unlock and open by touching door switch",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_007",
@@ -87666,10 +84432,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 220,
-            "source_detail_raw": "",
-            "source_option_name": "Keyless Open and Start",
-            "source_description": "Includes 2 remote transmitters that enable automatic door unlock and open by touching door switch",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_007",
@@ -87694,10 +84457,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 220,
-            "source_detail_raw": "",
-            "source_option_name": "Keyless Open and Start",
-            "source_description": "Includes 2 remote transmitters that enable automatic door unlock and open by touching door switch",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_008",
@@ -87722,10 +84482,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 230,
-            "source_detail_raw": "",
-            "source_option_name": "Interior Theater Dimming Lighting",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_008",
@@ -87750,10 +84507,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 230,
-            "source_detail_raw": "",
-            "source_option_name": "Interior Theater Dimming Lighting",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_008",
@@ -87778,10 +84532,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 230,
-            "source_detail_raw": "",
-            "source_option_name": "Interior Theater Dimming Lighting",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_008",
@@ -87806,10 +84557,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 230,
-            "source_detail_raw": "",
-            "source_option_name": "Interior Theater Dimming Lighting",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_008",
@@ -87834,10 +84582,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 230,
-            "source_detail_raw": "",
-            "source_option_name": "Interior Theater Dimming Lighting",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_008",
@@ -87862,10 +84607,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 230,
-            "source_detail_raw": "",
-            "source_option_name": "Interior Theater Dimming Lighting",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_010",
@@ -87890,10 +84632,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 240,
-            "source_detail_raw": "",
-            "source_option_name": "Remote Vehicle Starter System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_010",
@@ -87918,10 +84657,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 240,
-            "source_detail_raw": "",
-            "source_option_name": "Remote Vehicle Starter System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_010",
@@ -87946,10 +84682,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 240,
-            "source_detail_raw": "",
-            "source_option_name": "Remote Vehicle Starter System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_010",
@@ -87974,10 +84707,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 240,
-            "source_detail_raw": "",
-            "source_option_name": "Remote Vehicle Starter System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_010",
@@ -88002,10 +84732,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 240,
-            "source_detail_raw": "",
-            "source_option_name": "Remote Vehicle Starter System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_010",
@@ -88030,10 +84757,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 240,
-            "source_detail_raw": "",
-            "source_option_name": "Remote Vehicle Starter System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_011",
@@ -88058,10 +84782,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 250,
-            "source_detail_raw": "",
-            "source_option_name": "Steering Wheel Controls",
-            "source_description": "Audio, voice recognition, cruise and Driver Information Center",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_011",
@@ -88086,10 +84807,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 250,
-            "source_detail_raw": "",
-            "source_option_name": "Steering Wheel Controls",
-            "source_description": "Audio, voice recognition, cruise and Driver Information Center",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_011",
@@ -88114,10 +84832,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 250,
-            "source_detail_raw": "",
-            "source_option_name": "Steering Wheel Controls",
-            "source_description": "Audio, voice recognition, cruise and Driver Information Center",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_011",
@@ -88142,10 +84857,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 250,
-            "source_detail_raw": "",
-            "source_option_name": "Steering Wheel Controls",
-            "source_description": "Audio, voice recognition, cruise and Driver Information Center",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_011",
@@ -88170,10 +84882,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 250,
-            "source_detail_raw": "",
-            "source_option_name": "Steering Wheel Controls",
-            "source_description": "Audio, voice recognition, cruise and Driver Information Center",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_011",
@@ -88198,10 +84907,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 250,
-            "source_detail_raw": "",
-            "source_option_name": "Steering Wheel Controls",
-            "source_description": "Audio, voice recognition, cruise and Driver Information Center",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_013",
@@ -88226,10 +84932,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 260,
-            "source_detail_raw": "",
-            "source_option_name": "Push Button Trunk Release",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_013",
@@ -88254,10 +84957,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 260,
-            "source_detail_raw": "",
-            "source_option_name": "Push Button Trunk Release",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_013",
@@ -88282,10 +84982,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 260,
-            "source_detail_raw": "",
-            "source_option_name": "Push Button Trunk Release",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_013",
@@ -88310,10 +85007,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 260,
-            "source_detail_raw": "",
-            "source_option_name": "Push Button Trunk Release",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_013",
@@ -88338,10 +85032,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 260,
-            "source_detail_raw": "",
-            "source_option_name": "Push Button Trunk Release",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_013",
@@ -88366,10 +85057,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 260,
-            "source_detail_raw": "",
-            "source_option_name": "Push Button Trunk Release",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_014",
@@ -88394,10 +85082,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 270,
-            "source_detail_raw": "",
-            "source_option_name": "Covered Illuminated Driver and Passenger Vanity Visors",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_014",
@@ -88422,10 +85107,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 270,
-            "source_detail_raw": "",
-            "source_option_name": "Covered Illuminated Driver and Passenger Vanity Visors",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_014",
@@ -88450,10 +85132,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 270,
-            "source_detail_raw": "",
-            "source_option_name": "Covered Illuminated Driver and Passenger Vanity Visors",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_014",
@@ -88478,10 +85157,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 270,
-            "source_detail_raw": "",
-            "source_option_name": "Covered Illuminated Driver and Passenger Vanity Visors",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_014",
@@ -88506,10 +85182,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 270,
-            "source_detail_raw": "",
-            "source_option_name": "Covered Illuminated Driver and Passenger Vanity Visors",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_014",
@@ -88534,10 +85207,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 270,
-            "source_detail_raw": "",
-            "source_option_name": "Covered Illuminated Driver and Passenger Vanity Visors",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_016",
@@ -88562,10 +85232,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 280,
-            "source_detail_raw": "",
-            "source_option_name": "Driver and Passenger Express-Down/Up Power Windows",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_016",
@@ -88590,10 +85257,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 280,
-            "source_detail_raw": "",
-            "source_option_name": "Driver and Passenger Express-Down/Up Power Windows",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_016",
@@ -88618,10 +85282,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 280,
-            "source_detail_raw": "",
-            "source_option_name": "Driver and Passenger Express-Down/Up Power Windows",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_016",
@@ -88646,10 +85307,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 280,
-            "source_detail_raw": "",
-            "source_option_name": "Driver and Passenger Express-Down/Up Power Windows",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_016",
@@ -88674,10 +85332,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 280,
-            "source_detail_raw": "",
-            "source_option_name": "Driver and Passenger Express-Down/Up Power Windows",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_016",
@@ -88702,10 +85357,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 280,
-            "source_detail_raw": "",
-            "source_option_name": "Driver and Passenger Express-Down/Up Power Windows",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_017",
@@ -88730,10 +85382,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 290,
-            "source_detail_raw": "",
-            "source_option_name": "Daytime Running Lamps",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_017",
@@ -88758,10 +85407,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 290,
-            "source_detail_raw": "",
-            "source_option_name": "Daytime Running Lamps",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_017",
@@ -88786,10 +85432,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 290,
-            "source_detail_raw": "",
-            "source_option_name": "Daytime Running Lamps",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_017",
@@ -88814,10 +85457,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 290,
-            "source_detail_raw": "",
-            "source_option_name": "Daytime Running Lamps",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_017",
@@ -88842,10 +85482,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 290,
-            "source_detail_raw": "",
-            "source_option_name": "Daytime Running Lamps",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_017",
@@ -88870,10 +85507,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 290,
-            "source_detail_raw": "",
-            "source_option_name": "Daytime Running Lamps",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_018",
@@ -88898,10 +85532,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 300,
-            "source_detail_raw": "",
-            "source_option_name": "Solar-Ray Light-Tinted Glass",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_018",
@@ -88926,10 +85557,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 300,
-            "source_detail_raw": "",
-            "source_option_name": "Solar-Ray Light-Tinted Glass",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_018",
@@ -88954,10 +85582,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 300,
-            "source_detail_raw": "",
-            "source_option_name": "Solar-Ray Light-Tinted Glass",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_018",
@@ -88982,10 +85607,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 300,
-            "source_detail_raw": "",
-            "source_option_name": "Solar-Ray Light-Tinted Glass",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_018",
@@ -89010,10 +85632,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 300,
-            "source_detail_raw": "",
-            "source_option_name": "Solar-Ray Light-Tinted Glass",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_018",
@@ -89038,10 +85657,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 300,
-            "source_detail_raw": "",
-            "source_option_name": "Solar-Ray Light-Tinted Glass",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_021",
@@ -89066,10 +85682,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 310,
-            "source_detail_raw": "",
-            "source_option_name": "Aluminum Frame Structure",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_021",
@@ -89094,10 +85707,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 310,
-            "source_detail_raw": "",
-            "source_option_name": "Aluminum Frame Structure",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_021",
@@ -89122,10 +85732,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 310,
-            "source_detail_raw": "",
-            "source_option_name": "Aluminum Frame Structure",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_021",
@@ -89150,10 +85757,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 310,
-            "source_detail_raw": "",
-            "source_option_name": "Aluminum Frame Structure",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_021",
@@ -89178,10 +85782,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 310,
-            "source_detail_raw": "",
-            "source_option_name": "Aluminum Frame Structure",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_021",
@@ -89206,10 +85807,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 310,
-            "source_detail_raw": "",
-            "source_option_name": "Aluminum Frame Structure",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_022",
@@ -89234,10 +85832,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 320,
-            "source_detail_raw": "",
-            "source_option_name": "Oil Life Monitoring System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_022",
@@ -89262,10 +85857,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 320,
-            "source_detail_raw": "",
-            "source_option_name": "Oil Life Monitoring System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_022",
@@ -89290,10 +85882,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 320,
-            "source_detail_raw": "",
-            "source_option_name": "Oil Life Monitoring System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_022",
@@ -89318,10 +85907,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 320,
-            "source_detail_raw": "",
-            "source_option_name": "Oil Life Monitoring System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_022",
@@ -89346,10 +85932,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 320,
-            "source_detail_raw": "",
-            "source_option_name": "Oil Life Monitoring System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_022",
@@ -89374,10 +85957,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 320,
-            "source_detail_raw": "",
-            "source_option_name": "Oil Life Monitoring System",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_023",
@@ -89402,10 +85982,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 330,
-            "source_detail_raw": "",
-            "source_option_name": "Electric Rack-and-Pinion Speed-Sensitive Power Steering",
-            "source_description": "Variable ratio",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_023",
@@ -89430,10 +86007,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 330,
-            "source_detail_raw": "",
-            "source_option_name": "Electric Rack-and-Pinion Speed-Sensitive Power Steering",
-            "source_description": "Variable ratio",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_023",
@@ -89458,10 +86032,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 330,
-            "source_detail_raw": "",
-            "source_option_name": "Electric Rack-and-Pinion Speed-Sensitive Power Steering",
-            "source_description": "Variable ratio",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_023",
@@ -89486,10 +86057,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 330,
-            "source_detail_raw": "",
-            "source_option_name": "Electric Rack-and-Pinion Speed-Sensitive Power Steering",
-            "source_description": "Variable ratio",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_023",
@@ -89514,10 +86082,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 330,
-            "source_detail_raw": "",
-            "source_option_name": "Electric Rack-and-Pinion Speed-Sensitive Power Steering",
-            "source_description": "Variable ratio",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_023",
@@ -89542,10 +86107,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 330,
-            "source_detail_raw": "",
-            "source_option_name": "Electric Rack-and-Pinion Speed-Sensitive Power Steering",
-            "source_description": "Variable ratio",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_024",
@@ -89570,10 +86132,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 340,
-            "source_detail_raw": "",
-            "source_option_name": "Front Intermittent Wipers",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_024",
@@ -89598,10 +86157,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 340,
-            "source_detail_raw": "",
-            "source_option_name": "Front Intermittent Wipers",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_024",
@@ -89626,10 +86182,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 340,
-            "source_detail_raw": "",
-            "source_option_name": "Front Intermittent Wipers",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_024",
@@ -89654,10 +86207,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 340,
-            "source_detail_raw": "",
-            "source_option_name": "Front Intermittent Wipers",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_024",
@@ -89682,10 +86232,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 340,
-            "source_detail_raw": "",
-            "source_option_name": "Front Intermittent Wipers",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_024",
@@ -89710,10 +86257,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 340,
-            "source_detail_raw": "",
-            "source_option_name": "Front Intermittent Wipers",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_nk4_001",
@@ -89738,10 +86282,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Leather-Wrapped Steering Wheel",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_nk4_001",
@@ -89766,10 +86307,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Leather-Wrapped Steering Wheel",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_nk4_001",
@@ -89794,10 +86332,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Leather-Wrapped Steering Wheel",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_nk4_001",
@@ -89822,10 +86357,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Leather-Wrapped Steering Wheel",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_nk4_001",
@@ -89850,10 +86382,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Leather-Wrapped Steering Wheel",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_nk4_001",
@@ -89878,10 +86407,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "",
-            "source_option_name": "Leather-Wrapped Steering Wheel",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_fea_001",
@@ -89906,10 +86432,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Touring Magnetic Ride Suspension",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_fea_001",
@@ -89934,10 +86457,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Touring Magnetic Ride Suspension",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_fea_001",
@@ -89962,10 +86482,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Touring Magnetic Ride Suspension",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_fea_001",
@@ -89990,10 +86507,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Touring Magnetic Ride Suspension",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_fea_001",
@@ -90018,10 +86532,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Touring Magnetic Ride Suspension",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_fea_001",
@@ -90046,10 +86557,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "",
-            "source_option_name": "Touring Magnetic Ride Suspension",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_z15_001",
@@ -90074,10 +86582,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 5,
-            "source_detail_raw": "1. Requires one of the following Grand Sport Heritage Hash Marks: (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist. Only additional stripes or graphics available with Z15 are (DMU/DMV/DMW/DMX/DMY) Grand Sport Heritage Center Stripes.",
-            "source_option_name": "Grand Sport Heritage Graphics",
-            "source_description": "Includes Grand Sport Heritage Hash Marks available in (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires one of the following Grand Sport Heritage Hash Marks: (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist. Only additional stripes or graphics available with Z15 are (DMU/DMV/DMW/DMX/DMY) Grand Sport Heritage Center Stripes."
           },
           {
             "choice_id": "2lt_e07__opt_z15_001",
@@ -90102,10 +86607,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 5,
-            "source_detail_raw": "1. Requires one of the following Grand Sport Heritage Hash Marks: (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist. Only additional stripes or graphics available with Z15 are (DMU/DMV/DMW/DMX/DMY) Grand Sport Heritage Center Stripes.",
-            "source_option_name": "Grand Sport Heritage Graphics",
-            "source_description": "Includes Grand Sport Heritage Hash Marks available in (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires one of the following Grand Sport Heritage Hash Marks: (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist. Only additional stripes or graphics available with Z15 are (DMU/DMV/DMW/DMX/DMY) Grand Sport Heritage Center Stripes."
           },
           {
             "choice_id": "3lt_e07__opt_z15_001",
@@ -90130,10 +86632,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 5,
-            "source_detail_raw": "1. Requires one of the following Grand Sport Heritage Hash Marks: (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist. Only additional stripes or graphics available with Z15 are (DMU/DMV/DMW/DMX/DMY) Grand Sport Heritage Center Stripes.",
-            "source_option_name": "Grand Sport Heritage Graphics",
-            "source_description": "Includes Grand Sport Heritage Hash Marks available in (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires one of the following Grand Sport Heritage Hash Marks: (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist. Only additional stripes or graphics available with Z15 are (DMU/DMV/DMW/DMX/DMY) Grand Sport Heritage Center Stripes."
           },
           {
             "choice_id": "1lt_e67__opt_z15_001",
@@ -90158,10 +86657,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 5,
-            "source_detail_raw": "1. Requires one of the following Grand Sport Heritage Hash Marks: (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist. Only additional stripes or graphics available with Z15 are (DMU/DMV/DMW/DMX/DMY) Grand Sport Heritage Center Stripes.",
-            "source_option_name": "Grand Sport Heritage Graphics",
-            "source_description": "Includes Grand Sport Heritage Hash Marks available in (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires one of the following Grand Sport Heritage Hash Marks: (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist. Only additional stripes or graphics available with Z15 are (DMU/DMV/DMW/DMX/DMY) Grand Sport Heritage Center Stripes."
           },
           {
             "choice_id": "2lt_e67__opt_z15_001",
@@ -90186,10 +86682,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 5,
-            "source_detail_raw": "1. Requires one of the following Grand Sport Heritage Hash Marks: (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist. Only additional stripes or graphics available with Z15 are (DMU/DMV/DMW/DMX/DMY) Grand Sport Heritage Center Stripes.",
-            "source_option_name": "Grand Sport Heritage Graphics",
-            "source_description": "Includes Grand Sport Heritage Hash Marks available in (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires one of the following Grand Sport Heritage Hash Marks: (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist. Only additional stripes or graphics available with Z15 are (DMU/DMV/DMW/DMX/DMY) Grand Sport Heritage Center Stripes."
           },
           {
             "choice_id": "3lt_e67__opt_z15_001",
@@ -90214,10 +86707,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 5,
-            "source_detail_raw": "1. Requires one of the following Grand Sport Heritage Hash Marks: (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist. Only additional stripes or graphics available with Z15 are (DMU/DMV/DMW/DMX/DMY) Grand Sport Heritage Center Stripes.",
-            "source_option_name": "Grand Sport Heritage Graphics",
-            "source_description": "Includes Grand Sport Heritage Hash Marks available in (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires one of the following Grand Sport Heritage Hash Marks: (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist. Only additional stripes or graphics available with Z15 are (DMU/DMV/DMW/DMX/DMY) Grand Sport Heritage Center Stripes."
           },
           {
             "choice_id": "1lt_e07__opt_dth_001",
@@ -90242,10 +86732,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Metallic Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_dth_001",
@@ -90270,10 +86757,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Metallic Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_dth_001",
@@ -90298,10 +86782,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Metallic Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_dth_001",
@@ -90326,10 +86807,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Metallic Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_dth_001",
@@ -90354,10 +86832,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Metallic Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_dth_001",
@@ -90382,10 +86857,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Metallic Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_dub_001",
@@ -90410,10 +86882,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Sterling Silver Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_dub_001",
@@ -90438,10 +86907,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Sterling Silver Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_dub_001",
@@ -90466,10 +86932,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Sterling Silver Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_dub_001",
@@ -90494,10 +86957,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Sterling Silver Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_dub_001",
@@ -90522,10 +86982,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Sterling Silver Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_dub_001",
@@ -90550,10 +87007,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Sterling Silver Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_dt0_001",
@@ -90578,10 +87032,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Competition Yellow Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "2lt_e07__opt_dt0_001",
@@ -90606,10 +87057,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Competition Yellow Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "3lt_e07__opt_dt0_001",
@@ -90634,10 +87082,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Competition Yellow Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "1lt_e67__opt_dt0_001",
@@ -90662,10 +87107,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Competition Yellow Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "2lt_e67__opt_dt0_001",
@@ -90690,10 +87132,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Competition Yellow Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "3lt_e67__opt_dt0_001",
@@ -90718,10 +87157,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Competition Yellow Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "1lt_e07__opt_duw_001",
@@ -90746,10 +87182,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Edge Blue Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "2lt_e07__opt_duw_001",
@@ -90774,10 +87207,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Edge Blue Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "3lt_e07__opt_duw_001",
@@ -90802,10 +87232,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Edge Blue Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "1lt_e67__opt_duw_001",
@@ -90830,10 +87257,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Edge Blue Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "2lt_e67__opt_duw_001",
@@ -90858,10 +87282,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Edge Blue Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "3lt_e67__opt_duw_001",
@@ -90886,10 +87307,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Edge Blue Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "1lt_e07__opt_dsy_001",
@@ -90914,10 +87332,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "source_option_name": "Edge Orange Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "choice_id": "2lt_e07__opt_dsy_001",
@@ -90942,10 +87357,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "source_option_name": "Edge Orange Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "choice_id": "3lt_e07__opt_dsy_001",
@@ -90970,10 +87382,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "source_option_name": "Edge Orange Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "choice_id": "1lt_e67__opt_dsy_001",
@@ -90998,10 +87407,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "source_option_name": "Edge Orange Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "choice_id": "2lt_e67__opt_dsy_001",
@@ -91026,10 +87432,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "source_option_name": "Edge Orange Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "choice_id": "3lt_e67__opt_dsy_001",
@@ -91054,10 +87457,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "source_option_name": "Edge Orange Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "choice_id": "1lt_e07__opt_dsz_001",
@@ -91082,10 +87482,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Edge Red Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "2lt_e07__opt_dsz_001",
@@ -91110,10 +87507,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Edge Red Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "3lt_e07__opt_dsz_001",
@@ -91138,10 +87532,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Edge Red Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "1lt_e67__opt_dsz_001",
@@ -91166,10 +87557,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Edge Red Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "2lt_e67__opt_dsz_001",
@@ -91194,10 +87582,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Edge Red Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "3lt_e67__opt_dsz_001",
@@ -91222,10 +87607,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Edge Red Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "1lt_e07__opt_dpb_001",
@@ -91250,10 +87632,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Carbon Flash/Blue Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "2lt_e07__opt_dpb_001",
@@ -91278,10 +87657,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Carbon Flash/Blue Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "3lt_e07__opt_dpb_001",
@@ -91306,10 +87682,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Carbon Flash/Blue Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "1lt_e67__opt_dpb_001",
@@ -91334,10 +87707,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Carbon Flash/Blue Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "2lt_e67__opt_dpb_001",
@@ -91362,10 +87732,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Carbon Flash/Blue Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "3lt_e67__opt_dpb_001",
@@ -91390,10 +87757,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Carbon Flash/Blue Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "1lt_e07__opt_dpg_001",
@@ -91418,10 +87782,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "source_option_name": "Carbon Flash/Orange Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "choice_id": "2lt_e07__opt_dpg_001",
@@ -91446,10 +87807,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "source_option_name": "Carbon Flash/Orange Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "choice_id": "3lt_e07__opt_dpg_001",
@@ -91474,10 +87832,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "source_option_name": "Carbon Flash/Orange Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "choice_id": "1lt_e67__opt_dpg_001",
@@ -91502,10 +87857,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "source_option_name": "Carbon Flash/Orange Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "choice_id": "2lt_e67__opt_dpg_001",
@@ -91530,10 +87882,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "source_option_name": "Carbon Flash/Orange Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "choice_id": "3lt_e67__opt_dpg_001",
@@ -91558,10 +87907,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 80,
-            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "source_option_name": "Carbon Flash/Orange Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "choice_id": "1lt_e07__opt_dpl_001",
@@ -91586,10 +87932,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Carbon Flash/Red Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "2lt_e07__opt_dpl_001",
@@ -91614,10 +87957,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Carbon Flash/Red Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "3lt_e07__opt_dpl_001",
@@ -91642,10 +87982,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Carbon Flash/Red Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "1lt_e67__opt_dpl_001",
@@ -91670,10 +88007,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Carbon Flash/Red Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "2lt_e67__opt_dpl_001",
@@ -91698,10 +88032,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Carbon Flash/Red Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "3lt_e67__opt_dpl_001",
@@ -91726,10 +88057,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 90,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Carbon Flash/Red Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "1lt_e07__opt_dpt_001",
@@ -91754,10 +88082,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash/Silver Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_dpt_001",
@@ -91782,10 +88107,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash/Silver Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_dpt_001",
@@ -91810,10 +88132,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash/Silver Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_dpt_001",
@@ -91838,10 +88157,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash/Silver Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_dpt_001",
@@ -91866,10 +88182,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash/Silver Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_dpt_001",
@@ -91894,10 +88207,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 100,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash/Silver Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_dpc_001",
@@ -91922,10 +88232,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Carbon Flash/Yellow Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "2lt_e07__opt_dpc_001",
@@ -91950,10 +88257,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Carbon Flash/Yellow Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "3lt_e07__opt_dpc_001",
@@ -91978,10 +88282,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Carbon Flash/Yellow Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "1lt_e67__opt_dpc_001",
@@ -92006,10 +88307,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Carbon Flash/Yellow Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "2lt_e67__opt_dpc_001",
@@ -92034,10 +88332,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Carbon Flash/Yellow Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "3lt_e67__opt_dpc_001",
@@ -92062,10 +88357,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 110,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Carbon Flash/Yellow Racing Stripes",
-            "source_description": "Full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "1lt_e07__opt_duk_001",
@@ -92090,10 +88382,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Edge Red/Carbon Flash Racing Stripes",
-            "source_description": "Asymmetrical, full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "2lt_e07__opt_duk_001",
@@ -92118,10 +88407,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Edge Red/Carbon Flash Racing Stripes",
-            "source_description": "Asymmetrical, full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "3lt_e07__opt_duk_001",
@@ -92146,10 +88432,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Edge Red/Carbon Flash Racing Stripes",
-            "source_description": "Asymmetrical, full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "1lt_e67__opt_duk_001",
@@ -92174,10 +88457,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Edge Red/Carbon Flash Racing Stripes",
-            "source_description": "Asymmetrical, full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "2lt_e67__opt_duk_001",
@@ -92202,10 +88482,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Edge Red/Carbon Flash Racing Stripes",
-            "source_description": "Asymmetrical, full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "3lt_e67__opt_duk_001",
@@ -92230,10 +88507,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 120,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Edge Red/Carbon Flash Racing Stripes",
-            "source_description": "Asymmetrical, full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "1lt_e07__opt_due_001",
@@ -92258,10 +88532,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Santorini Blue/Carbon Flash Racing Stripes",
-            "source_description": "New for 2027. Asymmetrical, full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "2lt_e07__opt_due_001",
@@ -92286,10 +88557,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Santorini Blue/Carbon Flash Racing Stripes",
-            "source_description": "New for 2027. Asymmetrical, full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "3lt_e07__opt_due_001",
@@ -92314,10 +88582,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Santorini Blue/Carbon Flash Racing Stripes",
-            "source_description": "New for 2027. Asymmetrical, full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "1lt_e67__opt_due_001",
@@ -92342,10 +88607,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Santorini Blue/Carbon Flash Racing Stripes",
-            "source_description": "New for 2027. Asymmetrical, full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "2lt_e67__opt_due_001",
@@ -92370,10 +88632,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Santorini Blue/Carbon Flash Racing Stripes",
-            "source_description": "New for 2027. Asymmetrical, full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "3lt_e67__opt_due_001",
@@ -92398,10 +88657,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 1295,
             "display_behavior": "",
             "display_order": 130,
-            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "source_option_name": "Santorini Blue/Carbon Flash Racing Stripes",
-            "source_description": "New for 2027. Asymmetrical, full-length dual design",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "choice_id": "1lt_e07__opt_dzu_001",
@@ -92426,10 +88682,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 140,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Carbon Flash/Competition Yellow Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "2lt_e07__opt_dzu_001",
@@ -92454,10 +88707,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 140,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Carbon Flash/Competition Yellow Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "3lt_e07__opt_dzu_001",
@@ -92482,10 +88732,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 140,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Carbon Flash/Competition Yellow Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "1lt_e67__opt_dzu_001",
@@ -92510,10 +88757,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 140,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Carbon Flash/Competition Yellow Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "2lt_e67__opt_dzu_001",
@@ -92538,10 +88782,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 140,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Carbon Flash/Competition Yellow Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "3lt_e67__opt_dzu_001",
@@ -92566,10 +88807,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 140,
-            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "source_option_name": "Carbon Flash/Competition Yellow Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "choice_id": "1lt_e07__opt_dzx_001",
@@ -92594,10 +88832,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Carbon Flash/Edge Red Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "2lt_e07__opt_dzx_001",
@@ -92622,10 +88857,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Carbon Flash/Edge Red Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "3lt_e07__opt_dzx_001",
@@ -92650,10 +88882,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Carbon Flash/Edge Red Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "1lt_e67__opt_dzx_001",
@@ -92678,10 +88907,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Carbon Flash/Edge Red Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "2lt_e67__opt_dzx_001",
@@ -92706,10 +88932,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Carbon Flash/Edge Red Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "3lt_e67__opt_dzx_001",
@@ -92734,10 +88957,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 150,
-            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "source_option_name": "Carbon Flash/Edge Red Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "choice_id": "1lt_e07__opt_dzv_001",
@@ -92762,10 +88982,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash/Midnight Silver Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_dzv_001",
@@ -92790,10 +89007,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash/Midnight Silver Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_dzv_001",
@@ -92818,10 +89032,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash/Midnight Silver Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_dzv_001",
@@ -92846,10 +89057,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash/Midnight Silver Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_dzv_001",
@@ -92874,10 +89082,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash/Midnight Silver Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_dzv_001",
@@ -92902,10 +89107,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 595,
             "display_behavior": "",
             "display_order": 160,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash/Midnight Silver Stinger Stripe",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_sht_001",
@@ -92930,10 +89132,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Tech Bronze Jake Hood Graphic",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "2lt_e07__opt_sht_001",
@@ -92958,10 +89157,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Tech Bronze Jake Hood Graphic",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "3lt_e07__opt_sht_001",
@@ -92986,10 +89182,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Tech Bronze Jake Hood Graphic",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "1lt_e67__opt_sht_001",
@@ -93014,10 +89207,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Tech Bronze Jake Hood Graphic",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "2lt_e67__opt_sht_001",
@@ -93042,10 +89232,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Tech Bronze Jake Hood Graphic",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "3lt_e67__opt_sht_001",
@@ -93070,10 +89257,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 495,
             "display_behavior": "",
             "display_order": 170,
-            "source_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Tech Bronze Jake Hood Graphic",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "1lt_e07__opt_vpo_001",
@@ -93098,10 +89282,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 575,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Tech Bronze Jake C8.R Rear Hash Graphic",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "2lt_e07__opt_vpo_001",
@@ -93126,10 +89307,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 575,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Tech Bronze Jake C8.R Rear Hash Graphic",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "3lt_e07__opt_vpo_001",
@@ -93154,10 +89332,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 575,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Tech Bronze Jake C8.R Rear Hash Graphic",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "1lt_e67__opt_vpo_001",
@@ -93182,10 +89357,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 575,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Tech Bronze Jake C8.R Rear Hash Graphic",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "2lt_e67__opt_vpo_001",
@@ -93210,10 +89382,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 575,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Tech Bronze Jake C8.R Rear Hash Graphic",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "3lt_e67__opt_vpo_001",
@@ -93238,10 +89407,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 575,
             "display_behavior": "",
             "display_order": 180,
-            "source_detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics.",
-            "source_option_name": "Tech Bronze Jake C8.R Rear Hash Graphic",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics."
           },
           {
             "choice_id": "1lt_e07__opt_ive_001",
@@ -93266,10 +89432,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Infotainment System with Google Built-In",
-            "source_description": "Includes 12.7\" diagonal center console display, 14\" diagonal Driver Information Center, and 6.6\" diagonal auxiliary touchscreen, with navigation capability, connected apps, Natural Voice Recognition, and wireless phone integration for compatible phones",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_ive_001",
@@ -93294,10 +89457,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Infotainment System with Google Built-In",
-            "source_description": "Includes 12.7\" diagonal center console display, 14\" diagonal Driver Information Center, and 6.6\" diagonal auxiliary touchscreen, with navigation capability, connected apps, Natural Voice Recognition, and wireless phone integration for compatible phones",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_ive_001",
@@ -93322,10 +89482,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Infotainment System with Google Built-In",
-            "source_description": "Includes 12.7\" diagonal center console display, 14\" diagonal Driver Information Center, and 6.6\" diagonal auxiliary touchscreen, with navigation capability, connected apps, Natural Voice Recognition, and wireless phone integration for compatible phones",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_ive_001",
@@ -93350,10 +89507,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Infotainment System with Google Built-In",
-            "source_description": "Includes 12.7\" diagonal center console display, 14\" diagonal Driver Information Center, and 6.6\" diagonal auxiliary touchscreen, with navigation capability, connected apps, Natural Voice Recognition, and wireless phone integration for compatible phones",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_ive_001",
@@ -93378,10 +89532,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Infotainment System with Google Built-In",
-            "source_description": "Includes 12.7\" diagonal center console display, 14\" diagonal Driver Information Center, and 6.6\" diagonal auxiliary touchscreen, with navigation capability, connected apps, Natural Voice Recognition, and wireless phone integration for compatible phones",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_ive_001",
@@ -93406,10 +89557,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "",
-            "source_option_name": "Infotainment System with Google Built-In",
-            "source_description": "Includes 12.7\" diagonal center console display, 14\" diagonal Driver Information Center, and 6.6\" diagonal auxiliary touchscreen, with navigation capability, connected apps, Natural Voice Recognition, and wireless phone integration for compatible phones",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_ppw_001",
@@ -93434,10 +89582,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Wireless Apple CarPlay and Android Auto",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_ppw_001",
@@ -93462,10 +89607,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Wireless Apple CarPlay and Android Auto",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_ppw_001",
@@ -93490,10 +89632,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Wireless Apple CarPlay and Android Auto",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_ppw_001",
@@ -93518,10 +89657,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Wireless Apple CarPlay and Android Auto",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_ppw_001",
@@ -93546,10 +89682,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Wireless Apple CarPlay and Android Auto",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_ppw_001",
@@ -93574,10 +89707,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "",
-            "source_option_name": "Wireless Apple CarPlay and Android Auto",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_015",
@@ -93602,10 +89732,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Integral Front/Rear Antenna",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_015",
@@ -93630,10 +89757,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Integral Front/Rear Antenna",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_015",
@@ -93658,10 +89782,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Integral Front/Rear Antenna",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_015",
@@ -93686,10 +89807,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Integral Front/Rear Antenna",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_015",
@@ -93714,10 +89832,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Integral Front/Rear Antenna",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_015",
@@ -93742,10 +89857,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 0,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "",
-            "source_option_name": "Integral Front/Rear Antenna",
-            "source_description": "",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_spy_001",
@@ -93770,10 +89882,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 320,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Not available with (S47) Chrome lug nuts, LPO.",
-            "source_option_name": "Black Lug Nuts",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (S47) Chrome lug nuts, LPO."
           },
           {
             "choice_id": "2lt_e07__opt_spy_001",
@@ -93798,10 +89907,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 320,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Not available with (S47) Chrome lug nuts, LPO.",
-            "source_option_name": "Black Lug Nuts",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (S47) Chrome lug nuts, LPO."
           },
           {
             "choice_id": "3lt_e07__opt_spy_001",
@@ -93826,10 +89932,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 320,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Not available with (S47) Chrome lug nuts, LPO.",
-            "source_option_name": "Black Lug Nuts",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (S47) Chrome lug nuts, LPO."
           },
           {
             "choice_id": "1lt_e67__opt_spy_001",
@@ -93854,10 +89957,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 320,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Not available with (S47) Chrome lug nuts, LPO.",
-            "source_option_name": "Black Lug Nuts",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (S47) Chrome lug nuts, LPO."
           },
           {
             "choice_id": "2lt_e67__opt_spy_001",
@@ -93882,10 +89982,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 320,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Not available with (S47) Chrome lug nuts, LPO.",
-            "source_option_name": "Black Lug Nuts",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (S47) Chrome lug nuts, LPO."
           },
           {
             "choice_id": "3lt_e67__opt_spy_001",
@@ -93910,10 +90007,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 320,
             "display_behavior": "",
             "display_order": 10,
-            "source_detail_raw": "1. Not available with (S47) Chrome lug nuts, LPO.",
-            "source_option_name": "Black Lug Nuts",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (S47) Chrome lug nuts, LPO."
           },
           {
             "choice_id": "1lt_e07__opt_spz_001",
@@ -93938,10 +90032,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 105,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (SPY) Black lug nuts, LPO.",
-            "source_option_name": "Black Wheel Locks",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (SPY) Black lug nuts, LPO."
           },
           {
             "choice_id": "2lt_e07__opt_spz_001",
@@ -93966,10 +90057,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 105,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (SPY) Black lug nuts, LPO.",
-            "source_option_name": "Black Wheel Locks",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (SPY) Black lug nuts, LPO."
           },
           {
             "choice_id": "3lt_e07__opt_spz_001",
@@ -93994,10 +90082,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 105,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (SPY) Black lug nuts, LPO.",
-            "source_option_name": "Black Wheel Locks",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (SPY) Black lug nuts, LPO."
           },
           {
             "choice_id": "1lt_e67__opt_spz_001",
@@ -94022,10 +90107,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 105,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (SPY) Black lug nuts, LPO.",
-            "source_option_name": "Black Wheel Locks",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (SPY) Black lug nuts, LPO."
           },
           {
             "choice_id": "2lt_e67__opt_spz_001",
@@ -94050,10 +90132,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 105,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (SPY) Black lug nuts, LPO.",
-            "source_option_name": "Black Wheel Locks",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (SPY) Black lug nuts, LPO."
           },
           {
             "choice_id": "3lt_e67__opt_spz_001",
@@ -94078,10 +90157,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 105,
             "display_behavior": "",
             "display_order": 20,
-            "source_detail_raw": "1. Requires (SPY) Black lug nuts, LPO.",
-            "source_option_name": "Black Wheel Locks",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (SPY) Black lug nuts, LPO."
           },
           {
             "choice_id": "1lt_e07__opt_s47_001",
@@ -94106,10 +90182,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 275,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "source_option_name": "Chrome Lug Nuts",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "choice_id": "2lt_e07__opt_s47_001",
@@ -94134,10 +90207,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 275,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "source_option_name": "Chrome Lug Nuts",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "choice_id": "3lt_e07__opt_s47_001",
@@ -94162,10 +90232,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 275,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "source_option_name": "Chrome Lug Nuts",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "choice_id": "1lt_e67__opt_s47_001",
@@ -94190,10 +90257,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 275,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "source_option_name": "Chrome Lug Nuts",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "choice_id": "2lt_e67__opt_s47_001",
@@ -94218,10 +90282,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 275,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "source_option_name": "Chrome Lug Nuts",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "choice_id": "3lt_e67__opt_s47_001",
@@ -94246,10 +90307,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 275,
             "display_behavior": "",
             "display_order": 30,
-            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "source_option_name": "Chrome Lug Nuts",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "choice_id": "1lt_e07__opt_sfe_001",
@@ -94274,10 +90332,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "source_option_name": "Chrome Wheel Locks",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "choice_id": "2lt_e07__opt_sfe_001",
@@ -94302,10 +90357,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "source_option_name": "Chrome Wheel Locks",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "choice_id": "3lt_e07__opt_sfe_001",
@@ -94330,10 +90382,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "source_option_name": "Chrome Wheel Locks",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "choice_id": "1lt_e67__opt_sfe_001",
@@ -94358,10 +90407,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "source_option_name": "Chrome Wheel Locks",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "choice_id": "2lt_e67__opt_sfe_001",
@@ -94386,10 +90432,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "source_option_name": "Chrome Wheel Locks",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "choice_id": "3lt_e67__opt_sfe_001",
@@ -94414,10 +90457,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 125,
             "display_behavior": "",
             "display_order": 40,
-            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "source_option_name": "Chrome Wheel Locks",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "choice_id": "1lt_e07__opt_5zd_001",
@@ -94442,10 +90482,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Crossed Flags Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_5zd_001",
@@ -94470,10 +90507,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Crossed Flags Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_5zd_001",
@@ -94498,10 +90532,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Crossed Flags Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_5zd_001",
@@ -94526,10 +90557,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Crossed Flags Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_5zd_001",
@@ -94554,10 +90582,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Crossed Flags Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_5zd_001",
@@ -94582,10 +90607,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Crossed Flags Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_5zc_001",
@@ -94610,10 +90632,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Jake Logo Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_5zc_001",
@@ -94638,10 +90657,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Jake Logo Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_5zc_001",
@@ -94666,10 +90682,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Jake Logo Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_5zc_001",
@@ -94694,10 +90707,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Jake Logo Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_5zc_001",
@@ -94722,10 +90732,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Jake Logo Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_5zc_001",
@@ -94750,10 +90757,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "",
-            "source_option_name": "Jake Logo Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_5zb_001",
@@ -94778,10 +90782,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Grand Sport Logo Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e07__opt_5zb_001",
@@ -94806,10 +90807,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Grand Sport Logo Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e07__opt_5zb_001",
@@ -94834,10 +90832,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Grand Sport Logo Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e67__opt_5zb_001",
@@ -94862,10 +90857,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Grand Sport Logo Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "2lt_e67__opt_5zb_001",
@@ -94890,10 +90882,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Grand Sport Logo Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "3lt_e67__opt_5zb_001",
@@ -94918,10 +90907,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 250,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "",
-            "source_option_name": "Grand Sport Logo Wheel Center Caps",
-            "source_description": "LPO. Genuine Corvette Accessory",
-            "text_cleanup_notes": []
+            "source_detail_raw": ""
           },
           {
             "choice_id": "1lt_e07__opt_swm_001",
@@ -94947,9 +90933,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png",
             "image_alt": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -94979,9 +90962,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png",
             "image_alt": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95011,9 +90991,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png",
             "image_alt": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95043,9 +91020,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png",
             "image_alt": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95075,9 +91049,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png",
             "image_alt": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95107,9 +91078,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "",
-            "source_option_name": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png",
             "image_alt": "Pearl Nickel 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95139,9 +91107,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Gloss Black 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png",
             "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95171,9 +91136,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Gloss Black 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png",
             "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95203,9 +91165,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Gloss Black 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png",
             "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95235,9 +91194,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Gloss Black 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png",
             "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95267,9 +91223,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Gloss Black 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png",
             "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95299,9 +91252,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "",
-            "source_option_name": "Gloss Black 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png",
             "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95331,9 +91281,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "High-Polished 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png",
             "image_alt": "High-Polished 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95363,9 +91310,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "High-Polished 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png",
             "image_alt": "High-Polished 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95395,9 +91339,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "High-Polished 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png",
             "image_alt": "High-Polished 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95427,9 +91368,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "High-Polished 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png",
             "image_alt": "High-Polished 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95459,9 +91397,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "High-Polished 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png",
             "image_alt": "High-Polished 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95491,9 +91426,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "",
-            "source_option_name": "High-Polished 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png",
             "image_alt": "High-Polished 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95523,9 +91455,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png",
             "image_alt": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95555,9 +91484,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png",
             "image_alt": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95587,9 +91513,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png",
             "image_alt": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95619,9 +91542,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png",
             "image_alt": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95651,9 +91571,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png",
             "image_alt": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95683,9 +91600,6 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "",
-            "source_option_name": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": [],
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png",
             "image_alt": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
             "image_fit": "cover",
@@ -95714,10 +91628,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 11995,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Carbon Flash-Painted Carbon Fiber Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "2lt_e07__opt_roy_001",
@@ -95742,10 +91653,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 11995,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Carbon Flash-Painted Carbon Fiber Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "3lt_e07__opt_roy_001",
@@ -95770,10 +91678,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 11995,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Carbon Flash-Painted Carbon Fiber Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "1lt_e67__opt_roy_001",
@@ -95798,10 +91703,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 11995,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Carbon Flash-Painted Carbon Fiber Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "2lt_e67__opt_roy_001",
@@ -95826,10 +91728,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 11995,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Carbon Flash-Painted Carbon Fiber Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "3lt_e67__opt_roy_001",
@@ -95854,10 +91753,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 11995,
             "display_behavior": "",
             "display_order": 50,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Carbon Flash-Painted Carbon Fiber Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "1lt_e07__opt_roz_001",
@@ -95882,10 +91778,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 13995,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Visible Carbon Fiber Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "2lt_e07__opt_roz_001",
@@ -95910,10 +91803,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 13995,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Visible Carbon Fiber Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "3lt_e07__opt_roz_001",
@@ -95938,10 +91828,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 13995,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Visible Carbon Fiber Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "1lt_e67__opt_roz_001",
@@ -95966,10 +91853,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 13995,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Visible Carbon Fiber Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "2lt_e67__opt_roz_001",
@@ -95994,10 +91878,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 13995,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Visible Carbon Fiber Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "3lt_e67__opt_roz_001",
@@ -96022,10 +91903,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 13995,
             "display_behavior": "",
             "display_order": 60,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Visible Carbon Fiber Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "1lt_e07__opt_stz_001",
@@ -96050,10 +91928,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 15500,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Visible Carbon Fiber Red Stripe Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "2lt_e07__opt_stz_001",
@@ -96078,10 +91953,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 15500,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Visible Carbon Fiber Red Stripe Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "3lt_e07__opt_stz_001",
@@ -96106,10 +91978,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 15500,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Visible Carbon Fiber Red Stripe Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "1lt_e67__opt_stz_001",
@@ -96134,10 +92003,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 15500,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Visible Carbon Fiber Red Stripe Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "2lt_e67__opt_stz_001",
@@ -96162,10 +92028,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 15500,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Visible Carbon Fiber Red Stripe Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "choice_id": "3lt_e67__opt_stz_001",
@@ -96190,10 +92053,7 @@ window.CORVETTE_FORM_DATA = {
             "base_price": 15500,
             "display_behavior": "",
             "display_order": 70,
-            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes.",
-            "source_option_name": "Visible Carbon Fiber Red Stripe Wheels",
-            "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-            "text_cleanup_notes": []
+            "source_detail_raw": "1. Requires (J57) carbon ceramic brakes."
           }
         ],
         "standardEquipment": [
@@ -115531,1687 +111391,7 @@ window.CORVETTE_FORM_DATA = {
             "entity_id": "",
             "message": "245 color override rows exported from color_overrides."
           }
-        ],
-        "draftMetadata": {
-          "sourcePreviewStatus": "read_only_preview",
-          "candidateAvailableOrStandardChoices": 1242,
-          "fullVariantMatrixChoices": 1380,
-          "ruleDetailHotSpots": {
-            "counts": {
-              "except": 2,
-              "included_with": 17,
-              "includes": 43,
-              "not_available": 49,
-              "not_recommended": 4,
-              "only": 26,
-              "requires": 33,
-              "special_package_review": 26
-            },
-            "rows": [
-              {
-                "option_id": "opt_uqh_001",
-                "rpo": "UQH",
-                "option_name": "Bose Performance Series Audio System",
-                "section_id": "sec_2lte_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_aqa_001",
-                "rpo": "AQA",
-                "option_name": "Memory Driver and Passenger Convenience Package",
-                "section_id": "sec_2lte_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_iwe_001",
-                "rpo": "IWE",
-                "option_name": "Sueded Microfiber-Wrapped Upper Interior Trim Package",
-                "section_id": "sec_3lte_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_j6d_001",
-                "rpo": "J6D",
-                "option_name": "Dark Gray Metallic-Painted Calipers",
-                "section_id": "sec_cali_001",
-                "matched_terms": [
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included and only available with (J57) carbon ceramic brakes."
-              },
-              {
-                "option_id": "opt_j6l_001",
-                "rpo": "J6L",
-                "option_name": "Orange-Painted Calipers",
-                "section_id": "sec_cali_001",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (J57) carbon ceramic brakes."
-              },
-              {
-                "option_id": "opt_d30_001",
-                "rpo": "D30",
-                "option_name": "Color Combination Override",
-                "section_id": "sec_colo_001",
-                "matched_terms": [
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
-              },
-              {
-                "option_id": "opt_r6x_001",
-                "rpo": "R6X",
-                "option_name": "Custom Interior Trim and Seat Combination",
-                "section_id": "sec_colo_001",
-                "matched_terms": [
-                  "requires",
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
-              },
-              {
-                "option_id": "opt_r8c_001",
-                "rpo": "R8C",
-                "option_name": "Corvette Museum Delivery",
-                "section_id": "sec_cust_001",
-                "matched_terms": [
-                  "not_available",
-                  "includes",
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels."
-              },
-              {
-                "option_id": "opt_pin_001",
-                "rpo": "PIN",
-                "option_name": "Customer VIN Ending Reservation",
-                "section_id": "sec_cust_001",
-                "matched_terms": [
-                  "not_available",
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only."
-              },
-              {
-                "option_id": "opt_bv4_001",
-                "rpo": "BV4",
-                "option_name": "Personalized Specification Plaque",
-                "section_id": "sec_cust_001",
-                "matched_terms": [
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
-              },
-              {
-                "option_id": "opt_38s_001",
-                "rpo": "38S",
-                "option_name": "Adrenaline Red Custom Leather Stitching",
-                "section_id": "sec_cust_002",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior or (HU0/HXO) Adrenaline Red/Jet Black interior."
-              },
-              {
-                "option_id": "opt_36s_001",
-                "rpo": "36S",
-                "option_name": "Competition Yellow Custom Leather Stitching",
-                "section_id": "sec_cust_002",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior."
-              },
-              {
-                "option_id": "opt_37s_001",
-                "rpo": "37S",
-                "option_name": "Santorini Blue Custom Leather Stitching",
-                "section_id": "sec_cust_002",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior."
-              },
-              {
-                "option_id": "opt_b6p_001",
-                "rpo": "B6P",
-                "option_name": "Coupe Engine Appearance Package",
-                "section_id": "sec_engi_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_zz3_001",
-                "rpo": "ZZ3",
-                "option_name": "Convertible Engine Appearance Package",
-                "section_id": "sec_engi_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_d3v_001",
-                "rpo": "D3V",
-                "option_name": "Engine Lighting",
-                "section_id": "sec_engi_001",
-                "matched_terms": [
-                  "included_with"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers."
-              },
-              {
-                "option_id": "opt_sl9_001",
-                "rpo": "SL9",
-                "option_name": "Engine Specification Plaque",
-                "section_id": "sec_engi_001",
-                "matched_terms": [
-                  "included_with"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included with (B6P/ZZ3) Engine Appearance Package."
-              },
-              {
-                "option_id": "opt_bc7_001",
-                "rpo": "BC7",
-                "option_name": "Black LS6 Engine Cover",
-                "section_id": "sec_engi_001",
-                "matched_terms": [
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
-              },
-              {
-                "option_id": "opt_bcp_002",
-                "rpo": "BCP",
-                "option_name": "Edge Red LS6 Engine Cover",
-                "section_id": "sec_engi_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
-              },
-              {
-                "option_id": "opt_bcs_002",
-                "rpo": "BCS",
-                "option_name": "Sterling Silver LS6 Engine Cover",
-                "section_id": "sec_engi_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
-              },
-              {
-                "option_id": "opt_bc4_002",
-                "rpo": "BC4",
-                "option_name": "Blue LS6 Engine Cover",
-                "section_id": "sec_engi_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)"
-              },
-              {
-                "option_id": "opt_wub_001",
-                "rpo": "WUB",
-                "option_name": "Quad Center Exit Exhaust",
-                "section_id": "sec_exha_001",
-                "matched_terms": [
-                  "included_with",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "FEY"
-                ],
-                "detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
-              },
-              {
-                "option_id": "opt_nwi_001",
-                "rpo": "NWI",
-                "option_name": "Bright Chrome Exhaust Tips",
-                "section_id": "sec_exha_001",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (WUB) quad center exit exhaust."
-              },
-              {
-                "option_id": "opt_efr_001",
-                "rpo": "EFR",
-                "option_name": "Carbon Flash Painted Accents",
-                "section_id": "sec_exte_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered."
-              },
-              {
-                "option_id": "opt_zyc_001",
-                "rpo": "ZYC",
-                "option_name": "Carbon Flash Mirrors and Spoiler",
-                "section_id": "sec_exte_001",
-                "matched_terms": [
-                  "not_available",
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with exterior color (GBA) Black."
-              },
-              {
-                "option_id": "opt_dmu_001",
-                "rpo": "DMU",
-                "option_name": "Carbon Flash Center Stripe",
-                "section_id": "sec_gsce_001",
-                "matched_terms": [
-                  "requires",
-                  "includes",
-                  "only",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "Z15"
-                ],
-                "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics."
-              },
-              {
-                "option_id": "opt_dmv_001",
-                "rpo": "DMV",
-                "option_name": "Blade Silver Center Stripe",
-                "section_id": "sec_gsce_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available",
-                  "includes",
-                  "only",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "Z15"
-                ],
-                "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
-              },
-              {
-                "option_id": "opt_dmw_001",
-                "rpo": "DMW",
-                "option_name": "Arctic White Center Stripe",
-                "section_id": "sec_gsce_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available",
-                  "includes",
-                  "only",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "Z15"
-                ],
-                "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White."
-              },
-              {
-                "option_id": "opt_dmx_001",
-                "rpo": "DMX",
-                "option_name": "Admiral Blue Center Stripe",
-                "section_id": "sec_gsce_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available",
-                  "includes",
-                  "only",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "Z15"
-                ],
-                "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
-              },
-              {
-                "option_id": "opt_dmy_001",
-                "rpo": "DMY",
-                "option_name": "Red Mist Center Stripe",
-                "section_id": "sec_gsce_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available",
-                  "includes",
-                  "only",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "Z15"
-                ],
-                "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
-              },
-              {
-                "option_id": "opt_17a_001",
-                "rpo": "17A",
-                "option_name": "Blade Silver Hash Marks",
-                "section_id": "sec_gsha_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "Z15"
-                ],
-                "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
-              },
-              {
-                "option_id": "opt_20a_001",
-                "rpo": "20A",
-                "option_name": "Admiral Blue Hash Marks",
-                "section_id": "sec_gsha_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "Z15"
-                ],
-                "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
-              },
-              {
-                "option_id": "opt_55a_001",
-                "rpo": "55A",
-                "option_name": "Competition Yellow Hash Marks.",
-                "section_id": "sec_gsha_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "Z15"
-                ],
-                "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
-              },
-              {
-                "option_id": "opt_75a_001",
-                "rpo": "75A",
-                "option_name": "Torch Red Hash Marks",
-                "section_id": "sec_gsha_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "Z15"
-                ],
-                "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
-              },
-              {
-                "option_id": "opt_97a_001",
-                "rpo": "97A",
-                "option_name": "Carbon Flash Hash Marks",
-                "section_id": "sec_gsha_001",
-                "matched_terms": [
-                  "requires",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "Z15"
-                ],
-                "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics."
-              },
-              {
-                "option_id": "opt_dx4_001",
-                "rpo": "DX4",
-                "option_name": "Red Mist Hash Marks",
-                "section_id": "sec_gsha_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "Z15"
-                ],
-                "detail_raw": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
-              },
-              {
-                "option_id": "opt_drg_001",
-                "rpo": "DRG",
-                "option_name": "Carbon Flash Outside Mirrors",
-                "section_id": "sec_incl_001",
-                "matched_terms": [
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included and only available with (ZYC) Carbon Flash Metallic-painted outside mirrors and spoiler (when equipped) or (5JR) outside mirror covers in visible Carbon Fiber, LPO."
-              },
-              {
-                "option_id": "opt_tr7_001",
-                "rpo": "TR7",
-                "option_name": "Automatic Leveling Headlamp Control",
-                "section_id": "sec_incl_001",
-                "matched_terms": [
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included and only available with (E60) front lift adjustable height."
-              },
-              {
-                "option_id": "opt_cfx_001",
-                "rpo": "CFX",
-                "option_name": "Personalized Corvette Museum Plaque",
-                "section_id": "sec_incl_001",
-                "matched_terms": [
-                  "includes",
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included and only available with (R8C) Corvette Museum Delivery."
-              },
-              {
-                "option_id": "opt_xfr_001",
-                "rpo": "XFR",
-                "option_name": "High Performance Tires",
-                "section_id": "sec_incl_001",
-                "matched_terms": [
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
-              },
-              {
-                "option_id": "opt_xfs_001",
-                "rpo": "XFS",
-                "option_name": "Michelin Pilot Sport Cup 2 R Tires",
-                "section_id": "sec_incl_001",
-                "matched_terms": [
-                  "only",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "FEY"
-                ],
-                "detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package."
-              },
-              {
-                "option_id": "opt_n26_001",
-                "rpo": "N26",
-                "option_name": "Sueded Microfiber-Wrapped Steering Wheel",
-                "section_id": "sec_inte_001",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (HTJ) Jet Black interior.\n2. Requires leather seating surfaces with perforated sueded microfiber inserts interior: HTP, HU6, HU7, HTQ.\n3. Requires leather seating surfaces with perforated sueded microfiber inserts interiors: HTT, HU9, HUA, HTG, HUF, HMO, HVT, HXO, HZP, HUX, EPX, HUB."
-              },
-              {
-                "option_id": "opt_tu7_001",
-                "rpo": "TU7",
-                "option_name": "Two-Tone Seats",
-                "section_id": "sec_inte_001",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (AH2) GT2 seats. Available with (HUK/HU6) Sky Cool Gray, (HUL/HU7) Adrenaline Red, (HTN/HTQ) Natural interiors.\n2. Requires (AH2) GT2 seats. Available with (HU1/HU9) Sky Cool Gray, (HU2/HUA) Adrenaline Red, (HUE/HTG) Natural, (HMO/HVV) Jet Black/Sky Cool Gray, (HU0/HXO) Jet Black/Adrenaline Red interiors."
-              },
-              {
-                "option_id": "opt_sfz_001",
-                "rpo": "SFZ",
-                "option_name": "Dark Stealth Crossed Flags Emblems",
-                "section_id": "sec_lpoe_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
-              },
-              {
-                "option_id": "opt_r88_001",
-                "rpo": "R88",
-                "option_name": "Front Illuminated Crossed Flags Emblem",
-                "section_id": "sec_lpoe_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
-              },
-              {
-                "option_id": "opt_sbt_001",
-                "rpo": "SBT",
-                "option_name": "Dual Roof Package",
-                "section_id": "sec_lpoe_001",
-                "matched_terms": [
-                  "not_available",
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with (CC3) transparent, removable roof panel."
-              },
-              {
-                "option_id": "opt_sc7_001",
-                "rpo": "SC7",
-                "option_name": "Roof Panel Storage Pouch",
-                "section_id": "sec_lpoe_001",
-                "matched_terms": [
-                  "included_with"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included with (SBT) dual roof, LPO."
-              },
-              {
-                "option_id": "opt_pcq_001",
-                "rpo": "PCQ",
-                "option_name": "Grille Screen Protection Package",
-                "section_id": "sec_lpoe_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_vwe_001",
-                "rpo": "VWE",
-                "option_name": "Front Radiator Grille Screens",
-                "section_id": "sec_lpoe_001",
-                "matched_terms": [
-                  "included_with"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
-              },
-              {
-                "option_id": "opt_vwt_001",
-                "rpo": "VWT",
-                "option_name": "Insect Protection Grille Screen",
-                "section_id": "sec_lpoe_001",
-                "matched_terms": [
-                  "included_with"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
-              },
-              {
-                "option_id": "opt_5jr_001",
-                "rpo": "5JR",
-                "option_name": "Visible Carbon Fiber Outside Mirror Covers",
-                "section_id": "sec_lpoe_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_rz9_001",
-                "rpo": "RZ9",
-                "option_name": "Visible Carbon Fiber Grille Insert",
-                "section_id": "sec_lpoe_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available at this time."
-              },
-              {
-                "option_id": "opt_rin_001",
-                "rpo": "RIN",
-                "option_name": "Arctic White Rear Corvette Script Badge",
-                "section_id": "sec_lpoe_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with RIK, SL8."
-              },
-              {
-                "option_id": "opt_sl8_001",
-                "rpo": "SL8",
-                "option_name": "Edge Red Rear Corvette Script Badge",
-                "section_id": "sec_lpoe_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with RIK, RIN."
-              },
-              {
-                "option_id": "opt_rik_001",
-                "rpo": "RIK",
-                "option_name": "Torch Red Rear Corvette Script Badge",
-                "section_id": "sec_lpoe_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with RIN, SL8."
-              },
-              {
-                "option_id": "opt_sig_001",
-                "rpo": "SIG",
-                "option_name": "Clear Smoked Jake Logo Spoiler Extension",
-                "section_id": "sec_lpoe_001",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (T0E) rear spoiler."
-              },
-              {
-                "option_id": "opt_pdy_001",
-                "rpo": "PDY",
-                "option_name": "Roadside Safety Package",
-                "section_id": "sec_lpoi_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_ryt_001",
-                "rpo": "RYT",
-                "option_name": "First Aid Kit",
-                "section_id": "sec_lpoi_001",
-                "matched_terms": [
-                  "included_with"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included with (PDY) Roadside Safety Package."
-              },
-              {
-                "option_id": "opt_s08_001",
-                "rpo": "S08",
-                "option_name": "Highway Safety Kit",
-                "section_id": "sec_lpoi_001",
-                "matched_terms": [
-                  "included_with"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included with (PDY) Roadside Safety Package."
-              },
-              {
-                "option_id": "opt_pef_001",
-                "rpo": "PEF",
-                "option_name": "Jake Logo Contoured Liner Protection Package",
-                "section_id": "sec_lpoi_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_ria_001",
-                "rpo": "RIA",
-                "option_name": "All-Weather Floor Liners",
-                "section_id": "sec_lpoi_001",
-                "matched_terms": [
-                  "included_with"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
-              },
-              {
-                "option_id": "opt_cav_001",
-                "rpo": "CAV",
-                "option_name": "Contoured Cargo Area Liners",
-                "section_id": "sec_lpoi_001",
-                "matched_terms": [
-                  "included_with"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
-              },
-              {
-                "option_id": "opt_v8x_001",
-                "rpo": "V8X",
-                "option_name": "Visible Carbon Fiber Sill Plates",
-                "section_id": "sec_lpoi_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available at this time."
-              },
-              {
-                "option_id": "opt_r9w_001",
-                "rpo": "R9W",
-                "option_name": "Deleted Mobile Service Plus",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires a dealer with a BFU of 284. Requires TRE, SRE or Fleet order types."
-              },
-              {
-                "option_id": "opt_r6p_001",
-                "rpo": "R6P",
-                "option_name": "Three-Year SiriusXM Subscription",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available",
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires SiriusXM. Not available with a FGO order type. SiriusXM Extended Service subscription will stop at the end of the applicable subscription period unless you decide to continue service. Plan is non-transferable and non-refundable. Service subject to the SiriusXM Customer Agreement and Privacy Policy, visit siriusxm.com/terms to see complete terms and how to cancel which includes online methods or calling 1-866-635-2349. Some services, content and features are subject to device capabilities, an active data connection enabled in the vehicle and location availability. All fees, content and features are subject to change. Content varies by subscription plan. SiriusXM and related logos are trademarks of Sirius XM Radio Inc. and its respective subsidiaries."
-              },
-              {
-                "option_id": "opt_prb_001",
-                "rpo": "PRB",
-                "option_name": "Three-Year OnStar One Standalone Plan",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (UE1) OnStar and a Retail order type. Not available on vehicles being shipped to Puerto Rico, the Virgin Islands, or Guam. OnStar plan, working electrical system, cell reception and GPS signal required. OnStar links to emergency services. Not all vehicles may transmit all crash data. Service coverage varies with conditions and location. Service availability, features and functionality vary by device and software version. Subject to user terms. See onstar.com for details and limitations."
-              },
-              {
-                "option_id": "opt_r9y_001",
-                "rpo": "R9Y",
-                "option_name": "One-Year Mobile Service Plus",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available",
-                  "only",
-                  "except"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Required and only available for dealers who have a BFU of 284, except for orders with (R9W) Deleted Mobile Service Plus. Requires TRE, SRE, FBC, FNR or Fleet order types. Not available with (R9V) Mobile Service Plus for 3 years."
-              },
-              {
-                "option_id": "opt_r9v_001",
-                "rpo": "R9V",
-                "option_name": "Three-Year Mobile Service Plus",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "requires",
-                  "not_available",
-                  "only",
-                  "except"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Required and only available for dealers who have a BFU of 284, except for orders with (R9W) Deleted Mobile Service Plus. Requires TRE, SRE or Fleet order types. Not available with (R9Y) Mobile Service Plus for 1 year."
-              },
-              {
-                "option_id": "opt_r9l_001",
-                "rpo": "R9L",
-                "option_name": "Removes OnStar Basics (OnStar Fleet Basics for Fleet)",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included and only available on vehicles being shipped to Puerto Rico, the Virgin Islands, or Guam. Will delete OnStar Services and OnStar standard equipment (OnStar Basics / Connected Access / EV Access / R9M Services i.e. OnStar One and OnStar One Super Cruise as equipped) for vehicles shipping to these territories."
-              },
-              {
-                "option_id": "opt_u2k_001",
-                "rpo": "U2K",
-                "option_name": "SiriusXM Trial Subscription",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. IMPORTANT: The SiriusXM trial subscription is not provided on vehicles that are ordered for Fleet Daily Rental (\"FDR\") use. Trial subscription is subject to the SiriusXM Customer Agreement and privacy policy, visit siriusxm.com which includes full terms and how to cancel. All fees, content, features, and availability are subject to change."
-              },
-              {
-                "option_id": "opt_009",
-                "rpo": "",
-                "option_name": "OnStar Basics (OnStar Fleet Basics for Fleet)",
-                "section_id": "sec_onst_001",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (UE1) OnStar. OnStar Basics is standard for 8 years; working electrical system, cell reception and GPS signal required. OnStar links to emergency services. Service coverage varies with conditions and location. Service availability, features and functionality vary by device and software version. Subject to user terms. See onstar.com for details and limitations. Removed with a ship-to of Guam, Puerto Rico or the Virgin Islands."
-              },
-              {
-                "option_id": "opt_t0e_001",
-                "rpo": "T0E",
-                "option_name": "Low Rear Spoiler",
-                "section_id": "sec_perf_aero_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_t0f_001",
-                "rpo": "T0F",
-                "option_name": "Carbon Flash-Painted Carbon Fiber Aero Package",
-                "section_id": "sec_perf_aero_001",
-                "matched_terms": [
-                  "requires",
-                  "included_with",
-                  "includes",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "FEY"
-                ],
-                "detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package."
-              },
-              {
-                "option_id": "opt_5zv_001",
-                "rpo": "5ZV",
-                "option_name": "Carbon Flash Metallic Three-Stanchion High Wing Spoiler",
-                "section_id": "sec_perf_aero_001",
-                "matched_terms": [
-                  "not_available",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "FEY"
-                ],
-                "detail_raw": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
-              },
-              {
-                "option_id": "opt_j56_001",
-                "rpo": "J56",
-                "option_name": "Performance Disc Brakes",
-                "section_id": "sec_perf_brake_001",
-                "matched_terms": [
-                  "includes",
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included and only available with (FEB) Z52 Sport Performance Package."
-              },
-              {
-                "option_id": "opt_jx6_001",
-                "rpo": "JX6",
-                "option_name": "Low-Dust Touring Brakes",
-                "section_id": "sec_perf_brake_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_j57_001",
-                "rpo": "J57",
-                "option_name": "Carbon Ceramic Brakes",
-                "section_id": "sec_perf_brake_001",
-                "matched_terms": [
-                  "included_with",
-                  "includes",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "FEY"
-                ],
-                "detail_raw": "1. Included with (FEY) Z52 Track Performance Package."
-              },
-              {
-                "option_id": "opt_cfl_001",
-                "rpo": "CFL",
-                "option_name": "Extended Front Splitter, Carbon Flash",
-                "section_id": "sec_perf_ground_001",
-                "matched_terms": [
-                  "not_available",
-                  "includes",
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with (CFV/CFZ) ground effects."
-              },
-              {
-                "option_id": "opt_cfz_001",
-                "rpo": "CFZ",
-                "option_name": "Carbon Flash Carbon Fiber Ground Effects",
-                "section_id": "sec_perf_ground_001",
-                "matched_terms": [
-                  "included_with",
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package."
-              },
-              {
-                "option_id": "opt_cfv_001",
-                "rpo": "CFV",
-                "option_name": "Visible Carbon Fiber Ground Effects",
-                "section_id": "sec_perf_ground_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available at this time."
-              },
-              {
-                "option_id": "opt_e60_001",
-                "rpo": "E60",
-                "option_name": "Front Lift Adjustable Height",
-                "section_id": "sec_perf_support_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_feb_001",
-                "rpo": "FEB",
-                "option_name": "Z52 Sport Performance Package",
-                "section_id": "sec_perf_z52_001",
-                "matched_terms": [
-                  "includes",
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_fey_001",
-                "rpo": "FEY",
-                "option_name": "Z52 Track Performance Package",
-                "section_id": "sec_perf_z52_001",
-                "matched_terms": [
-                  "includes",
-                  "special_package_review"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_cm9_001",
-                "rpo": "CM9",
-                "option_name": "Body-Color Power Convertible Hardtop",
-                "section_id": "sec_roof_001",
-                "matched_terms": [
-                  "includes",
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_cf8_001",
-                "rpo": "CF8",
-                "option_name": "Electrochromic Dimming Roof Panel",
-                "section_id": "sec_roof_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY)."
-              },
-              {
-                "option_id": "opt_d84_001",
-                "rpo": "D84",
-                "option_name": "Carbon Flash Convertible Top",
-                "section_id": "sec_roof_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with exterior color (GBA) Black."
-              },
-              {
-                "option_id": "opt_d86_001",
-                "rpo": "D86",
-                "option_name": "Body-Color Roof, Carbon Flash-painted Nacelles",
-                "section_id": "sec_roof_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with exterior color (GBA) Black."
-              },
-              {
-                "option_id": "opt_719_001",
-                "rpo": "719",
-                "option_name": "Black Seat Belt Color",
-                "section_id": "sec_seat_001",
-                "matched_terms": [
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "EL9"
-                ],
-                "detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color."
-              },
-              {
-                "option_id": "opt_3n9_001",
-                "rpo": "3N9",
-                "option_name": "Natural Seat Belt Color",
-                "section_id": "sec_seat_001",
-                "matched_terms": [
-                  "included_with"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Recommended with (HTA, HTJ) Jet Black interior.\n2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\n3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors."
-              },
-              {
-                "option_id": "opt_379_001",
-                "rpo": "379",
-                "option_name": "Orange Seat Belt Color",
-                "section_id": "sec_seat_001",
-                "matched_terms": [
-                  "included_with",
-                  "not_recommended",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "EL9"
-                ],
-                "detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior. Included with (HUW, HUX) Habanero interiors."
-              },
-              {
-                "option_id": "opt_3a9_001",
-                "rpo": "3A9",
-                "option_name": "Santorini Blue Seat Belt Color",
-                "section_id": "sec_seat_001",
-                "matched_terms": [
-                  "included_with",
-                  "not_recommended"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
-              },
-              {
-                "option_id": "opt_3f9_001",
-                "rpo": "3F9",
-                "option_name": "Torch Red Seat Belt Color",
-                "section_id": "sec_seat_001",
-                "matched_terms": [
-                  "included_with",
-                  "not_recommended",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "EL9",
-                  "Z25"
-                ],
-                "detail_raw": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition."
-              },
-              {
-                "option_id": "opt_3m9_001",
-                "rpo": "3M9",
-                "option_name": "Yellow Seat Belt Color",
-                "section_id": "sec_seat_001",
-                "matched_terms": [
-                  "not_recommended",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "EL9"
-                ],
-                "detail_raw": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. \n2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior, (HAG) Asymmetrical Santorini Blue/Jet Black interior or (EL9) Santorini Blue Dipped with Red accents interior."
-              },
-              {
-                "option_id": "opt_aq9_001",
-                "rpo": "AQ9",
-                "option_name": "GT1 Bucket Seats",
-                "section_id": "sec_seat_002",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "Not Available with 3LT"
-              },
-              {
-                "option_id": "opt_ah2_001",
-                "rpo": "AH2",
-                "option_name": "GT2 Bucket Seats",
-                "section_id": "sec_seat_002",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "Not Available with 1LT"
-              },
-              {
-                "option_id": "opt_aup_001",
-                "rpo": "AUP",
-                "option_name": "Asymmetrical Seats",
-                "section_id": "sec_seat_002",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
-              },
-              {
-                "option_id": "opt_z25_001",
-                "rpo": "Z25",
-                "option_name": "Grand Sport Launch Edition",
-                "section_id": "sec_spec_001",
-                "matched_terms": [
-                  "includes",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "EL9"
-                ],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_m1n_001",
-                "rpo": "M1N",
-                "option_name": "8-Speed Dual Clutch Transmission",
-                "section_id": "sec_stan_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_002",
-                "rpo": "",
-                "option_name": "Floor Console",
-                "section_id": "sec_stan_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_007",
-                "rpo": "",
-                "option_name": "Keyless Open and Start",
-                "section_id": "sec_stan_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_cm9_002",
-                "rpo": "CM9",
-                "option_name": "Body-Color Power Convertible Hardtop",
-                "section_id": "sec_stan_002",
-                "matched_terms": [
-                  "includes",
-                  "only"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_efr_002",
-                "rpo": "EFR",
-                "option_name": "Carbon Flash Exterior Accents",
-                "section_id": "sec_stan_002",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered."
-              },
-              {
-                "option_id": "opt_719_002",
-                "rpo": "719",
-                "option_name": "Black Seat Belt Color",
-                "section_id": "sec_stan_002",
-                "matched_terms": [
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "EL9"
-                ],
-                "detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color."
-              },
-              {
-                "option_id": "opt_z15_001",
-                "rpo": "Z15",
-                "option_name": "Grand Sport Heritage Graphics",
-                "section_id": "sec_stri_001",
-                "matched_terms": [
-                  "requires",
-                  "includes",
-                  "only",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "Z15"
-                ],
-                "detail_raw": "1. Requires one of the following Grand Sport Heritage Hash Marks: (17A) Blade Silver, (20A) Admiral Blue, (55A) Competition Yellow, (75A) Torch Red, (97A) Carbon Flash, and (DX4) Red Mist. Only additional stripes or graphics available with Z15 are (DMU/DMV/DMW/DMX/DMY) Grand Sport Heritage Center Stripes."
-              },
-              {
-                "option_id": "opt_dt0_001",
-                "rpo": "DT0",
-                "option_name": "Competition Yellow Racing Stripes",
-                "section_id": "sec_stri_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
-              },
-              {
-                "option_id": "opt_duw_001",
-                "rpo": "DUW",
-                "option_name": "Edge Blue Racing Stripes",
-                "section_id": "sec_stri_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
-              },
-              {
-                "option_id": "opt_dsy_001",
-                "rpo": "DSY",
-                "option_name": "Edge Orange Racing Stripes",
-                "section_id": "sec_stri_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
-              },
-              {
-                "option_id": "opt_dsz_001",
-                "rpo": "DSZ",
-                "option_name": "Edge Red Racing Stripes",
-                "section_id": "sec_stri_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
-              },
-              {
-                "option_id": "opt_dpb_001",
-                "rpo": "DPB",
-                "option_name": "Carbon Flash/Blue Racing Stripes",
-                "section_id": "sec_stri_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
-              },
-              {
-                "option_id": "opt_dpg_001",
-                "rpo": "DPG",
-                "option_name": "Carbon Flash/Orange Racing Stripes",
-                "section_id": "sec_stri_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
-              },
-              {
-                "option_id": "opt_dpl_001",
-                "rpo": "DPL",
-                "option_name": "Carbon Flash/Red Racing Stripes",
-                "section_id": "sec_stri_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
-              },
-              {
-                "option_id": "opt_dpc_001",
-                "rpo": "DPC",
-                "option_name": "Carbon Flash/Yellow Racing Stripes",
-                "section_id": "sec_stri_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
-              },
-              {
-                "option_id": "opt_duk_001",
-                "rpo": "DUK",
-                "option_name": "Edge Red/Carbon Flash Racing Stripes",
-                "section_id": "sec_stri_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
-              },
-              {
-                "option_id": "opt_due_001",
-                "rpo": "DUE",
-                "option_name": "Santorini Blue/Carbon Flash Racing Stripes",
-                "section_id": "sec_stri_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
-              },
-              {
-                "option_id": "opt_dzu_001",
-                "rpo": "DZU",
-                "option_name": "Carbon Flash/Competition Yellow Stinger Stripe",
-                "section_id": "sec_stri_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
-              },
-              {
-                "option_id": "opt_dzx_001",
-                "rpo": "DZX",
-                "option_name": "Carbon Flash/Edge Red Stinger Stripe",
-                "section_id": "sec_stri_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
-              },
-              {
-                "option_id": "opt_sht_001",
-                "rpo": "SHT",
-                "option_name": "Tech Bronze Jake Hood Graphic",
-                "section_id": "sec_stri_001",
-                "matched_terms": [
-                  "not_available",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "Z15"
-                ],
-                "detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics."
-              },
-              {
-                "option_id": "opt_vpo_001",
-                "rpo": "VPO",
-                "option_name": "Tech Bronze Jake C8.R Rear Hash Graphic",
-                "section_id": "sec_stri_001",
-                "matched_terms": [
-                  "not_available",
-                  "special_package_review"
-                ],
-                "special_mentions": [
-                  "Z15"
-                ],
-                "detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics."
-              },
-              {
-                "option_id": "opt_ive_001",
-                "rpo": "IVE",
-                "option_name": "Infotainment System with Google Built-In",
-                "section_id": "sec_tech_001",
-                "matched_terms": [
-                  "includes"
-                ],
-                "special_mentions": [],
-                "detail_raw": ""
-              },
-              {
-                "option_id": "opt_spy_001",
-                "rpo": "SPY",
-                "option_name": "Black Lug Nuts",
-                "section_id": "sec_whee_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with (S47) Chrome lug nuts, LPO."
-              },
-              {
-                "option_id": "opt_spz_001",
-                "rpo": "SPZ",
-                "option_name": "Black Wheel Locks",
-                "section_id": "sec_whee_001",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (SPY) Black lug nuts, LPO."
-              },
-              {
-                "option_id": "opt_s47_001",
-                "rpo": "S47",
-                "option_name": "Chrome Lug Nuts",
-                "section_id": "sec_whee_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
-              },
-              {
-                "option_id": "opt_sfe_001",
-                "rpo": "SFE",
-                "option_name": "Chrome Wheel Locks",
-                "section_id": "sec_whee_001",
-                "matched_terms": [
-                  "not_available"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
-              },
-              {
-                "option_id": "opt_roy_001",
-                "rpo": "ROY",
-                "option_name": "Carbon Flash-Painted Carbon Fiber Wheels",
-                "section_id": "sec_whee_002",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (J57) carbon ceramic brakes."
-              },
-              {
-                "option_id": "opt_roz_001",
-                "rpo": "ROZ",
-                "option_name": "Visible Carbon Fiber Wheels",
-                "section_id": "sec_whee_002",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (J57) carbon ceramic brakes."
-              },
-              {
-                "option_id": "opt_stz_001",
-                "rpo": "STZ",
-                "option_name": "Visible Carbon Fiber Red Stripe Wheels",
-                "section_id": "sec_whee_002",
-                "matched_terms": [
-                  "requires"
-                ],
-                "special_mentions": [],
-                "detail_raw": "1. Requires (J57) carbon ceramic brakes."
-              }
-            ],
-            "special_mentions": {
-              "EL9": [
-                {
-                  "option_id": "opt_719_001",
-                  "rpo": "719",
-                  "option_name": "Black Seat Belt Color"
-                },
-                {
-                  "option_id": "opt_379_001",
-                  "rpo": "379",
-                  "option_name": "Orange Seat Belt Color"
-                },
-                {
-                  "option_id": "opt_3f9_001",
-                  "rpo": "3F9",
-                  "option_name": "Torch Red Seat Belt Color"
-                },
-                {
-                  "option_id": "opt_3m9_001",
-                  "rpo": "3M9",
-                  "option_name": "Yellow Seat Belt Color"
-                },
-                {
-                  "option_id": "opt_z25_001",
-                  "rpo": "Z25",
-                  "option_name": "Grand Sport Launch Edition"
-                },
-                {
-                  "option_id": "opt_719_002",
-                  "rpo": "719",
-                  "option_name": "Black Seat Belt Color"
-                }
-              ],
-              "FEY": [
-                {
-                  "option_id": "opt_wub_001",
-                  "rpo": "WUB",
-                  "option_name": "Quad Center Exit Exhaust"
-                },
-                {
-                  "option_id": "opt_xfs_001",
-                  "rpo": "XFS",
-                  "option_name": "Michelin Pilot Sport Cup 2 R Tires"
-                },
-                {
-                  "option_id": "opt_t0f_001",
-                  "rpo": "T0F",
-                  "option_name": "Carbon Flash-Painted Carbon Fiber Aero Package"
-                },
-                {
-                  "option_id": "opt_5zv_001",
-                  "rpo": "5ZV",
-                  "option_name": "Carbon Flash Metallic Three-Stanchion High Wing Spoiler"
-                },
-                {
-                  "option_id": "opt_j57_001",
-                  "rpo": "J57",
-                  "option_name": "Carbon Ceramic Brakes"
-                }
-              ],
-              "Z15": [
-                {
-                  "option_id": "opt_dmu_001",
-                  "rpo": "DMU",
-                  "option_name": "Carbon Flash Center Stripe"
-                },
-                {
-                  "option_id": "opt_dmv_001",
-                  "rpo": "DMV",
-                  "option_name": "Blade Silver Center Stripe"
-                },
-                {
-                  "option_id": "opt_dmw_001",
-                  "rpo": "DMW",
-                  "option_name": "Arctic White Center Stripe"
-                },
-                {
-                  "option_id": "opt_dmx_001",
-                  "rpo": "DMX",
-                  "option_name": "Admiral Blue Center Stripe"
-                },
-                {
-                  "option_id": "opt_dmy_001",
-                  "rpo": "DMY",
-                  "option_name": "Red Mist Center Stripe"
-                },
-                {
-                  "option_id": "opt_17a_001",
-                  "rpo": "17A",
-                  "option_name": "Blade Silver Hash Marks"
-                },
-                {
-                  "option_id": "opt_20a_001",
-                  "rpo": "20A",
-                  "option_name": "Admiral Blue Hash Marks"
-                },
-                {
-                  "option_id": "opt_55a_001",
-                  "rpo": "55A",
-                  "option_name": "Competition Yellow Hash Marks."
-                },
-                {
-                  "option_id": "opt_75a_001",
-                  "rpo": "75A",
-                  "option_name": "Torch Red Hash Marks"
-                },
-                {
-                  "option_id": "opt_97a_001",
-                  "rpo": "97A",
-                  "option_name": "Carbon Flash Hash Marks"
-                },
-                {
-                  "option_id": "opt_dx4_001",
-                  "rpo": "DX4",
-                  "option_name": "Red Mist Hash Marks"
-                },
-                {
-                  "option_id": "opt_z15_001",
-                  "rpo": "Z15",
-                  "option_name": "Grand Sport Heritage Graphics"
-                },
-                {
-                  "option_id": "opt_sht_001",
-                  "rpo": "SHT",
-                  "option_name": "Tech Bronze Jake Hood Graphic"
-                },
-                {
-                  "option_id": "opt_vpo_001",
-                  "rpo": "VPO",
-                  "option_name": "Tech Bronze Jake C8.R Rear Hash Graphic"
-                }
-              ],
-              "Z25": [
-                {
-                  "option_id": "opt_3f9_001",
-                  "rpo": "3F9",
-                  "option_name": "Torch Red Seat Belt Color"
-                }
-              ]
-            }
-          },
-          "normalization": {
-            "blankSectionOverrides": [],
-            "textCleanupSummary": {
-              "changed_fields": 0,
-              "notes": {}
-            },
-            "unresolvedIssues": []
-          },
-          "priceRuleSourceRows": 45,
-          "deferredSurfaces": []
-        }
+        ]
       },
       "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/gs-copy.png",
       "image_alt": "Corvette Grand Sport",

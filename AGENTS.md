@@ -81,7 +81,6 @@ The canonical workbook is `stingray_master.xlsx`.
 Current shared or Stingray-facing sheets include:
 
 - `variant_master`
-- `category_master`
 - `section_master`
 - `stingray_options`
 - `stingray_ovs`
@@ -95,6 +94,8 @@ Current shared or Stingray-facing sheets include:
 - `lt_interiors`
 - `LZ_Interiors`
 - `PriceRef`
+
+`archive_category_master` is retained as historical evidence only; `category_master` is not an active source sheet.
 
 Current Grand Sport model-scoped sheets include:
 

@@ -475,7 +475,7 @@ def build_grand_sport_interiors(config: ModelConfig) -> list[dict[str, Any]]:
         for row in rule_rows
         if row.get("rule_type", "").lower() == "includes"
         and row.get("target_id", "") == "opt_z25_001"
-        and not row.get("generation_action", "").startswith("omit")
+        and runtime_authored_rule(row)
     }
     interior_price_ref = price_ref_prices(price_ref_rows)
     interior_component_price_ref = price_ref_component_prices(price_ref_rows)
@@ -656,6 +656,15 @@ def rows_from_optional_sheet(wb, sheet_name: str) -> list[dict[str, str]]:
 
 def active_source_row(row: dict[str, str]) -> bool:
     return clean(row.get("active", "True")) == "True"
+
+
+def runtime_authored_rule(row: dict[str, str]) -> bool:
+    status = clean(row.get("normalization_status", "")).lower()
+    if status in {"omitted", "replaced"}:
+        return False
+    if status == "preserved":
+        return True
+    return not clean(row.get("generation_action", "")).lower().startswith("omit")
 
 
 def display_behavior_status(
@@ -851,7 +860,7 @@ def build_draft_rules(
         target_id = rule.get("target_id", "")
         if not rule_type or source_id not in valid_ids or target_id not in valid_ids:
             continue
-        if rule.get("generation_action", "").startswith("omit"):
+        if not runtime_authored_rule(rule):
             continue
         if rule_type == "requires" and (source_id, target_id) in grouped_requires:
             continue
