@@ -314,6 +314,129 @@ textarea {
   gap: 10px;
 }
 
+.vehicle-setup-section {
+  display: grid;
+  gap: 18px;
+}
+
+.vehicle-setup-intro {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid rgba(217, 209, 196, 0.72);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.vehicle-setup-intro h3,
+.vehicle-setup-summary h3,
+.vehicle-setup-group-heading h3 {
+  margin: 0;
+}
+
+.vehicle-setup-intro p,
+.vehicle-setup-group-heading p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.vehicle-setup-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.vehicle-setup-choices,
+.vehicle-setup-group {
+  display: grid;
+  gap: 12px;
+}
+
+.vehicle-setup-group {
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(217, 209, 196, 0.72);
+}
+
+.vehicle-setup-group:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.setup-choice-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.trim-setup-group .setup-choice-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.setup-choice-card,
+.model-setup-group .model-choice-card {
+  min-height: 0;
+}
+
+.selection-status {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 4px;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: #eadfce;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.selection-status[data-selected="true"] {
+  background: var(--accent);
+  color: #fff;
+}
+
+.vehicle-setup-summary {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fffaf2;
+  box-shadow: var(--shadow);
+}
+
+.vehicle-setup-summary dl {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  margin: 0;
+}
+
+.vehicle-setup-summary dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid rgba(217, 209, 196, 0.72);
+  padding-top: 9px;
+}
+
+.vehicle-setup-summary dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.vehicle-setup-summary dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 800;
+}
+
 .selected-seat-context {
   margin: -2px 0 14px;
   color: var(--muted);
@@ -1554,6 +1677,27 @@ textarea {
 
   .choice-panel {
     order: 2;
+  }
+
+  .vehicle-setup-layout,
+  .trim-setup-group .setup-choice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vehicle-setup-summary {
+    position: static;
+  }
+
+  .vehicle-setup-summary dl {
+    grid-template-columns: 1fr;
+  }
+
+  .vehicle-setup-intro {
+    padding: 14px;
+  }
+
+  .setup-choice-grid {
+    grid-template-columns: 1fr;
   }
 
   .step-rail {

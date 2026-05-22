@@ -96,8 +96,9 @@ const els = {
 
 const modelStep = {
   step_key: "model",
-  step_label: "Model",
+  step_label: "Vehicle Setup",
 };
+const vehicleSetupStepKeys = new Set(["model", "body_style", "trim_level"]);
 let runtimeSteps = [];
 let variants = [];
 let pendingConfirmationAction = null;
@@ -395,13 +396,23 @@ function currentVariantId() {
   return currentVariant()?.variant_id || "";
 }
 
+function normalizeStepKey(stepKey) {
+  return vehicleSetupStepKeys.has(stepKey) ? "model" : stepKey;
+}
+
+function visibleRuntimeSteps() {
+  return runtimeSteps.filter((step) => step.step_key === "model" || !vehicleSetupStepKeys.has(step.step_key));
+}
+
 function currentStepIndex() {
-  return runtimeSteps.findIndex((step) => step.step_key === state.activeStep);
+  const activeStepKey = normalizeStepKey(state.activeStep);
+  return visibleRuntimeSteps().findIndex((step) => step.step_key === activeStepKey);
 }
 
 function nextStep() {
+  const steps = visibleRuntimeSteps();
   const index = currentStepIndex();
-  return index >= 0 ? runtimeSteps[index + 1] : null;
+  return index >= 0 ? steps[index + 1] : null;
 }
 
 function setButtonExpanded(button, expanded) {
@@ -431,8 +442,9 @@ function handleMobileDrawerKeydown(event) {
 }
 
 function activateStep(stepKey, { closeDrawer = false } = {}) {
-  if (!stepKey) return;
-  state.activeStep = stepKey;
+  const normalizedStepKey = normalizeStepKey(stepKey);
+  if (!normalizedStepKey) return;
+  state.activeStep = normalizedStepKey;
   render({ resetScroll: true });
   if (closeDrawer) closeMobileDrawers();
 }
@@ -1379,13 +1391,14 @@ function handleInterior(interior) {
 }
 
 function currentStepSummary() {
+  const steps = visibleRuntimeSteps();
   const index = Math.max(0, currentStepIndex());
   return {
     index,
-    total: runtimeSteps.length,
-    step: runtimeSteps[index],
-    previous: runtimeSteps[index - 1],
-    next: runtimeSteps[index + 1],
+    total: steps.length,
+    step: steps[index],
+    previous: steps[index - 1],
+    next: steps[index + 1],
   };
 }
 
@@ -1414,10 +1427,10 @@ function renderMobileProgress() {
 }
 
 function renderStepRail() {
-  els.stepRail.innerHTML = runtimeSteps
+  els.stepRail.innerHTML = visibleRuntimeSteps()
     .map(
       (step, index) => `
-        <button class="step-link ${state.activeStep === step.step_key ? "active" : ""}" data-step="${step.step_key}" type="button">
+        <button class="step-link ${normalizeStepKey(state.activeStep) === step.step_key ? "active" : ""}" data-step="${step.step_key}" type="button">
           <span class="step-index">${index + 1}</span>
           <span>${step.step_label}</span>
         </button>
@@ -1567,21 +1580,24 @@ function renderInteriorGroups(interiors) {
   `;
 }
 
-function renderContextCard(choice) {
+function renderContextCard(choice, { setup = false } = {}) {
   const selected =
     (choice.context_type === "body_style" && choice.value === state.bodyStyle) ||
     (choice.context_type === "trim_level" && choice.body_style === state.bodyStyle && choice.trim_level === state.trimLevel);
   const disabled = choice.context_type === "trim_level" && choice.body_style !== state.bodyStyle;
   const classes = ["choice-card", "context-choice-card"];
+  if (setup) classes.push("setup-choice-card");
   if (cardHasMedia(choice)) classes.push("has-media");
   if (selected) classes.push("selected");
   if (disabled) classes.push("disabled");
   const price = choice.base_price ? formatMoney(choice.base_price) : "";
+  const statusLabel = selected ? "Selected" : disabled ? "Unavailable" : "Select";
   return `
     <button class="${classes.join(" ")}" type="button" data-context-choice="${choice.context_choice_id}" ${disabled ? "aria-disabled=\"true\"" : ""}>
       ${renderCardMedia(choice, choice.description || choice.label, { disabled })}
       <span class="topline"><span class="rpo">${escapeHtml(choice.label)}</span><span class="price">${price}</span></span>
       <span class="choice-name"><span>${escapeHtml(choice.description)}</span>${renderInfoTooltip(choice.info_tooltip, `${choice.label} details`)}</span>
+      <span class="selection-status" data-selected="${selected ? "true" : "false"}">${selected ? "✓ " : ""}${statusLabel}</span>
       ${disabled ? renderStatePill(`Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} first`, "disabled-reason", `Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} body style first.`) : ""}
     </button>
   `;
@@ -1616,7 +1632,83 @@ function renderModelCard(model) {
       ${renderCardMedia(model, model.modelName || model.label)}
       <span class="topline"><span class="rpo">${escapeHtml(model.label)}</span><span class="price">${variants.length} variants</span></span>
       <span class="choice-note">${escapeHtml([bodyStyles, trimLevels].filter(Boolean).join(" | "))}</span>
+      <span class="selection-status" data-selected="${selected ? "true" : "false"}">${selected ? "✓ Selected" : "Select"}</span>
     </button>
+  `;
+}
+
+function bodyStyleSetupChoices() {
+  return data.contextChoices
+    .filter((choice) => choice.step_key === "body_style")
+    .map((choice) => {
+      const bodyVariants = variants.filter((variant) => variant.body_style === choice.value);
+      const trimLabels = [...new Set(bodyVariants.map((variant) => variant.trim_level).filter(Boolean))];
+      const startingPrice = Math.min(...bodyVariants.map((variant) => Number(variant.base_price || 0)).filter((price) => price > 0));
+      return {
+        ...choice,
+        description: trimLabels.length ? `Available with ${trimLabels.join(", ")}` : choice.description,
+        base_price: Number.isFinite(startingPrice) ? startingPrice : choice.base_price,
+      };
+    })
+    .sort((a, b) => Number(a.display_order || 0) - Number(b.display_order || 0));
+}
+
+function trimLevelSetupChoices() {
+  return data.contextChoices
+    .filter((choice) => choice.step_key === "trim_level" && choice.body_style === state.bodyStyle)
+    .sort((a, b) => Number(a.display_order || 0) - Number(b.display_order || 0));
+}
+
+function renderVehicleSetupGroup(title, note, cardsHtml, className = "") {
+  return `
+    <section class="vehicle-setup-group ${className}">
+      <div class="vehicle-setup-group-heading">
+        <h3>${escapeHtml(title)}</h3>
+        ${note ? `<p>${escapeHtml(note)}</p>` : ""}
+      </div>
+      <div class="choice-grid setup-choice-grid">${cardsHtml}</div>
+    </section>
+  `;
+}
+
+function renderVehicleSetupSummary() {
+  const variant = currentVariant();
+  return `
+    <aside class="vehicle-setup-summary" aria-label="Selected starting build">
+      <p class="eyebrow">Build starts as</p>
+      <h3>${escapeHtml(variant?.display_name || activeModel.modelName || activeModel.label || "Corvette")}</h3>
+      <dl>
+        <div><dt>Model</dt><dd>${escapeHtml(activeModel.modelName || activeModel.label || "")}</dd></div>
+        <div><dt>Body</dt><dd>${escapeHtml(state.bodyStyle ? state.bodyStyle[0].toUpperCase() + state.bodyStyle.slice(1) : "")}</dd></div>
+        <div><dt>Trim</dt><dd>${escapeHtml(state.trimLevel || "")}</dd></div>
+        <div><dt>Base MSRP</dt><dd>${formatMoney(Number(variant?.base_price || 0))}</dd></div>
+      </dl>
+    </aside>
+  `;
+}
+
+function renderVehicleSetupContent() {
+  const modelCards = modelEntries().map(renderModelCard).join("");
+  const bodyCards = bodyStyleSetupChoices().map((choice) => renderContextCard(choice, { setup: true })).join("");
+  const trimCards = trimLevelSetupChoices().map((choice) => renderContextCard(choice, { setup: true })).join("");
+  const selectedBody = state.bodyStyle ? state.bodyStyle[0].toUpperCase() + state.bodyStyle.slice(1) : "selected body style";
+  return `
+    <section class="section-block vehicle-setup-section">
+      <div class="vehicle-setup-intro">
+        <div>
+          <h3>Choose your Corvette foundation</h3>
+          <p>We've started you with ${escapeHtml(currentVariant()?.display_name || "a default build")}. Adjust the model, body style, and trim before choosing paint.</p>
+        </div>
+      </div>
+      <div class="vehicle-setup-layout">
+        <div class="vehicle-setup-choices">
+          ${renderVehicleSetupGroup("Model", "Choose the Corvette family for this build.", modelCards, "model-setup-group")}
+          ${renderVehicleSetupGroup("Body Style", "Choose coupe or convertible before comparing trim pricing.", bodyCards, "body-setup-group")}
+          ${renderVehicleSetupGroup("Trim Level", `Showing trims available with ${selectedBody}.`, trimCards, "trim-setup-group")}
+        </div>
+        ${renderVehicleSetupSummary()}
+      </div>
+    </section>
   `;
 }
 
@@ -1810,12 +1902,7 @@ function renderStepContent({ resetScroll = false } = {}) {
   let body = "";
 
   if (isModelStep) {
-    body = `
-      <section class="section-block model-step-section">
-        <div class="section-title"><h3>Corvette Model</h3><span>${modelEntries().length} choices</span></div>
-        <div class="choice-grid">${modelEntries().map(renderModelCard).join("")}</div>
-      </section>
-    `;
+    body = renderVehicleSetupContent();
   } else if (isContextStep) {
     const contextChoices = data.contextChoices
       .filter((choice) => choice.step_key === state.activeStep)
@@ -1871,6 +1958,7 @@ function renderStepContent({ resetScroll = false } = {}) {
   }
 
   const next = nextStep();
+  const nextButtonLabel = isModelStep && next ? `Continue to ${next.step_label}` : next ? `Next: ${next.step_label}` : "";
   els.stepContent.dataset.activeStep = state.activeStep;
   els.stepContent.dataset.stepKind = isModelStep ? "model" : isContextStep ? "context" : "option";
   els.stepContent.innerHTML = `
@@ -1884,7 +1972,7 @@ function renderStepContent({ resetScroll = false } = {}) {
     ${body}
     ${
       next
-        ? `<footer class="step-footer"><button type="button" data-next-step="${next.step_key}">Next: ${next.step_label}</button></footer>`
+        ? `<footer class="step-footer"><button type="button" data-next-step="${next.step_key}">${nextButtonLabel}</button></footer>`
         : renderFinalStepActions()
     }
   `;

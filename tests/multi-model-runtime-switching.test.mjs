@@ -134,6 +134,7 @@ window.__testApi = {
   resetDefaults,
   reconcileSelections,
   handleChoice,
+  handleContextChoice: typeof handleContextChoice === "function" ? handleContextChoice : undefined,
   computeAutoAdded,
   disableReasonForChoice,
   missingRequirementDetails,
@@ -160,6 +161,9 @@ window.__testApi = {
   renderInteriorGroups: typeof renderInteriorGroups === "function" ? renderInteriorGroups : undefined,
   formatTooltipContent: typeof formatTooltipContent === "function" ? formatTooltipContent : undefined,
   renderStepChoiceGroups: typeof renderStepChoiceGroups === "function" ? renderStepChoiceGroups : undefined,
+  currentStepSummary: typeof currentStepSummary === "function" ? currentStepSummary : undefined,
+  goToNextStep: typeof goToNextStep === "function" ? goToNextStep : undefined,
+  activateStep: typeof activateStep === "function" ? activateStep : undefined,
   downloads: window.__downloads,
   elements,
 };
@@ -353,6 +357,69 @@ test("generated Stingray paint choices apply active image assets from asset_map"
     assert.equal(choice.image_fit, "cover");
     assert.equal(choice.image_position, "center");
   }
+});
+
+test("runtime renders vehicle setup as one visible foundation step", () => {
+  const runtime = loadRuntime();
+  runtime.render();
+
+  const railHtml = runtime.elements.get("#stepRail").innerHTML;
+  const setupHtml = runtime.elements.get("#stepContent").innerHTML;
+
+  assert.match(railHtml, /Vehicle Setup/);
+  assert.doesNotMatch(railHtml, />\s*2\s*<\/span>\s*Body Style/);
+  assert.doesNotMatch(railHtml, />\s*3\s*<\/span>\s*Trim Level/);
+  assert.match(railHtml, /Exterior Paint/);
+  assert.match(setupHtml, /Model/);
+  assert.match(setupHtml, /Body Style/);
+  assert.match(setupHtml, /Trim Level/);
+  assert.match(setupHtml, /data-model-choice="stingray"/);
+  assert.match(setupHtml, /data-context-choice="body_style__coupe"/);
+  assert.match(setupHtml, /data-context-choice="trim_level__coupe__1lt"/);
+  assert.match(setupHtml, /Continue to Exterior Paint/);
+});
+
+test("runtime advances from vehicle setup directly to exterior paint", () => {
+  const runtime = loadRuntime();
+
+  assert.equal(runtime.state.activeStep, "model");
+  runtime.goToNextStep();
+
+  assert.equal(runtime.state.activeStep, "paint");
+  assert.equal(runtime.currentStepSummary().step.step_key, "paint");
+  assert.equal(runtime.currentStepSummary().previous.step_key, "model");
+});
+
+test("runtime routes direct body and trim step activation back to vehicle setup", () => {
+  const runtime = loadRuntime();
+
+  runtime.activateStep("trim_level");
+
+  assert.equal(runtime.state.activeStep, "model");
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /Vehicle Setup/);
+});
+
+test("runtime keeps body and trim choices functional inside vehicle setup", () => {
+  const runtime = loadRuntime();
+  const convertible = runtime.data.contextChoices.find((choice) => choice.context_choice_id === "body_style__convertible");
+  const trim = runtime.data.contextChoices.find((choice) => choice.context_choice_id === "trim_level__convertible__2lt");
+
+  runtime.state.activeStep = "model";
+  runtime.render();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.handleContextChoice(convertible);
+  runtime.handleContextChoice(trim);
+
+  const order = runtime.currentOrder();
+  assert.equal(runtime.state.bodyStyle, "convertible");
+  assert.equal(runtime.state.trimLevel, "2LT");
+  assert.equal(order.vehicle.body_style, "convertible");
+  assert.equal(order.vehicle.trim_level, "2LT");
+  assert.equal(order.vehicle.display_name, "Corvette Stingray Convertible 2LT");
+  assert.equal(order.vehicle.base_price, 87595);
 });
 
 test("runtime renders Stingray paint image media from generated choice data", () => {
