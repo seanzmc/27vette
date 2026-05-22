@@ -359,7 +359,7 @@ test("generated Stingray paint choices apply active image assets from asset_map"
   }
 });
 
-test("runtime renders vehicle setup as one visible foundation step", () => {
+test("runtime renders vehicle setup as one paced visible foundation step", () => {
   const runtime = loadRuntime();
   runtime.render();
 
@@ -370,21 +370,43 @@ test("runtime renders vehicle setup as one visible foundation step", () => {
   assert.doesNotMatch(railHtml, />\s*2\s*<\/span>\s*Body Style/);
   assert.doesNotMatch(railHtml, />\s*3\s*<\/span>\s*Trim Level/);
   assert.match(railHtml, /Exterior Paint/);
-  assert.match(setupHtml, /Model/);
-  assert.match(setupHtml, /Body Style/);
-  assert.match(setupHtml, /Trim Level/);
+  assert.equal(runtime.state.vehicleSetupStage, "model");
+  assert.match(setupHtml, /data-vehicle-setup-stage="model"/);
+  assert.match(setupHtml, /vehicle-setup-stepper/);
   assert.match(setupHtml, /data-model-choice="stingray"/);
-  assert.match(setupHtml, /data-context-choice="body_style__coupe"/);
-  assert.match(setupHtml, /data-context-choice="trim_level__coupe__1lt"/);
-  assert.match(setupHtml, /Continue to Exterior Paint/);
+  assert.doesNotMatch(setupHtml, /data-context-choice="body_style__/);
+  assert.doesNotMatch(setupHtml, /data-context-choice="trim_level__/);
+  assert.match(setupHtml, /Continue to Body Style/);
+  assert.doesNotMatch(setupHtml, /Continue to Exterior Paint/);
 });
 
-test("runtime advances from vehicle setup directly to exterior paint", () => {
+test("runtime progressively advances vehicle setup panels before exterior paint", () => {
   const runtime = loadRuntime();
+  const convertible = runtime.data.contextChoices.find((choice) => choice.context_choice_id === "body_style__convertible");
+  const trim = runtime.data.contextChoices.find((choice) => choice.context_choice_id === "trim_level__convertible__2lt");
 
   assert.equal(runtime.state.activeStep, "model");
-  runtime.goToNextStep();
+  assert.equal(runtime.state.vehicleSetupStage, "model");
 
+  runtime.requestModelChange("grandSport");
+  assert.equal(runtime.activeModelKey, "grandSport");
+  assert.equal(runtime.state.activeStep, "model");
+  assert.equal(runtime.state.vehicleSetupStage, "body_style");
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /data-context-choice="body_style__convertible"/);
+  assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /data-context-choice="trim_level__convertible__2lt"/);
+
+  runtime.handleContextChoice(convertible);
+  assert.equal(runtime.state.bodyStyle, "convertible");
+  assert.equal(runtime.state.vehicleSetupStage, "trim_level");
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /data-context-choice="trim_level__convertible__2lt"/);
+
+  runtime.handleContextChoice(trim);
+  assert.equal(runtime.state.trimLevel, "2LT");
+  assert.equal(runtime.state.vehicleSetupStage, "ready");
+  assert.equal(runtime.state.activeStep, "model");
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /Continue to Exterior Paint/);
+
+  runtime.goToNextStep();
   assert.equal(runtime.state.activeStep, "paint");
   assert.equal(runtime.currentStepSummary().step.step_key, "paint");
   assert.equal(runtime.currentStepSummary().previous.step_key, "model");

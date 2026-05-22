@@ -667,6 +667,9 @@ test("mobile shell exposes compact progress and summary targets", () => {
   assert.doesNotMatch(appSource, /renderVehicleContext/);
   assert.match(htmlSource, /Current Build/);
   assert.match(htmlSource, /id="mobileSummaryButton"/);
+  assert.match(htmlSource, /id="openSummaryDrawerButton"/);
+  assert.match(htmlSource, /View Build Summary/);
+  assert.doesNotMatch(htmlSource, /<span aria-hidden="true">\$<\/span>/);
   assert.match(htmlSource, /id="mobileSummaryTotal"/);
   assert.match(htmlSource, /id="mobileSummaryMissing"/);
   assert.match(htmlSource, /id="mobileProgress"/);
@@ -700,18 +703,22 @@ test("shell containers share one spacing and radius rhythm", () => {
   assert.doesNotMatch(stylesSource, /border-radius:\s*0 0 8px 8px/);
 });
 
-test("middle breakpoint makes summary off-canvas before step rail collapses", () => {
+test("summary drawer is callable instead of fixed in the desktop layout", () => {
+  const baseStyles = stylesSource.slice(0, stylesSource.indexOf("@media (max-width: 1120px)"));
   const middleStart = stylesSource.indexOf("@media (max-width: 1120px)");
   const mobileStart = stylesSource.indexOf("@media (max-width: 760px)");
   const reducedMotionStart = stylesSource.indexOf("@media (prefers-reduced-motion: reduce)");
   const middleBreakpoint = stylesSource.slice(middleStart, mobileStart);
   const mobileBreakpoint = stylesSource.slice(mobileStart, reducedMotionStart);
 
+  assert.match(baseStyles, /grid-template-columns:\s*240px minmax\(0, 1fr\)/);
+  assert.doesNotMatch(baseStyles, /grid-template-columns:\s*240px minmax\(0, 1fr\) 340px/);
+  assert.match(baseStyles, /\.mobile-drawer-button-right\s*\{[\s\S]*display:\s*inline-flex/);
+  assert.match(baseStyles, /\.summary-panel\s*\{[\s\S]*position:\s*fixed;[\s\S]*transform:\s*translateX\(100%\)/);
+  assert.match(baseStyles, /\.app-shell\[data-mobile-drawer="summary"\] \.summary-panel\s*\{[\s\S]*transform:\s*translateX\(0\)/);
+  assert.match(baseStyles, /\.mobile-drawer-backdrop:not\(\[hidden\]\)/);
   assert.match(middleBreakpoint, /grid-template-columns:\s*180px minmax\(0, 1fr\)/);
-  assert.match(middleBreakpoint, /\.mobile-drawer-button-right\s*\{[\s\S]*display:\s*inline-grid/);
   assert.match(middleBreakpoint, /\.mobile-summary-bar\s*\{[\s\S]*display:\s*none/);
-  assert.match(middleBreakpoint, /\.summary-panel\s*\{[\s\S]*position:\s*fixed/);
-  assert.match(middleBreakpoint, /\.app-shell\[data-mobile-drawer="summary"\] \.summary-panel/);
   assert.doesNotMatch(middleBreakpoint, /\.step-rail\s*\{[\s\S]*position:\s*fixed/);
   assert.match(mobileBreakpoint, /\.mobile-summary-bar\s*\{[\s\S]*display:\s*flex/);
   assert.match(mobileBreakpoint, /\.step-rail\s*\{[\s\S]*position:\s*fixed/);
@@ -727,7 +734,7 @@ test("mobile progress and compact summary update from runtime state", () => {
   assert.equal(runtime.elements.get("#mobilePrevStep").hidden, true);
   assert.equal(runtime.elements.get("#mobileProgress").dataset.hasPrevious, "false");
   assert.equal(runtime.elements.get("#mobileNextStep").textContent, "Next");
-  assert.equal(runtime.elements.get("#mobileNextStep").title, "Next: Exterior Paint");
+  assert.equal(runtime.elements.get("#mobileNextStep").title, "Next: Body Style");
   assert.match(runtime.elements.get("#mobileSummaryTotal").textContent, /^\$/);
   assert.match(runtime.elements.get("#mobileSummarySelected").textContent, /selected item/);
   assert.match(runtime.elements.get("#mobileSummaryMissing").textContent, /required choice/);
@@ -742,19 +749,24 @@ test("mobile progress and compact summary update from runtime state", () => {
   assert.equal(runtime.elements.get("#mobileProgress").dataset.hasPrevious, "true");
 });
 
-test("vehicle setup exposes mobile readability hooks without changing option step content", () => {
+test("vehicle setup exposes paced readability hooks without changing option step content", () => {
   const runtime = loadRuntime();
   runtime.render();
 
+  const setupHtml = runtime.elements.get("#stepContent").innerHTML;
   assert.equal(runtime.elements.get("#stepContent").dataset.activeStep, "model");
   assert.equal(runtime.elements.get("#stepContent").dataset.stepKind, "model");
-  assert.match(runtime.elements.get("#stepContent").innerHTML, /vehicle-setup-section/);
-  assert.match(runtime.elements.get("#stepContent").innerHTML, /<h3>Model<\/h3>/);
-  assert.match(runtime.elements.get("#stepContent").innerHTML, /<h3>Body Style<\/h3>/);
-  assert.match(runtime.elements.get("#stepContent").innerHTML, /<h3>Trim Level<\/h3>/);
-  assert.match(runtime.elements.get("#stepContent").innerHTML, /<span class="rpo">Stingray<\/span>/);
-  assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /<span class="choice-name"><span>Corvette Stingray<\/span><\/span>/);
-  assert.match(runtime.elements.get("#stepContent").innerHTML, /aria-label="Corvette Stingray, Coupe \/ Convertible, 1LT \/ 2LT \/ 3LT"/);
+  assert.match(setupHtml, /vehicle-setup-section/);
+  assert.match(setupHtml, /vehicle-setup-stepper/);
+  assert.match(setupHtml, /vehicle-setup-current/);
+  assert.match(setupHtml, /<h3>Choose your model<\/h3>/);
+  assert.doesNotMatch(setupHtml, /<h3>Body Style<\/h3>/);
+  assert.doesNotMatch(setupHtml, /<h3>Trim Level<\/h3>/);
+  assert.match(setupHtml, /<span class="rpo">Stingray<\/span>/);
+  assert.match(setupHtml, /Continue to Body Style/);
+  assert.doesNotMatch(setupHtml, /Coupe \/ Convertible \| 1LT \/ 2LT \/ 3LT/);
+  assert.doesNotMatch(setupHtml, /Available with 1LT, 2LT, 3LT/);
+  assert.doesNotMatch(setupHtml, /Corvette Stingray Coupe 1LT 1LT details/);
 
   runtime.activateStep("body_style");
   assert.equal(runtime.elements.get("#stepContent").dataset.activeStep, "model");
