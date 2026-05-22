@@ -30,6 +30,7 @@ const state = {
   userSelected: new Set(),
   selectedInterior: "",
   activeStep: "model",
+  vehicleSetupStage: "model",
   customer: {
     name: "",
     address: "",
@@ -99,6 +100,7 @@ const modelStep = {
   step_label: "Vehicle Setup",
 };
 const vehicleSetupStepKeys = new Set(["model", "body_style", "trim_level"]);
+const vehicleSetupStages = ["model", "body_style", "trim_level", "ready"];
 let runtimeSteps = [];
 let variants = [];
 let pendingConfirmationAction = null;
@@ -404,6 +406,27 @@ function visibleRuntimeSteps() {
   return runtimeSteps.filter((step) => step.step_key === "model" || !vehicleSetupStepKeys.has(step.step_key));
 }
 
+function normalizeVehicleSetupStage(stage) {
+  return vehicleSetupStages.includes(stage) ? stage : "model";
+}
+
+function setVehicleSetupStage(stage, { shouldRender = true, resetScroll = true } = {}) {
+  state.vehicleSetupStage = normalizeVehicleSetupStage(stage);
+  if (shouldRender) render({ resetScroll });
+}
+
+function advanceVehicleSetupStage() {
+  const stage = normalizeVehicleSetupStage(state.vehicleSetupStage);
+  const nextStage = stage === "model" ? "body_style" : stage === "body_style" ? "trim_level" : stage === "trim_level" ? "ready" : "ready";
+  setVehicleSetupStage(nextStage);
+}
+
+function previousVehicleSetupStage() {
+  const stage = normalizeVehicleSetupStage(state.vehicleSetupStage);
+  const previousStage = stage === "ready" ? "trim_level" : stage === "trim_level" ? "body_style" : stage === "body_style" ? "model" : "model";
+  setVehicleSetupStage(previousStage);
+}
+
 function currentStepIndex() {
   const activeStepKey = normalizeStepKey(state.activeStep);
   return visibleRuntimeSteps().findIndex((step) => step.step_key === activeStepKey);
@@ -444,12 +467,19 @@ function handleMobileDrawerKeydown(event) {
 function activateStep(stepKey, { closeDrawer = false } = {}) {
   const normalizedStepKey = normalizeStepKey(stepKey);
   if (!normalizedStepKey) return;
+  if (vehicleSetupStepKeys.has(stepKey) && stepKey !== "model") {
+    state.vehicleSetupStage = stepKey;
+  }
   state.activeStep = normalizedStepKey;
   render({ resetScroll: true });
   if (closeDrawer) closeMobileDrawers();
 }
 
 function goToNextStep() {
+  if (state.activeStep === "model" && normalizeVehicleSetupStage(state.vehicleSetupStage) !== "ready") {
+    advanceVehicleSetupStage();
+    return;
+  }
   const step = nextStep();
   if (!step) return;
   activateStep(step.step_key);
@@ -1324,10 +1354,11 @@ function reconcileSelections() {
   dedupeSelectedRpos();
 }
 
-function setBodyAndTrim(bodyStyle, trimLevel) {
+function setBodyAndTrim(bodyStyle, trimLevel, { vehicleSetupStage } = {}) {
   resetDealerSubmissionState();
   state.bodyStyle = bodyStyle;
   state.trimLevel = trimLevel;
+  if (vehicleSetupStage) state.vehicleSetupStage = normalizeVehicleSetupStage(vehicleSetupStage);
   resetDefaults();
   reconcileSelections();
   render();
@@ -1336,11 +1367,11 @@ function setBodyAndTrim(bodyStyle, trimLevel) {
 function handleContextChoice(choice) {
   if (choice.context_type === "body_style") {
     const nextTrim = variants.find((variant) => variant.body_style === choice.value)?.trim_level;
-    setBodyAndTrim(choice.value, nextTrim);
+    setBodyAndTrim(choice.value, nextTrim, { vehicleSetupStage: "trim_level" });
     return;
   }
   if (choice.context_type === "trim_level") {
-    setBodyAndTrim(choice.body_style, choice.trim_level);
+    setBodyAndTrim(choice.body_style, choice.trim_level, { vehicleSetupStage: "ready" });
   }
 }
 
@@ -1403,6 +1434,10 @@ function currentStepSummary() {
 }
 
 function goToPreviousStep() {
+  if (state.activeStep === "model" && normalizeVehicleSetupStage(state.vehicleSetupStage) !== "model") {
+    previousVehicleSetupStage();
+    return;
+  }
   const { previous } = currentStepSummary();
   if (!previous) return;
   activateStep(previous.step_key);
@@ -1410,19 +1445,24 @@ function goToPreviousStep() {
 
 function renderMobileProgress() {
   const { index, total, step, previous, next } = currentStepSummary();
+  const setupStage = state.activeStep === "model" ? normalizeVehicleSetupStage(state.vehicleSetupStage) : "";
+  const setupPreviousLabel = setupStage === "body_style" ? "Model" : setupStage === "trim_level" ? "Body Style" : setupStage === "ready" ? "Trim Level" : "";
+  const setupNextLabel = setupStage === "model" ? "Body Style" : setupStage === "body_style" ? "Trim Level" : setupStage === "trim_level" ? "Review setup" : "";
+  const hasPrevious = Boolean(previous || setupPreviousLabel);
+  const hasNext = Boolean(next || setupNextLabel);
   if (els.mobileStepCount) els.mobileStepCount.textContent = `Step ${index + 1} of ${total || 1}`;
   if (els.mobileStepName) els.mobileStepName.textContent = step?.step_label || "Step";
-  if (els.mobileProgress) els.mobileProgress.dataset.hasPrevious = previous ? "true" : "false";
+  if (els.mobileProgress) els.mobileProgress.dataset.hasPrevious = hasPrevious ? "true" : "false";
   if (els.mobilePrevStep) {
-    els.mobilePrevStep.disabled = !previous;
-    els.mobilePrevStep.hidden = !previous;
-    els.mobilePrevStep.textContent = previous ? "Back" : "Previous";
-    els.mobilePrevStep.title = previous ? `Back: ${previous.step_label}` : "";
+    els.mobilePrevStep.disabled = !hasPrevious;
+    els.mobilePrevStep.hidden = !hasPrevious;
+    els.mobilePrevStep.textContent = hasPrevious ? "Back" : "Previous";
+    els.mobilePrevStep.title = setupPreviousLabel ? `Back: ${setupPreviousLabel}` : previous ? `Back: ${previous.step_label}` : "";
   }
   if (els.mobileNextStep) {
-    els.mobileNextStep.disabled = !next;
-    els.mobileNextStep.textContent = next ? "Next" : "Review";
-    els.mobileNextStep.title = next ? `Next: ${next.step_label}` : "";
+    els.mobileNextStep.disabled = !hasNext;
+    els.mobileNextStep.textContent = hasNext ? "Next" : "Review";
+    els.mobileNextStep.title = setupNextLabel ? `Next: ${setupNextLabel}` : next ? `Next: ${next.step_label}` : "";
   }
 }
 
@@ -1580,7 +1620,7 @@ function renderInteriorGroups(interiors) {
   `;
 }
 
-function renderContextCard(choice, { setup = false } = {}) {
+function renderContextCard(choice, { setup = false, compact = false } = {}) {
   const selected =
     (choice.context_type === "body_style" && choice.value === state.bodyStyle) ||
     (choice.context_type === "trim_level" && choice.body_style === state.bodyStyle && choice.trim_level === state.trimLevel);
@@ -1592,11 +1632,14 @@ function renderContextCard(choice, { setup = false } = {}) {
   if (disabled) classes.push("disabled");
   const price = choice.base_price ? formatMoney(choice.base_price) : "";
   const statusLabel = selected ? "Selected" : disabled ? "Unavailable" : "Select";
+  const description = compact ? "" : choice.description;
+  const tooltip = choice.context_type === "trim_level" ? choice.info_tooltip : compact ? "" : choice.info_tooltip;
+  const choiceName = description || tooltip ? `<span class="choice-name">${description ? `<span>${escapeHtml(description)}</span>` : ""}${renderInfoTooltip(tooltip, `${choice.label} details`)}</span>` : "";
   return `
     <button class="${classes.join(" ")}" type="button" data-context-choice="${choice.context_choice_id}" ${disabled ? "aria-disabled=\"true\"" : ""}>
       ${renderCardMedia(choice, choice.description || choice.label, { disabled })}
       <span class="topline"><span class="rpo">${escapeHtml(choice.label)}</span><span class="price">${price}</span></span>
-      <span class="choice-name"><span>${escapeHtml(choice.description)}</span>${renderInfoTooltip(choice.info_tooltip, `${choice.label} details`)}</span>
+      ${choiceName}
       <span class="selection-status" data-selected="${selected ? "true" : "false"}">${selected ? "✓ " : ""}${statusLabel}</span>
       ${disabled ? renderStatePill(`Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} first`, "disabled-reason", `Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} body style first.`) : ""}
     </button>
@@ -1618,20 +1661,14 @@ function modelEntries() {
 
 function renderModelCard(model) {
   const selected = model.key === activeModelKey;
-  const variants = model.data?.variants || [];
-  const bodyStyles = [...new Set(variants.map((variant) => variant.body_style).filter(Boolean))]
-    .map((bodyStyle) => bodyStyle[0].toUpperCase() + bodyStyle.slice(1))
-    .join(" / ");
-  const trimLevels = [...new Set(variants.map((variant) => variant.trim_level).filter(Boolean))].join(" / ");
   const classes = ["choice-card", "model-choice-card"];
   if (cardHasMedia(model)) classes.push("has-media");
   if (selected) classes.push("selected");
-  const descriptor = [model.modelName, bodyStyles, trimLevels].filter(Boolean).join(", ");
+  const descriptor = model.modelName || model.label;
   return `
     <button class="${classes.join(" ")}" type="button" data-model-choice="${escapeHtml(model.key)}" aria-pressed="${selected ? "true" : "false"}" aria-label="${escapeHtml(descriptor)}">
       ${renderCardMedia(model, model.modelName || model.label)}
-      <span class="topline"><span class="rpo">${escapeHtml(model.label)}</span><span class="price">${variants.length} variants</span></span>
-      <span class="choice-note">${escapeHtml([bodyStyles, trimLevels].filter(Boolean).join(" | "))}</span>
+      <span class="topline"><span class="rpo">${escapeHtml(model.label)}</span><span class="price">Model</span></span>
       <span class="selection-status" data-selected="${selected ? "true" : "false"}">${selected ? "✓ Selected" : "Select"}</span>
     </button>
   `;
@@ -1642,11 +1679,10 @@ function bodyStyleSetupChoices() {
     .filter((choice) => choice.step_key === "body_style")
     .map((choice) => {
       const bodyVariants = variants.filter((variant) => variant.body_style === choice.value);
-      const trimLabels = [...new Set(bodyVariants.map((variant) => variant.trim_level).filter(Boolean))];
       const startingPrice = Math.min(...bodyVariants.map((variant) => Number(variant.base_price || 0)).filter((price) => price > 0));
       return {
         ...choice,
-        description: trimLabels.length ? `Available with ${trimLabels.join(", ")}` : choice.description,
+        description: "",
         base_price: Number.isFinite(startingPrice) ? startingPrice : choice.base_price,
       };
     })
@@ -1659,14 +1695,72 @@ function trimLevelSetupChoices() {
     .sort((a, b) => Number(a.display_order || 0) - Number(b.display_order || 0));
 }
 
-function renderVehicleSetupGroup(title, note, cardsHtml, className = "") {
+function formatBodyStyle(bodyStyle) {
+  return bodyStyle ? bodyStyle[0].toUpperCase() + bodyStyle.slice(1) : "";
+}
+
+function renderVehicleSetupCurrent() {
+  const variant = currentVariant();
+  const pieces = [activeModel.label, formatBodyStyle(state.bodyStyle), state.trimLevel].filter(Boolean);
   return `
-    <section class="vehicle-setup-group ${className}">
+    <div class="vehicle-setup-current" aria-label="Current vehicle setup">
+      <span>Current setup</span>
+      <strong>${escapeHtml(pieces.join(" • ") || activeModel.label || "Corvette")}</strong>
+      <em>${formatMoney(Number(variant?.base_price || 0))}</em>
+    </div>
+  `;
+}
+
+function setupStageSummary(stage) {
+  if (stage === "model") return activeModel.label || "Choose";
+  if (stage === "body_style") return formatBodyStyle(state.bodyStyle) || "Choose";
+  if (stage === "trim_level") return state.trimLevel || "Choose";
+  return "Ready";
+}
+
+function renderVehicleSetupStepper() {
+  const activeStage = normalizeVehicleSetupStage(state.vehicleSetupStage);
+  const stages = [
+    ["model", "Model"],
+    ["body_style", "Body"],
+    ["trim_level", "Trim"],
+  ];
+  return `
+    <div class="vehicle-setup-stepper" role="list" aria-label="Vehicle setup progress">
+      ${stages
+        .map(([stage, label], index) => {
+          const isActive = activeStage === stage || (activeStage === "ready" && stage === "trim_level");
+          return `
+            <button class="vehicle-setup-chip ${isActive ? "active" : ""}" type="button" data-setup-stage="${stage}" role="listitem" aria-pressed="${isActive ? "true" : "false"}">
+              <span>${index + 1}. ${label}</span>
+              <strong>${escapeHtml(setupStageSummary(stage))}</strong>
+            </button>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
+function renderVehicleSetupPanel(title, note, cardsHtml, className = "") {
+  return `
+    <section class="vehicle-setup-panel ${className}" data-setup-panel>
       <div class="vehicle-setup-group-heading">
         <h3>${escapeHtml(title)}</h3>
         ${note ? `<p>${escapeHtml(note)}</p>` : ""}
       </div>
       <div class="choice-grid setup-choice-grid">${cardsHtml}</div>
+    </section>
+  `;
+}
+
+function renderVehicleSetupReadyPanel() {
+  const variant = currentVariant();
+  return `
+    <section class="vehicle-setup-panel vehicle-setup-ready" data-setup-panel>
+      <p class="eyebrow">Ready for customization</p>
+      <h3>${escapeHtml(variant?.display_name || activeModel.modelName || activeModel.label || "Corvette")}</h3>
+      <p>Model, body style, and trim are set. Continue to paint, or use the chips above to adjust the starting point.</p>
     </section>
   `;
 }
@@ -1679,7 +1773,7 @@ function renderVehicleSetupSummary() {
       <h3>${escapeHtml(variant?.display_name || activeModel.modelName || activeModel.label || "Corvette")}</h3>
       <dl>
         <div><dt>Model</dt><dd>${escapeHtml(activeModel.modelName || activeModel.label || "")}</dd></div>
-        <div><dt>Body</dt><dd>${escapeHtml(state.bodyStyle ? state.bodyStyle[0].toUpperCase() + state.bodyStyle.slice(1) : "")}</dd></div>
+        <div><dt>Body</dt><dd>${escapeHtml(formatBodyStyle(state.bodyStyle))}</dd></div>
         <div><dt>Trim</dt><dd>${escapeHtml(state.trimLevel || "")}</dd></div>
         <div><dt>Base MSRP</dt><dd>${formatMoney(Number(variant?.base_price || 0))}</dd></div>
       </dl>
@@ -1688,23 +1782,32 @@ function renderVehicleSetupSummary() {
 }
 
 function renderVehicleSetupContent() {
+  const stage = normalizeVehicleSetupStage(state.vehicleSetupStage);
   const modelCards = modelEntries().map(renderModelCard).join("");
-  const bodyCards = bodyStyleSetupChoices().map((choice) => renderContextCard(choice, { setup: true })).join("");
-  const trimCards = trimLevelSetupChoices().map((choice) => renderContextCard(choice, { setup: true })).join("");
-  const selectedBody = state.bodyStyle ? state.bodyStyle[0].toUpperCase() + state.bodyStyle.slice(1) : "selected body style";
+  const bodyCards = bodyStyleSetupChoices().map((choice) => renderContextCard(choice, { setup: true, compact: true })).join("");
+  const trimCards = trimLevelSetupChoices().map((choice) => renderContextCard(choice, { setup: true, compact: true })).join("");
+  const selectedBody = formatBodyStyle(state.bodyStyle) || "selected body style";
+  const panel =
+    stage === "body_style"
+      ? renderVehicleSetupPanel("Choose your body style", "Pick the format, then compare trims.", bodyCards, "body-setup-group")
+      : stage === "trim_level"
+        ? renderVehicleSetupPanel("Choose your trim", `Showing trims for ${selectedBody}.`, trimCards, "trim-setup-group")
+        : stage === "ready"
+          ? renderVehicleSetupReadyPanel()
+          : renderVehicleSetupPanel("Choose your model", "Start with the Corvette family for this build.", modelCards, "model-setup-group");
   return `
-    <section class="section-block vehicle-setup-section">
+    <section class="section-block vehicle-setup-section" data-vehicle-setup-stage="${stage}">
       <div class="vehicle-setup-intro">
         <div>
           <h3>Choose your Corvette foundation</h3>
-          <p>We've started you with ${escapeHtml(currentVariant()?.display_name || "a default build")}. Adjust the model, body style, and trim before choosing paint.</p>
+          <p>Set model, body, and trim here. Each choice stays available without turning this into three separate pages.</p>
         </div>
       </div>
+      ${renderVehicleSetupCurrent()}
+      ${renderVehicleSetupStepper()}
       <div class="vehicle-setup-layout">
         <div class="vehicle-setup-choices">
-          ${renderVehicleSetupGroup("Model", "Choose the Corvette family for this build.", modelCards, "model-setup-group")}
-          ${renderVehicleSetupGroup("Body Style", "Choose coupe or convertible before comparing trim pricing.", bodyCards, "body-setup-group")}
-          ${renderVehicleSetupGroup("Trim Level", `Showing trims available with ${selectedBody}.`, trimCards, "trim-setup-group")}
+          ${panel}
         </div>
         ${renderVehicleSetupSummary()}
       </div>
@@ -1958,6 +2061,16 @@ function renderStepContent({ resetScroll = false } = {}) {
   }
 
   const next = nextStep();
+  const vehicleSetupStage = normalizeVehicleSetupStage(state.vehicleSetupStage);
+  const isVehicleSetupReady = !isModelStep || vehicleSetupStage === "ready";
+  const vehicleSetupNextLabel =
+    vehicleSetupStage === "model"
+      ? "Continue to Body Style"
+      : vehicleSetupStage === "body_style"
+        ? "Continue to Trim Level"
+        : vehicleSetupStage === "trim_level"
+          ? "Review Vehicle Setup"
+          : "";
   const nextButtonLabel = isModelStep && next ? `Continue to ${next.step_label}` : next ? `Next: ${next.step_label}` : "";
   els.stepContent.dataset.activeStep = state.activeStep;
   els.stepContent.dataset.stepKind = isModelStep ? "model" : isContextStep ? "context" : "option";
@@ -1972,7 +2085,9 @@ function renderStepContent({ resetScroll = false } = {}) {
     ${body}
     ${
       next
-        ? `<footer class="step-footer"><button type="button" data-next-step="${next.step_key}">${nextButtonLabel}</button></footer>`
+        ? isVehicleSetupReady
+          ? `<footer class="step-footer"><button type="button" data-next-step="${next.step_key}">${nextButtonLabel}</button></footer>`
+          : `<footer class="step-footer"><button type="button" data-next-step="model">${vehicleSetupNextLabel}</button></footer>`
         : renderFinalStepActions()
     }
   `;
@@ -1999,6 +2114,11 @@ function renderStepContent({ resetScroll = false } = {}) {
   els.stepContent.querySelectorAll("[data-model-choice]").forEach((button) => {
     button.addEventListener("click", () => {
       requestModelChange(button.dataset.modelChoice);
+    });
+  });
+  els.stepContent.querySelectorAll("[data-setup-stage]").forEach((button) => {
+    button.addEventListener("click", () => {
+      setVehicleSetupStage(button.dataset.setupStage);
     });
   });
   els.stepContent.querySelector("[data-next-step]")?.addEventListener("click", goToNextStep);
@@ -2549,6 +2669,7 @@ function resetModelScopedState() {
   state.userSelected.clear();
   state.selectedInterior = "";
   state.activeStep = "model";
+  state.vehicleSetupStage = "model";
 }
 
 function renderModelChrome() {
@@ -2557,7 +2678,7 @@ function renderModelChrome() {
   document.title = title;
 }
 
-function activateModel(modelKey, { preserveCustomer = true, shouldRender = true } = {}) {
+function activateModel(modelKey, { preserveCustomer = true, shouldRender = true, vehicleSetupStage = "model" } = {}) {
   const nextModel = registry.models[modelKey];
   if (!nextModel) return;
   activeModelKey = modelKey;
@@ -2565,6 +2686,7 @@ function activateModel(modelKey, { preserveCustomer = true, shouldRender = true 
   data = activeModel.data;
   rebuildDataIndexes();
   resetModelScopedState();
+  state.vehicleSetupStage = normalizeVehicleSetupStage(vehicleSetupStage);
   if (!preserveCustomer) resetCustomerInformation();
   resetDefaults();
   reconcileSelections();
@@ -2610,6 +2732,7 @@ function resetBuild() {
   resetDefaults();
   resetCustomerInformation();
   state.activeStep = "model";
+  state.vehicleSetupStage = "model";
   reconcileSelections();
   render({ resetScroll: true });
 }
@@ -2630,14 +2753,14 @@ function requestResetBuild() {
 function requestModelChange(modelKey) {
   if (!modelKey || modelKey === activeModelKey) return;
   if (!buildHasResettableChanges()) {
-    activateModel(modelKey);
+    activateModel(modelKey, { vehicleSetupStage: "body_style" });
     return;
   }
   openConfirmActionModal({
     title: "Change Model",
     message: "Changing models will reset all selected options. Are you sure?",
     confirmLabel: "Yes, Change Model",
-    onConfirm: () => activateModel(modelKey),
+    onConfirm: () => activateModel(modelKey, { vehicleSetupStage: "body_style" }),
   });
 }
 
