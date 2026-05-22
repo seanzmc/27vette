@@ -758,7 +758,10 @@ test("vehicle setup exposes paced readability hooks without changing option step
   assert.equal(runtime.elements.get("#stepContent").dataset.stepKind, "model");
   assert.match(setupHtml, /vehicle-setup-section/);
   assert.match(setupHtml, /vehicle-setup-stepper/);
-  assert.match(setupHtml, /vehicle-setup-current/);
+  assert.doesNotMatch(setupHtml, /vehicle-setup-current/);
+  assert.doesNotMatch(setupHtml, /vehicle-setup-summary/);
+  assert.doesNotMatch(setupHtml, /Build starts as/);
+  assert.match(setupHtml, /data-setup-chip-state="active"/);
   assert.match(setupHtml, /<h3>Choose your model<\/h3>/);
   assert.doesNotMatch(setupHtml, /<h3>Body Style<\/h3>/);
   assert.doesNotMatch(setupHtml, /<h3>Trim Level<\/h3>/);

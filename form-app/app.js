@@ -1699,18 +1699,6 @@ function formatBodyStyle(bodyStyle) {
   return bodyStyle ? bodyStyle[0].toUpperCase() + bodyStyle.slice(1) : "";
 }
 
-function renderVehicleSetupCurrent() {
-  const variant = currentVariant();
-  const pieces = [activeModel.label, formatBodyStyle(state.bodyStyle), state.trimLevel].filter(Boolean);
-  return `
-    <div class="vehicle-setup-current" aria-label="Current vehicle setup">
-      <span>Current setup</span>
-      <strong>${escapeHtml(pieces.join(" • ") || activeModel.label || "Corvette")}</strong>
-      <em>${formatMoney(Number(variant?.base_price || 0))}</em>
-    </div>
-  `;
-}
-
 function setupStageSummary(stage) {
   if (stage === "model") return activeModel.label || "Choose";
   if (stage === "body_style") return formatBodyStyle(state.bodyStyle) || "Choose";
@@ -1720,20 +1708,25 @@ function setupStageSummary(stage) {
 
 function renderVehicleSetupStepper() {
   const activeStage = normalizeVehicleSetupStage(state.vehicleSetupStage);
+  const stageOrder = ["model", "body_style", "trim_level", "ready"];
+  const activeIndex = stageOrder.indexOf(activeStage);
   const stages = [
     ["model", "Model"],
-    ["body_style", "Body"],
-    ["trim_level", "Trim"],
+    ["body_style", "Body Style"],
+    ["trim_level", "Trim Level"],
   ];
   return `
     <div class="vehicle-setup-stepper" role="list" aria-label="Vehicle setup progress">
       ${stages
         .map(([stage, label], index) => {
           const isActive = activeStage === stage || (activeStage === "ready" && stage === "trim_level");
+          const isComplete = activeIndex > stageOrder.indexOf(stage);
+          const status = isActive ? "Current" : isComplete ? "Selected" : "Next";
           return `
-            <button class="vehicle-setup-chip ${isActive ? "active" : ""}" type="button" data-setup-stage="${stage}" role="listitem" aria-pressed="${isActive ? "true" : "false"}">
-              <span>${index + 1}. ${label}</span>
-              <strong>${escapeHtml(setupStageSummary(stage))}</strong>
+            <button class="vehicle-setup-chip ${isActive ? "active" : ""}" type="button" data-setup-stage="${stage}" data-setup-chip-state="${isActive ? "active" : isComplete ? "complete" : "upcoming"}" role="listitem" aria-pressed="${isActive ? "true" : "false"}" ${isActive ? 'aria-current="step"' : ""}>
+              <span>${status}</span>
+              <strong>${index + 1}. ${label}</strong>
+              <em>${escapeHtml(setupStageSummary(stage))}</em>
             </button>
           `;
         })
@@ -1756,28 +1749,17 @@ function renderVehicleSetupPanel(title, note, cardsHtml, className = "") {
 
 function renderVehicleSetupReadyPanel() {
   const variant = currentVariant();
+  const displayName = variant?.display_name || activeModel.modelName || activeModel.label || "Corvette";
   return `
     <section class="vehicle-setup-panel vehicle-setup-ready" data-setup-panel>
       <p class="eyebrow">Ready for customization</p>
-      <h3>${escapeHtml(variant?.display_name || activeModel.modelName || activeModel.label || "Corvette")}</h3>
-      <p>Model, body style, and trim are set. Continue to paint, or use the chips above to adjust the starting point.</p>
+      <h3>${escapeHtml(displayName)}</h3>
+      <p>Model, body style, and trim are set. Continue to paint, or use the setup choices above to adjust the starting point.</p>
+      <div class="vehicle-setup-ready-meta" aria-label="Selected starting price">
+        <span>Base MSRP</span>
+        <strong>${formatMoney(Number(variant?.base_price || 0))}</strong>
+      </div>
     </section>
-  `;
-}
-
-function renderVehicleSetupSummary() {
-  const variant = currentVariant();
-  return `
-    <aside class="vehicle-setup-summary" aria-label="Selected starting build">
-      <p class="eyebrow">Build starts as</p>
-      <h3>${escapeHtml(variant?.display_name || activeModel.modelName || activeModel.label || "Corvette")}</h3>
-      <dl>
-        <div><dt>Model</dt><dd>${escapeHtml(activeModel.modelName || activeModel.label || "")}</dd></div>
-        <div><dt>Body</dt><dd>${escapeHtml(formatBodyStyle(state.bodyStyle))}</dd></div>
-        <div><dt>Trim</dt><dd>${escapeHtml(state.trimLevel || "")}</dd></div>
-        <div><dt>Base MSRP</dt><dd>${formatMoney(Number(variant?.base_price || 0))}</dd></div>
-      </dl>
-    </aside>
   `;
 }
 
@@ -1798,18 +1780,15 @@ function renderVehicleSetupContent() {
   return `
     <section class="section-block vehicle-setup-section" data-vehicle-setup-stage="${stage}">
       <div class="vehicle-setup-intro">
-        <div>
-          <h3>Choose your Corvette foundation</h3>
-          <p>Set model, body, and trim here. Each choice stays available without turning this into three separate pages.</p>
-        </div>
+        <p class="eyebrow">Vehicle Setup</p>
+        <h3>Choose your Corvette foundation</h3>
+        <p>Start with model, body style, and trim. You can come back to any setup choice before submitting.</p>
       </div>
-      ${renderVehicleSetupCurrent()}
       ${renderVehicleSetupStepper()}
       <div class="vehicle-setup-layout">
         <div class="vehicle-setup-choices">
           ${panel}
         </div>
-        ${renderVehicleSetupSummary()}
       </div>
     </section>
   `;

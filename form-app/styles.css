@@ -339,63 +339,39 @@ textarea {
 
 .vehicle-setup-section {
   display: grid;
-  gap: 18px;
+  gap: 14px;
 }
 
 .vehicle-setup-intro {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px;
-  border: 1px solid rgba(217, 209, 196, 0.72);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.42);
+  display: grid;
+  gap: 5px;
+  padding: 2px 2px 8px;
 }
 
 .vehicle-setup-intro h3,
-.vehicle-setup-current strong,
-.vehicle-setup-summary h3,
-.vehicle-setup-group-heading h3 {
+.vehicle-setup-group-heading h3,
+.vehicle-setup-ready h3 {
+  margin: 0;
+}
+
+.vehicle-setup-intro .eyebrow {
   margin: 0;
 }
 
 .vehicle-setup-intro p,
 .vehicle-setup-group-heading p,
 .vehicle-setup-ready p {
-  margin: 5px 0 0;
+  margin: 0;
   color: var(--muted);
   font-size: 13px;
   line-height: 1.45;
 }
 
-.vehicle-setup-current,
 .vehicle-setup-stepper,
 .vehicle-setup-panel {
   border: 1px solid rgba(217, 209, 196, 0.72);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.42);
-}
-
-.vehicle-setup-current {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-}
-
-.vehicle-setup-current span,
-.vehicle-setup-current em {
-  color: var(--muted);
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
-.vehicle-setup-current strong {
-  flex: 1 1 auto;
-  color: var(--ink);
 }
 
 .vehicle-setup-stepper {
@@ -408,10 +384,10 @@ textarea {
 .vehicle-setup-chip {
   display: grid;
   justify-items: start;
-  gap: 3px;
+  gap: 4px;
   min-height: 0;
   border-color: transparent;
-  padding: 10px 12px;
+  padding: 11px 12px;
   background: transparent;
   color: var(--ink);
   text-align: left;
@@ -419,8 +395,9 @@ textarea {
 
 .vehicle-setup-chip span {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 850;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -428,11 +405,34 @@ textarea {
   font-size: 14px;
 }
 
+.vehicle-setup-chip em {
+  color: var(--muted);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 800;
+}
+
 .vehicle-setup-chip:hover,
-.vehicle-setup-chip:focus-visible,
+.vehicle-setup-chip:focus-visible {
+  border-color: rgba(178, 34, 52, 0.18);
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--accent-dark);
+}
+
 .vehicle-setup-chip.active {
-  border-color: rgba(178, 34, 52, 0.22);
+  border-color: rgba(178, 34, 52, 0.36);
   background: var(--panel-strong);
+  box-shadow: inset 0 0 0 1px rgba(178, 34, 52, 0.12);
+  color: var(--accent-dark);
+}
+
+.vehicle-setup-chip.active span,
+.vehicle-setup-chip.active em {
+  color: var(--accent-dark);
+}
+
+.vehicle-setup-chip[data-setup-chip-state="complete"] strong::after {
+  content: " ✓";
   color: var(--accent-dark);
 }
 
@@ -445,7 +445,7 @@ textarea {
 .vehicle-setup-layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 18px;
+  gap: 14px;
   align-items: start;
 }
 
@@ -497,43 +497,26 @@ textarea {
   color: #fff;
 }
 
-.vehicle-setup-summary {
-  display: grid;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fffaf2;
-  box-shadow: var(--shadow);
-}
-
-.vehicle-setup-summary dl {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 9px;
-  margin: 0;
-}
-
-.vehicle-setup-summary dl div {
+.vehicle-setup-ready-meta {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
+  width: min(100%, 320px);
   border-top: 1px solid rgba(217, 209, 196, 0.72);
-  padding-top: 9px;
+  padding-top: 12px;
 }
 
-.vehicle-setup-summary dt {
+.vehicle-setup-ready-meta span {
   color: var(--muted);
   font-size: 12px;
   font-weight: 800;
-  text-transform: uppercase;
   letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.vehicle-setup-summary dd {
-  margin: 0;
-  text-align: right;
-  font-weight: 800;
+.vehicle-setup-ready-meta strong {
+  color: var(--ink);
 }
 
 .selected-seat-context {
@@ -1816,20 +1799,13 @@ textarea {
   }
 
   .vehicle-setup-layout,
+  .vehicle-setup-stepper,
   .trim-setup-group .setup-choice-grid {
     grid-template-columns: 1fr;
   }
 
-  .vehicle-setup-summary {
-    position: static;
-  }
-
-  .vehicle-setup-summary dl {
-    grid-template-columns: 1fr;
-  }
-
   .vehicle-setup-intro {
-    padding: 14px;
+    padding: 0 0 4px;
   }
 
   .setup-choice-grid {
