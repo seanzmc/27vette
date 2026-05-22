@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-22T04:55:20+00:00"
+          "generated_at": "2026-05-22T13:43:01+00:00"
         },
         "variants": [
           {
@@ -48299,6 +48299,17 @@ window.CORVETTE_FORM_DATA = {
             "variant_scope": "*",
             "priority": 30,
             "notes": "Default black seat belt when no seat-belt option is selected or auto-added."
+          },
+          {
+            "rule_id": "default_bc7",
+            "target_option_id": "opt_bc7_001",
+            "condition_type": "always",
+            "condition_id": "",
+            "body_style_scope": "coupe",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "priority": 40,
+            "notes": "Workbook-owned coupe BC7 default/restoration rule. Runtime serves this through generic defaultSelectionRules, while grp_ls6_engine_covers prevents BC7 from re-adding when a paid engine-cover peer is selected."
           }
         ],
         "runtimeRuleExceptions": [
@@ -56150,7 +56161,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-05-22T04:54:21+00:00",
+          "generated_at": "2026-05-22T13:41:10+00:00",
           "status": "draft_not_runtime_active"
         },
         "variants": [
@@ -111328,6 +111339,17 @@ window.CORVETTE_FORM_DATA = {
             "variant_scope": "*",
             "priority": 20,
             "notes": "Default Grand Sport standard NGA exhaust tips unless NWI bright chrome tips are selected."
+          },
+          {
+            "rule_id": "gs_default_bc7_coupe",
+            "target_option_id": "opt_bc7_001",
+            "condition_type": "always",
+            "condition_id": "",
+            "body_style_scope": "coupe",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "priority": 40,
+            "notes": "Workbook-owned Grand Sport coupe BC7 default/restoration rule. Runtime serves this through generic defaultSelectionRules, while gs_excl_ls6_engine_covers prevents BC7 from re-adding when a paid engine-cover peer is selected."
           },
           {
             "rule_id": "gs_default_j6d_with_j57",

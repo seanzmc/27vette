@@ -282,6 +282,16 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
     false,
     "Grand Sport price rules should not leak into Stingray data"
   );
+  const stingrayBc7Default = registry.models.stingray.data.defaultSelectionRules.find((rule) => rule.rule_id === "default_bc7");
+  assert.ok(stingrayBc7Default, "Stingray BC7 coupe default should be emitted from workbook default_selection_rules");
+  assert.equal(stingrayBc7Default.target_option_id, "opt_bc7_001");
+  assert.equal(stingrayBc7Default.condition_type, "always");
+  assert.equal(stingrayBc7Default.body_style_scope, "coupe");
+  const grandSportBc7Default = registry.models.grandSport.data.defaultSelectionRules.find((rule) => rule.rule_id === "gs_default_bc7_coupe");
+  assert.ok(grandSportBc7Default, "Grand Sport BC7 coupe default should be emitted from workbook default_selection_rules");
+  assert.equal(grandSportBc7Default.target_option_id, "opt_bc7_001");
+  assert.equal(grandSportBc7Default.condition_type, "always");
+  assert.equal(grandSportBc7Default.body_style_scope, "coupe");
   assert.deepEqual(dataWindow.STINGRAY_FORM_DATA, registry.models.stingray.data);
   assert.deepEqual(
     JSON.parse(JSON.stringify(registry.models.grandSport.data.variants.map((variant) => variant.variant_id))),
@@ -723,6 +733,9 @@ test("Grand Sport engine covers are radio peers without an open Engine Appearanc
   runtime.handleChoice(bcp);
   assert.equal(runtime.state.selected.has("opt_bcp_002"), true, "another paid LS6 cover should select");
   assert.equal(runtime.state.selected.has("opt_bc4_002"), false, "paid LS6 covers should remain radio peers");
+  runtime.handleChoice(bcp);
+  assert.equal(runtime.state.selected.has("opt_bcp_002"), false, "clicking selected paid cover should remove it");
+  assert.equal(runtime.state.selected.has("opt_bc7_001"), true, "removing paid cover should restore workbook-owned BC7 coupe default");
 });
 
 test("Grand Sport WUB enables NWI without replacing NGA; NWI replaces and restores NGA", () => {

@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-05-22T04:55:20+00:00"
+    "generated_at": "2026-05-22T13:43:01+00:00"
   },
   "variants": [
     {
@@ -48291,6 +48291,17 @@
       "variant_scope": "*",
       "priority": 30,
       "notes": "Default black seat belt when no seat-belt option is selected or auto-added."
+    },
+    {
+      "rule_id": "default_bc7",
+      "target_option_id": "opt_bc7_001",
+      "condition_type": "always",
+      "condition_id": "",
+      "body_style_scope": "coupe",
+      "trim_level_scope": "*",
+      "variant_scope": "*",
+      "priority": 40,
+      "notes": "Workbook-owned coupe BC7 default/restoration rule. Runtime serves this through generic defaultSelectionRules, while grp_ls6_engine_covers prevents BC7 from re-adding when a paid engine-cover peer is selected."
     }
   ],
   "runtimeRuleExceptions": [

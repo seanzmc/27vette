@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-05-22T04:55:31+00:00",
+    "generated_at": "2026-05-22T13:43:13+00:00",
     "status": "draft_not_runtime_active"
   },
   "variants": [
@@ -59323,6 +59323,17 @@
       "variant_scope": "*",
       "priority": 20,
       "notes": "Default Grand Sport standard NGA exhaust tips unless NWI bright chrome tips are selected."
+    },
+    {
+      "rule_id": "gs_default_bc7_coupe",
+      "target_option_id": "opt_bc7_001",
+      "condition_type": "always",
+      "condition_id": "",
+      "body_style_scope": "coupe",
+      "trim_level_scope": "*",
+      "variant_scope": "*",
+      "priority": 40,
+      "notes": "Workbook-owned Grand Sport coupe BC7 default/restoration rule. Runtime serves this through generic defaultSelectionRules, while gs_excl_ls6_engine_covers prevents BC7 from re-adding when a paid engine-cover peer is selected."
     },
     {
       "rule_id": "gs_default_j6d_with_j57",

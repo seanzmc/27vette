@@ -384,6 +384,11 @@ test("LS6 engine covers are treated as an exclusive selection group", () => {
     ["opt_bc7_001", "opt_bcp_001", "opt_bcs_001", "opt_bc4_001"]
   );
   assert.equal(group.selection_mode, "single_within_group");
+  const defaultBc7 = data.defaultSelectionRules.find((rule) => rule.rule_id === "default_bc7");
+  assert.ok(defaultBc7, "BC7 coupe default should be workbook-owned through default_selection_rules");
+  assert.equal(defaultBc7.target_option_id, "opt_bc7_001");
+  assert.equal(defaultBc7.condition_type, "always");
+  assert.equal(defaultBc7.body_style_scope, "coupe");
   assert.match(appSource, /const exclusiveGroupByOption = new Map\(\)/);
   assert.match(appSource, /function optionExclusiveGroup\(optionId\)/);
   assert.match(appSource, /function removeOtherExclusiveGroupOptions\(optionId\)/);
@@ -547,10 +552,18 @@ test("Stingray coupe engine covers switch BC7 and paid covers as radio peers", (
   assert.ok(bc7 && bcp, "BC7 and BCP should be active on Stingray coupe");
   assert.equal(runtime.state.selected.has("opt_bc7_001"), true, "BC7 should seed as the coupe default cover");
 
+  runtime.handleChoice(bc7);
+  assert.equal(runtime.state.selected.has("opt_bc7_001"), true, "clicking selected BC7 should restore the workbook-owned coupe default");
+
   runtime.handleChoice(bcp);
   assert.equal(runtime.state.selected.has("opt_bcp_001"), true, "BCP should select");
   assert.equal(runtime.state.selected.has("opt_bc7_001"), false, "BCP should remove default BC7");
 
+  runtime.handleChoice(bcp);
+  assert.equal(runtime.state.selected.has("opt_bcp_001"), false, "clicking selected BCP should remove the paid cover");
+  assert.equal(runtime.state.selected.has("opt_bc7_001"), true, "removing a paid cover should restore the workbook-owned BC7 coupe default");
+
+  runtime.handleChoice(bcp);
   runtime.handleChoice(bc7);
   assert.equal(runtime.state.selected.has("opt_bc7_001"), true, "BC7 should be selectable again");
   assert.equal(runtime.state.selected.has("opt_bcp_001"), false, "BC7 should replace BCP");
@@ -1532,7 +1545,7 @@ test("order summary helpers are exposed for browser debug inspection", () => {
 test("runtime defaults and RPO exceptions are workbook-generated metadata", () => {
   assert.deepEqual(
     JSON.parse(JSON.stringify(data.defaultSelectionRules.map((rule) => rule.rule_id).sort())),
-    ["default_719", "default_fe1", "default_nga"]
+    ["default_719", "default_bc7", "default_fe1", "default_nga"]
   );
   assert.deepEqual(
     JSON.parse(JSON.stringify(data.runtimeRuleExceptions.map((exception) => exception.exception_id).sort())),
@@ -1761,9 +1774,12 @@ test("standard equipment dedupes mirrored RPO rows and does not require default_
   }
 });
 
-test("coupe defaults include BC7 engine appearance from workbook-authored choice metadata", () => {
+test("coupe defaults include BC7 engine appearance from workbook-authored choice metadata and default rules", () => {
   const bc7Rule = data.defaultSelectionRules.find((rule) => rule.rule_id === "default_bc7");
-  assert.equal(bc7Rule, undefined, "BC7 should no longer use a generated default selection rule");
+  assert.ok(bc7Rule, "BC7 should use a workbook-authored default selection rule for coupe restoration");
+  assert.equal(bc7Rule.target_option_id, "opt_bc7_001");
+  assert.equal(bc7Rule.condition_type, "always");
+  assert.equal(bc7Rule.body_style_scope, "coupe");
 
   const coupeBc7Choices = data.choices.filter((choice) => choice.option_id === "opt_bc7_001" && choice.body_style === "coupe");
   assert.equal(coupeBc7Choices.length, 3);
