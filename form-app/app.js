@@ -1133,31 +1133,16 @@ function relationshipBadgesForChoice(choice, { disabled = false } = {}) {
       type: "includes",
       className: `includes${disabled ? " disabled" : ""}`,
       label: `Includes ${includeRules.length} item${includeRules.length === 1 ? "" : "s"}`,
-      includedItems: includeRules.map((rule) => getEntityLabel(rule.target_id)),
     });
   }
   return badges;
 }
 
-function renderIncludedItemsTooltip(items = []) {
-  const rows = items.filter(Boolean);
-  if (!rows.length) return "Included items.";
-  return `
-    <span class="tooltip-content structured">
-      <ul class="tooltip-list">
-        ${rows.map((item) => `<li><span>${escapeHtml(item)}</span></li>`).join("")}
-      </ul>
-    </span>
-  `;
-}
-
 function renderRelationshipBadge(badge) {
   if (badge.type === "includes") {
-    const ariaContent = escapeHtml([badge.label, ...badge.includedItems].join(": "));
     return `
-      <span class="choice-relationship-badge ${badge.className} info-tooltip" tabindex="0" aria-label="${ariaContent}">
-        <span class="tooltip-trigger-text">${escapeHtml(badge.label)}</span>
-        <span class="tooltip-panel" role="tooltip">${renderIncludedItemsTooltip(badge.includedItems)}</span>
+      <span class="choice-relationship-badge ${badge.className}">
+        <span>${escapeHtml(badge.label)}</span>
       </span>
     `;
   }

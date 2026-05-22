@@ -439,17 +439,22 @@ test("runtime renders include relationship badges without exclusive or required 
 
   const stingrayPackage = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_pdv_001");
   html = runtime.renderChoiceCard(stingrayPackage, new Map());
-  assert.match(html, /choice-relationship-badge includes info-tooltip/);
+  assert.match(html, /choice-relationship-badge includes/);
+  assert.doesNotMatch(html, /choice-relationship-badge includes info-tooltip/);
   assert.match(html, /Includes 2 items/);
-  assert.match(html, /<span class="tooltip-trigger-text">Includes 2 items<\/span>/);
-  assert.match(html, /SB7 Corvette Racing Themed Jake and Stingray R Graphics Package/);
-  assert.match(html, /VWD Stingray R Logo Wheel Center Caps/);
+  assert.doesNotMatch(html, /<span class="tooltip-trigger-text">Includes 2 items<\/span>/);
+  assert.doesNotMatch(html, /SB7 Corvette Racing Themed Jake and Stingray R Graphics Package/);
+  assert.doesNotMatch(html, /VWD Stingray R Logo Wheel Center Caps/);
   assert.doesNotMatch(html, /Workbook includes|Workbook-defined/);
   assert.doesNotMatch(html, /choice-relationship-badge includes[\s\S]*info-icon/);
+  assert.doesNotMatch(html, /choice-relationship-badge includes[\s\S]*tooltip-panel/);
+  assert.match(html, /choice-name[\s\S]*info-tooltip/);
 
   const disabledIncludesChoice = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_fe4_001");
   html = runtime.renderChoiceCard(disabledIncludesChoice, new Map());
-  assert.match(html, /choice-relationship-badge includes disabled info-tooltip/);
+  assert.match(html, /choice-relationship-badge includes disabled/);
+  assert.doesNotMatch(html, /choice-relationship-badge includes disabled info-tooltip/);
+  assert.doesNotMatch(html, /<span class="tooltip-trigger-text">Includes 1 item<\/span>/);
 
   runtime.activateModel("grandSport");
   const requiredBrake = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j57_001");
