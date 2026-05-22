@@ -97,3 +97,49 @@ test("Grand Sport engine cover order and customer descriptions match reviewed so
     assert.equal(row.description ?? null, expectedDescription, `grandSport_options ${optionId} description`);
   }
 });
+
+test("source sheets keep accessory branding in descriptions when the base product remains identifiable", () => {
+  const expectedRows = {
+    stingray_options: {
+      opt_sln_001: ["Visible Carbon Fiber Engine Cross Brace", "LPO. Features Jake logo. Genuine Corvette Accessory."],
+      opt_vtb_001: ["Rear Fascia/Roof Storage Protector", "LPO. Black. Embroidered crossed flags logo. Genuine Corvette Accessory."],
+      opt_rwh_001: ["Black Premium Indoor Car Cover", "LPO. Crossed flags logo. Genuine Corvette Accessory."],
+      opt_sl1_001: ["Red Premium Indoor Car Cover", "LPO. Stingray logo. Genuine Corvette Accessory."],
+      opt_wkq_001: [
+        "Black Premium Indoor Car Cover with Access Panels",
+        "LPO. Crossed flags logo. Access panels allow access to the front and rear trunks without removing the cover from the car. Genuine Corvette Accessory.",
+      ],
+      opt_rnx_001: [
+        "Gray Premium Outdoor Car Cover with Access Panels",
+        "LPO. Includes access panels and Corvette silhouette within the Stingray logo. Genuine Corvette Accessory.",
+      ],
+      opt_rwj_001: ["Gray Premium Outdoor Car Cover", "LPO. Crossed flags logo and Corvette silhouette. Genuine Corvette Accessory."],
+      opt_pef_001: [
+        "Contoured Liner Protection Package",
+        "LPO. Includes (CAV) Jake logo contoured cargo area liners and (RIA) Jake logo all-weather floor liners. Genuine Corvette Accessory.",
+      ],
+      opt_ria_001: ["All-Weather Floor Liners", "LPO. Jake logo. Genuine Corvette Accessory."],
+      opt_cav_001: ["Contoured Cargo Area Liners", "LPO. Jake logo. Genuine Corvette Accessory."],
+      opt_vyw_001: [
+        "Premium Carpeted Floor Mats",
+        "LPO. Features car silhouette logo on Stingray, Grand Sport, ZR1 and ZR1X models. Genuine Corvette Accessory.",
+      ],
+    },
+    grandSport_options: {
+      opt_pef_001: [
+        "Contoured Liner Protection Package",
+        "LPO. Includes (CAV) Jake logo contoured cargo area liners and (RIA) Jake logo all-weather floor liners. Genuine Corvette Accessory",
+      ],
+      opt_cav_001: ["Contoured Cargo Area Liners", "LPO. Jake logo. Genuine Corvette Accessory"],
+      opt_sig_001: ["Clear Smoked Spoiler Extension", "LPO. Jake logo. Genuine Corvette Accessory"],
+    },
+  };
+
+  for (const [sheetName, rows] of Object.entries(expectedRows)) {
+    for (const [optionId, [expectedName, expectedDescription]] of Object.entries(rows)) {
+      const row = rowFor(sheetName, optionId);
+      assert.equal(row.option_name, expectedName, `${sheetName} ${optionId} name`);
+      assert.equal(row.description, expectedDescription, `${sheetName} ${optionId} description`);
+    }
+  }
+});
