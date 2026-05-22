@@ -721,43 +721,45 @@ test("mobile progress and compact summary update from runtime state", () => {
   const runtime = loadRuntime();
   runtime.render();
 
-  assert.equal(runtime.elements.get("#mobileStepCount").textContent, "Step 1 of 14");
-  assert.equal(runtime.elements.get("#mobileStepName").textContent, "Model");
+  assert.equal(runtime.elements.get("#mobileStepCount").textContent, "Step 1 of 12");
+  assert.equal(runtime.elements.get("#mobileStepName").textContent, "Vehicle Setup");
   assert.equal(runtime.elements.get("#mobilePrevStep").disabled, true);
   assert.equal(runtime.elements.get("#mobilePrevStep").hidden, true);
   assert.equal(runtime.elements.get("#mobileProgress").dataset.hasPrevious, "false");
   assert.equal(runtime.elements.get("#mobileNextStep").textContent, "Next");
-  assert.equal(runtime.elements.get("#mobileNextStep").title, "Next: Body Style");
+  assert.equal(runtime.elements.get("#mobileNextStep").title, "Next: Exterior Paint");
   assert.match(runtime.elements.get("#mobileSummaryTotal").textContent, /^\$/);
   assert.match(runtime.elements.get("#mobileSummarySelected").textContent, /selected item/);
   assert.match(runtime.elements.get("#mobileSummaryMissing").textContent, /required choice/);
 
-  runtime.state.activeStep = "trim_level";
+  runtime.state.activeStep = "paint";
   runtime.render();
-  assert.equal(runtime.elements.get("#mobileStepCount").textContent, "Step 3 of 14");
-  assert.equal(runtime.elements.get("#mobileStepName").textContent, "Trim Level");
+  assert.equal(runtime.elements.get("#mobileStepCount").textContent, "Step 2 of 12");
+  assert.equal(runtime.elements.get("#mobileStepName").textContent, "Exterior Paint");
   assert.equal(runtime.elements.get("#mobilePrevStep").hidden, false);
   assert.equal(runtime.elements.get("#mobilePrevStep").textContent, "Back");
-  assert.equal(runtime.elements.get("#mobilePrevStep").title, "Back: Body Style");
+  assert.equal(runtime.elements.get("#mobilePrevStep").title, "Back: Vehicle Setup");
   assert.equal(runtime.elements.get("#mobileProgress").dataset.hasPrevious, "true");
 });
 
-test("context steps expose mobile readability hooks without changing step content", () => {
+test("vehicle setup exposes mobile readability hooks without changing option step content", () => {
   const runtime = loadRuntime();
   runtime.render();
 
   assert.equal(runtime.elements.get("#stepContent").dataset.activeStep, "model");
   assert.equal(runtime.elements.get("#stepContent").dataset.stepKind, "model");
-  assert.match(runtime.elements.get("#stepContent").innerHTML, /model-step-section/);
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /vehicle-setup-section/);
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /<h3>Model<\/h3>/);
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /<h3>Body Style<\/h3>/);
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /<h3>Trim Level<\/h3>/);
   assert.match(runtime.elements.get("#stepContent").innerHTML, /<span class="rpo">Stingray<\/span>/);
   assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /<span class="choice-name"><span>Corvette Stingray<\/span><\/span>/);
   assert.match(runtime.elements.get("#stepContent").innerHTML, /aria-label="Corvette Stingray, Coupe \/ Convertible, 1LT \/ 2LT \/ 3LT"/);
 
-  runtime.state.activeStep = "body_style";
-  runtime.render();
-  assert.equal(runtime.elements.get("#stepContent").dataset.activeStep, "body_style");
-  assert.equal(runtime.elements.get("#stepContent").dataset.stepKind, "context");
-  assert.match(runtime.elements.get("#stepContent").innerHTML, /context-step-section/);
+  runtime.activateStep("body_style");
+  assert.equal(runtime.elements.get("#stepContent").dataset.activeStep, "model");
+  assert.equal(runtime.elements.get("#stepContent").dataset.stepKind, "model");
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /vehicle-setup-section/);
 
   runtime.state.activeStep = "paint";
   runtime.render();
@@ -810,7 +812,7 @@ test("mobile drawers expose route and summary state without changing form logic"
   assert.equal(runtime.elements.get("#openStepDrawerButton").getAttribute("aria-expanded"), "true");
 
   runtime.activateStep("trim_level", { closeDrawer: true });
-  assert.equal(runtime.state.activeStep, "trim_level");
+  assert.equal(runtime.state.activeStep, "model");
   assert.equal(runtime.elements.get(".app-shell").dataset.mobileDrawer, undefined);
   assert.equal(runtime.elements.get("#mobileDrawerBackdrop").hidden, true);
 
