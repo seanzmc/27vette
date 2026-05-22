@@ -395,10 +395,29 @@ textarea {
   background: var(--panel);
 }
 
+.interior-color-section .selected-seat-context {
+  margin-top: 0;
+}
+
 .interior-group {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: transparent;
+  border: 1px solid rgba(198, 187, 171, 0.95);
+  border-radius: 10px;
+  background: rgba(248, 243, 234, 0.5);
+  box-shadow: inset 0 1px 4px rgba(32, 24, 16, 0.09), 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+.interior-group:hover,
+.interior-group:focus-within {
+  border-color: rgba(178, 34, 52, 0.26);
+  background: rgba(248, 243, 234, 0.72);
+  box-shadow: inset 0 2px 8px rgba(32, 24, 16, 0.12), 0 1px 0 rgba(255, 255, 255, 0.64);
+}
+
+.interior-group[open] {
+  border-color: rgba(178, 34, 52, 0.32);
+  background: rgba(255, 252, 246, 0.78);
+  box-shadow: inset 0 2px 9px rgba(32, 24, 16, 0.1), 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 .interior-group-header {
@@ -757,7 +776,20 @@ textarea {
 }
 
 .required-mark {
-  color: var(--accent-dark);
+  color: var(--accent);
+  font-weight: 900;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .full-field {

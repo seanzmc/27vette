@@ -429,14 +429,13 @@ test("runtime formats long includes tooltips into escaped RPO bullet lists", () 
   assert.doesNotMatch(runtime.formatTooltipContent("Includes (ABC) <img src=x onerror=alert(1)> and (DEF) safe accessory details.".repeat(2)), /<img/);
 });
 
-test("runtime renders customer-facing relationship badges on exclusive and package choices", () => {
+test("runtime renders include relationship badges without exclusive or required choice pills", () => {
   const runtime = loadRuntime();
   const stingrayCover = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_bc7_001");
   let html = runtime.renderChoiceCard(stingrayCover, new Map());
-  assert.match(html, /choice-relationship-badge/);
-  assert.match(html, /Choose one/);
-  assert.match(html, /data-exclusive-group="grp_ls6_engine_covers"/);
-  assert.doesNotMatch(html, />grp_ls6_engine_covers</);
+  assert.doesNotMatch(html, /choice-relationship-badge exclusive/);
+  assert.doesNotMatch(html, /Choose one/);
+  assert.doesNotMatch(html, /data-exclusive-group="grp_ls6_engine_covers"/);
 
   const stingrayPackage = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_pdv_001");
   html = runtime.renderChoiceCard(stingrayPackage, new Map());
@@ -455,8 +454,9 @@ test("runtime renders customer-facing relationship badges on exclusive and packa
   runtime.activateModel("grandSport");
   const requiredBrake = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j57_001");
   html = runtime.renderChoiceCard(requiredBrake, new Map());
-  assert.match(html, /Required choice/);
-  assert.match(html, /data-exclusive-group="gs_excl_performance_brakes"/);
+  assert.doesNotMatch(html, /Required choice/);
+  assert.doesNotMatch(html, /choice-relationship-badge required/);
+  assert.doesNotMatch(html, /data-exclusive-group="gs_excl_performance_brakes"/);
 });
 
 test("runtime groups visible exclusive-group peers within option sections", () => {
@@ -474,9 +474,28 @@ test("runtime groups visible exclusive-group peers within option sections", () =
   assert.match(html, /data-option="opt_jx6_001"/);
   assert.match(html, /data-option="opt_j56_001"/);
   assert.match(html, /data-option="opt_j57_001"/);
-  assert.match(html, /Choose one/);
-  assert.match(html, /Choose any that apply/);
+  assert.doesNotMatch(html, /Choose one|Choose up to one|Choose any that apply/);
+  assert.doesNotMatch(html, /Required choice|choice-relationship-badge required|choice-relationship-badge exclusive/);
+  assert.match(html, /required-mark/);
   assert.doesNotMatch(html, /Required single choice|Optional multiple choice/);
+});
+
+test("runtime avoids duplicate Interior Color headings and keeps interior groups interactive", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "convertible";
+  runtime.state.trimLevel = "2LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.state.activeStep = "base_interior";
+  runtime.render();
+
+  const html = runtime.elements.get("#stepContent").innerHTML;
+  assert.match(html, /<h2>Interior Color<\/h2>/);
+  assert.doesNotMatch(html, /<div class="section-title"><h3>Interior Color<\/h3>/);
+  assert.match(html, /selected-seat-context/);
+  assert.match(html, /interior-group/);
+  assert.match(html, /interior-group-header/);
 });
 
 test("runtime renders selected RPO summary as sectioned rows matching export sections", () => {

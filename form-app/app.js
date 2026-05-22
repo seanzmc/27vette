@@ -1127,15 +1127,6 @@ function includeRulesForChoice(choice) {
 
 function relationshipBadgesForChoice(choice, { disabled = false } = {}) {
   const badges = [];
-  const group = optionExclusiveGroup(choice.option_id);
-  if (group && exclusiveGroupAllowsSingleSelection(group)) {
-    badges.push({
-      type: "exclusive",
-      className: exclusiveGroupRequiresSelection(group) ? "required" : "exclusive",
-      label: exclusiveGroupVisualLabel(group),
-      dataAttribute: `data-exclusive-group="${escapeHtml(group.group_id)}"`,
-    });
-  }
   const includeRules = includeRulesForChoice(choice);
   if (includeRules.length) {
     badges.push({
@@ -1479,14 +1470,24 @@ function renderChoiceCard(choice, autoAdded) {
 }
 
 function renderModeLabel(section) {
-  const label = section?.selection_mode_label || section?.selection_mode || "";
-  const friendlyLabels = {
-    "Required single choice": "Choose one",
-    "Optional single choice": "Choose up to one",
-    "Optional multiple choice": "Choose any that apply",
-    "Required multiple choice": "Choose required options",
-  };
-  return friendlyLabels[label] || label;
+  return section?.selection_mode_label || section?.selection_mode || "";
+}
+
+function sectionRequiresSelection(section, choices = []) {
+  if (section?.selection_mode === "single_select_req" || truthyValue(section?.is_required)) return true;
+  return choices.some((choice) => {
+    const group = optionExclusiveGroup(choice.option_id);
+    return exclusiveGroupRequiresSelection(group);
+  });
+}
+
+function renderSectionTitle(section, fallbackLabel, choices = []) {
+  const required = sectionRequiresSelection(section, choices);
+  return `
+    <div class="section-title">
+      <h3>${escapeHtml(section?.section_name || fallbackLabel)}${required ? ' <span class="required-mark" aria-hidden="true">*</span><span class="sr-only"> required</span>' : ""}</h3>
+    </div>
+  `;
 }
 
 function renderInteriorCard(interior) {
@@ -1838,7 +1839,7 @@ function renderStepContent({ resetScroll = false } = {}) {
     const section = sectionsById.get(state.activeStep === "body_style" ? "sec_context_body_style" : "sec_context_trim_level");
     body = `
       <section class="section-block context-step-section">
-        <div class="section-title"><h3>${section?.section_name || step?.step_label}</h3><span>${renderModeLabel(section)}</span></div>
+        ${renderSectionTitle(section, step?.step_label)}
         <div class="choice-grid">${contextChoices.map(renderContextCard).join("")}</div>
       </section>
       ${state.activeStep === "trim_level" ? renderTrimStandardEquipment() : ""}
@@ -1848,7 +1849,6 @@ function renderStepContent({ resetScroll = false } = {}) {
     const selectedSeat = selectedSeatChoice();
     body = `
       <section class="section-block interior-color-section">
-        <div class="section-title"><h3>Interior Color</h3><span>${interiors.length} choices</span></div>
         ${selectedSeat ? `<p class="selected-seat-context">Showing colors compatible with ${escapeHtml(selectedSeat.rpo)} ${escapeHtml(selectedSeat.label)}.</p>` : ""}
         ${renderInteriorGroups(interiors)}
       </section>
@@ -1876,7 +1876,7 @@ function renderStepContent({ resetScroll = false } = {}) {
         const section = sectionsById.get(sectionId);
         return `
           <section class="section-block">
-            <div class="section-title"><h3>${section?.section_name || sectionId}</h3><span>${renderModeLabel(section)}</span></div>
+            ${renderSectionTitle(section, sectionId, choices)}
             ${renderStepChoiceGroups(choices, autoAdded)}
           </section>
         `;
