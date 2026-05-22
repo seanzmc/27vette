@@ -321,6 +321,67 @@ textarea {
   font-weight: 750;
 }
 
+.choice-relation-group {
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(178, 34, 52, 0.18);
+  border-radius: 10px;
+  padding: 14px;
+  background: linear-gradient(135deg, rgba(255, 247, 243, 0.92), rgba(255, 253, 249, 0.92));
+}
+
+.choice-relation-group + .choice-grid,
+.choice-grid + .choice-relation-group,
+.choice-relation-group + .choice-relation-group {
+  margin-top: 12px;
+}
+
+.choice-relation-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.choice-relation-eyebrow,
+.choice-relation-title,
+.choice-relation-note {
+  margin: 0;
+}
+
+.choice-relation-eyebrow {
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.choice-relation-title {
+  margin-top: 2px;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.choice-relation-note {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.choice-relation-count {
+  flex: 0 0 auto;
+  border: 1px solid rgba(178, 34, 52, 0.24);
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: var(--panel-strong);
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 850;
+}
+
 .interior-layout {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -574,6 +635,51 @@ textarea {
   color: var(--panel-strong);
 }
 
+.choice-relationship-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.choice-relationship-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  justify-self: start;
+  border: 1px solid rgba(178, 34, 52, 0.28);
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: #fff7f3;
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.01em;
+}
+
+.choice-relationship-badge.required {
+  border-color: rgba(161, 92, 0, 0.36);
+  background: #fff7e8;
+  color: var(--warn);
+}
+
+.choice-relationship-badge.includes {
+  border-color: rgba(31, 122, 77, 0.32);
+  background: #f1f8f2;
+  color: var(--ok);
+}
+
+.choice-relationship-badge .info-tooltip {
+  width: 16px;
+  height: 16px;
+  color: inherit;
+}
+
+.choice-relationship-badge .info-icon {
+  width: 15px;
+  height: 15px;
+  font-size: 9px;
+}
+
 .auto-reason {
   color: var(--ok);
 }
@@ -784,6 +890,74 @@ textarea {
   font-size: 13px;
 }
 
+.summary-list .summary-rpo-section {
+  display: grid;
+  gap: 7px;
+  border-bottom: 0;
+  padding-bottom: 4px;
+}
+
+.summary-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid rgba(217, 209, 196, 0.8);
+  padding: 2px 0 6px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.summary-rpo-rows {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.summary-list li.summary-rpo-row,
+.summary-rpo-row {
+  display: grid;
+  grid-template-columns: minmax(42px, auto) minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  border-bottom: 1px solid rgba(217, 209, 196, 0.55);
+  padding: 0 0 6px;
+  color: var(--ink);
+}
+
+.summary-rpo-code {
+  justify-self: start;
+  border: 1px solid rgba(178, 34, 52, 0.25);
+  border-radius: 999px;
+  padding: 2px 6px;
+  background: #fff7f3;
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.summary-rpo-label {
+  min-width: 0;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.summary-rpo-price {
+  color: var(--ink);
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.summary-rpo-row .info-tooltip {
+  grid-column: 2 / -1;
+  justify-self: start;
+}
+
 #requirementsCard {
   order: 2;
 }
@@ -860,7 +1034,7 @@ textarea {
   right: 0;
   z-index: 90;
   width: max-content;
-  max-width: min(280px, 72vw);
+  max-width: min(360px, 82vw);
   border: 1px solid rgba(23, 32, 38, 0.16);
   border-radius: 6px;
   padding: 9px 10px;
@@ -885,6 +1059,43 @@ textarea {
   opacity: 1;
   transform: translateY(0);
   visibility: visible;
+}
+
+.tooltip-content {
+  display: grid;
+  gap: 8px;
+}
+
+.tooltip-lead,
+.tooltip-tail {
+  display: block;
+}
+
+.tooltip-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tooltip-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 7px;
+  align-items: start;
+}
+
+.tooltip-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 999px;
+  padding: 1px 6px;
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: 0.04em;
 }
 
 .standard-equipment-list {

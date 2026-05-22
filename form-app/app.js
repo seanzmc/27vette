@@ -215,12 +215,56 @@ function truthyValue(value) {
   return ["true", "1", "yes", "y"].includes(String(value || "").trim().toLowerCase());
 }
 
+function plainTooltipText(content) {
+  return String(content || "").replace(/\s+/g, " ").trim();
+}
+
+function cleanTooltipFragment(value) {
+  return String(value || "")
+    .replace(/^\s*(?:,|;|\.|and\b|or\b|with\b)+\s*/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function formatTooltipContent(content) {
+  const text = plainTooltipText(content);
+  if (!text) return "";
+  const codeMatches = [...text.matchAll(/\(([A-Z0-9]{2,4})\)/g)];
+  const shouldStructure = text.length >= 120 && codeMatches.length >= 2 && /\bincludes?\b/i.test(text);
+  if (!shouldStructure) return escapeHtml(text);
+
+  const firstMatch = codeMatches[0];
+  const includesIndex = text.search(/\bincludes?\b/i);
+  const leadEnd = includesIndex >= 0 ? Math.min(firstMatch.index, includesIndex + text.slice(includesIndex).match(/\bincludes?\b/i)[0].length) : firstMatch.index;
+  const lead = cleanTooltipFragment(text.slice(0, leadEnd));
+  const bullets = codeMatches.map((match, index) => {
+    const next = codeMatches[index + 1];
+    const start = match.index + match[0].length;
+    const end = next ? next.index : text.length;
+    return {
+      code: match[1],
+      text: cleanTooltipFragment(text.slice(start, end)),
+    };
+  }).filter((item) => item.text);
+
+  if (bullets.length < 2) return escapeHtml(text);
+  return `
+    <span class="tooltip-content structured">
+      ${lead ? `<span class="tooltip-lead">${escapeHtml(lead)}</span>` : ""}
+      <ul class="tooltip-list">
+        ${bullets.map((item) => `<li><span class="tooltip-code">${escapeHtml(item.code)}</span><span>${escapeHtml(item.text)}</span></li>`).join("")}
+      </ul>
+    </span>
+  `;
+}
+
 function renderInfoTooltip(content, label = "More information", { focusable = true, icon = true, triggerText = "" } = {}) {
   if (!content) return "";
-  const safeContent = escapeHtml(content);
+  const safeContent = formatTooltipContent(content);
   const safeLabel = escapeHtml(label);
+  const ariaContent = escapeHtml(plainTooltipText(content));
   return `
-    <span class="info-tooltip" ${focusable ? "tabindex=\"0\"" : ""} aria-label="${safeLabel}: ${safeContent}">
+    <span class="info-tooltip" ${focusable ? "tabindex=\"0\"" : ""} aria-label="${safeLabel}: ${ariaContent}">
       ${triggerText ? `<span class="tooltip-trigger-text">${escapeHtml(triggerText)}</span>` : ""}
       ${icon ? `<span class="info-icon" aria-hidden="true">i</span>` : ""}
       <span class="tooltip-panel" role="tooltip">${safeContent}</span>
@@ -239,11 +283,12 @@ function descriptiveTooltipText(value) {
 function renderStatePill(label, className, tooltip) {
   if (tooltip) {
     const safeLabel = escapeHtml(label);
-    const safeTooltip = escapeHtml(tooltip);
+    const safeTooltip = escapeHtml(plainTooltipText(tooltip));
+    const tooltipContent = formatTooltipContent(tooltip);
     return `
       <span class="choice-state ${className} info-tooltip" tabindex="0" aria-label="${safeLabel} details: ${safeTooltip}">
         <span class="tooltip-trigger-text">${safeLabel}</span>
-        <span class="tooltip-panel" role="tooltip">${safeTooltip}</span>
+        <span class="tooltip-panel" role="tooltip">${tooltipContent}</span>
       </span>
     `;
   }
@@ -1062,6 +1107,64 @@ function requiredExclusiveGroups() {
   return (data.exclusiveGroups || []).filter((group) => group.active === "True" && exclusiveGroupRequiresSelection(group));
 }
 
+function exclusiveGroupVisualLabel(group) {
+  if (exclusiveGroupRequiresSelection(group)) return "Required choice";
+  if (exclusiveGroupAllowsSingleSelection(group)) return "Choose one";
+  return "Related options";
+}
+
+function exclusiveGroupHeading(group) {
+  if (exclusiveGroupRequiresSelection(group)) return "Choose one required option";
+  if (exclusiveGroupAllowsSingleSelection(group)) return "Choose one of these related options";
+  return "Related options";
+}
+
+function includeRulesForChoice(choice) {
+  return (ruleTargetsBySource.get(choice.option_id) || []).filter(
+    (rule) => rule.rule_type === "includes" && ruleAppliesToCurrentVariant(rule) && (!rule.active || rule.active === "True")
+  );
+}
+
+function relationshipBadgesForChoice(choice) {
+  const badges = [];
+  const group = optionExclusiveGroup(choice.option_id);
+  if (group && exclusiveGroupAllowsSingleSelection(group)) {
+    badges.push({
+      className: exclusiveGroupRequiresSelection(group) ? "required" : "exclusive",
+      label: exclusiveGroupVisualLabel(group),
+      dataAttribute: `data-exclusive-group="${escapeHtml(group.group_id)}"`,
+    });
+  }
+  const includeRules = includeRulesForChoice(choice);
+  if (includeRules.length) {
+    const includedLabels = includeRules.map((rule) => getEntityLabel(rule.target_id)).join("; ");
+    badges.push({
+      className: "includes",
+      label: `Includes ${includeRules.length} item${includeRules.length === 1 ? "" : "s"}`,
+      tooltip: includedLabels ? `Workbook includes: ${includedLabels}.` : "Workbook-defined included items.",
+    });
+  }
+  return badges;
+}
+
+function renderChoiceRelationshipBadges(choice) {
+  const badges = relationshipBadgesForChoice(choice);
+  if (!badges.length) return "";
+  return `
+    <span class="choice-relationship-badges">
+      ${badges
+        .map(
+          (badge) => `
+            <span class="choice-relationship-badge ${badge.className}" ${badge.dataAttribute || ""}>
+              <span>${escapeHtml(badge.label)}</span>${badge.tooltip ? renderInfoTooltip(badge.tooltip, badge.label, { focusable: false, icon: true }) : ""}
+            </span>
+          `
+        )
+        .join("")}
+    </span>
+  `;
+}
+
 function removeOtherExclusiveGroupOptions(optionId) {
   const group = optionExclusiveGroup(optionId);
   if (!exclusiveGroupAllowsSingleSelection(group)) return;
@@ -1346,6 +1449,7 @@ function renderChoiceCard(choice, autoAdded) {
       ${renderCardMedia(choice, choice.label, { disabled })}
       <span class="topline"><span class="rpo">${escapeHtml(choice.rpo || choice.option_id)}</span><span class="price">${formatMoney(choiceDisplayPrice(choice))}</span></span>
       <span class="choice-name"><span>${escapeHtml(choice.label)}</span>${renderInfoTooltip(detail, "Option details", { focusable: false })}</span>
+      ${renderChoiceRelationshipBadges(choice)}
       ${disabledReason ? renderStatePill("Unavailable", "disabled-reason", disabledReason) : ""}
       ${autoReason ? renderStatePill("Auto-added", "auto-reason", autoReason) : ""}
     </button>
@@ -1628,6 +1732,63 @@ function renderFinalStepActions() {
   `;
 }
 
+function renderChoiceGrid(choices, autoAdded) {
+  if (!choices.length) return "";
+  return `<div class="choice-grid">${choices.map((choice) => renderChoiceCard(choice, autoAdded)).join("")}</div>`;
+}
+
+function customerSafeGroupNote(group) {
+  const note = String(group?.notes || "").trim();
+  if (!note || /\b(option_ids?|group_id|runtime|workbook|radio peers?)\b/i.test(note)) return "";
+  return note;
+}
+
+function renderChoiceRelationGroup(group, choices, autoAdded) {
+  const note = customerSafeGroupNote(group);
+  return `
+    <div class="choice-relation-group" data-choice-relation-group="${escapeHtml(group.group_id)}">
+      <div class="choice-relation-heading">
+        <div>
+          <p class="choice-relation-eyebrow">Related choices</p>
+          <h4 class="choice-relation-title">${escapeHtml(exclusiveGroupHeading(group))}</h4>
+          ${note ? `<p class="choice-relation-note">${escapeHtml(note)}</p>` : ""}
+        </div>
+        <span class="choice-relation-count">${choices.length} options</span>
+      </div>
+      ${renderChoiceGrid(choices, autoAdded)}
+    </div>
+  `;
+}
+
+function renderStepChoiceGroups(choices, autoAdded) {
+  const rendered = [];
+  const consumed = new Set();
+  let looseChoices = [];
+  const flushLoose = () => {
+    if (!looseChoices.length) return;
+    rendered.push(renderChoiceGrid(looseChoices, autoAdded));
+    looseChoices = [];
+  };
+
+  for (const choice of choices) {
+    if (consumed.has(choice.option_id)) continue;
+    const group = optionExclusiveGroup(choice.option_id);
+    const peers = group && exclusiveGroupAllowsSingleSelection(group)
+      ? choices.filter((candidate) => (group.option_ids || []).includes(candidate.option_id))
+      : [];
+    if (group && peers.length > 1) {
+      flushLoose();
+      for (const peer of peers) consumed.add(peer.option_id);
+      rendered.push(renderChoiceRelationGroup(group, peers, autoAdded));
+    } else {
+      looseChoices.push(choice);
+      consumed.add(choice.option_id);
+    }
+  }
+  flushLoose();
+  return rendered.join("");
+}
+
 function renderStepContent({ resetScroll = false } = {}) {
   const step = runtimeSteps.find((item) => item.step_key === state.activeStep);
   const autoAdded = computeAutoAdded();
@@ -1689,7 +1850,7 @@ function renderStepContent({ resetScroll = false } = {}) {
         return `
           <section class="section-block">
             <div class="section-title"><h3>${section?.section_name || sectionId}</h3><span>${renderModeLabel(section)}</span></div>
-            <div class="choice-grid">${choices.map((choice) => renderChoiceCard(choice, autoAdded)).join("")}</div>
+            ${renderStepChoiceGroups(choices, autoAdded)}
           </section>
         `;
       })
@@ -1746,6 +1907,43 @@ function renderStepContent({ resetScroll = false } = {}) {
   bindTooltips(els.stepContent);
 }
 
+function renderSummaryRpoRow(item, { includeReason = false } = {}) {
+  return `
+    <li class="summary-rpo-row">
+      <span class="summary-rpo-code">${escapeHtml(item.rpo || item.id)}</span>
+      <span class="summary-rpo-label">${escapeHtml(item.label)}</span>
+      <span class="summary-rpo-price">${formatMoney(item.price)}</span>
+      ${includeReason && item.reason ? renderInfoTooltip(item.reason, "Auto-added reason") : ""}
+    </li>
+  `;
+}
+
+function renderSectionedSummaryItems(items, pricing) {
+  if (!items.length) return "<li class=\"empty\">No selections yet.</li>";
+  const sections = sectionedOrderRecap(items, pricing).filter(
+    (section) => !["vehicle", "pricing_summary", "auto_added_required"].includes(section.section_key) && section.items.length
+  );
+  return sections
+    .map(
+      (section) => `
+        <li class="summary-rpo-section">
+          <div class="summary-section-heading">
+            <span>${escapeHtml(section.section_label)}</span>
+            <span>${formatMoney(section.section_total)}</span>
+          </div>
+          <ul class="summary-rpo-rows">
+            ${section.items.map((item) => renderSummaryRpoRow(item)).join("")}
+          </ul>
+        </li>
+      `
+    )
+    .join("") || "<li class=\"empty\">No selections yet.</li>";
+}
+
+function renderAutoSummaryItems(items) {
+  return items.map((item) => renderSummaryRpoRow(item, { includeReason: true })).join("") || "<li class=\"empty\">No auto-added RPOs.</li>";
+}
+
 function renderSummary() {
   const variant = currentVariant();
   const items = lineItems();
@@ -1759,12 +1957,11 @@ function renderSummary() {
 
   const selectedItems = items.filter((item) => item.type !== "auto_added");
   const autoItems = items.filter((item) => item.type === "auto_added");
-  els.selectedList.innerHTML =
-    selectedItems.map((item) => `<li><strong>${escapeHtml(item.rpo || item.id)}</strong> ${escapeHtml(item.label)} - ${formatMoney(item.price)}</li>`).join("") ||
-    "<li class=\"empty\">No selections yet.</li>";
-  els.autoList.innerHTML =
-    autoItems.map((item) => `<li><strong>${escapeHtml(item.rpo || item.id)}</strong> ${escapeHtml(item.label)} - ${formatMoney(item.price)}${renderInfoTooltip(item.reason, "Auto-added reason")}</li>`).join("") ||
-    "<li class=\"empty\">No auto-added RPOs.</li>";
+  els.selectedList.innerHTML = renderSectionedSummaryItems(selectedItems, {
+    base_price: base,
+    total_msrp: total,
+  });
+  els.autoList.innerHTML = renderAutoSummaryItems(autoItems);
   const missingDetails = missingRequirementDetails();
   const missing = missingDetails.map((item) => item.label);
   if (els.requirementsCard) els.requirementsCard.dataset.requirementsStatus = missing.length ? "open" : "complete";

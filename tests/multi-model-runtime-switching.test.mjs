@@ -158,6 +158,8 @@ window.__testApi = {
   renderChoiceCard,
   renderContextCard,
   renderInteriorGroups: typeof renderInteriorGroups === "function" ? renderInteriorGroups : undefined,
+  formatTooltipContent: typeof formatTooltipContent === "function" ? formatTooltipContent : undefined,
+  renderStepChoiceGroups: typeof renderStepChoiceGroups === "function" ? renderStepChoiceGroups : undefined,
   downloads: window.__downloads,
   elements,
 };
@@ -407,6 +409,86 @@ test("runtime renders context choice tooltips without replacing visible trim des
   assert.match(html, /info-tooltip/);
   assert.match(html, /1LT details/);
   assert.match(html, /driving purists/);
+});
+
+test("runtime formats long includes tooltips into escaped RPO bullet lists", () => {
+  const runtime = loadRuntime();
+  assert.equal(typeof runtime.formatTooltipContent, "function");
+
+  const longTooltip = "LPO. Includes (SB7) Corvette Racing Themed Graphics Package with Jake and Stingray R logos and (VWD) Stingray R logo wheel center caps. Genuine Corvette Accessory.";
+  const html = runtime.formatTooltipContent(longTooltip);
+  assert.match(html, /tooltip-content structured/);
+  assert.match(html, /<ul class="tooltip-list">/);
+  assert.match(html, /<span class="tooltip-code">SB7<\/span>/);
+  assert.match(html, /Corvette Racing Themed Graphics Package/);
+  assert.match(html, /<span class="tooltip-code">VWD<\/span>/);
+  assert.match(html, /Stingray R logo wheel center caps/);
+  assert.match(html, /Genuine Corvette Accessory/);
+
+  assert.equal(runtime.formatTooltipContent("Short trim detail."), "Short trim detail.");
+  assert.doesNotMatch(runtime.formatTooltipContent("Includes (ABC) <img src=x onerror=alert(1)> and (DEF) safe accessory details.".repeat(2)), /<img/);
+});
+
+test("runtime renders customer-facing relationship badges on exclusive and package choices", () => {
+  const runtime = loadRuntime();
+  const stingrayCover = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_bc7_001");
+  let html = runtime.renderChoiceCard(stingrayCover, new Map());
+  assert.match(html, /choice-relationship-badge/);
+  assert.match(html, /Choose one/);
+  assert.match(html, /data-exclusive-group="grp_ls6_engine_covers"/);
+  assert.doesNotMatch(html, />grp_ls6_engine_covers</);
+
+  const stingrayPackage = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_pdv_001");
+  html = runtime.renderChoiceCard(stingrayPackage, new Map());
+  assert.match(html, /Includes \d+ items/);
+
+  runtime.activateModel("grandSport");
+  const requiredBrake = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j57_001");
+  html = runtime.renderChoiceCard(requiredBrake, new Map());
+  assert.match(html, /Required choice/);
+  assert.match(html, /data-exclusive-group="gs_excl_performance_brakes"/);
+});
+
+test("runtime groups visible exclusive-group peers within option sections", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.activeStep = "packages_performance";
+  runtime.render();
+
+  const html = runtime.elements.get("#stepContent").innerHTML;
+  assert.match(html, /choice-relation-group/);
+  assert.match(html, /Choose one required option/);
+  assert.match(html, /data-choice-relation-group="gs_excl_performance_brakes"/);
+  assert.match(html, /data-option="opt_jx6_001"/);
+  assert.match(html, /data-option="opt_j56_001"/);
+  assert.match(html, /data-option="opt_j57_001"/);
+});
+
+test("runtime renders selected RPO summary as sectioned rows matching export sections", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001"));
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_pdv_001"));
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+  runtime.reconcileSelections();
+  runtime.render();
+
+  const selectedHtml = runtime.elements.get("#selectedList").innerHTML;
+  const exportedSections = runtime.compactOrder().sections.map((section) => section.section);
+  assert.ok(exportedSections.includes("Exterior Paint"));
+  assert.match(selectedHtml, /summary-section-heading/);
+  assert.match(selectedHtml, /Exterior Paint/);
+  assert.match(selectedHtml, /summary-rpo-code/);
+  assert.match(selectedHtml, /summary-rpo-label/);
+  assert.match(selectedHtml, /summary-rpo-price/);
+  assert.match(selectedHtml, /GBA/);
+
+  const autoHtml = runtime.elements.get("#autoList").innerHTML;
+  assert.match(autoHtml, /summary-rpo-row/);
+  assert.match(autoHtml, /info-tooltip/);
 });
 
 test("Grand Sport exclusive groups are model-scoped and Stingray groups are unchanged", () => {
