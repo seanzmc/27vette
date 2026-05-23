@@ -44,6 +44,7 @@ function loadRuntime() {
   const elements = new Map();
   const fetchCalls = [];
   const turnstileCalls = [];
+  const scrollCalls = [];
   const document = {
     querySelector(selector) {
       if (!elements.has(selector)) {
@@ -83,7 +84,11 @@ function loadRuntime() {
       },
       scrollX: 0,
       scrollY: 0,
-      scrollTo() {},
+      scrollTo(position = {}) {
+        scrollCalls.push(position);
+        if (typeof position.left === "number") this.scrollX = position.left;
+        if (typeof position.top === "number") this.scrollY = position.top;
+      },
     },
     fetch: async (url, options = {}) => {
       fetchCalls.push({ url, options });
@@ -98,6 +103,7 @@ function loadRuntime() {
     fetchCalls,
     elements,
     turnstileCalls,
+    scrollCalls,
     Intl,
     Number,
     Set,
@@ -154,6 +160,11 @@ window.__testApi = {
     dealerSubmissionPayload,
     fetchCalls,
     turnstileCalls,
+    scrollCalls,
+    setWindowScroll: (x, y) => {
+      window.scrollX = x;
+      window.scrollY = y;
+    },
     exportJson,
   exportCsv,
   renderChoiceCard,
@@ -391,25 +402,79 @@ test("runtime progressively advances vehicle setup panels before exterior paint"
   runtime.requestModelChange("grandSport");
   assert.equal(runtime.activeModelKey, "grandSport");
   assert.equal(runtime.state.activeStep, "model");
+  assert.equal(runtime.state.vehicleSetupStage, "model");
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /Purist, rear-wheel-drive performance/);
+  assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /data-context-choice="body_style__convertible"/);
+
+  runtime.goToNextStep();
   assert.equal(runtime.state.vehicleSetupStage, "body_style");
   assert.match(runtime.elements.get("#stepContent").innerHTML, /data-context-choice="body_style__convertible"/);
   assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /data-context-choice="trim_level__convertible__2lt"/);
 
   runtime.handleContextChoice(convertible);
   assert.equal(runtime.state.bodyStyle, "convertible");
+  assert.equal(runtime.state.vehicleSetupStage, "body_style");
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /Hardtop convertible character/);
+  assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /data-context-choice="trim_level__convertible__2lt"/);
+
+  runtime.goToNextStep();
   assert.equal(runtime.state.vehicleSetupStage, "trim_level");
   assert.match(runtime.elements.get("#stepContent").innerHTML, /data-context-choice="trim_level__convertible__2lt"/);
 
   runtime.handleContextChoice(trim);
   assert.equal(runtime.state.trimLevel, "2LT");
-  assert.equal(runtime.state.vehicleSetupStage, "ready");
+  assert.equal(runtime.state.vehicleSetupStage, "trim_level");
   assert.equal(runtime.state.activeStep, "model");
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /2LT defines the cabin and included equipment/);
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /See what this trim includes/);
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /vehicle-setup-equipment-disclosure/);
+  assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /<details class="vehicle-setup-equipment-disclosure" open/);
+  assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /sets the comfort and finish level/);
+  assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /Continue to Exterior Paint/);
+
+  runtime.goToNextStep();
+  assert.equal(runtime.state.vehicleSetupStage, "ready");
   assert.match(runtime.elements.get("#stepContent").innerHTML, /Continue to Exterior Paint/);
 
   runtime.goToNextStep();
   assert.equal(runtime.state.activeStep, "paint");
   assert.equal(runtime.currentStepSummary().step.step_key, "paint");
   assert.equal(runtime.currentStepSummary().previous.step_key, "model");
+});
+
+test("runtime preserves viewport while switching models inside vehicle setup", () => {
+  const runtime = loadRuntime();
+  runtime.setWindowScroll(0, 640);
+  runtime.scrollCalls.length = 0;
+
+  runtime.requestModelChange("grandSport");
+
+  assert.equal(runtime.activeModelKey, "grandSport");
+  assert.equal(runtime.state.vehicleSetupStage, "model");
+  assert.equal(runtime.scrollCalls.at(-1).top, 640);
+  assert.equal(runtime.scrollCalls.at(-1).left, 0);
+  assert.ok(!runtime.scrollCalls.some((call) => call.top === 0), "model switch should not reset viewport to top");
+});
+
+test("runtime preserves viewport while moving between vehicle setup stages", () => {
+  const runtime = loadRuntime();
+  runtime.setWindowScroll(0, 720);
+  runtime.scrollCalls.length = 0;
+
+  runtime.goToNextStep();
+
+  assert.equal(runtime.state.vehicleSetupStage, "body_style");
+  assert.equal(runtime.scrollCalls.at(-1).top, 720);
+  assert.equal(runtime.scrollCalls.at(-1).left, 0);
+  assert.ok(!runtime.scrollCalls.some((call) => call.top === 0), "setup stage advance should not reset viewport to top");
+
+  runtime.setWindowScroll(0, 540);
+  runtime.scrollCalls.length = 0;
+  runtime.goToNextStep();
+
+  assert.equal(runtime.state.vehicleSetupStage, "trim_level");
+  assert.equal(runtime.scrollCalls.at(-1).top, 540);
+  assert.ok(!runtime.scrollCalls.some((call) => call.top === 0), "second setup stage advance should not reset viewport to top");
 });
 
 test("runtime routes direct body and trim step activation back to vehicle setup", () => {

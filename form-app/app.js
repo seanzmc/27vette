@@ -101,6 +101,22 @@ const modelStep = {
 };
 const vehicleSetupStepKeys = new Set(["model", "body_style", "trim_level"]);
 const vehicleSetupStages = ["model", "body_style", "trim_level", "ready"];
+const vehicleSetupHighlights = {
+  stingray: {
+    eyebrow: "Refreshed everyday supercar",
+    title: "Next-generation LS6 power for the everyday supercar",
+    description:
+      "The 2027 Stingray moves to Corvette’s next-generation LS6 6.7L V8, pairing 535 horsepower with the familiar rear-drive Stingray foundation before you choose colors and options.",
+    facts: ["LS6 6.7L V8", "535 hp / 520 lb-ft", "Available center-exit exhaust"],
+  },
+  grandSport: {
+    eyebrow: "Purist, rear-wheel-drive performance",
+    title: "Grand Sport is the driver’s-car sweet spot",
+    description:
+      "Grand Sport blends naturally aspirated LS6 power, rear-wheel-drive dynamics, standard Magnetic Ride Control, and available Z52 performance packages for a sharper Corvette foundation.",
+    facts: ["Purist RWD", "Magnetic Ride Control standard", "Available Z52 packages"],
+  },
+};
 let runtimeSteps = [];
 let variants = [];
 let pendingConfirmationAction = null;
@@ -410,9 +426,9 @@ function normalizeVehicleSetupStage(stage) {
   return vehicleSetupStages.includes(stage) ? stage : "model";
 }
 
-function setVehicleSetupStage(stage, { shouldRender = true, resetScroll = true } = {}) {
+function setVehicleSetupStage(stage, { shouldRender = true, preserveScroll = true, resetScroll = false } = {}) {
   state.vehicleSetupStage = normalizeVehicleSetupStage(stage);
-  if (shouldRender) render({ resetScroll });
+  if (shouldRender) render(preserveScroll ? { preserveScroll: true } : { resetScroll });
 }
 
 function advanceVehicleSetupStage() {
@@ -442,7 +458,17 @@ function setButtonExpanded(button, expanded) {
   button?.setAttribute?.("aria-expanded", expanded ? "true" : "false");
 }
 
+function updateSummaryDrawerControls(isOpen) {
+  const summaryLabel = els.openSummaryDrawerButton?.querySelector(".summary-drawer-label");
+  const summaryIcon = els.openSummaryDrawerButton?.querySelector(".summary-drawer-icon");
+  if (summaryLabel) summaryLabel.textContent = isOpen ? "Hide Build Summary" : "Build Summary";
+  if (summaryIcon) summaryIcon.textContent = isOpen ? "›" : "‹";
+  els.openSummaryDrawerButton?.setAttribute("aria-label", isOpen ? "Hide build summary" : "View build summary");
+  els.mobileSummaryButton?.setAttribute("aria-label", isOpen ? "Hide build summary" : "Open build summary");
+}
+
 function setMobileDrawer(drawerName = "") {
+  const summaryOpen = drawerName === "summary";
   if (els.appShell) {
     if (drawerName) {
       els.appShell.dataset.mobileDrawer = drawerName;
@@ -452,8 +478,9 @@ function setMobileDrawer(drawerName = "") {
   }
   if (els.mobileDrawerBackdrop) els.mobileDrawerBackdrop.hidden = !drawerName;
   setButtonExpanded(els.openStepDrawerButton, drawerName === "steps");
-  setButtonExpanded(els.openSummaryDrawerButton, drawerName === "summary");
-  setButtonExpanded(els.mobileSummaryButton, drawerName === "summary");
+  setButtonExpanded(els.openSummaryDrawerButton, summaryOpen);
+  setButtonExpanded(els.mobileSummaryButton, summaryOpen);
+  updateSummaryDrawerControls(summaryOpen);
 }
 
 function closeMobileDrawers() {
@@ -1365,13 +1392,14 @@ function setBodyAndTrim(bodyStyle, trimLevel, { vehicleSetupStage } = {}) {
 }
 
 function handleContextChoice(choice) {
+  const currentSetupStage = normalizeVehicleSetupStage(state.vehicleSetupStage);
   if (choice.context_type === "body_style") {
     const nextTrim = variants.find((variant) => variant.body_style === choice.value)?.trim_level;
-    setBodyAndTrim(choice.value, nextTrim, { vehicleSetupStage: "trim_level" });
+    setBodyAndTrim(choice.value, nextTrim, { vehicleSetupStage: currentSetupStage === "body_style" ? "body_style" : "trim_level" });
     return;
   }
   if (choice.context_type === "trim_level") {
-    setBodyAndTrim(choice.body_style, choice.trim_level, { vehicleSetupStage: "ready" });
+    setBodyAndTrim(choice.body_style, choice.trim_level, { vehicleSetupStage: currentSetupStage === "trim_level" ? "trim_level" : "ready" });
   }
 }
 
@@ -1450,9 +1478,11 @@ function renderMobileProgress() {
   const setupNextLabel = setupStage === "model" ? "Body Style" : setupStage === "body_style" ? "Trim Level" : setupStage === "trim_level" ? "Review setup" : "";
   const hasPrevious = Boolean(previous || setupPreviousLabel);
   const hasNext = Boolean(next || setupNextLabel);
+  const showMobileNext = state.activeStep !== "model" && hasNext;
   if (els.mobileStepCount) els.mobileStepCount.textContent = `Step ${index + 1} of ${total || 1}`;
   if (els.mobileStepName) els.mobileStepName.textContent = step?.step_label || "Step";
   if (els.mobileProgress) els.mobileProgress.dataset.hasPrevious = hasPrevious ? "true" : "false";
+  if (els.mobileProgress) els.mobileProgress.dataset.hasNext = showMobileNext ? "true" : "false";
   if (els.mobilePrevStep) {
     els.mobilePrevStep.disabled = !hasPrevious;
     els.mobilePrevStep.hidden = !hasPrevious;
@@ -1460,9 +1490,10 @@ function renderMobileProgress() {
     els.mobilePrevStep.title = setupPreviousLabel ? `Back: ${setupPreviousLabel}` : previous ? `Back: ${previous.step_label}` : "";
   }
   if (els.mobileNextStep) {
-    els.mobileNextStep.disabled = !hasNext;
-    els.mobileNextStep.textContent = hasNext ? "Next" : "Review";
-    els.mobileNextStep.title = setupNextLabel ? `Next: ${setupNextLabel}` : next ? `Next: ${next.step_label}` : "";
+    els.mobileNextStep.disabled = !showMobileNext;
+    els.mobileNextStep.hidden = !showMobileNext;
+    els.mobileNextStep.textContent = showMobileNext ? "Next" : "Review";
+    els.mobileNextStep.title = showMobileNext ? (setupNextLabel ? `Next: ${setupNextLabel}` : next ? `Next: ${next.step_label}` : "") : "";
   }
 }
 
@@ -1632,8 +1663,8 @@ function renderContextCard(choice, { setup = false, compact = false } = {}) {
   if (disabled) classes.push("disabled");
   const price = choice.base_price ? formatMoney(choice.base_price) : "";
   const statusLabel = selected ? "Selected" : disabled ? "Unavailable" : "Select";
-  const description = compact ? "" : choice.description;
-  const tooltip = choice.context_type === "trim_level" ? choice.info_tooltip : compact ? "" : choice.info_tooltip;
+  const description = setup ? choice.description : compact ? "" : choice.description;
+  const tooltip = choice.context_type === "trim_level" ? choice.info_tooltip : setup ? choice.info_tooltip : compact ? "" : choice.info_tooltip;
   const choiceName = description || tooltip ? `<span class="choice-name">${description ? `<span>${escapeHtml(description)}</span>` : ""}${renderInfoTooltip(tooltip, `${choice.label} details`)}</span>` : "";
   return `
     <button class="${classes.join(" ")}" type="button" data-context-choice="${choice.context_choice_id}" ${disabled ? "aria-disabled=\"true\"" : ""}>
@@ -1659,16 +1690,107 @@ function modelEntries() {
   }));
 }
 
+function activeModelHighlight(modelKey = activeModelKey) {
+  const model = registry.models?.[modelKey] || activeModel;
+  return (
+    vehicleSetupHighlights[modelKey] || {
+      eyebrow: "Corvette foundation",
+      title: `${model?.label || "Corvette"} sets the starting personality`,
+      description: "Choose the model that best matches how this build should feel before moving into body style, trim, colors, and options.",
+      facts: [model?.modelName || model?.label || "Corvette"],
+    }
+  );
+}
+
+function bodyStyleHighlight(bodyStyle = state.bodyStyle) {
+  const bodyLabel = formatBodyStyle(bodyStyle) || "Body style";
+  if (bodyStyle === "convertible") {
+    return {
+      eyebrow: "Open-air presentation",
+      title: "Hardtop convertible character",
+      description: "Convertible keeps the setup focused on open-air driving and the power retractable hardtop experience before the trim decision.",
+      facts: ["Open-air driving", "Hardtop convertible", "Same trim path"],
+    };
+  }
+  return {
+    eyebrow: "Removable-roof coupe",
+    title: `${bodyLabel} keeps the cockpit focused`,
+    description: "Coupe preserves the classic mid-engine silhouette with a removable roof-panel experience and the same clear path into trim selection.",
+    facts: ["Removable roof panel", "Focused cockpit feel", "Clear trim path"],
+  };
+}
+
+function trimLevelHighlight(trimLevel = state.trimLevel) {
+  const choice = trimLevelSetupChoices().find((item) => item.trim_level === trimLevel) || trimLevelSetupChoices()[0];
+  const plainDetail = plainTooltipText(choice?.info_tooltip || choice?.description || "");
+  const trimLabel = trimLevel || choice?.label || "Trim";
+  return {
+    eyebrow: "Equipment level",
+    title: `${trimLabel} defines the cabin and included equipment`,
+    description:
+      plainDetail || "Trim level sets the interior presentation, technology baseline, and included equipment before colors, wheels, packages, and accessories.",
+    facts: ["Included equipment baseline", "Interior and technology content", "Next: exterior paint"],
+  };
+}
+
+function renderVehicleSetupEquipmentDisclosure() {
+  const rows = trimEquipmentRows();
+  if (!rows.length) return "";
+  const countLabel = rows.length === 1 ? "1 included item" : `${rows.length} included items`;
+  return `
+    <details class="vehicle-setup-equipment-disclosure">
+      <summary>
+        <span>See what this trim includes</span>
+        <em>${escapeHtml(countLabel)}</em>
+      </summary>
+      <div class="vehicle-setup-equipment-body">
+        ${renderStandardEquipmentGroups(rows, false, `${state.trimLevel} Equipment`)}
+      </div>
+    </details>
+  `;
+}
+
+function renderVehicleSetupNextAction(ctaLabel = "") {
+  if (!ctaLabel) return "";
+  const buttonLabel = /^(Continue|Review)\b/.test(ctaLabel) ? ctaLabel : `Continue to ${ctaLabel}`;
+  return `
+    <div class="vehicle-setup-next-action">
+      <p>When this foundation feels right, continue with <strong>${escapeHtml(ctaLabel)}</strong>.</p>
+      <button type="button" data-next-step="model">${escapeHtml(buttonLabel)}</button>
+    </div>
+  `;
+}
+
+function renderVehicleSetupHighlight(highlight, ctaLabel = "") {
+  if (!highlight) return "";
+  return `
+    <aside class="vehicle-setup-highlight" aria-label="Selected vehicle highlight">
+      <p class="eyebrow">${escapeHtml(highlight.eyebrow || "Vehicle highlight")}</p>
+      <h4>${escapeHtml(highlight.title || "Build foundation")}</h4>
+      <p>${escapeHtml(highlight.description || "")}</p>
+      ${
+        highlight.facts?.length
+          ? `<div class="vehicle-setup-facts">${highlight.facts.map((fact) => `<span>${escapeHtml(fact)}</span>`).join("")}</div>`
+          : ""
+      }
+      ${highlight.equipmentDisclosure ? renderVehicleSetupEquipmentDisclosure() : ""}
+      ${renderVehicleSetupNextAction(ctaLabel)}
+    </aside>
+  `;
+}
+
 function renderModelCard(model) {
   const selected = model.key === activeModelKey;
   const classes = ["choice-card", "model-choice-card"];
   if (cardHasMedia(model)) classes.push("has-media");
   if (selected) classes.push("selected");
   const descriptor = model.modelName || model.label;
+  const highlight = activeModelHighlight(model.key);
   return `
     <button class="${classes.join(" ")}" type="button" data-model-choice="${escapeHtml(model.key)}" aria-pressed="${selected ? "true" : "false"}" aria-label="${escapeHtml(descriptor)}">
       ${renderCardMedia(model, model.modelName || model.label)}
       <span class="topline"><span class="rpo">${escapeHtml(model.label)}</span><span class="price">Model</span></span>
+      <span class="choice-name"><span>${escapeHtml(highlight.eyebrow)}</span></span>
       <span class="selection-status" data-selected="${selected ? "true" : "false"}">${selected ? "✓ Selected" : "Select"}</span>
     </button>
   `;
@@ -1713,19 +1835,18 @@ function renderVehicleSetupStepper() {
   const stages = [
     ["model", "Model"],
     ["body_style", "Body Style"],
-    ["trim_level", "Trim Level"],
+    ["trim_level", "Trim"],
   ];
   return `
-    <div class="vehicle-setup-stepper" role="list" aria-label="Vehicle setup progress">
+    <div class="vehicle-setup-stepper compact" role="list" aria-label="Vehicle setup progress">
       ${stages
         .map(([stage, label], index) => {
-          const isActive = activeStage === stage || (activeStage === "ready" && stage === "trim_level");
+          const isActive = activeStage === stage;
           const isComplete = activeIndex > stageOrder.indexOf(stage);
-          const status = isActive ? "Current" : isComplete ? "Selected" : "Next";
           return `
             <button class="vehicle-setup-chip ${isActive ? "active" : ""}" type="button" data-setup-stage="${stage}" data-setup-chip-state="${isActive ? "active" : isComplete ? "complete" : "upcoming"}" role="listitem" aria-pressed="${isActive ? "true" : "false"}" ${isActive ? 'aria-current="step"' : ""}>
-              <span>${status}</span>
-              <strong>${index + 1}. ${label}</strong>
+              <span>${isComplete ? "✓" : index + 1}</span>
+              <strong>${label}</strong>
               <em>${escapeHtml(setupStageSummary(stage))}</em>
             </button>
           `;
@@ -1735,7 +1856,7 @@ function renderVehicleSetupStepper() {
   `;
 }
 
-function renderVehicleSetupPanel(title, note, cardsHtml, className = "") {
+function renderVehicleSetupPanel(title, note, cardsHtml, className = "", highlight = null, nextLabel = "") {
   return `
     <section class="vehicle-setup-panel ${className}" data-setup-panel>
       <div class="vehicle-setup-group-heading">
@@ -1743,6 +1864,7 @@ function renderVehicleSetupPanel(title, note, cardsHtml, className = "") {
         ${note ? `<p>${escapeHtml(note)}</p>` : ""}
       </div>
       <div class="choice-grid setup-choice-grid">${cardsHtml}</div>
+      ${renderVehicleSetupHighlight(highlight, nextLabel)}
     </section>
   `;
 }
@@ -1759,6 +1881,7 @@ function renderVehicleSetupReadyPanel() {
         <span>Base MSRP</span>
         <strong>${formatMoney(Number(variant?.base_price || 0))}</strong>
       </div>
+      ${renderVehicleSetupNextAction("Continue to Exterior Paint")}
     </section>
   `;
 }
@@ -1771,19 +1894,35 @@ function renderVehicleSetupContent() {
   const selectedBody = formatBodyStyle(state.bodyStyle) || "selected body style";
   const panel =
     stage === "body_style"
-      ? renderVehicleSetupPanel("Choose your body style", "Pick the format, then compare trims.", bodyCards, "body-setup-group")
+      ? renderVehicleSetupPanel(
+          "Choose your body style",
+          "Pick the roof experience. The selection stays here so you can compare before continuing.",
+          bodyCards,
+          "body-setup-group",
+          bodyStyleHighlight(),
+          "Trim Level"
+        )
       : stage === "trim_level"
-        ? renderVehicleSetupPanel("Choose your trim", `Showing trims for ${selectedBody}.`, trimCards, "trim-setup-group")
+        ? renderVehicleSetupPanel(
+            "Choose your trim",
+            `Showing trims for ${selectedBody}. Select a trim, review the equipment feel, then continue when ready.`,
+            trimCards,
+            "trim-setup-group",
+            { ...trimLevelHighlight(), equipmentDisclosure: true },
+            "Vehicle Setup Review"
+          )
         : stage === "ready"
           ? renderVehicleSetupReadyPanel()
-          : renderVehicleSetupPanel("Choose your model", "Start with the Corvette family for this build.", modelCards, "model-setup-group");
+          : renderVehicleSetupPanel(
+              "Choose your model",
+              "Start with the Corvette personality for this build. Selection previews the highlights before the flow moves on.",
+              modelCards,
+              "model-setup-group",
+              activeModelHighlight(),
+              "Body Style"
+            );
   return `
     <section class="section-block vehicle-setup-section" data-vehicle-setup-stage="${stage}">
-      <div class="vehicle-setup-intro">
-        <p class="eyebrow">Vehicle Setup</p>
-        <h3>Choose your Corvette foundation</h3>
-        <p>Start with model, body style, and trim. You can come back to any setup choice before submitting.</p>
-      </div>
       ${renderVehicleSetupStepper()}
       <div class="vehicle-setup-layout">
         <div class="vehicle-setup-choices">
@@ -2040,17 +2179,8 @@ function renderStepContent({ resetScroll = false } = {}) {
   }
 
   const next = nextStep();
-  const vehicleSetupStage = normalizeVehicleSetupStage(state.vehicleSetupStage);
-  const isVehicleSetupReady = !isModelStep || vehicleSetupStage === "ready";
-  const vehicleSetupNextLabel =
-    vehicleSetupStage === "model"
-      ? "Continue to Body Style"
-      : vehicleSetupStage === "body_style"
-        ? "Continue to Trim Level"
-        : vehicleSetupStage === "trim_level"
-          ? "Review Vehicle Setup"
-          : "";
-  const nextButtonLabel = isModelStep && next ? `Continue to ${next.step_label}` : next ? `Next: ${next.step_label}` : "";
+  const isVehicleSetupStep = isModelStep;
+  const nextButtonLabel = next ? `Next: ${next.step_label}` : "";
   els.stepContent.dataset.activeStep = state.activeStep;
   els.stepContent.dataset.stepKind = isModelStep ? "model" : isContextStep ? "context" : "option";
   els.stepContent.innerHTML = `
@@ -2063,11 +2193,11 @@ function renderStepContent({ resetScroll = false } = {}) {
     </header>
     ${body}
     ${
-      next
-        ? isVehicleSetupReady
-          ? `<footer class="step-footer"><button type="button" data-next-step="${next.step_key}">${nextButtonLabel}</button></footer>`
-          : `<footer class="step-footer"><button type="button" data-next-step="model">${vehicleSetupNextLabel}</button></footer>`
-        : renderFinalStepActions()
+      next && !isVehicleSetupStep
+        ? `<footer class="step-footer"><button type="button" data-next-step="${next.step_key}">${nextButtonLabel}</button></footer>`
+        : !next
+          ? renderFinalStepActions()
+          : ""
     }
   `;
   if (resetScroll) resetStepScroll();
@@ -2184,8 +2314,12 @@ function renderSummary() {
       selectedItems.length === 1 ? "1 selected item" : `${selectedItems.length} selected items`;
   }
   if (els.mobileSummaryMissing) {
-    els.mobileSummaryMissing.textContent =
-      missing.length === 0 ? "Requirements complete" : `${missing.length} required choice${missing.length === 1 ? "" : "s"} left`;
+    els.mobileSummaryMissing.textContent = "›";
+  }
+  if (els.mobileSummaryButton) {
+    const selectedLabel = selectedItems.length === 1 ? "1 selected item" : `${selectedItems.length} selected items`;
+    const requirementsLabel = missing.length === 0 ? "requirements complete" : `${missing.length} required choices left`;
+    els.mobileSummaryButton.setAttribute?.("aria-label", `Open build summary: ${formatMoney(total)}, ${selectedLabel}, ${requirementsLabel}`);
   }
   renderStandardEquipment();
 
@@ -2657,7 +2791,7 @@ function renderModelChrome() {
   document.title = title;
 }
 
-function activateModel(modelKey, { preserveCustomer = true, shouldRender = true, vehicleSetupStage = "model" } = {}) {
+function activateModel(modelKey, { preserveCustomer = true, shouldRender = true, vehicleSetupStage = "model", preserveScroll = false } = {}) {
   const nextModel = registry.models[modelKey];
   if (!nextModel) return;
   activeModelKey = modelKey;
@@ -2670,7 +2804,7 @@ function activateModel(modelKey, { preserveCustomer = true, shouldRender = true,
   resetDefaults();
   reconcileSelections();
   renderModelChrome();
-  if (shouldRender) render({ resetScroll: true });
+  if (shouldRender) render(preserveScroll ? { preserveScroll: true } : { resetScroll: true });
 }
 
 function render({ resetScroll = false, preserveScroll = false } = {}) {
@@ -2731,15 +2865,17 @@ function requestResetBuild() {
 
 function requestModelChange(modelKey) {
   if (!modelKey || modelKey === activeModelKey) return;
+  const nextSetupStage = normalizeVehicleSetupStage(state.vehicleSetupStage) === "model" ? "model" : "body_style";
+  const preserveSetupScroll = state.activeStep === "model";
   if (!buildHasResettableChanges()) {
-    activateModel(modelKey, { vehicleSetupStage: "body_style" });
+    activateModel(modelKey, { vehicleSetupStage: nextSetupStage, preserveScroll: preserveSetupScroll });
     return;
   }
   openConfirmActionModal({
     title: "Change Model",
     message: "Changing models will reset all selected options. Are you sure?",
     confirmLabel: "Yes, Change Model",
-    onConfirm: () => activateModel(modelKey, { vehicleSetupStage: "body_style" }),
+    onConfirm: () => activateModel(modelKey, { vehicleSetupStage: nextSetupStage, preserveScroll: preserveSetupScroll }),
   });
 }
 
@@ -2752,8 +2888,8 @@ function init() {
   els.mobileNextStep?.addEventListener("click", goToNextStep);
   els.openStepDrawerButton?.addEventListener("click", () => setMobileDrawer("steps"));
   els.closeStepDrawerButton?.addEventListener("click", closeMobileDrawers);
-  els.openSummaryDrawerButton?.addEventListener("click", () => setMobileDrawer("summary"));
-  els.mobileSummaryButton?.addEventListener("click", () => setMobileDrawer("summary"));
+  els.openSummaryDrawerButton?.addEventListener("click", () => setMobileDrawer(els.appShell?.dataset.mobileDrawer === "summary" ? "" : "summary"));
+  els.mobileSummaryButton?.addEventListener("click", () => setMobileDrawer(els.appShell?.dataset.mobileDrawer === "summary" ? "" : "summary"));
   els.closeSummaryDrawerButton?.addEventListener("click", closeMobileDrawers);
   els.mobileDrawerBackdrop?.addEventListener("click", closeMobileDrawers);
   document.addEventListener?.("keydown", handleMobileDrawerKeydown);
