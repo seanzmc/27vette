@@ -112,7 +112,7 @@ Type: Next-Generation LS6 6.7L V8
 Displacement:
 (L / cu. in.) 6.7 / 409
 Bore & Stroke: 103.25 mm / 100 mm
-Block Material: Aluminum block with cast-in iron cylinder liners (Gen 6 Small Block architecture)  
+Block Material: Aluminum block with cast-in iron cylinder liners (Gen 6 Small Block architecture)
 Cylinder Heat Material: Aluminum
 Fuel Delivery: Direct and Port Injection with Active Fuel Management
 Oiling System: High-capacity, performance-focused lubrication system engineered for extended high-load, high-temperature operation
@@ -134,7 +134,7 @@ CHASSIS & SUSPENSION
 Drive Configuration: Rear-wheel drive (RWD)
 Front Suspension: Short/long arm (SLA) double wishbone; forged aluminum upper and cast aluminum lower control arms; monotube shock absorbers; Magnetic Ride Control. Front lift with memory is available.
 Rear Suspension: Short/long arm (SLA) double wishbone; forged aluminum upper and cast aluminum lower control arms; direct-acting stabilizer bar; monotube shock absorbers; Magnetic Ride Control
-Rear Differential: eLSD standard  
+Rear Differential: eLSD standard
 Steering Type: Variable-ratio rack-and-pinion with electric power assist
 Steering Ratio: 15.7:1
 Turning Circle, Wall to wall (ft. / m): 38 / 11.6
@@ -149,7 +149,7 @@ Front: 20-inch x 10-inch carbon fiber (avail.)
 Rear: 21-inch x 13-inch forged aluminum (std.)
 Rear: 21-inch x 13-inch carbon fiber (avail.)
 Tire Size: Front: 275/30ZR20
-Rear: 345/25ZR21  
+Rear: 345/25ZR21
 CHASSIS PACKAGES
 
 Standard Touring Suspension: Magnetic Ride Control; Michelin Pilot Sport All-Season tires; Touring, low-dust brake system
@@ -178,7 +178,7 @@ Cargo Volume1(cu. ft. / L): 12.6 / 356.8
 SAFETY & DRIVER AWARENESS FEATURES
 
 Airbags1Frontal and side-impact for driver and front passenger; includes Passenger Sensing System
-Standard Tire Pressure Monitor System (includes tire fill alert)  
+Standard Tire Pressure Monitor System (includes tire fill alert)
 Standard Safety2Content includes Rear Park Assist, Forward Collision Alert, IntelliBeam auto high beams, Automatic Emergency Braking, Intersection Automatic Emergency Braking, Front Pedestrian and Bicyclist Braking
 Standard Features: Rear Camera Mirror, HD Rear Vision Camera
 Available Features: HD Front and Rear Vision Camera with front curb view, Side Blind Zone Alert, Rear Cross Traffic Alert
@@ -205,7 +205,7 @@ Type: Next-Generation LS6 6.7L V8
 Displacement:
 (L / cu. in.) 6.7 / 409
 Bore & Stroke: 103.25 mm / 100 mm
-Block Material: Aluminum block with cast-in iron cylinder liners (Gen 6 Small Block architecture)  
+Block Material: Aluminum block with cast-in iron cylinder liners (Gen 6 Small Block architecture)
 Cylinder Heat Material: Aluminum
 Fuel Delivery: Direct and Port Injection with Active Fuel Management
 Oiling System: High-capacity, performance-focused lubrication system engineered for extended high-load, high-temperature operation

@@ -90,32 +90,32 @@ The workbook is valid, but the current pipeline is only partially repeatable. St
 
 **Findings**
 
-1. **P1: Schema validation is hardcoded to Stingray and Grand Sport.**  
-   [schema_validation.py](/Users/seandm/Projects/27vette/scripts/corvette_form_generator/schema_validation.py:13) explicitly names `stingray_*` and `grandSport_*` sheets in boolean/price/RPO checks, required sheets, header pairs, and OVS validation.  
+1. **P1: Schema validation is hardcoded to Stingray and Grand Sport.**
+   [schema_validation.py](/Users/seandm/Projects/27vette/scripts/corvette_form_generator/schema_validation.py:13) explicitly names `stingray_*` and `grandSport_*` sheets in boolean/price/RPO checks, required sheets, header pairs, and OVS validation.
    Fix path: make validation derive active models and source-role sheets from `model_master`, `model_workbook_sources`, and `model_variants`.
 
-2. **P1: App data promotion is two-model only.**  
-   [generate_stingray_form.py](/Users/seandm/Projects/27vette/scripts/generate_stingray_form.py:197) only loads a Grand Sport draft beside Stingray, and [line 219](/Users/seandm/Projects/27vette/scripts/generate_stingray_form.py:219) builds a registry with Stingray plus maybe Grand Sport.  
+2. **P1: App data promotion is two-model only.**
+   [generate_stingray_form.py](/Users/seandm/Projects/27vette/scripts/generate_stingray_form.py:197) only loads a Grand Sport draft beside Stingray, and [line 219](/Users/seandm/Projects/27vette/scripts/generate_stingray_form.py:219) builds a registry with Stingray plus maybe Grand Sport.
    Fix path: extract a generic active-model registry builder that loops promoted model configs/data artifacts instead of naming Grand Sport.
 
-3. **P1: LZ interiors exist but are not wired as a repeatable source.**  
-   Workbook has hidden `LZ_Interiors` with the same 132-row shape as `lt_interiors`, but `model_interior_scope` only has `grand_sport:132`, and `interior_components` only has `stingray`/`grand_sport`. [inspection.py](/Users/seandm/Projects/27vette/scripts/corvette_form_generator/inspection.py:468) reads `lt_interiors` directly and falls back to LT trims at [line 499](/Users/seandm/Projects/27vette/scripts/corvette_form_generator/inspection.py:499).  
+3. **P1: LZ interiors exist but are not wired as a repeatable source.**
+   Workbook has hidden `LZ_Interiors` with the same 132-row shape as `lt_interiors`, but `model_interior_scope` only has `grand_sport:132`, and `interior_components` only has `stingray`/`grand_sport`. [inspection.py](/Users/seandm/Projects/27vette/scripts/corvette_form_generator/inspection.py:468) reads `lt_interiors` directly and falls back to LT trims at [line 499](/Users/seandm/Projects/27vette/scripts/corvette_form_generator/inspection.py:499).
    Fix path: add an interior source role/config field, add Z06/ZR1/ZR1X rows to `model_interior_scope` and `interior_components`, and emit source sheet / active flags generically.
 
-4. **P1: Runtime contains model-specific presentation/business facts.**  
-   [app.js](/Users/seandm/Projects/27vette/form-app/app.js:104) hardcodes Stingray and Grand Sport setup highlights, including LS6, horsepower, Magnetic Ride, Z52, etc.  
+4. **P1: Runtime contains model-specific presentation/business facts.**
+   [app.js](/Users/seandm/Projects/27vette/form-app/app.js:104) hardcodes Stingray and Grand Sport setup highlights, including LS6, horsepower, Magnetic Ride, Z52, etc.
    Fix path: add workbook-owned model presentation metadata, or extend `model_master`/`asset_map`, emit it into each registry model entry, and have `activeModelHighlight()` read generated data.
 
-5. **P1: One explicit runtime business exception remains in JS.**  
-   [app.js](/Users/seandm/Projects/27vette/form-app/app.js:868) special-cases `choice.rpo === "GBA"` and `rule.source_id === "opt_zyc_001"`.  
+5. **P1: One explicit runtime business exception remains in JS.**
+   [app.js](/Users/seandm/Projects/27vette/form-app/app.js:868) special-cases `choice.rpo === "GBA"` and `rule.source_id === "opt_zyc_001"`.
    Fix path: move this to `runtime_rule_exceptions` or normalize the source rule so runtime only evaluates generated rule metadata.
 
-6. **P2: Order summary metadata is only workbook-owned for Stingray.**  
-   Workbook `order_summary_sections` has `stingray:11`; `step_order_summary_map` has `stingray:13`. Runtime falls back to hardcoded definitions at [app.js](/Users/seandm/Projects/27vette/form-app/app.js:132) and [line 147](/Users/seandm/Projects/27vette/form-app/app.js:147).  
+6. **P2: Order summary metadata is only workbook-owned for Stingray.**
+   Workbook `order_summary_sections` has `stingray:11`; `step_order_summary_map` has `stingray:13`. Runtime falls back to hardcoded definitions at [app.js](/Users/seandm/Projects/27vette/form-app/app.js:132) and [line 147](/Users/seandm/Projects/27vette/form-app/app.js:147).
    Fix path: add shared/per-model rows for every model and require generated `data.orderSummary` for all promoted models.
 
-7. **P2: Grand Sport inspection/draft scripts are not generic enough for the next models.**  
-   [model_configs.py](/Users/seandm/Projects/27vette/scripts/corvette_form_generator/model_configs.py:150) only defines `STINGRAY_MODEL` and `GRAND_SPORT_MODEL`; [inspection.py](/Users/seandm/Projects/27vette/scripts/corvette_form_generator/inspection.py:1731) emits Grand Sport-specific validation messages; [build_grand_sport_rule_sources.py](/Users/seandm/Projects/27vette/scripts/build_grand_sport_rule_sources.py:14) imports `GRAND_SPORT_MODEL` directly.  
+7. **P2: Grand Sport inspection/draft scripts are not generic enough for the next models.**
+   [model_configs.py](/Users/seandm/Projects/27vette/scripts/corvette_form_generator/model_configs.py:150) only defines `STINGRAY_MODEL` and `GRAND_SPORT_MODEL`; [inspection.py](/Users/seandm/Projects/27vette/scripts/corvette_form_generator/inspection.py:1731) emits Grand Sport-specific validation messages; [build_grand_sport_rule_sources.py](/Users/seandm/Projects/27vette/scripts/build_grand_sport_rule_sources.py:14) imports `GRAND_SPORT_MODEL` directly.
    Fix path: create generic `generate_model_form.py` / `build_model_rule_sources.py` driven by `ModelConfig` plus workbook metadata.
 
 **Workbook Shape**
