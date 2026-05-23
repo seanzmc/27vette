@@ -67,6 +67,11 @@ function makeElement() {
     value: "",
     dataset: {},
     hidden: false,
+    scrollTop: 0,
+    scrollLeft: 0,
+    clientHeight: 0,
+    scrollHeight: 0,
+    style: {},
     attributes: {},
     listeners: {},
     addEventListener(type, listener) {
@@ -98,6 +103,7 @@ function makeElement() {
 function loadRuntime({ fetchImpl, turnstileAvailable = true } = {}) {
   const downloads = [];
   const elements = new Map();
+  const docListeners = {};
   const fetchCalls = [];
   const turnstileCalls = [];
   let turnstileToken = "test-turnstile-token";
@@ -136,6 +142,9 @@ function loadRuntime({ fetchImpl, turnstileAvailable = true } = {}) {
       };
     },
     document: {
+      addEventListener(type, listener, options) {
+        docListeners[type] = { listener, options };
+      },
       querySelector(selector) {
         if (!elements.has(selector)) {
           const element = makeElement();
@@ -157,6 +166,7 @@ function loadRuntime({ fetchImpl, turnstileAvailable = true } = {}) {
       },
     },
     fetchCalls,
+    docListeners,
     elements,
     turnstileCalls,
     turnstileApi,
@@ -217,7 +227,9 @@ window.__testApi = {
   requestResetBuild: typeof requestResetBuild === "function" ? requestResetBuild : undefined,
   closeConfirmActionModal: typeof closeConfirmActionModal === "function" ? closeConfirmActionModal : undefined,
   confirmPendingAction: typeof confirmPendingAction === "function" ? confirmPendingAction : undefined,
+  handleDrawerWheel: typeof handleDrawerWheel === "function" ? handleDrawerWheel : undefined,
   fetchCalls,
+  docListeners,
   turnstileCalls,
   setTurnstileToken: typeof setTurnstileToken === "function" ? setTurnstileToken : undefined,
   setWindowTurnstile: () => {
@@ -668,6 +680,10 @@ test("mobile shell exposes compact progress and summary targets", () => {
   assert.match(htmlSource, /Current Build/);
   assert.match(htmlSource, /id="mobileSummaryButton"/);
   assert.match(htmlSource, /id="openSummaryDrawerButton"/);
+  assert.match(htmlSource, /id="downloadBuildButton"[\s\S]*aria-label="Download Build"[\s\S]*<svg class="download-icon"[\s\S]*<path d="M12 3v11/);
+  assert.match(htmlSource, /class="toolbar-action-group toolbar-build-group"[\s\S]*id="openSummaryDrawerButton"[\s\S]*id="submitDealerButton"/);
+  assert.doesNotMatch(htmlSource, /summary-drawer-icon/);
+  assert.doesNotMatch(appSource, /summaryIcon/);
   assert.match(htmlSource, /Build Summary/);
   assert.doesNotMatch(htmlSource, /<span aria-hidden="true">\$<\/span>/);
   assert.match(htmlSource, /id="mobileSummaryTotal"/);
@@ -677,6 +693,8 @@ test("mobile shell exposes compact progress and summary targets", () => {
   assert.match(htmlSource, /id="mobileNextStep"/);
   assert.match(htmlSource, /id="openStepDrawerButton"/);
   assert.match(htmlSource, /id="openSummaryDrawerButton"/);
+  assert.match(htmlSource, /id="resetButton"[\s\S]*aria-label="Reset build"[\s\S]*title="Reset build"[\s\S]*<svg class="reset-icon"/);
+  assert.doesNotMatch(htmlSource, /class="reset-icon" aria-hidden="true">↻/);
   assert.doesNotMatch(htmlSource, /id="modelSelect"/);
   assert.match(htmlSource, /class="reset-icon"/);
   assert.match(htmlSource, /id="mobileDrawerBackdrop"/);
@@ -703,41 +721,76 @@ test("shell containers share one spacing and radius rhythm", () => {
   assert.doesNotMatch(stylesSource, /border-radius:\s*0 0 8px 8px/);
 });
 
-test("summary drawer is callable instead of fixed in the desktop layout", () => {
+test("summary drawer is callable from desktop and condensed at smaller breakpoints", () => {
   const baseStyles = stylesSource.slice(0, stylesSource.indexOf("@media (max-width: 1120px)"));
   const middleStart = stylesSource.indexOf("@media (max-width: 1120px)");
+  const narrowDesktopStart = stylesSource.indexOf("@media (min-width: 761px) and (max-width: 887px)");
   const mobileStart = stylesSource.indexOf("@media (max-width: 760px)");
   const reducedMotionStart = stylesSource.indexOf("@media (prefers-reduced-motion: reduce)");
-  const middleBreakpoint = stylesSource.slice(middleStart, mobileStart);
+  const middleBreakpoint = stylesSource.slice(middleStart, narrowDesktopStart);
+  const narrowDesktopBreakpoint = stylesSource.slice(narrowDesktopStart, mobileStart);
   const mobileBreakpoint = stylesSource.slice(mobileStart, reducedMotionStart);
 
   assert.match(baseStyles, /grid-template-columns:\s*240px minmax\(0, 1fr\)/);
   assert.doesNotMatch(baseStyles, /grid-template-columns:\s*240px minmax\(0, 1fr\) 340px/);
-  assert.match(baseStyles, /\.mobile-drawer-button-right\s*\{[\s\S]*display:\s*none/);
+  assert.match(baseStyles, /\.toolbar \.mobile-drawer-button-right\s*\{[\s\S]*display:\s*inline-flex/);
+  assert.match(baseStyles, /\.reset-icon-button,\n\.download-icon-button\s*\{[\s\S]*width:\s*42px/);
+  assert.match(baseStyles, /\.reset-icon,\n\.download-icon\s*\{[\s\S]*stroke-linecap:\s*round/);
+  assert.match(baseStyles, /\.toolbar-build-group\s*\{[\s\S]*border-left:\s*1px/);
   assert.match(baseStyles, /\.summary-panel\s*\{[\s\S]*position:\s*fixed;[\s\S]*transform:\s*translateX\(100%\)/);
-  assert.match(baseStyles, /\.app-shell\[data-mobile-drawer="summary"\] \.summary-panel\s*\{[\s\S]*transform:\s*translateX\(0\)/);
+  assert.match(baseStyles, /\.app-shell\[data-mobile-drawer="summary"\] \.summary-panel\s*\{[\s\S]*transform:\s*none/);
+  assert.doesNotMatch(stylesSource, /\.app-shell\[data-mobile-drawer="summary"\] \.summary-panel\s*\{[\s\S]*transform:\s*translateX\(0\)/);
   assert.match(baseStyles, /body:has\(\.app-shell\[data-mobile-drawer\]\)\s*\{[\s\S]*overflow:\s*hidden/);
   assert.match(baseStyles, /\.mobile-drawer-backdrop:not\(\[hidden\]\)/);
   assert.match(middleBreakpoint, /grid-template-columns:\s*180px minmax\(0, 1fr\)/);
-  assert.match(middleBreakpoint, /\.mobile-drawer-button-right\s*\{[\s\S]*display:\s*inline-flex/);
+  assert.match(middleBreakpoint, /\.toolbar\s*\{[\s\S]*flex-wrap:\s*nowrap/);
+  assert.match(middleBreakpoint, /\.toolbar \.mobile-drawer-button-right\s*\{[\s\S]*display:\s*inline-flex/);
   assert.match(middleBreakpoint, /\.summary-drawer-label\s*\{[\s\S]*display:\s*inline/);
-  assert.match(stylesSource, /@media \(min-width: 761px\) and \(max-width: 887px\) \{[\s\S]*grid-template-columns:\s*minmax\(220px, 1fr\) minmax\(0, 300px\) minmax\(132px, auto\)/);
-  assert.match(stylesSource, /@media \(min-width: 761px\) and \(max-width: 887px\) \{[\s\S]*\.mobile-drawer-button-right\s*\{[\s\S]*width:\s*100%/);
+  assert.match(narrowDesktopBreakpoint, /grid-template-columns:\s*minmax\(200px, 1fr\) minmax\(0, 360px\)/);
+  assert.match(narrowDesktopBreakpoint, /\.toolbar-build-group\s*\{[\s\S]*grid-template-columns:\s*minmax\(122px, 0\.9fr\) minmax\(142px, 1\.1fr\)/);
+  assert.match(narrowDesktopBreakpoint, /\.toolbar \.mobile-drawer-button-right\s*\{[\s\S]*width:\s*100%/);
   assert.match(middleBreakpoint, /\.mobile-summary-bar\s*\{[\s\S]*display:\s*none/);
   assert.doesNotMatch(middleBreakpoint, /\.step-rail\s*\{[\s\S]*position:\s*fixed/);
   assert.match(mobileBreakpoint, /\.mobile-summary-bar\s*\{[\s\S]*display:\s*grid/);
-  assert.match(mobileBreakpoint, /\.mobile-drawer-button-right\s*\{[\s\S]*display:\s*none/);
+  assert.match(mobileBreakpoint, /\.toolbar \.mobile-drawer-button-right\s*\{[\s\S]*display:\s*none/);
   assert.match(mobileBreakpoint, /\.mobile-summary-bar\s*\{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\) auto/);
   assert.match(mobileBreakpoint, /\.mobile-summary-bar > span:last-child\s*\{[\s\S]*white-space:\s*nowrap/);
   assert.match(mobileBreakpoint, /\.mobile-summary-bar > span:last-child\s*\{[\s\S]*width:\s*36px/);
   assert.doesNotMatch(mobileBreakpoint, /\.mobile-summary-bar > span:last-child::after/);
   assert.match(mobileBreakpoint, /\.mobile-progress\[data-has-next="false"\]\s*\{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\)/);
-  assert.match(mobileBreakpoint, /\.toolbar\s*\{[\s\S]*grid-template-columns:\s*42px minmax\(0, 1fr\)/);
-  assert.match(mobileBreakpoint, /\.toolbar #downloadBuildButton,\n\s*\.toolbar #submitDealerButton\s*\{[\s\S]*grid-column:\s*2/);
+  assert.match(mobileBreakpoint, /\.toolbar\s*\{[\s\S]*grid-template-columns:\s*42px 42px minmax\(0, 1fr\)/);
+  assert.match(mobileBreakpoint, /\.toolbar #downloadBuildButton\s*\{[\s\S]*grid-column:\s*2/);
+  assert.match(mobileBreakpoint, /\.toolbar #submitDealerButton\s*\{[\s\S]*grid-column:\s*3/);
   assert.match(mobileBreakpoint, /\.vehicle-setup-stepper\s*\{[\s\S]*display:\s*grid;[\s\S]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/);
   assert.match(mobileBreakpoint, /\.vehicle-setup-chip\s*\{[\s\S]*padding:\s*6px 4px/);
   assert.match(mobileBreakpoint, /\.vehicle-setup-chip em\s*\{[\s\S]*display:\s*none/);
   assert.match(mobileBreakpoint, /\.step-rail\s*\{[\s\S]*position:\s*fixed/);
+});
+
+test("summary drawer redirects page wheel scrolling and lets standard equipment tooltips escape", () => {
+  const runtime = loadRuntime();
+  assert.match(appSource, /document\.addEventListener\?\.\("wheel", handleDrawerWheel, \{ passive: false \}\)/);
+  assert.match(appSource, /function handleDrawerWheel/);
+  assert.match(appSource, /dataset\?\.mobileDrawer !== "summary"/);
+  assert.match(appSource, /summaryDrawer\.scrollTop \+= deltaY/);
+  assert.match(appSource, /summaryDrawer\.scrollLeft \+= deltaX/);
+  assert.match(appSource, /floatsOverSummaryDrawer/);
+  assert.match(appSource, /dataset\.floating = "viewport"/);
+  assert.match(stylesSource, /\.tooltip-panel\[data-floating="viewport"\]\s*\{[\s\S]*position:\s*fixed;[\s\S]*z-index:\s*120/);
+  assert.match(stylesSource, /\.app-shell\[data-mobile-drawer="summary"\] \.summary-panel\s*\{[\s\S]*transform:\s*none/);
+  assert.match(appSource, /standard-equipment-summary/);
+  assert.doesNotMatch(appSource, /nested-standard-equipment/);
+  assert.doesNotMatch(stylesSource, /\.nested-standard-equipment/);
+
+  const summaryDrawer = runtime.elements.get("#summaryDrawer");
+  runtime.handleDrawerWheel({ deltaY: 120, deltaX: 7, preventDefault() { this.prevented = true; } });
+  assert.equal(summaryDrawer.scrollTop, 0, "closed drawer should not intercept wheel scrolling");
+  runtime.setMobileDrawer("summary");
+  const event = { deltaY: 120, deltaX: 7, prevented: false, preventDefault() { this.prevented = true; } };
+  runtime.handleDrawerWheel(event);
+  assert.equal(event.prevented, true);
+  assert.equal(summaryDrawer.scrollTop, 120);
+  assert.equal(summaryDrawer.scrollLeft, 7);
 });
 
 test("mobile progress and compact summary update from runtime state", () => {

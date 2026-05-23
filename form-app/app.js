@@ -345,21 +345,51 @@ function renderCardMedia(row = {}, fallbackAlt = "", { disabled = false } = {}) 
   `;
 }
 
+function tooltipPanelForTrigger(trigger) {
+  return trigger?._floatingTooltipPanel || trigger?.querySelector?.(".tooltip-panel") || null;
+}
+
+function hideTooltip(trigger) {
+  const panel = tooltipPanelForTrigger(trigger);
+  if (panel?.dataset?.floating === "viewport") delete panel.dataset.open;
+}
+
 function closeTooltips(exceptTrigger = null) {
   if (!document?.querySelectorAll) return;
   document.querySelectorAll(".info-tooltip.is-open").forEach((trigger) => {
-    if (trigger !== exceptTrigger) trigger.classList?.remove("is-open");
+    if (trigger !== exceptTrigger) {
+      trigger.classList?.remove("is-open");
+      hideTooltip(trigger);
+    }
+  });
+  document.querySelectorAll('.tooltip-panel[data-floating="viewport"][data-open="true"]').forEach((panel) => {
+    if (panel.__tooltipTrigger !== exceptTrigger) delete panel.dataset.open;
   });
 }
 
 function positionTooltip(trigger) {
-  const panel = trigger?.querySelector(".tooltip-panel");
+  const panel = tooltipPanelForTrigger(trigger);
   if (!panel) return;
   const margin = 10;
+  const floatsOverSummaryDrawer = Boolean(trigger.closest?.("#summaryDrawer"));
+  if (floatsOverSummaryDrawer && panel.parentElement !== document.body) {
+    trigger._floatingTooltipPanel = panel;
+    panel.__tooltipTrigger = trigger;
+    document.body?.appendChild(panel);
+  }
   panel.style.left = "";
   panel.style.right = "";
   panel.style.top = "";
   panel.style.bottom = "";
+  if (panel.dataset) {
+    if (floatsOverSummaryDrawer) {
+      panel.dataset.floating = "viewport";
+      panel.dataset.open = "true";
+    } else {
+      delete panel.dataset.floating;
+      delete panel.dataset.open;
+    }
+  }
   const triggerRect = trigger.getBoundingClientRect();
   const panelRect = panel.getBoundingClientRect();
   const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
@@ -373,8 +403,8 @@ function positionTooltip(trigger) {
   }
   top = Math.min(Math.max(top, margin), viewportHeight - panelRect.height - margin);
 
-  panel.style.left = `${Math.round(left - triggerRect.left)}px`;
-  panel.style.top = `${Math.round(top - triggerRect.top)}px`;
+  panel.style.left = `${Math.round(floatsOverSummaryDrawer ? left : left - triggerRect.left)}px`;
+  panel.style.top = `${Math.round(floatsOverSummaryDrawer ? top : top - triggerRect.top)}px`;
 }
 
 function bindTooltips(root = document) {
@@ -383,7 +413,13 @@ function bindTooltips(root = document) {
     if (trigger.dataset?.tooltipBound === "true") return;
     if (trigger.dataset) trigger.dataset.tooltipBound = "true";
     trigger.addEventListener("mouseenter", () => positionTooltip(trigger));
+    trigger.addEventListener("mouseleave", () => {
+      if (!trigger.classList?.contains("is-open")) hideTooltip(trigger);
+    });
     trigger.addEventListener("focus", () => positionTooltip(trigger));
+    trigger.addEventListener("blur", () => {
+      if (!trigger.classList?.contains("is-open")) hideTooltip(trigger);
+    });
     trigger.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -391,10 +427,12 @@ function bindTooltips(root = document) {
       closeTooltips(trigger);
       trigger.classList?.toggle("is-open", shouldOpen);
       if (shouldOpen) positionTooltip(trigger);
+      else hideTooltip(trigger);
     });
     trigger.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
       trigger.classList?.remove("is-open");
+      hideTooltip(trigger);
       event.stopPropagation();
     });
   });
@@ -460,9 +498,7 @@ function setButtonExpanded(button, expanded) {
 
 function updateSummaryDrawerControls(isOpen) {
   const summaryLabel = els.openSummaryDrawerButton?.querySelector(".summary-drawer-label");
-  const summaryIcon = els.openSummaryDrawerButton?.querySelector(".summary-drawer-icon");
   if (summaryLabel) summaryLabel.textContent = isOpen ? "Hide Build Summary" : "Build Summary";
-  if (summaryIcon) summaryIcon.textContent = isOpen ? "›" : "‹";
   els.openSummaryDrawerButton?.setAttribute("aria-label", isOpen ? "Hide build summary" : "View build summary");
   els.mobileSummaryButton?.setAttribute("aria-label", isOpen ? "Hide build summary" : "Open build summary");
 }
@@ -485,6 +521,16 @@ function setMobileDrawer(drawerName = "") {
 
 function closeMobileDrawers() {
   setMobileDrawer("");
+}
+
+function handleDrawerWheel(event) {
+  if (els.appShell?.dataset?.mobileDrawer !== "summary" || !els.summaryDrawer) return;
+  const deltaY = Number(event.deltaY || 0);
+  const deltaX = Number(event.deltaX || 0);
+  if (!deltaY && !deltaX) return;
+  event.preventDefault?.();
+  els.summaryDrawer.scrollTop += deltaY;
+  els.summaryDrawer.scrollLeft += deltaX;
 }
 
 function handleMobileDrawerKeydown(event) {
@@ -2347,10 +2393,8 @@ function resetCustomerInformation() {
 function renderStandardEquipment() {
   const rows = standardEquipmentRows();
   els.selectedStandardEquipmentList.innerHTML = `
-    <details class="standard-group">
-      <summary>Standard & Included <span>${rows.length}</span></summary>
-      <div class="nested-standard-equipment">${renderStandardEquipmentGroups(rows)}</div>
-    </details>
+    <div class="standard-equipment-summary">Standard & Included <span>${rows.length}</span></div>
+    ${renderStandardEquipmentGroups(rows)}
   `;
 }
 
@@ -2893,6 +2937,7 @@ function init() {
   els.closeSummaryDrawerButton?.addEventListener("click", closeMobileDrawers);
   els.mobileDrawerBackdrop?.addEventListener("click", closeMobileDrawers);
   document.addEventListener?.("keydown", handleMobileDrawerKeydown);
+  document.addEventListener?.("wheel", handleDrawerWheel, { passive: false });
   els.dealerSubmitForm?.addEventListener("submit", submitDealerBuild);
   els.dealerSubmitCloseButton?.addEventListener("click", closeDealerSubmitModal);
   els.dealerSubmitCancelButton?.addEventListener("click", closeDealerSubmitModal);
