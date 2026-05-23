@@ -677,7 +677,8 @@ test("mobile shell exposes compact progress and summary targets", () => {
   assert.doesNotMatch(htmlSource, /id="currentTrim"/);
   assert.doesNotMatch(htmlSource, /id="basePrice"/);
   assert.doesNotMatch(appSource, /renderVehicleContext/);
-  assert.match(htmlSource, /Current Build/);
+  assert.doesNotMatch(htmlSource, /Current Build/);
+  assert.match(htmlSource, /<small class="mobile-summary-label">Build Summary<\/small>/);
   assert.match(htmlSource, /id="mobileSummaryButton"/);
   assert.match(htmlSource, /id="openSummaryDrawerButton"/);
   assert.match(htmlSource, /id="downloadBuildButton"[\s\S]*aria-label="Download Build"[\s\S]*<svg class="download-icon"[\s\S]*<path d="M12 3v11/);
@@ -747,7 +748,10 @@ test("summary drawer is callable from desktop and condensed at smaller breakpoin
   assert.match(middleBreakpoint, /\.toolbar \.mobile-drawer-button-right\s*\{[\s\S]*display:\s*inline-flex/);
   assert.match(middleBreakpoint, /\.summary-drawer-label\s*\{[\s\S]*display:\s*inline/);
   assert.match(narrowDesktopBreakpoint, /grid-template-columns:\s*minmax\(200px, 1fr\) minmax\(0, 360px\)/);
-  assert.match(narrowDesktopBreakpoint, /\.toolbar-build-group\s*\{[\s\S]*grid-template-columns:\s*minmax\(122px, 0\.9fr\) minmax\(142px, 1\.1fr\)/);
+  assert.match(narrowDesktopBreakpoint, /\.toolbar\s*\{[\s\S]*grid-template-columns:\s*1fr/);
+  assert.match(narrowDesktopBreakpoint, /\.toolbar-utility-group\s*\{[\s\S]*justify-self:\s*end;[\s\S]*width:\s*auto/);
+  assert.match(narrowDesktopBreakpoint, /\.toolbar-build-group\s*\{[\s\S]*grid-template-columns:\s*minmax\(132px, 0\.9fr\) minmax\(158px, 1\.1fr\)/);
+  assert.match(narrowDesktopBreakpoint, /\.toolbar button\s*\{[\s\S]*white-space:\s*normal/);
   assert.match(narrowDesktopBreakpoint, /\.toolbar \.mobile-drawer-button-right\s*\{[\s\S]*width:\s*100%/);
   assert.match(middleBreakpoint, /\.mobile-summary-bar\s*\{[\s\S]*display:\s*none/);
   assert.doesNotMatch(middleBreakpoint, /\.step-rail\s*\{[\s\S]*position:\s*fixed/);
@@ -761,6 +765,8 @@ test("summary drawer is callable from desktop and condensed at smaller breakpoin
   assert.match(mobileBreakpoint, /\.toolbar\s*\{[\s\S]*grid-template-columns:\s*42px 42px minmax\(0, 1fr\)/);
   assert.match(mobileBreakpoint, /\.toolbar #downloadBuildButton\s*\{[\s\S]*grid-column:\s*2/);
   assert.match(mobileBreakpoint, /\.toolbar #submitDealerButton\s*\{[\s\S]*grid-column:\s*3/);
+  assert.match(mobileBreakpoint, /\.setup-choice-grid,\n\s*\.trim-setup-group \.setup-choice-grid\s*\{[\s\S]*grid-template-columns:\s*1fr/);
+  assert.match(mobileBreakpoint, /\.setup-choice-card,\n\s*\.model-choice-card\s*\{[\s\S]*min-width:\s*0/);
   assert.match(mobileBreakpoint, /\.vehicle-setup-stepper\s*\{[\s\S]*display:\s*grid;[\s\S]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/);
   assert.match(mobileBreakpoint, /\.vehicle-setup-chip\s*\{[\s\S]*padding:\s*6px 4px/);
   assert.match(mobileBreakpoint, /\.vehicle-setup-chip em\s*\{[\s\S]*display:\s*none/);
@@ -802,15 +808,15 @@ test("mobile progress and compact summary update from runtime state", () => {
   assert.equal(runtime.elements.get("#mobilePrevStep").disabled, true);
   assert.equal(runtime.elements.get("#mobilePrevStep").hidden, true);
   assert.equal(runtime.elements.get("#mobileProgress").dataset.hasPrevious, "false");
-  assert.equal(runtime.elements.get("#mobileProgress").dataset.hasNext, "false");
-  assert.equal(runtime.elements.get("#mobileNextStep").hidden, true);
-  assert.equal(runtime.elements.get("#mobileNextStep").disabled, true);
-  assert.equal(runtime.elements.get("#mobileNextStep").textContent, "Review");
-  assert.equal(runtime.elements.get("#mobileNextStep").title, "");
+  assert.equal(runtime.elements.get("#mobileProgress").dataset.hasNext, "true");
+  assert.equal(runtime.elements.get("#mobileNextStep").hidden, false);
+  assert.equal(runtime.elements.get("#mobileNextStep").disabled, false);
+  assert.equal(runtime.elements.get("#mobileNextStep").textContent, "Next");
+  assert.equal(runtime.elements.get("#mobileNextStep").title, "Next: Body Style");
   assert.match(runtime.elements.get("#mobileSummaryTotal").textContent, /^\$/);
   assert.match(runtime.elements.get("#mobileSummarySelected").textContent, /selected item/);
   assert.equal(runtime.elements.get("#mobileSummaryMissing").textContent, "›");
-  assert.match(runtime.elements.get("#mobileSummaryButton").getAttribute("aria-label"), /required choices left/);
+  assert.match(runtime.elements.get("#mobileSummaryButton").getAttribute("aria-label"), /View build summary: .*required choices left/);
 
   runtime.state.activeStep = "paint";
   runtime.render();
@@ -831,6 +837,9 @@ test("vehicle setup exposes paced readability hooks without changing option step
   assert.equal(runtime.elements.get("#stepContent").dataset.stepKind, "model");
   assert.match(setupHtml, /vehicle-setup-section/);
   assert.match(setupHtml, /vehicle-setup-stepper compact/);
+  assert.doesNotMatch(setupHtml, /role="list"/);
+  assert.doesNotMatch(setupHtml, /role="listitem"/);
+  assert.match(setupHtml, /<button class="vehicle-setup-chip active" type="button"/);
   assert.doesNotMatch(setupHtml, /vehicle-setup-current/);
   assert.doesNotMatch(setupHtml, /<div class="vehicle-setup-intro">/);
   assert.doesNotMatch(setupHtml, /vehicle-setup-summary/);
@@ -967,7 +976,7 @@ test("mobile drawers expose route and summary state without changing form logic"
   runtime.closeMobileDrawers();
   assert.equal(runtime.elements.get(".app-shell").dataset.mobileDrawer, undefined);
   assert.equal(runtime.elements.get("#openSummaryDrawerButton").getAttribute("aria-label"), "View build summary");
-  assert.equal(runtime.elements.get("#mobileSummaryButton").getAttribute("aria-label"), "Open build summary");
+  assert.equal(runtime.elements.get("#mobileSummaryButton").getAttribute("aria-label"), "View build summary");
 });
 
 test("body style choices put coupe before convertible", () => {

@@ -1800,10 +1800,10 @@ body:has(.app-shell[data-mobile-drawer]) {
 
   .toolbar {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: 1fr;
     grid-column: 2;
     grid-row: 1;
-    align-items: center;
+    justify-items: stretch;
     gap: 8px;
     width: 100%;
   }
@@ -1812,16 +1812,22 @@ body:has(.app-shell[data-mobile-drawer]) {
     width: 100%;
   }
 
+  .toolbar-utility-group {
+    justify-self: end;
+    width: auto;
+  }
+
   .toolbar-build-group {
     display: grid;
-    grid-template-columns: minmax(122px, 0.9fr) minmax(142px, 1.1fr);
+    grid-template-columns: minmax(132px, 0.9fr) minmax(158px, 1.1fr);
     gap: 8px;
   }
 
   .toolbar button {
     width: 100%;
+    min-width: 0;
     padding: 0 10px;
-    white-space: nowrap;
+    white-space: normal;
   }
 
   .download-icon-button,
@@ -2090,8 +2096,14 @@ body:has(.app-shell[data-mobile-drawer]) {
     min-width: 0;
   }
 
+  .setup-choice-grid,
   .trim-setup-group .setup-choice-grid {
     grid-template-columns: 1fr;
+    min-width: 0;
+  }
+
+  .setup-choice-card,
+  .model-choice-card {
     min-width: 0;
   }
 

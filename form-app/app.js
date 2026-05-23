@@ -500,7 +500,7 @@ function updateSummaryDrawerControls(isOpen) {
   const summaryLabel = els.openSummaryDrawerButton?.querySelector(".summary-drawer-label");
   if (summaryLabel) summaryLabel.textContent = isOpen ? "Hide Build Summary" : "Build Summary";
   els.openSummaryDrawerButton?.setAttribute("aria-label", isOpen ? "Hide build summary" : "View build summary");
-  els.mobileSummaryButton?.setAttribute("aria-label", isOpen ? "Hide build summary" : "Open build summary");
+  els.mobileSummaryButton?.setAttribute("aria-label", isOpen ? "Hide build summary" : "View build summary");
 }
 
 function setMobileDrawer(drawerName = "") {
@@ -1524,7 +1524,7 @@ function renderMobileProgress() {
   const setupNextLabel = setupStage === "model" ? "Body Style" : setupStage === "body_style" ? "Trim Level" : setupStage === "trim_level" ? "Review setup" : "";
   const hasPrevious = Boolean(previous || setupPreviousLabel);
   const hasNext = Boolean(next || setupNextLabel);
-  const showMobileNext = state.activeStep !== "model" && hasNext;
+  const showMobileNext = hasNext;
   if (els.mobileStepCount) els.mobileStepCount.textContent = `Step ${index + 1} of ${total || 1}`;
   if (els.mobileStepName) els.mobileStepName.textContent = step?.step_label || "Step";
   if (els.mobileProgress) els.mobileProgress.dataset.hasPrevious = hasPrevious ? "true" : "false";
@@ -1895,13 +1895,13 @@ function renderVehicleSetupStepper() {
     ["trim_level", "Trim"],
   ];
   return `
-    <div class="vehicle-setup-stepper compact" role="list" aria-label="Vehicle setup progress">
+    <div class="vehicle-setup-stepper compact" aria-label="Vehicle setup progress">
       ${stages
         .map(([stage, label], index) => {
           const isActive = activeStage === stage;
           const isComplete = activeIndex > stageOrder.indexOf(stage);
           return `
-            <button class="vehicle-setup-chip ${isActive ? "active" : ""}" type="button" data-setup-stage="${stage}" data-setup-chip-state="${isActive ? "active" : isComplete ? "complete" : "upcoming"}" role="listitem" aria-pressed="${isActive ? "true" : "false"}" ${isActive ? 'aria-current="step"' : ""}>
+            <button class="vehicle-setup-chip ${isActive ? "active" : ""}" type="button" data-setup-stage="${stage}" data-setup-chip-state="${isActive ? "active" : isComplete ? "complete" : "upcoming"}" aria-pressed="${isActive ? "true" : "false"}" ${isActive ? 'aria-current="step"' : ""}>
               <span>${isComplete ? "✓" : index + 1}</span>
               <strong>${label}</strong>
               <em>${escapeHtml(setupStageSummary(stage))}</em>
@@ -2373,7 +2373,7 @@ function renderSummary() {
   if (els.mobileSummaryButton) {
     const selectedLabel = selectedItems.length === 1 ? "1 selected item" : `${selectedItems.length} selected items`;
     const requirementsLabel = missing.length === 0 ? "requirements complete" : `${missing.length} required choices left`;
-    els.mobileSummaryButton.setAttribute?.("aria-label", `Open build summary: ${formatMoney(total)}, ${selectedLabel}, ${requirementsLabel}`);
+    els.mobileSummaryButton.setAttribute?.("aria-label", `View build summary: ${formatMoney(total)}, ${selectedLabel}, ${requirementsLabel}`);
   }
   renderStandardEquipment();
 
