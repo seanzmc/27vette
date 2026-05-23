@@ -543,6 +543,26 @@ textarea {
   line-height: 1.5;
 }
 
+.vehicle-setup-highlight.compact {
+  border-color: rgba(217, 209, 196, 0.72);
+  border-radius: 10px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: none;
+}
+
+.vehicle-setup-highlight.compact h4 {
+  max-width: 920px;
+  font-size: clamp(18px, 1.8vw, 22px);
+  line-height: 1.18;
+}
+
+.vehicle-setup-highlight.compact > p:not(.eyebrow) {
+  max-width: 880px;
+  color: var(--ink);
+  font-size: 14px;
+}
+
 .vehicle-setup-facts {
   display: flex;
   flex-wrap: wrap;
@@ -557,6 +577,22 @@ textarea {
   color: var(--accent-dark);
   font-size: 12px;
   font-weight: 850;
+}
+
+.trim-setup-group {
+  border-color: rgba(217, 209, 196, 0.58);
+  background: rgba(255, 250, 242, 0.5);
+  box-shadow: none;
+}
+
+.trim-setup-group .setup-choice-grid {
+  margin-bottom: 2px;
+}
+
+.trim-setup-group .vehicle-setup-facts span {
+  border-color: rgba(217, 209, 196, 0.9);
+  background: rgba(255, 250, 242, 0.8);
+  color: var(--ink);
 }
 
 .vehicle-setup-next-action {
@@ -629,43 +665,29 @@ textarea {
   white-space: nowrap;
 }
 
-.vehicle-setup-equipment-body {
+.vehicle-setup-equipment-list {
   display: grid;
   gap: 8px;
   border-top: 1px solid rgba(217, 209, 196, 0.72);
-  padding: 10px 12px 12px;
-}
-
-.vehicle-setup-equipment-body .standard-group {
   margin: 0;
+  padding: 10px 12px 12px;
+  list-style: none;
 }
 
-.vehicle-setup-equipment-body .standard-group summary {
-  min-height: 0;
-  padding: 8px 0;
+.vehicle-setup-equipment-list li {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid rgba(217, 209, 196, 0.55);
+  padding-bottom: 8px;
+  color: var(--muted);
+  font-size: 13px;
 }
 
-.vehicle-setup-layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-  align-items: start;
-}
-
-.vehicle-setup-choices,
-.vehicle-setup-group {
-  display: grid;
-  gap: 12px;
-}
-
-.vehicle-setup-group {
-  padding-bottom: 16px;
-  border-bottom: 1px solid rgba(217, 209, 196, 0.72);
-}
-
-.vehicle-setup-group:last-child {
-  padding-bottom: 0;
+.vehicle-setup-equipment-list li:last-child {
   border-bottom: 0;
+  padding-bottom: 0;
 }
 
 .setup-choice-grid {
@@ -2068,7 +2090,6 @@ body:has(.app-shell[data-mobile-drawer]) {
     min-width: 0;
   }
 
-  .vehicle-setup-layout,
   .trim-setup-group .setup-choice-grid {
     grid-template-columns: 1fr;
     min-width: 0;

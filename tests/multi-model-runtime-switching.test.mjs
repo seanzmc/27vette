@@ -425,12 +425,21 @@ test("runtime progressively advances vehicle setup panels before exterior paint"
   assert.equal(runtime.state.trimLevel, "2LT");
   assert.equal(runtime.state.vehicleSetupStage, "trim_level");
   assert.equal(runtime.state.activeStep, "model");
-  assert.match(runtime.elements.get("#stepContent").innerHTML, /2LT defines the cabin and included equipment/);
-  assert.match(runtime.elements.get("#stepContent").innerHTML, /See what this trim includes/);
-  assert.match(runtime.elements.get("#stepContent").innerHTML, /vehicle-setup-equipment-disclosure/);
-  assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /<details class="vehicle-setup-equipment-disclosure" open/);
-  assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /sets the comfort and finish level/);
-  assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /Continue to Exterior Paint/);
+  const trimSetupHtml = runtime.elements.get("#stepContent").innerHTML;
+  assert.match(trimSetupHtml, /<h4>2LT adds a number of comfort and convenience features/);
+  assert.match(trimSetupHtml, /<p>Trim Level defines your available interior configuration, creature comforts, and safety features\.<\/p>/);
+  assert.match(trimSetupHtml, /2LT adds a number[\s\S]*Trim Level defines your available interior configuration/);
+  assert.match(trimSetupHtml, /Safety features/);
+  assert.doesNotMatch(trimSetupHtml, /2LT defines the cabin and included equipment/);
+  assert.doesNotMatch(trimSetupHtml, /Included equipment baseline|Next: exterior paint/);
+  assert.match(trimSetupHtml, /See what this trim includes/);
+  assert.match(trimSetupHtml, /vehicle-setup-equipment-disclosure/);
+  assert.match(trimSetupHtml, /vehicle-setup-equipment-list/);
+  assert.doesNotMatch(trimSetupHtml, /vehicle-setup-equipment-body/);
+  assert.doesNotMatch(trimSetupHtml, /<details class="standard-group"/);
+  assert.doesNotMatch(trimSetupHtml, /<details class="vehicle-setup-equipment-disclosure" open/);
+  assert.doesNotMatch(trimSetupHtml, /sets the comfort and finish level/);
+  assert.doesNotMatch(trimSetupHtml, /Continue to Exterior Paint/);
 
   runtime.goToNextStep();
   assert.equal(runtime.state.vehicleSetupStage, "ready");

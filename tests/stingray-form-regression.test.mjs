@@ -845,6 +845,12 @@ test("vehicle setup exposes paced readability hooks without changing option step
   assert.match(setupHtml, /535 hp \/ 520 lb-ft/);
   assert.doesNotMatch(setupHtml, /Grand Sport X|eAWD|721-hp/);
   assert.match(setupHtml, /Continue to Body Style/);
+  assert.doesNotMatch(appSource, /Clear trim path|Same trim path/);
+  assert.match(appSource, /Choose trim next/);
+  assert.match(appSource, /Power retractable hardtop/);
+  assert.doesNotMatch(appSource, /Open Requirements|Build requirements complete/);
+  assert.match(htmlSource, /Required Selections/);
+  assert.match(appSource, /All required selections are complete/);
   assert.match(setupHtml, /vehicle-setup-next-action/);
   assert.doesNotMatch(setupHtml, /<footer class="step-footer"><button type="button" data-next-step="model">Continue to Body Style/);
   assert.match(stylesSource, /#stepContent\[data-step-kind="model"\] > \.step-header\s*\{[\s\S]*display:\s*none/);
@@ -863,10 +869,23 @@ test("vehicle setup exposes paced readability hooks without changing option step
   const trimEquipmentCount = runtime.data.standardEquipment.filter(
     (item) => item.variant_id === "1lt_c07" && item.standard_equipment_group_type === "trim_equipment"
   ).length;
-  assert.match(trimSetupHtml, /1LT defines the cabin and included equipment/);
+  assert.match(trimSetupHtml, /<h4>1LT is the car for driving purists who want the lightest Corvette possible, but one that&#39;s still very well equipped\.<\/h4>/);
+  assert.match(trimSetupHtml, /<p>Trim Level defines your available interior configuration, creature comforts, and safety features\.<\/p>/);
+  assert.match(trimSetupHtml, /1LT is the car[\s\S]*Trim Level defines your available interior configuration/);
+  assert.match(trimSetupHtml, /Interior configuration/);
+  assert.match(trimSetupHtml, /Comfort and technology/);
+  assert.match(trimSetupHtml, /Safety features/);
+  assert.doesNotMatch(trimSetupHtml, /1LT defines the cabin and included equipment/);
+  assert.doesNotMatch(trimSetupHtml, /Included equipment baseline|Interior and technology content|Next: exterior paint/);
+  assert.doesNotMatch(trimSetupHtml, /vehicle-setup-layout|vehicle-setup-choices|vehicle-setup-trim-detail/);
+  assert.match(trimSetupHtml, /vehicle-setup-highlight compact/);
+  assert.match(trimSetupHtml, /Choose the comfort, technology, and interior-content level for your Coupe\./);
   assert.match(trimSetupHtml, /See what this trim includes/);
   assert.match(trimSetupHtml, new RegExp(`${trimEquipmentCount} included items`));
   assert.match(trimSetupHtml, /vehicle-setup-equipment-disclosure/);
+  assert.match(trimSetupHtml, /vehicle-setup-equipment-list/);
+  assert.doesNotMatch(trimSetupHtml, /vehicle-setup-equipment-body/);
+  assert.doesNotMatch(trimSetupHtml, /<details class="standard-group"/);
   assert.match(trimSetupHtml, /vehicle-setup-next-action/);
   assert.doesNotMatch(trimSetupHtml, /<footer class="step-footer"><button type="button" data-next-step="model">Review Vehicle Setup/);
   assert.doesNotMatch(trimSetupHtml, /<details class="vehicle-setup-equipment-disclosure" open/);

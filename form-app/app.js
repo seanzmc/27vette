@@ -1754,29 +1754,40 @@ function bodyStyleHighlight(bodyStyle = state.bodyStyle) {
     return {
       eyebrow: "Open-air presentation",
       title: "Hardtop convertible character",
-      description: "Convertible keeps the setup focused on open-air driving and the power retractable hardtop experience before the trim decision.",
-      facts: ["Open-air driving", "Hardtop convertible", "Same trim path"],
+      description: "Convertible adds open-air driving with a power retractable hardtop, then lets you choose the trim that fits your comfort and feature preferences.",
+      facts: ["Open-air driving", "Power retractable hardtop", "Choose trim next"],
     };
   }
   return {
     eyebrow: "Removable-roof coupe",
     title: `${bodyLabel} keeps the cockpit focused`,
-    description: "Coupe preserves the classic mid-engine silhouette with a removable roof-panel experience and the same clear path into trim selection.",
-    facts: ["Removable roof panel", "Focused cockpit feel", "Clear trim path"],
+    description: "Coupe preserves the classic mid-engine silhouette with a removable roof-panel experience, then lets you choose the trim that fits your comfort and feature preferences.",
+    facts: ["Removable roof panel", "Focused cockpit feel", "Choose trim next"],
   };
 }
 
 function trimLevelHighlight(trimLevel = state.trimLevel) {
   const choice = trimLevelSetupChoices().find((item) => item.trim_level === trimLevel) || trimLevelSetupChoices()[0];
   const plainDetail = plainTooltipText(choice?.info_tooltip || choice?.description || "");
-  const trimLabel = trimLevel || choice?.label || "Trim";
   return {
-    eyebrow: "Equipment level",
-    title: `${trimLabel} defines the cabin and included equipment`,
-    description:
-      plainDetail || "Trim level sets the interior presentation, technology baseline, and included equipment before colors, wheels, packages, and accessories.",
-    facts: ["Included equipment baseline", "Interior and technology content", "Next: exterior paint"],
+    eyebrow: "Trim Level",
+    title: plainDetail || "Choose the comfort, technology, and interior-content level that fits how you want to use the car.",
+    description: "Trim Level defines your available interior configuration, creature comforts, and safety features.",
+    facts: ["Interior configuration", "Comfort and technology", "Safety features"],
   };
+}
+
+function renderVehicleSetupEquipmentItems(rows) {
+  return `
+    <ul class="vehicle-setup-equipment-list">
+      ${rows
+        .map(
+          (item) =>
+            `<li><span>${escapeHtml(item.label)}</span>${renderInfoTooltip(item.description, "Equipment details")}</li>`
+        )
+        .join("")}
+    </ul>
+  `;
 }
 
 function renderVehicleSetupEquipmentDisclosure() {
@@ -1789,9 +1800,7 @@ function renderVehicleSetupEquipmentDisclosure() {
         <span>See what this trim includes</span>
         <em>${escapeHtml(countLabel)}</em>
       </summary>
-      <div class="vehicle-setup-equipment-body">
-        ${renderStandardEquipmentGroups(rows, false, `${state.trimLevel} Equipment`)}
-      </div>
+      ${renderVehicleSetupEquipmentItems(rows)}
     </details>
   `;
 }
@@ -1809,8 +1818,10 @@ function renderVehicleSetupNextAction(ctaLabel = "") {
 
 function renderVehicleSetupHighlight(highlight, ctaLabel = "") {
   if (!highlight) return "";
+  const classes = ["vehicle-setup-highlight"];
+  if (highlight.compact) classes.push("compact");
   return `
-    <aside class="vehicle-setup-highlight" aria-label="Selected vehicle highlight">
+    <aside class="${classes.join(" ")}" aria-label="Selected vehicle highlight">
       <p class="eyebrow">${escapeHtml(highlight.eyebrow || "Vehicle highlight")}</p>
       <h4>${escapeHtml(highlight.title || "Build foundation")}</h4>
       <p>${escapeHtml(highlight.description || "")}</p>
@@ -1903,6 +1914,7 @@ function renderVehicleSetupStepper() {
 }
 
 function renderVehicleSetupPanel(title, note, cardsHtml, className = "", highlight = null, nextLabel = "") {
+  const compactTrimPanel = className.includes("trim-setup-group");
   return `
     <section class="vehicle-setup-panel ${className}" data-setup-panel>
       <div class="vehicle-setup-group-heading">
@@ -1910,7 +1922,7 @@ function renderVehicleSetupPanel(title, note, cardsHtml, className = "", highlig
         ${note ? `<p>${escapeHtml(note)}</p>` : ""}
       </div>
       <div class="choice-grid setup-choice-grid">${cardsHtml}</div>
-      ${renderVehicleSetupHighlight(highlight, nextLabel)}
+      ${renderVehicleSetupHighlight(compactTrimPanel && highlight ? { ...highlight, compact: true } : highlight, nextLabel)}
     </section>
   `;
 }
@@ -1951,7 +1963,7 @@ function renderVehicleSetupContent() {
       : stage === "trim_level"
         ? renderVehicleSetupPanel(
             "Choose your trim",
-            `Showing trims for ${selectedBody}. Select a trim, review the equipment feel, then continue when ready.`,
+            `Choose the comfort, technology, and interior-content level for your ${selectedBody}.`,
             trimCards,
             "trim-setup-group",
             { ...trimLevelHighlight(), equipmentDisclosure: true },
@@ -1970,11 +1982,7 @@ function renderVehicleSetupContent() {
   return `
     <section class="section-block vehicle-setup-section" data-vehicle-setup-stage="${stage}">
       ${renderVehicleSetupStepper()}
-      <div class="vehicle-setup-layout">
-        <div class="vehicle-setup-choices">
-          ${panel}
-        </div>
-      </div>
+      ${panel}
     </section>
   `;
 }
@@ -2347,7 +2355,7 @@ function renderSummary() {
         `
       )
       .join("") ||
-    "<li class=\"empty positive\">Build requirements complete. You can keep exploring options or download/submit when ready.</li>";
+    "<li class=\"empty positive\">All required selections are complete.</li>";
   els.downloadBuildButton.disabled = missing.length > 0;
   els.downloadBuildButton.title = missing.length ? "Complete required selections before downloading your build." : "";
   if (els.submitDealerButton) {
