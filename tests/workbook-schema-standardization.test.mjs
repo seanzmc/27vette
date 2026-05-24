@@ -48,6 +48,9 @@ payload = {
     'grand_sport_variant_selectable': column_values('grandSport_variant_overrides', 'selectable'),
     'rule_mapping_rows': records('rule_mapping'),
     'grand_sport_rule_mapping_rows': records('grandSport_rule_mapping'),
+    'model_master_rows': records('model_master'),
+    'model_variant_rows': records('model_variants'),
+    'model_source_rows': records('model_workbook_sources'),
 }
 print(json.dumps(payload))
 `);
@@ -95,6 +98,91 @@ test("LZ_Interiors is schema-compatible but not read by Stingray generation", ()
   const stingrayInteriors = registry.models.stingray.data.interiors;
   assert.equal(stingrayInteriors.some((interior) => interior.source_sheet === "LZ_Interiors"), false);
   assert.equal(stingrayInteriors.some((interior) => interior.interior_id === "3LT_AH2_EL9"), false);
+});
+
+test("future Corvette model metadata is scaffolded inactive against shared LZ interiors", () => {
+  const expectedModels = {
+    z06: { label: "Z06", registryKey: "z06", variantCount: 6 },
+    zr1: { label: "ZR1", registryKey: "zr1", variantCount: 4 },
+    zr1x: { label: "ZR1X", registryKey: "zr1x", variantCount: 4 },
+  };
+  const expectedVariants = {
+    z06: ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"],
+    zr1: ["1lz_r07", "3lz_r07", "1lz_r67", "3lz_r67"],
+    zr1x: ["1lz_s07", "3lz_s07", "1lz_s67", "3lz_s67"],
+  };
+  const sourceSheetNames = {
+    z06: {
+      source_option_sheet: "z06_options",
+      status_sheet: "z06_ovs",
+      rule_mapping_sheet: "z06_rule_mapping",
+      price_rules_sheet: "z06_price_rules",
+      rule_groups_sheet: "z06_rule_groups",
+      rule_group_members_sheet: "z06_rule_group_members",
+      exclusive_groups_sheet: "z06_exclusive_groups",
+      exclusive_group_members_sheet: "z06_exclusive_members",
+      variant_option_overrides_sheet: "z06_variant_overrides",
+      color_overrides_sheet: "color_overrides",
+      interior_source_sheet: "LZ_Interiors",
+    },
+    zr1: {
+      source_option_sheet: "zr1_options",
+      status_sheet: "zr1_ovs",
+      rule_mapping_sheet: "zr1_rule_mapping",
+      price_rules_sheet: "zr1_price_rules",
+      rule_groups_sheet: "zr1_rule_groups",
+      rule_group_members_sheet: "zr1_rule_group_members",
+      exclusive_groups_sheet: "zr1_exclusive_groups",
+      exclusive_group_members_sheet: "zr1_exclusive_members",
+      variant_option_overrides_sheet: "zr1_variant_overrides",
+      color_overrides_sheet: "color_overrides",
+      interior_source_sheet: "LZ_Interiors",
+    },
+    zr1x: {
+      source_option_sheet: "zr1x_options",
+      status_sheet: "zr1x_ovs",
+      rule_mapping_sheet: "zr1x_rule_mapping",
+      price_rules_sheet: "zr1x_price_rules",
+      rule_groups_sheet: "zr1x_rule_groups",
+      rule_group_members_sheet: "zr1x_rule_group_members",
+      exclusive_groups_sheet: "zr1x_exclusive_groups",
+      exclusive_group_members_sheet: "zr1x_exclusive_members",
+      variant_option_overrides_sheet: "zr1x_variant_overrides",
+      color_overrides_sheet: "color_overrides",
+      interior_source_sheet: "LZ_Interiors",
+    },
+  };
+
+  for (const [modelKey, expected] of Object.entries(expectedModels)) {
+    const modelRow = snapshot.model_master_rows.find((row) => row.model_key === modelKey);
+    assert.ok(modelRow, `${modelKey} missing model_master row`);
+    assert.equal(modelRow.registry_key, expected.registryKey);
+    assert.equal(modelRow.model_label, expected.label);
+    assert.equal(modelRow.model_year, "2027");
+    assert.equal(modelRow.expected_variant_count, expected.variantCount);
+    assert.equal(modelRow.default_model, false);
+    assert.equal(modelRow.active, false);
+
+    const variantRows = snapshot.model_variant_rows.filter((row) => row.model_key === modelKey);
+    assert.deepEqual(
+      variantRows.map((row) => row.variant_id),
+      expectedVariants[modelKey],
+    );
+    assert.deepEqual(
+      variantRows.map((row) => row.display_order),
+      expectedVariants[modelKey].map((_, index) => index + 1),
+    );
+    assert.equal(variantRows.every((row) => row.active === false), true);
+
+    const sourceRows = snapshot.model_source_rows.filter((row) => row.model_key === modelKey);
+    assert.equal(sourceRows.length, Object.keys(sourceSheetNames[modelKey]).length);
+    for (const [sourceRole, sheetName] of Object.entries(sourceSheetNames[modelKey])) {
+      const sourceRow = sourceRows.find((row) => row.source_role === sourceRole);
+      assert.ok(sourceRow, `${modelKey} missing ${sourceRole}`);
+      assert.equal(sourceRow.sheet_name, sheetName);
+      assert.equal(sourceRow.active, false, `${modelKey}.${sourceRole} should stay inactive`);
+    }
+  }
 });
 
 test("rule lifecycle metadata keeps retained source rows auditable", () => {

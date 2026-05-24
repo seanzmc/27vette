@@ -225,6 +225,24 @@ class SchemaValidationMetadataTests(unittest.TestCase):
 
         self.assertFalse(any(issue.sheet == "missing_future_options" for issue in issues), issues)
 
+    def test_inactive_future_model_rows_do_not_require_missing_source_sheets(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[
+                {"model_key": "stingray", "registry_key": "stingray", "active": True},
+                {"model_key": "z06", "registry_key": "z06", "active": False},
+            ],
+            extra_source_rows=[
+                {"model_key": "z06", "source_role": "source_option_sheet", "sheet_name": "z06_options", "active": True},
+                {"model_key": "z06", "source_role": "status_sheet", "sheet_name": "z06_ovs", "active": True},
+                {"model_key": "z06", "source_role": "interior_source_sheet", "sheet_name": "LZ_Interiors", "active": True},
+            ],
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertFalse(any(issue.sheet in {"z06_options", "z06_ovs"} for issue in issues), issues)
+        self.assertFalse(any(issue.check_id == "source_role_header_drift" for issue in issues), issues)
+
 
 if __name__ == "__main__":
     unittest.main()
