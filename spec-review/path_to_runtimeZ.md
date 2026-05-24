@@ -16,6 +16,13 @@ Durable project fact recorded: Z06, ZR1, and ZR1X reuse Grand Sport compatibilit
 
 These sheets preserve the true order-guide shape, including vertically merged RPO/status cells that keep disclosure statements attached to the same option block. Phase 7 should parse those merged raw blocks into a workbook-owned review map. Treat `archive_Z06_Ingest`, `archive_ZR1_Ingest`, and `archive_ZR1X_Ingest` as legacy comparison evidence only unless explicitly reapproved.
 
+Confirmed pricing/disclosure rules for this raw-source path:
+
+- Use the section-specific `List Price` value from `price_sched_raw`; do not assume the same physical column in the model and option sections.
+- For base model / variant pricing, add the model-section `DFC` amount to `List Price` for accurate customer-facing variant price evidence.
+- Treat the `$0.00` Gas Guzzler tax as a manufacturer placeholder pending certification, not a confirmed zero-dollar tax.
+- Preserve availability-matrix numeric suffixes such as `S1`, `A1`, `S2`, and `A2`, and map them to the corresponding disclosure statement when an option block contains multiple disclosures.
+
 ---
 
 ## Current State
@@ -83,6 +90,8 @@ All are currently **0 data rows**.
 | `zr1_zr1x_intextmec_raw` | combined ZR1/ZR1X interior/exterior/mechanical raw rows and disclosures |
 
 Raw option sheets use rows 7-9 as multi-row headers and frequently use vertically merged cells in the RPO/status columns. The parser must resolve merged-cell anchors so disclosure rows inside a merged block become option detail/provenance, not separate option rows.
+
+`price_sched_raw` must be parsed by header context rather than fixed column letters. The model-price and option-price sections may put `List Price` in different physical columns, and model rows need DFC added to list price before they become accurate variant-price evidence.
 
 ### Legacy Archive / Preview State
 
@@ -237,6 +246,8 @@ Add a review-owned mapping table before writing normalized rows. The mapping inp
 | `active` | |
 
 The review sheet should also preserve raw and normalized variant status columns for each future variant, e.g. `raw_status_1lz_h07` plus `status_1lz_h07`. Raw tokens such as `S1`, `A1`, `D`, `■`, and `□` carry meaning that normalized OVS statuses cannot fully express, so do not discard them during preview/review-map generation.
+
+When raw status tokens include numeric suffixes, preserve the suffix in a status-note/reference field and map it to the matching disclosure text from the same merged option block. This is especially important when one option block has multiple disclosures.
 
 **This should resolve:**
 

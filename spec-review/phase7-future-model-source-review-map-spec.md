@@ -59,7 +59,11 @@ The raw order-guide tables have a materially different shape from the previous a
 - The price schedule is a separate raw source:
   - base model prices appear near rows 9-40.
   - option price rows begin under `Additional Options` around row 47.
+  - the authoritative retail price is the section's `List Price` value, but the physical column may differ between the base-model section and the options section.
+  - base model variant prices must add the `DFC` amount to the base model `List Price` to produce the accurate customer-facing variant price.
   - repeated RPOs with different application text and price values exist, so price schedule rows must be review candidates and later price-rule input, not blindly copied into a single option price value.
+  - the `$0.00` Gas Guzzler tax is a manufacturer placeholder pending certification, not a confirmed zero-cost tax decision.
+- Raw availability statuses may include superscript-style numeric suffixes such as `S1` or `A2`. Those suffixes must be preserved and mapped back to the matching disclosure statement in the same merged option block when multiple disclosures exist.
 
 Root cause: the previous Phase 7 plan assumed the Phase 5 archive-derived preview was the best staging input. That is now stale. Phase 7 should use the true raw order-guide sheets as the source of future-model option/OVS migration, with a parser that preserves merged option/disclosure blocks, variant status tokens, price schedule application text, and raw source provenance.
 
@@ -146,7 +150,7 @@ Create:
 Create:
 
 - `tests/test_future_model_raw_source_parser.py`
-  - Covers merged block parsing, disclosure attachment, variant column mapping, raw status normalization, combined ZR1/ZR1X model splitting, and price schedule candidate extraction.
+  - Covers merged block parsing, disclosure attachment, disclosure-note mapping from availability suffixes like `1`/`2`, variant column mapping, raw status normalization, combined ZR1/ZR1X model splitting, and price schedule candidate extraction.
 
 - `tests/test_future_model_source_review.py`
   - Covers review row generation, idempotent review preservation, blocked-row validation, and source materialization dry runs.
@@ -217,6 +221,7 @@ For each raw option sheet:
    - Nonblank column C values inside the same block after the start row are disclosure/detail lines for that block.
    - Do not emit disclosure/detail lines as separate option rows.
    - Preserve `raw_start_row`, `raw_end_row`, and contributing `raw_disclosure_rows`.
+   - Preserve disclosure order and expose a deterministic note map, e.g. `1 -> first disclosure row`, `2 -> second disclosure row`, so raw availability suffixes such as `S1`, `A1`, `S2`, or `A2` can be traced back to the matching disclosure text.
 
 4. Detect section/category rows:
    - Rows such as `Equipment Groups`, `Additional Options`, `Battery:`, `Brakes:`, etc. have source value but no variant statuses.
@@ -241,9 +246,9 @@ Initial candidate normalization:
 | Raw token | Candidate normalized status | Required preservation/flags |
 |---|---|---|
 | `S` | `standard` | none |
-| `S1`, `S2`, etc. | `standard` | preserve suffix as `status_note` / disclosure evidence |
+| `S1`, `S2`, etc. | `standard` | preserve suffix as `status_note_ref` and map it to the matching disclosure text in the same option block |
 | `A` | `available` | none |
-| `A1`, `A2`, etc. | `available` | preserve suffix as `status_note` / disclosure evidence |
+| `A1`, `A2`, etc. | `available` | preserve suffix as `status_note_ref` and map it to the matching disclosure text in the same option block |
 | `--` | `unavailable` | none |
 | `D` | `available` | flag `dealer_installed_status` / ADI evidence |
 | `■` | `standard` candidate | flag `included_in_equipment_group` |
@@ -251,7 +256,7 @@ Initial candidate normalization:
 | blank | blank | allowed only for variants outside row/model scope; otherwise flag `blank_variant_status` |
 | any other token | blank | flag `unknown_status` |
 
-Do not discard the distinction between `S`, `S1`, `A1`, `■`, and `□`. The normalized source sheets may only support `available`, `standard`, and `unavailable`, but the review map must preserve the raw token and semantics for later rule/price/group decisions.
+Do not discard the distinction between `S`, `S1`, `A1`, `■`, and `□`. The normalized source sheets may only support `available`, `standard`, and `unavailable`, but the review map must preserve the raw token, numeric disclosure reference, and semantics for later rule/price/group decisions.
 
 ### Price schedule parsing requirements
 
@@ -259,12 +264,17 @@ Parse `price_sched_raw` separately:
 
 - Base model price rows:
   - Use as evidence for future model base-price review and later model/variant metadata work.
+  - Detect the `List Price` column from the model-section header instead of hardcoding a column letter.
+  - Detect the `DFC` column from the model-section header and add it to `List Price` for the accurate customer-facing variant/base price.
+  - Preserve all three components separately: base list price, DFC, and list-plus-DFC total.
   - Do not write into option source sheets during Phase 7.
 - Additional option price rows:
+  - Detect the `List Price` column from the options-section header instead of assuming it matches the model-section column.
   - Capture `price_rpo`, `price_description`, `price_application`, `price_list`, `price_msrp`, `price_invoice`, and `raw_price_row`.
   - Match price candidates to raw option blocks by RPO and, where possible, normalized description text.
   - Repeated RPOs with different application text/prices must be preserved as multiple candidates and flagged as `price_schedule_multiple_candidates`.
   - Conditional rows must not be collapsed into a single `approved_price`; they are likely future `price_rules` or review decisions.
+  - Treat the `$0.00` Gas Guzzler tax row as `pending_certification_placeholder`, not as a confirmed zero-dollar final tax.
   - Do not copy Grand Sport price values to future models.
 
 ## Proposed Workbook Review Sheet Contract
@@ -287,6 +297,7 @@ Required columns:
 | `source_primary_rpo` | Initial RPO selected from column A or B |
 | `source_option_description` | Raw block-start description |
 | `source_disclosure_raw` | Joined disclosure/detail rows from the same merged block |
+| `source_disclosure_map` | Deterministic note map for disclosures, e.g. `1=... | 2=...`, used by status suffixes |
 | `source_detail_raw` | Combined provenance/detail text to carry into normalized source review |
 | `candidate_option_id` | Deterministic draft option ID |
 | `candidate_section_id` | Candidate section ID when unambiguous |
@@ -296,6 +307,9 @@ Required columns:
 | `candidate_price` | Single safe price candidate only when unambiguous |
 | `price_candidate_rows` | `|`-delimited price schedule raw row refs |
 | `price_candidate_summary` | Human-readable price candidate/application summary |
+| `base_model_list_price` | For base model price rows/review evidence only |
+| `base_model_dfc` | DFC amount to add to base model list price |
+| `base_model_total_price` | `base_model_list_price + base_model_dfc` |
 | `review_flags` | `; `-delimited flags, e.g. `section_conflict`, `duplicate_rpo`, `missing_rpo`, `price_schedule_multiple_candidates` |
 | `approved_option_id` | Final stable option ID to write to `*_options` |
 | `approved_rpo` | Final RPO to write; can remain blank only if row is inactive/review-only |
@@ -325,8 +339,12 @@ Variant status columns:
   - `status_1lz_h07`, `status_2lz_h07`, `status_3lz_h07`, `status_1lz_h67`, `status_2lz_h67`, `status_3lz_h67`
   - `status_1lz_r07`, `status_3lz_r07`, `status_1lz_r67`, `status_3lz_r67`
   - `status_1lz_s07`, `status_3lz_s07`, `status_1lz_s67`, `status_3lz_s67`
+- Status note-reference columns, optional but preferred for review/debugging:
+  - `status_note_1lz_h07`, `status_note_2lz_h07`, `status_note_3lz_h07`, `status_note_1lz_h67`, `status_note_2lz_h67`, `status_note_3lz_h67`
+  - `status_note_1lz_r07`, `status_note_3lz_r07`, `status_note_1lz_r67`, `status_note_3lz_r67`
+  - `status_note_1lz_s07`, `status_note_3lz_s07`, `status_note_1lz_s67`, `status_note_3lz_s67`
 
-Only columns for the row's model are populated. Valid normalized status values are `available`, `standard`, `unavailable`, or blank when the variant does not belong to that model.
+Only columns for the row's model are populated. Valid normalized status values are `available`, `standard`, `unavailable`, or blank when the variant does not belong to that model. Status-note columns preserve suffixes like `1` or `2` so reviewers can trace variant-specific availability notes to `source_disclosure_map`.
 
 Initial seeding rules:
 
@@ -339,6 +357,7 @@ Initial seeding rules:
   - `active=False`
   - approved fields copied from candidate/source fields where safe, but blocked from source emission until reviewed
 - Rows containing disclosure/detail text should keep that text in `approved_detail_raw` by default, not in the customer-facing option name.
+- Rows containing multiple disclosure/detail lines should preserve an explicit disclosure map so superscript-style availability references can be reviewed and later rendered/audited if needed.
 - Rows with no RPO in either raw RPO column must remain inactive until `approved_rpo` and `approved_option_id` are explicitly reviewed.
 - Section conflicts/unresolved sections must remain inactive until `approved_section_id` is explicitly reviewed.
 - Duplicate-RPO rows must remain inactive unless `approved_option_id` and, when needed, `duplicate_group_id` or `copy_from_option_id` make the intended identity explicit.
@@ -407,6 +426,10 @@ Do not write unresolved or inactive review rows to normalized source sheets. Do 
 - Combined ZR1/ZR1X sheets must split variant columns by model code. A parser that treats all columns as one model would produce invalid OVS rows.
 - `■` and `□` tokens carry equipment-group semantics that normalized OVS statuses cannot fully express. The review map must preserve those tokens for later rule/group work.
 - Repeated price schedule RPOs with application text are likely price-rule candidates. Collapsing them into a single option price would lose business logic.
+- Price schedule parsing by fixed column letter is unsafe because the `List Price` column may differ between base-model and options sections. Header-derived parsing is required.
+- Base model list prices are not sufficient by themselves for displayed variant pricing; DFC must be added and preserved as a separate component.
+- The `$0.00` Gas Guzzler tax is a placeholder pending certification, so treating it as a confirmed zero-dollar tax would be misleading.
+- Multiple disclosures inside a merged option block can correspond to numeric availability suffixes. Dropping suffixes like `1`/`2` would break traceability from the matrix to the disclosure text.
 - Raw category rows are useful evidence but not final `section_id` values.
 - Source population can create partial future model source sheets if run before all review rows are approved. Tests should make partial status explicit and keep model metadata inactive.
 
@@ -532,13 +555,17 @@ Do not write unresolved or inactive review rows to normalized source sheets. Do 
 
 15. Do not run runtime gates unless a diff unexpectedly touches runtime files. If runtime files change, stop and explain before proceeding.
 
-## Clarifications To Confirm Before Implementation
+## Confirmed Clarifications
 
-These do not block revising the spec, but they should be confirmed before writing source population logic:
+Sean confirmed before implementation:
 
-1. Treat `price_sched_raw` as authoritative future-model price evidence, but not as automatic option-level price assignment when the same RPO has multiple application rows. This spec assumes yes.
-2. Treat the older hidden `archive_*_Ingest` sheets as legacy comparison evidence only. This spec assumes yes.
-3. Preserve disclosure text from merged blocks in `detail_raw`/provenance by default, not in customer-facing option labels. This spec assumes yes.
+1. Treat `price_sched_raw` as authoritative future-model price evidence, but not as automatic option-level price assignment when the same RPO has multiple application rows.
+2. Treat the older hidden `archive_*_Ingest` sheets as legacy comparison evidence only.
+3. Preserve disclosure text from merged blocks in `detail_raw`/provenance by default, not in customer-facing option labels.
+4. Use the section-specific `List Price` value from `price_sched_raw`; do not assume the same physical column in the model and option sections.
+5. Add the model-section DFC amount to the model-section list price for accurate variant/base price evidence.
+6. Treat the `$0.00` Gas Guzzler tax as a placeholder pending certification.
+7. Preserve and map disclosure references from availability-matrix suffixes such as `1` and `2` to the matching disclosure text when option rows have multiple disclosures.
 
 ## Approval Gate
 
