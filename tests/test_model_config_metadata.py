@@ -116,6 +116,28 @@ class ModelConfigMetadataTests(unittest.TestCase):
         self.assertEqual(resolved.expected_variant_count, 2)
         self.assertEqual(STINGRAY_MODEL.source_option_sheet, "stingray_options")
 
+    def test_workbook_metadata_overrides_interior_source_sheet(self) -> None:
+        wb = workbook_with_model_metadata(
+            model_rows=[stingray_model_row()],
+            source_rows=[
+                {
+                    "model_key": "stingray",
+                    "source_role": "interior_source_sheet",
+                    "sheet_name": "LZ_Interiors",
+                    "active": True,
+                }
+            ],
+            variant_rows=[
+                {"model_key": "stingray", "variant_id": "1lz_h07", "display_order": 1, "active": True},
+                {"model_key": "stingray", "variant_id": "3lz_h07", "display_order": 2, "active": True},
+            ],
+        )
+
+        resolved = load_model_config_overrides(wb, STINGRAY_MODEL)
+
+        self.assertEqual(resolved.interior_source_sheet, "LZ_Interiors")
+        self.assertEqual(STINGRAY_MODEL.interior_source_sheet, "lt_interiors")
+
     def test_unknown_source_role_fails_fast(self) -> None:
         wb = workbook_with_model_metadata(
             source_rows=[

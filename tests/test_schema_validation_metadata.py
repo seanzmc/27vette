@@ -81,6 +81,8 @@ def minimal_schema_workbook(
     append_sheet(wb, "PriceRef", ["RPO", "Price"])
 
     for name, (headers, rows) in (extra_sheets or {}).items():
+        if name in wb.sheetnames:
+            del wb[name]
         append_sheet(wb, name, headers, rows)
     return wb
 
@@ -146,6 +148,68 @@ class SchemaValidationMetadataTests(unittest.TestCase):
 
         self.assertTrue(
             any(issue.check_id == "source_role_header_drift" and issue.sheet == "source_option_sheet" for issue in issues),
+            issues,
+        )
+
+    def test_metadata_discovered_interior_source_sheet_role_is_known(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "z06", "registry_key": "z06", "active": True}],
+            extra_source_rows=[
+                {"model_key": "z06", "source_role": "interior_source_sheet", "sheet_name": "LZ_Interiors", "active": True},
+            ],
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertFalse(any(issue.check_id == "unknown_model_source_role" for issue in issues), issues)
+
+    def test_metadata_discovered_interior_source_sheet_must_exist(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "zr1", "registry_key": "zr1", "active": True}],
+            extra_source_rows=[
+                {
+                    "model_key": "zr1",
+                    "source_role": "interior_source_sheet",
+                    "sheet_name": "missing_zr1_interiors",
+                    "active": True,
+                },
+            ],
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(
+            any(issue.check_id == "missing_model_source_sheet" and issue.sheet == "missing_zr1_interiors" for issue in issues),
+            issues,
+        )
+
+    def test_metadata_discovered_lz_interiors_validates_by_interior_role(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "zr1x", "registry_key": "zr1x", "active": True}],
+            extra_source_rows=[
+                {"model_key": "zr1x", "source_role": "interior_source_sheet", "sheet_name": "LZ_Interiors", "active": True},
+            ],
+            extra_sheets={
+                "LZ_Interiors": (
+                    INTERIOR_HEADERS,
+                    [
+                        {
+                            "interior_id": "1LZ_AQ9_HTE",
+                            "Trim": "1LZ",
+                            "Price": "not numeric",
+                            "active_for_stingray": True,
+                            "requires_r6x": False,
+                            "Seat": "AQ9",
+                        }
+                    ],
+                )
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(
+            any(issue.check_id == "price_type_drift" and issue.sheet == "LZ_Interiors" and issue.column == "Price" for issue in issues),
             issues,
         )
 

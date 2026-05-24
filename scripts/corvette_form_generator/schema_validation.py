@@ -59,6 +59,7 @@ MODEL_SOURCE_ROLES: set[str] = {
     "exclusive_group_members_sheet",
     "color_overrides_sheet",
     "variant_option_overrides_sheet",
+    "interior_source_sheet",
 }
 
 LEGACY_MODEL_SOURCES: dict[str, dict[str, str]] = {
@@ -72,6 +73,7 @@ LEGACY_MODEL_SOURCES: dict[str, dict[str, str]] = {
         "exclusive_groups_sheet": "exclusive_groups",
         "exclusive_group_members_sheet": "exclusive_group_members",
         "color_overrides_sheet": "color_overrides",
+        "interior_source_sheet": "lt_interiors",
     },
     "grand_sport": {
         "source_option_sheet": "grandSport_options",
@@ -84,6 +86,7 @@ LEGACY_MODEL_SOURCES: dict[str, dict[str, str]] = {
         "exclusive_group_members_sheet": "grandSport_exclusive_members",
         "color_overrides_sheet": "color_overrides",
         "variant_option_overrides_sheet": "grandSport_variant_overrides",
+        "interior_source_sheet": "lt_interiors",
     },
 }
 
@@ -96,11 +99,13 @@ ROLE_BOOLEAN_COLUMNS: dict[str, tuple[str, ...]] = {
     "exclusive_groups_sheet": ("active",),
     "exclusive_group_members_sheet": ("active",),
     "variant_option_overrides_sheet": ("active", "selectable"),
+    "interior_source_sheet": ("active_for_stingray", "requires_r6x"),
 }
 
 ROLE_PRICE_COLUMNS: dict[str, tuple[str, ...]] = {
     "source_option_sheet": ("price",),
     "price_rules_sheet": ("price_value",),
+    "interior_source_sheet": ("Price",),
 }
 
 ROLE_RPO_COLUMNS: dict[str, tuple[str, ...]] = {
@@ -116,6 +121,7 @@ HEADER_MATCH_ROLES: tuple[str, ...] = (
     "rule_group_members_sheet",
     "exclusive_groups_sheet",
     "exclusive_group_members_sheet",
+    "interior_source_sheet",
 )
 
 HEADER_PAIRS: tuple[tuple[str, str], ...] = (

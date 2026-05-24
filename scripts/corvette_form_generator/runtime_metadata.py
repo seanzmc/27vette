@@ -28,6 +28,7 @@ _MODEL_CONFIG_SOURCE_ROLES = {
     "exclusive_group_members_sheet",
     "color_overrides_sheet",
     "variant_option_overrides_sheet",
+    "interior_source_sheet",
 }
 
 
@@ -688,4 +689,5 @@ def load_model_config_overrides(wb: Any, config: ModelConfig) -> ModelConfig:
         color_overrides_sheet=sources.get("color_overrides_sheet") or config.color_overrides_sheet,
         variant_option_overrides_sheet=sources.get("variant_option_overrides_sheet")
         or config.variant_option_overrides_sheet,
+        interior_source_sheet=sources.get("interior_source_sheet") or config.interior_source_sheet,
     )

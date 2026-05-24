@@ -465,54 +465,77 @@ def grouping_fields_for_interior(
     }
 
 
-def build_grand_sport_interiors(config: ModelConfig) -> list[dict[str, Any]]:
+def fallback_interior_trims(config: ModelConfig) -> set[str]:
+    trims: set[str] = set()
+    for variant_id in config.variant_ids:
+        trim = clean(variant_id.split("_", 1)[0]).upper()
+        if not trim:
+            continue
+        trims.add(trim)
+        if trim.startswith("3"):
+            trims.add(f"{trim}_R6X")
+    return trims
+
+
+def active_interior_flags(config: ModelConfig) -> dict[str, bool]:
+    flags = {"active_for_stingray": config.model_key == "stingray"}
+    flags[f"active_for_{config.model_key}"] = True
+    return flags
+
+
+def build_model_interiors(config: ModelConfig) -> list[dict[str, Any]]:
     wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
-    lt_interiors_raw = rows_from_sheet(wb, "lt_interiors")
-    price_ref_rows = rows_from_sheet(wb, "PriceRef")
-    rule_rows = rows_from_sheet(wb, config.rule_mapping_sheet)
-    z25_interior_ids = {
-        row.get("source_id", "")
-        for row in rule_rows
-        if row.get("rule_type", "").lower() == "includes"
-        and row.get("target_id", "") == "opt_z25_001"
-        and runtime_authored_rule(row)
-    }
-    interior_price_ref = price_ref_prices(price_ref_rows)
-    interior_component_price_ref = price_ref_component_prices(price_ref_rows)
-    workbook_components_by_interior_id = load_interior_components(wb, config.model_key)
-    model_interior_scope = load_model_interior_scope_map(wb, config.model_key)
+    try:
+        interior_rows = rows_from_sheet(wb, config.interior_source_sheet)
+        price_ref_rows = rows_from_sheet(wb, "PriceRef")
+        rule_rows = rows_from_sheet(wb, config.rule_mapping_sheet)
+        z25_interior_ids = {
+            row.get("source_id", "")
+            for row in rule_rows
+            if row.get("rule_type", "").lower() == "includes"
+            and row.get("target_id", "") == "opt_z25_001"
+            and runtime_authored_rule(row)
+        }
+        interior_price_ref = price_ref_prices(price_ref_rows)
+        interior_component_price_ref = price_ref_component_prices(price_ref_rows)
+        workbook_components_by_interior_id = load_interior_components(wb, config.model_key)
+        model_interior_scope = load_model_interior_scope_map(wb, config.model_key)
+    finally:
+        wb.close()
+
     reference_by_id, reference_rows = read_interior_reference(config)
     reference_order_by_id = {
         row["interior_id"]: index
         for index, row in enumerate((row for row in reference_rows if row["interior_id"]), start=1)
     }
     fallback_order = len(reference_order_by_id) + 1
+    fallback_trims = fallback_interior_trims(config)
+    active_flags = active_interior_flags(config)
     interiors: list[dict[str, Any]] = []
 
-    for row in lt_interiors_raw:
+    for row in interior_rows:
         trim = clean(row.get("Trim", ""))
         interior_id = clean(row.get("interior_id", ""))
         scope_row = model_interior_scope.get(interior_id)
         if model_interior_scope:
             if not scope_row:
                 continue
-        elif trim not in {"1LT", "2LT", "3LT", "3LT_R6X"}:
+        elif fallback_trims and trim not in fallback_trims:
             continue
         components = workbook_interior_component_metadata(row, workbook_components_by_interior_id, interior_component_price_ref)
         legacy_components = interior_component_metadata(row, interior_component_price_ref)
         if not components and legacy_components:
             if model_interior_scope:
                 raise ValueError(
-                    f"Grand Sport interior {interior_id} has component-bearing legacy output but no active interior_components workbook rows."
+                    f"{config.model_label} interior {interior_id} has component-bearing legacy output but no active interior_components workbook rows."
                 )
             components = legacy_components
         trim_level = clean(scope_row.get("trim_level")) if scope_row else ""
         requires_option_id = clean(scope_row.get("requires_option_id")) if scope_row else ""
         interior = {
             "interior_id": interior_id,
-            "source_sheet": "lt_interiors",
-            "active_for_stingray": False,
-            "active_for_grand_sport": True,
+            "source_sheet": config.interior_source_sheet,
+            **active_flags,
             "requires_z25": "True" if requires_option_id == "opt_z25_001" or interior_id in z25_interior_ids else "False",
             "trim_level": trim_level or trim.replace("_R6X", ""),
             "requires_r6x": "True" if "_R6X" in trim or interior_id.endswith("_R6X") else "False",
@@ -539,6 +562,10 @@ def build_grand_sport_interiors(config: ModelConfig) -> list[dict[str, Any]]:
         interiors.append(interior)
 
     return interiors
+
+
+def build_grand_sport_interiors(config: ModelConfig) -> list[dict[str, Any]]:
+    return build_model_interiors(config)
 
 
 def resolved_step_key(

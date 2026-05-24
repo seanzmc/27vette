@@ -14,6 +14,7 @@ from openpyxl import load_workbook
 from corvette_form_generator.model_configs import GRAND_SPORT_MODEL
 from corvette_form_generator.runtime_metadata import (
     load_audit_group_members,
+    load_model_config_overrides,
     load_rule_phrase_map,
     load_rule_review_rpos,
 )
@@ -160,9 +161,9 @@ def detail_fragments(detail_raw: str) -> list[str]:
     return fragments or ([re.sub(r"\s+", " ", detail_raw).strip()] if detail_raw.strip() else [])
 
 
-def interior_combination_codes(wb) -> set[str]:
+def interior_combination_codes(wb, config: Any) -> set[str]:
     codes: set[str] = set()
-    for row in rows_from_sheet(wb, "lt_interiors"):
+    for row in rows_from_sheet(wb, config.interior_source_sheet):
         for key in ("Interior Code", "Seat", "Stitch", "Suede", "Two Tone"):
             value = clean(row.get(key, "")).upper()
             if re.fullmatch(r"[A-Z0-9]{3}", value):
@@ -924,15 +925,16 @@ def write_rule_audit(
 
 
 def main() -> None:
-    config = GRAND_SPORT_MODEL
-    wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
+    base_config = GRAND_SPORT_MODEL
+    wb = load_workbook(base_config.workbook_path, data_only=True, read_only=True)
+    config = load_model_config_overrides(wb, base_config)
     all_grand_sport_options = rows_from_sheet(wb, config.source_option_sheet)
     status_rows = rows_from_sheet(wb, config.status_sheet)
     variant_rows = rows_from_sheet(wb, "variant_master")
     grand_sport_options = [row for row in all_grand_sport_options if active_source_row(row)]
     _, active_option_ids_by_rpo = option_indexes(grand_sport_options)
     _, all_option_ids_by_rpo = option_indexes(all_grand_sport_options)
-    interior_codes = interior_combination_codes(wb)
+    interior_codes = interior_combination_codes(wb, config)
     rule_phrase_rows = load_rule_phrase_map(wb, RULE_PHRASES)
     engine_cover_group_members = load_audit_group_members(wb, "engine_cover", ENGINE_COVER_RPOS)
     special_review_rpos = load_rule_review_rpos(wb, config.model_key, config.special_rule_review_rpos)

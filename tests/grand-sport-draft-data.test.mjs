@@ -568,9 +568,12 @@ test("Grand Sport draft includes model-scoped LT interiors with EL9 launch editi
   );
   assert.match(inspectionSource, /load_model_interior_scope_map/);
   assert.match(inspectionSource, /load_interior_components/);
-  assert.match(inspectionSource, /if model_interior_scope:/);
-  assert.match(inspectionSource, /elif trim not in \{["']1LT["'], ["']2LT["'], ["']3LT["'], ["']3LT_R6X["']\}/);
+  assert.match(inspectionSource, /build_model_interiors/);
+  assert.match(inspectionSource, /config\.interior_source_sheet/);
+  assert.doesNotMatch(inspectionSource, /rows_from_sheet\(wb, ["']lt_interiors["']\)/);
+  assert.doesNotMatch(inspectionSource, /source_sheet["']?: ["']lt_interiors["']/);
 
+  assert.equal(draft.interiors.every((interior) => interior.source_sheet === "lt_interiors"), true);
   const byId = new Map(draft.interiors.map((interior) => [interior.interior_id, interior]));
   for (const interiorId of ["3LT_AE4_EL9", "3LT_AH2_EL9"]) {
     const interior = byId.get(interiorId);

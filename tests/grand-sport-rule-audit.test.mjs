@@ -50,6 +50,13 @@ const generateOutput = JSON.parse(
 );
 const audit = JSON.parse(fs.readFileSync(auditPath, "utf8"));
 const draft = JSON.parse(fs.readFileSync(draftPath, "utf8"));
+const ruleSource = fs.readFileSync("scripts/build_grand_sport_rule_sources.py", "utf8");
+
+test("Grand Sport rule audit reads interior suppression codes from model metadata", () => {
+  assert.match(ruleSource, /load_model_config_overrides/);
+  assert.match(ruleSource, /config\.interior_source_sheet/);
+  assert.doesNotMatch(ruleSource, /rows_from_sheet\(wb, ["']lt_interiors["']\)/);
+});
 
 test("Grand Sport audit metadata is workbook-owned", () => {
   const phraseRows = workbookRows("rule_phrase_map");
