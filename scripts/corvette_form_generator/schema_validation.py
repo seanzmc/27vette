@@ -48,6 +48,76 @@ RPO_COLUMNS: dict[str, tuple[str, ...]] = {
     "interior_components": ("rpo",),
 }
 
+MODEL_SOURCE_ROLES: set[str] = {
+    "source_option_sheet",
+    "status_sheet",
+    "rule_mapping_sheet",
+    "price_rules_sheet",
+    "rule_groups_sheet",
+    "rule_group_members_sheet",
+    "exclusive_groups_sheet",
+    "exclusive_group_members_sheet",
+    "color_overrides_sheet",
+    "variant_option_overrides_sheet",
+}
+
+LEGACY_MODEL_SOURCES: dict[str, dict[str, str]] = {
+    "stingray": {
+        "source_option_sheet": "stingray_options",
+        "status_sheet": "stingray_ovs",
+        "rule_mapping_sheet": "rule_mapping",
+        "price_rules_sheet": "price_rules",
+        "rule_groups_sheet": "rule_groups",
+        "rule_group_members_sheet": "rule_group_members",
+        "exclusive_groups_sheet": "exclusive_groups",
+        "exclusive_group_members_sheet": "exclusive_group_members",
+        "color_overrides_sheet": "color_overrides",
+    },
+    "grand_sport": {
+        "source_option_sheet": "grandSport_options",
+        "status_sheet": "grandSport_ovs",
+        "rule_mapping_sheet": "grandSport_rule_mapping",
+        "price_rules_sheet": "grandSport_price_rules",
+        "rule_groups_sheet": "grandSport_rule_groups",
+        "rule_group_members_sheet": "grandSport_rule_group_members",
+        "exclusive_groups_sheet": "grandSport_exclusive_groups",
+        "exclusive_group_members_sheet": "grandSport_exclusive_members",
+        "color_overrides_sheet": "color_overrides",
+        "variant_option_overrides_sheet": "grandSport_variant_overrides",
+    },
+}
+
+ROLE_BOOLEAN_COLUMNS: dict[str, tuple[str, ...]] = {
+    "source_option_sheet": ("selectable", "active"),
+    "rule_mapping_sheet": ("review_flag",),
+    "price_rules_sheet": ("review_flag",),
+    "rule_groups_sheet": ("active",),
+    "rule_group_members_sheet": ("active",),
+    "exclusive_groups_sheet": ("active",),
+    "exclusive_group_members_sheet": ("active",),
+    "variant_option_overrides_sheet": ("active", "selectable"),
+}
+
+ROLE_PRICE_COLUMNS: dict[str, tuple[str, ...]] = {
+    "source_option_sheet": ("price",),
+    "price_rules_sheet": ("price_value",),
+}
+
+ROLE_RPO_COLUMNS: dict[str, tuple[str, ...]] = {
+    "source_option_sheet": ("rpo",),
+}
+
+HEADER_MATCH_ROLES: tuple[str, ...] = (
+    "source_option_sheet",
+    "status_sheet",
+    "rule_mapping_sheet",
+    "price_rules_sheet",
+    "rule_groups_sheet",
+    "rule_group_members_sheet",
+    "exclusive_groups_sheet",
+    "exclusive_group_members_sheet",
+)
+
 HEADER_PAIRS: tuple[tuple[str, str], ...] = (
     ("stingray_options", "grandSport_options"),
     ("stingray_ovs", "grandSport_ovs"),
@@ -177,6 +247,123 @@ def option_ids(wb, sheet: str) -> set[str]:
     return {str(row.get("option_id")) for _, row in records(wb[sheet]) if row.get("option_id")}
 
 
+def clean_text(value: Any) -> str:
+    if value is None:
+        return ""
+    return str(value).strip()
+
+
+def truthy(value: Any, default: bool = True) -> bool:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    text = clean_text(value).lower()
+    if not text:
+        return default
+    if text in {"1", "true", "t", "yes", "y", "on", "active", "enabled"}:
+        return True
+    if text in {"0", "false", "f", "no", "n", "off", "inactive", "disabled"}:
+        return False
+    return default
+
+
+def active_metadata_rows(wb, sheet: str, model_key: str | None = None) -> list[dict[str, Any]]:
+    if sheet not in wb.sheetnames:
+        return []
+    rows = [row for _, row in records(wb[sheet]) if truthy(row.get("active"), default=True)]
+    if model_key is None:
+        return rows
+    return [row for row in rows if clean_text(row.get("model_key")).lower() in {model_key.lower(), "*", "all", "shared"}]
+
+
+def metadata_source_graph(wb, issues: list[SchemaIssue]) -> dict[str, dict[str, str]]:
+    """Return active model source-role mapping with legacy fallback seeds."""
+
+    graph = {model: dict(sources) for model, sources in LEGACY_MODEL_SOURCES.items()}
+    active_models = {clean_text(row.get("model_key")).lower() for row in active_metadata_rows(wb, "model_master")}
+    active_models.discard("")
+
+    if "model_workbook_sources" not in wb.sheetnames:
+        return graph
+
+    seen: set[tuple[str, str]] = set()
+    for row_number, row in records(wb["model_workbook_sources"]):
+        if not truthy(row.get("active"), default=True):
+            continue
+        model_key = clean_text(row.get("model_key")).lower()
+        source_role = clean_text(row.get("source_role"))
+        sheet_name = clean_text(row.get("sheet_name"))
+        if not model_key or not source_role or not sheet_name:
+            continue
+        if active_models and model_key not in active_models and model_key not in {"*", "all", "shared"}:
+            continue
+        if source_role not in MODEL_SOURCE_ROLES:
+            add_issue(
+                issues,
+                "error",
+                "unknown_model_source_role",
+                sheet="model_workbook_sources",
+                row=row_number,
+                column="source_role",
+                value=source_role,
+                message=f"Unknown model_workbook_sources source_role {source_role!r}.",
+            )
+            continue
+        duplicate_key = (model_key, source_role)
+        if duplicate_key in seen:
+            add_issue(
+                issues,
+                "error",
+                "duplicate_model_source_role",
+                sheet="model_workbook_sources",
+                row=row_number,
+                column="source_role",
+                value={"model_key": model_key, "source_role": source_role},
+                message=f"Duplicate active source role {source_role!r} for model {model_key!r}.",
+            )
+            continue
+        seen.add(duplicate_key)
+        graph.setdefault(model_key, {})[source_role] = sheet_name
+
+    for model_key, sources in graph.items():
+        for source_role, sheet_name in sources.items():
+            if sheet_name and sheet_name not in wb.sheetnames:
+                add_issue(
+                    issues,
+                    "error",
+                    "missing_model_source_sheet",
+                    sheet=sheet_name,
+                    value={"model_key": model_key, "source_role": source_role},
+                    message=f"Active {model_key}.{source_role} sheet {sheet_name!r} does not exist.",
+                )
+    return graph
+
+
+def sheets_by_role(source_graph: dict[str, dict[str, str]]) -> dict[str, list[str]]:
+    by_role: dict[str, list[str]] = {}
+    for sources in source_graph.values():
+        for source_role, sheet_name in sources.items():
+            if not sheet_name:
+                continue
+            by_role.setdefault(source_role, [])
+            if sheet_name not in by_role[source_role]:
+                by_role[source_role].append(sheet_name)
+    return by_role
+
+
+def merge_sheet_columns(
+    base: dict[str, tuple[str, ...]],
+    by_role: dict[str, list[str]],
+    role_columns: dict[str, tuple[str, ...]],
+) -> dict[str, tuple[str, ...]]:
+    merged = {sheet: tuple(columns) for sheet, columns in base.items()}
+    for source_role, columns in role_columns.items():
+        for sheet in by_role.get(source_role, []):
+            merged[sheet] = tuple(dict.fromkeys((*merged.get(sheet, ()), *columns)))
+    return merged
+
+
 def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool = True) -> list[SchemaIssue]:
     workbook = Path(workbook)
     wb = load_workbook(workbook, read_only=True, data_only=True)
@@ -195,6 +382,9 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                 message="category_master should not be an active source sheet; keep only archive_category_master if historical context is needed.",
             )
 
+        source_graph = metadata_source_graph(wb, issues)
+        source_sheets_by_role = sheets_by_role(source_graph)
+
         for left, right in HEADER_PAIRS:
             if left not in wb.sheetnames or right not in wb.sheetnames:
                 continue
@@ -210,6 +400,29 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                     message=f"{left} and {right} headers must match after schema standardization.",
                 )
 
+        for source_role in HEADER_MATCH_ROLES:
+            existing_sheets = [sheet for sheet in source_sheets_by_role.get(source_role, []) if sheet in wb.sheetnames]
+            if len(existing_sheets) < 2:
+                continue
+            canonical_sheet = existing_sheets[0]
+            canonical_headers = nonblank_headers(wb[canonical_sheet])
+            for sheet in existing_sheets[1:]:
+                current_headers = nonblank_headers(wb[sheet])
+                if current_headers != canonical_headers:
+                    add_issue(
+                        issues,
+                        "error",
+                        "source_role_header_drift",
+                        sheet=source_role,
+                        value={
+                            "canonical_sheet": canonical_sheet,
+                            "canonical_headers": canonical_headers,
+                            "sheet": sheet,
+                            "headers": current_headers,
+                        },
+                        message=f"All active {source_role} sheets must share headers; {sheet} differs from {canonical_sheet}.",
+                    )
+
         if "lt_interiors" in wb.sheetnames and "LZ_Interiors" in wb.sheetnames:
             lt_headers = nonblank_headers(wb["lt_interiors"])
             lz_headers = nonblank_headers(wb["LZ_Interiors"])
@@ -223,7 +436,11 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                     message="LZ_Interiors headers must exactly match lt_interiors headers.",
                 )
 
-        for sheet, columns in BOOLEAN_COLUMNS.items():
+        boolean_columns = merge_sheet_columns(BOOLEAN_COLUMNS, source_sheets_by_role, ROLE_BOOLEAN_COLUMNS)
+        rpo_columns = merge_sheet_columns(RPO_COLUMNS, source_sheets_by_role, ROLE_RPO_COLUMNS)
+        price_columns = merge_sheet_columns(PRICE_COLUMNS, source_sheets_by_role, ROLE_PRICE_COLUMNS)
+
+        for sheet, columns in boolean_columns.items():
             if sheet not in wb.sheetnames:
                 continue
             ws = wb[sheet]
@@ -247,7 +464,7 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                             message=f"{sheet}.{column} must be a real Excel boolean, not {type(value).__name__}.",
                         )
 
-        for sheet, columns in RPO_COLUMNS.items():
+        for sheet, columns in rpo_columns.items():
             if sheet not in wb.sheetnames:
                 continue
             ws = wb[sheet]
@@ -271,7 +488,7 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                             message=f"{sheet}.{column} must be stored as text, including numeric-looking RPOs.",
                         )
 
-        for sheet, columns in PRICE_COLUMNS.items():
+        for sheet, columns in price_columns.items():
             if sheet not in wb.sheetnames:
                 continue
             ws = wb[sheet]
@@ -295,7 +512,11 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                             message=f"{sheet}.{column} must be numeric or blank; blank means null/not-priced and 0 means explicit zero-price.",
                         )
 
-        for sheet in ("rule_mapping", "grandSport_rule_mapping"):
+        rule_mapping_sheets = tuple(source_sheets_by_role.get("rule_mapping_sheet", [])) or (
+            "rule_mapping",
+            "grandSport_rule_mapping",
+        )
+        for sheet in rule_mapping_sheets:
             if sheet not in wb.sheetnames:
                 continue
             ws = wb[sheet]
@@ -393,7 +614,13 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                         message="preserve_runtime_exclude rows must have normalization_status preserved.",
                     )
 
-        for option_sheet, ovs_sheet in (("stingray_options", "stingray_ovs"), ("grandSport_options", "grandSport_ovs")):
+        validated_ovs_pairs: set[tuple[str, str]] = set()
+        for model_key, sources in source_graph.items():
+            option_sheet = sources.get("source_option_sheet", "")
+            ovs_sheet = sources.get("status_sheet", "")
+            if not option_sheet or not ovs_sheet or (option_sheet, ovs_sheet) in validated_ovs_pairs:
+                continue
+            validated_ovs_pairs.add((option_sheet, ovs_sheet))
             if option_sheet not in wb.sheetnames or ovs_sheet not in wb.sheetnames:
                 continue
             valid_options = option_ids(wb, option_sheet)
@@ -408,7 +635,7 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                         row=row_number,
                         column="option_id",
                         value=option_id,
-                        message=f"{ovs_sheet}.option_id does not resolve to {option_sheet}.",
+                        message=f"{ovs_sheet}.option_id does not resolve to {option_sheet} for model {model_key}.",
                     )
 
         if check_live_contract:
