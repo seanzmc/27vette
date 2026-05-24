@@ -34,6 +34,32 @@ def records(sheet):
             rows.append(record)
     return rows
 
+def sheet_details(sheet):
+    if sheet not in wb.sheetnames:
+        return {'exists': False, 'headers': [], 'max_row': 0, 'state': None}
+    ws = wb[sheet]
+    return {'exists': True, 'headers': headers(sheet), 'max_row': ws.max_row, 'state': ws.sheet_state}
+
+canonical_source_sheets = {
+    'options': 'grandSport_options',
+    'ovs': 'grandSport_ovs',
+    'rule_mapping': 'grandSport_rule_mapping',
+    'price_rules': 'grandSport_price_rules',
+    'rule_groups': 'grandSport_rule_groups',
+    'rule_group_members': 'grandSport_rule_group_members',
+    'exclusive_groups': 'grandSport_exclusive_groups',
+    'exclusive_members': 'grandSport_exclusive_members',
+    'variant_overrides': 'grandSport_variant_overrides',
+}
+future_source_sheets = [
+    'z06_options', 'z06_ovs', 'z06_rule_mapping', 'z06_price_rules', 'z06_rule_groups',
+    'z06_rule_group_members', 'z06_exclusive_groups', 'z06_exclusive_members', 'z06_variant_overrides',
+    'zr1_options', 'zr1_ovs', 'zr1_rule_mapping', 'zr1_price_rules', 'zr1_rule_groups',
+    'zr1_rule_group_members', 'zr1_exclusive_groups', 'zr1_exclusive_members', 'zr1_variant_overrides',
+    'zr1x_options', 'zr1x_ovs', 'zr1x_rule_mapping', 'zr1x_price_rules', 'zr1x_rule_groups',
+    'zr1x_rule_group_members', 'zr1x_exclusive_groups', 'zr1x_exclusive_members', 'zr1x_variant_overrides',
+]
+
 payload = {
     'sheetnames': wb.sheetnames,
     'lt_headers': headers('lt_interiors'),
@@ -51,6 +77,8 @@ payload = {
     'model_master_rows': records('model_master'),
     'model_variant_rows': records('model_variants'),
     'model_source_rows': records('model_workbook_sources'),
+    'canonical_source_headers': {role: headers(sheet) for role, sheet in canonical_source_sheets.items()},
+    'future_source_sheet_details': {sheet: sheet_details(sheet) for sheet in future_source_sheets},
 }
 print(json.dumps(payload))
 `);
@@ -182,6 +210,36 @@ test("future Corvette model metadata is scaffolded inactive against shared LZ in
       assert.equal(sourceRow.sheet_name, sheetName);
       assert.equal(sourceRow.active, false, `${modelKey}.${sourceRole} should stay inactive`);
     }
+  }
+});
+
+test("future Corvette normalized source sheets exist as empty Grand Sport-compatible shells", () => {
+  const roleBySuffix = {
+    options: "options",
+    ovs: "ovs",
+    rule_mapping: "rule_mapping",
+    price_rules: "price_rules",
+    rule_groups: "rule_groups",
+    rule_group_members: "rule_group_members",
+    exclusive_groups: "exclusive_groups",
+    exclusive_members: "exclusive_members",
+    variant_overrides: "variant_overrides",
+  };
+
+  for (const modelKey of ["z06", "zr1", "zr1x"]) {
+    for (const [suffix, canonicalRole] of Object.entries(roleBySuffix)) {
+      const sheetName = `${modelKey}_${suffix}`;
+      const details = snapshot.future_source_sheet_details[sheetName];
+      assert.ok(details, `${sheetName} missing from future source snapshot`);
+      assert.equal(details.exists, true, `${sheetName} should exist`);
+      assert.equal(details.state, "visible", `${sheetName} should be visible`);
+      assert.deepEqual(details.headers, snapshot.canonical_source_headers[canonicalRole], `${sheetName} headers drifted`);
+      assert.equal(details.max_row, 1, `${sheetName} should only contain a header row`);
+    }
+  }
+
+  for (const row of snapshot.model_source_rows.filter((row) => ["z06", "zr1", "zr1x"].includes(row.model_key))) {
+    assert.equal(row.active, false, `${row.model_key}.${row.source_role} should remain inactive after sheet scaffolding`);
   }
 });
 
