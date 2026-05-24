@@ -972,6 +972,12 @@ test("Grand Sport workbook default_selected rows seed and reconcile defaults gen
 
   const order = runtime.currentOrder();
   assert.equal(order.auto_added_options.some((item) => item.rpo === "J57"), true, "FEY should auto-add J57");
+  assert.equal(order.auto_added_options.some((item) => item.rpo === "T0F" && item.price === 0), true, "FEY should auto-add T0F at $0");
+  assert.equal(order.auto_added_options.some((item) => item.rpo === "CFZ" && item.price === 0), true, "FEY should auto-add CFZ at $0 through T0F");
+  assert.equal(runtime.optionPrice("opt_t0f_001"), 0, "FEY should keep the T0F price override");
+  assert.equal(runtime.computeAutoAdded().has("opt_t0f_001"), true, "FEY should keep T0F in the auto-added set");
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0f_001"));
+  assert.equal(runtime.computeAutoAdded().has("opt_t0f_001"), true, "T0F should remain auto-added while FEY includes it");
   assert.equal(order.selected_options.some((item) => item.rpo === "J6D"), true, "FEY auto-added J57 should soft-default grey calipers into selected RPOs");
   assert.equal(order.auto_added_options.some((item) => item.rpo === "J6D"), false, "grey calipers should not be hard auto-added");
   assert.equal(order.selected_options.some((item) => item.rpo === "J6A"), false, "J57 should replace default black calipers");

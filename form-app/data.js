@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-05-24T16:32:40+00:00"
+          "generated_at": "2026-05-24T18:37:59+00:00"
         },
         "variants": [
           {
@@ -56161,7 +56161,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-05-23T20:31:31+00:00",
+          "generated_at": "2026-05-24T18:37:57+00:00",
           "status": "draft_not_runtime_active"
         },
         "variants": [
@@ -98925,6 +98925,21 @@ window.CORVETTE_FORM_DATA = {
             "disabled_reason": "Only Grand Sport Heritage Center Stripes are available with Z15 Grand Sport Heritage Graphics.",
             "active": "True",
             "notes": "Replaces repeated hash-mark conflict rows after grouped exclusions are wired in runtime."
+          },
+          {
+            "group_id": "gs_group_t0f_z52_requirement",
+            "group_type": "requires_any",
+            "source_id": "opt_t0f_001",
+            "target_ids": [
+              "opt_feb_001",
+              "opt_fey_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "Requires FEB Z52 Sport Performance Package or FEY Z52 Track Performance Package.",
+            "active": "True",
+            "notes": "T0F is available with FEB plus required J57, or included by FEY."
           }
         ],
         "exclusiveGroups": [
@@ -100601,25 +100616,6 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "runtime_action": "active",
             "source_note": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package.",
-            "review_flag": "False"
-          },
-          {
-            "rule_id": "gs_rule_opt_t0f_001_requires_opt_feb_001",
-            "source_id": "opt_t0f_001",
-            "rule_type": "requires",
-            "target_id": "opt_feb_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_perf_aero_001",
-            "target_section": "sec_perf_z52_001",
-            "source_selection_mode": "single_select_req",
-            "target_selection_mode": "single_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Requires FEB Z52 Sport Performance Package.",
-            "auto_add": "False",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package.",
             "review_flag": "False"
           },
           {
@@ -111390,7 +111386,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "197 active compatibility rules exported from grandSport_rule_mapping."
+            "message": "196 active compatibility rules exported from grandSport_rule_mapping."
           },
           {
             "check_id": "interior_contract",

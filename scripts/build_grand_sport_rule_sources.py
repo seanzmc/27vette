@@ -96,7 +96,12 @@ def runtime_available_option_ids(options: list[dict[str, str]], status_rows: lis
     }
 
 
-def runtime_rule_rows(workbook_rules: list[dict[str, str]], runtime_option_ids: set[str], grouped_excludes: set[tuple[str, str]]) -> list[dict[str, str]]:
+def runtime_rule_rows(
+    workbook_rules: list[dict[str, str]],
+    runtime_option_ids: set[str],
+    grouped_excludes: set[tuple[str, str]],
+    grouped_requires: set[tuple[str, str]],
+) -> list[dict[str, str]]:
     rows: list[dict[str, str]] = []
     for row in workbook_rules:
         if not runtime_authored_rule(row):
@@ -114,6 +119,8 @@ def runtime_rule_rows(workbook_rules: list[dict[str, str]], runtime_option_ids: 
             and (source_id, target_id) in grouped_excludes
             and row.get("generation_action", "") != "preserve_runtime_exclude"
         ):
+            continue
+        if row.get("rule_type", "").lower() == "requires" and (source_id, target_id) in grouped_requires:
             continue
         rows.append(row)
     return rows
@@ -809,6 +816,7 @@ def write_rule_audit(
 ) -> dict[str, str]:
     exclusive_group_excludes = exclusive_group_pairs(exclusive_groups, exclusive_group_members)
     rule_group_excludes = rule_group_pairs(rule_groups, rule_group_members, "excludes_any")
+    rule_group_requires = rule_group_pairs(rule_groups, rule_group_members, "requires_any")
     grouped_excludes = exclusive_group_excludes | rule_group_excludes
     duplicate_keys = [key for key, count in Counter(full_rule_key(row) for row in workbook_rules).items() if count > 1]
     options_by_id = {row.get("option_id", ""): row for row in all_options if row.get("option_id", "")}
@@ -838,13 +846,14 @@ def write_rule_audit(
         and (row.get("source_id", ""), row.get("target_id", "")) in grouped_excludes
     ]
     runtime_ids = runtime_available_option_ids(options, status_rows, tuple(config.variant_ids))
-    runtime_rows = runtime_rule_rows(workbook_rules, runtime_ids, grouped_excludes)
+    runtime_rows = runtime_rule_rows(workbook_rules, runtime_ids, grouped_excludes, rule_group_requires)
     omitted_inactive_or_unemitted = [
         row
         for row in annotated_rules
         if not runtime_authored_rule(row)
         or ((row.get("source_type", "option") or "option") == "option" and row.get("source_id", "") not in runtime_ids)
         or ((row.get("target_type", "option") or "option") == "option" and row.get("target_id", "") not in runtime_ids)
+        or (row.get("rule_type", "").lower() == "requires" and (row.get("source_id", ""), row.get("target_id", "")) in rule_group_requires)
     ]
     origin_counts = Counter(row["_audit_origin"] for row in annotated_rules)
     audit = {
@@ -874,6 +883,7 @@ def write_rule_audit(
             "ruleGroups": len(rule_groups),
             "ruleGroupMembers": len(rule_group_members),
             "groupedExclusionPairs": len(rule_group_excludes),
+            "groupedRequirementPairs": len(rule_group_requires),
             "duplicateSemanticRuleKeys": len(duplicate_semantic_rule_keys),
             "exactDuplicateRuleRows": len(duplicate_semantic_rule_keys),
             "overlappingScopedRuleRows": len(overlapping_scoped_rule_rows),
