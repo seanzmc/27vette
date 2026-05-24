@@ -1,3 +1,5 @@
+# Schema Review - Validate
+
 Review complete. I treated this as report/spec review only and made no edits.
 
     What I verified:
@@ -7,7 +9,8 @@ Review complete. I treated this as report/spec review only and made no edits.
       returned status: valid, issue_count: 0.
     - The cited workbook/runtime/generator issues are mostly valid against the current repo.
 
-    Verdict:
+## Verdict:
+
     The attached findings are directionally correct and useful. I would tighten them in two places:
 
     1. The codebase is not purely “two-model hardcoded” anymore.
@@ -36,7 +39,7 @@ Review complete. I treated this as report/spec review only and made no edits.
 
        The model_variants metadata table is therefore the right place to explicitly bind those IDs to model keys.
 
-    Validated findings by priority:
+## Validated findings by priority:
 
     P1 valid: schema validation is still model/sheet-name hardcoded
     Evidence:
@@ -127,7 +130,7 @@ Review complete. I treated this as report/spec review only and made no edits.
     Correction:
     - The existing ModelConfig shape is reusable, but model discovery and command entrypoints are still specific.
 
-    Recommended implementation spec
+## Recommended implementation spec
 
     Title:
     Prepare repeatable multi-model schema/generator/runtime substrate for Z06, ZR1, and ZR1X
@@ -236,9 +239,10 @@ Review complete. I treated this as report/spec review only and made no edits.
     - Do not remove runtime fallbacks until generated data exists for all promoted models.
     - Do not seed copied compatibility rules until target option IDs have been resolved.
 
-    Recommended phased fix path:
+## Recommended phased fix path:
 
-    Phase 1: Metadata substrate and validation discovery
+### Phase 1: Metadata substrate and validation discovery
+
     Goal:
     Make validation understand active workbook metadata without changing generated app behavior.
 
@@ -260,7 +264,8 @@ Review complete. I treated this as report/spec review only and made no edits.
     - .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
     - full current test suite if validator tests are added.
 
-    Phase 2: LZ interior source ownership
+### Phase 2: LZ interior source ownership
+
     Goal:
     Let a model config/metadata row choose lt_interiors vs LZ_Interiors.
 
@@ -282,7 +287,8 @@ Review complete. I treated this as report/spec review only and made no edits.
     - node --test tests/grand-sport-draft-data.test.mjs
     - node --test tests/grand-sport-contract-preview.test.mjs
 
-    Phase 3: Workbook-owned model presentation metadata
+### Phase 3: Workbook-owned model presentation metadata
+
     Goal:
     Move vehicleSetupHighlights business/presentation facts out of form-app/app.js.
 
@@ -312,7 +318,8 @@ Review complete. I treated this as report/spec review only and made no edits.
     - node --test tests/multi-model-runtime-switching.test.mjs
     - node --test tests/stingray-form-regression.test.mjs
 
-    Phase 4: Runtime business exception migration
+### Phase 4: Runtime business exception migration
+
     Goal:
     Remove choice.rpo === "GBA" && rule.source_id === "opt_zyc_001" from runtime JS.
 
@@ -335,7 +342,8 @@ Review complete. I treated this as report/spec review only and made no edits.
     - node --test tests/stingray-form-regression.test.mjs
     - manual smoke of selecting GBA and ZYC-related option paths
 
-    Phase 5: Generic model draft generator
+### Phase 5: Generic model draft generator
+
     Goal:
     Allow a command to generate a draft contract for any workbook-backed model key.
 
@@ -358,7 +366,8 @@ Review complete. I treated this as report/spec review only and made no edits.
     - compare Grand Sport draft artifact parity
     - Grand Sport test suite
 
-    Phase 6: Generic registry promotion
+### Phase 6: Generic registry promotion
+
     Goal:
     Replace two-model registry building with a metadata-driven promoted-model registry.
 
