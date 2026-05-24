@@ -30,6 +30,7 @@ BOOLEAN_COLUMNS: dict[str, tuple[str, ...]] = {
     "LZ_Interiors": ("active_for_stingray", "requires_r6x"),
     "model_interior_scope": ("active",),
     "interior_components": ("active",),
+    "model_registry_promotion": ("promoted_to_runtime", "default_model", "active"),
 }
 
 PRICE_COLUMNS: dict[str, tuple[str, ...]] = {
@@ -186,6 +187,20 @@ RULE_REPLACEMENT_ACTIONS: set[str] = {
 }
 
 DRAFT_ONLY_CHOICE_FIELDS: set[str] = {"source_option_name", "source_description", "text_cleanup_notes"}
+
+MODEL_REGISTRY_PROMOTION_HEADERS: tuple[str, ...] = (
+    "model_key",
+    "registry_key",
+    "promoted_to_runtime",
+    "default_model",
+    "artifact_path",
+    "artifact_type",
+    "legacy_alias",
+    "active",
+    "display_order",
+    "notes",
+)
+VALID_REGISTRY_PROMOTION_ARTIFACT_TYPES: set[str] = {"current_generation", "draft_artifact"}
 
 
 @dataclass
@@ -358,6 +373,119 @@ def sheets_by_role(source_graph: dict[str, dict[str, str]]) -> dict[str, list[st
     return by_role
 
 
+def validate_registry_promotion_metadata(wb, issues: list[SchemaIssue]) -> None:
+    if "model_registry_promotion" not in wb.sheetnames:
+        return
+
+    headers = nonblank_headers(wb["model_registry_promotion"])
+    if headers != list(MODEL_REGISTRY_PROMOTION_HEADERS):
+        add_issue(
+            issues,
+            "error",
+            "registry_promotion_header_drift",
+            sheet="model_registry_promotion",
+            value={"expected": list(MODEL_REGISTRY_PROMOTION_HEADERS), "actual": headers},
+            message="model_registry_promotion headers must match the workbook-owned runtime promotion contract.",
+        )
+
+    model_rows = {
+        clean_text(row.get("model_key")).lower(): row
+        for _, row in records(wb["model_master"])
+        if clean_text(row.get("model_key"))
+    }
+    promoted_rows: list[tuple[int, dict[str, Any]]] = []
+    seen_registry_keys: set[str] = set()
+    for row_number, row in records(wb["model_registry_promotion"]):
+        if not truthy(row.get("active"), default=True) or not truthy(row.get("promoted_to_runtime"), default=False):
+            continue
+        promoted_rows.append((row_number, row))
+        model_key = clean_text(row.get("model_key")).lower()
+        registry_key = clean_text(row.get("registry_key"))
+        artifact_path = clean_text(row.get("artifact_path"))
+        artifact_type = clean_text(row.get("artifact_type")) or "draft_artifact"
+        if registry_key in seen_registry_keys:
+            add_issue(
+                issues,
+                "error",
+                "registry_promotion_duplicate_registry_key",
+                sheet="model_registry_promotion",
+                row=row_number,
+                column="registry_key",
+                value=registry_key,
+                message=f"Duplicate promoted runtime registry_key {registry_key!r}.",
+            )
+        seen_registry_keys.add(registry_key)
+        model_row = model_rows.get(model_key)
+        if not model_row:
+            add_issue(
+                issues,
+                "error",
+                "registry_promotion_unknown_model",
+                sheet="model_registry_promotion",
+                row=row_number,
+                column="model_key",
+                value=model_key,
+                message=f"Promoted runtime model {model_key!r} is not present in model_master.",
+            )
+            continue
+        expected_registry_key = clean_text(model_row.get("registry_key")) or model_key
+        if registry_key != expected_registry_key:
+            add_issue(
+                issues,
+                "error",
+                "registry_promotion_registry_key_mismatch",
+                sheet="model_registry_promotion",
+                row=row_number,
+                column="registry_key",
+                value={"model_key": model_key, "registry_key": registry_key, "expected": expected_registry_key},
+                message=f"Promoted runtime registry_key for {model_key!r} must match model_master.registry_key {expected_registry_key!r}.",
+            )
+        if not truthy(model_row.get("active"), default=True):
+            add_issue(
+                issues,
+                "error",
+                "registry_promotion_inactive_model",
+                sheet="model_registry_promotion",
+                row=row_number,
+                column="model_key",
+                value=model_key,
+                message=f"Promoted runtime model {model_key!r} is inactive in model_master.",
+            )
+        if artifact_type not in VALID_REGISTRY_PROMOTION_ARTIFACT_TYPES:
+            add_issue(
+                issues,
+                "error",
+                "registry_promotion_unknown_artifact_type",
+                sheet="model_registry_promotion",
+                row=row_number,
+                column="artifact_type",
+                value=artifact_type,
+                message=f"Unsupported runtime promotion artifact_type {artifact_type!r}.",
+            )
+        if artifact_type != "current_generation" and not artifact_path:
+            add_issue(
+                issues,
+                "error",
+                "registry_promotion_missing_artifact_path",
+                sheet="model_registry_promotion",
+                row=row_number,
+                column="artifact_path",
+                value={"model_key": model_key, "artifact_type": artifact_type},
+                message="Promoted non-current-generation runtime models must provide artifact_path.",
+            )
+
+    default_count = sum(1 for _, row in promoted_rows if truthy(row.get("default_model"), default=False))
+    if promoted_rows and default_count != 1:
+        add_issue(
+            issues,
+            "error",
+            "registry_promotion_default_count",
+            sheet="model_registry_promotion",
+            value={"promoted_rows": len(promoted_rows), "default_count": default_count},
+            message="model_registry_promotion must have exactly one active promoted default model.",
+        )
+
+
 def merge_sheet_columns(
     base: dict[str, tuple[str, ...]],
     by_role: dict[str, list[str]],
@@ -390,6 +518,7 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
 
         source_graph = metadata_source_graph(wb, issues)
         source_sheets_by_role = sheets_by_role(source_graph)
+        validate_registry_promotion_metadata(wb, issues)
 
         for left, right in HEADER_PAIRS:
             if left not in wb.sheetnames or right not in wb.sheetnames:

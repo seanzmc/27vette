@@ -20,6 +20,7 @@ from corvette_form_generator.mapping import (
 )
 from corvette_form_generator.model_configs import GRAND_SPORT_MODEL, STINGRAY_MODEL
 from corvette_form_generator.output import write_app_data_registry, write_json_output
+from corvette_form_generator.registry_promotion import build_registry_from_promotions
 from corvette_form_generator.runtime_metadata import (
     load_context_sections,
     load_default_selection_rules,
@@ -216,8 +217,23 @@ def refresh_grand_sport_registry_source() -> None:
     return
 
 
-def build_app_data_registry(stingray_data: dict[str, Any]) -> dict[str, Any]:
+def build_app_data_registry(stingray_data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, str]]:
     model_assets = load_model_asset_map()
+    wb = load_workbook(WORKBOOK_PATH, read_only=True, data_only=True)
+    try:
+        promoted_registry = build_registry_from_promotions(
+            wb,
+            current_model_key=MODEL_CONFIG.model_key,
+            current_data=stingray_data,
+            model_assets=model_assets,
+            root=ROOT,
+        )
+    finally:
+        wb.close()
+    if promoted_registry is not None:
+        legacy_aliases = promoted_registry.pop("legacyAliases", {})
+        return promoted_registry, legacy_aliases
+
     stingray_key = registry_model_key(MODEL_CONFIG.model_key)
     models = {
         stingray_key: model_registry_entry(
@@ -240,7 +256,7 @@ def build_app_data_registry(stingray_data: dict[str, Any]) -> dict[str, Any]:
     return {
         "defaultModelKey": "stingray",
         "models": models,
-    }
+    }, {"STINGRAY_FORM_DATA": "stingray"}
 
 def step_for_section(
     section_id: str,
@@ -1501,10 +1517,11 @@ def main() -> None:
     json_path = OUTPUT_DIR / "stingray-form-data.json"
     write_json_output(json_path, data)
     refresh_grand_sport_registry_source()
+    app_registry, legacy_aliases = build_app_data_registry(data)
     write_app_data_registry(
         APP_DIR / "data.js",
-        build_app_data_registry(data),
-        legacy_aliases={"STINGRAY_FORM_DATA": "stingray"},
+        app_registry,
+        legacy_aliases=legacy_aliases,
     )
     csv_path = OUTPUT_DIR / "stingray-form-data.csv"
     with csv_path.open("w", newline="", encoding="utf-8") as handle:

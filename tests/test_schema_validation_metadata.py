@@ -243,6 +243,92 @@ class SchemaValidationMetadataTests(unittest.TestCase):
         self.assertFalse(any(issue.sheet in {"z06_options", "z06_ovs"} for issue in issues), issues)
         self.assertFalse(any(issue.check_id == "source_role_header_drift" for issue in issues), issues)
 
+    def test_model_registry_promotion_requires_exactly_one_promoted_default(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[
+                {"model_key": "stingray", "registry_key": "stingray", "active": True},
+                {"model_key": "grand_sport", "registry_key": "grandSport", "active": True},
+            ],
+            extra_sheets={
+                "model_registry_promotion": (
+                    [
+                        "model_key",
+                        "registry_key",
+                        "promoted_to_runtime",
+                        "default_model",
+                        "artifact_path",
+                        "artifact_type",
+                        "legacy_alias",
+                        "active",
+                        "display_order",
+                        "notes",
+                    ],
+                    [
+                        {
+                            "model_key": "stingray",
+                            "registry_key": "stingray",
+                            "promoted_to_runtime": True,
+                            "default_model": False,
+                            "artifact_type": "current_generation",
+                            "active": True,
+                            "display_order": 1,
+                        },
+                        {
+                            "model_key": "grand_sport",
+                            "registry_key": "grandSport",
+                            "promoted_to_runtime": True,
+                            "default_model": False,
+                            "artifact_path": "form-output/inspection/grand-sport-form-data-draft.json",
+                            "artifact_type": "draft_artifact",
+                            "active": True,
+                            "display_order": 2,
+                        },
+                    ],
+                )
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(any(issue.check_id == "registry_promotion_default_count" for issue in issues), issues)
+
+    def test_model_registry_promotion_rejects_future_promoted_registry_key_drift(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "z06", "registry_key": "z06", "active": False}],
+            extra_sheets={
+                "model_registry_promotion": (
+                    [
+                        "model_key",
+                        "registry_key",
+                        "promoted_to_runtime",
+                        "default_model",
+                        "artifact_path",
+                        "artifact_type",
+                        "legacy_alias",
+                        "active",
+                        "display_order",
+                        "notes",
+                    ],
+                    [
+                        {
+                            "model_key": "z06",
+                            "registry_key": "wrong",
+                            "promoted_to_runtime": True,
+                            "default_model": True,
+                            "artifact_path": "form-output/inspection/z06-form-data-draft.json",
+                            "artifact_type": "draft_artifact",
+                            "active": True,
+                            "display_order": 3,
+                        }
+                    ],
+                )
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(any(issue.check_id == "registry_promotion_registry_key_mismatch" for issue in issues), issues)
+
 
 if __name__ == "__main__":
     unittest.main()
