@@ -1,17 +1,17 @@
 # Future Model Source Preview
 
-Generated: 2026-05-24T15:57:27+00:00
+Generated: 2026-05-25T02:01:03+00:00
 
 Inspection-only: workbook source sheets were not written, model activation was not changed, and runtime app data was not generated.
 
 ## z06
 
-- Archive sheet: `archive_Z06_Ingest`
+- Source mode: raw order-guide sheets
 - Future option target: `z06_options`
 - Future OVS target: `z06_ovs`
-- Archive rows: 363
-- Proposed option rows: 363
-- Proposed OVS rows: 2178
+- Raw source blocks: 334
+- Proposed option rows: 334
+- Proposed OVS rows: 2004
 
 Variant columns:
 - `1LZ Coupe` -> `1lz_h07`
@@ -22,74 +22,78 @@ Variant columns:
 - `3LZ Convertible` -> `3lz_h67`
 
 Status counts:
-- available: 910
-- standard: 990
-- unavailable: 278
+- available: 870
+- standard: 902
+- unavailable: 232
 
 Section resolution counts:
-- conflict: 14
-- resolved: 240
-- unresolved: 109
+- conflict: 13
+- resolved: 209
+- unresolved: 112
 
 Review counts:
-- resolved: 240
-- section_conflict: 14
-- section_unresolved: 109
-- missing_rpo: 52
-- duplicate_rpo: 156
+- resolved: 57
+- section_conflict: 13
+- section_unresolved: 112
+- missing_rpo: 51
+- duplicate_rpo: 114
 - blank_variant_status: 0
 - unknown_status: 0
 - price_type_issue: 0
 - candidate_id_collision: 0
+- price_schedule_multiple_candidates: 9
+- dealer_installed_status: 56
+- included_in_equipment_group: 23
+- included_in_equipment_group_upgradeable: 0
 
 Top unresolved RPO/name examples:
-- row 11: DY0 — Display hood
-- row 34: N3W — Steering wheel
-- row 50: CFV — Ground effects
-- row 65: LT6 — Engine
-- row 73: R8E — Gas guzzler tax
-- row 75: SOE — Wheels
-- row 80: FE6 — Suspension
-- row 83: M1M — Transmission
+- z06_standard_raw:25-25: DY0 — Display hood, Carbon Fiber, located above the Driver Information Center display
+- z06_standard_raw:63-63: N3W — Steering wheel, carbon fiber and leather-wrapped
+- z06_standard_raw:83-86: CFV — Ground effects, visible carbon fiber
+- z06_standard_raw:104-104: LT6 — Engine, 5.5L V8 DI, high-output, Variable Valve Timing (VVT), (670 hp [499.6 kW] @ 8400 rpm, 460 lb-ft of torque [623.8 N-m] @ 6300 rpm)
+- z06_standard_raw:115-115: R8E — Gas guzzler tax, mandatory federal tax added to price of vehicle
+- z06_standard_raw:120-120: SOE — Wheels, 20" x 10" (50.8 cm x 25.4 cm) front and 21" x 13" (53.3 cm x 33 cm) rear Spider design, Titanium Satin forged aluminum
+- z06_standard_raw:125-125: FE6 — Suspension, performance with Magnetic Selective Ride Control
+- z06_standard_raw:128-128: M1M — Transmission, 8-speed dual clutch, includes manual and auto modes
 
 Top section conflicts:
-- row 25: UQT — Performance data and video recorder; candidates: sec_2lte_001, sec_inte_001
-- row 29: AQ9 — Seats; candidates: sec_1lte_001, sec_2lte_001, sec_seat_002
-- row 77: B4Z — Performance Traction Management; candidates: sec_incl_001, sec_stan_001
-- row 78: G0K — Rear axle; candidates: sec_incl_001, sec_stan_001
-- row 120: SC7 — LPO, Roof panel storage pouch; candidates: sec_lpoe_001, sec_lpoi_001
-- row 133: UQT — Performance data and video recorder; candidates: sec_2lte_001, sec_inte_001
-- row 145: AQ9 — Seats; candidates: sec_1lte_001, sec_2lte_001, sec_seat_002
-- row 146: AH2 — Seats; candidates: sec_3lte_001, sec_seat_002
+- z06_standard_raw:51-51: UQT — Performance data and video recorder
+- z06_standard_raw:58-58: AQ9 — Seats, GT1 bucket
+- z06_standard_raw:122-122: B4Z — Performance Traction Management
+- z06_standard_raw:123-123: G0K — Rear axle, 5.56 ratio
+- z06_intextmec_raw:73-76: SC7 — LPO, Roof panel storage pouch, Genuine Corvette Accessory
+- z06_intextmec_raw:119-119: UQT — Performance data and video recorder
+- z06_intextmec_raw:160-160: AQ9 — Seats, GT1 bucket
+- z06_intextmec_raw:161-161: AH2 — Seats, GT2 bucket
 
 Missing-RPO examples:
-- row 4: <missing RPO> — Air filtration system with pollen filter
-- row 9: <missing RPO> — Console
-- row 10: <missing RPO> — Cruise control
-- row 12: <missing RPO> — Door locks
-- row 13: <missing RPO> — Floor mats
-- row 15: <missing RPO> — Hatch release
-- row 17: <missing RPO> — Keyless Open and Start
-- row 19: <missing RPO> — Lighting
+- z06_standard_raw:15-15: <missing RPO> — Air filtration system with pollen filter
+- z06_standard_raw:23-23: <missing RPO> — Console, floor, 2 cup holders, auxiliary power outlet, 3 USB ports (2 type-C, 1 type-A), passenger grab handle and lockable storage
+- z06_standard_raw:24-24: <missing RPO> — Cruise control, electronic with set and resume speed
+- z06_standard_raw:26-26: <missing RPO> — Door locks, power programmable with lockout protection
+- z06_standard_raw:27-27: <missing RPO> — Floor mats, carpeted
+- z06_standard_raw:29-29: <missing RPO> — Hatch release, push button open
+- z06_standard_raw:31-31: <missing RPO> — Keyless Open and Start, includes 2 remote transmitters that enable automatic door unlock and open by touching door switch
+- z06_standard_raw:33-33: <missing RPO> — Lighting, interior, theater dimming
 
 Duplicate-RPO examples:
-- row 2: AJ7 — Airbags
-- row 3: CJ2 — Air conditioning
-- row 5: IVE — Infotainment system with Google Built-In
-- row 6: UQS — Audio system feature
-- row 7: U2K — SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road.
-- row 8: U80 — Compass
-- row 11: DY0 — Display hood
-- row 14: UEU — Forward Collision Alert
+- z06_standard_raw:10-13: AJ7 — Airbags, frontal and side-impact, driver and passenger with Passenger Sensing System
+- z06_standard_raw:14-14: CJ2 — Air conditioning, dual-zone automatic climate control, individual climate settings for driver and passenger, with outside temperature display
+- z06_standard_raw:16-16: IVE — Infotainment system with Google Built-In,12.7" diagonal center console display, 14" diagonal Driver Information Center, and 6.6" diagonal auxiliary touchscreen, with Google Built-In compatibility, including navigation capability, connected apps, Natural Voice Recognition. Phone integration for Wireless Apple CarPlay/Wireless Android Auto for compatible phones
+- z06_standard_raw:17-17: UQS — Audio system feature, Bose Premium 10-speaker system
+- z06_standard_raw:18-21: U2K — SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road.
+- z06_standard_raw:22-22: U80 — Compass, digital
+- z06_standard_raw:25-25: DY0 — Display hood, Carbon Fiber, located above the Driver Information Center display
+- z06_standard_raw:28-28: UEU — Forward Collision Alert
 
 ## zr1
 
-- Archive sheet: `archive_ZR1_Ingest`
+- Source mode: raw order-guide sheets
 - Future option target: `zr1_options`
 - Future OVS target: `zr1_ovs`
-- Archive rows: 336
-- Proposed option rows: 336
-- Proposed OVS rows: 1344
+- Raw source blocks: 305
+- Proposed option rows: 305
+- Proposed OVS rows: 1220
 
 Variant columns:
 - `1LZ Coupe` -> `1lz_r07`
@@ -98,74 +102,78 @@ Variant columns:
 - `3LZ Convertible` -> `3lz_r67`
 
 Status counts:
-- available: 450
-- standard: 684
-- unavailable: 210
+- available: 414
+- standard: 634
+- unavailable: 172
 
 Section resolution counts:
-- conflict: 14
-- resolved: 212
+- conflict: 13
+- resolved: 182
 - unresolved: 110
 
 Review counts:
-- resolved: 212
-- section_conflict: 14
+- resolved: 41
+- section_conflict: 13
 - section_unresolved: 110
-- missing_rpo: 52
-- duplicate_rpo: 162
+- missing_rpo: 51
+- duplicate_rpo: 122
 - blank_variant_status: 0
 - unknown_status: 0
 - price_type_issue: 0
 - candidate_id_collision: 0
+- price_schedule_multiple_candidates: 4
+- dealer_installed_status: 40
+- included_in_equipment_group: 21
+- included_in_equipment_group_upgradeable: 0
 
 Top unresolved RPO/name examples:
-- row 11: DY0 — Display hood
-- row 34: N3W — Steering wheel
-- row 46: CFC — Convertible top
-- row 50: CFV — Ground effects
-- row 56: J58 — Brakes
-- row 57: J59 — Brakes
-- row 64: LT7 — Engine
-- row 65: HP1 — Front axle
+- zr1_zr1x_standard_raw:25-25: DY0 — Display hood, Carbon Fiber, located above the Driver Information Center display
+- zr1_zr1x_standard_raw:63-63: N3W — Steering wheel, carbon fiber and leather-wrapped
+- zr1_zr1x_standard_raw:75-75: CFC — Convertible top, retractable, power-folding hard top, visible carbon fiber, remote control (down only), includes power glass rear window with integral defogger; Nacelles, A-pillars, and header are Carbon-Flash painted (body-color when (GBA) Black exterior color is selected)
+- zr1_zr1x_standard_raw:82-82: CFV — Ground effects, visible carbon fiber
+- zr1_zr1x_standard_raw:88-88: J58 — Brakes, 4-wheel antilock, 4-wheel disc, carbon ceramic, ZR1-specific
+- zr1_zr1x_standard_raw:89-92: J59 — Brakes, 4-wheel antilock, 4-wheel disc, carbon ceramic, 10-piston front, 6-piston rear
+- zr1_zr1x_standard_raw:99-99: LT7 — Engine, 5.5L V8 Twin Turbo, TPI, DI, high-output, Variable Valve Timing (VVT) (1064 hp [793 kW] @ 7000 rpm, 828 lb-ft of torque [1123 N-m] @ 6000 rpm)
+- zr1_zr1x_standard_raw:100-100: HP1 — Front axle, electrified propulsion (186 hp [138.7 kW], 145 lb-ft of front torque [196.6 N-m]). 1250 (932.1 kW) total combined hp with LT7 engine
 
 Top section conflicts:
-- row 25: UQT — Performance data and video recorder; candidates: sec_2lte_001, sec_inte_001
-- row 29: AQ9 — Seats; candidates: sec_1lte_001, sec_2lte_001, sec_seat_002
-- row 77: B4Z — Performance Traction Management; candidates: sec_incl_001, sec_stan_001
-- row 78: G0K — Rear axle; candidates: sec_incl_001, sec_stan_001
-- row 123: SC7 — LPO, Roof panel storage pouch; candidates: sec_lpoe_001, sec_lpoi_001
-- row 136: UQT — Performance data and video recorder; candidates: sec_2lte_001, sec_inte_001
-- row 148: AQ9 — Seats; candidates: sec_1lte_001, sec_2lte_001, sec_seat_002
-- row 149: AH2 — Seats; candidates: sec_3lte_001, sec_seat_002
+- zr1_zr1x_standard_raw:51-51: UQT — Performance data and video recorder
+- zr1_zr1x_standard_raw:58-58: AQ9 — Seats, GT1 bucket
+- zr1_zr1x_standard_raw:115-115: B4Z — Performance Traction Management
+- zr1_zr1x_standard_raw:116-116: G0K — Rear axle, 5.56 ratio
+- zr1_zr1x_intextmec_raw:73-76: SC7 — LPO, Roof panel storage pouch, Genuine Corvette Accessory
+- zr1_zr1x_intextmec_raw:119-119: UQT — Performance data and video recorder
+- zr1_zr1x_intextmec_raw:159-159: AQ9 — Seats, GT1 bucket
+- zr1_zr1x_intextmec_raw:160-160: AH2 — Seats, GT2 bucket
 
 Missing-RPO examples:
-- row 4: <missing RPO> — Air filtration system with pollen filter
-- row 9: <missing RPO> — Console
-- row 10: <missing RPO> — Cruise control
-- row 12: <missing RPO> — Door locks
-- row 13: <missing RPO> — Floor mats
-- row 15: <missing RPO> — Hatch release
-- row 17: <missing RPO> — Keyless Open and Start
-- row 19: <missing RPO> — Lighting
+- zr1_zr1x_standard_raw:15-15: <missing RPO> — Air filtration system with pollen filter
+- zr1_zr1x_standard_raw:23-23: <missing RPO> — Console, floor, 2 cup holders, auxiliary power outlet, 3 USB ports (2 type-C, 1 type-A), passenger grab handle and lockable storage
+- zr1_zr1x_standard_raw:24-24: <missing RPO> — Cruise control, electronic with set and resume speed
+- zr1_zr1x_standard_raw:26-26: <missing RPO> — Door locks, power programmable with lockout protection
+- zr1_zr1x_standard_raw:27-27: <missing RPO> — Floor mats, carpeted
+- zr1_zr1x_standard_raw:29-29: <missing RPO> — Hatch release, push button open
+- zr1_zr1x_standard_raw:31-31: <missing RPO> — Keyless Open and Start, includes 2 remote transmitters that enable automatic door unlock and open by touching door switch
+- zr1_zr1x_standard_raw:33-33: <missing RPO> — Lighting, interior, theater dimming
 
 Duplicate-RPO examples:
-- row 2: AJ7 — Airbags
-- row 3: CJ2 — Air conditioning
-- row 5: IVE — Infotainment system with Google Built-In
-- row 6: UQS — Audio system feature
-- row 7: U2K — SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road.
-- row 8: U80 — Compass
-- row 11: DY0 — Display hood
-- row 14: UEU — Forward Collision Alert
+- zr1_zr1x_standard_raw:10-13: AJ7 — Airbags, frontal and side-impact, driver and passenger with Passenger Sensing System
+- zr1_zr1x_standard_raw:14-14: CJ2 — Air conditioning, dual-zone automatic climate control, individual climate settings for driver and passenger, with outside temperature display
+- zr1_zr1x_standard_raw:16-16: IVE — Infotainment system with Google Built-In,12.7" diagonal center console display, 14" diagonal Driver Information Center, and 6.6" diagonal auxiliary touchscreen, with Google Built-In compatibility, including navigation capability, connected apps, Natural Voice Recognition. Phone integration for Wireless Apple CarPlay/Wireless Android Auto for compatible phones
+- zr1_zr1x_standard_raw:17-17: UQS — Audio system feature, Bose Premium 10-speaker system
+- zr1_zr1x_standard_raw:18-21: U2K — SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road.
+- zr1_zr1x_standard_raw:22-22: U80 — Compass, digital
+- zr1_zr1x_standard_raw:25-25: DY0 — Display hood, Carbon Fiber, located above the Driver Information Center display
+- zr1_zr1x_standard_raw:28-28: UEU — Forward Collision Alert
 
 ## zr1x
 
-- Archive sheet: `archive_ZR1X_Ingest`
+- Source mode: raw order-guide sheets
 - Future option target: `zr1x_options`
 - Future OVS target: `zr1x_ovs`
-- Archive rows: 337
-- Proposed option rows: 337
-- Proposed OVS rows: 1348
+- Raw source blocks: 305
+- Proposed option rows: 305
+- Proposed OVS rows: 1220
 
 Variant columns:
 - `1LZ Coupe` -> `1lz_s07`
@@ -174,65 +182,69 @@ Variant columns:
 - `3LZ Convertible` -> `3lz_s67`
 
 Status counts:
-- available: 442
-- standard: 692
-- unavailable: 214
+- available: 406
+- standard: 642
+- unavailable: 172
 
 Section resolution counts:
-- conflict: 14
-- resolved: 212
-- unresolved: 111
+- conflict: 13
+- resolved: 182
+- unresolved: 110
 
 Review counts:
-- resolved: 212
-- section_conflict: 14
-- section_unresolved: 111
-- missing_rpo: 52
-- duplicate_rpo: 164
+- resolved: 42
+- section_conflict: 13
+- section_unresolved: 110
+- missing_rpo: 51
+- duplicate_rpo: 122
 - blank_variant_status: 0
 - unknown_status: 0
 - price_type_issue: 0
 - candidate_id_collision: 0
+- price_schedule_multiple_candidates: 4
+- dealer_installed_status: 39
+- included_in_equipment_group: 21
+- included_in_equipment_group_upgradeable: 0
 
 Top unresolved RPO/name examples:
-- row 11: DY0 — Display hood
-- row 34: N3W — Steering wheel
-- row 46: CFC — Convertible top
-- row 50: CFV — Ground effects
-- row 56: J58 — Brakes
-- row 57: J59 — Brakes
-- row 64: LT7 — Engine
-- row 65: HP1 — Front axle
+- zr1_zr1x_standard_raw:25-25: DY0 — Display hood, Carbon Fiber, located above the Driver Information Center display
+- zr1_zr1x_standard_raw:63-63: N3W — Steering wheel, carbon fiber and leather-wrapped
+- zr1_zr1x_standard_raw:75-75: CFC — Convertible top, retractable, power-folding hard top, visible carbon fiber, remote control (down only), includes power glass rear window with integral defogger; Nacelles, A-pillars, and header are Carbon-Flash painted (body-color when (GBA) Black exterior color is selected)
+- zr1_zr1x_standard_raw:82-82: CFV — Ground effects, visible carbon fiber
+- zr1_zr1x_standard_raw:88-88: J58 — Brakes, 4-wheel antilock, 4-wheel disc, carbon ceramic, ZR1-specific
+- zr1_zr1x_standard_raw:89-92: J59 — Brakes, 4-wheel antilock, 4-wheel disc, carbon ceramic, 10-piston front, 6-piston rear
+- zr1_zr1x_standard_raw:99-99: LT7 — Engine, 5.5L V8 Twin Turbo, TPI, DI, high-output, Variable Valve Timing (VVT) (1064 hp [793 kW] @ 7000 rpm, 828 lb-ft of torque [1123 N-m] @ 6000 rpm)
+- zr1_zr1x_standard_raw:100-100: HP1 — Front axle, electrified propulsion (186 hp [138.7 kW], 145 lb-ft of front torque [196.6 N-m]). 1250 (932.1 kW) total combined hp with LT7 engine
 
 Top section conflicts:
-- row 25: UQT — Performance data and video recorder; candidates: sec_2lte_001, sec_inte_001
-- row 29: AQ9 — Seats; candidates: sec_1lte_001, sec_2lte_001, sec_seat_002
-- row 77: B4Z — Performance Traction Management; candidates: sec_incl_001, sec_stan_001
-- row 78: G0K — Rear axle; candidates: sec_incl_001, sec_stan_001
-- row 123: SC7 — LPO, Roof panel storage pouch; candidates: sec_lpoe_001, sec_lpoi_001
-- row 136: UQT — Performance data and video recorder; candidates: sec_2lte_001, sec_inte_001
-- row 148: AQ9 — Seats; candidates: sec_1lte_001, sec_2lte_001, sec_seat_002
-- row 149: AH2 — Seats; candidates: sec_3lte_001, sec_seat_002
+- zr1_zr1x_standard_raw:51-51: UQT — Performance data and video recorder
+- zr1_zr1x_standard_raw:58-58: AQ9 — Seats, GT1 bucket
+- zr1_zr1x_standard_raw:115-115: B4Z — Performance Traction Management
+- zr1_zr1x_standard_raw:116-116: G0K — Rear axle, 5.56 ratio
+- zr1_zr1x_intextmec_raw:73-76: SC7 — LPO, Roof panel storage pouch, Genuine Corvette Accessory
+- zr1_zr1x_intextmec_raw:119-119: UQT — Performance data and video recorder
+- zr1_zr1x_intextmec_raw:159-159: AQ9 — Seats, GT1 bucket
+- zr1_zr1x_intextmec_raw:160-160: AH2 — Seats, GT2 bucket
 
 Missing-RPO examples:
-- row 4: <missing RPO> — Air filtration system with pollen filter
-- row 9: <missing RPO> — Console
-- row 10: <missing RPO> — Cruise control
-- row 12: <missing RPO> — Door locks
-- row 13: <missing RPO> — Floor mats
-- row 15: <missing RPO> — Hatch release
-- row 17: <missing RPO> — Keyless Open and Start
-- row 19: <missing RPO> — Lighting
+- zr1_zr1x_standard_raw:15-15: <missing RPO> — Air filtration system with pollen filter
+- zr1_zr1x_standard_raw:23-23: <missing RPO> — Console, floor, 2 cup holders, auxiliary power outlet, 3 USB ports (2 type-C, 1 type-A), passenger grab handle and lockable storage
+- zr1_zr1x_standard_raw:24-24: <missing RPO> — Cruise control, electronic with set and resume speed
+- zr1_zr1x_standard_raw:26-26: <missing RPO> — Door locks, power programmable with lockout protection
+- zr1_zr1x_standard_raw:27-27: <missing RPO> — Floor mats, carpeted
+- zr1_zr1x_standard_raw:29-29: <missing RPO> — Hatch release, push button open
+- zr1_zr1x_standard_raw:31-31: <missing RPO> — Keyless Open and Start, includes 2 remote transmitters that enable automatic door unlock and open by touching door switch
+- zr1_zr1x_standard_raw:33-33: <missing RPO> — Lighting, interior, theater dimming
 
 Duplicate-RPO examples:
-- row 2: AJ7 — Airbags
-- row 3: CJ2 — Air conditioning
-- row 5: IVE — Infotainment system with Google Built-In
-- row 6: UQS — Audio system feature
-- row 7: U2K — SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road.
-- row 8: U80 — Compass
-- row 11: DY0 — Display hood
-- row 14: UEU — Forward Collision Alert
+- zr1_zr1x_standard_raw:10-13: AJ7 — Airbags, frontal and side-impact, driver and passenger with Passenger Sensing System
+- zr1_zr1x_standard_raw:14-14: CJ2 — Air conditioning, dual-zone automatic climate control, individual climate settings for driver and passenger, with outside temperature display
+- zr1_zr1x_standard_raw:16-16: IVE — Infotainment system with Google Built-In,12.7" diagonal center console display, 14" diagonal Driver Information Center, and 6.6" diagonal auxiliary touchscreen, with Google Built-In compatibility, including navigation capability, connected apps, Natural Voice Recognition. Phone integration for Wireless Apple CarPlay/Wireless Android Auto for compatible phones
+- zr1_zr1x_standard_raw:17-17: UQS — Audio system feature, Bose Premium 10-speaker system
+- zr1_zr1x_standard_raw:18-21: U2K — SiriusXM with 360L Trial Subscription. SiriusXM with 360L transforms your customers' ride with our most extensive and personalized radio experience on the road.
+- zr1_zr1x_standard_raw:22-22: U80 — Compass, digital
+- zr1_zr1x_standard_raw:25-25: DY0 — Display hood, Carbon Fiber, located above the Driver Information Center display
+- zr1_zr1x_standard_raw:28-28: UEU — Forward Collision Alert
 
 ## Recommended next step
 

@@ -27,7 +27,7 @@ def main() -> int:
     json_path = inspection_dir / "future-model-source-preview.json"
     md_path = inspection_dir / "future-model-source-preview.md"
 
-    wb = load_workbook(WORKBOOK_PATH, data_only=True, read_only=True)
+    wb = load_workbook(WORKBOOK_PATH, data_only=True, read_only=False)
     try:
         preview = build_future_model_preview(wb)
     finally:
