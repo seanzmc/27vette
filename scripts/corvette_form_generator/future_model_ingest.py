@@ -173,6 +173,38 @@ FUTURE_MODEL_SOURCE_REVIEW_HEADERS = (
     *(f"status_note_{variant_id}" for variant_id in RAW_VARIANT_IDS),
 )
 
+OPTION_SOURCE_HEADERS = (
+    "option_id",
+    "rpo",
+    "price",
+    "option_name",
+    "description",
+    "detail_raw",
+    "section_id",
+    "selectable",
+    "display_order",
+    "active",
+    "display_behavior",
+)
+
+OVS_SOURCE_HEADERS = (
+    "option_id",
+    "variant_id",
+    "status",
+)
+
+VALID_SOURCE_STATUSES = {"available", "standard", "unavailable"}
+
+BLOCKING_REVIEW_FLAGS = {
+    "section_conflict",
+    "section_unresolved",
+    "missing_rpo",
+    "blank_variant_status",
+    "unknown_status",
+    "candidate_id_collision",
+    "price_type_issue",
+}
+
 _RAW_STATUS_FLAGS = {
     "D": "dealer_installed_status",
     "■": "included_in_equipment_group",
@@ -764,6 +796,183 @@ def build_source_review_rows(wb) -> list[dict[str, Any]]:
         rows.append(row)
 
     return rows
+
+
+def _split_review_flags(value: Any) -> list[str]:
+    return [flag.strip() for flag in clean(value).split(";") if flag.strip()]
+
+
+def _intish_string(value: Any) -> str:
+    text = clean(value)
+    if not text:
+        return ""
+    numeric = float(text)
+    if numeric.is_integer():
+        return str(int(numeric))
+    return text
+
+
+def _selected_future_model_keys(model_keys: Iterable[str]) -> list[str]:
+    requested = [clean(model_key) for model_key in model_keys if clean(model_key)]
+    if not requested or requested == ["all"]:
+        return list(FUTURE_MODEL_SPECS)
+    if "all" in requested:
+        return list(FUTURE_MODEL_SPECS)
+    unknown = [model_key for model_key in requested if model_key not in FUTURE_MODEL_SPECS]
+    if unknown:
+        raise ValueError(f"Unknown future model key(s): {', '.join(unknown)}")
+    return requested
+
+
+def _section_ids(wb) -> set[str]:
+    return {clean(row.get("section_id")) for row in _rows_from_sheet(wb, "section_master") if clean(row.get("section_id"))}
+
+
+def _current_sheet_row_count(wb, sheet_name: str) -> int:
+    return len(_rows_from_sheet(wb, sheet_name))
+
+
+def _validation_errors_for_approved_row(row: dict[str, Any], spec: FutureModelSpec, section_ids: set[str], duplicate_option_ids: set[str]) -> list[str]:
+    errors: list[str] = []
+    option_id = clean(row.get("approved_option_id"))
+    review_flags = set(_split_review_flags(row.get("review_flags")))
+    blocking_flags = sorted(review_flags & BLOCKING_REVIEW_FLAGS)
+    if blocking_flags:
+        errors.append(f"blocking review flag(s): {', '.join(blocking_flags)}")
+    if "price_schedule_multiple_candidates" in review_flags and clean(row.get("approved_price")):
+        errors.append("price_schedule_multiple_candidates requires blank approved_price")
+    for field in ("approved_option_id", "approved_rpo", "approved_option_name", "approved_section_id"):
+        if not clean(row.get(field)):
+            errors.append(f"{field} is required")
+    section_id = clean(row.get("approved_section_id"))
+    if section_id and section_id not in section_ids:
+        errors.append(f"approved_section_id {section_id} is not in section_master")
+    if not clean(row.get("approved_display_order")):
+        errors.append("approved_display_order is required")
+    else:
+        try:
+            _intish_string(row.get("approved_display_order"))
+        except ValueError:
+            errors.append("approved_display_order must be numeric")
+    if option_id and option_id in duplicate_option_ids:
+        errors.append(f"duplicate approved_option_id {option_id}")
+    for variant_id in spec.variant_columns.values():
+        status = clean(row.get(f"status_{variant_id}"))
+        if not status:
+            errors.append(f"status_{variant_id} is required")
+        elif status not in VALID_SOURCE_STATUSES:
+            errors.append(f"status_{variant_id} has invalid value {status}")
+    return errors
+
+
+def _option_row_from_review(row: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "option_id": clean(row.get("approved_option_id")),
+        "rpo": clean(row.get("approved_rpo")),
+        "price": clean(row.get("approved_price")),
+        "option_name": clean(row.get("approved_option_name")),
+        "description": clean(row.get("approved_description")),
+        "detail_raw": clean(row.get("approved_detail_raw")),
+        "section_id": clean(row.get("approved_section_id")),
+        "selectable": clean(row.get("approved_selectable")),
+        "display_order": _intish_string(row.get("approved_display_order")),
+        "active": clean(row.get("active")),
+        "display_behavior": clean(row.get("approved_display_behavior")),
+    }
+
+
+def _source_label(row: dict[str, Any]) -> str:
+    return clean(row.get("raw_source_spans")) or clean(row.get("approved_option_id")) or clean(row.get("candidate_option_id")) or "review row"
+
+
+def build_future_source_population_plan(wb, model_keys: Iterable[str]) -> dict[str, Any]:
+    """Materialize approved future_model_source_review rows without mutating a workbook."""
+
+    selected_model_keys = _selected_future_model_keys(model_keys)
+    review_rows = _rows_from_sheet(wb, "future_model_source_review")
+    section_ids = _section_ids(wb)
+    plan: dict[str, Any] = {
+        "selected_model_keys": selected_model_keys,
+        "models": {},
+        "error_count": 0,
+    }
+
+    for model_key in selected_model_keys:
+        spec = FUTURE_MODEL_SPECS[model_key]
+        model_rows = [row for row in review_rows if clean(row.get("model_key")) == model_key]
+        approved_active_rows = [
+            row for row in model_rows
+            if clean(row.get("review_status")) == "approved" and active_bool(row.get("active"))
+        ]
+        option_id_counts = Counter(clean(row.get("approved_option_id")) for row in approved_active_rows if clean(row.get("approved_option_id")))
+        duplicate_option_ids = {option_id for option_id, count in option_id_counts.items() if count > 1}
+
+        option_rows: list[dict[str, Any]] = []
+        ovs_rows: list[dict[str, Any]] = []
+        blocked_counts: Counter[str] = Counter()
+        errors: list[str] = []
+
+        for row in model_rows:
+            review_status = clean(row.get("review_status"))
+            active = active_bool(row.get("active"))
+            review_flags = _split_review_flags(row.get("review_flags"))
+            if review_status != "approved":
+                blocked_counts[review_status or "not_approved"] += 1
+                for flag in review_flags:
+                    blocked_counts[flag] += 1
+                if not active:
+                    blocked_counts["inactive"] += 1
+                continue
+            if not active:
+                blocked_counts["inactive"] += 1
+                for flag in review_flags:
+                    blocked_counts[flag] += 1
+                continue
+
+            row_errors = _validation_errors_for_approved_row(row, spec, section_ids, duplicate_option_ids)
+            if row_errors:
+                for flag in review_flags:
+                    blocked_counts[flag] += 1
+                for error in row_errors:
+                    blocked_counts[error] += 1
+                errors.append(f"{_source_label(row)}: {'; '.join(row_errors)}")
+                continue
+
+            option_row = _option_row_from_review(row)
+            option_rows.append(option_row)
+            for variant_id in spec.variant_columns.values():
+                ovs_rows.append(
+                    {
+                        "option_id": option_row["option_id"],
+                        "variant_id": variant_id,
+                        "status": clean(row.get(f"status_{variant_id}")),
+                    }
+                )
+
+        display_order = {row["option_id"]: (float(clean(row.get("display_order")) or 0), row["option_id"]) for row in option_rows}
+        option_rows.sort(key=lambda row: display_order[row["option_id"]])
+        variant_order = {variant_id: index for index, variant_id in enumerate(spec.variant_columns.values())}
+        ovs_rows.sort(key=lambda row: (display_order[row["option_id"]], variant_order[row["variant_id"]]))
+
+        model_plan = {
+            "model_key": model_key,
+            "target_option_sheet": spec.target_option_sheet,
+            "target_ovs_sheet": spec.target_ovs_sheet,
+            "current_option_rows": _current_sheet_row_count(wb, spec.target_option_sheet),
+            "current_ovs_rows": _current_sheet_row_count(wb, spec.target_ovs_sheet),
+            "would_write_option_rows": len(option_rows),
+            "would_write_ovs_rows": len(ovs_rows),
+            "eligible_option_count": len(option_rows),
+            "emitted_ovs_count": len(ovs_rows),
+            "blocked_counts": dict(sorted(blocked_counts.items())),
+            "errors": errors,
+            "option_rows": option_rows,
+            "ovs_rows": ovs_rows,
+        }
+        plan["models"][model_key] = model_plan
+        plan["error_count"] += len(errors)
+
+    return plan
 
 
 def build_preview_for_model(wb, spec: FutureModelSpec, candidates: dict[str, Any] | None = None) -> dict[str, Any]:

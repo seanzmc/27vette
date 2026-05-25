@@ -213,7 +213,7 @@ test("future Corvette model metadata is scaffolded inactive against shared LZ in
   }
 });
 
-test("future Corvette normalized source sheets exist as empty Grand Sport-compatible shells", () => {
+test("future Corvette normalized source sheets stay compatible and inactive after approved source staging", () => {
   const roleBySuffix = {
     options: "options",
     ovs: "ovs",
@@ -225,6 +225,7 @@ test("future Corvette normalized source sheets exist as empty Grand Sport-compat
     exclusive_members: "exclusive_members",
     variant_overrides: "variant_overrides",
   };
+  const expectedVariantCounts = { z06: 6, zr1: 4, zr1x: 4 };
 
   for (const modelKey of ["z06", "zr1", "zr1x"]) {
     for (const [suffix, canonicalRole] of Object.entries(roleBySuffix)) {
@@ -234,12 +235,23 @@ test("future Corvette normalized source sheets exist as empty Grand Sport-compat
       assert.equal(details.exists, true, `${sheetName} should exist`);
       assert.equal(details.state, "visible", `${sheetName} should be visible`);
       assert.deepEqual(details.headers, snapshot.canonical_source_headers[canonicalRole], `${sheetName} headers drifted`);
-      assert.equal(details.max_row, 1, `${sheetName} should only contain a header row`);
+      if (!["options", "ovs"].includes(suffix)) {
+        assert.equal(details.max_row, 1, `${sheetName} should remain a header-only scaffold`);
+      }
     }
+
+    const optionRows = snapshot.future_source_sheet_details[`${modelKey}_options`].max_row - 1;
+    const ovsRows = snapshot.future_source_sheet_details[`${modelKey}_ovs`].max_row - 1;
+    assert.ok(optionRows >= 0, `${modelKey}_options should be readable`);
+    assert.equal(
+      ovsRows,
+      optionRows * expectedVariantCounts[modelKey],
+      `${modelKey}_ovs should have one status row per staged option and variant`,
+    );
   }
 
   for (const row of snapshot.model_source_rows.filter((row) => ["z06", "zr1", "zr1x"].includes(row.model_key))) {
-    assert.equal(row.active, false, `${row.model_key}.${row.source_role} should remain inactive after sheet scaffolding`);
+    assert.equal(row.active, false, `${row.model_key}.${row.source_role} should remain inactive after approved source staging`);
   }
 });
 
