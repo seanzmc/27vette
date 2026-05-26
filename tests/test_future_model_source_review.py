@@ -53,6 +53,8 @@ def create_review_workbook() -> Workbook:
             "option_name": "Airbags, frontal and side-impact",
             "section_id": "standard_equipment",
             "active": True,
+            "display_order": "10",
+            "display_behavior": "standard",
         }
     ])
     ws = wb.create_sheet("z06_standard_raw")
@@ -80,6 +82,26 @@ def create_review_workbook() -> Workbook:
     ws.cell(15, 3, "Missing RPO row")
     for col in range(4, 10):
         ws.cell(15, col, "A")
+
+    intext = wb.create_sheet("z06_intextmec_raw")
+    intext.cell(7, 1, "Orderable RPO Code")
+    intext.cell(7, 2, "Ref. Only RPO Code")
+    intext.cell(7, 3, "Description")
+    for col, (model, code, trim) in enumerate([
+        ("Z06 Coupe", "1YH07", "1LZ"),
+        ("Z06 Coupe", "1YH07", "2LZ"),
+        ("Z06 Coupe", "1YH07", "3LZ"),
+        ("Z06 Convertible", "1YH67", "1LZ"),
+        ("Z06 Convertible", "1YH67", "2LZ"),
+        ("Z06 Convertible", "1YH67", "3LZ"),
+    ], start=4):
+        intext.cell(7, col, model)
+        intext.cell(8, col, code)
+        intext.cell(9, col, trim)
+    intext.cell(10, 2, "AJ7")
+    intext.cell(10, 3, "Airbags, frontal and side-impact")
+    for col in range(4, 10):
+        intext.cell(10, col, "S")
 
     eq = wb.create_sheet("z06_eqgrps_raw")
     eq.cell(7, 1, "Orderable RPO Code")
@@ -109,7 +131,7 @@ class FutureModelSourceReviewTests(unittest.TestCase):
 
         rows = build_source_review_rows(wb)
 
-        self.assertEqual(len(rows), 2)
+        self.assertEqual(len(rows), 3)
         self.assertFalse(any(row["raw_source_sheets"] == "z06_eqgrps_raw" for row in rows))
         self.assertIn("source_disclosure_map", FUTURE_MODEL_SOURCE_REVIEW_HEADERS)
         self.assertIn("status_note_1lz_h07", FUTURE_MODEL_SOURCE_REVIEW_HEADERS)
@@ -126,13 +148,23 @@ class FutureModelSourceReviewTests(unittest.TestCase):
         self.assertEqual(first["candidate_section_id"], "")
         self.assertEqual(first["candidate_section_resolution"], "")
         self.assertEqual(first["approved_section_id"], "")
-        self.assertEqual(first["review_status"], "needs_section_review")
+        self.assertEqual(first["review_status"], "deferred")
+        self.assertIn("duplicate_rpo_noncanonical", first["review_reason"])
         self.assertFalse(first["active"])
 
         missing = next(row for row in rows if row["source_option_description"] == "Missing RPO row")
         self.assertIn("missing_rpo", missing["review_flags"])
+        self.assertEqual(missing["candidate_option_id"], "opt_002")
         self.assertEqual(missing["review_status"], "needs_section_review")
         self.assertFalse(missing["active"])
+
+        canonical = next(row for row in rows if row["raw_source_spans"] == "z06_intextmec_raw:10-10")
+        self.assertEqual(canonical["review_status"], "approved")
+        self.assertTrue(canonical["active"])
+        self.assertEqual(canonical["approved_option_id"], "opt_aj7_existing")
+        self.assertEqual(canonical["approved_section_id"], "standard_equipment")
+        self.assertEqual(canonical["approved_display_order"], "10")
+        self.assertEqual(canonical["copy_from_model_key"], "grand_sport")
 
     def test_future_model_preview_uses_raw_sources_when_present(self) -> None:
         wb = create_review_workbook()
@@ -142,9 +174,9 @@ class FutureModelSourceReviewTests(unittest.TestCase):
         self.assertEqual(preview["source_mode"], "raw_order_guide")
         self.assertIn("Raw order-guide sheets were read", preview["notes"][0])
         z06 = preview["models"]["z06"]
-        self.assertEqual(z06["summary"]["raw_source_block_count"], 2)
-        self.assertEqual(z06["summary"]["review_row_count"], 2)
-        self.assertEqual(z06["summary"]["section_resolution_counts"], {"not_assigned": 2})
+        self.assertEqual(z06["summary"]["raw_source_block_count"], 3)
+        self.assertEqual(z06["summary"]["review_row_count"], 3)
+        self.assertEqual(z06["summary"]["section_resolution_counts"], {"not_assigned": 3})
         self.assertEqual(z06["review_rows"][0]["source_primary_rpo"], "AJ7")
 
 

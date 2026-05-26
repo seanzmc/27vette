@@ -516,6 +516,12 @@ def normalize_match_text(value: Any) -> str:
     return re.sub(r"\s+", " ", clean(value).casefold()).strip()
 
 
+def normalize_option_match_text(value: Any) -> str:
+    """Normalize option copy for cross-model identity matching."""
+
+    return re.sub(r"[^a-z0-9]+", " ", clean(value).casefold()).strip()
+
+
 def active_bool(value: Any) -> bool:
     if isinstance(value, bool):
         return value
@@ -656,7 +662,77 @@ def _slug_id_part(value: str) -> str:
 def _propose_option_id(rpo: str, source_order: int, rpo_sequence: int) -> str:
     if rpo:
         return f"opt_{_slug_id_part(rpo)}_{rpo_sequence:03d}"
-    return f"opt_review_{source_order:03d}"
+    return f"opt_{source_order:03d}"
+
+
+def _grand_sport_template_index(wb) -> dict[str, Any]:
+    """Build active Grand Sport option indexes for safe future-model review seeding."""
+
+    exact: dict[tuple[str, str], list[dict[str, str]]] = defaultdict(list)
+    by_rpo: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for row in _rows_from_sheet(wb, "grandSport_options"):
+        if not active_bool(row.get("active")):
+            continue
+        rpo = clean(row.get("rpo"))
+        section_id = clean(row.get("section_id"))
+        display_order = clean(row.get("display_order"))
+        if not rpo or not section_id or not display_order:
+            continue
+        template = {
+            "source_sheet": "grandSport_options",
+            "option_id": clean(row.get("option_id")),
+            "rpo": rpo,
+            "option_name": clean(row.get("option_name")),
+            "section_id": section_id,
+            "display_order": display_order,
+            "display_behavior": clean(row.get("display_behavior")),
+        }
+        rpo_key = normalize_match_text(rpo)
+        by_rpo[rpo_key].append(template)
+        exact[(rpo_key, normalize_option_match_text(row.get("option_name")))].append(template)
+    return {"exact": dict(exact), "rpo": dict(by_rpo)}
+
+
+def _grand_sport_template_match(block: dict[str, Any], template_index: dict[str, Any]) -> tuple[str, dict[str, str] | None]:
+    """Return a safe Grand Sport template match for a raw source block, if one exists."""
+
+    rpo_key = normalize_match_text(block.get("source_primary_rpo"))
+    if not rpo_key:
+        return "missing_rpo", None
+    exact_matches = template_index.get("exact", {}).get(
+        (rpo_key, normalize_option_match_text(block.get("source_option_description"))),
+        [],
+    )
+    if len(exact_matches) == 1:
+        return "grand_sport_exact", exact_matches[0]
+    rpo_matches = template_index.get("rpo", {}).get(rpo_key, [])
+    if len(rpo_matches) == 1:
+        return "grand_sport_rpo_unique", rpo_matches[0]
+    if len(rpo_matches) > 1:
+        return "grand_sport_rpo_ambiguous", None
+    return "grand_sport_missing", None
+
+
+def _available_in_statuses(block: dict[str, Any]) -> bool:
+    return any(status == "available" for status in block.get("statuses", {}).values())
+
+
+def _duplicate_canonical_spans(blocks: list[dict[str, Any]]) -> dict[tuple[str, str], str]:
+    """Choose the canonical source span for duplicate RPO groups when intextmec is unambiguous."""
+
+    grouped: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    for block in blocks:
+        rpo = clean(block.get("source_primary_rpo"))
+        if rpo:
+            grouped[(clean(block.get("model_key")), rpo)].append(block)
+    canonical: dict[tuple[str, str], str] = {}
+    for key, items in grouped.items():
+        if len(items) <= 1:
+            continue
+        intextmec = [item for item in items if clean(item.get("source_group")) == "interior_exterior_mechanical"]
+        if len(intextmec) == 1:
+            canonical[key] = clean(intextmec[0].get("raw_source_span"))
+    return canonical
 
 
 def _status_values_for_row(row: dict[str, Any], spec: FutureModelSpec) -> tuple[list[dict[str, str]], list[str]]:
@@ -709,6 +785,8 @@ def build_source_review_rows(wb) -> list[dict[str, Any]]:
 
     blocks = build_raw_source_blocks(wb)
     price_rows = build_price_schedule_rows(wb)
+    template_index = _grand_sport_template_index(wb)
+    canonical_spans = _duplicate_canonical_spans(blocks)
     rpo_counts = Counter(
         (block["model_key"], clean(block.get("source_primary_rpo")))
         for block in blocks
@@ -726,22 +804,51 @@ def build_source_review_rows(wb) -> list[dict[str, Any]]:
         option_id = _propose_option_id(rpo, source_order, rpo_seen[rpo_key] if rpo else 1)
         candidate_price, price_candidate_rows, price_summary, price_flags = _review_price_candidates(block, price_rows)
 
+        duplicate_count = rpo_counts[rpo_key] if rpo else 0
+        canonical_span = canonical_spans.get(rpo_key, "")
+        current_span = clean(block.get("raw_source_span"))
+        duplicate_is_noncanonical = bool(duplicate_count > 1 and canonical_span and current_span != canonical_span)
+        duplicate_needs_manual = bool(duplicate_count > 1 and not canonical_span)
+
         flags: list[str] = []
         if not rpo:
             flags.append("missing_rpo")
-        elif rpo_counts[rpo_key] > 1:
+        elif duplicate_count > 1:
             flags.append("duplicate_rpo")
         flags.extend(block.get("status_flags", []))
         flags.extend(price_flags)
         flags = _dedupe_flags(flags)
 
-        row = {header: "" for header in FUTURE_MODEL_SOURCE_REVIEW_HEADERS}
+        template_resolution, template = _grand_sport_template_match(block, template_index)
+        blocking_flags = set(flags) & BLOCKING_REVIEW_FLAGS
+        can_auto_approve = bool(
+            rpo
+            and template
+            and not duplicate_is_noncanonical
+            and not duplicate_needs_manual
+            and not blocking_flags
+        )
+
+        if duplicate_is_noncanonical:
+            review_status = "deferred"
+            review_reason_parts = [*flags, "duplicate_rpo_noncanonical", f"canonical_source_span={canonical_span}"]
+        elif duplicate_needs_manual:
+            review_status = "needs_section_review"
+            review_reason_parts = [*flags, "duplicate_rpo_manual_review"]
+        elif can_auto_approve:
+            review_status = "approved"
+            review_reason_parts = [*flags, template_resolution]
+        else:
+            review_status = "needs_section_review"
+            review_reason_parts = [*flags, template_resolution, "section_review_pending"]
+
+        row: dict[str, Any] = {header: "" for header in FUTURE_MODEL_SOURCE_REVIEW_HEADERS}
         row.update(
             {
                 "model_key": model_key,
                 "source_group": block.get("source_group", ""),
                 "raw_source_sheets": block.get("raw_source_sheet", ""),
-                "raw_source_spans": block.get("raw_source_span", ""),
+                "raw_source_spans": current_span,
                 "raw_category_context": "",
                 "source_orderable_rpo": block.get("source_orderable_rpo", ""),
                 "source_ref_rpo": block.get("source_ref_rpo", ""),
@@ -759,11 +866,28 @@ def build_source_review_rows(wb) -> list[dict[str, Any]]:
                 "price_candidate_rows": price_candidate_rows,
                 "price_candidate_summary": price_summary,
                 "review_flags": "; ".join(flags),
-                "review_status": "needs_section_review",
-                "review_reason": "; ".join([*flags, "section_review_pending"]),
-                "active": False,
+                "review_status": review_status,
+                "review_reason": "; ".join(part for part in review_reason_parts if part),
+                "active": bool(can_auto_approve),
             }
         )
+        if can_auto_approve and template:
+            row.update(
+                {
+                    "approved_option_id": template["option_id"],
+                    "approved_rpo": rpo,
+                    "approved_price": "",
+                    "approved_option_name": block.get("source_option_description", ""),
+                    "approved_description": "",
+                    "approved_detail_raw": block.get("source_disclosure_raw", ""),
+                    "approved_section_id": template["section_id"],
+                    "approved_selectable": _available_in_statuses(block),
+                    "approved_display_behavior": template["display_behavior"],
+                    "approved_display_order": template["display_order"],
+                    "copy_from_model_key": "grand_sport",
+                    "copy_from_option_id": template["option_id"],
+                }
+            )
         for variant_id, raw_status in block.get("raw_statuses", {}).items():
             row[f"raw_status_{variant_id}"] = raw_status
         for variant_id, status in block.get("statuses", {}).items():

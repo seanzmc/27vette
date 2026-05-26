@@ -43,6 +43,12 @@ PRESERVED_REVIEW_FIELDS = {
     "active",
     "notes",
 }
+AUTO_APPROVED_MANUAL_FIELDS = {
+    "approved_price",
+    "approved_description",
+    "approved_detail_raw",
+    "notes",
+}
 
 
 def row_key(row: dict[str, Any]) -> tuple[str, str, str, str]:
@@ -83,7 +89,16 @@ def merge_preserved_fields(generated_rows: list[dict[str, Any]], existing_rows: 
     for generated in generated_rows:
         prior = existing_rows.get(row_key(generated))
         if prior and _has_manual_review_decision(prior):
-            for field in PRESERVED_REVIEW_FIELDS:
+            prior_status = clean(prior.get("review_status"))
+            if (
+                prior_status == "approved"
+                and clean(generated.get("review_status")) == "approved"
+                and clean(generated.get("copy_from_model_key")) == "grand_sport"
+            ):
+                fields_to_preserve = AUTO_APPROVED_MANUAL_FIELDS
+            else:
+                fields_to_preserve = PRESERVED_REVIEW_FIELDS
+            for field in fields_to_preserve:
                 if clean(prior.get(field)):
                     generated[field] = prior[field]
         merged.append(generated)
