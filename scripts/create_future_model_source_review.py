@@ -67,13 +67,22 @@ def existing_review_rows(wb) -> dict[tuple[str, str, str, str], dict[str, str]]:
     return rows
 
 
+def _has_manual_review_decision(row: dict[str, str]) -> bool:
+    status = clean(row.get("review_status"))
+    if status in {"approved", "inactive", "deferred"}:
+        return True
+    if clean(row.get("active")).casefold() in {"true", "1", "yes", "y", "active"}:
+        return True
+    return False
+
+
 def merge_preserved_fields(generated_rows: list[dict[str, Any]], existing_rows: dict[tuple[str, str, str, str], dict[str, str]], *, reset_reviewed_fields: bool) -> list[dict[str, Any]]:
     if reset_reviewed_fields:
         return generated_rows
     merged: list[dict[str, Any]] = []
     for generated in generated_rows:
         prior = existing_rows.get(row_key(generated))
-        if prior:
+        if prior and _has_manual_review_decision(prior):
             for field in PRESERVED_REVIEW_FIELDS:
                 if clean(prior.get(field)):
                     generated[field] = prior[field]

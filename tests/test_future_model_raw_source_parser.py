@@ -92,6 +92,42 @@ class FutureModelRawSourceParserTests(unittest.TestCase):
         self.assertEqual(block["status_notes"]["1lz_h07"], "2")
         self.assertEqual(block["status_note_texts"]["1lz_h07"], "Second disclosure should map to 2")
 
+    def test_consumed_merged_child_rows_do_not_become_context_or_option_starts(self) -> None:
+        wb = Workbook()
+        del wb[wb.sheetnames[0]]
+        ws = create_raw_sheet(
+            wb,
+            "z06_intextmec_raw",
+            [
+                ("Z06 Coupe", "1YH07", "1LZ"),
+                ("Z06 Coupe", "1YH07", "2LZ"),
+                ("Z06 Coupe", "1YH07", "3LZ"),
+                ("Z06 Convertible", "1YH67", "1LZ"),
+                ("Z06 Convertible", "1YH67", "2LZ"),
+                ("Z06 Convertible", "1YH67", "3LZ"),
+            ],
+        )
+        ws.cell(10, 1, "AAA")
+        ws.cell(10, 3, "First option")
+        ws.cell(12, 3, "Misleading disclosure text that is not a category")
+        for col in [1, 2, 4, 5, 6, 7, 8, 9]:
+            ws.merge_cells(start_row=10, start_column=col, end_row=13, end_column=col)
+        for col in range(4, 10):
+            ws.cell(10, col, "A1")
+        ws.cell(14, 1, "BBB")
+        ws.cell(14, 3, "Second option")
+        for col in range(4, 10):
+            ws.cell(14, col, "S")
+
+        blocks = build_raw_source_blocks(wb)
+
+        self.assertEqual([block["raw_start_row"] for block in blocks], [10, 14])
+        self.assertEqual(blocks[0]["source_disclosure_rows"], [12])
+        self.assertEqual(blocks[0]["source_disclosure_raw"], "Misleading disclosure text that is not a category")
+        self.assertEqual(blocks[0]["raw_category_context"], "")
+        self.assertEqual(blocks[1]["raw_category_context"], "")
+        self.assertNotIn("Misleading disclosure", blocks[1].get("raw_category_context", ""))
+
     def test_combined_zr1_zr1x_raw_sheet_splits_statuses_by_model(self) -> None:
         wb = Workbook()
         del wb[wb.sheetnames[0]]

@@ -1,6 +1,6 @@
 # Future Model Source Preview
 
-Generated: 2026-05-25T02:01:03+00:00
+Generated: 2026-05-26T14:26:13+00:00
 
 Inspection-only: workbook source sheets were not written, model activation was not changed, and runtime app data was not generated.
 
@@ -26,15 +26,13 @@ Status counts:
 - standard: 902
 - unavailable: 232
 
-Section resolution counts:
-- conflict: 13
-- resolved: 209
-- unresolved: 112
+Section assignment counts:
+- not_assigned: 334
 
 Review counts:
-- resolved: 57
-- section_conflict: 13
-- section_unresolved: 112
+- resolved: 0
+- section_conflict: 0
+- section_unresolved: 0
 - missing_rpo: 51
 - duplicate_rpo: 114
 - blank_variant_status: 0
@@ -45,26 +43,13 @@ Review counts:
 - dealer_installed_status: 56
 - included_in_equipment_group: 23
 - included_in_equipment_group_upgradeable: 0
+- raw_parsed: 89
 
 Top unresolved RPO/name examples:
-- z06_standard_raw:25-25: DY0 — Display hood, Carbon Fiber, located above the Driver Information Center display
-- z06_standard_raw:63-63: N3W — Steering wheel, carbon fiber and leather-wrapped
-- z06_standard_raw:83-86: CFV — Ground effects, visible carbon fiber
-- z06_standard_raw:104-104: LT6 — Engine, 5.5L V8 DI, high-output, Variable Valve Timing (VVT), (670 hp [499.6 kW] @ 8400 rpm, 460 lb-ft of torque [623.8 N-m] @ 6300 rpm)
-- z06_standard_raw:115-115: R8E — Gas guzzler tax, mandatory federal tax added to price of vehicle
-- z06_standard_raw:120-120: SOE — Wheels, 20" x 10" (50.8 cm x 25.4 cm) front and 21" x 13" (53.3 cm x 33 cm) rear Spider design, Titanium Satin forged aluminum
-- z06_standard_raw:125-125: FE6 — Suspension, performance with Magnetic Selective Ride Control
-- z06_standard_raw:128-128: M1M — Transmission, 8-speed dual clutch, includes manual and auto modes
+- none
 
 Top section conflicts:
-- z06_standard_raw:51-51: UQT — Performance data and video recorder
-- z06_standard_raw:58-58: AQ9 — Seats, GT1 bucket
-- z06_standard_raw:122-122: B4Z — Performance Traction Management
-- z06_standard_raw:123-123: G0K — Rear axle, 5.56 ratio
-- z06_intextmec_raw:73-76: SC7 — LPO, Roof panel storage pouch, Genuine Corvette Accessory
-- z06_intextmec_raw:119-119: UQT — Performance data and video recorder
-- z06_intextmec_raw:160-160: AQ9 — Seats, GT1 bucket
-- z06_intextmec_raw:161-161: AH2 — Seats, GT2 bucket
+- none
 
 Missing-RPO examples:
 - z06_standard_raw:15-15: <missing RPO> — Air filtration system with pollen filter
@@ -106,15 +91,13 @@ Status counts:
 - standard: 634
 - unavailable: 172
 
-Section resolution counts:
-- conflict: 13
-- resolved: 182
-- unresolved: 110
+Section assignment counts:
+- not_assigned: 305
 
 Review counts:
-- resolved: 41
-- section_conflict: 13
-- section_unresolved: 110
+- resolved: 0
+- section_conflict: 0
+- section_unresolved: 0
 - missing_rpo: 51
 - duplicate_rpo: 122
 - blank_variant_status: 0
@@ -125,26 +108,13 @@ Review counts:
 - dealer_installed_status: 40
 - included_in_equipment_group: 21
 - included_in_equipment_group_upgradeable: 0
+- raw_parsed: 70
 
 Top unresolved RPO/name examples:
-- zr1_zr1x_standard_raw:25-25: DY0 — Display hood, Carbon Fiber, located above the Driver Information Center display
-- zr1_zr1x_standard_raw:63-63: N3W — Steering wheel, carbon fiber and leather-wrapped
-- zr1_zr1x_standard_raw:75-75: CFC — Convertible top, retractable, power-folding hard top, visible carbon fiber, remote control (down only), includes power glass rear window with integral defogger; Nacelles, A-pillars, and header are Carbon-Flash painted (body-color when (GBA) Black exterior color is selected)
-- zr1_zr1x_standard_raw:82-82: CFV — Ground effects, visible carbon fiber
-- zr1_zr1x_standard_raw:88-88: J58 — Brakes, 4-wheel antilock, 4-wheel disc, carbon ceramic, ZR1-specific
-- zr1_zr1x_standard_raw:89-92: J59 — Brakes, 4-wheel antilock, 4-wheel disc, carbon ceramic, 10-piston front, 6-piston rear
-- zr1_zr1x_standard_raw:99-99: LT7 — Engine, 5.5L V8 Twin Turbo, TPI, DI, high-output, Variable Valve Timing (VVT) (1064 hp [793 kW] @ 7000 rpm, 828 lb-ft of torque [1123 N-m] @ 6000 rpm)
-- zr1_zr1x_standard_raw:100-100: HP1 — Front axle, electrified propulsion (186 hp [138.7 kW], 145 lb-ft of front torque [196.6 N-m]). 1250 (932.1 kW) total combined hp with LT7 engine
+- none
 
 Top section conflicts:
-- zr1_zr1x_standard_raw:51-51: UQT — Performance data and video recorder
-- zr1_zr1x_standard_raw:58-58: AQ9 — Seats, GT1 bucket
-- zr1_zr1x_standard_raw:115-115: B4Z — Performance Traction Management
-- zr1_zr1x_standard_raw:116-116: G0K — Rear axle, 5.56 ratio
-- zr1_zr1x_intextmec_raw:73-76: SC7 — LPO, Roof panel storage pouch, Genuine Corvette Accessory
-- zr1_zr1x_intextmec_raw:119-119: UQT — Performance data and video recorder
-- zr1_zr1x_intextmec_raw:159-159: AQ9 — Seats, GT1 bucket
-- zr1_zr1x_intextmec_raw:160-160: AH2 — Seats, GT2 bucket
+- none
 
 Missing-RPO examples:
 - zr1_zr1x_standard_raw:15-15: <missing RPO> — Air filtration system with pollen filter
@@ -186,15 +156,13 @@ Status counts:
 - standard: 642
 - unavailable: 172
 
-Section resolution counts:
-- conflict: 13
-- resolved: 182
-- unresolved: 110
+Section assignment counts:
+- not_assigned: 305
 
 Review counts:
-- resolved: 42
-- section_conflict: 13
-- section_unresolved: 110
+- resolved: 0
+- section_conflict: 0
+- section_unresolved: 0
 - missing_rpo: 51
 - duplicate_rpo: 122
 - blank_variant_status: 0
@@ -205,26 +173,13 @@ Review counts:
 - dealer_installed_status: 39
 - included_in_equipment_group: 21
 - included_in_equipment_group_upgradeable: 0
+- raw_parsed: 71
 
 Top unresolved RPO/name examples:
-- zr1_zr1x_standard_raw:25-25: DY0 — Display hood, Carbon Fiber, located above the Driver Information Center display
-- zr1_zr1x_standard_raw:63-63: N3W — Steering wheel, carbon fiber and leather-wrapped
-- zr1_zr1x_standard_raw:75-75: CFC — Convertible top, retractable, power-folding hard top, visible carbon fiber, remote control (down only), includes power glass rear window with integral defogger; Nacelles, A-pillars, and header are Carbon-Flash painted (body-color when (GBA) Black exterior color is selected)
-- zr1_zr1x_standard_raw:82-82: CFV — Ground effects, visible carbon fiber
-- zr1_zr1x_standard_raw:88-88: J58 — Brakes, 4-wheel antilock, 4-wheel disc, carbon ceramic, ZR1-specific
-- zr1_zr1x_standard_raw:89-92: J59 — Brakes, 4-wheel antilock, 4-wheel disc, carbon ceramic, 10-piston front, 6-piston rear
-- zr1_zr1x_standard_raw:99-99: LT7 — Engine, 5.5L V8 Twin Turbo, TPI, DI, high-output, Variable Valve Timing (VVT) (1064 hp [793 kW] @ 7000 rpm, 828 lb-ft of torque [1123 N-m] @ 6000 rpm)
-- zr1_zr1x_standard_raw:100-100: HP1 — Front axle, electrified propulsion (186 hp [138.7 kW], 145 lb-ft of front torque [196.6 N-m]). 1250 (932.1 kW) total combined hp with LT7 engine
+- none
 
 Top section conflicts:
-- zr1_zr1x_standard_raw:51-51: UQT — Performance data and video recorder
-- zr1_zr1x_standard_raw:58-58: AQ9 — Seats, GT1 bucket
-- zr1_zr1x_standard_raw:115-115: B4Z — Performance Traction Management
-- zr1_zr1x_standard_raw:116-116: G0K — Rear axle, 5.56 ratio
-- zr1_zr1x_intextmec_raw:73-76: SC7 — LPO, Roof panel storage pouch, Genuine Corvette Accessory
-- zr1_zr1x_intextmec_raw:119-119: UQT — Performance data and video recorder
-- zr1_zr1x_intextmec_raw:159-159: AQ9 — Seats, GT1 bucket
-- zr1_zr1x_intextmec_raw:160-160: AH2 — Seats, GT2 bucket
+- none
 
 Missing-RPO examples:
 - zr1_zr1x_standard_raw:15-15: <missing RPO> — Air filtration system with pollen filter

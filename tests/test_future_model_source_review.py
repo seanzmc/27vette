@@ -121,14 +121,17 @@ class FutureModelSourceReviewTests(unittest.TestCase):
         self.assertEqual(first["raw_status_1lz_h07"], "S1")
         self.assertEqual(first["status_1lz_h07"], "standard")
         self.assertEqual(first["status_note_1lz_h07"], "1")
-        self.assertEqual(first["approved_detail_raw"], "Disclosure one\nDisclosure two")
-        self.assertEqual(first["approved_section_id"], "standard_equipment")
-        self.assertEqual(first["review_status"], "approved")
-        self.assertTrue(first["active"])
+        self.assertEqual(first["approved_detail_raw"], "")
+        self.assertEqual(first["raw_category_context"], "")
+        self.assertEqual(first["candidate_section_id"], "")
+        self.assertEqual(first["candidate_section_resolution"], "")
+        self.assertEqual(first["approved_section_id"], "")
+        self.assertEqual(first["review_status"], "needs_section_review")
+        self.assertFalse(first["active"])
 
         missing = next(row for row in rows if row["source_option_description"] == "Missing RPO row")
         self.assertIn("missing_rpo", missing["review_flags"])
-        self.assertEqual(missing["review_status"], "needs_review")
+        self.assertEqual(missing["review_status"], "needs_section_review")
         self.assertFalse(missing["active"])
 
     def test_future_model_preview_uses_raw_sources_when_present(self) -> None:
@@ -141,6 +144,7 @@ class FutureModelSourceReviewTests(unittest.TestCase):
         z06 = preview["models"]["z06"]
         self.assertEqual(z06["summary"]["raw_source_block_count"], 2)
         self.assertEqual(z06["summary"]["review_row_count"], 2)
+        self.assertEqual(z06["summary"]["section_resolution_counts"], {"not_assigned": 2})
         self.assertEqual(z06["review_rows"][0]["source_primary_rpo"], "AJ7")
 
 

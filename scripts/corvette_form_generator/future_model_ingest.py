@@ -311,13 +311,6 @@ def _raw_option_block_start(ws, row: int, variant_columns: list[dict[str, Any]],
     return not any(_is_merged_child(row, col, merge_lookup) for col in relevant_cols)
 
 
-def _raw_category_context(ws, row: int, variant_columns: list[dict[str, Any]], current_category: str) -> str:
-    if _has_status_value(ws, row, variant_columns, {}):
-        return current_category
-    text = clean(ws.cell(row, 1).value) or clean(ws.cell(row, 3).value)
-    return text or current_category
-
-
 def parse_raw_option_sheet(wb, sheet_name: str) -> list[dict[str, Any]]:
     """Parse one raw order-guide sheet into model-scoped option blocks."""
 
@@ -328,11 +321,11 @@ def parse_raw_option_sheet(wb, sheet_name: str) -> list[dict[str, Any]]:
     merge_lookup = _merged_anchor_lookup(ws)
     variant_columns = _raw_variant_columns(ws)
     blocks: list[dict[str, Any]] = []
-    current_category = ""
 
-    for row in range(10, ws.max_row + 1):
+    row = 10
+    while row <= ws.max_row:
         if not _raw_option_block_start(ws, row, variant_columns, merge_lookup):
-            current_category = _raw_category_context(ws, row, variant_columns, current_category)
+            row += 1
             continue
 
         block_end = row
@@ -384,7 +377,7 @@ def parse_raw_option_sheet(wb, sheet_name: str) -> list[dict[str, Any]]:
                     "raw_source_span": f"{sheet_name}:{row}-{block_end}",
                     "raw_start_row": row,
                     "raw_end_row": block_end,
-                    "raw_category_context": current_category,
+                    "raw_category_context": "",
                     "source_orderable_rpo": source_orderable_rpo,
                     "source_ref_rpo": source_ref_rpo,
                     "source_primary_rpo": source_primary_rpo,
@@ -399,6 +392,8 @@ def parse_raw_option_sheet(wb, sheet_name: str) -> list[dict[str, Any]]:
                     "status_flags": _dedupe_flags(model_bucket["status_flags"]),
                 }
             )
+
+        row = block_end + 1
 
     return blocks
 
@@ -713,7 +708,6 @@ def build_source_review_rows(wb) -> list[dict[str, Any]]:
     """Build workbook-ready future_model_source_review rows from raw source blocks."""
 
     blocks = build_raw_source_blocks(wb)
-    candidates = build_section_candidates(wb)
     price_rows = build_price_schedule_rows(wb)
     rpo_counts = Counter(
         (block["model_key"], clean(block.get("source_primary_rpo")))
@@ -730,14 +724,9 @@ def build_source_review_rows(wb) -> list[dict[str, Any]]:
         if rpo:
             rpo_seen[rpo_key] += 1
         option_id = _propose_option_id(rpo, source_order, rpo_seen[rpo_key] if rpo else 1)
-        section = resolve_section({"rpo": rpo, "option_name": block.get("source_option_description")}, candidates)
         candidate_price, price_candidate_rows, price_summary, price_flags = _review_price_candidates(block, price_rows)
 
         flags: list[str] = []
-        if section["section_resolution"] == "conflict":
-            flags.append("section_conflict")
-        elif section["section_resolution"] != "resolved":
-            flags.append("section_unresolved")
         if not rpo:
             flags.append("missing_rpo")
         elif rpo_counts[rpo_key] > 1:
@@ -746,8 +735,6 @@ def build_source_review_rows(wb) -> list[dict[str, Any]]:
         flags.extend(price_flags)
         flags = _dedupe_flags(flags)
 
-        review_status = "needs_review" if flags else "approved"
-        active = not flags
         row = {header: "" for header in FUTURE_MODEL_SOURCE_REVIEW_HEADERS}
         row.update(
             {
@@ -755,7 +742,7 @@ def build_source_review_rows(wb) -> list[dict[str, Any]]:
                 "source_group": block.get("source_group", ""),
                 "raw_source_sheets": block.get("raw_source_sheet", ""),
                 "raw_source_spans": block.get("raw_source_span", ""),
-                "raw_category_context": block.get("raw_category_context", ""),
+                "raw_category_context": "",
                 "source_orderable_rpo": block.get("source_orderable_rpo", ""),
                 "source_ref_rpo": block.get("source_ref_rpo", ""),
                 "source_primary_rpo": rpo,
@@ -764,27 +751,17 @@ def build_source_review_rows(wb) -> list[dict[str, Any]]:
                 "source_disclosure_map": _format_disclosure_map(block.get("source_disclosure_map", {})),
                 "source_detail_raw": block.get("source_disclosure_raw", ""),
                 "candidate_option_id": option_id,
-                "candidate_section_id": section["section_id"],
-                "candidate_section_resolution": section["section_resolution"],
-                "candidate_section_candidates": "|".join(section["section_candidates"]),
-                "candidate_display_behavior": section["display_behavior"],
+                "candidate_section_id": "",
+                "candidate_section_resolution": "",
+                "candidate_section_candidates": "",
+                "candidate_display_behavior": "",
                 "candidate_price": candidate_price,
                 "price_candidate_rows": price_candidate_rows,
                 "price_candidate_summary": price_summary,
                 "review_flags": "; ".join(flags),
-                "approved_option_id": option_id if active else "",
-                "approved_rpo": rpo if active else "",
-                "approved_price": candidate_price if active else "",
-                "approved_option_name": block.get("source_option_description", "") if active else "",
-                "approved_description": "",
-                "approved_detail_raw": block.get("source_disclosure_raw", "") if active else "",
-                "approved_section_id": section["section_id"] if active else "",
-                "approved_selectable": any(status == "available" for status in block.get("statuses", {}).values()) if active else "",
-                "approved_display_behavior": section["display_behavior"] if active else "",
-                "approved_display_order": source_order if active else "",
-                "review_status": review_status,
-                "review_reason": "; ".join(flags),
-                "active": active,
+                "review_status": "needs_section_review",
+                "review_reason": "; ".join([*flags, "section_review_pending"]),
+                "active": False,
             }
         )
         for variant_id, raw_status in block.get("raw_statuses", {}).items():
@@ -1098,13 +1075,14 @@ def _raw_preview_for_model(model_key: str, review_rows: list[dict[str, Any]]) ->
     section_resolution_counts: Counter[str] = Counter()
     proposed_ovs: list[dict[str, Any]] = []
     for row in model_rows:
-        section_resolution_counts[clean(row.get("candidate_section_resolution"))] += 1
+        section_resolution_counts[clean(row.get("candidate_section_resolution")) or "not_assigned"] += 1
         for flag in clean(row.get("review_flags")).split("; "):
             if flag:
                 review_counts.setdefault(flag, 0)
                 review_counts[flag] += 1
         if not clean(row.get("review_flags")):
-            review_counts["resolved"] += 1
+            review_counts.setdefault("raw_parsed", 0)
+            review_counts["raw_parsed"] += 1
         for variant_id in spec.variant_columns.values():
             status = clean(row.get(f"status_{variant_id}"))
             if not status:
@@ -1162,6 +1140,7 @@ def build_future_model_preview(wb, *, generated_at: str | None = None) -> dict[s
                 "Raw order-guide sheets were read but workbook source sheets were not written.",
                 "Merged RPO/status cells are parsed as option blocks; disclosure rows are attached as provenance/detail text.",
                 "Option IDs, sections, prices, and status-note mappings are draft-only until manual review.",
+                "Raw option sheets do not contain reliable section/category data; section assignment is a separate review step.",
             ],
         }
 
@@ -1225,7 +1204,10 @@ def render_preview_markdown(preview: dict[str, Any]) -> str:
         if not summary["status_counts"]:
             lines.append("- none")
         lines.append("")
-        lines.append("Section resolution counts:")
+        if preview.get("source_mode") == "raw_order_guide":
+            lines.append("Section assignment counts:")
+        else:
+            lines.append("Section resolution counts:")
         for resolution, count in summary["section_resolution_counts"].items():
             lines.append(f"- {resolution}: {count}")
         lines.append("")
