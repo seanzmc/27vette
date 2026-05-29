@@ -226,6 +226,29 @@ test("future Corvette normalized source sheets stay compatible and inactive afte
     variant_overrides: "variant_overrides",
   };
   const expectedVariantCounts = { z06: 6, zr1: 4, zr1x: 4 };
+  const expectedStagedRowCounts = {
+    z06: {
+      rule_mapping: 100,
+      rule_groups: 0,
+      rule_group_members: 0,
+      exclusive_groups: 7,
+      exclusive_members: 16,
+    },
+    zr1: {
+      rule_mapping: 56,
+      rule_groups: 0,
+      rule_group_members: 0,
+      exclusive_groups: 4,
+      exclusive_members: 10,
+    },
+    zr1x: {
+      rule_mapping: 56,
+      rule_groups: 0,
+      rule_group_members: 0,
+      exclusive_groups: 4,
+      exclusive_members: 10,
+    },
+  };
 
   for (const modelKey of ["z06", "zr1", "zr1x"]) {
     for (const [suffix, canonicalRole] of Object.entries(roleBySuffix)) {
@@ -236,7 +259,8 @@ test("future Corvette normalized source sheets stay compatible and inactive afte
       assert.equal(details.state, "visible", `${sheetName} should be visible`);
       assert.deepEqual(details.headers, snapshot.canonical_source_headers[canonicalRole], `${sheetName} headers drifted`);
       if (!["options", "ovs"].includes(suffix)) {
-        assert.equal(details.max_row, 1, `${sheetName} should remain a header-only scaffold`);
+        const expectedRows = expectedStagedRowCounts[modelKey]?.[suffix] ?? 0;
+        assert.equal(details.max_row - 1, expectedRows, `${sheetName} staged row count drifted`);
       }
     }
 
