@@ -28,7 +28,6 @@ from corvette_form_generator.future_model_ingest import (  # noqa: E402
 from corvette_form_generator.model_configs import WORKBOOK_PATH  # noqa: E402
 from corvette_form_generator.workbook import clean, excel_lock_path, save_workbook_safely, write_sheet  # noqa: E402
 
-DEFAULT_CSV_PATH = ROOT / "stingray_master - future_model_option_review.csv"
 FUTURE_MODEL_KEYS = tuple(FUTURE_MODEL_SPECS)
 
 
@@ -361,7 +360,12 @@ def verify_saved_workbook(path: Path, plan: dict[str, Any], expected_option_revi
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--csv-path", type=Path, default=DEFAULT_CSV_PATH)
+    parser.add_argument(
+        "--csv-path",
+        type=Path,
+        default=None,
+        help="Optional CSV import override; when omitted, decisions come from the workbook future_model_option_review sheet.",
+    )
     parser.add_argument("--model-key", choices=("all", *FUTURE_MODEL_KEYS), default="all")
     parser.add_argument("--dry-run", action="store_true", help="Report rows that would be written without saving the workbook.")
     args = parser.parse_args(argv)
@@ -370,17 +374,27 @@ def main(argv: list[str] | None = None) -> int:
         raise RuntimeError(f"Refusing to write workbook while Excel lock file exists: {excel_lock_path(WORKBOOK_PATH)}")
 
     loaded_mtime_ns = WORKBOOK_PATH.stat().st_mtime_ns
-    csv_rows = load_csv_rows(args.csv_path)
     wb = load_workbook(WORKBOOK_PATH, data_only=False, read_only=False)
     backup_path = None
     try:
         existing_rows = rows_from_sheet(wb, OPTION_REVIEW_SHEET)
-        merged_rows = merge_csv_with_existing_option_review_rows(existing_rows, csv_rows)
+        if args.csv_path is not None:
+            csv_rows = load_csv_rows(args.csv_path)
+            source_rows = csv_rows
+            merged_rows = merge_csv_with_existing_option_review_rows(existing_rows, csv_rows)
+            source_kind = "csv"
+            source_label = str(args.csv_path)
+        else:
+            source_rows = existing_rows
+            merged_rows = [{header: clean(row.get(header)) for header in OPTION_REVIEW_HEADERS} for row in existing_rows]
+            source_kind = "workbook_sheet"
+            source_label = f"workbook:{OPTION_REVIEW_SHEET}"
         selected = list(FUTURE_MODEL_KEYS) if args.model_key == "all" else [args.model_key]
-        plan = build_future_option_population_plan(wb, csv_rows, selected)
+        plan = build_future_option_population_plan(wb, source_rows, selected)
         report = {
-            "csv_path": str(args.csv_path),
-            "csv_rows": len(csv_rows),
+            "source": source_kind,
+            "csv_path": source_label,
+            "source_rows": len(source_rows),
             "existing_option_review_rows": len(existing_rows),
             "merged_option_review_rows": len(merged_rows),
             **_strip_rows_from_plan(plan),
@@ -404,8 +418,9 @@ def main(argv: list[str] | None = None) -> int:
                 "status": "written",
                 "workbook": str(WORKBOOK_PATH),
                 "backup": str(backup_path),
-                "csv_path": str(args.csv_path),
-                "csv_rows": len(csv_rows),
+                "source": source_kind,
+                "csv_path": source_label,
+                "source_rows": len(source_rows),
                 "merged_option_review_rows": len(merged_rows),
                 **_strip_rows_from_plan(plan),
                 "verification": verification,
