@@ -15,7 +15,7 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from corvette_form_generator.schema_validation import validate_workbook_schema  # noqa: E402
+from corvette_form_generator.schema_validation import live_contract_provenance_leaks, validate_workbook_schema  # noqa: E402
 
 
 OPTION_HEADERS = ["option_id", "rpo", "selectable", "active", "price"]
@@ -95,6 +95,32 @@ def validate_temp_workbook(wb: Workbook):
 
 
 class SchemaValidationMetadataTests(unittest.TestCase):
+    def test_live_contract_provenance_leaks_flags_future_model_review_lineage_only(self) -> None:
+        data = {
+            "dataset": {"source_sheet": "grandSport_options"},
+            "label": "Grand Sport",
+            "choices": [
+                {
+                    "choice_id": "choice-1",
+                    "source_detail_raw": "customer-facing source detail",
+                    "suggested_copy_from": "grand_sport:opt_abc_001",
+                }
+            ],
+            "rules": [
+                {
+                    "source_id": "opt_abc_001",
+                    "source_type": "option",
+                    "copy_from_model_key": "grand_sport",
+                }
+            ],
+        }
+
+        leaks = list(live_contract_provenance_leaks(data))
+
+        self.assertEqual({path for path, _, _ in leaks}, {"$.choices[0].suggested_copy_from", "$.rules[0].copy_from_model_key"})
+        self.assertFalse(any(path == "$.dataset.source_sheet" for path, _, _ in leaks))
+        self.assertFalse(any(path == "$.label" for path, _, _ in leaks))
+
     def test_metadata_discovered_ovs_sheet_validates_option_ids(self) -> None:
         wb = minimal_schema_workbook(
             extra_model_rows=[{"model_key": "z06", "registry_key": "z06", "active": True}],

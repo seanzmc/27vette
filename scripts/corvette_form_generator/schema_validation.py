@@ -187,6 +187,17 @@ RULE_REPLACEMENT_ACTIONS: set[str] = {
 }
 
 DRAFT_ONLY_CHOICE_FIELDS: set[str] = {"source_option_name", "source_description", "text_cleanup_notes"}
+DRAFT_ONLY_PROVENANCE_FIELDS: set[str] = {
+    "draftMetadata",
+    "copy_from_model_key",
+    "suggested_copy_from",
+    "raw_source_sheet",
+    "raw_source_sheets",
+    "review_status",
+    "review_flags",
+}
+DRAFT_ONLY_LIVE_CONTRACT_FIELDS: set[str] = DRAFT_ONLY_CHOICE_FIELDS | DRAFT_ONLY_PROVENANCE_FIELDS
+FORBIDDEN_LIVE_LINEAGE_VALUE_TOKENS: tuple[str, ...] = ("grand_sport:",)
 
 MODEL_REGISTRY_PROMOTION_HEADERS: tuple[str, ...] = (
     "model_key",
@@ -256,6 +267,25 @@ def add_issue(
             message=message,
         )
     )
+
+
+def live_contract_provenance_leaks(value: Any, path: str = "$") -> Iterable[tuple[str, str, Any]]:
+    if isinstance(value, dict):
+        for key, child in value.items():
+            child_path = f"{path}.{key}"
+            if key in DRAFT_ONLY_LIVE_CONTRACT_FIELDS:
+                yield (child_path, "field", child)
+                continue
+            yield from live_contract_provenance_leaks(child, child_path)
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            yield from live_contract_provenance_leaks(child, f"{path}[{index}]")
+    elif isinstance(value, str):
+        normalized = value.lower()
+        for token in FORBIDDEN_LIVE_LINEAGE_VALUE_TOKENS:
+            if token in normalized:
+                yield (path, "value", value)
+                break
 
 
 def is_number(value: Any) -> bool:
@@ -784,27 +814,20 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                     registry = json.loads(registry_json)
                     for model_key, entry in registry.get("models", {}).items():
                         data = entry.get("data", {})
-                        if "draftMetadata" in data:
+                        for path, leak_type, leaked_value in live_contract_provenance_leaks(data):
                             add_issue(
                                 issues,
                                 "error",
-                                "draft_metadata_in_live_contract",
+                                "draft_provenance_in_live_contract",
                                 sheet="form-app/data.js",
-                                value=model_key,
-                                message="draftMetadata is inspection provenance and must not be emitted in live app data.",
+                                value={
+                                    "model_key": model_key,
+                                    "path": path,
+                                    "leak_type": leak_type,
+                                    "value": leaked_value,
+                                },
+                                message="Draft/review provenance must not leak into live app data.",
                             )
-                        for index, choice in enumerate(data.get("choices", []), start=1):
-                            leaked = sorted(DRAFT_ONLY_CHOICE_FIELDS & set(choice))
-                            if leaked:
-                                add_issue(
-                                    issues,
-                                    "error",
-                                    "draft_choice_fields_in_live_contract",
-                                    sheet="form-app/data.js",
-                                    row=index,
-                                    value={"model_key": model_key, "choice_id": choice.get("choice_id"), "fields": leaked},
-                                    message="Draft/provenance choice fields must not leak into live app data.",
-                                )
                 except (IndexError, json.JSONDecodeError) as exc:
                     add_issue(
                         issues,
