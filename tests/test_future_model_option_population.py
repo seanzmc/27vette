@@ -49,12 +49,14 @@ def option_review_row(**overrides: object) -> dict[str, object]:
             "suggested_option_id": "opt_abc_001",
             "suggested_section_id": "wheels",
             "suggested_display_order": "12",
+            "review_status": "approved",
+            "active": "True",
             "final_option_id": "",
             "final_option_name": "Final Option Name",
             "final_description": "Final description",
             "final_detail_raw": "Final detail",
-            "final_section_id": "ignored_final_section",
-            "final_selectable": "ignored",
+            "final_section_id": "",
+            "final_selectable": "",
             "final_display_order": "14",
             "final_display_behavior": "option_card",
         }
@@ -119,7 +121,7 @@ class FutureModelOptionPopulationTests(unittest.TestCase):
             ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"],
         )
         self.assertEqual([row["status"] for row in z06["ovs_rows"]], ["available", "standard", "unavailable", "available", "standard", "unavailable"])
-        self.assertEqual(z06["blocked_counts"]["blank_suggested_section_id"], 1)
+        self.assertEqual(z06["blocked_counts"]["missing_resolved_section_id"], 1)
 
     def test_ref_only_rows_emit_as_not_selectable_when_section_filled(self) -> None:
         wb = population_workbook()
@@ -155,8 +157,70 @@ class FutureModelOptionPopulationTests(unittest.TestCase):
         self.assertEqual(plan["error_count"], 2)
         self.assertEqual(z06["eligible_option_count"], 0)
         self.assertTrue(any("duplicate option_id opt_abc_001" in error for error in z06["errors"]))
-        self.assertTrue(any("suggested_section_id missing_section is not in section_master" in error for error in z06["errors"]))
+        self.assertTrue(any("resolved_section_id missing_section is not in section_master" in error for error in z06["errors"]))
         self.assertTrue(any("status_2lz_h07 is required" in error for error in z06["errors"]))
+
+    def test_inactive_needs_section_review_rows_with_sections_are_blocked(self) -> None:
+        wb = population_workbook()
+        csv_rows = [
+            option_review_row(
+                review_status="needs_section_review",
+                active="False",
+                suggested_section_id="wheels",
+                suggested_option_id="opt_blocked_001",
+            )
+        ]
+
+        plan = option_apply.build_future_option_population_plan(wb, csv_rows, ["z06"])
+
+        z06 = plan["models"]["z06"]
+        self.assertEqual(plan["error_count"], 0)
+        self.assertEqual(z06["eligible_option_count"], 0)
+        self.assertEqual(z06["emitted_ovs_count"], 0)
+        self.assertEqual(z06["blocked_counts"]["needs_section_review"], 1)
+        self.assertEqual(z06["blocked_counts"]["inactive"], 1)
+
+    def test_final_section_and_selectable_override_suggested_defaults(self) -> None:
+        wb = population_workbook()
+        csv_rows = [
+            option_review_row(
+                suggested_section_id="wheels",
+                final_section_id="exterior",
+                orderable_rpo="ABC",
+                final_selectable="False",
+            )
+        ]
+
+        plan = option_apply.build_future_option_population_plan(wb, csv_rows, ["z06"])
+
+        z06 = plan["models"]["z06"]
+        self.assertEqual(plan["error_count"], 0)
+        self.assertEqual(z06["eligible_option_count"], 1)
+        self.assertEqual(z06["option_rows"][0]["section_id"], "exterior")
+        self.assertEqual(z06["option_rows"][0]["selectable"], "False")
+
+    def test_blocked_deferred_rows_are_reported_separately_from_missing_sections(self) -> None:
+        wb = population_workbook()
+        csv_rows = [
+            option_review_row(review_status="deferred", active="False", suggested_section_id="wheels"),
+            option_review_row(
+                raw_source_span="z06_intextmec_raw:21-21",
+                source_rpo="DEF",
+                suggested_option_id="opt_def_001",
+                review_status="approved",
+                active="True",
+                suggested_section_id="",
+            ),
+        ]
+
+        plan = option_apply.build_future_option_population_plan(wb, csv_rows, ["z06"])
+
+        z06 = plan["models"]["z06"]
+        self.assertEqual(plan["error_count"], 0)
+        self.assertEqual(z06["eligible_option_count"], 0)
+        self.assertEqual(z06["blocked_counts"]["deferred"], 1)
+        self.assertEqual(z06["blocked_counts"]["inactive"], 1)
+        self.assertEqual(z06["blocked_counts"]["missing_resolved_section_id"], 1)
 
 
 if __name__ == "__main__":

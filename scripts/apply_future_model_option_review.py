@@ -108,6 +108,35 @@ def _display_order_value(row: dict[str, Any]) -> str:
     return clean(row.get("final_display_order")) or clean(row.get("suggested_display_order"))
 
 
+def active_bool(value: Any) -> bool:
+    text = clean(value).casefold()
+    return text in {"true", "1", "yes", "y", "active"}
+
+
+def _resolved_section_id(row: dict[str, Any]) -> str:
+    return clean(row.get("final_section_id")) or clean(row.get("suggested_section_id"))
+
+
+def _selectable_value(row: dict[str, Any]) -> str:
+    final_selectable = clean(row.get("final_selectable"))
+    if final_selectable:
+        lowered = final_selectable.casefold()
+        if lowered in {"true", "1", "yes", "y"}:
+            return "True"
+        if lowered in {"false", "0", "no", "n"}:
+            return "False"
+        return final_selectable
+    return "True" if clean(row.get("orderable_rpo")) else "False"
+
+
+def _current_option_ids(wb, sheet_name: str) -> set[str]:
+    return {clean(row.get("option_id")) for row in rows_from_sheet(wb, sheet_name) if clean(row.get("option_id"))}
+
+
+def _current_ovs_option_ids(wb, sheet_name: str) -> set[str]:
+    return {clean(row.get("option_id")) for row in rows_from_sheet(wb, sheet_name) if clean(row.get("option_id"))}
+
+
 def _intish_string(value: Any) -> str:
     text = clean(value)
     if not text:
@@ -146,7 +175,7 @@ def _validation_errors_for_selected_row(
 ) -> list[str]:
     errors: list[str] = []
     option_id = _option_id_for_row(row)
-    section_id = clean(row.get("suggested_section_id"))
+    section_id = _resolved_section_id(row)
     statuses = _parse_status_summary(row.get("normalized_status_summary"))
     if not option_id:
         errors.append("option_id is required")
@@ -155,9 +184,9 @@ def _validation_errors_for_selected_row(
     if not _option_name_for_row(row):
         errors.append("option_name is required")
     if not section_id:
-        errors.append("suggested_section_id is required")
+        errors.append("missing_resolved_section_id")
     elif section_id not in section_ids:
-        errors.append(f"suggested_section_id {section_id} is not in section_master")
+        errors.append(f"resolved_section_id {section_id} is not in section_master")
     display_order = _display_order_value(row)
     if display_order:
         try:
@@ -181,8 +210,8 @@ def _option_row_from_review(row: dict[str, Any]) -> dict[str, Any]:
         "option_name": _option_name_for_row(row),
         "description": clean(row.get("final_description")),
         "detail_raw": _detail_raw_for_row(row),
-        "section_id": clean(row.get("suggested_section_id")),
-        "selectable": "True" if clean(row.get("orderable_rpo")) else "False",
+        "section_id": _resolved_section_id(row),
+        "selectable": _selectable_value(row),
         "display_order": _intish_string(_display_order_value(row)),
         "active": "True",
         "display_behavior": clean(row.get("final_display_behavior")),
@@ -208,8 +237,11 @@ def build_future_option_population_plan(wb, option_review_rows: list[dict[str, A
         spec = FUTURE_MODEL_SPECS[model_key]
         variant_ids = list(spec.variant_columns.values())
         model_rows = [row for row in option_review_rows if clean(row.get("model_key")) == model_key]
-        selected_rows = [row for row in model_rows if clean(row.get("suggested_section_id"))]
-        option_id_counts = Counter(_option_id_for_row(row) for row in selected_rows if _option_id_for_row(row))
+        approved_active_rows = [
+            row for row in model_rows
+            if clean(row.get("review_status")) == "approved" and active_bool(row.get("active"))
+        ]
+        option_id_counts = Counter(_option_id_for_row(row) for row in approved_active_rows if _option_id_for_row(row))
         duplicate_option_ids = {option_id for option_id, count in option_id_counts.items() if count > 1}
 
         option_rows: list[dict[str, Any]] = []
@@ -218,8 +250,18 @@ def build_future_option_population_plan(wb, option_review_rows: list[dict[str, A
         errors: list[str] = []
 
         for row in model_rows:
-            if not clean(row.get("suggested_section_id")):
-                blocked_counts["blank_suggested_section_id"] += 1
+            review_status = clean(row.get("review_status"))
+            active = active_bool(row.get("active"))
+            if review_status != "approved":
+                blocked_counts[review_status or "not_approved"] += 1
+                if not active:
+                    blocked_counts["inactive"] += 1
+                continue
+            if not active:
+                blocked_counts["inactive"] += 1
+                continue
+            if not _resolved_section_id(row):
+                blocked_counts["missing_resolved_section_id"] += 1
                 continue
             row_errors = _validation_errors_for_selected_row(row, section_ids=section_ids, variant_ids=variant_ids, duplicate_option_ids=duplicate_option_ids)
             if row_errors:
@@ -238,6 +280,11 @@ def build_future_option_population_plan(wb, option_review_rows: list[dict[str, A
         variant_order = {variant_id: index for index, variant_id in enumerate(variant_ids)}
         ovs_rows.sort(key=lambda row: (display_order[row["option_id"]], variant_order[row["variant_id"]]))
 
+        current_option_ids = _current_option_ids(wb, spec.target_option_sheet)
+        current_ovs_option_ids = _current_ovs_option_ids(wb, spec.target_ovs_sheet)
+        planned_option_ids = {row["option_id"] for row in option_rows}
+        dangling_ovs_after_plan = current_ovs_option_ids - planned_option_ids
+
         model_plan = {
             "model_key": model_key,
             "target_option_sheet": spec.target_option_sheet,
@@ -248,6 +295,11 @@ def build_future_option_population_plan(wb, option_review_rows: list[dict[str, A
             "would_write_ovs_rows": len(ovs_rows),
             "eligible_option_count": len(option_rows),
             "emitted_ovs_count": len(ovs_rows),
+            "current_option_ids_beyond_eligible": sorted(current_option_ids - planned_option_ids),
+            "eligible_option_ids_missing_from_current": sorted(planned_option_ids - current_option_ids),
+            "would_remove_option_ids": sorted(current_option_ids - planned_option_ids),
+            "would_add_option_ids": sorted(planned_option_ids - current_option_ids),
+            "current_ovs_option_ids_beyond_eligible": sorted(dangling_ovs_after_plan),
             "blocked_counts": dict(sorted(blocked_counts.items())),
             "errors": errors,
             "option_rows": option_rows,
