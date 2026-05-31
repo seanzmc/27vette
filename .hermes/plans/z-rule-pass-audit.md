@@ -1,7 +1,7 @@
 # Z Rule / Exclusive / Default Audit
 
 Status: `rule_audit_generated`
-Generated: `2026-05-31T18:51:52+00:00`
+Generated: `2026-05-31T19:38:52+00:00`
 
 - Read-only audit: workbook was inspected but not saved.
 - Audit uses the same rule/exclusive/default source-sheet concepts as Stingray and Grand Sport.
@@ -13,7 +13,7 @@ Generated: `2026-05-31T18:51:52+00:00`
 - activeOptions: 239
 - optionRows: 239
 - ovsRows: 1434
-- ruleMappingRows: 100
+- ruleMappingRows: 94
 - exclusiveGroups: 7
 - exclusiveMembers: 16
 - ruleGroups: 0
@@ -21,13 +21,13 @@ Generated: `2026-05-31T18:51:52+00:00`
 - defaultSelectionRules: 3
 
 ### Rule types
-- excludes: 76
+- excludes: 70
 - includes: 15
 - requires: 9
 
 ### Focused review counts
 - duplicateSemanticRules: 0
-- directExcludesCoveredByExclusiveGroups: 6
+- directExcludesCoveredByExclusiveGroups: 0
 - missingOptionReferences: 0
 - inactiveOptionReferences: 0
 - missingRuleGroupMemberReferences: 0
@@ -56,7 +56,7 @@ Generated: `2026-05-31T18:51:52+00:00`
 - activeOptions: 203
 - optionRows: 203
 - ovsRows: 812
-- ruleMappingRows: 56
+- ruleMappingRows: 50
 - exclusiveGroups: 4
 - exclusiveMembers: 10
 - ruleGroups: 0
@@ -64,13 +64,13 @@ Generated: `2026-05-31T18:51:52+00:00`
 - defaultSelectionRules: 4
 
 ### Rule types
-- excludes: 39
+- excludes: 33
 - includes: 14
 - requires: 3
 
 ### Focused review counts
 - duplicateSemanticRules: 0
-- directExcludesCoveredByExclusiveGroups: 6
+- directExcludesCoveredByExclusiveGroups: 0
 - missingOptionReferences: 0
 - inactiveOptionReferences: 0
 - missingRuleGroupMemberReferences: 0
@@ -99,7 +99,7 @@ Generated: `2026-05-31T18:51:52+00:00`
 - activeOptions: 204
 - optionRows: 204
 - ovsRows: 816
-- ruleMappingRows: 56
+- ruleMappingRows: 50
 - exclusiveGroups: 4
 - exclusiveMembers: 10
 - ruleGroups: 0
@@ -107,13 +107,13 @@ Generated: `2026-05-31T18:51:52+00:00`
 - defaultSelectionRules: 4
 
 ### Rule types
-- excludes: 39
+- excludes: 33
 - includes: 14
 - requires: 3
 
 ### Focused review counts
 - duplicateSemanticRules: 0
-- directExcludesCoveredByExclusiveGroups: 6
+- directExcludesCoveredByExclusiveGroups: 0
 - missingOptionReferences: 0
 - inactiveOptionReferences: 0
 - missingRuleGroupMemberReferences: 0

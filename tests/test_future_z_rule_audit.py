@@ -98,6 +98,7 @@ def audit_workbook() -> Workbook:
             {"rule_id": "r2", "source_id": "opt_a", "rule_type": "excludes", "target_id": "opt_b", "target_type": "option", "source_type": "option", "normalization_status": "active"},
             {"rule_id": "r3", "source_id": "opt_a", "rule_type": "requires", "target_id": "missing", "target_type": "option", "source_type": "option", "normalization_status": "active"},
             {"rule_id": "r4", "source_id": "opt_inactive", "rule_type": "includes", "target_id": "opt_c", "target_type": "option", "source_type": "option", "normalization_status": "active"},
+            {"rule_id": "r5", "source_id": "opt_a", "rule_type": "excludes", "target_id": "opt_b", "target_type": "option", "source_type": "option", "generation_action": "omit_grouped_exclusion", "normalization_status": "omitted", "normalization_reason": "Covered by exclusive group", "replacement_group_id": "x1"},
         ],
     )
     append_sheet(wb, "z06_rule_groups", GROUP_HEADERS, [{"group_id": "g1", "group_type": "requires_any", "source_id": "opt_a", "active": True}])

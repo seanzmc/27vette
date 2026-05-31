@@ -65,6 +65,15 @@ def _option_indexes(option_rows: list[dict[str, str]]) -> dict[str, Any]:
     return {"by_id": by_id, "active_by_id": active_by_id, "rpo_by_id": rpo_by_id}
 
 
+def runtime_authored_rule(row: dict[str, str]) -> bool:
+    status = clean(row.get("normalization_status")).casefold()
+    if status in {"omitted", "replaced"}:
+        return False
+    if status == "preserved":
+        return True
+    return not clean(row.get("generation_action")).casefold().startswith("omit")
+
+
 def _rule_semantic_key(row: dict[str, str]) -> tuple[str, str, str, str, str]:
     return (
         clean(row.get("source_id")),
@@ -199,7 +208,8 @@ def _hot_spots(options: list[dict[str, str]], rules: list[dict[str, str]], exclu
 
 def _audit_model(wb: Any, model_key: str) -> dict[str, Any]:
     options = optional_rows(wb, f"{model_key}_options")
-    rules = optional_rows(wb, f"{model_key}_rule_mapping")
+    all_rules = optional_rows(wb, f"{model_key}_rule_mapping")
+    rules = [row for row in all_rules if runtime_authored_rule(row)]
     ovs_rows = optional_rows(wb, f"{model_key}_ovs")
     rule_groups = optional_rows(wb, f"{model_key}_rule_groups")
     rule_group_members = optional_rows(wb, f"{model_key}_rule_group_members")

@@ -1,6 +1,6 @@
 {
   "status": "rule_audit_generated",
-  "generated_at": "2026-05-31T18:51:52+00:00",
+  "generated_at": "2026-05-31T19:38:52+00:00",
   "selected_model_keys": [
     "z06",
     "zr1",
@@ -13,7 +13,7 @@
         "activeOptions": 239,
         "optionRows": 239,
         "ovsRows": 1434,
-        "ruleMappingRows": 100,
+        "ruleMappingRows": 94,
         "exclusiveGroups": 7,
         "exclusiveMembers": 16,
         "ruleGroups": 0,
@@ -21,13 +21,13 @@
         "defaultSelectionRules": 3
       },
       "ruleTypeCounts": {
-        "excludes": 76,
+        "excludes": 70,
         "includes": 15,
         "requires": 9
       },
       "focusedReviewCounts": {
         "duplicateSemanticRules": 0,
-        "directExcludesCoveredByExclusiveGroups": 6,
+        "directExcludesCoveredByExclusiveGroups": 0,
         "missingOptionReferences": 0,
         "inactiveOptionReferences": 0,
         "missingRuleGroupMemberReferences": 0,
@@ -40,14 +40,7 @@
       },
       "focusedReview": {
         "duplicateSemanticRules": [],
-        "directExcludesCoveredByExclusiveGroups": [
-          "z06_copy_rule_opt_rik_001_excludes_opt_rin_001_opt_rik_001_excludes_opt_rin_001",
-          "z06_copy_rule_opt_rik_001_excludes_opt_sl8_001_opt_rik_001_excludes_opt_sl8_001",
-          "z06_copy_rule_opt_rin_001_excludes_opt_rik_001_opt_rin_001_excludes_opt_rik_001",
-          "z06_copy_rule_opt_rin_001_excludes_opt_sl8_001_opt_rin_001_excludes_opt_sl8_001",
-          "z06_copy_rule_opt_sl8_001_excludes_opt_rik_001_opt_sl8_001_excludes_opt_rik_001",
-          "z06_copy_rule_opt_sl8_001_excludes_opt_rin_001_opt_sl8_001_excludes_opt_rin_001"
-        ],
+        "directExcludesCoveredByExclusiveGroups": [],
         "missingOptionReferences": [],
         "inactiveOptionReferences": [],
         "missingRuleGroupMemberReferences": [],
@@ -315,7 +308,7 @@
         "activeOptions": 203,
         "optionRows": 203,
         "ovsRows": 812,
-        "ruleMappingRows": 56,
+        "ruleMappingRows": 50,
         "exclusiveGroups": 4,
         "exclusiveMembers": 10,
         "ruleGroups": 0,
@@ -323,13 +316,13 @@
         "defaultSelectionRules": 4
       },
       "ruleTypeCounts": {
-        "excludes": 39,
+        "excludes": 33,
         "includes": 14,
         "requires": 3
       },
       "focusedReviewCounts": {
         "duplicateSemanticRules": 0,
-        "directExcludesCoveredByExclusiveGroups": 6,
+        "directExcludesCoveredByExclusiveGroups": 0,
         "missingOptionReferences": 0,
         "inactiveOptionReferences": 0,
         "missingRuleGroupMemberReferences": 0,
@@ -342,14 +335,7 @@
       },
       "focusedReview": {
         "duplicateSemanticRules": [],
-        "directExcludesCoveredByExclusiveGroups": [
-          "zr1_copy_rule_opt_rik_001_excludes_opt_rin_001_opt_rik_001_excludes_opt_rin_001",
-          "zr1_copy_rule_opt_rik_001_excludes_opt_sl8_001_opt_rik_001_excludes_opt_sl8_001",
-          "zr1_copy_rule_opt_rin_001_excludes_opt_rik_001_opt_rin_001_excludes_opt_rik_001",
-          "zr1_copy_rule_opt_rin_001_excludes_opt_sl8_001_opt_rin_001_excludes_opt_sl8_001",
-          "zr1_copy_rule_opt_sl8_001_excludes_opt_rik_001_opt_sl8_001_excludes_opt_rik_001",
-          "zr1_copy_rule_opt_sl8_001_excludes_opt_rin_001_opt_sl8_001_excludes_opt_rin_001"
-        ],
+        "directExcludesCoveredByExclusiveGroups": [],
         "missingOptionReferences": [],
         "inactiveOptionReferences": [],
         "missingRuleGroupMemberReferences": [],
@@ -549,7 +535,7 @@
         "activeOptions": 204,
         "optionRows": 204,
         "ovsRows": 816,
-        "ruleMappingRows": 56,
+        "ruleMappingRows": 50,
         "exclusiveGroups": 4,
         "exclusiveMembers": 10,
         "ruleGroups": 0,
@@ -557,13 +543,13 @@
         "defaultSelectionRules": 4
       },
       "ruleTypeCounts": {
-        "excludes": 39,
+        "excludes": 33,
         "includes": 14,
         "requires": 3
       },
       "focusedReviewCounts": {
         "duplicateSemanticRules": 0,
-        "directExcludesCoveredByExclusiveGroups": 6,
+        "directExcludesCoveredByExclusiveGroups": 0,
         "missingOptionReferences": 0,
         "inactiveOptionReferences": 0,
         "missingRuleGroupMemberReferences": 0,
@@ -576,14 +562,7 @@
       },
       "focusedReview": {
         "duplicateSemanticRules": [],
-        "directExcludesCoveredByExclusiveGroups": [
-          "zr1x_copy_rule_opt_rik_001_excludes_opt_rin_001_opt_rik_001_excludes_opt_rin_001",
-          "zr1x_copy_rule_opt_rik_001_excludes_opt_sl8_001_opt_rik_001_excludes_opt_sl8_001",
-          "zr1x_copy_rule_opt_rin_001_excludes_opt_rik_001_opt_rin_001_excludes_opt_rik_001",
-          "zr1x_copy_rule_opt_rin_001_excludes_opt_sl8_001_opt_rin_001_excludes_opt_sl8_001",
-          "zr1x_copy_rule_opt_sl8_001_excludes_opt_rik_001_opt_sl8_001_excludes_opt_rik_001",
-          "zr1x_copy_rule_opt_sl8_001_excludes_opt_rin_001_opt_sl8_001_excludes_opt_rin_001"
-        ],
+        "directExcludesCoveredByExclusiveGroups": [],
         "missingOptionReferences": [],
         "inactiveOptionReferences": [],
         "missingRuleGroupMemberReferences": [],
