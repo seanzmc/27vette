@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-01T16:03:37+00:00"
+          "generated_at": "2026-06-01T19:05:30+00:00"
         },
         "variants": [
           {
@@ -111481,7 +111481,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-01T16:03:05+00:00",
+          "generated_at": "2026-06-01T19:05:27+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -117832,7 +117832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 9995,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -117857,7 +117857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 9995,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -117882,7 +117882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 9995,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -117907,7 +117907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 9995,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -117932,7 +117932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 9995,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -117957,7 +117957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 9995,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -119182,7 +119182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Included with (B6P) Coupe Engine Appearance Package or (BCW) Red engine intake."
@@ -119207,7 +119207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Included with (B6P) Coupe Engine Appearance Package or (BCW) Red engine intake."
@@ -119232,7 +119232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Included with (B6P) Coupe Engine Appearance Package or (BCW) Red engine intake."
@@ -119257,7 +119257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Included with (B6P) Coupe Engine Appearance Package or (BCW) Red engine intake."
@@ -119282,7 +119282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Included with (B6P) Coupe Engine Appearance Package or (BCW) Red engine intake."
@@ -119307,7 +119307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Included with (B6P) Coupe Engine Appearance Package or (BCW) Red engine intake."
@@ -119332,7 +119332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2495,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": ""
@@ -119357,7 +119357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2495,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": ""
@@ -119382,7 +119382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2495,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": ""
@@ -119407,7 +119407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2495,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": ""
@@ -119432,7 +119432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2495,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": ""
@@ -119457,7 +119457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2495,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": ""
@@ -119482,7 +119482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": "Included with (B6P/ZZ3) Engine Appearance Package."
@@ -119507,7 +119507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": "Included with (B6P/ZZ3) Engine Appearance Package."
@@ -119532,7 +119532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": "Included with (B6P/ZZ3) Engine Appearance Package."
@@ -119557,7 +119557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": "Included with (B6P/ZZ3) Engine Appearance Package."
@@ -119582,7 +119582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": "Included with (B6P/ZZ3) Engine Appearance Package."
@@ -119607,7 +119607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": "Included with (B6P/ZZ3) Engine Appearance Package."
@@ -119632,7 +119632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1995,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -119657,7 +119657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1995,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -119682,7 +119682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1995,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -119707,7 +119707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1995,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -119732,7 +119732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1995,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -119757,7 +119757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1995,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -119782,7 +119782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2895,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with (RXI) LT6 engine cover in visible carbon fiber, LPO."
@@ -119807,7 +119807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2895,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with (RXI) LT6 engine cover in visible carbon fiber, LPO."
@@ -119832,7 +119832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2895,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with (RXI) LT6 engine cover in visible carbon fiber, LPO."
@@ -119857,7 +119857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2895,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with (RXI) LT6 engine cover in visible carbon fiber, LPO."
@@ -119882,7 +119882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2895,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with (RXI) LT6 engine cover in visible carbon fiber, LPO."
@@ -119907,7 +119907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2895,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with (RXI) LT6 engine cover in visible carbon fiber, LPO."
@@ -119932,7 +119932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -119957,7 +119957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -119982,7 +119982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -120007,7 +120007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -120032,7 +120032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -120057,7 +120057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -120082,7 +120082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1195,
             "display_behavior": "",
             "display_order": 5,
             "source_detail_raw": ""
@@ -120107,7 +120107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1195,
             "display_behavior": "",
             "display_order": 5,
             "source_detail_raw": ""
@@ -120132,7 +120132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1195,
             "display_behavior": "",
             "display_order": 5,
             "source_detail_raw": ""
@@ -120157,7 +120157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1195,
             "display_behavior": "",
             "display_order": 5,
             "source_detail_raw": ""
@@ -120182,7 +120182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1195,
             "display_behavior": "",
             "display_order": 5,
             "source_detail_raw": ""
@@ -120207,7 +120207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1195,
             "display_behavior": "",
             "display_order": 5,
             "source_detail_raw": ""
@@ -121132,7 +121132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 295,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -121157,7 +121157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 295,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -121182,7 +121182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 295,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -121207,7 +121207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 295,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -121232,7 +121232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 295,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -121257,7 +121257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 295,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -122332,7 +122332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -122357,7 +122357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -122382,7 +122382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -122407,7 +122407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -122432,7 +122432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -122457,7 +122457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -122632,7 +122632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5295,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with (FA5) carbon fiber interior trim."
@@ -122657,7 +122657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5295,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with (FA5) carbon fiber interior trim."
@@ -122682,7 +122682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5295,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with (FA5) carbon fiber interior trim."
@@ -122707,7 +122707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5295,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with (FA5) carbon fiber interior trim."
@@ -122732,7 +122732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5295,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with (FA5) carbon fiber interior trim."
@@ -122757,7 +122757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5295,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with (FA5) carbon fiber interior trim."
@@ -122782,7 +122782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Requires (HTJ) Jet Black interior.\nRequires leather seating surfaces with perforated sueded microfiber inserts interior: HTP, HU6, HU7, HTQ."
@@ -122807,7 +122807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Requires (HTJ) Jet Black interior.\nRequires leather seating surfaces with perforated sueded microfiber inserts interior: HTP, HU6, HU7, HTQ."
@@ -122832,7 +122832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Requires (HTJ) Jet Black interior.\nRequires leather seating surfaces with perforated sueded microfiber inserts interior: HTP, HU6, HU7, HTQ."
@@ -122857,7 +122857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Requires (HTJ) Jet Black interior.\nRequires leather seating surfaces with perforated sueded microfiber inserts interior: HTP, HU6, HU7, HTQ."
@@ -122882,7 +122882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Requires (HTJ) Jet Black interior.\nRequires leather seating surfaces with perforated sueded microfiber inserts interior: HTP, HU6, HU7, HTQ."
@@ -122907,7 +122907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Requires (HTJ) Jet Black interior.\nRequires leather seating surfaces with perforated sueded microfiber inserts interior: HTP, HU6, HU7, HTQ."
@@ -122932,7 +122932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 895,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Requires leather seating surfaces with perforated sueded microfiber inserts interiors: HTT, HU9, HUA, HTG, HUF, HMO, HVT, HXO, HZP, HUX, EPX, HUB."
@@ -122957,7 +122957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 895,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Requires leather seating surfaces with perforated sueded microfiber inserts interiors: HTT, HU9, HUA, HTG, HUF, HMO, HVT, HXO, HZP, HUX, EPX, HUB."
@@ -122982,7 +122982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 895,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Requires leather seating surfaces with perforated sueded microfiber inserts interiors: HTT, HU9, HUA, HTG, HUF, HMO, HVT, HXO, HZP, HUX, EPX, HUB."
@@ -123007,7 +123007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 895,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Requires leather seating surfaces with perforated sueded microfiber inserts interiors: HTT, HU9, HUA, HTG, HUF, HMO, HVT, HXO, HZP, HUX, EPX, HUB."
@@ -123032,7 +123032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 895,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Requires leather seating surfaces with perforated sueded microfiber inserts interiors: HTT, HU9, HUA, HTG, HUF, HMO, HVT, HXO, HZP, HUX, EPX, HUB."
@@ -123057,7 +123057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 895,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Requires leather seating surfaces with perforated sueded microfiber inserts interiors: HTT, HU9, HUA, HTG, HUF, HMO, HVT, HXO, HZP, HUX, EPX, HUB."
@@ -123232,7 +123232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Requires (AH2) GT2 seats. Available with (HUK/HU6) Sky Cool Gray, (HUL/HU7) Adrenaline Red, (HTN/HTQ) Natural interiors.\nRequires (AH2) GT2 seats. Available with (HU1/HU9) Sky Cool Gray, (HU2/HUA) Adrenaline Red, (HUE/HTG) Natural, (HMO/HVV) Jet Black/Sky Cool Gray, (HU0/HXO) Jet Black/Adrenaline Red interiors."
@@ -123257,7 +123257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Requires (AH2) GT2 seats. Available with (HUK/HU6) Sky Cool Gray, (HUL/HU7) Adrenaline Red, (HTN/HTQ) Natural interiors.\nRequires (AH2) GT2 seats. Available with (HU1/HU9) Sky Cool Gray, (HU2/HUA) Adrenaline Red, (HUE/HTG) Natural, (HMO/HVV) Jet Black/Sky Cool Gray, (HU0/HXO) Jet Black/Adrenaline Red interiors."
@@ -123282,7 +123282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Requires (AH2) GT2 seats. Available with (HUK/HU6) Sky Cool Gray, (HUL/HU7) Adrenaline Red, (HTN/HTQ) Natural interiors.\nRequires (AH2) GT2 seats. Available with (HU1/HU9) Sky Cool Gray, (HU2/HUA) Adrenaline Red, (HUE/HTG) Natural, (HMO/HVV) Jet Black/Sky Cool Gray, (HU0/HXO) Jet Black/Adrenaline Red interiors."
@@ -123307,7 +123307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Requires (AH2) GT2 seats. Available with (HUK/HU6) Sky Cool Gray, (HUL/HU7) Adrenaline Red, (HTN/HTQ) Natural interiors.\nRequires (AH2) GT2 seats. Available with (HU1/HU9) Sky Cool Gray, (HU2/HUA) Adrenaline Red, (HUE/HTG) Natural, (HMO/HVV) Jet Black/Sky Cool Gray, (HU0/HXO) Jet Black/Adrenaline Red interiors."
@@ -123332,7 +123332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Requires (AH2) GT2 seats. Available with (HUK/HU6) Sky Cool Gray, (HUL/HU7) Adrenaline Red, (HTN/HTQ) Natural interiors.\nRequires (AH2) GT2 seats. Available with (HU1/HU9) Sky Cool Gray, (HU2/HUA) Adrenaline Red, (HUE/HTG) Natural, (HMO/HVV) Jet Black/Sky Cool Gray, (HU0/HXO) Jet Black/Adrenaline Red interiors."
@@ -123357,7 +123357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Requires (AH2) GT2 seats. Available with (HUK/HU6) Sky Cool Gray, (HUL/HU7) Adrenaline Red, (HTN/HTQ) Natural interiors.\nRequires (AH2) GT2 seats. Available with (HU1/HU9) Sky Cool Gray, (HU2/HUA) Adrenaline Red, (HUE/HTG) Natural, (HMO/HVV) Jet Black/Sky Cool Gray, (HU0/HXO) Jet Black/Adrenaline Red interiors."
@@ -123382,7 +123382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -123407,7 +123407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -123432,7 +123432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -123457,7 +123457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -123482,7 +123482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -123507,7 +123507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -123532,7 +123532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1395,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -123557,7 +123557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1395,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -123582,7 +123582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1395,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -123607,7 +123607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1395,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -123632,7 +123632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1395,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -123657,7 +123657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1395,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -123832,7 +123832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5295,
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ, EYK, PDA, SNE or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -123857,7 +123857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5295,
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ, EYK, PDA, SNE or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -123882,7 +123882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5295,
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ, EYK, PDA, SNE or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -123907,7 +123907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5295,
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ, EYK, PDA, SNE or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -123932,7 +123932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5295,
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ, EYK, PDA, SNE or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -123957,7 +123957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5295,
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ, EYK, PDA, SNE or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -123982,7 +123982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": "Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW)."
@@ -124007,7 +124007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": "Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW)."
@@ -124032,7 +124032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": "Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW)."
@@ -124057,7 +124057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": "Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW)."
@@ -124082,7 +124082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": "Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW)."
@@ -124107,7 +124107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": "Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW)."
@@ -124132,7 +124132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 82,
             "source_detail_raw": "Not available with RIN, SL8."
@@ -124157,7 +124157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 82,
             "source_detail_raw": "Not available with RIN, SL8."
@@ -124182,7 +124182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 82,
             "source_detail_raw": "Not available with RIN, SL8."
@@ -124207,7 +124207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 82,
             "source_detail_raw": "Not available with RIN, SL8."
@@ -124232,7 +124232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 82,
             "source_detail_raw": "Not available with RIN, SL8."
@@ -124257,7 +124257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 82,
             "source_detail_raw": "Not available with RIN, SL8."
@@ -124282,7 +124282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 440,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Not available with RIK, SL8."
@@ -124307,7 +124307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 440,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Not available with RIK, SL8."
@@ -124332,7 +124332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 440,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Not available with RIK, SL8."
@@ -124357,7 +124357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 440,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Not available with RIK, SL8."
@@ -124382,7 +124382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 440,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Not available with RIK, SL8."
@@ -124407,7 +124407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 440,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Not available with RIK, SL8."
@@ -124432,7 +124432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -124457,7 +124457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -124482,7 +124482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -124507,7 +124507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -124532,7 +124532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -124557,7 +124557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -124582,7 +124582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
             "source_detail_raw": ""
@@ -124607,7 +124607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
             "source_detail_raw": ""
@@ -124632,7 +124632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
             "source_detail_raw": ""
@@ -124657,7 +124657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
             "source_detail_raw": ""
@@ -124682,7 +124682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
             "source_detail_raw": ""
@@ -124707,7 +124707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
             "source_detail_raw": ""
@@ -124882,7 +124882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2525,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (CC3) transparent, removable roof panel."
@@ -124907,7 +124907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2525,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (CC3) transparent, removable roof panel."
@@ -124932,7 +124932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2525,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (CC3) transparent, removable roof panel."
@@ -124957,7 +124957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2525,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (CC3) transparent, removable roof panel."
@@ -124982,7 +124982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2525,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (CC3) transparent, removable roof panel."
@@ -125007,7 +125007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2525,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (CC3) transparent, removable roof panel."
@@ -125032,7 +125032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Included with (SBT) dual roof, LPO."
@@ -125057,7 +125057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Included with (SBT) dual roof, LPO."
@@ -125082,7 +125082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Included with (SBT) dual roof, LPO."
@@ -125107,7 +125107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Included with (SBT) dual roof, LPO."
@@ -125132,7 +125132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Included with (SBT) dual roof, LPO."
@@ -125157,7 +125157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Included with (SBT) dual roof, LPO."
@@ -125182,7 +125182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -125207,7 +125207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -125232,7 +125232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -125257,7 +125257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -125282,7 +125282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -125307,7 +125307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -125332,7 +125332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -125357,7 +125357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -125382,7 +125382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -125407,7 +125407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -125432,7 +125432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -125457,7 +125457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -125482,7 +125482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 325,
             "display_behavior": "",
             "display_order": 22,
             "source_detail_raw": ""
@@ -125507,7 +125507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 325,
             "display_behavior": "",
             "display_order": 22,
             "source_detail_raw": ""
@@ -125532,7 +125532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 325,
             "display_behavior": "",
             "display_order": 22,
             "source_detail_raw": ""
@@ -125557,7 +125557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 325,
             "display_behavior": "",
             "display_order": 22,
             "source_detail_raw": ""
@@ -125582,7 +125582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 325,
             "display_behavior": "",
             "display_order": 22,
             "source_detail_raw": ""
@@ -125607,7 +125607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 325,
             "display_behavior": "",
             "display_order": 22,
             "source_detail_raw": ""
@@ -125632,7 +125632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 425,
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Requires (T0E) rear spoiler."
@@ -125657,7 +125657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 425,
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Requires (T0E) rear spoiler."
@@ -125682,7 +125682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 425,
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Requires (T0E) rear spoiler."
@@ -125707,7 +125707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 425,
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Requires (T0E) rear spoiler."
@@ -125732,7 +125732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 425,
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Requires (T0E) rear spoiler."
@@ -125757,7 +125757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 425,
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Requires (T0E) rear spoiler."
@@ -125782,7 +125782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 81,
             "source_detail_raw": "Not available with RIK, RIN."
@@ -125807,7 +125807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 81,
             "source_detail_raw": "Not available with RIK, RIN."
@@ -125832,7 +125832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 81,
             "source_detail_raw": "Not available with RIK, RIN."
@@ -125857,7 +125857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 81,
             "source_detail_raw": "Not available with RIK, RIN."
@@ -125882,7 +125882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 81,
             "source_detail_raw": "Not available with RIK, RIN."
@@ -125907,7 +125907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 81,
             "source_detail_raw": "Not available with RIK, RIN."
@@ -125932,7 +125932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -125957,7 +125957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -125982,7 +125982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -126007,7 +126007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -126032,7 +126032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -126057,7 +126057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -126082,7 +126082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 950,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Included with (PCQ) Grille Screen Protection Package, LPO."
@@ -126107,7 +126107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 950,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Included with (PCQ) Grille Screen Protection Package, LPO."
@@ -126132,7 +126132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 950,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Included with (PCQ) Grille Screen Protection Package, LPO."
@@ -126157,7 +126157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 950,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Included with (PCQ) Grille Screen Protection Package, LPO."
@@ -126182,7 +126182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 950,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Included with (PCQ) Grille Screen Protection Package, LPO."
@@ -126207,7 +126207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 950,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Included with (PCQ) Grille Screen Protection Package, LPO."
@@ -126232,7 +126232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 55,
             "source_detail_raw": "Included with (PCQ) Grille Screen Protection Package, LPO."
@@ -126257,7 +126257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 55,
             "source_detail_raw": "Included with (PCQ) Grille Screen Protection Package, LPO."
@@ -126282,7 +126282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 55,
             "source_detail_raw": "Included with (PCQ) Grille Screen Protection Package, LPO."
@@ -126307,7 +126307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 55,
             "source_detail_raw": "Included with (PCQ) Grille Screen Protection Package, LPO."
@@ -126332,7 +126332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 55,
             "source_detail_raw": "Included with (PCQ) Grille Screen Protection Package, LPO."
@@ -126357,7 +126357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 55,
             "source_detail_raw": "Included with (PCQ) Grille Screen Protection Package, LPO."
@@ -126382,7 +126382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1275,
             "display_behavior": "",
             "display_order": 71,
             "source_detail_raw": "When ordered with one of the following spoilers: 5V5, 5ZV, 5ZW, or (T0F/T0G) Carbon Fiber Aero Package, High Wing version is provided."
@@ -126407,7 +126407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1275,
             "display_behavior": "",
             "display_order": 71,
             "source_detail_raw": "When ordered with one of the following spoilers: 5V5, 5ZV, 5ZW, or (T0F/T0G) Carbon Fiber Aero Package, High Wing version is provided."
@@ -126432,7 +126432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1275,
             "display_behavior": "",
             "display_order": 71,
             "source_detail_raw": "When ordered with one of the following spoilers: 5V5, 5ZV, 5ZW, or (T0F/T0G) Carbon Fiber Aero Package, High Wing version is provided."
@@ -126457,7 +126457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1275,
             "display_behavior": "",
             "display_order": 71,
             "source_detail_raw": "When ordered with one of the following spoilers: 5V5, 5ZV, 5ZW, or (T0F/T0G) Carbon Fiber Aero Package, High Wing version is provided."
@@ -126482,7 +126482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1275,
             "display_behavior": "",
             "display_order": 71,
             "source_detail_raw": "When ordered with one of the following spoilers: 5V5, 5ZV, 5ZW, or (T0F/T0G) Carbon Fiber Aero Package, High Wing version is provided."
@@ -126507,7 +126507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1275,
             "display_behavior": "",
             "display_order": 71,
             "source_detail_raw": "When ordered with one of the following spoilers: 5V5, 5ZV, 5ZW, or (T0F/T0G) Carbon Fiber Aero Package, High Wing version is provided."
@@ -126532,7 +126532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
             "source_detail_raw": ""
@@ -126557,7 +126557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
             "source_detail_raw": ""
@@ -126582,7 +126582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
             "source_detail_raw": ""
@@ -126607,7 +126607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
             "source_detail_raw": ""
@@ -126632,7 +126632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
             "source_detail_raw": ""
@@ -126657,7 +126657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 72,
             "source_detail_raw": ""
@@ -126682,7 +126682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 230,
             "display_behavior": "",
             "display_order": 32,
             "source_detail_raw": "Included with (PEF) Contoured Liner Protection Package, LPO."
@@ -126707,7 +126707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 230,
             "display_behavior": "",
             "display_order": 32,
             "source_detail_raw": "Included with (PEF) Contoured Liner Protection Package, LPO."
@@ -126732,7 +126732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 230,
             "display_behavior": "",
             "display_order": 32,
             "source_detail_raw": "Included with (PEF) Contoured Liner Protection Package, LPO."
@@ -126757,7 +126757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 230,
             "display_behavior": "",
             "display_order": 32,
             "source_detail_raw": "Included with (PEF) Contoured Liner Protection Package, LPO."
@@ -126782,7 +126782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 230,
             "display_behavior": "",
             "display_order": 32,
             "source_detail_raw": "Included with (PEF) Contoured Liner Protection Package, LPO."
@@ -126807,7 +126807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 230,
             "display_behavior": "",
             "display_order": 32,
             "source_detail_raw": "Included with (PEF) Contoured Liner Protection Package, LPO."
@@ -126832,7 +126832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 5,
             "source_detail_raw": ""
@@ -126857,7 +126857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 5,
             "source_detail_raw": ""
@@ -126882,7 +126882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 5,
             "source_detail_raw": ""
@@ -126907,7 +126907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 5,
             "source_detail_raw": ""
@@ -126932,7 +126932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 5,
             "source_detail_raw": ""
@@ -126957,7 +126957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 195,
             "display_behavior": "",
             "display_order": 5,
             "source_detail_raw": ""
@@ -126982,7 +126982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 475,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -127007,7 +127007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 475,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -127032,7 +127032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 475,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -127057,7 +127057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 475,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -127082,7 +127082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 475,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -127107,7 +127107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 475,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -127132,7 +127132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 265,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Included with (PEF) Contoured Liner Protection Package, LPO."
@@ -127157,7 +127157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 265,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Included with (PEF) Contoured Liner Protection Package, LPO."
@@ -127182,7 +127182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 265,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Included with (PEF) Contoured Liner Protection Package, LPO."
@@ -127207,7 +127207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 265,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Included with (PEF) Contoured Liner Protection Package, LPO."
@@ -127232,7 +127232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 265,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Included with (PEF) Contoured Liner Protection Package, LPO."
@@ -127257,7 +127257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 265,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Included with (PEF) Contoured Liner Protection Package, LPO."
@@ -127282,7 +127282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 175,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -127307,7 +127307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 175,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -127332,7 +127332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 175,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -127357,7 +127357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 175,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -127382,7 +127382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 175,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -127407,7 +127407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 175,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -127432,7 +127432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 60,
             "display_behavior": "",
             "display_order": 6,
             "source_detail_raw": "Included with (PDY) Roadside Safety Package."
@@ -127457,7 +127457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 60,
             "display_behavior": "",
             "display_order": 6,
             "source_detail_raw": "Included with (PDY) Roadside Safety Package."
@@ -127482,7 +127482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 60,
             "display_behavior": "",
             "display_order": 6,
             "source_detail_raw": "Included with (PDY) Roadside Safety Package."
@@ -127507,7 +127507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 60,
             "display_behavior": "",
             "display_order": 6,
             "source_detail_raw": "Included with (PDY) Roadside Safety Package."
@@ -127532,7 +127532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 60,
             "display_behavior": "",
             "display_order": 6,
             "source_detail_raw": "Included with (PDY) Roadside Safety Package."
@@ -127557,7 +127557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 60,
             "display_behavior": "",
             "display_order": 6,
             "source_detail_raw": "Included with (PDY) Roadside Safety Package."
@@ -127582,7 +127582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 7,
             "source_detail_raw": "Included with (PDY) Roadside Safety Package."
@@ -127607,7 +127607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 7,
             "source_detail_raw": "Included with (PDY) Roadside Safety Package."
@@ -127632,7 +127632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 7,
             "source_detail_raw": "Included with (PDY) Roadside Safety Package."
@@ -127657,7 +127657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 7,
             "source_detail_raw": "Included with (PDY) Roadside Safety Package."
@@ -127682,7 +127682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 7,
             "source_detail_raw": "Included with (PDY) Roadside Safety Package."
@@ -127707,7 +127707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 150,
             "display_behavior": "",
             "display_order": 7,
             "source_detail_raw": "Included with (PDY) Roadside Safety Package."
@@ -127732,7 +127732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -127757,7 +127757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -127782,7 +127782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -127807,7 +127807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -127832,7 +127832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -127857,7 +127857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": ""
@@ -127882,7 +127882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2095,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": ""
@@ -127907,7 +127907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2095,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": ""
@@ -127932,7 +127932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2095,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": ""
@@ -127957,7 +127957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2095,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": ""
@@ -127982,7 +127982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2095,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": ""
@@ -128007,7 +128007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2095,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": ""
@@ -128032,7 +128032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2095,
             "display_behavior": "",
             "display_order": 81,
             "source_detail_raw": ""
@@ -128057,7 +128057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2095,
             "display_behavior": "",
             "display_order": 81,
             "source_detail_raw": ""
@@ -128082,7 +128082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2095,
             "display_behavior": "",
             "display_order": 81,
             "source_detail_raw": ""
@@ -128107,7 +128107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2095,
             "display_behavior": "",
             "display_order": 81,
             "source_detail_raw": ""
@@ -128132,7 +128132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2095,
             "display_behavior": "",
             "display_order": 81,
             "source_detail_raw": ""
@@ -128157,7 +128157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2095,
             "display_behavior": "",
             "display_order": 81,
             "source_detail_raw": ""
@@ -128182,7 +128182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2695,
             "display_behavior": "",
             "display_order": 82,
             "source_detail_raw": ""
@@ -128207,7 +128207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2695,
             "display_behavior": "",
             "display_order": 82,
             "source_detail_raw": ""
@@ -128232,7 +128232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2695,
             "display_behavior": "",
             "display_order": 82,
             "source_detail_raw": ""
@@ -128257,7 +128257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2695,
             "display_behavior": "",
             "display_order": 82,
             "source_detail_raw": ""
@@ -128282,7 +128282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2695,
             "display_behavior": "",
             "display_order": 82,
             "source_detail_raw": ""
@@ -128307,7 +128307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2695,
             "display_behavior": "",
             "display_order": 82,
             "source_detail_raw": ""
@@ -128482,7 +128482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 275,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -128507,7 +128507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 275,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -128532,7 +128532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 275,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -128557,7 +128557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 275,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -128582,7 +128582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 275,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -128607,7 +128607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 275,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -128632,7 +128632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -128657,7 +128657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -128682,7 +128682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -128707,7 +128707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -128732,7 +128732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -128757,7 +128757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -128782,7 +128782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 4450,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ."
@@ -128807,7 +128807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 4450,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ."
@@ -128832,7 +128832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 4450,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ."
@@ -128857,7 +128857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 4450,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ."
@@ -128882,7 +128882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 4450,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ."
@@ -128907,7 +128907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 4450,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ."
@@ -128932,7 +128932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 4450,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ. Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -128957,7 +128957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 4450,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ. Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -128982,7 +128982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 4450,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ. Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -129007,7 +129007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 4450,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ. Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -129032,7 +129032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 4450,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ. Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -129057,7 +129057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 4450,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ. Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -129082,7 +129082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 5995,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Unavailable until further notice. Not available with T0F, T0G."
@@ -129107,7 +129107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 5995,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Unavailable until further notice. Not available with T0F, T0G."
@@ -129132,7 +129132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 5995,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Unavailable until further notice. Not available with T0F, T0G."
@@ -129157,7 +129157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 5995,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Unavailable until further notice. Not available with T0F, T0G."
@@ -129182,7 +129182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 5995,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Unavailable until further notice. Not available with T0F, T0G."
@@ -129207,7 +129207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 5995,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": "Unavailable until further notice. Not available with T0F, T0G."
@@ -129232,7 +129232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 2075,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with T0F, T0G, 5V5."
@@ -129257,7 +129257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 2075,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with T0F, T0G, 5V5."
@@ -129282,7 +129282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 2075,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with T0F, T0G, 5V5."
@@ -129307,7 +129307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 2075,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with T0F, T0G, 5V5."
@@ -129332,7 +129332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 2075,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with T0F, T0G, 5V5."
@@ -129357,7 +129357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 2075,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with T0F, T0G, 5V5."
@@ -130582,7 +130582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2995,
             "display_behavior": "",
             "display_order": 15,
             "source_detail_raw": ""
@@ -130607,7 +130607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2995,
             "display_behavior": "",
             "display_order": 15,
             "source_detail_raw": ""
@@ -130632,7 +130632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2995,
             "display_behavior": "",
             "display_order": 15,
             "source_detail_raw": ""
@@ -130657,7 +130657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2995,
             "display_behavior": "",
             "display_order": 15,
             "source_detail_raw": ""
@@ -130682,7 +130682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2995,
             "display_behavior": "",
             "display_order": 15,
             "source_detail_raw": ""
@@ -130707,7 +130707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 2995,
             "display_behavior": "",
             "display_order": 15,
             "source_detail_raw": ""
@@ -130732,7 +130732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 100,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -130757,7 +130757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 100,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -130782,7 +130782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 100,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -130807,7 +130807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 100,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -130832,7 +130832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 100,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -130857,7 +130857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 100,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -130882,7 +130882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 16000,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -130907,7 +130907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 16000,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -130932,7 +130932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 16000,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -130957,7 +130957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 16000,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -130982,7 +130982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 16000,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -131007,7 +131007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 16000,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -131032,7 +131032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 25495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -131057,7 +131057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 25495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -131082,7 +131082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 25495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -131107,7 +131107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 25495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -131132,7 +131132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 25495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -131157,7 +131157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 25495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -131182,7 +131182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 26495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -131207,7 +131207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 26495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -131232,7 +131232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 26495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -131257,7 +131257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 26495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -131282,7 +131282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 26495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -131307,7 +131307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 26495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -131482,7 +131482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 2595,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": ""
@@ -131507,7 +131507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 2595,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": ""
@@ -131532,7 +131532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 2595,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": ""
@@ -131557,7 +131557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 2595,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": ""
@@ -131582,7 +131582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 2595,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": ""
@@ -131607,7 +131607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 2595,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": ""
@@ -135082,7 +135082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -135107,7 +135107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -135132,7 +135132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -135157,7 +135157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -135182,7 +135182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -135207,7 +135207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -135232,7 +135232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 25,
             "source_detail_raw": ""
@@ -135257,7 +135257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 25,
             "source_detail_raw": ""
@@ -135282,7 +135282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 25,
             "source_detail_raw": ""
@@ -135307,7 +135307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 25,
             "source_detail_raw": ""
@@ -135332,7 +135332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 25,
             "source_detail_raw": ""
@@ -135357,7 +135357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 25,
             "source_detail_raw": ""
@@ -143332,7 +143332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 950,
             "display_behavior": "",
             "display_order": 165,
             "source_detail_raw": "Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -143357,7 +143357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 950,
             "display_behavior": "",
             "display_order": 165,
             "source_detail_raw": "Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -143382,7 +143382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 950,
             "display_behavior": "",
             "display_order": 165,
             "source_detail_raw": "Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -143407,7 +143407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 950,
             "display_behavior": "",
             "display_order": 165,
             "source_detail_raw": "Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -143432,7 +143432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 950,
             "display_behavior": "",
             "display_order": 165,
             "source_detail_raw": "Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -143457,7 +143457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 950,
             "display_behavior": "",
             "display_order": 165,
             "source_detail_raw": "Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -143482,7 +143482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 170,
             "source_detail_raw": "Not available with PDA, SNE or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -143507,7 +143507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 170,
             "source_detail_raw": "Not available with PDA, SNE or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -143532,7 +143532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 170,
             "source_detail_raw": "Not available with PDA, SNE or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -143557,7 +143557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 170,
             "source_detail_raw": "Not available with PDA, SNE or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -143582,7 +143582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 170,
             "source_detail_raw": "Not available with PDA, SNE or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -143607,7 +143607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 170,
             "source_detail_raw": "Not available with PDA, SNE or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -143632,7 +143632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 166,
             "source_detail_raw": "Included with (PDA) Jake C8.R Graphics Package, LPO. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -143657,7 +143657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 166,
             "source_detail_raw": "Included with (PDA) Jake C8.R Graphics Package, LPO. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -143682,7 +143682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 166,
             "source_detail_raw": "Included with (PDA) Jake C8.R Graphics Package, LPO. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -143707,7 +143707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 166,
             "source_detail_raw": "Included with (PDA) Jake C8.R Graphics Package, LPO. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -143732,7 +143732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 166,
             "source_detail_raw": "Included with (PDA) Jake C8.R Graphics Package, LPO. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -143757,7 +143757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 166,
             "source_detail_raw": "Included with (PDA) Jake C8.R Graphics Package, LPO. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX)."
@@ -143782,7 +143782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 180,
             "source_detail_raw": "Not available with VPW or PDA. Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -143807,7 +143807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 180,
             "source_detail_raw": "Not available with VPW or PDA. Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -143832,7 +143832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 180,
             "source_detail_raw": "Not available with VPW or PDA. Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -143857,7 +143857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 180,
             "source_detail_raw": "Not available with VPW or PDA. Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -143882,7 +143882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 180,
             "source_detail_raw": "Not available with VPW or PDA. Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -143907,7 +143907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 180,
             "source_detail_raw": "Not available with VPW or PDA. Included with (PCZ) Tech Bronze Accent Package, LPO."
@@ -143932,7 +143932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 167,
             "source_detail_raw": "Included with (PDA) Jake C8.R Graphics Package, LPO."
@@ -143957,7 +143957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 167,
             "source_detail_raw": "Included with (PDA) Jake C8.R Graphics Package, LPO."
@@ -143982,7 +143982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 167,
             "source_detail_raw": "Included with (PDA) Jake C8.R Graphics Package, LPO."
@@ -144007,7 +144007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 167,
             "source_detail_raw": "Included with (PDA) Jake C8.R Graphics Package, LPO."
@@ -144032,7 +144032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 167,
             "source_detail_raw": "Included with (PDA) Jake C8.R Graphics Package, LPO."
@@ -144057,7 +144057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 575,
             "display_behavior": "",
             "display_order": 167,
             "source_detail_raw": "Included with (PDA) Jake C8.R Graphics Package, LPO."
@@ -145432,7 +145432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -145457,7 +145457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -145482,7 +145482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -145507,7 +145507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -145532,7 +145532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -145557,7 +145557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": ""
@@ -145732,7 +145732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 275,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
@@ -145757,7 +145757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 275,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
@@ -145782,7 +145782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 275,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
@@ -145807,7 +145807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 275,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
@@ -145832,7 +145832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 275,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
@@ -145857,7 +145857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 275,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
@@ -145882,7 +145882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
@@ -145907,7 +145907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
@@ -145932,7 +145932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
@@ -145957,7 +145957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
@@ -145982,7 +145982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
@@ -146007,7 +146007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 125,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
@@ -146032,7 +146032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 320,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Not available with (S47) Chrome lug nuts, LPO."
@@ -146057,7 +146057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 320,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Not available with (S47) Chrome lug nuts, LPO."
@@ -146082,7 +146082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 320,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Not available with (S47) Chrome lug nuts, LPO."
@@ -146107,7 +146107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 320,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Not available with (S47) Chrome lug nuts, LPO."
@@ -146132,7 +146132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 320,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Not available with (S47) Chrome lug nuts, LPO."
@@ -146157,7 +146157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 320,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Not available with (S47) Chrome lug nuts, LPO."
@@ -146182,7 +146182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 105,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Requires (SPY) Black lug nuts, LPO."
@@ -146207,7 +146207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 105,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Requires (SPY) Black lug nuts, LPO."
@@ -146232,7 +146232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 105,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Requires (SPY) Black lug nuts, LPO."
@@ -146257,7 +146257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 105,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Requires (SPY) Black lug nuts, LPO."
@@ -146282,7 +146282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 105,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Requires (SPY) Black lug nuts, LPO."
@@ -146307,7 +146307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 105,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Requires (SPY) Black lug nuts, LPO."
@@ -146932,7 +146932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -146957,7 +146957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -146982,7 +146982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -147007,7 +147007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -147032,7 +147032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -147057,7 +147057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -147532,7 +147532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": ""
@@ -147557,7 +147557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": ""
@@ -147582,7 +147582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": ""
@@ -147607,7 +147607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": ""
@@ -147632,7 +147632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": ""
@@ -147657,7 +147657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 11,
             "source_detail_raw": ""
@@ -147682,7 +147682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": ""
@@ -147707,7 +147707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": ""
@@ -147732,7 +147732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": ""
@@ -147757,7 +147757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": ""
@@ -147782,7 +147782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": ""
@@ -147807,7 +147807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": ""
@@ -147832,7 +147832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1995,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": ""
@@ -147857,7 +147857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1995,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": ""
@@ -147882,7 +147882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1995,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": ""
@@ -147907,7 +147907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1995,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": ""
@@ -147932,7 +147932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1995,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": ""
@@ -147957,7 +147957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1995,
             "display_behavior": "",
             "display_order": 31,
             "source_detail_raw": ""
