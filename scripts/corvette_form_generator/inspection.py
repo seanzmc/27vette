@@ -244,10 +244,14 @@ def price_ref_prices(rows: list[dict[str, str]]) -> dict[tuple[str, str], int]:
     return prices
 
 
+def price_ref_component_type_key(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", clean(value).lower())
+
+
 def price_ref_component_prices(rows: list[dict[str, str]]) -> dict[tuple[str, str, str], int]:
     prices: dict[tuple[str, str, str], int] = {}
     for row in rows:
-        option_type = clean(row.get("OptionType", "")).lower()
+        option_type = price_ref_component_type_key(row.get("OptionType", ""))
         code = clean(row.get("Code", ""))
         if not option_type or not code:
             continue
@@ -261,7 +265,7 @@ def price_ref_component_price(
     code: str,
     trim: str = "",
 ) -> int:
-    normalized_type = clean(option_type).lower()
+    normalized_type = price_ref_component_type_key(option_type)
     normalized_trim = clean(trim).replace("_", " ")
     normalized_code = clean(code)
     if (normalized_type, normalized_trim, normalized_code) in price_ref:
@@ -1183,7 +1187,7 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
         warnings.append(f"Expected {config.expected_variant_count} configured variants, found {len(variant_rows)} in variant_master.")
     if configured_variant_ids - active_variant_ids:
         warnings.append(
-            "Configured Grand Sport variants are present but inactive in variant_master, preserving the live Stingray-only generator path: "
+            f"Configured {config.model_label} variants are present but inactive in variant_master, preserving the live active-model generator path: "
             f"{', '.join(sorted(configured_variant_ids - active_variant_ids))}."
         )
     if missing_status_cells:
@@ -1586,7 +1590,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
 
     return {
         "dataset": {
-            "name": "2027 Corvette Grand Sport contract preview",
+            "name": f"{config.model_year} Corvette {config.model_label} contract preview",
             "model": config.model_label,
             "model_year": config.model_year,
             "source_workbook": config.workbook_path.name,
@@ -1755,25 +1759,25 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
 
     validation = [
         {
-            "check_id": "grand_sport_draft_status",
+            "check_id": f"{config.model_key}_draft_status",
             "severity": "warning",
             "entity_type": "dataset",
             "entity_id": "",
-            "message": "Grand Sport form data is a draft inspection artifact and is not runtime active.",
+            "message": f"{config.model_label} form data is a draft inspection artifact and is not runtime active.",
         },
         {
             "check_id": "active_variants",
             "severity": "pass",
             "entity_type": "variant",
             "entity_id": "",
-            "message": f"{len(preview['variants'])} configured Grand Sport variants included by model config; workbook active flags are unchanged.",
+            "message": f"{len(preview['variants'])} configured {config.model_label} variants included by model config; workbook active flags are unchanged.",
         },
         {
             "check_id": "availability_rows",
             "severity": "pass",
             "entity_type": "availability",
             "entity_id": "",
-            "message": f"{len(draft_choices)} draft choice rows exported from the Grand Sport variant matrix.",
+            "message": f"{len(draft_choices)} draft choice rows exported from the {config.model_label} variant matrix.",
         },
         {
             "check_id": "rules",
@@ -1787,7 +1791,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
             "severity": "pass",
             "entity_type": "interior",
             "entity_id": "",
-            "message": f"{len(interiors)} model-scoped Grand Sport LT interiors exported.",
+            "message": f"{len(interiors)} model-scoped {config.model_label} LT interiors exported.",
         },
     ]
     validation.extend(price_rule_validation)
@@ -1808,7 +1812,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
                 "severity": "warning",
                 "entity_type": "price_rule",
                 "entity_id": "",
-                "message": f"No valid Grand Sport price rules exported from {config.price_rules_sheet}; package pricing remains deferred.",
+                "message": f"No valid {config.model_label} price rules exported from {config.price_rules_sheet}; package pricing remains deferred.",
             }
         )
     if color_overrides:
@@ -1824,7 +1828,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
 
     return {
         "dataset": {
-            "name": "2027 Corvette Grand Sport form data draft",
+            "name": f"{config.model_year} Corvette {config.model_label} form data draft",
             "model": config.model_label,
             "model_year": config.model_year,
             "source_workbook": config.workbook_path.name,
@@ -1867,10 +1871,10 @@ def write_form_data_draft_artifacts(draft: dict[str, Any], output_dir: Path, art
     return {"json": str(json_path), "markdown": str(md_path)}
 
 
-def write_inspection_artifacts(report: dict[str, Any], output_dir: Path) -> dict[str, str]:
+def write_inspection_artifacts(report: dict[str, Any], output_dir: Path, artifact_prefix: str = "grand-sport-inspection") -> dict[str, str]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    json_path = output_dir / "grand-sport-inspection.json"
-    md_path = output_dir / "grand-sport-inspection.md"
+    json_path = output_dir / f"{artifact_prefix}.json"
+    md_path = output_dir / f"{artifact_prefix}.md"
     json_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
     md_path.write_text(render_markdown_report(report), encoding="utf-8")
     return {"json": str(json_path), "markdown": str(md_path)}

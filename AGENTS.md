@@ -34,7 +34,7 @@ If a task intentionally migrates away from a documented workflow, call that out 
 
 ## Current Architecture
 
-The live customer app is currently a static Corvette order-form runtime for Stingray and Grand Sport. It is deployed at `order.stingraychevroletcorvette.com` and supports active dealer submissions.
+The live customer app is currently a static Corvette order-form runtime for Stingray, Grand Sport, and Z06. It is deployed at `order.stingraychevroletcorvette.com` and supports active dealer submissions.
 
 The current default architecture is:
 
@@ -49,7 +49,7 @@ stingray_master.xlsx
   -> build download / dealer submission
 ```
 
-`form-app/data.js` currently exposes `window.CORVETTE_FORM_DATA` with model entries for Stingray and Grand Sport. `window.STINGRAY_FORM_DATA` remains as a compatibility alias.
+`form-app/data.js` currently exposes `window.CORVETTE_FORM_DATA` with model entries for Stingray, Grand Sport, and Z06. `window.STINGRAY_FORM_DATA` remains as a compatibility alias.
 
 The project is transitioning to workbook-owned business logic. Some model-specific migration status may drift as work lands, so verify the current workbook sheets, generator code, runtime registry, and tests before assuming one model's workflow applies to another. Do not expand transitional generator/runtime seams unless explicitly approved.
 
@@ -83,6 +83,8 @@ The canonical workbook is `stingray_master.xlsx`.
 
 Current shared or Stingray-facing sheets include:
 
+- `model_master`
+- `model_registry_promotion`
 - `variant_master`
 - `section_master`
 - `stingray_options`
@@ -111,6 +113,18 @@ Current Grand Sport model-scoped sheets include:
 - `grandSport_exclusive_groups`
 - `grandSport_exclusive_members`
 - `grandSport_variant_overrides`
+
+Current Z06 model-scoped sheets include:
+
+- `z06_options`
+- `z06_ovs`
+- `z06_rule_mapping`
+- `z06_price_rules`
+- `z06_rule_groups`
+- `z06_rule_group_members`
+- `z06_exclusive_groups`
+- `z06_exclusive_members`
+- `z06_variant_overrides`
 
 Current generated sheets are written by the generator and should not be edited manually:
 
@@ -234,6 +248,55 @@ node --test tests/multi-model-runtime-switching.test.mjs
 
 Some Grand Sport artifact names and metadata still reflect the inspection/draft migration path. Do not infer production status from naming alone; inspect the active registry, tests, and deployment intent.
 
+## Z06 Generator Workflow
+
+Current read-only preview/draft command from the repo root:
+
+```sh
+cd <repo-root>
+.venv/bin/python scripts/generate_z06_form.py
+```
+
+Current expected outputs under `form-output/inspection/`:
+
+- `z06-inspection.json`
+- `z06-inspection.md`
+- `z06-contract-preview.json`
+- `z06-contract-preview.md`
+- `z06-form-data-draft.json`
+- `z06-form-data-draft.md`
+
+This script must not mutate `form-app/data.js` or write `stingray_master.xlsx`.
+
+Then run:
+
+```sh
+node --test tests/z06-contract-preview.test.mjs
+node --test tests/z06-form-data-draft.test.mjs
+```
+
+## Z06 Runtime Promotion Workflow
+
+Use the workbook-owned promotion path when Z06 runtime activation needs to be applied or verified:
+
+```sh
+cd <repo-root>
+.venv/bin/python scripts/promote_z06_runtime.py --write
+.venv/bin/python scripts/generate_z06_form.py
+.venv/bin/python scripts/generate_stingray_form.py
+```
+
+`scripts/promote_z06_runtime.py` updates only Z06 rows in `model_master`, `model_registry_promotion`, and the six Z06 rows in `variant_master`. It must use `save_workbook_safely()`, refuse to run while an Excel lock file exists, and verify the saved workbook rows on disk.
+
+After promotion or regeneration, run:
+
+```sh
+node --test tests/z06-runtime-promotion.test.mjs
+node --test tests/multi-model-runtime-switching.test.mjs
+```
+
+Do not promote ZR1 or ZR1X as part of a Z06 pass unless that scope is explicitly approved.
+
 ## Static App Workflow
 
 The app currently has no package install or frontend build step.
@@ -249,7 +312,7 @@ Open `http://localhost:8000`.
 
 For runtime changes, verify:
 
-- model switching between Stingray and Grand Sport
+- model switching between Stingray, Grand Sport, and Z06
 - body style and trim selection
 - required step completion
 - option select/deselect behavior
@@ -296,6 +359,24 @@ node --test tests/grand-sport-draft-data.test.mjs
 node --test tests/grand-sport-rule-audit.test.mjs
 ```
 
+Z06 source/draft refresh:
+
+```sh
+.venv/bin/python scripts/generate_z06_form.py
+node --test tests/z06-contract-preview.test.mjs
+node --test tests/z06-form-data-draft.test.mjs
+```
+
+Z06 runtime promotion:
+
+```sh
+.venv/bin/python scripts/promote_z06_runtime.py --write
+.venv/bin/python scripts/generate_z06_form.py
+.venv/bin/python scripts/generate_stingray_form.py
+node --test tests/z06-runtime-promotion.test.mjs
+node --test tests/multi-model-runtime-switching.test.mjs
+```
+
 Runtime or multi-model behavior:
 
 ```sh
@@ -311,6 +392,9 @@ node --test tests/stingray-generator-stability.test.mjs
 node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
 node --test tests/grand-sport-rule-audit.test.mjs
+node --test tests/z06-contract-preview.test.mjs
+node --test tests/z06-form-data-draft.test.mjs
+node --test tests/z06-runtime-promotion.test.mjs
 node --test tests/multi-model-runtime-switching.test.mjs
 ```
 

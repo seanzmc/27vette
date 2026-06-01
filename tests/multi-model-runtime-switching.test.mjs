@@ -284,12 +284,16 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
 
   assert.ok(registry, "CORVETTE_FORM_DATA registry should exist");
   assert.equal(registry.defaultModelKey, "stingray");
-  assert.deepEqual(Object.keys(registry.models).sort(), ["grandSport", "stingray"]);
+  assert.deepEqual(Object.keys(registry.models).sort(), ["grandSport", "stingray", "z06"]);
   assert.equal(registry.models.stingray.label, "Stingray");
   assert.equal(registry.models.stingray.modelName, "Corvette Stingray");
   assert.equal(registry.models.grandSport.label, "Grand Sport");
   assert.equal(registry.models.grandSport.modelName, "Corvette Grand Sport");
   assert.equal(registry.models.grandSport.data.dataset.source_sheet, "grandSport_options");
+  assert.equal(registry.models.z06.label, "Z06");
+  assert.equal(registry.models.z06.modelName, "Corvette Z06");
+  assert.equal(registry.models.z06.data.dataset.source_sheet, "z06_options");
+  assert.equal(registry.models.z06.data.dataset.status, "runtime_active");
   assert.ok(
     registry.models.grandSport.data.priceRules.some((rule) => rule.price_rule_id === "gs_pr_fey_j57_001"),
     "Grand Sport packaged data should include Grand Sport price rules"
@@ -313,6 +317,10 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
   assert.deepEqual(
     JSON.parse(JSON.stringify(registry.models.grandSport.data.variants.map((variant) => variant.variant_id))),
     ["1lt_e07", "2lt_e07", "3lt_e07", "1lt_e67", "2lt_e67", "3lt_e67"]
+  );
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(registry.models.z06.data.variants.map((variant) => variant.variant_id))),
+    ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"]
   );
 });
 

@@ -76,8 +76,25 @@ def _strip_live_contract_provenance(value: Any) -> Any:
 def live_contract_data(data: dict[str, Any]) -> dict[str, Any]:
     """Strip inspection-only provenance fields before embedding runtime data."""
 
-    cleaned = json.loads(json.dumps(data))
-    return _strip_live_contract_provenance(cleaned)
+    cleaned = _strip_live_contract_provenance(json.loads(json.dumps(data)))
+    dataset = cleaned.get("dataset")
+    if isinstance(dataset, dict) and dataset.get("status") == "draft_not_runtime_active":
+        dataset["status"] = "runtime_active"
+        name = dataset.get("name")
+        if isinstance(name, str):
+            dataset["name"] = name.replace(" form data draft", " operational form")
+    validation = cleaned.get("validation")
+    if isinstance(validation, list):
+        cleaned["validation"] = [
+            row
+            for row in validation
+            if not (
+                isinstance(row, dict)
+                and row.get("severity") == "warning"
+                and str(row.get("check_id", "")).endswith("_draft_status")
+            )
+        ]
+    return cleaned
 
 
 def _rows(wb: Any, sheet_name: str) -> list[dict[str, str]]:
