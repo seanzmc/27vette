@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-01T06:16:21+00:00"
+          "generated_at": "2026-06-01T16:03:37+00:00"
         },
         "variants": [
           {
@@ -111481,7 +111481,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-01T06:15:17+00:00",
+          "generated_at": "2026-06-01T16:03:05+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -116032,7 +116032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -116057,7 +116057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -116082,7 +116082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -116107,7 +116107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -116132,7 +116132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -116157,7 +116157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -116482,7 +116482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -116507,7 +116507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -116532,7 +116532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -116557,7 +116557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -116582,7 +116582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -116607,7 +116607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -116782,7 +116782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -116807,7 +116807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -116832,7 +116832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -116857,7 +116857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -116882,7 +116882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -116907,7 +116907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -116932,7 +116932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -116957,7 +116957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -116982,7 +116982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -117007,7 +117007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -117032,7 +117032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -117057,7 +117057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -117082,7 +117082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Requires (J57) carbon ceramic brakes."
@@ -117107,7 +117107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Requires (J57) carbon ceramic brakes."
@@ -117132,7 +117132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Requires (J57) carbon ceramic brakes."
@@ -117157,7 +117157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Requires (J57) carbon ceramic brakes."
@@ -117182,7 +117182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Requires (J57) carbon ceramic brakes."
@@ -117207,7 +117207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Requires (J57) carbon ceramic brakes."
@@ -117232,7 +117232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -117257,7 +117257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -117282,7 +117282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -117307,7 +117307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -117332,7 +117332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -117357,7 +117357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 795,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": ""
@@ -117382,7 +117382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "auto_only",
             "display_order": 10,
             "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
@@ -117407,7 +117407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "auto_only",
             "display_order": 10,
             "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
@@ -117432,7 +117432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "auto_only",
             "display_order": 10,
             "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
@@ -117457,7 +117457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "auto_only",
             "display_order": 10,
             "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
@@ -117482,7 +117482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "auto_only",
             "display_order": 10,
             "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
@@ -117507,7 +117507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "auto_only",
             "display_order": 10,
             "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
@@ -117532,7 +117532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 20,
             "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
@@ -117557,7 +117557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 20,
             "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
@@ -117582,7 +117582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 20,
             "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
@@ -117607,7 +117607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 20,
             "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
@@ -117632,7 +117632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 20,
             "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
@@ -117657,7 +117657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "auto_only",
             "display_order": 20,
             "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
@@ -117682,7 +117682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
@@ -117707,7 +117707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
@@ -117732,7 +117732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
@@ -117757,7 +117757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
@@ -117782,7 +117782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
@@ -117807,7 +117807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
@@ -117982,7 +117982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only."
@@ -118007,7 +118007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only."
@@ -118032,7 +118032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only."
@@ -118057,7 +118057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only."
@@ -118082,7 +118082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only."
@@ -118107,7 +118107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 5495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "This option is subject to restrictions and approval. NOT AVAILABLE on all VINs. Available on SOLD orders only."
@@ -118132,7 +118132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels."
@@ -118157,7 +118157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels."
@@ -118182,7 +118182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels."
@@ -118207,7 +118207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels."
@@ -118232,7 +118232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels."
@@ -118257,7 +118257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1695,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels."
@@ -118282,7 +118282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 40,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Will be forced on orders with ship-to states that require a front license plate."
@@ -118307,7 +118307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 40,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Will be forced on orders with ship-to states that require a front license plate."
@@ -118332,7 +118332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 40,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Will be forced on orders with ship-to states that require a front license plate."
@@ -118357,7 +118357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 40,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Will be forced on orders with ship-to states that require a front license plate."
@@ -118382,7 +118382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 40,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Will be forced on orders with ship-to states that require a front license plate."
@@ -118407,7 +118407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 40,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Will be forced on orders with ship-to states that require a front license plate."
@@ -118432,7 +118432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
@@ -118457,7 +118457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
@@ -118482,7 +118482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
@@ -118507,7 +118507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
@@ -118532,7 +118532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
@@ -118557,7 +118557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
@@ -118582,7 +118582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
@@ -118607,7 +118607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
@@ -118632,7 +118632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
@@ -118657,7 +118657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
@@ -118682,7 +118682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
@@ -118707,7 +118707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
@@ -118732,7 +118732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior or (HU0/HXO) Adrenaline Red/Jet Black interior."
@@ -118757,7 +118757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior or (HU0/HXO) Adrenaline Red/Jet Black interior."
@@ -118782,7 +118782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior or (HU0/HXO) Adrenaline Red/Jet Black interior."
@@ -118807,7 +118807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior or (HU0/HXO) Adrenaline Red/Jet Black interior."
@@ -118832,7 +118832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior or (HU0/HXO) Adrenaline Red/Jet Black interior."
@@ -118857,7 +118857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 495,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior or (HU0/HXO) Adrenaline Red/Jet Black interior."
@@ -118882,7 +118882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1895,
             "display_behavior": "",
             "display_order": 1,
             "source_detail_raw": ""
@@ -118907,7 +118907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1895,
             "display_behavior": "",
             "display_order": 1,
             "source_detail_raw": ""
@@ -118932,7 +118932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1895,
             "display_behavior": "",
             "display_order": 1,
             "source_detail_raw": ""
@@ -118957,7 +118957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1895,
             "display_behavior": "",
             "display_order": 1,
             "source_detail_raw": ""
@@ -118982,7 +118982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1895,
             "display_behavior": "",
             "display_order": 1,
             "source_detail_raw": ""
@@ -119007,7 +119007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1895,
             "display_behavior": "",
             "display_order": 1,
             "source_detail_raw": ""
@@ -120382,7 +120382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -120407,7 +120407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -120432,7 +120432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -120457,7 +120457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -120482,7 +120482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -120507,7 +120507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 395,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -120682,7 +120682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.\nTonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered."
@@ -120707,7 +120707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.\nTonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered."
@@ -120732,7 +120732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.\nTonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered."
@@ -120757,7 +120757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.\nTonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered."
@@ -120782,7 +120782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.\nTonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered."
@@ -120807,7 +120807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.\nTonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered."
@@ -120982,7 +120982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": "Not available with exterior color (GBA) Black. Rockers are not body-color when (CFZ/CFV) ground effects is also ordered.\nNot available with exterior color (GBA) Black. Also includes tonneau grille. Rockers are not body-color when (CFZ/CFV) ground effects is also ordered."
@@ -121007,7 +121007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": "Not available with exterior color (GBA) Black. Rockers are not body-color when (CFZ/CFV) ground effects is also ordered.\nNot available with exterior color (GBA) Black. Also includes tonneau grille. Rockers are not body-color when (CFZ/CFV) ground effects is also ordered."
@@ -121032,7 +121032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": "Not available with exterior color (GBA) Black. Rockers are not body-color when (CFZ/CFV) ground effects is also ordered.\nNot available with exterior color (GBA) Black. Also includes tonneau grille. Rockers are not body-color when (CFZ/CFV) ground effects is also ordered."
@@ -121057,7 +121057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": "Not available with exterior color (GBA) Black. Rockers are not body-color when (CFZ/CFV) ground effects is also ordered.\nNot available with exterior color (GBA) Black. Also includes tonneau grille. Rockers are not body-color when (CFZ/CFV) ground effects is also ordered."
@@ -121082,7 +121082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": "Not available with exterior color (GBA) Black. Rockers are not body-color when (CFZ/CFV) ground effects is also ordered.\nNot available with exterior color (GBA) Black. Also includes tonneau grille. Rockers are not body-color when (CFZ/CFV) ground effects is also ordered."
@@ -121107,7 +121107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 21,
             "source_detail_raw": "Not available with exterior color (GBA) Black. Rockers are not body-color when (CFZ/CFV) ground effects is also ordered.\nNot available with exterior color (GBA) Black. Also includes tonneau grille. Rockers are not body-color when (CFZ/CFV) ground effects is also ordered."
@@ -122182,7 +122182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -122207,7 +122207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -122232,7 +122232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -122257,7 +122257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -122282,7 +122282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -122307,7 +122307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 695,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -122482,7 +122482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1795,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -122507,7 +122507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1795,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -122532,7 +122532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1795,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -122557,7 +122557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1795,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -122582,7 +122582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1795,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -122607,7 +122607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 1795,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -130132,7 +130132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (CFV/CFZ) ground effects."
@@ -130157,7 +130157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (CFV/CFZ) ground effects."
@@ -130182,7 +130182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (CFV/CFZ) ground effects."
@@ -130207,7 +130207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (CFV/CFZ) ground effects."
@@ -130232,7 +130232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (CFV/CFZ) ground effects."
@@ -130257,7 +130257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with (CFV/CFZ) ground effects."
@@ -131632,7 +131632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 12,
             "source_detail_raw": ""
@@ -131657,7 +131657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 12,
             "source_detail_raw": ""
@@ -131682,7 +131682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 12,
             "source_detail_raw": ""
@@ -131707,7 +131707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 12,
             "source_detail_raw": ""
@@ -131732,7 +131732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 12,
             "source_detail_raw": ""
@@ -131757,7 +131757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 12,
             "source_detail_raw": ""
@@ -131932,7 +131932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 3500,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW)."
@@ -131957,7 +131957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 3500,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW)."
@@ -131982,7 +131982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 3500,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW)."
@@ -132007,7 +132007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 3500,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW)."
@@ -132032,7 +132032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 3500,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW)."
@@ -132057,7 +132057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 3500,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW)."
@@ -132232,7 +132232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -132257,7 +132257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -132282,7 +132282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -132307,7 +132307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -132332,7 +132332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -132357,7 +132357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -132382,7 +132382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -132407,7 +132407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -132432,7 +132432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -132457,7 +132457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -132482,7 +132482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -132507,7 +132507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Not available with exterior color (GBA) Black."
@@ -134182,7 +134182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors."
@@ -134207,7 +134207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors."
@@ -134232,7 +134232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors."
@@ -134257,7 +134257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors."
@@ -134282,7 +134282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors."
@@ -134307,7 +134307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors."
@@ -134332,7 +134332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -134357,7 +134357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -134382,7 +134382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -134407,7 +134407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -134432,7 +134432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -134457,7 +134457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -134482,7 +134482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior."
@@ -134507,7 +134507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior."
@@ -134532,7 +134532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior."
@@ -134557,7 +134557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior."
@@ -134582,7 +134582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior."
@@ -134607,7 +134607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior."
@@ -134632,7 +134632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -134657,7 +134657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -134682,7 +134682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -134707,7 +134707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -134732,7 +134732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -134757,7 +134757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -134782,7 +134782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Recommended with (HTA, HTJ) Jet Black interior.\nRecommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\nRecommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors."
@@ -134807,7 +134807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Recommended with (HTA, HTJ) Jet Black interior.\nRecommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\nRecommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors."
@@ -134832,7 +134832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Recommended with (HTA, HTJ) Jet Black interior.\nRecommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\nRecommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors."
@@ -134857,7 +134857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Recommended with (HTA, HTJ) Jet Black interior.\nRecommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\nRecommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors."
@@ -134882,7 +134882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Recommended with (HTA, HTJ) Jet Black interior.\nRecommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\nRecommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors."
@@ -134907,7 +134907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": "Recommended with (HTA, HTJ) Jet Black interior.\nRecommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\nRecommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors."
@@ -135532,7 +135532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 350,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -135557,7 +135557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 350,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -135582,7 +135582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 350,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -135607,7 +135607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 350,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -135632,7 +135632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 350,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -135657,7 +135657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 350,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Requires (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
@@ -140932,7 +140932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -140957,7 +140957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -140982,7 +140982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -141007,7 +141007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -141032,7 +141032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -141057,7 +141057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 70,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -141082,7 +141082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 110,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -141107,7 +141107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 110,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -141132,7 +141132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 110,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -141157,7 +141157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 110,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -141182,7 +141182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 110,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -141207,7 +141207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 110,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -141232,7 +141232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Not available with exterior color (G26) Sebring Orange Tintcoat."
@@ -141257,7 +141257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Not available with exterior color (G26) Sebring Orange Tintcoat."
@@ -141282,7 +141282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Not available with exterior color (G26) Sebring Orange Tintcoat."
@@ -141307,7 +141307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Not available with exterior color (G26) Sebring Orange Tintcoat."
@@ -141332,7 +141332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Not available with exterior color (G26) Sebring Orange Tintcoat."
@@ -141357,7 +141357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 80,
             "source_detail_raw": "Not available with exterior color (G26) Sebring Orange Tintcoat."
@@ -141382,7 +141382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -141407,7 +141407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -141432,7 +141432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -141457,7 +141457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -141482,7 +141482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -141507,7 +141507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 90,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -141532,7 +141532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": ""
@@ -141557,7 +141557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": ""
@@ -141582,7 +141582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": ""
@@ -141607,7 +141607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": ""
@@ -141632,7 +141632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": ""
@@ -141657,7 +141657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 100,
             "source_detail_raw": ""
@@ -141682,7 +141682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not available with exterior color (G26) Sebring Orange Tintcoat."
@@ -141707,7 +141707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not available with exterior color (G26) Sebring Orange Tintcoat."
@@ -141732,7 +141732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not available with exterior color (G26) Sebring Orange Tintcoat."
@@ -141757,7 +141757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not available with exterior color (G26) Sebring Orange Tintcoat."
@@ -141782,7 +141782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not available with exterior color (G26) Sebring Orange Tintcoat."
@@ -141807,7 +141807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": "Not available with exterior color (G26) Sebring Orange Tintcoat."
@@ -141832,7 +141832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -141857,7 +141857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -141882,7 +141882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -141907,7 +141907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -141932,7 +141932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -141957,7 +141957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 60,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -141982,7 +141982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -142007,7 +142007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -142032,7 +142032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -142057,7 +142057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -142082,7 +142082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -142107,7 +142107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -142132,7 +142132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -142157,7 +142157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -142182,7 +142182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -142207,7 +142207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -142232,7 +142232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -142257,7 +142257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 10,
             "source_detail_raw": ""
@@ -142282,7 +142282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -142307,7 +142307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -142332,7 +142332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -142357,7 +142357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -142382,7 +142382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -142407,7 +142407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 20,
             "source_detail_raw": ""
@@ -142432,7 +142432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 130,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -142457,7 +142457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 130,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -142482,7 +142482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 130,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -142507,7 +142507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 130,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -142532,7 +142532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 130,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -142557,7 +142557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 130,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -142582,7 +142582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 120,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -142607,7 +142607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 120,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -142632,7 +142632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 120,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -142657,7 +142657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 120,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -142682,7 +142682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 120,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -142707,7 +142707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 120,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -142732,7 +142732,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -142757,7 +142757,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -142782,7 +142782,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -142807,7 +142807,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -142832,7 +142832,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -142857,7 +142857,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 1295,
             "display_behavior": "",
             "display_order": 40,
             "source_detail_raw": "Not available with exterior color (GTR) Admiral Blue Metallic."
@@ -142882,7 +142882,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 140,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -142907,7 +142907,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 140,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -142932,7 +142932,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 140,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -142957,7 +142957,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 140,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -142982,7 +142982,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 140,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -143007,7 +143007,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 140,
             "source_detail_raw": "Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
@@ -143032,7 +143032,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 160,
             "source_detail_raw": ""
@@ -143057,7 +143057,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 160,
             "source_detail_raw": ""
@@ -143082,7 +143082,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 160,
             "source_detail_raw": ""
@@ -143107,7 +143107,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 160,
             "source_detail_raw": ""
@@ -143132,7 +143132,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 160,
             "source_detail_raw": ""
@@ -143157,7 +143157,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 160,
             "source_detail_raw": ""
@@ -143182,7 +143182,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 150,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -143207,7 +143207,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 150,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -143232,7 +143232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 150,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -143257,7 +143257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 150,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -143282,7 +143282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 150,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -143307,7 +143307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_opt",
             "selection_mode_label": "Optional single choice",
-            "base_price": 0,
+            "base_price": 595,
             "display_behavior": "",
             "display_order": 150,
             "source_detail_raw": "Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
@@ -145582,7 +145582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -145607,7 +145607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -145632,7 +145632,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -145657,7 +145657,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -145682,7 +145682,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -145707,7 +145707,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 0,
+            "base_price": 250,
             "display_behavior": "",
             "display_order": 50,
             "source_detail_raw": ""
@@ -146332,7 +146332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 12,
             "source_detail_raw": ""
@@ -146357,7 +146357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 12,
             "source_detail_raw": ""
@@ -146382,7 +146382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 12,
             "source_detail_raw": ""
@@ -146407,7 +146407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 12,
             "source_detail_raw": ""
@@ -146432,7 +146432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 12,
             "source_detail_raw": ""
@@ -146457,7 +146457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 12,
             "source_detail_raw": ""
@@ -146482,7 +146482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 23,
             "source_detail_raw": ""
@@ -146507,7 +146507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 23,
             "source_detail_raw": ""
@@ -146532,7 +146532,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 23,
             "source_detail_raw": ""
@@ -146557,7 +146557,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 23,
             "source_detail_raw": ""
@@ -146582,7 +146582,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 23,
             "source_detail_raw": ""
@@ -146607,7 +146607,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 995,
             "display_behavior": "",
             "display_order": 23,
             "source_detail_raw": ""
@@ -147232,7 +147232,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -147257,7 +147257,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -147282,7 +147282,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -147307,7 +147307,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -147332,7 +147332,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -147357,7 +147357,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1495,
             "display_behavior": "",
             "display_order": 30,
             "source_detail_raw": ""
@@ -147382,7 +147382,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 22,
             "source_detail_raw": ""
@@ -147407,7 +147407,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 22,
             "source_detail_raw": ""
@@ -147432,7 +147432,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 22,
             "source_detail_raw": ""
@@ -147457,7 +147457,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 22,
             "source_detail_raw": ""
@@ -147482,7 +147482,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 22,
             "source_detail_raw": ""
@@ -147507,7 +147507,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "selection_mode": "single_select_req",
             "selection_mode_label": "Required single choice",
-            "base_price": 0,
+            "base_price": 1095,
             "display_behavior": "",
             "display_order": 22,
             "source_detail_raw": ""
