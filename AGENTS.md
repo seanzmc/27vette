@@ -22,6 +22,9 @@ Every handoff must report:
 - What did not change: preserved runtime behavior, visual constraints, schemas, deployment paths, and any explicitly excluded work.
 - Gate results: typecheck, lint, tests, generator runs, workbook validation, or `not run` with a reason.
 - Manual verification still pending, residual risks, and follow-up work.
+- Next step guidance: a brief recommended next pass when the task is part of an active multi-pass pathway. Tie the recommendation to current repo evidence, plans/specs, and user-stated goals. If the task is isolated or there is no clear safe continuation, say that no obvious next pass is implied rather than inventing work.
+
+For active migration legs such as adding Z06/ZR1/ZR1X to the form runtime, keep the broader path visible without expanding the current scope. The next-step guidance should name the logical next pass, not implement it, unless the user explicitly approves that pass.
 
 ## Using This File
 

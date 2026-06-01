@@ -89,6 +89,12 @@ Remaining transitional seams:
 - Do not claim workbook edits landed without verifying the saved workbook on disk.
 - Do not stage temporary workbook backups or unrelated generated output.
 
+## Handoff Expectations
+
+- End every task handoff with brief next-step guidance when the work is part of a visible multi-pass path.
+- Ground that next-pass recommendation in current repo evidence, saved specs/plans, and user-stated goals; do not invent a pathway for isolated tasks.
+- For the Z06/ZR1/ZR1X runtime-addition leg, keep naming the logical next pass needed to move the Z sheets toward canonical runtime readiness, while preserving the approved scope of the current pass.
+
 ## Validation Commands
 
 Use the project virtual environment:
