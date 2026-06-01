@@ -202,9 +202,19 @@ def _validation_errors_for_selected_row(
     return errors
 
 
-def _option_row_from_review(row: dict[str, Any]) -> dict[str, Any]:
+def _existing_option_rows(wb, sheet_name: str) -> dict[str, dict[str, str]]:
     return {
-        "option_id": _option_id_for_row(row),
+        clean(row.get("option_id")): {header: clean(value) for header, value in row.items()}
+        for row in rows_from_sheet(wb, sheet_name)
+        if clean(row.get("option_id"))
+    }
+
+
+def _option_row_from_review(row: dict[str, Any], existing_rows: dict[str, dict[str, str]] | None = None) -> dict[str, Any]:
+    option_id = _option_id_for_row(row)
+    existing = (existing_rows or {}).get(option_id, {})
+    option_row = {
+        "option_id": option_id,
         "rpo": clean(row.get("source_rpo")),
         "price": "",
         "option_name": _option_name_for_row(row),
@@ -216,6 +226,10 @@ def _option_row_from_review(row: dict[str, Any]) -> dict[str, Any]:
         "active": "True",
         "display_behavior": clean(row.get("final_display_behavior")),
     }
+    for header in OPTION_SOURCE_HEADERS:
+        if clean(option_row.get(header)) == "" and clean(existing.get(header)):
+            option_row[header] = clean(existing.get(header))
+    return option_row
 
 
 def _source_label(row: dict[str, Any]) -> str:
@@ -246,6 +260,7 @@ def build_future_option_population_plan(wb, option_review_rows: list[dict[str, A
 
         option_rows: list[dict[str, Any]] = []
         ovs_rows: list[dict[str, Any]] = []
+        existing_rows_by_option_id = _existing_option_rows(wb, spec.target_option_sheet)
         blocked_counts: Counter[str] = Counter()
         errors: list[str] = []
 
@@ -269,7 +284,7 @@ def build_future_option_population_plan(wb, option_review_rows: list[dict[str, A
                     blocked_counts[error] += 1
                 errors.append(f"{_source_label(row)}: {'; '.join(row_errors)}")
                 continue
-            option_row = _option_row_from_review(row)
+            option_row = _option_row_from_review(row, existing_rows_by_option_id)
             option_rows.append(option_row)
             statuses = _parse_status_summary(row.get("normalized_status_summary"))
             for variant_id in variant_ids:
@@ -419,10 +434,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Optional CSV import override; when omitted, decisions come from the workbook future_model_option_review sheet.",
     )
     parser.add_argument("--model-key", choices=("all", *FUTURE_MODEL_KEYS), default="all")
-    parser.add_argument("--dry-run", action="store_true", help="Report rows that would be written without saving the workbook.")
+    parser.add_argument("--write", action="store_true", help="Write the workbook. Omit for a dry-run report.")
+    parser.add_argument("--dry-run", action="store_true", help="Deprecated alias for the default no-write mode.")
     args = parser.parse_args(argv)
 
-    if not args.dry_run and excel_lock_path(WORKBOOK_PATH).exists():
+    if args.write and excel_lock_path(WORKBOOK_PATH).exists():
         raise RuntimeError(f"Refusing to write workbook while Excel lock file exists: {excel_lock_path(WORKBOOK_PATH)}")
 
     loaded_mtime_ns = WORKBOOK_PATH.stat().st_mtime_ns
@@ -454,7 +470,7 @@ def main(argv: list[str] | None = None) -> int:
         if plan["error_count"]:
             print(json.dumps({"status": "blocked", **report}, indent=2))
             return 1
-        if args.dry_run:
+        if not args.write or args.dry_run:
             print(json.dumps({"status": "dry_run", **report}, indent=2))
             return 0
         write_sheet(wb, OPTION_REVIEW_SHEET, list(OPTION_REVIEW_HEADERS), merged_rows)

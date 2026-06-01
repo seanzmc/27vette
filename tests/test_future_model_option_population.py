@@ -133,6 +133,62 @@ class FutureModelOptionPopulationTests(unittest.TestCase):
         self.assertEqual(row["rpo"], "REF")
         self.assertEqual(row["selectable"], "False")
 
+    def test_population_plan_preserves_existing_option_prices(self) -> None:
+        wb = population_workbook()
+        wb["z06_options"].append([
+            "opt_abc_001" if header == "option_id" else
+            "ABC" if header == "rpo" else
+            "1495" if header == "price" else
+            "Existing Option" if header == "option_name" else
+            "wheels" if header == "section_id" else
+            "True" if header in {"selectable", "active"} else
+            ""
+            for header in OPTION_SOURCE_HEADERS
+        ])
+        csv_rows = [option_review_row()]
+
+        plan = option_apply.build_future_option_population_plan(wb, csv_rows, ["z06"])
+
+        row = plan["models"]["z06"]["option_rows"][0]
+        self.assertEqual(row["option_id"], "opt_abc_001")
+        self.assertEqual(row["price"], "1495")
+
+    def test_population_plan_preserves_existing_option_values_when_review_fields_are_blank(self) -> None:
+        wb = population_workbook()
+        wb["z06_options"].append([
+            "opt_abc_001" if header == "option_id" else
+            "ABC" if header == "rpo" else
+            "1495" if header == "price" else
+            "Existing Option" if header == "option_name" else
+            "Existing description" if header == "description" else
+            "Existing detail" if header == "detail_raw" else
+            "wheels" if header == "section_id" else
+            "55" if header == "display_order" else
+            "option_card" if header == "display_behavior" else
+            "True" if header in {"selectable", "active"} else
+            ""
+            for header in OPTION_SOURCE_HEADERS
+        ])
+        csv_rows = [
+            option_review_row(
+                source_disclosure_raw="",
+                final_description="",
+                final_detail_raw="",
+                final_display_order="",
+                suggested_display_order="",
+                final_display_behavior="",
+            )
+        ]
+
+        plan = option_apply.build_future_option_population_plan(wb, csv_rows, ["z06"])
+
+        row = plan["models"]["z06"]["option_rows"][0]
+        self.assertEqual(row["price"], "1495")
+        self.assertEqual(row["description"], "Existing description")
+        self.assertEqual(row["detail_raw"], "Existing detail")
+        self.assertEqual(row["display_order"], "55")
+        self.assertEqual(row["display_behavior"], "option_card")
+
     def test_overlay_csv_rows_preserves_existing_workbook_rows_missing_from_csv(self) -> None:
         existing = option_review_row(notes="keep me")
         csv_replacement = option_review_row(final_option_name="CSV Name")
