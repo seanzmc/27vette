@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-01T22:47:46+00:00",
+  "generated_at": "2026-06-02T01:56:54+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "z06",
@@ -95,15 +95,15 @@
     "unique_rpos": 223,
     "variant_status_cells": 1494,
     "status_source_rows": 1494,
-    "candidate_choice_rows_available_or_standard": 1482,
-    "candidate_standard_equipment_cells": 490,
-    "candidate_standard_option_rows": 96,
+    "candidate_choice_rows_available_or_standard": 1476,
+    "candidate_standard_equipment_cells": 488,
+    "candidate_standard_option_rows": 95,
     "selectable_counts": {
       "False": 91,
       "True": 158
     },
-    "active_option_rows_available_or_standard": 245,
-    "inactive_option_rows_all_unavailable_or_blank": 4,
+    "active_option_rows_available_or_standard": 244,
+    "inactive_option_rows_all_unavailable_or_blank": 5,
     "status_counts": {
       "available": 821,
       "standard": 490,
@@ -4436,14 +4436,6 @@
         "step_key": "interior_trim"
       },
       {
-        "option_id": "opt_n3w_002",
-        "rpo": "N3W",
-        "section_id": "sec_inte_001",
-        "original_section_id": "sec_inte_001",
-        "section_override_applied": false,
-        "step_key": "interior_trim"
-      },
-      {
         "option_id": "opt_tu7_001",
         "rpo": "TU7",
         "section_id": "sec_inte_001",
@@ -6764,20 +6756,6 @@
       "variant_id": "3lz_h67",
       "section_id": "sec_incl_001",
       "option_name": "Tires, 275/30ZR20 front and 345/25ZR21 rear, blackwall, high performance"
-    },
-    {
-      "option_id": "opt_n3w_002",
-      "rpo": "N3W",
-      "variant_id": "3lz_h07",
-      "section_id": "sec_inte_001",
-      "option_name": "Steering wheel, carbon fiber and leather-wrapped"
-    },
-    {
-      "option_id": "opt_n3w_002",
-      "rpo": "N3W",
-      "variant_id": "3lz_h67",
-      "section_id": "sec_inte_001",
-      "option_name": "Steering wheel, carbon fiber and leather-wrapped"
     },
     {
       "option_id": "opt_uqt_001",
