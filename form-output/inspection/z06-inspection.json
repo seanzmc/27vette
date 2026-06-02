@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-01T20:00:13+00:00",
+  "generated_at": "2026-06-01T22:47:46+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "z06",
@@ -95,15 +95,15 @@
     "unique_rpos": 223,
     "variant_status_cells": 1494,
     "status_source_rows": 1494,
-    "candidate_choice_rows_available_or_standard": 1494,
+    "candidate_choice_rows_available_or_standard": 1482,
     "candidate_standard_equipment_cells": 490,
     "candidate_standard_option_rows": 96,
     "selectable_counts": {
       "False": 91,
       "True": 158
     },
-    "active_option_rows_available_or_standard": 247,
-    "inactive_option_rows_all_unavailable_or_blank": 2,
+    "active_option_rows_available_or_standard": 245,
+    "inactive_option_rows_all_unavailable_or_blank": 4,
     "status_counts": {
       "available": 821,
       "standard": 490,
@@ -4524,14 +4524,6 @@
         "step_key": "accessories"
       },
       {
-        "option_id": "opt_ryq_001",
-        "rpo": "RYQ",
-        "section_id": "sec_lpoe_001",
-        "original_section_id": "sec_lpoe_001",
-        "section_override_applied": false,
-        "step_key": "accessories"
-      },
-      {
         "option_id": "opt_sbt_001",
         "rpo": "SBT",
         "section_id": "sec_lpoe_001",
@@ -4710,14 +4702,6 @@
       {
         "option_id": "opt_sxt_001",
         "rpo": "SXT",
-        "section_id": "sec_lpoi_001",
-        "original_section_id": "sec_lpoi_001",
-        "section_override_applied": false,
-        "step_key": "accessories"
-      },
-      {
-        "option_id": "opt_v8x_001",
-        "rpo": "V8X",
         "section_id": "sec_lpoi_001",
         "original_section_id": "sec_lpoi_001",
         "section_override_applied": false,

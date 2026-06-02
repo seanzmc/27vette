@@ -128,9 +128,9 @@ test("LZ_Interiors is schema-compatible but not read by Stingray generation", ()
   assert.equal(stingrayInteriors.some((interior) => interior.interior_id === "3LT_AH2_EL9"), false);
 });
 
-test("future Corvette model metadata is scaffolded inactive against shared LZ interiors", () => {
+test("future Corvette model metadata is scaffolded against shared LZ interiors", () => {
   const expectedModels = {
-    z06: { label: "Z06", registryKey: "z06", variantCount: 6 },
+    z06: { label: "Z06", registryKey: "z06", variantCount: 6, active: true },
     zr1: { label: "ZR1", registryKey: "zr1", variantCount: 4 },
     zr1x: { label: "ZR1X", registryKey: "zr1x", variantCount: 4 },
   };
@@ -189,7 +189,7 @@ test("future Corvette model metadata is scaffolded inactive against shared LZ in
     assert.equal(modelRow.model_year, "2027");
     assert.equal(modelRow.expected_variant_count, expected.variantCount);
     assert.equal(modelRow.default_model, false);
-    assert.equal(modelRow.active, false);
+    assert.equal(modelRow.active, expected.active ?? false);
 
     const variantRows = snapshot.model_variant_rows.filter((row) => row.model_key === modelKey);
     assert.deepEqual(
@@ -213,7 +213,7 @@ test("future Corvette model metadata is scaffolded inactive against shared LZ in
   }
 });
 
-test("future Corvette normalized source sheets stay compatible and inactive after approved source staging", () => {
+test("future Corvette normalized source sheets stay compatible and source rows stay inactive after approved source staging", () => {
   const roleBySuffix = {
     options: "options",
     ovs: "ovs",
@@ -228,11 +228,12 @@ test("future Corvette normalized source sheets stay compatible and inactive afte
   const expectedVariantCounts = { z06: 6, zr1: 4, zr1x: 4 };
   const expectedStagedRowCounts = {
     z06: {
-      rule_mapping: 100,
-      rule_groups: 0,
-      rule_group_members: 0,
-      exclusive_groups: 7,
-      exclusive_members: 16,
+      rule_mapping: 209,
+      price_rules: 36,
+      rule_groups: 4,
+      rule_group_members: 11,
+      exclusive_groups: 8,
+      exclusive_members: 21,
     },
     zr1: {
       rule_mapping: 56,

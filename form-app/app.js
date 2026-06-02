@@ -772,6 +772,7 @@ function sameExclusiveGroupPeer(optionId, peerId) {
 }
 
 function requiresAnyReason(choice, selectedIds) {
+  if (!selectedIds.has(choice.option_id)) return "";
   const groups = ruleGroupsBySource.get(choice.option_id) || [];
   for (const group of groups) {
     if (group.group_type !== "requires_any" || !ruleGroupAppliesToCurrentVariant(group)) continue;
@@ -849,7 +850,7 @@ function computeAutoAdded() {
   return autoAdded;
 }
 
-function disableReasonForChoice(choice) {
+function disableReasonForChoice(choice, { includeSelectedRequirements = true } = {}) {
   if (choice.active !== "True") return "Inactive in the source workbook.";
   if (choice.status === "unavailable") return "Not available for this body and trim.";
 
@@ -857,7 +858,7 @@ function disableReasonForChoice(choice) {
   if (exception) return exception.disabled_reason || `Blocked by ${getEntityLabel(exception.source_option_id)}.`;
 
   const selectedIds = selectedContextIds();
-  const groupedReason = requiresAnyReason(choice, selectedIds);
+  const groupedReason = includeSelectedRequirements ? requiresAnyReason(choice, selectedIds) : "";
   if (groupedReason) return groupedReason;
   const groupedExclusionReason = excludesAnyReason(choice, selectedIds);
   if (groupedExclusionReason) return groupedExclusionReason;
@@ -891,7 +892,7 @@ function disableReasonForChoice(choice) {
     }
   }
 
-  if (choice.selectable !== "True" && choice.status !== "standard") return "Display-only source row.";
+  if (choice.selectable !== "True") return "Display-only source row.";
 
   return "";
 }
@@ -1093,6 +1094,21 @@ function missingRequirementDetails() {
       stepKey: choices[0]?.step_key || "",
       detail: `Choose one ${step?.step_label ? `in ${step.step_label}` : "required option"} from ${section?.section_name || group.group_id}.`,
     });
+  }
+  for (const sourceId of selectedIds) {
+    for (const group of ruleGroupsBySource.get(sourceId) || []) {
+      if (group.group_type !== "requires_any" || !ruleGroupAppliesToCurrentVariant(group)) continue;
+      if ((group.target_ids || []).some((targetId) => selectedIds.has(targetId) || autoAdded.has(targetId))) continue;
+      const choices = (group.target_ids || []).map((targetId) => optionsById.get(targetId)).filter(Boolean);
+      const section = sectionsById.get(choices[0]?.section_id || "");
+      const step = runtimeSteps.find((item) => item.step_key === choices[0]?.step_key);
+      missing.push({
+        label: section?.section_name || getEntityLabel(sourceId),
+        hasOptions: choices.some((choice) => choice.selectable === "True" && !disableReasonForChoice(choice)),
+        stepKey: choices[0]?.step_key || "",
+        detail: group.disabled_reason || `Choose one ${step?.step_label ? `in ${step.step_label}` : "required option"}: ${(group.target_ids || []).map(getEntityLabel).join(", ")}.`,
+      });
+    }
   }
   if (!state.selectedInterior) {
     missing.push({
@@ -1412,13 +1428,13 @@ function reconcileSelections() {
   }
   for (const id of [...state.selected]) {
     const choice = choiceForCurrentVariant(id);
-    if (!choice || shouldHideChoice(choice) || disableReasonForChoice(choice)) deleteSelectedOption(id);
+    if (!choice || shouldHideChoice(choice) || disableReasonForChoice(choice, { includeSelectedRequirements: false })) deleteSelectedOption(id);
   }
   reconcileInteriorSelection();
   const autoAdded = computeAutoAdded();
   for (const id of [...state.selected]) {
     const choice = choiceForCurrentVariant(id);
-    if (!choice || shouldHideChoice(choice) || disableReasonForChoice(choice)) deleteSelectedOption(id);
+    if (!choice || shouldHideChoice(choice) || disableReasonForChoice(choice, { includeSelectedRequirements: false })) deleteSelectedOption(id);
   }
   removeAutoDefaultDuplicates(autoAdded);
   const refreshedAutoAdded = computeAutoAdded();
