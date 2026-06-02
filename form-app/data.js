@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-02T01:56:52+00:00"
+          "generated_at": "2026-06-02T04:05:52+00:00"
         },
         "variants": [
           {
@@ -111481,7 +111481,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-02T01:56:49+00:00",
+          "generated_at": "2026-06-02T04:05:49+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -120227,13 +120227,13 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LZ",
             "status": "standard",
             "status_label": "Standard",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
-            "display_behavior": "",
+            "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": ""
           },
@@ -120252,13 +120252,13 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "2LZ",
             "status": "standard",
             "status_label": "Standard",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
-            "display_behavior": "",
+            "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": ""
           },
@@ -120277,13 +120277,13 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LZ",
             "status": "standard",
             "status_label": "Standard",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
-            "display_behavior": "",
+            "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": ""
           },
@@ -120302,13 +120302,13 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LZ",
             "status": "standard",
             "status_label": "Standard",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
-            "display_behavior": "",
+            "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": ""
           },
@@ -120327,13 +120327,13 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "2LZ",
             "status": "standard",
             "status_label": "Standard",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
-            "display_behavior": "",
+            "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": ""
           },
@@ -120352,13 +120352,13 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LZ",
             "status": "standard",
             "status_label": "Standard",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
-            "display_behavior": "",
+            "display_behavior": "default_selected",
             "display_order": 10,
             "source_detail_raw": ""
           },
@@ -156626,6 +156626,17 @@ window.CORVETTE_FORM_DATA = {
             "notes": "Brake choices require one active brake selection; selected default cannot be cleared without choosing another brake package."
           },
           {
+            "group_id": "z06_excl_carbon_wheel_packages",
+            "option_ids": [
+              "opt_pdb_001",
+              "opt_pdd_001",
+              "opt_pdf_001"
+            ],
+            "selection_mode": "single_within_group",
+            "active": "True",
+            "notes": "PDB, PDD, and PDF are radio-like package peers; selecting one replaces the others without greying them out."
+          },
+          {
             "group_id": "z06_excl_fa5_fa6_interior_trim",
             "option_ids": [
               "opt_fa5_001",
@@ -156634,6 +156645,28 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "single_within_group",
             "active": "True",
             "notes": "Z06 FA5 and FA6 carbon-fiber interior trim options are mutually exclusive."
+          },
+          {
+            "group_id": "z06_excl_aero_packages",
+            "option_ids": [
+              "opt_t0e_001",
+              "opt_t0f_001",
+              "opt_t0g_001",
+              "opt_5zv_001"
+            ],
+            "selection_mode": "single_within_group",
+            "active": "True",
+            "notes": "Z06 aero choices are radio-like peers; T0E is the default and T0F/T0G/5ZV replace it without hard disabling peers."
+          },
+          {
+            "group_id": "z06_excl_exhaust_tips",
+            "option_ids": [
+              "opt_nga_001",
+              "opt_nwi_001"
+            ],
+            "selection_mode": "single_within_group",
+            "active": "True",
+            "notes": "Z06 exhaust tips are mutually exclusive; NGA is the default/restored tip and NWI replaces it when selected."
           }
         ],
         "rules": [
@@ -157015,25 +157048,6 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "runtime_action": "active",
             "source_note": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package.",
-            "review_flag": "False"
-          },
-          {
-            "rule_id": "z06_rule_opt_5zv_001_excludes_opt_t0f_001",
-            "source_id": "opt_5zv_001",
-            "rule_type": "excludes",
-            "target_id": "opt_t0f_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_perf_aero_001",
-            "target_section": "sec_perf_aero_001",
-            "source_selection_mode": "single_select_req",
-            "target_selection_mode": "single_select_req",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by 5ZV LPO, Three-Stanchion high wing spoiler, Carbon Flash Metallic-painted, Genuine Corvette Accessory.",
-            "auto_add": "False",
-            "active": "False",
-            "runtime_action": "omit_redundant_same_section_exclude",
-            "source_note": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package.",
             "review_flag": "False"
           },
           {
@@ -158614,44 +158628,6 @@ window.CORVETTE_FORM_DATA = {
             "review_flag": "False"
           },
           {
-            "rule_id": "z06_rule_opt_pdd_001_excludes_opt_t0g_001",
-            "source_id": "opt_pdd_001",
-            "rule_type": "excludes",
-            "target_id": "opt_t0g_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_z06_pkg_001",
-            "target_section": "sec_perf_aero_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "single_select_req",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by PDD.",
-            "auto_add": "False",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": "PDD uses T0F and blocks the visible aero package peer.",
-            "review_flag": "False"
-          },
-          {
-            "rule_id": "z06_rule_opt_pdf_001_excludes_opt_t0f_001",
-            "source_id": "opt_pdf_001",
-            "rule_type": "excludes",
-            "target_id": "opt_t0f_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_z06_pkg_001",
-            "target_section": "sec_perf_aero_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "single_select_req",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by PDF.",
-            "auto_add": "False",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": "PDF uses T0G and blocks the Carbon Flash aero package peer.",
-            "review_flag": "False"
-          },
-          {
             "rule_id": "z06_rule_opt_bcw_001_requires_opt_zz3_001_convertible",
             "source_id": "opt_bcw_001",
             "rule_type": "requires",
@@ -159830,44 +159806,6 @@ window.CORVETTE_FORM_DATA = {
             "review_flag": "False"
           },
           {
-            "rule_id": "z06_rule_opt_pdb_001_excludes_opt_pdd_001",
-            "source_id": "opt_pdb_001",
-            "rule_type": "excludes",
-            "target_id": "opt_pdd_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_z06_pkg_001",
-            "target_section": "sec_z06_pkg_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "single_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by selected PDB package.",
-            "auto_add": "False",
-            "active": "False",
-            "runtime_action": "omit_redundant_same_section_exclude",
-            "source_note": "PDB deactivates peer wheel-and-brake package PDD.",
-            "review_flag": "False"
-          },
-          {
-            "rule_id": "z06_rule_opt_pdb_001_excludes_opt_pdf_001",
-            "source_id": "opt_pdb_001",
-            "rule_type": "excludes",
-            "target_id": "opt_pdf_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_z06_pkg_001",
-            "target_section": "sec_z06_pkg_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "single_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by selected PDB package.",
-            "auto_add": "False",
-            "active": "False",
-            "runtime_action": "omit_redundant_same_section_exclude",
-            "source_note": "PDB deactivates peer wheel-and-brake package PDF.",
-            "review_flag": "False"
-          },
-          {
             "rule_id": "z06_rule_opt_pdb_001_excludes_opt_rou_001",
             "source_id": "opt_pdb_001",
             "rule_type": "excludes",
@@ -160039,44 +159977,6 @@ window.CORVETTE_FORM_DATA = {
             "review_flag": "False"
           },
           {
-            "rule_id": "z06_rule_opt_pdd_001_excludes_opt_pdb_001",
-            "source_id": "opt_pdd_001",
-            "rule_type": "excludes",
-            "target_id": "opt_pdb_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_z06_pkg_001",
-            "target_section": "sec_z06_pkg_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "single_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by selected PDD package.",
-            "auto_add": "False",
-            "active": "False",
-            "runtime_action": "omit_redundant_same_section_exclude",
-            "source_note": "PDD deactivates peer wheel-and-brake package PDB.",
-            "review_flag": "False"
-          },
-          {
-            "rule_id": "z06_rule_opt_pdd_001_excludes_opt_pdf_001",
-            "source_id": "opt_pdd_001",
-            "rule_type": "excludes",
-            "target_id": "opt_pdf_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_z06_pkg_001",
-            "target_section": "sec_z06_pkg_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "single_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by selected PDD package.",
-            "auto_add": "False",
-            "active": "False",
-            "runtime_action": "omit_redundant_same_section_exclude",
-            "source_note": "PDD deactivates peer wheel-and-brake package PDF.",
-            "review_flag": "False"
-          },
-          {
             "rule_id": "z06_rule_opt_pdd_001_excludes_opt_rou_001",
             "source_id": "opt_pdd_001",
             "rule_type": "excludes",
@@ -160245,44 +160145,6 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "runtime_action": "active",
             "source_note": "PDD requires carbon fiber wheels and deactivates aluminum wheel STX.",
-            "review_flag": "False"
-          },
-          {
-            "rule_id": "z06_rule_opt_pdf_001_excludes_opt_pdb_001",
-            "source_id": "opt_pdf_001",
-            "rule_type": "excludes",
-            "target_id": "opt_pdb_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_z06_pkg_001",
-            "target_section": "sec_z06_pkg_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "single_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by selected PDF package.",
-            "auto_add": "False",
-            "active": "False",
-            "runtime_action": "omit_redundant_same_section_exclude",
-            "source_note": "PDF deactivates peer wheel-and-brake package PDB.",
-            "review_flag": "False"
-          },
-          {
-            "rule_id": "z06_rule_opt_pdf_001_excludes_opt_pdd_001",
-            "source_id": "opt_pdf_001",
-            "rule_type": "excludes",
-            "target_id": "opt_pdd_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_z06_pkg_001",
-            "target_section": "sec_z06_pkg_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "single_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by selected PDF package.",
-            "auto_add": "False",
-            "active": "False",
-            "runtime_action": "omit_redundant_same_section_exclude",
-            "source_note": "PDF deactivates peer wheel-and-brake package PDD.",
             "review_flag": "False"
           },
           {
@@ -167109,7 +166971,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "201 active compatibility rules exported from z06_rule_mapping."
+            "message": "192 active compatibility rules exported from z06_rule_mapping."
           },
           {
             "check_id": "interior_contract",

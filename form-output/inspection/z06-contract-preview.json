@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-06-02T01:56:54+00:00",
+    "generated_at": "2026-06-02T04:08:18+00:00",
     "status": "read_only_preview"
   },
   "variants": [
@@ -7047,8 +7047,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -7074,8 +7074,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -7101,8 +7101,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -7128,8 +7128,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -7155,8 +7155,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -7182,8 +7182,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nwi_001",
@@ -38981,8 +38981,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -39008,8 +39008,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -39035,8 +39035,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -39062,8 +39062,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -39089,8 +39089,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -39116,8 +39116,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_wub_001",

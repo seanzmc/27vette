@@ -765,6 +765,24 @@ function userSelectedExclusiveGroupPeer(optionId, selectedIds) {
   return (group.option_ids || []).some((id) => id !== optionId && selectedIds.has(id) && state.userSelected.has(id));
 }
 
+function includedExclusiveGroupPeerReason(optionId, selectedIds = selectedContextIds()) {
+  const group = optionExclusiveGroup(optionId);
+  if (!exclusiveGroupAllowsSingleSelection(group) || group.selection_mode !== "single_within_group") return "";
+  for (const peerId of group.option_ids || []) {
+    if (peerId === optionId || !selectedIds.has(peerId)) continue;
+    const rules = rulesByTarget.get(peerId) || [];
+    const includeRule = rules.find(
+      (rule) =>
+        rule.rule_type === "includes" &&
+        ruleAppliesToCurrentVariant(rule) &&
+        selectedIds.has(rule.source_id) &&
+        exclusiveGroupAllowsSingleSelection(optionExclusiveGroup(rule.source_id))
+    );
+    if (includeRule) return `${getEntityLabel(peerId)} is locked because it is ${includedWithReason(includeRule).toLowerCase()}`;
+  }
+  return "";
+}
+
 function sameExclusiveGroupPeer(optionId, peerId) {
   const group = optionExclusiveGroup(optionId);
   if (!exclusiveGroupAllowsSingleSelection(group)) return false;
@@ -824,7 +842,7 @@ function computeAutoAdded() {
           !selectedExcludesTarget(rule.target_id, selectedIds) &&
           !shouldSuppressIncludedDefault(rule) &&
           includedTargetRequirementsMet(rule.target_id, selectedIds) &&
-          !userSelectedExclusiveGroupPeer(rule.target_id, selectedIds)
+          (!userSelectedExclusiveGroupPeer(rule.target_id, selectedIds) || exclusiveGroupAllowsSingleSelection(optionExclusiveGroup(rule.source_id)))
         ) {
           autoAdded.set(rule.target_id, includedWithReason(rule));
           if (!selectedIds.has(rule.target_id)) {
@@ -858,10 +876,12 @@ function disableReasonForChoice(choice, { includeSelectedRequirements = true } =
   if (exception) return exception.disabled_reason || `Blocked by ${getEntityLabel(exception.source_option_id)}.`;
 
   const selectedIds = selectedContextIds();
-  const groupedReason = includeSelectedRequirements ? requiresAnyReason(choice, selectedIds) : "";
+  const groupedReason = includeSelectedRequirements && !state.selected.has(choice.option_id) ? requiresAnyReason(choice, selectedIds) : "";
   if (groupedReason) return groupedReason;
   const groupedExclusionReason = excludesAnyReason(choice, selectedIds);
   if (groupedExclusionReason) return groupedExclusionReason;
+  const includedPeerReason = includedExclusiveGroupPeerReason(choice.option_id, selectedIds);
+  if (includedPeerReason) return includedPeerReason;
   const targetRules = rulesByTarget.get(choice.option_id) || [];
   for (const rule of targetRules) {
     if (rule.rule_type === "excludes" && selectedIds.has(rule.source_id) && ruleAppliesToCurrentVariant(rule)) {
@@ -1159,7 +1179,9 @@ function addWorkbookDefaultChoices({ restoreSingleRequiredOnly = true } = {}) {
   for (const choice of rows) {
     const section = sectionsById.get(choice.section_id);
     if (!section) continue;
-    if (restoreSingleRequiredOnly && section.selection_mode !== "single_select_req") continue;
+    const group = optionExclusiveGroup(choice.option_id);
+    const canRestoreDefaultGroup = group && exclusiveGroupAllowsSingleSelection(group) && !selectedOrAutoInExclusiveGroup(group, autoAdded);
+    if (restoreSingleRequiredOnly && section.selection_mode !== "single_select_req" && !canRestoreDefaultGroup) continue;
     if (section.choice_mode === "single" && selectedOrAutoInSection(choice.section_id)) continue;
     if (selectedOrAutoExclusiveGroupPeer(choice.option_id, state.selected, autoAdded)) continue;
     if (disableReasonForChoice(choice)) continue;

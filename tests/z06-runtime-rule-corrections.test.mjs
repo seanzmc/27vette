@@ -193,7 +193,7 @@ test("Z06 package selections require carbon wheels and make package peers consis
     }
     const peerRpos = ["PDB", "PDD", "PDF"].filter((peer) => peer !== rpo);
     for (const peerRpo of peerRpos) {
-      assert.notEqual(runtime.disableReasonForChoice(choice(runtime, peerRpo)), "", `${peerRpo} should be blocked while ${rpo} is selected`);
+      assert.equal(runtime.disableReasonForChoice(choice(runtime, peerRpo)), "", `${peerRpo} should stay clickable while ${rpo} is selected`);
     }
   }
 });
