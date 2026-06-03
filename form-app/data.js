@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-03T02:59:23+00:00"
+          "generated_at": "2026-06-03T04:04:24+00:00"
         },
         "variants": [
           {
@@ -111481,7 +111481,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-03T02:59:20+00:00",
+          "generated_at": "2026-06-03T04:04:20+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -160183,6 +160183,82 @@ window.CORVETTE_FORM_DATA = {
             "runtime_action": "replace",
             "source_note": "PDF requires carbon fiber wheels and deactivates aluminum wheel STX.",
             "review_flag": "False"
+          },
+          {
+            "rule_id": "z06_rule_opt_z07_001_includes_opt_t0f_001",
+            "source_id": "opt_z07_001",
+            "rule_type": "includes",
+            "target_id": "opt_t0f_001",
+            "target_type": "option",
+            "source_type": "",
+            "source_section": "",
+            "target_section": "",
+            "source_selection_mode": "",
+            "target_selection_mode": "",
+            "body_style_scope": "",
+            "disabled_reason": "Included with Z07 Z07 Performance Package, includes (J57) 4-wheel antilock, 4-wheel disc, carbon ceramic brakes with (J6D) Dark Gray Metallic-painted calipers, (FE7) Z07 suspension with Magnetic Selective Ride Control and (XFS) 275/30ZR20 front and 345/25ZR21 rear Michelin Pilot Sport Cup 2 R ultra performance tires; (J6D) Dark Gray Metallic-painted calipers can be upgraded at additional cost to one of the following painted caliper colors: (J6B) Blue, (J6F) Bright Red, (J6N) Edge Red, (J6L) Orange, or (J6E) Velocity Yellow.",
+            "auto_add": "True",
+            "active": "True",
+            "runtime_action": "active",
+            "source_note": "Z07 defaults Carbon Flash aero T0F while allowing the user to switch to T0G.",
+            "review_flag": ""
+          },
+          {
+            "rule_id": "z06_rule_opt_pdb_001_includes_opt_roy_001",
+            "source_id": "opt_pdb_001",
+            "rule_type": "includes",
+            "target_id": "opt_roy_001",
+            "target_type": "option",
+            "source_type": "",
+            "source_section": "",
+            "target_section": "",
+            "source_selection_mode": "",
+            "target_selection_mode": "",
+            "body_style_scope": "",
+            "disabled_reason": "Included with PDB Carbon Fiber Wheel and Brake Package, includes (J57) carbon ceramic brakes with (J6D) Dark Gray Metallic-painted calipers and choice of one of the following wheels set: (ROY) 20\" front/21\" rear Carbon Flash-painted carbon fiber wheels, (ROZ) 20\" front/21\" rear visible carbon fiber wheels, or (STZ) 20\" front/21\" rear visible carbon fiber wheels with Red stripe.",
+            "auto_add": "True",
+            "active": "True",
+            "runtime_action": "active",
+            "source_note": "PDB defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches.",
+            "review_flag": ""
+          },
+          {
+            "rule_id": "z06_rule_opt_pdd_001_includes_opt_roy_001",
+            "source_id": "opt_pdd_001",
+            "rule_type": "includes",
+            "target_id": "opt_roy_001",
+            "target_type": "option",
+            "source_type": "",
+            "source_section": "",
+            "target_section": "",
+            "source_selection_mode": "",
+            "target_selection_mode": "",
+            "body_style_scope": "",
+            "disabled_reason": "Included with PDD Z07 Carbon Flash Aero and Wheel Package, includes (Z07) Z07 Performance Package, (T0F) Carbon Flash-painted Carbon Fiber Aero Package, (CFZ) Carbon Flash-painted carbon fiber ground effects, and choice of one of the following wheels set: (ROY) 20\" front/21\" rear Carbon Flash-painted carbon fiber wheels, (ROZ) 20\" front/21\" rear visible carbon fiber wheels, or (STZ) 20\" front/21\" rear visible carbon fiber wheels with Red stripe.",
+            "auto_add": "True",
+            "active": "True",
+            "runtime_action": "active",
+            "source_note": "PDD defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches.",
+            "review_flag": ""
+          },
+          {
+            "rule_id": "z06_rule_opt_pdf_001_includes_opt_roy_001",
+            "source_id": "opt_pdf_001",
+            "rule_type": "includes",
+            "target_id": "opt_roy_001",
+            "target_type": "option",
+            "source_type": "",
+            "source_section": "",
+            "target_section": "",
+            "source_selection_mode": "",
+            "target_selection_mode": "",
+            "body_style_scope": "",
+            "disabled_reason": "Included with PDF Z07 Visible Carbon Aero and Wheel Package, includes (Z07) Z07 Performance Package, (T0G) Visible Carbon Fiber Aero Package, (CFV) visible carbon fiber ground effects, and choice of one of the following wheels set: (ROY) 20\" front/21\" rear Carbon Flash-painted carbon fiber wheels, (ROZ) 20\" front/21\" rear visible carbon fiber wheels, or (STZ) 20\" front/21\" rear visible carbon fiber wheels with Red stripe.",
+            "auto_add": "True",
+            "active": "True",
+            "runtime_action": "active",
+            "source_note": "PDF defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches.",
+            "review_flag": ""
           }
         ],
         "priceRules": [
@@ -166837,7 +166913,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "185 active compatibility rules exported from z06_rule_mapping."
+            "message": "189 active compatibility rules exported from z06_rule_mapping."
           },
           {
             "check_id": "interior_contract",

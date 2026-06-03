@@ -221,6 +221,52 @@ def apply_default_option_metadata(wb, changes: list[Change]) -> None:
     set_cell(wb[OPTION_SHEET], row_number, "price", 0, changes, key="NGA", reason="NGA default exhaust tips should remain zero-price")
 
 
+def ensure_include_rule(wb, changes: list[Change], source_rpo: str, target_rpo: str, reason: str) -> None:
+    _, id_by_rpo, _ = option_maps(wb)
+    require_rpos(id_by_rpo, [source_rpo, target_rpo])
+    ws = wb[RULE_MAPPING_SHEET]
+    source_id = id_by_rpo[source_rpo]
+    target_id = id_by_rpo[target_rpo]
+    rule_id = f"z06_rule_{source_id}_includes_{target_id}"
+    row_number = None
+    for candidate_number, row in rows(ws):
+        if clean(row.get("rule_id")) == rule_id or (
+            clean(row.get("source_id")) == source_id
+            and clean(row.get("rule_type")).lower() == "includes"
+            and clean(row.get("target_id")) == target_id
+        ):
+            row_number = candidate_number
+            break
+    values = {
+        "rule_id": rule_id,
+        "source_id": source_id,
+        "rule_type": "includes",
+        "target_id": target_id,
+        "target_type": "option",
+        "original_detail_raw": reason,
+        "normalization_status": "active",
+        "normalization_reason": reason,
+    }
+    if row_number is None:
+        row_number = ws.max_row + 1
+        idx = index(ws)
+        for field, value in values.items():
+            ws.cell(row_number, idx[field]).value = value
+        changes.append(Change(ws.title, f"new:{row_number}", rule_id, "row", None, values, reason))
+    else:
+        for field, value in values.items():
+            if field == "rule_id":
+                continue
+            set_cell(ws, row_number, field, value, changes, key=rule_id, reason=reason)
+        set_cell(ws, row_number, "generation_action", "", changes, key=rule_id, reason=reason)
+
+
+def apply_forced_package_defaults(wb, changes: list[Change]) -> None:
+    ensure_include_rule(wb, changes, "Z07", "T0F", "Z07 defaults Carbon Flash aero T0F while allowing the user to switch to T0G.")
+    for package_rpo in PACKAGE_RPOS:
+        ensure_include_rule(wb, changes, package_rpo, "ROY", f"{package_rpo} defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches.")
+
+
 def apply_package_wheel_replace_actions(wb, changes: list[Change]) -> None:
     _, id_by_rpo, rpo_by_id = option_maps(wb)
     ws = wb[RULE_MAPPING_SHEET]
@@ -268,6 +314,7 @@ def build_plan(wb) -> list[Change]:
     changes: list[Change] = []
     apply_exclusive_groups(wb, changes)
     apply_default_option_metadata(wb, changes)
+    apply_forced_package_defaults(wb, changes)
     apply_package_wheel_replace_actions(wb, changes)
     omit_legacy_excludes(wb, changes)
     return changes
@@ -313,6 +360,16 @@ def verify_saved(path: Path) -> dict[str, Any]:
         checks["omitted_legacy_excludes"] = omitted
         if omitted != len(OMIT_EXCLUDE_PAIRS):
             raise RuntimeError(f"Expected {len(OMIT_EXCLUDE_PAIRS)} omitted legacy excludes, found {omitted}")
+        include_pairs = {
+            (rpo_by_id.get(clean(row.get("source_id")), ""), rpo_by_id.get(clean(row.get("target_id")), ""))
+            for _, row in rows(wb[RULE_MAPPING_SHEET])
+            if clean(row.get("rule_type")).lower() == "includes" and clean(row.get("normalization_status")) != "omitted"
+        }
+        expected_includes = {("Z07", "T0F"), *( (rpo, "ROY") for rpo in PACKAGE_RPOS )}
+        missing_includes = sorted(expected_includes - include_pairs)
+        if missing_includes:
+            raise RuntimeError(f"Missing forced package default include(s): {missing_includes}")
+        checks["forced_default_includes"] = sorted(f"{source}->{target}" for source, target in expected_includes)
         return checks
     finally:
         wb.close()

@@ -771,6 +771,29 @@ function includedRuleLocksExclusivePeer(rule) {
   return exclusiveGroupAllowsSingleSelection(sourceGroup) && targetGroup?.selection_mode === "single_within_group";
 }
 
+function includedRuleAllowedReplacementPeers(rule) {
+  const groups = ruleGroupsBySource.get(rule.source_id) || [];
+  const group = groups.find(
+    (candidate) =>
+      candidate.group_type === "requires_any" &&
+      ruleGroupAppliesToCurrentVariant(candidate) &&
+      (candidate.target_ids || []).includes(rule.target_id)
+  );
+  return group ? new Set(group.target_ids || []) : null;
+}
+
+function includedRuleLocksAgainstPeer(rule, peerId) {
+  const allowedReplacementPeers = includedRuleAllowedReplacementPeers(rule);
+  if (allowedReplacementPeers) return !allowedReplacementPeers.has(peerId);
+  return includedRuleLocksExclusivePeer(rule);
+}
+
+function includedRuleSuppressesUserPeer(rule, selectedIds) {
+  const allowedReplacementPeers = includedRuleAllowedReplacementPeers(rule);
+  if (!allowedReplacementPeers) return includedRuleLocksExclusivePeer(rule);
+  return !(rule.target_id && [...allowedReplacementPeers].some((peerId) => peerId !== rule.target_id && selectedIds.has(peerId) && state.userSelected.has(peerId)));
+}
+
 function includedExclusiveGroupPeerReason(optionId, selectedIds = selectedContextIds()) {
   const group = optionExclusiveGroup(optionId);
   if (!exclusiveGroupAllowsSingleSelection(group) || group.selection_mode !== "single_within_group") return "";
@@ -782,7 +805,7 @@ function includedExclusiveGroupPeerReason(optionId, selectedIds = selectedContex
         rule.rule_type === "includes" &&
         ruleAppliesToCurrentVariant(rule) &&
         selectedIds.has(rule.source_id) &&
-        includedRuleLocksExclusivePeer(rule)
+        includedRuleLocksAgainstPeer(rule, optionId)
     );
     if (includeRule) return `${getEntityLabel(peerId)} is locked because it is ${includedWithReason(includeRule).toLowerCase()}`;
   }
@@ -847,7 +870,7 @@ function computeAutoAdded() {
           !selectedExcludesTarget(rule.target_id, selectedIds) &&
           !shouldSuppressIncludedDefault(rule) &&
           includedTargetRequirementsMet(rule.target_id, selectedIds) &&
-          (!userSelectedExclusiveGroupPeer(rule.target_id, selectedIds) || includedRuleLocksExclusivePeer(rule))
+          (!userSelectedExclusiveGroupPeer(rule.target_id, selectedIds) || includedRuleSuppressesUserPeer(rule, selectedIds))
         ) {
           autoAdded.set(rule.target_id, includedWithReason(rule));
           if (!selectedIds.has(rule.target_id)) {
@@ -1450,15 +1473,13 @@ function removeLockedIncludedExclusiveGroupPeers() {
   const selectedIds = selectedContextIds();
   let removed = false;
   for (const sourceId of [...selectedIds]) {
-    const sourceGroup = optionExclusiveGroup(sourceId);
-    if (!exclusiveGroupAllowsSingleSelection(sourceGroup)) continue;
     const rules = ruleTargetsBySource.get(sourceId) || [];
     for (const rule of rules) {
-      if (rule.rule_type !== "includes" || !ruleAppliesToCurrentVariant(rule) || !includedRuleLocksExclusivePeer(rule)) continue;
+      if (rule.rule_type !== "includes" || !ruleAppliesToCurrentVariant(rule)) continue;
       const targetGroup = optionExclusiveGroup(rule.target_id);
       if (!exclusiveGroupAllowsSingleSelection(targetGroup)) continue;
       for (const peerId of targetGroup.option_ids || []) {
-        if (peerId === rule.target_id || !state.selected.has(peerId)) continue;
+        if (peerId === rule.target_id || !state.selected.has(peerId) || !includedRuleLocksAgainstPeer(rule, peerId)) continue;
         deleteSelectedOption(peerId);
         removed = true;
       }

@@ -189,6 +189,30 @@ test("Z06 draft emits approved package/wheel and Z07 price rules", () => {
   }
 });
 
+test("Z06 draft emits forced Z07 aero and package wheel defaults", () => {
+  const activeIncludePairs = new Set(
+    draft.rules
+      .filter((rule) => rule.rule_type === "includes" && rule.active === "True")
+      .map((rule) => `${rule.source_id}->${rule.target_id}`)
+  );
+  for (const [sourceId, targetId] of [
+    ["opt_z07_001", "opt_t0f_001"],
+    ["opt_t0f_001", "opt_cfz_001"],
+    ["opt_t0g_001", "opt_cfv_002"],
+    ["opt_pdb_001", "opt_roy_001"],
+    ["opt_pdd_001", "opt_roy_001"],
+    ["opt_pdf_001", "opt_roy_001"],
+  ]) {
+    assert.equal(activeIncludePairs.has(`${sourceId}->${targetId}`), true, `${sourceId} should include/default ${targetId}`);
+  }
+
+  const requiredGroupsBySource = new Map(draft.ruleGroups.map((group) => [group.source_id, group]));
+  assert.deepEqual(requiredGroupsBySource.get("opt_z07_001")?.target_ids, ["opt_t0f_001", "opt_t0g_001"]);
+  for (const sourceId of ["opt_pdb_001", "opt_pdd_001", "opt_pdf_001"]) {
+    assert.deepEqual(requiredGroupsBySource.get(sourceId)?.target_ids, ["opt_roy_001", "opt_roz_001", "opt_stz_001"]);
+  }
+});
+
 test("Z06 draft keeps BCW price override without auto-adding BCW from B6P", () => {
   const b6pBcwPrice = draft.priceRules.find((rule) => rule.price_rule_id === "z06_pr_b6p_bcw_895_coupe");
   assert.ok(b6pBcwPrice, "B6P should still own the BCW price override");

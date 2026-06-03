@@ -135,7 +135,7 @@ function autoAddedRpos(runtime) {
   return [...runtime.computeAutoAdded().keys()].map((id) => choices.find((choice) => choice.option_id === id)?.rpo || id).sort();
 }
 
-test("Z06 Z07 is selectable first, then requires T0F or T0G and keeps J57 included at zero", () => {
+test("Z06 Z07 defaults T0F, allows T0G switching, and keeps J57 included at zero", () => {
   const runtime = z06Runtime();
   const z07 = choice(runtime, "Z07");
 
@@ -145,11 +145,14 @@ test("Z06 Z07 is selectable first, then requires T0F or T0G and keeps J57 includ
 
   assert.equal(runtime.state.selected.has(z07.option_id), true, "Z07 should be selected");
   assert.equal(autoAddedRpos(runtime).includes("J57"), true, "Z07 should auto-add J57");
+  assert.equal(autoAddedRpos(runtime).includes("T0F"), true, "Z07 should default the required aero choice to T0F");
+  assert.equal(autoAddedRpos(runtime).includes("CFZ"), true, "Z07 default T0F should auto-add CFZ");
+  assert.equal(runtime.state.selected.has(choice(runtime, "T0E").option_id), false, "Z07 should replace the T0E default spoiler");
   assert.equal(runtime.optionPrice(choice(runtime, "J57").option_id), 0, "Z07-included J57 should price at zero");
-  assert.match(
+  assert.doesNotMatch(
     runtime.missingRequirementDetails().map((item) => item.detail).join("\n"),
     /T0F|T0G|aero/i,
-    "Z07 should create a missing requirement for T0F/T0G after selection"
+    "Z07 should satisfy its aero requirement with default T0F"
   );
 
   runtime.handleChoice(choice(runtime, "J57"));
@@ -158,11 +161,9 @@ test("Z06 Z07 is selectable first, then requires T0F or T0G and keeps J57 includ
 
   runtime.handleChoice(choice(runtime, "T0G"));
   runtime.reconcileSelections();
-  assert.doesNotMatch(
-    runtime.missingRequirementDetails().map((item) => item.detail).join("\n"),
-    /T0F|T0G|aero/i,
-    "choosing T0G should satisfy the Z07 aero requirement"
-  );
+  assert.equal(runtime.state.selected.has(choice(runtime, "T0G").option_id), true, "T0G should be selectable as the Z07 aero alternate");
+  assert.equal(autoAddedRpos(runtime).includes("T0F"), false, "T0G should suppress the T0F default");
+  assert.equal(autoAddedRpos(runtime).includes("CFV"), true, "T0G should auto-add CFV");
 });
 
 test("Z06 T0F does not require J57 as a prerequisite", () => {
@@ -172,7 +173,7 @@ test("Z06 T0F does not require J57 as a prerequisite", () => {
   assert.equal(runtime.disableReasonForChoice(t0f), "", "T0F should be selectable without first selecting J57");
 });
 
-test("Z06 package selections require carbon wheels and make package peers consistent", () => {
+test("Z06 package selections default ROY carbon wheels and make package peers consistent", () => {
   for (const rpo of ["PDB", "PDD", "PDF"]) {
     const runtime = z06Runtime();
     const packageChoice = choice(runtime, rpo);
@@ -181,16 +182,21 @@ test("Z06 package selections require carbon wheels and make package peers consis
     runtime.reconcileSelections();
 
     assert.equal(runtime.state.selected.has(packageChoice.option_id), true, `${rpo} should be selected`);
-    assert.match(
+    assert.equal(autoAddedRpos(runtime).includes("ROY"), true, `${rpo} should default to ROY`);
+    assert.doesNotMatch(
       runtime.missingRequirementDetails().map((item) => item.detail).join("\n"),
       /ROY|ROZ|STZ|carbon fiber wheel/i,
-      `${rpo} should require one of ROY/ROZ/STZ`
+      `${rpo} should satisfy its carbon fiber wheel requirement with default ROY`
     );
-    for (const wheelRpo of ["ROY", "ROZ", "STZ"]) {
+    for (const wheelRpo of ["ROZ", "STZ"]) {
       const carbonWheel = choice(runtime, wheelRpo);
       assert.equal(runtime.disableReasonForChoice(carbonWheel), "", `${wheelRpo} should be selectable after ${rpo}`);
       assert.equal(runtime.optionPrice(carbonWheel.option_id), 0, `${wheelRpo} should price at zero when included by ${rpo}`);
     }
+    runtime.handleChoice(choice(runtime, "ROZ"));
+    runtime.reconcileSelections();
+    assert.equal(runtime.state.selected.has(choice(runtime, "ROZ").option_id), true, `${rpo} should allow switching from ROY default to ROZ`);
+    assert.equal(autoAddedRpos(runtime).includes("ROY"), false, `${rpo} should release ROY after ROZ is selected`);
     const peerRpos = ["PDB", "PDD", "PDF"].filter((peer) => peer !== rpo);
     for (const peerRpo of peerRpos) {
       assert.equal(runtime.disableReasonForChoice(choice(runtime, peerRpo)), "", `${peerRpo} should stay clickable while ${rpo} is selected`);

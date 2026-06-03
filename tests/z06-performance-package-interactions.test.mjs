@@ -133,12 +133,12 @@ function missingText(runtime) {
   return runtime.missingRequirementDetails().map((item) => item.detail).join("\n");
 }
 
-test("Z06 packages stay selectable after selection while inner requirements remain visible", () => {
-  for (const [packageRpo, expectedRequirement] of [
-    ["Z07", /T0F|T0G|aero/i],
-    ["PDB", /ROY|ROZ|STZ|carbon fiber wheel/i],
-    ["PDD", /ROY|ROZ|STZ|carbon fiber wheel/i],
-    ["PDF", /ROY|ROZ|STZ|carbon fiber wheel/i],
+test("Z06 package selections default their required inner aero and wheel choices", () => {
+  for (const [packageRpo, expectedAutoRpos] of [
+    ["Z07", ["J57", "T0F", "CFZ"]],
+    ["PDB", ["J57", "J6D", "ROY"]],
+    ["PDD", ["Z07", "J57", "T0F", "CFZ", "ROY"]],
+    ["PDF", ["Z07", "J57", "T0G", "CFV", "ROY"]],
   ]) {
     const runtime = z06Runtime();
     const packageChoice = choice(runtime, packageRpo);
@@ -147,9 +147,13 @@ test("Z06 packages stay selectable after selection while inner requirements rema
     runtime.handleChoice(packageChoice);
     runtime.reconcileSelections();
 
+    const autoRpos = autoAddedRpos(runtime);
     assert.equal(runtime.state.selected.has(packageChoice.option_id), true, `${packageRpo} should remain selected`);
-    assert.equal(runtime.disableReasonForChoice(packageChoice), "", `${packageRpo} should not become disabled by its own inner requirement`);
-    assert.match(missingText(runtime), expectedRequirement, `${packageRpo} should still report its unresolved inner requirement`);
+    assert.equal(runtime.disableReasonForChoice(packageChoice), "", `${packageRpo} should not become disabled by its own inner choices`);
+    for (const expectedRpo of expectedAutoRpos) {
+      assert.equal(autoRpos.includes(expectedRpo), true, `${packageRpo} should auto-add/default ${expectedRpo}`);
+    }
+    assert.doesNotMatch(missingText(runtime), /T0F|T0G|aero|ROY|ROZ|STZ|carbon fiber wheel/i, `${packageRpo} should satisfy its forced inner aero/wheel defaults`);
   }
 });
 
@@ -210,6 +214,47 @@ test("Z06 package-included aero ground effects stay locked until the aero peer c
   runtime.reconcileSelections();
   assert.equal(autoAddedRpos(runtime).includes("CFV"), true, "switching to T0G should lock CFV instead");
   assert.equal(autoAddedRpos(runtime).includes("CFZ"), false, "switching away from T0F should release CFZ");
+});
+
+test("Z06 Z07 defaults Carbon Flash aero and lets the user switch to visible carbon aero", () => {
+  const runtime = z06Runtime();
+  runtime.handleChoice(choice(runtime, "Z07"));
+  runtime.reconcileSelections();
+
+  assert.equal(runtime.state.selected.has(choice(runtime, "Z07").option_id), true, "Z07 should remain selected");
+  assert.equal(runtime.state.selected.has(choice(runtime, "T0E").option_id), false, "Z07 should replace the default rear spoiler");
+  assert.equal(autoAddedRpos(runtime).includes("T0F"), true, "Z07 should default to T0F aero");
+  assert.equal(autoAddedRpos(runtime).includes("CFZ"), true, "Z07 default T0F should auto-add CFZ");
+  assert.notEqual(runtime.disableReasonForChoice(choice(runtime, "T0E")), "", "T0E should be blocked while Z07 owns the aero choice");
+  assert.notEqual(runtime.disableReasonForChoice(choice(runtime, "5ZV")), "", "5ZV should be blocked while Z07 owns the aero choice");
+  assert.equal(runtime.disableReasonForChoice(choice(runtime, "T0G")), "", "T0G should stay available as the Z07 alternate aero choice");
+
+  runtime.handleChoice(choice(runtime, "T0G"));
+  runtime.reconcileSelections();
+
+  assert.equal(runtime.state.selected.has(choice(runtime, "T0G").option_id), true, "T0G should become selected as the Z07 aero alternate");
+  assert.equal(autoAddedRpos(runtime).includes("T0F"), false, "T0G should suppress the Z07 T0F default");
+  assert.equal(autoAddedRpos(runtime).includes("CFZ"), false, "T0G should release CFZ");
+  assert.equal(autoAddedRpos(runtime).includes("CFV"), true, "T0G should auto-add CFV");
+});
+
+test("Z06 carbon wheel package ROY defaults can switch to ROZ or STZ", () => {
+  for (const packageRpo of ["PDB", "PDD", "PDF"]) {
+    const runtime = z06Runtime();
+    runtime.handleChoice(choice(runtime, packageRpo));
+    runtime.reconcileSelections();
+
+    assert.equal(autoAddedRpos(runtime).includes("ROY"), true, `${packageRpo} should default to ROY`);
+    assert.equal(runtime.state.selected.has(choice(runtime, "SOE").option_id), false, `${packageRpo} should replace the default aluminum wheel`);
+    assert.equal(runtime.disableReasonForChoice(choice(runtime, "ROZ")), "", `${packageRpo} should allow switching the default wheel to ROZ`);
+    assert.equal(runtime.disableReasonForChoice(choice(runtime, "STZ")), "", `${packageRpo} should allow switching the default wheel to STZ`);
+
+    runtime.handleChoice(choice(runtime, "ROZ"));
+    runtime.reconcileSelections();
+    assert.equal(runtime.state.selected.has(choice(runtime, "ROZ").option_id), true, `${packageRpo} should allow ROZ selection`);
+    assert.equal(autoAddedRpos(runtime).includes("ROY"), false, `${packageRpo} ROZ selection should suppress the ROY default`);
+    assert.doesNotMatch(missingText(runtime), /ROY|ROZ|STZ|carbon fiber wheel/i, `${packageRpo} should remain complete after switching to ROZ`);
+  }
 });
 
 test("Z06 B6P changes BCW price without auto-adding BCW", () => {
