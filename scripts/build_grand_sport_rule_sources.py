@@ -840,20 +840,24 @@ def write_rule_audit(
     omitted_exclusive = [
         row
         for row in annotated_rules
-        if runtime_authored_rule(row)
-        and row.get("rule_type", "").lower() == "excludes"
+        if row.get("rule_type", "").lower() == "excludes"
         and row.get("generation_action", "") != "preserve_runtime_exclude"
         and (row.get("source_id", ""), row.get("target_id", "")) in grouped_excludes
+        and (runtime_authored_rule(row) or row.get("generation_action", "") == "omit_grouped_exclusion")
     ]
+    omitted_exclusive_rule_ids = {row.get("rule_id", "") for row in omitted_exclusive}
     runtime_ids = runtime_available_option_ids(options, status_rows, tuple(config.variant_ids))
     runtime_rows = runtime_rule_rows(workbook_rules, runtime_ids, grouped_excludes, rule_group_requires)
     omitted_inactive_or_unemitted = [
         row
         for row in annotated_rules
-        if not runtime_authored_rule(row)
-        or ((row.get("source_type", "option") or "option") == "option" and row.get("source_id", "") not in runtime_ids)
-        or ((row.get("target_type", "option") or "option") == "option" and row.get("target_id", "") not in runtime_ids)
-        or (row.get("rule_type", "").lower() == "requires" and (row.get("source_id", ""), row.get("target_id", "")) in rule_group_requires)
+        if row.get("rule_id", "") not in omitted_exclusive_rule_ids
+        and (
+            not runtime_authored_rule(row)
+            or ((row.get("source_type", "option") or "option") == "option" and row.get("source_id", "") not in runtime_ids)
+            or ((row.get("target_type", "option") or "option") == "option" and row.get("target_id", "") not in runtime_ids)
+            or (row.get("rule_type", "").lower() == "requires" and (row.get("source_id", ""), row.get("target_id", "")) in rule_group_requires)
+        )
     ]
     origin_counts = Counter(row["_audit_origin"] for row in annotated_rules)
     audit = {

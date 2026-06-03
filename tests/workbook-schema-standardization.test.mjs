@@ -297,6 +297,88 @@ test("rule lifecycle metadata keeps retained source rows auditable", () => {
   }
 });
 
+test("active explicit excludes do not duplicate active exclusive-group peers", () => {
+  const duplicates = pythonJson(`
+import json
+from collections import defaultdict
+from openpyxl import load_workbook
+
+wb = load_workbook('stingray_master.xlsx', read_only=True, data_only=True)
+
+def clean(value):
+    return '' if value is None else str(value).strip()
+
+def rows(sheet):
+    ws = wb[sheet]
+    raw_rows = list(ws.iter_rows(values_only=True))
+    headers = [clean(value) for value in raw_rows[0]]
+    result = []
+    for row_number, raw in enumerate(raw_rows[1:], start=2):
+        record = {header: raw[index] if index < len(raw) else '' for index, header in enumerate(headers) if header}
+        if any(clean(value) for value in record.values()):
+            record['_row'] = row_number
+            result.append(record)
+    return result
+
+def active(row):
+    value = clean(row.get('active'))
+    return value.lower() not in {'false', '0', 'no', 'inactive'}
+
+def runtime_authored_rule(row):
+    status = clean(row.get('normalization_status')).lower()
+    if status in {'omitted', 'replaced'}:
+        return False
+    if status == 'preserved':
+        return True
+    return not clean(row.get('generation_action')).lower().startswith('omit')
+
+models = {
+    'stingray': ('rule_mapping', 'exclusive_groups', 'exclusive_group_members'),
+    'grandSport': ('grandSport_rule_mapping', 'grandSport_exclusive_groups', 'grandSport_exclusive_members'),
+    'z06': ('z06_rule_mapping', 'z06_exclusive_groups', 'z06_exclusive_members'),
+    'zr1': ('zr1_rule_mapping', 'zr1_exclusive_groups', 'zr1_exclusive_members'),
+    'zr1x': ('zr1x_rule_mapping', 'zr1x_exclusive_groups', 'zr1x_exclusive_members'),
+}
+
+duplicates = []
+for model_key, (rule_sheet, group_sheet, member_sheet) in models.items():
+    active_group_ids = {clean(row.get('group_id')) for row in rows(group_sheet) if active(row)}
+    group_by_option = {}
+    for row in rows(member_sheet):
+        if not active(row):
+            continue
+        group_id = clean(row.get('group_id'))
+        option_id = clean(row.get('option_id'))
+        if group_id in active_group_ids and option_id:
+            group_by_option[option_id] = group_id
+    for row in rows(rule_sheet):
+        if not runtime_authored_rule(row) or clean(row.get('rule_type')) != 'excludes':
+            continue
+        source_id = clean(row.get('source_id'))
+        target_id = clean(row.get('target_id'))
+        source_group = group_by_option.get(source_id)
+        if not source_group or source_group != group_by_option.get(target_id):
+            continue
+        if clean(row.get('runtime_action')) == 'replace':
+            continue
+        if clean(row.get('generation_action')) == 'preserve_runtime_exclude':
+            continue
+        duplicates.append({
+            'model': model_key,
+            'sheet': rule_sheet,
+            'row': row['_row'],
+            'rule_id': clean(row.get('rule_id')),
+            'group_id': source_group,
+            'source_id': source_id,
+            'target_id': target_id,
+        })
+
+wb.close()
+print(json.dumps(duplicates))
+`);
+  assert.deepEqual(duplicates, []);
+});
+
 test("category_master is retired from the active source graph and draft provenance is not live app data", () => {
   assert.equal(snapshot.sheetnames.includes("category_master"), false);
   assert.equal(snapshot.sheetnames.includes("archive_category_master"), true);
