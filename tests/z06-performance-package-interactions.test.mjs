@@ -212,6 +212,59 @@ test("Z06 package-included aero ground effects stay locked until the aero peer c
   assert.equal(autoAddedRpos(runtime).includes("CFZ"), false, "switching away from T0F should release CFZ");
 });
 
+test("Z06 B6P changes BCW price without auto-adding BCW", () => {
+  const runtime = z06Runtime();
+  const b6p = choice(runtime, "B6P");
+  const bcw = choice(runtime, "BCW");
+
+  runtime.handleChoice(b6p);
+  runtime.reconcileSelections();
+
+  assert.equal(runtime.state.selected.has(b6p.option_id), true, "B6P should be selected");
+  assert.equal(runtime.optionPrice(bcw.option_id), 895, "B6P should change BCW's displayed price");
+  assert.equal(autoAddedRpos(runtime).includes("BCW"), false, "B6P should not auto-add BCW");
+  assert.equal(runtime.state.selected.has(bcw.option_id), false, "BCW should remain unselected until the user chooses it");
+});
+
+test("Z06 Z07 locks included J57 even when J57 was selected first", () => {
+  const runtime = z06Runtime();
+  const j57 = choice(runtime, "J57");
+  const z07 = choice(runtime, "Z07");
+
+  runtime.handleChoice(j57);
+  runtime.handleChoice(z07);
+  runtime.reconcileSelections();
+
+  assert.equal(runtime.state.selected.has(z07.option_id), true, "Z07 should be selected");
+  assert.equal(autoAddedRpos(runtime).includes("J57"), true, "Z07 should own J57 as included equipment");
+
+  runtime.handleChoice(j57);
+  runtime.reconcileSelections();
+
+  assert.equal(autoAddedRpos(runtime).includes("J57"), true, "J57 should stay included while Z07 is selected");
+  assert.equal(runtime.state.selected.has(j57.option_id), false, "J57 should not remain a user-selected removable item under Z07");
+});
+
+test("Z06 T0F/T0G included ground effects replace a prior CFL selection", () => {
+  const runtime = z06Runtime();
+  runtime.handleChoice(choice(runtime, "CFL"));
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has(choice(runtime, "CFL").option_id), true, "CFL should be user-selectable before aero package selection");
+
+  runtime.handleChoice(choice(runtime, "T0F"));
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has(choice(runtime, "CFL").option_id), false, "T0F should remove the prior CFL selection");
+  assert.equal(autoAddedRpos(runtime).includes("CFZ"), true, "T0F should auto-add CFZ");
+
+  const visibleRuntime = z06Runtime();
+  visibleRuntime.handleChoice(choice(visibleRuntime, "CFL"));
+  visibleRuntime.reconcileSelections();
+  visibleRuntime.handleChoice(choice(visibleRuntime, "T0G"));
+  visibleRuntime.reconcileSelections();
+  assert.equal(visibleRuntime.state.selected.has(choice(visibleRuntime, "CFL").option_id), false, "T0G should remove the prior CFL selection");
+  assert.equal(autoAddedRpos(visibleRuntime).includes("CFV"), true, "T0G should auto-add CFV");
+});
+
 test("Z06 exhaust tips are mutually exclusive and NWI does not require WUB", () => {
   const runtime = z06Runtime();
   const nwi = choice(runtime, "NWI");

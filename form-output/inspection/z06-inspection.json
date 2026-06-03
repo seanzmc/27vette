@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-02T04:08:17+00:00",
+  "generated_at": "2026-06-03T03:03:23+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "z06",
@@ -99,11 +99,11 @@
     "candidate_standard_equipment_cells": 488,
     "candidate_standard_option_rows": 95,
     "selectable_counts": {
-      "False": 90,
-      "True": 159
+      "False": 84,
+      "True": 165
     },
-    "active_option_rows_available_or_standard": 244,
-    "inactive_option_rows_all_unavailable_or_blank": 5,
+    "active_option_rows_available_or_standard": 243,
+    "inactive_option_rows_all_unavailable_or_blank": 6,
     "status_counts": {
       "available": 821,
       "standard": 490,
@@ -5534,18 +5534,18 @@
       {
         "option_id": "opt_fe6_002",
         "rpo": "FE6",
-        "section_id": "sec_susp_001",
-        "original_section_id": "sec_susp_001",
+        "section_id": "sec_incl_001",
+        "original_section_id": "sec_incl_001",
         "section_override_applied": false,
-        "step_key": "packages_performance"
+        "step_key": "standard_equipment"
       },
       {
         "option_id": "opt_fe7_001",
         "rpo": "FE7",
-        "section_id": "sec_susp_001",
-        "original_section_id": "sec_susp_001",
+        "section_id": "sec_incl_001",
+        "original_section_id": "sec_incl_001",
         "section_override_applied": false,
-        "step_key": "packages_performance"
+        "step_key": "standard_equipment"
       },
       {
         "option_id": "opt_ive_001",
@@ -8875,42 +8875,42 @@
       "option_id": "opt_fe6_002",
       "rpo": "FE6",
       "variant_id": "1lz_h07",
-      "section_id": "sec_susp_001",
+      "section_id": "sec_incl_001",
       "option_name": "Suspension, performance with Magnetic Selective Ride Control"
     },
     {
       "option_id": "opt_fe6_002",
       "rpo": "FE6",
       "variant_id": "2lz_h07",
-      "section_id": "sec_susp_001",
+      "section_id": "sec_incl_001",
       "option_name": "Suspension, performance with Magnetic Selective Ride Control"
     },
     {
       "option_id": "opt_fe6_002",
       "rpo": "FE6",
       "variant_id": "3lz_h07",
-      "section_id": "sec_susp_001",
+      "section_id": "sec_incl_001",
       "option_name": "Suspension, performance with Magnetic Selective Ride Control"
     },
     {
       "option_id": "opt_fe6_002",
       "rpo": "FE6",
       "variant_id": "1lz_h67",
-      "section_id": "sec_susp_001",
+      "section_id": "sec_incl_001",
       "option_name": "Suspension, performance with Magnetic Selective Ride Control"
     },
     {
       "option_id": "opt_fe6_002",
       "rpo": "FE6",
       "variant_id": "2lz_h67",
-      "section_id": "sec_susp_001",
+      "section_id": "sec_incl_001",
       "option_name": "Suspension, performance with Magnetic Selective Ride Control"
     },
     {
       "option_id": "opt_fe6_002",
       "rpo": "FE6",
       "variant_id": "3lz_h67",
-      "section_id": "sec_susp_001",
+      "section_id": "sec_incl_001",
       "option_name": "Suspension, performance with Magnetic Selective Ride Control"
     },
     {
@@ -11351,7 +11351,7 @@
         "option_id": "opt_fe7_001",
         "rpo": "FE7",
         "option_name": "Suspension, Z07 with Magnetic Selective Ride Control",
-        "section_id": "sec_susp_001",
+        "section_id": "sec_incl_001",
         "matched_terms": [
           "only"
         ],

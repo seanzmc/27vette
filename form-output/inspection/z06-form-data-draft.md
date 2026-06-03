@@ -1,6 +1,6 @@
 # Grand Sport Form Data Draft
 
-Generated: `2026-06-02T04:08:18+00:00`
+Generated: `2026-06-03T03:03:24+00:00`
 Status: `draft_not_runtime_active`
 Source sheet: `z06_options`
 
@@ -9,12 +9,12 @@ Source sheet: `z06_options`
 - Variants: 6
 - Context choices: 8
 - Steps: 14
-- Sections: 37
+- Sections: 36
 - Choices: 1476
 - Standard equipment rows: 488
 - Rule groups: 4 (workbook-backed)
-- Exclusive groups: 11 (workbook-backed)
-- Rules: 192 (workbook-backed)
+- Exclusive groups: 12 (workbook-backed)
+- Rules: 185 (workbook-backed)
 - Price rules: 45 (workbook-backed)
 - Interiors: 132 (model-scoped)
 - Color overrides: 0

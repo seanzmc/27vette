@@ -1,6 +1,6 @@
 # Grand Sport Contract Preview
 
-Generated: `2026-06-02T04:08:18+00:00`
+Generated: `2026-06-03T03:03:23+00:00`
 Status: `read_only_preview`
 Source sheet: `z06_options`
 
@@ -9,7 +9,7 @@ Source sheet: `z06_options`
 - Variants: 6
 - Context choices: 8
 - Steps: 14
-- Sections: 37
+- Sections: 36
 - Choices: 1309
 - Candidate standard equipment cells: 488
 - Rule/detail hot spot rows: 106

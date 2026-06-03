@@ -765,6 +765,12 @@ function userSelectedExclusiveGroupPeer(optionId, selectedIds) {
   return (group.option_ids || []).some((id) => id !== optionId && selectedIds.has(id) && state.userSelected.has(id));
 }
 
+function includedRuleLocksExclusivePeer(rule) {
+  const sourceGroup = optionExclusiveGroup(rule.source_id);
+  const targetGroup = optionExclusiveGroup(rule.target_id);
+  return exclusiveGroupAllowsSingleSelection(sourceGroup) && targetGroup?.selection_mode === "single_within_group";
+}
+
 function includedExclusiveGroupPeerReason(optionId, selectedIds = selectedContextIds()) {
   const group = optionExclusiveGroup(optionId);
   if (!exclusiveGroupAllowsSingleSelection(group) || group.selection_mode !== "single_within_group") return "";
@@ -776,7 +782,7 @@ function includedExclusiveGroupPeerReason(optionId, selectedIds = selectedContex
         rule.rule_type === "includes" &&
         ruleAppliesToCurrentVariant(rule) &&
         selectedIds.has(rule.source_id) &&
-        exclusiveGroupAllowsSingleSelection(optionExclusiveGroup(rule.source_id))
+        includedRuleLocksExclusivePeer(rule)
     );
     if (includeRule) return `${getEntityLabel(peerId)} is locked because it is ${includedWithReason(includeRule).toLowerCase()}`;
   }
@@ -838,11 +844,10 @@ function computeAutoAdded() {
         if (
           rule.rule_type === "includes" &&
           ruleAppliesToCurrentVariant(rule) &&
-          !state.userSelected.has(rule.target_id) &&
           !selectedExcludesTarget(rule.target_id, selectedIds) &&
           !shouldSuppressIncludedDefault(rule) &&
           includedTargetRequirementsMet(rule.target_id, selectedIds) &&
-          (!userSelectedExclusiveGroupPeer(rule.target_id, selectedIds) || exclusiveGroupAllowsSingleSelection(optionExclusiveGroup(rule.source_id)))
+          (!userSelectedExclusiveGroupPeer(rule.target_id, selectedIds) || includedRuleLocksExclusivePeer(rule))
         ) {
           autoAdded.set(rule.target_id, includedWithReason(rule));
           if (!selectedIds.has(rule.target_id)) {
@@ -1441,6 +1446,27 @@ function removeAutoDefaultDuplicates(autoAdded) {
   }
 }
 
+function removeLockedIncludedExclusiveGroupPeers() {
+  const selectedIds = selectedContextIds();
+  let removed = false;
+  for (const sourceId of [...selectedIds]) {
+    const sourceGroup = optionExclusiveGroup(sourceId);
+    if (!exclusiveGroupAllowsSingleSelection(sourceGroup)) continue;
+    const rules = ruleTargetsBySource.get(sourceId) || [];
+    for (const rule of rules) {
+      if (rule.rule_type !== "includes" || !ruleAppliesToCurrentVariant(rule) || !includedRuleLocksExclusivePeer(rule)) continue;
+      const targetGroup = optionExclusiveGroup(rule.target_id);
+      if (!exclusiveGroupAllowsSingleSelection(targetGroup)) continue;
+      for (const peerId of targetGroup.option_ids || []) {
+        if (peerId === rule.target_id || !state.selected.has(peerId)) continue;
+        deleteSelectedOption(peerId);
+        removed = true;
+      }
+    }
+  }
+  return removed;
+}
+
 function reconcileSelections() {
   for (const id of [...state.selected]) {
     removeRuntimeExceptionTargets(id);
@@ -1459,6 +1485,9 @@ function reconcileSelections() {
     if (!choice || shouldHideChoice(choice) || disableReasonForChoice(choice, { includeSelectedRequirements: false })) deleteSelectedOption(id);
   }
   removeAutoDefaultDuplicates(autoAdded);
+  if (removeLockedIncludedExclusiveGroupPeers()) {
+    removeAutoDefaultDuplicates(computeAutoAdded());
+  }
   const refreshedAutoAdded = computeAutoAdded();
   addWorkbookDefaultChoices();
   addGeneratedDefaultChoices(refreshedAutoAdded);

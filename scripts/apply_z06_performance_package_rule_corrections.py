@@ -30,11 +30,14 @@ EXCLUSIVE_MEMBERS_SHEET = "z06_exclusive_members"
 PACKAGE_GROUP_ID = "z06_excl_carbon_wheel_packages"
 AERO_GROUP_ID = "z06_excl_aero_packages"
 EXHAUST_GROUP_ID = "z06_excl_exhaust_tips"
+DEFAULT_CARBON_WHEEL_GROUP_ID = "z06_excl_default_and_carbon_wheels"
 
 PACKAGE_RPOS = ("PDB", "PDD", "PDF")
 AERO_RPOS = ("T0E", "T0F", "T0G", "5ZV")
 GROUND_RPOS = ("CFL", "CFZ", "CFV")
 EXHAUST_RPOS = ("NGA", "NWI")
+CARBON_WHEEL_RPOS = ("ROY", "ROZ", "STZ")
+DEFAULT_WHEEL_RPOS = ("SOE",)
 
 # These rows modeled radio-like peers as hard conflicts. Pass 3 restores
 # workbook-owned exclusive groups so peers stay clickable and replace each other.
@@ -167,7 +170,7 @@ def ensure_group_member(wb, changes: list[Change], group_id: str, option_id: str
 
 def apply_exclusive_groups(wb, changes: list[Change]) -> None:
     _, id_by_rpo, _ = option_maps(wb)
-    require_rpos(id_by_rpo, [*PACKAGE_RPOS, *AERO_RPOS, *GROUND_RPOS, *EXHAUST_RPOS])
+    require_rpos(id_by_rpo, [*PACKAGE_RPOS, *AERO_RPOS, *GROUND_RPOS, *EXHAUST_RPOS, *CARBON_WHEEL_RPOS, *DEFAULT_WHEEL_RPOS])
     ensure_group(
         wb,
         changes,
@@ -198,6 +201,16 @@ def apply_exclusive_groups(wb, changes: list[Change]) -> None:
     for display_order, rpo in enumerate(EXHAUST_RPOS, start=1):
         ensure_group_member(wb, changes, EXHAUST_GROUP_ID, id_by_rpo[rpo], display_order * 10)
 
+    ensure_group(
+        wb,
+        changes,
+        DEFAULT_CARBON_WHEEL_GROUP_ID,
+        "single_within_group",
+        "SOE is the default selectable Z06 wheel; ROY, ROZ, and STZ carbon fiber wheels replace it without being greyed out.",
+    )
+    for display_order, rpo in enumerate([*DEFAULT_WHEEL_RPOS, *CARBON_WHEEL_RPOS], start=1):
+        ensure_group_member(wb, changes, DEFAULT_CARBON_WHEEL_GROUP_ID, id_by_rpo[rpo], display_order * 10)
+
 
 def apply_default_option_metadata(wb, changes: list[Change]) -> None:
     by_rpo, _, _ = option_maps(wb)
@@ -206,6 +219,30 @@ def apply_default_option_metadata(wb, changes: list[Change]) -> None:
     set_cell(wb[OPTION_SHEET], row_number, "selectable", "True", changes, key="NGA", reason="NGA should seed/restore as the default Z06 exhaust-tip peer")
     set_cell(wb[OPTION_SHEET], row_number, "display_behavior", "default_selected", changes, key="NGA", reason="NGA should seed/restore as the default Z06 exhaust-tip peer")
     set_cell(wb[OPTION_SHEET], row_number, "price", 0, changes, key="NGA", reason="NGA default exhaust tips should remain zero-price")
+
+
+def apply_package_wheel_replace_actions(wb, changes: list[Change]) -> None:
+    _, id_by_rpo, rpo_by_id = option_maps(wb)
+    ws = wb[RULE_MAPPING_SHEET]
+    package_ids = {id_by_rpo[rpo] for rpo in PACKAGE_RPOS}
+    carbon_ids = {id_by_rpo[rpo] for rpo in CARBON_WHEEL_RPOS}
+    for row_number, row in rows(ws):
+        source_id = clean(row.get("source_id"))
+        target_id = clean(row.get("target_id"))
+        if (
+            clean(row.get("rule_type")).lower() != "excludes"
+            or clean(row.get("normalization_status")) == "omitted"
+            or source_id not in package_ids
+            or target_id in carbon_ids
+        ):
+            continue
+        target_rpo = rpo_by_id.get(target_id, "")
+        if not target_rpo:
+            continue
+        source_rpo = rpo_by_id.get(source_id, "selected package")
+        key = clean(row.get("rule_id")) or f"{source_id}->{target_id}"
+        set_cell(ws, row_number, "runtime_action", "replace", changes, key=key, reason="Package carbon-wheel requirement should replace selectable default aluminum wheels instead of blocking package selection")
+        set_cell(ws, row_number, "disabled_reason", f"Replaced by {source_rpo}.", changes, key=key, reason="Package carbon-wheel requirement should replace selectable default aluminum wheels instead of blocking package selection")
 
 
 def omit_legacy_excludes(wb, changes: list[Change]) -> None:
@@ -231,6 +268,7 @@ def build_plan(wb) -> list[Change]:
     changes: list[Change] = []
     apply_exclusive_groups(wb, changes)
     apply_default_option_metadata(wb, changes)
+    apply_package_wheel_replace_actions(wb, changes)
     omit_legacy_excludes(wb, changes)
     return changes
 
@@ -250,6 +288,7 @@ def verify_saved(path: Path) -> dict[str, Any]:
             PACKAGE_GROUP_ID: {id_by_rpo[rpo] for rpo in PACKAGE_RPOS},
             AERO_GROUP_ID: {id_by_rpo[rpo] for rpo in AERO_RPOS},
             EXHAUST_GROUP_ID: {id_by_rpo[rpo] for rpo in EXHAUST_RPOS},
+            DEFAULT_CARBON_WHEEL_GROUP_ID: {id_by_rpo[rpo] for rpo in [*DEFAULT_WHEEL_RPOS, *CARBON_WHEEL_RPOS]},
         }
         for group_id, option_ids in expected.items():
             if clean(groups.get(group_id, {}).get("active")) != "True":

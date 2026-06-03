@@ -431,6 +431,26 @@ def seat_code_from_label(label: str) -> str:
     return clean(label).split(" ", 1)[0]
 
 
+def broad_interior_color_family(label: str) -> str:
+    value = clean(label)
+    if not value:
+        return "Other Interior Choices"
+    lower = value.lower()
+    if " / " in value:
+        value = value.split(" / ", 1)[0]
+        lower = value.lower()
+    for marker in (" interior", " seats"):
+        idx = lower.find(marker)
+        if idx > 0:
+            value = value[:idx]
+            lower = value.lower()
+    for marker in (" with ", " suede", " two tone"):
+        idx = lower.find(marker)
+        if idx > 0:
+            return value[:idx].strip()
+    return value
+
+
 def grouping_fields_for_interior(
     interior: dict[str, Any],
     reference: dict[str, Any] | None,
@@ -446,7 +466,9 @@ def grouping_fields_for_interior(
         interior["interior_name"] or interior["interior_id"],
     ]
     leaf_label = levels[-1] if levels else interior["interior_name"] or interior["interior_id"]
-    color_family = levels[2] if len(levels) > 2 else leaf_label
+    color_family = levels[2] if len(levels) > 2 else broad_interior_color_family(leaf_label)
+    if not reference:
+        color_family = broad_interior_color_family(interior["interior_name"] or leaf_label)
     material_family = interior.get("material") or "Standard interior"
     if len(levels) > 3 and levels[-2] != color_family:
         material_family = levels[-2]

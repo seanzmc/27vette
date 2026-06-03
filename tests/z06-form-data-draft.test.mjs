@@ -83,13 +83,90 @@ test("Z06 draft emits approved package, wheel, and standalone Z07 placements", (
 });
 
 test("Z06 draft keeps default-selected options selectable", () => {
-  for (const rpo of ["EFR", "T0E", "J56", "719"]) {
+  for (const rpo of ["EFR", "T0E", "J56", "719", "EYT", "J6A", "CF7", "CM9", "AQ9", "SOE"]) {
     const choices = draft.choices.filter((choice) => choice.rpo === rpo);
     assert.ok(choices.length > 0, `${rpo} should be emitted`);
     for (const choice of choices) {
+      if (choice.status === "unavailable") {
+        continue;
+      }
       assert.equal(choice.display_behavior, "default_selected", `${choice.choice_id} should remain default_selected`);
       assert.equal(choice.selectable, "True", `${choice.choice_id} should remain selectable`);
     }
+  }
+});
+
+test("Z06 future option review replay preserves selectable default rows", () => {
+  const plannedRows = JSON.parse(
+    execFileSync(
+      ".venv/bin/python",
+      [
+        "-c",
+        `import json, sys
+from openpyxl import load_workbook
+sys.path.insert(0, 'scripts')
+from apply_future_model_option_review import rows_from_sheet, build_future_option_population_plan
+wb = load_workbook('stingray_master.xlsx', data_only=False, read_only=False)
+try:
+    rows = rows_from_sheet(wb, 'future_model_option_review')
+    plan = build_future_option_population_plan(wb, rows, ['z06'])
+    target = {'EYT', 'J6A', 'CF7', 'CM9', 'AQ9', 'SOE'}
+    print(json.dumps([row for row in plan['models']['z06']['option_rows'] if row.get('rpo') in target], sort_keys=True))
+finally:
+    wb.close()
+`,
+      ],
+      { encoding: "utf8", stdio: "pipe" }
+    )
+  );
+
+  const sourceRows = JSON.parse(
+    execFileSync(
+      ".venv/bin/python",
+      [
+        "-c",
+        `import json, sys
+from openpyxl import load_workbook
+sys.path.insert(0, 'scripts')
+from corvette_form_generator.workbook import clean
+wb = load_workbook('stingray_master.xlsx', data_only=True, read_only=True)
+try:
+    ws = wb['future_model_source_review']
+    headers = [clean(cell.value) for cell in next(ws.iter_rows(min_row=1, max_row=1))]
+    idx = {header: offset for offset, header in enumerate(headers)}
+    target = {'EYT', 'J6A', 'CF7', 'CM9', 'AQ9', 'SOE'}
+    rows = []
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        if clean(row[idx['model_key']]) == 'z06' and clean(row[idx['approved_rpo']]) in target:
+            rows.append({
+                'rpo': clean(row[idx['approved_rpo']]),
+                'option_id': clean(row[idx['approved_option_id']]),
+                'selectable': clean(row[idx['approved_selectable']]),
+                'display_behavior': clean(row[idx['approved_display_behavior']]),
+                'review_status': clean(row[idx['review_status']]),
+                'active': clean(row[idx['active']]),
+            })
+    print(json.dumps(rows, sort_keys=True))
+finally:
+    wb.close()
+`,
+      ],
+      { encoding: "utf8", stdio: "pipe" }
+    )
+  );
+
+  const targetRpos = new Set(["EYT", "J6A", "CF7", "CM9", "AQ9", "SOE"]);
+  assert.equal(plannedRows.length, targetRpos.size);
+  assert.equal(sourceRows.length, targetRpos.size);
+  for (const row of plannedRows) {
+    assert.equal(row.selectable, "True", `${row.option_id} should replay as selectable`);
+    assert.equal(row.display_behavior, "default_selected", `${row.option_id} should replay as default_selected`);
+  }
+  for (const row of sourceRows) {
+    assert.equal(row.selectable, "True", `${row.option_id} source review should stay selectable`);
+    assert.equal(row.display_behavior, "default_selected", `${row.option_id} source review should stay default_selected`);
+    assert.equal(row.review_status, "approved", `${row.option_id} source review should stay approved`);
+    assert.equal(row.active, "True", `${row.option_id} source review should stay active`);
   }
 });
 
@@ -110,6 +187,56 @@ test("Z06 draft emits approved package/wheel and Z07 price rules", () => {
     assert.equal(rule.price_rule_type, "override");
     assert.equal(rule.price_value, priceValue);
   }
+});
+
+test("Z06 draft keeps BCW price override without auto-adding BCW from B6P", () => {
+  const b6pBcwPrice = draft.priceRules.find((rule) => rule.price_rule_id === "z06_pr_b6p_bcw_895_coupe");
+  assert.ok(b6pBcwPrice, "B6P should still own the BCW price override");
+  assert.equal(b6pBcwPrice.condition_option_id, "opt_b6p_001");
+  assert.equal(b6pBcwPrice.target_option_id, "opt_bcw_001");
+  assert.equal(b6pBcwPrice.price_rule_type, "override");
+  assert.equal(b6pBcwPrice.price_value, 895);
+
+  const autoBcwRules = draft.rules.filter(
+    (rule) => rule.rule_type === "includes" && rule.target_id === "opt_bcw_001" && rule.active === "True"
+  );
+  assert.deepEqual(
+    autoBcwRules.map((rule) => `${rule.source_id}->${rule.target_id}`),
+    [],
+    "BCW should not be auto-added by B6P/D3V; it should remain a selectable priced choice"
+  );
+});
+
+test("Z06 draft keeps suspension out of customer choice sections and in equipment summaries", () => {
+  const visibleSuspensionChoices = draft.choices.filter(
+    (choice) => choice.section_id === "sec_susp_001" && choice.step_key !== "standard_equipment"
+  );
+  assert.deepEqual(
+    visibleSuspensionChoices.map((choice) => `${choice.choice_id}:${choice.rpo}:${choice.status}:${choice.step_key}`),
+    [],
+    "Z06 suspension rows should not render as customer choice cards"
+  );
+
+  const equipmentRpos = new Set(draft.standardEquipment.map((row) => row.rpo));
+  assert.equal(equipmentRpos.has("FE6"), true, "standard FE6 suspension should be listed in standard equipment");
+
+  const fe7Choices = draft.choices.filter((choice) => choice.rpo === "FE7");
+  assert.ok(fe7Choices.length > 0, "FE7 should still be emitted as Z07-included equipment");
+  assert.equal(fe7Choices.every((choice) => choice.step_key === "standard_equipment"), true);
+  assert.equal(fe7Choices.every((choice) => choice.display_behavior === "auto_only"), true);
+  assert.ok(
+    draft.rules.some((rule) => rule.source_id === "opt_z07_001" && rule.rule_type === "includes" && rule.target_id === "opt_fe7_001"),
+    "Z07 should continue to include FE7 suspension"
+  );
+});
+
+test("Z06 interiors group by broad color family instead of one container per stitched variant", () => {
+  const byId = new Map(draft.interiors.map((interior) => [interior.interior_id, interior]));
+  for (const interiorId of ["2LZ_AQ9_H1Y", "2LZ_AQ9_H1Y_38S", "2LZ_AQ9_H1Y_36S", "2LZ_AQ9_H1Y_37S"]) {
+    assert.equal(byId.get(interiorId)?.interior_color_family, "Jet Black", `${interiorId} should group under Jet Black`);
+  }
+  assert.equal(byId.get("2LZ_AQ9_HUN")?.interior_color_family, "Sky Cool Gray");
+  assert.equal(byId.get("2LZ_AQ9_HUR")?.interior_color_family, "Adrenaline Red");
 });
 
 test("Z06 draft does not emit priced standard-equipment choices", () => {

@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-06-02T04:08:18+00:00",
+    "generated_at": "2026-06-03T03:03:23+00:00",
     "status": "read_only_preview"
   },
   "variants": [
@@ -123,7 +123,7 @@
       "step_label": "Performance & Aero",
       "runtime_order": 6,
       "source": "fallback_config",
-      "section_ids": "sec_exha_001|sec_perf_aero_001|sec_perf_brake_001|sec_perf_ground_001|sec_perf_z52_001|sec_susp_001|sec_z06_cf_whee_001|sec_z06_pkg_001"
+      "section_ids": "sec_exha_001|sec_perf_aero_001|sec_perf_brake_001|sec_perf_ground_001|sec_perf_z52_001|sec_z06_cf_whee_001|sec_z06_pkg_001"
     },
     {
       "step_key": "aero_exhaust_stripes_accessories",
@@ -385,19 +385,6 @@
       "choice_mode": "single",
       "is_required": "TRUE",
       "standard_behavior": "user_selected",
-      "section_display_order": 20,
-      "step_key": "packages_performance",
-      "step_label": "Performance & Aero"
-    },
-    {
-      "section_id": "sec_susp_001",
-      "section_name": "Suspension",
-      "source_section_name": "Suspension",
-      "selection_mode": "single_select_opt",
-      "selection_mode_label": "Optional single choice",
-      "choice_mode": "single",
-      "is_required": "False",
-      "standard_behavior": "replaceable_default",
       "section_display_order": 20,
       "step_key": "packages_performance",
       "step_label": "Performance & Aero"
@@ -3402,8 +3389,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
@@ -3429,8 +3416,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
@@ -3456,8 +3443,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
@@ -3483,8 +3470,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
@@ -3510,8 +3497,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
@@ -3537,8 +3524,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_j6a_001",
@@ -3564,8 +3551,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_j6a_001",
@@ -3591,8 +3578,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_j6a_001",
@@ -3618,8 +3605,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_j6a_001",
@@ -3645,8 +3632,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_j6a_001",
@@ -3672,8 +3659,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_j6a_001",
@@ -3699,8 +3686,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_j6b_001",
@@ -17787,8 +17774,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_cf7_001",
@@ -17814,8 +17801,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_cf7_001",
@@ -17841,8 +17828,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_cf8_001",
@@ -17922,8 +17909,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_cm9_001",
@@ -17949,8 +17936,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_cm9_001",
@@ -17976,8 +17963,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_d84_001",
@@ -21201,8 +21188,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_aq9_001",
@@ -21228,8 +21215,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_aq9_001",
@@ -21255,8 +21242,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_aq9_001",
@@ -21282,8 +21269,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_aup_001",
@@ -30215,24 +30202,24 @@
       "source_option_name": "Suspension, performance with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "",
-      "source_section_id": "sec_susp_001",
+      "source_section_id": "sec_incl_001",
       "active": "True",
       "base_price": 0,
       "display_order": 10,
       "text_cleanup_notes": [],
       "choice_id": "1lz_h07__opt_fe6_002",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "1lz_h07",
       "body_style": "coupe",
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_fe6_002",
@@ -30242,24 +30229,24 @@
       "source_option_name": "Suspension, performance with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "",
-      "source_section_id": "sec_susp_001",
+      "source_section_id": "sec_incl_001",
       "active": "True",
       "base_price": 0,
       "display_order": 10,
       "text_cleanup_notes": [],
       "choice_id": "2lz_h07__opt_fe6_002",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "2lz_h07",
       "body_style": "coupe",
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_fe6_002",
@@ -30269,24 +30256,24 @@
       "source_option_name": "Suspension, performance with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "",
-      "source_section_id": "sec_susp_001",
+      "source_section_id": "sec_incl_001",
       "active": "True",
       "base_price": 0,
       "display_order": 10,
       "text_cleanup_notes": [],
       "choice_id": "3lz_h07__opt_fe6_002",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "3lz_h07",
       "body_style": "coupe",
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_fe6_002",
@@ -30296,24 +30283,24 @@
       "source_option_name": "Suspension, performance with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "",
-      "source_section_id": "sec_susp_001",
+      "source_section_id": "sec_incl_001",
       "active": "True",
       "base_price": 0,
       "display_order": 10,
       "text_cleanup_notes": [],
       "choice_id": "1lz_h67__opt_fe6_002",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "1lz_h67",
       "body_style": "convertible",
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_fe6_002",
@@ -30323,24 +30310,24 @@
       "source_option_name": "Suspension, performance with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "",
-      "source_section_id": "sec_susp_001",
+      "source_section_id": "sec_incl_001",
       "active": "True",
       "base_price": 0,
       "display_order": 10,
       "text_cleanup_notes": [],
       "choice_id": "2lz_h67__opt_fe6_002",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "2lz_h67",
       "body_style": "convertible",
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_fe6_002",
@@ -30350,24 +30337,24 @@
       "source_option_name": "Suspension, performance with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "",
-      "source_section_id": "sec_susp_001",
+      "source_section_id": "sec_incl_001",
       "active": "True",
       "base_price": 0,
       "display_order": 10,
       "text_cleanup_notes": [],
       "choice_id": "3lz_h67__opt_fe6_002",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "3lz_h67",
       "body_style": "convertible",
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_fe7_001",
@@ -30377,24 +30364,24 @@
       "source_option_name": "Suspension, Z07 with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "Included and only available with (Z07) Z07 Performance Package.",
-      "source_section_id": "sec_susp_001",
-      "active": "True",
+      "source_section_id": "sec_incl_001",
+      "active": "False",
       "base_price": 0,
       "display_order": 20,
       "text_cleanup_notes": [],
       "choice_id": "1lz_h07__opt_fe7_001",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "1lz_h07",
       "body_style": "coupe",
       "trim_level": "1LZ",
-      "status": "available",
-      "status_label": "Available",
+      "status": "unavailable",
+      "status_label": "Not Available",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "auto_only"
     },
     {
       "option_id": "opt_fe7_001",
@@ -30404,24 +30391,24 @@
       "source_option_name": "Suspension, Z07 with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "Included and only available with (Z07) Z07 Performance Package.",
-      "source_section_id": "sec_susp_001",
-      "active": "True",
+      "source_section_id": "sec_incl_001",
+      "active": "False",
       "base_price": 0,
       "display_order": 20,
       "text_cleanup_notes": [],
       "choice_id": "2lz_h07__opt_fe7_001",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "2lz_h07",
       "body_style": "coupe",
       "trim_level": "2LZ",
-      "status": "available",
-      "status_label": "Available",
+      "status": "unavailable",
+      "status_label": "Not Available",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "auto_only"
     },
     {
       "option_id": "opt_fe7_001",
@@ -30431,24 +30418,24 @@
       "source_option_name": "Suspension, Z07 with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "Included and only available with (Z07) Z07 Performance Package.",
-      "source_section_id": "sec_susp_001",
-      "active": "True",
+      "source_section_id": "sec_incl_001",
+      "active": "False",
       "base_price": 0,
       "display_order": 20,
       "text_cleanup_notes": [],
       "choice_id": "3lz_h07__opt_fe7_001",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "3lz_h07",
       "body_style": "coupe",
       "trim_level": "3LZ",
-      "status": "available",
-      "status_label": "Available",
+      "status": "unavailable",
+      "status_label": "Not Available",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "auto_only"
     },
     {
       "option_id": "opt_fe7_001",
@@ -30458,24 +30445,24 @@
       "source_option_name": "Suspension, Z07 with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "Included and only available with (Z07) Z07 Performance Package.",
-      "source_section_id": "sec_susp_001",
-      "active": "True",
+      "source_section_id": "sec_incl_001",
+      "active": "False",
       "base_price": 0,
       "display_order": 20,
       "text_cleanup_notes": [],
       "choice_id": "1lz_h67__opt_fe7_001",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "1lz_h67",
       "body_style": "convertible",
       "trim_level": "1LZ",
-      "status": "available",
-      "status_label": "Available",
+      "status": "unavailable",
+      "status_label": "Not Available",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "auto_only"
     },
     {
       "option_id": "opt_fe7_001",
@@ -30485,24 +30472,24 @@
       "source_option_name": "Suspension, Z07 with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "Included and only available with (Z07) Z07 Performance Package.",
-      "source_section_id": "sec_susp_001",
-      "active": "True",
+      "source_section_id": "sec_incl_001",
+      "active": "False",
       "base_price": 0,
       "display_order": 20,
       "text_cleanup_notes": [],
       "choice_id": "2lz_h67__opt_fe7_001",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "2lz_h67",
       "body_style": "convertible",
       "trim_level": "2LZ",
-      "status": "available",
-      "status_label": "Available",
+      "status": "unavailable",
+      "status_label": "Not Available",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "auto_only"
     },
     {
       "option_id": "opt_fe7_001",
@@ -30512,24 +30499,24 @@
       "source_option_name": "Suspension, Z07 with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "Included and only available with (Z07) Z07 Performance Package.",
-      "source_section_id": "sec_susp_001",
-      "active": "True",
+      "source_section_id": "sec_incl_001",
+      "active": "False",
       "base_price": 0,
       "display_order": 20,
       "text_cleanup_notes": [],
       "choice_id": "3lz_h67__opt_fe7_001",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "3lz_h67",
       "body_style": "convertible",
       "trim_level": "3LZ",
-      "status": "available",
-      "status_label": "Available",
+      "status": "unavailable",
+      "status_label": "Not Available",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "auto_only"
     },
     {
       "option_id": "opt_ive_001",
@@ -33471,8 +33458,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_soe_002",
@@ -33498,8 +33485,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_soe_002",
@@ -33525,8 +33512,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_soe_002",
@@ -33552,8 +33539,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_soe_002",
@@ -33579,8 +33566,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_soe_002",
@@ -33606,8 +33593,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_som_001",
@@ -38657,8 +38644,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
@@ -38684,8 +38671,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
@@ -38711,8 +38698,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
@@ -38738,8 +38725,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
@@ -38765,8 +38752,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
@@ -38792,8 +38779,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_j6a_001",
@@ -38819,8 +38806,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_j6a_001",
@@ -38846,8 +38833,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_j6a_001",
@@ -38873,8 +38860,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_j6a_001",
@@ -38900,8 +38887,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_j6a_001",
@@ -38927,8 +38914,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_j6a_001",
@@ -38954,8 +38941,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_nga_001",
@@ -40235,8 +40222,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_cf7_001",
@@ -40262,8 +40249,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_cf7_001",
@@ -40289,8 +40276,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_cm9_001",
@@ -40316,8 +40303,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_cm9_001",
@@ -40343,8 +40330,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_cm9_001",
@@ -40370,8 +40357,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_aj7_001",
@@ -42407,8 +42394,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_aq9_001",
@@ -42434,8 +42421,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_aq9_001",
@@ -42461,8 +42448,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_aq9_001",
@@ -42488,8 +42475,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_a2x_001",
@@ -47953,24 +47940,24 @@
       "source_option_name": "Suspension, performance with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "",
-      "source_section_id": "sec_susp_001",
+      "source_section_id": "sec_incl_001",
       "active": "True",
       "base_price": 0,
       "display_order": 10,
       "text_cleanup_notes": [],
       "choice_id": "1lz_h07__opt_fe6_002",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "1lz_h07",
       "body_style": "coupe",
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_fe6_002",
@@ -47980,24 +47967,24 @@
       "source_option_name": "Suspension, performance with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "",
-      "source_section_id": "sec_susp_001",
+      "source_section_id": "sec_incl_001",
       "active": "True",
       "base_price": 0,
       "display_order": 10,
       "text_cleanup_notes": [],
       "choice_id": "2lz_h07__opt_fe6_002",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "2lz_h07",
       "body_style": "coupe",
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_fe6_002",
@@ -48007,24 +47994,24 @@
       "source_option_name": "Suspension, performance with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "",
-      "source_section_id": "sec_susp_001",
+      "source_section_id": "sec_incl_001",
       "active": "True",
       "base_price": 0,
       "display_order": 10,
       "text_cleanup_notes": [],
       "choice_id": "3lz_h07__opt_fe6_002",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "3lz_h07",
       "body_style": "coupe",
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_fe6_002",
@@ -48034,24 +48021,24 @@
       "source_option_name": "Suspension, performance with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "",
-      "source_section_id": "sec_susp_001",
+      "source_section_id": "sec_incl_001",
       "active": "True",
       "base_price": 0,
       "display_order": 10,
       "text_cleanup_notes": [],
       "choice_id": "1lz_h67__opt_fe6_002",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "1lz_h67",
       "body_style": "convertible",
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_fe6_002",
@@ -48061,24 +48048,24 @@
       "source_option_name": "Suspension, performance with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "",
-      "source_section_id": "sec_susp_001",
+      "source_section_id": "sec_incl_001",
       "active": "True",
       "base_price": 0,
       "display_order": 10,
       "text_cleanup_notes": [],
       "choice_id": "2lz_h67__opt_fe6_002",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "2lz_h67",
       "body_style": "convertible",
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_fe6_002",
@@ -48088,24 +48075,24 @@
       "source_option_name": "Suspension, performance with Magnetic Selective Ride Control",
       "source_description": "",
       "source_detail_raw": "",
-      "source_section_id": "sec_susp_001",
+      "source_section_id": "sec_incl_001",
       "active": "True",
       "base_price": 0,
       "display_order": 10,
       "text_cleanup_notes": [],
       "choice_id": "3lz_h67__opt_fe6_002",
-      "section_id": "sec_susp_001",
-      "resolved_section_id": "sec_susp_001",
-      "section_name": "Suspension",
+      "section_id": "sec_incl_001",
+      "resolved_section_id": "sec_incl_001",
+      "section_name": "Included",
       "standard_equipment_group_type": "",
-      "step_key": "packages_performance",
+      "step_key": "standard_equipment",
       "variant_id": "3lz_h67",
       "body_style": "convertible",
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
       "selectable": "False",
-      "display_behavior": ""
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_ive_001",
@@ -49265,8 +49252,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_soe_002",
@@ -49292,8 +49279,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_soe_002",
@@ -49319,8 +49306,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_soe_002",
@@ -49346,8 +49333,8 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_soe_002",
@@ -49373,8 +49360,8 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_soe_002",
@@ -49400,8 +49387,8 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
-      "display_behavior": ""
+      "selectable": "True",
+      "display_behavior": "default_selected"
     }
   ],
   "ruleDetailHotSpots": {
@@ -50503,7 +50490,7 @@
         "option_id": "opt_fe7_001",
         "rpo": "FE7",
         "option_name": "Suspension, Z07 with Magnetic Selective Ride Control",
-        "section_id": "sec_susp_001",
+        "section_id": "sec_incl_001",
         "matched_terms": [
           "only"
         ],

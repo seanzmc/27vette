@@ -277,6 +277,16 @@ def update_options(wb, changes: list[Change]) -> None:
         row = by_rpo.get(rpo)
         if row:
             set_cell(ws, int(row["_row_number"]), "active", "False", changes, key=rpo, reason="unreleased Z06 option should not appear on front end")
+    suspension_targets = {
+        "FE6": {"section_id": "sec_incl_001", "selectable": "False", "display_behavior": "display_only"},
+        "FE7": {"section_id": "sec_incl_001", "selectable": "False", "display_behavior": "auto_only"},
+    }
+    for rpo, fields in suspension_targets.items():
+        row = by_rpo.get(rpo)
+        if not row:
+            continue
+        for field, desired in fields.items():
+            set_cell(ws, int(row["_row_number"]), field, desired, changes, key=rpo, reason="Z06 suspension belongs in standard/included equipment, not visible choice cards")
     # Keep EFY in the exterior accent required group while preserving existing EDU/EFR rows.
     _, id_by_rpo, _ = option_maps(wb)
     required_option_ids(id_by_rpo, ["EFY"])
@@ -316,14 +326,13 @@ def build_plan(wb) -> list[Change]:
     omit_rule(wb, changes, "z06_rule_opt_t0f_001_requires_opt_j57_001", "Z06 T0F should not require J57 before selection.")
     omit_rule(wb, changes, "z06_copy_rule_opt_nwi_001_requires_opt_wub_001_opt_nwi_001_requires_opt_wub_001", "Z06 WUB is standard equipment; NWI should not require WUB.")
 
-    ensure_rule(wb, changes, "J57", "excludes", "J6A", "J57 carbon ceramic brakes make J6A black calipers unavailable.", disabled_reason="Blocked by J57 carbon ceramic brakes.")
-    ensure_rule(wb, changes, "D3V", "includes", "BCW", "D3V engine cover selection adds BCW red engine intake.")
+    ensure_rule(wb, changes, "J57", "excludes", "J6A", "J57 carbon ceramic brakes replace the default J6A black calipers.", runtime_action="replace", disabled_reason="Replaced by J57 carbon ceramic brakes.")
+    omit_rule(wb, changes, "z06_rule_opt_d3v_001_includes_opt_bcw_001", "BCW should remain selectable; B6P/ZZ3 only change BCW pricing and should not auto-add it through D3V.")
     ensure_rule(wb, changes, "PBC", "requires", "ZZ3", "PBC requires ZZ3 on convertible.", body="convertible", disabled_reason="Convertible PBC requires ZZ3 Convertible Engine Appearance Package.", rule_id="z06_rule_opt_pbc_001_requires_opt_zz3_001_convertible")
 
     for target_rpo in GBA_INCOMPATIBLE_RPOS:
         ensure_rule(wb, changes, "GBA", "excludes", target_rpo, f"{target_rpo} is not available with GBA Black exterior paint.", disabled_reason=f"Not available with GBA Black exterior paint.")
 
-    deactivate_package_exclusive_group(wb, changes)
     for package_rpo in PACKAGE_RPOS:
         ensure_rule_group(
             wb,
@@ -334,11 +343,6 @@ def build_plan(wb) -> list[Change]:
             f"{package_rpo} requires one Z06 carbon fiber wheel choice: ROY, ROZ, or STZ.",
             f"{package_rpo} wheel-and-brake package requires a carbon fiber wheel selection.",
         )
-        for peer_rpo in PACKAGE_RPOS:
-            if peer_rpo != package_rpo:
-                ensure_rule(wb, changes, package_rpo, "excludes", peer_rpo, f"{package_rpo} deactivates peer wheel-and-brake package {peer_rpo}.", disabled_reason=f"Blocked by selected {package_rpo} package.")
-        for wheel_rpo in active_normal_wheel_rpos(wb):
-            ensure_rule(wb, changes, package_rpo, "excludes", wheel_rpo, f"{package_rpo} requires carbon fiber wheels and deactivates aluminum wheel {wheel_rpo}.", disabled_reason=f"{package_rpo} requires a carbon fiber wheel selection.")
 
     ensure_price_rule(wb, changes, "z06_pr_b6p_d3v_zero", "B6P", "D3V", 0, "B6P includes D3V, so D3V does not add a second charge.")
     ensure_price_rule(wb, changes, "z06_pr_b6p_sl9_zero", "B6P", "SL9", 0, "B6P includes SL9, so SL9 does not add a second charge.")
