@@ -855,6 +855,7 @@ function excludesAnyReason(choice, selectedIds) {
 
 function computeAutoAdded() {
   const autoAdded = new Map();
+  const autoAddedSources = new Map();
   const selectedIds = new Set(state.selected);
   if (state.selectedInterior) selectedIds.add(state.selectedInterior);
 
@@ -872,7 +873,28 @@ function computeAutoAdded() {
           includedTargetRequirementsMet(rule.target_id, selectedIds) &&
           (!userSelectedExclusiveGroupPeer(rule.target_id, selectedIds) || includedRuleSuppressesUserPeer(rule, selectedIds))
         ) {
+          const targetGroup = optionExclusiveGroup(rule.target_id);
+          let blockedBySelectedSourcePeer = false;
+          if (exclusiveGroupAllowsSingleSelection(targetGroup)) {
+            for (const peerId of targetGroup.option_ids || []) {
+              if (peerId === rule.target_id || !autoAdded.has(peerId)) continue;
+              const existingSourceId = autoAddedSources.get(peerId);
+              const existingSourceIsSelected = state.selected.has(existingSourceId);
+              const currentSourceIsSelected = state.selected.has(rule.source_id);
+              if (existingSourceIsSelected && !currentSourceIsSelected) {
+                blockedBySelectedSourcePeer = true;
+                break;
+              }
+              if (currentSourceIsSelected && !existingSourceIsSelected) {
+                autoAdded.delete(peerId);
+                autoAddedSources.delete(peerId);
+                selectedIds.delete(peerId);
+              }
+            }
+          }
+          if (blockedBySelectedSourcePeer) continue;
           autoAdded.set(rule.target_id, includedWithReason(rule));
+          autoAddedSources.set(rule.target_id, rule.source_id);
           if (!selectedIds.has(rule.target_id)) {
             selectedIds.add(rule.target_id);
             changed = true;
@@ -960,13 +982,54 @@ function disableReasonForInterior(interior) {
   return "";
 }
 
+function matchingPriceRuleApplies(rule) {
+  return (
+    scopeMatches(rule.body_style_scope, state.bodyStyle) &&
+    scopeMatches(rule.trim_level_scope, state.trimLevel) &&
+    scopeMatches(rule.variant_scope, currentVariantId())
+  );
+}
+
+function packageComponentPriceRules(packageOptionId) {
+  return (priceRulesByTarget.get(packageOptionId) || []).filter((rule) => {
+    if (rule.price_rule_type !== "override" || !matchingPriceRuleApplies(rule)) return false;
+    const conditionGroup = optionExclusiveGroup(rule.condition_option_id);
+    return exclusiveGroupAllowsSingleSelection(conditionGroup) && Number(rule.price_value || 0) > 0;
+  });
+}
+
+function hasPackageComponentPricing(packageOptionId) {
+  return packageComponentPriceRules(packageOptionId).length > 1;
+}
+
+function packageComponentBasePrice(packageOptionId) {
+  const prices = packageComponentPriceRules(packageOptionId).map((rule) => Number(rule.price_value || 0));
+  return prices.length ? Math.min(...prices) : null;
+}
+
+function packageComponentDelta(optionId, selectedIds) {
+  for (const [packageOptionId, rules] of priceRulesByTarget.entries()) {
+    if (!selectedIds.has(packageOptionId)) continue;
+    const componentRules = packageComponentPriceRules(packageOptionId);
+    if (!componentRules.length) continue;
+    const rule = componentRules.find((candidate) => candidate.condition_option_id === optionId);
+    if (!rule) continue;
+    const basePrice = packageComponentBasePrice(packageOptionId);
+    if (basePrice === null) continue;
+    return Math.max(0, Number(rule.price_value || 0) - basePrice);
+  }
+  return null;
+}
+
 function optionPrice(optionId, candidateIds = []) {
   const selectedIds = selectedContextIds(candidateIds);
+  const componentDelta = packageComponentDelta(optionId, selectedIds);
+  if (componentDelta !== null) return componentDelta;
+  const packageBasePrice = packageComponentBasePrice(optionId);
+  if (packageBasePrice !== null && selectedIds.has(optionId)) return packageBasePrice;
   const priceRules = priceRulesByTarget.get(optionId) || [];
   for (const rule of priceRules) {
-    if (!scopeMatches(rule.body_style_scope, state.bodyStyle)) continue;
-    if (!scopeMatches(rule.trim_level_scope, state.trimLevel)) continue;
-    if (!scopeMatches(rule.variant_scope, currentVariantId())) continue;
+    if (!matchingPriceRuleApplies(rule)) continue;
     if (rule.price_rule_type === "override" && selectedIds.has(rule.condition_option_id)) {
       return Number(rule.price_value || 0);
     }
@@ -975,6 +1038,7 @@ function optionPrice(optionId, candidateIds = []) {
 }
 
 function choiceDisplayPrice(choice) {
+  if (hasPackageComponentPricing(choice.option_id)) return null;
   return optionPrice(choice.option_id, [choice.option_id]);
 }
 
@@ -1660,10 +1724,12 @@ function renderChoiceCard(choice, autoAdded) {
   if (selected) classes.push("selected");
   if (disabledReason) classes.push("disabled");
   if (autoReason) classes.push("auto");
+  const displayPrice = choiceDisplayPrice(choice);
+  const priceMarkup = displayPrice === null ? "" : `<span class=\"price\">${formatMoney(displayPrice)}</span>`;
   return `
     <button class="${classes.join(" ")}" type="button" data-option="${choice.option_id}" ${disabled ? "aria-disabled=\"true\"" : ""}>
       ${renderCardMedia(choice, choice.label, { disabled })}
-      <span class="topline"><span class="rpo">${escapeHtml(choice.rpo || choice.option_id)}</span><span class="price">${formatMoney(choiceDisplayPrice(choice))}</span></span>
+      <span class="topline"><span class="rpo">${escapeHtml(choice.rpo || choice.option_id)}</span>${priceMarkup}</span>
       <span class="choice-name"><span>${escapeHtml(choice.label)}</span>${renderInfoTooltip(detail, "Option details", { focusable: false })}</span>
       ${renderChoiceRelationshipBadges(choice, { disabled })}
       ${disabledReason ? renderStatePill("Unavailable", "disabled-reason", disabledReason) : ""}

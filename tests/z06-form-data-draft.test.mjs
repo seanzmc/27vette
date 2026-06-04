@@ -181,13 +181,36 @@ test("Z06 draft keeps suspension out of customer choice sections and in equipmen
   );
 });
 
-test("Z06 interiors group by broad color family instead of one container per stitched variant", () => {
+test("Z06 interiors use coded workbook-owned color families and seat hierarchy", () => {
   const byId = new Map(draft.interiors.map((interior) => [interior.interior_id, interior]));
-  for (const interiorId of ["2LZ_AQ9_H1Y", "2LZ_AQ9_H1Y_38S", "2LZ_AQ9_H1Y_36S", "2LZ_AQ9_H1Y_37S"]) {
-    assert.equal(byId.get(interiorId)?.interior_color_family, "Jet Black", `${interiorId} should group under Jet Black`);
+  assert.equal(byId.get("1LZ_AQ9_HTA")?.interior_color_family, "HTA Jet Black");
+  assert.equal(byId.get("1LZ_AE4_HTJ_N26")?.interior_color_family, "HTJ Jet Black");
+  assert.notEqual(
+    byId.get("1LZ_AQ9_HTA")?.interior_color_family,
+    byId.get("1LZ_AE4_HTJ_N26")?.interior_color_family,
+    "AQ9 HTA and AE4 HTJ Jet Black choices should not collapse into one plain Jet Black group"
+  );
+  assert.match(byId.get("1LZ_AQ9_HTA")?.interior_hierarchy_path || "", /AQ9 Seats/);
+  assert.match(byId.get("1LZ_AE4_HTJ_N26")?.interior_hierarchy_path || "", /AE4 Seats/);
+});
+
+test("Z06 N26 and custom stitch source rows do not render as selectable option-step cards", () => {
+  for (const rpo of ["N26", "36S", "37S", "38S"]) {
+    const choices = draft.choices.filter((choice) => choice.rpo === rpo);
+    assert.ok(choices.length > 0, `${rpo} should remain in source/generated data for dealer/build accuracy`);
+    assert.equal(
+      choices.every((choice) => choice.display_behavior === "hidden" || choice.step_key === "standard_equipment"),
+      true,
+      `${rpo} should be hidden from selectable customer option steps`
+    );
   }
-  assert.equal(byId.get("2LZ_AQ9_HUN")?.interior_color_family, "Sky Cool Gray");
-  assert.equal(byId.get("2LZ_AQ9_HUR")?.interior_color_family, "Adrenaline Red");
+
+  const n26InteriorComponents = draft.interiors.flatMap((interior) =>
+    (interior.interior_components || [])
+      .filter((component) => component.rpo === "N26")
+      .map((component) => `${interior.interior_id}:${component.rpo}:${component.price}`)
+  );
+  assert.ok(n26InteriorComponents.length > 0, "N26 should still auto-add through applicable interior component data");
 });
 
 test("Z06 draft does not emit priced standard-equipment choices", () => {

@@ -451,6 +451,12 @@ def broad_interior_color_family(label: str) -> str:
     return value
 
 
+def coded_color_family(interior: dict[str, Any], fallback_label: str) -> str:
+    color = broad_interior_color_family(fallback_label)
+    code = clean(interior.get("interior_code", ""))
+    return f"{code} {color}".strip() if code else color
+
+
 def grouping_fields_for_interior(
     interior: dict[str, Any],
     reference: dict[str, Any] | None,
@@ -458,17 +464,18 @@ def grouping_fields_for_interior(
     fallback: bool = False,
 ) -> dict[str, Any]:
     seat_label = reference["levels"][1] if reference and len(reference["levels"]) > 1 else f"{interior['seat_code']} Seats"
+    fallback_color_family = coded_color_family(interior, interior["interior_name"] or "Other Interior Choices")
     levels = reference["levels"] if reference else [
         interior["trim_level"],
         seat_label,
-        interior["interior_name"] or "Other Interior Choices",
+        fallback_color_family,
         interior["material"] or "Standard interior",
         interior["interior_name"] or interior["interior_id"],
     ]
     leaf_label = levels[-1] if levels else interior["interior_name"] or interior["interior_id"]
-    color_family = levels[2] if len(levels) > 2 else broad_interior_color_family(leaf_label)
+    color_family = levels[2] if len(levels) > 2 else coded_color_family(interior, leaf_label)
     if not reference:
-        color_family = broad_interior_color_family(interior["interior_name"] or leaf_label)
+        color_family = fallback_color_family
     material_family = interior.get("material") or "Standard interior"
     if len(levels) > 3 and levels[-2] != color_family:
         material_family = levels[-2]

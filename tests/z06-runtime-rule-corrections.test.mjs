@@ -188,10 +188,10 @@ test("Z06 package selections default ROY carbon wheels and make package peers co
       /ROY|ROZ|STZ|carbon fiber wheel/i,
       `${rpo} should satisfy its carbon fiber wheel requirement with default ROY`
     );
-    for (const wheelRpo of ["ROZ", "STZ"]) {
+    for (const [wheelRpo, expectedDelta] of [["ROZ", 1000], ["STZ", 1500]]) {
       const carbonWheel = choice(runtime, wheelRpo);
       assert.equal(runtime.disableReasonForChoice(carbonWheel), "", `${wheelRpo} should be selectable after ${rpo}`);
-      assert.equal(runtime.optionPrice(carbonWheel.option_id), 0, `${wheelRpo} should price at zero when included by ${rpo}`);
+      assert.equal(runtime.optionPrice(carbonWheel.option_id), expectedDelta, `${wheelRpo} should show the package-base delta when included by ${rpo}`);
     }
     runtime.handleChoice(choice(runtime, "ROZ"));
     runtime.reconcileSelections();

@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-06-04T02:38:30+00:00",
+    "generated_at": "2026-06-04T06:01:06+00:00",
     "status": "read_only_preview"
   },
   "variants": [
@@ -5820,7 +5820,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_36s_001",
@@ -5847,7 +5847,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_36s_001",
@@ -5874,7 +5874,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_36s_001",
@@ -5901,7 +5901,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_37s_001",
@@ -5928,7 +5928,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_37s_001",
@@ -5955,7 +5955,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_37s_001",
@@ -5982,7 +5982,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_37s_001",
@@ -6009,7 +6009,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_38s_001",
@@ -6036,7 +6036,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_38s_001",
@@ -6063,7 +6063,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_38s_001",
@@ -6090,7 +6090,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_38s_001",
@@ -6117,7 +6117,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_b6p_001",
@@ -9435,7 +9435,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_n26_001",
@@ -9462,7 +9462,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_n26_001",
@@ -9489,7 +9489,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_n26_001",
@@ -9516,7 +9516,7 @@
       "status": "available",
       "status_label": "Available",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "hidden"
     },
     {
       "option_id": "opt_n2z_001",

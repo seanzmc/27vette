@@ -94,6 +94,8 @@ window.__testApi = {
   missingRequirementDetails,
   computeAutoAdded,
   optionPrice,
+  choiceDisplayPrice,
+  lineItems,
   disableReasonForChoice,
 };
 init();
@@ -195,6 +197,23 @@ test("Z06 aero choices switch consistently from the default without greyed-out p
   assert.equal(runtime.state.selected.has(choice(runtime, "5ZV").option_id), false, "T0G should remove 5ZV through the same peer replacement path");
 });
 
+test("Z06 PDF replaces a prior T0F selection with included T0G", () => {
+  const runtime = z06Runtime();
+
+  runtime.handleChoice(choice(runtime, "T0F"));
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has(choice(runtime, "T0F").option_id), true, "T0F should be selectable before PDF");
+
+  runtime.handleChoice(choice(runtime, "PDF"));
+  runtime.reconcileSelections();
+
+  assert.equal(runtime.state.selected.has(choice(runtime, "PDF").option_id), true, "PDF should be selected");
+  assert.equal(runtime.state.selected.has(choice(runtime, "T0F").option_id), false, "PDF should remove the prior T0F selected state");
+  assert.equal(autoAddedRpos(runtime).includes("T0G"), true, "PDF should include/default T0G");
+  assert.equal(autoAddedRpos(runtime).includes("CFV"), true, "PDF/T0G should include visible-carbon ground effects");
+  assert.equal(autoAddedRpos(runtime).includes("CFZ"), false, "PDF should release T0F/CFZ Carbon Flash ground effects");
+});
+
 test("Z06 package-included aero ground effects stay locked until the aero peer changes", () => {
   const runtime = z06Runtime();
   runtime.handleChoice(choice(runtime, "T0F"));
@@ -255,6 +274,45 @@ test("Z06 carbon wheel package ROY defaults can switch to ROZ or STZ", () => {
     assert.equal(autoAddedRpos(runtime).includes("ROY"), false, `${packageRpo} ROZ selection should suppress the ROY default`);
     assert.doesNotMatch(missingText(runtime), /ROY|ROZ|STZ|carbon fiber wheel/i, `${packageRpo} should remain complete after switching to ROZ`);
   }
+});
+
+test("Z06 package wheel cards display package-base deltas while package cards stay price-less", () => {
+  for (const [packageRpo, basePrice] of [
+    ["PDB", 16000],
+    ["PDD", 25495],
+    ["PDF", 26495],
+  ]) {
+    const runtime = z06Runtime();
+    const packageChoice = choice(runtime, packageRpo);
+
+    runtime.handleChoice(packageChoice);
+    runtime.reconcileSelections();
+
+    assert.equal(runtime.choiceDisplayPrice(packageChoice), null, `${packageRpo} package card should not display a direct price`);
+    assert.equal(runtime.choiceDisplayPrice(choice(runtime, "ROY")), 0, `${packageRpo} default ROY wheel should show no delta over package base`);
+    assert.equal(runtime.choiceDisplayPrice(choice(runtime, "ROZ")), 1000, `${packageRpo} ROZ wheel card should show the delta over ${packageRpo} base`);
+    assert.equal(runtime.choiceDisplayPrice(choice(runtime, "STZ")), 1500, `${packageRpo} STZ wheel card should show the delta over ${packageRpo} base`);
+
+    runtime.handleChoice(choice(runtime, "ROZ"));
+    runtime.reconcileSelections();
+    const lineItemsByRpo = new Map(runtime.lineItems().map((item) => [item.rpo, item]));
+    assert.equal(lineItemsByRpo.get(packageRpo)?.price, basePrice, `${packageRpo} order line should carry the package base`);
+    assert.equal(lineItemsByRpo.get("ROZ")?.price, 1000, `${packageRpo}/ROZ order line should carry only the package-base delta`);
+  }
+});
+
+test("Z06 selecting BCW alone does not auto-add or zero D3V", () => {
+  const runtime = z06Runtime();
+  const bcw = choice(runtime, "BCW");
+  const d3v = choice(runtime, "D3V");
+
+  runtime.handleChoice(bcw);
+  runtime.reconcileSelections();
+
+  assert.equal(runtime.state.selected.has(bcw.option_id), true, "BCW should be selected");
+  assert.equal(autoAddedRpos(runtime).includes("D3V"), false, "BCW alone should not auto-add D3V");
+  assert.equal(runtime.state.selected.has(d3v.option_id), false, "D3V should remain unselected when only BCW is chosen");
+  assert.equal(runtime.optionPrice(d3v.option_id), 195, "D3V should keep its standalone price when BCW is the only selected engine option");
 });
 
 test("Z06 B6P changes BCW price without auto-adding BCW", () => {
