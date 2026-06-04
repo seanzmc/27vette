@@ -230,23 +230,23 @@ test("future Corvette normalized source sheets stay compatible and source rows s
     z06: {
       rule_mapping: 213,
       price_rules: 45,
-      rule_groups: 4,
-      rule_group_members: 11,
+      rule_groups: 9,
+      rule_group_members: 73,
       exclusive_groups: 12,
       exclusive_members: 33,
       variant_overrides: 4,
     },
     zr1: {
       rule_mapping: 56,
-      rule_groups: 0,
-      rule_group_members: 0,
+      rule_groups: 2,
+      rule_group_members: 29,
       exclusive_groups: 4,
       exclusive_members: 10,
     },
     zr1x: {
       rule_mapping: 56,
-      rule_groups: 0,
-      rule_group_members: 0,
+      rule_groups: 2,
+      rule_group_members: 29,
       exclusive_groups: 4,
       exclusive_members: 10,
     },
@@ -377,6 +377,126 @@ wb.close()
 print(json.dumps(duplicates))
 `);
   assert.deepEqual(duplicates, []);
+});
+
+test("approved one-source blocker clusters use excludes_any groups instead of direct excludes", () => {
+  const ungrouped = pythonJson(`
+import json
+from openpyxl import load_workbook
+
+wb = load_workbook('stingray_master.xlsx', read_only=True, data_only=True)
+
+def clean(value):
+    return '' if value is None else str(value).strip()
+
+def rows(sheet):
+    ws = wb[sheet]
+    raw_rows = list(ws.iter_rows(values_only=True))
+    headers = [clean(value) for value in raw_rows[0]]
+    result = []
+    for row_number, raw in enumerate(raw_rows[1:], start=2):
+        record = {header: raw[index] if index < len(raw) else '' for index, header in enumerate(headers) if header}
+        if any(clean(value) for value in record.values()):
+            record['_row'] = row_number
+            result.append(record)
+    return result
+
+def active(row):
+    value = clean(row.get('active'))
+    return value.lower() not in {'false', '0', 'no', 'inactive'}
+
+def runtime_authored_rule(row):
+    status = clean(row.get('normalization_status')).lower()
+    if status in {'omitted', 'replaced'}:
+        return False
+    if status == 'preserved':
+        return True
+    return not clean(row.get('generation_action')).lower().startswith('omit')
+
+models = {
+    'stingray': {
+        'rule_sheet': 'rule_mapping',
+        'group_sheet': 'rule_groups',
+        'member_sheet': 'rule_group_members',
+        'option_sheet': 'stingray_options',
+        'source_rpos': ['PCX', 'PDV', 'R88', 'SFZ', 'CF8'],
+    },
+    'grandSport': {
+        'rule_sheet': 'grandSport_rule_mapping',
+        'group_sheet': 'grandSport_rule_groups',
+        'member_sheet': 'grandSport_rule_group_members',
+        'option_sheet': 'grandSport_options',
+        'source_rpos': ['R88', 'SFZ', 'CF8', 'SHT'],
+    },
+    'z06': {
+        'rule_sheet': 'z06_rule_mapping',
+        'group_sheet': 'z06_rule_groups',
+        'member_sheet': 'z06_rule_group_members',
+        'option_sheet': 'z06_options',
+        'source_rpos': ['R88', 'SFZ', 'CF8', 'SHT', 'GBA'],
+    },
+    'zr1': {
+        'rule_sheet': 'zr1_rule_mapping',
+        'group_sheet': 'zr1_rule_groups',
+        'member_sheet': 'zr1_rule_group_members',
+        'option_sheet': 'zr1_options',
+        'source_rpos': ['R88', 'SFZ'],
+    },
+    'zr1x': {
+        'rule_sheet': 'zr1x_rule_mapping',
+        'group_sheet': 'zr1x_rule_groups',
+        'member_sheet': 'zr1x_rule_group_members',
+        'option_sheet': 'zr1x_options',
+        'source_rpos': ['R88', 'SFZ'],
+    },
+}
+
+issues = []
+for model_key, config in models.items():
+    option_by_id = {row.get('option_id'): row for row in rows(config['option_sheet'])}
+    option_ids_by_rpo = {}
+    for option in option_by_id.values():
+        option_ids_by_rpo.setdefault(clean(option.get('rpo')), []).append(clean(option.get('option_id')))
+    grouped_pairs = set()
+    active_groups = [row for row in rows(config['group_sheet']) if active(row) and clean(row.get('group_type')) == 'excludes_any']
+    members = rows(config['member_sheet'])
+    for group in active_groups:
+        source_id = clean(group.get('source_id'))
+        for member in members:
+            if active(member) and clean(member.get('group_id')) == clean(group.get('group_id')):
+                grouped_pairs.add((source_id, clean(member.get('target_id'))))
+    for source_rpo in config['source_rpos']:
+        source_ids = set(option_ids_by_rpo.get(source_rpo, []))
+        for rule in rows(config['rule_sheet']):
+            if not runtime_authored_rule(rule):
+                continue
+            if clean(rule.get('rule_type')) != 'excludes':
+                continue
+            if clean(rule.get('runtime_action')) == 'replace':
+                continue
+            if clean(rule.get('generation_action')) == 'preserve_runtime_exclude':
+                continue
+            source_id = clean(rule.get('source_id'))
+            target_id = clean(rule.get('target_id'))
+            if source_id not in source_ids:
+                continue
+            if (source_id, target_id) in grouped_pairs:
+                continue
+            issues.append({
+                'model': model_key,
+                'sheet': config['rule_sheet'],
+                'row': rule['_row'],
+                'source_rpo': source_rpo,
+                'source_id': source_id,
+                'target_rpo': clean(option_by_id.get(target_id, {}).get('rpo')),
+                'target_id': target_id,
+                'rule_id': clean(rule.get('rule_id')),
+            })
+
+wb.close()
+print(json.dumps(issues))
+`);
+  assert.deepEqual(ungrouped, []);
 });
 
 test("category_master is retired from the active source graph and draft provenance is not live app data", () => {

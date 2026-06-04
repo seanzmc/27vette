@@ -52,6 +52,7 @@ The workbook should own business data. Scripts should read, validate, normalize,
 - Python should not accumulate model-specific RPO exceptions.
 - JavaScript should not become the source of Corvette product rules.
 - Correct bad source data in the workbook rather than hiding it in generator/runtime code.
+- Use existing workbook pipelines first: fill canonical source cells, scope rows, group/member rows, or metadata the current generators already read before adding another module, staging sheet, duplicate column, or parallel review workflow.
 - Keep Stingray and Grand Sport structurally consistent unless there is an explicit documented exception.
 - Generated `form_*` sheets are output surfaces, not hand-edit surfaces.
 

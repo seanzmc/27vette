@@ -359,8 +359,6 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
     "opt_fey_001::includes::opt_cfz_001::::active",
     "opt_t0f_001::includes::opt_cfz_001::::active",
     "opt_bv4_001::excludes::opt_r8c_001::::active",
-    "opt_r88_001::excludes::opt_eyk_001::::active",
-    "opt_sfz_001::excludes::opt_eyk_001::::active",
     "3LT_AH2_EL9::includes::opt_3f9_001::::active",
     "3LT_AH2_HZN::includes::opt_3n9_001::::active",
     "3LT_AH2_H8T::includes::opt_3a9_001::::active",
@@ -370,6 +368,19 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
     "opt_bcs_002::includes::opt_d3v_001::coupe::active",
   ]) {
     assert.ok(ruleKeys.has(key), `${key} should be generated`);
+  }
+
+  const groupedBlockers = new Map(draft.ruleGroups.map((group) => [group.group_id, group]));
+  for (const [groupId, sourceId] of [
+    ["gs_group_r88_excludes_badge_and_stripe_choices", "opt_r88_001"],
+    ["gs_group_sfz_excludes_badge_and_stripe_choices", "opt_sfz_001"],
+  ]) {
+    const group = groupedBlockers.get(groupId);
+    assert.ok(group, `${groupId} should be generated`);
+    assert.equal(group.group_type, "excludes_any");
+    assert.equal(group.source_id, sourceId);
+    assert.ok(group.target_ids.includes("opt_eyk_001"), `${groupId} should target EYK`);
+    assert.equal(ruleKeys.has(`${sourceId}::excludes::opt_eyk_001::::active`), false, `${sourceId} should use grouped EYK exclusion`);
   }
 
   for (const legacyOptionId of ["opt_bc4_001", "opt_bcp_001", "opt_bcs_001"]) {

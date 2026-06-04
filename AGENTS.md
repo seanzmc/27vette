@@ -73,6 +73,8 @@ Workbook-owned business data includes:
 
 Scripts should be boring. They should read tables, normalize rows, validate references, emit artifacts, and apply generic runtime concepts. Avoid adding code such as "if this RPO on this model, do special behavior" when a workbook row can express the rule.
 
+Before adding a new helper module, review sheet, parallel taxonomy, or redundant column, first prove the existing workbook pipeline cannot express the decision. Prefer filling canonical workbook blanks/metadata and using current source sheets, generators, and runtime data paths over adding another intermediate layer. If an existing sheet already owns the relationship, use that sheet rather than duplicating its meaning somewhere else.
+
 Runtime JavaScript should render and evaluate generated data. It should not become the source of Corvette product knowledge.
 
 If a proposed change requires hardcoded model-specific business logic, flag it before implementing.
@@ -189,6 +191,8 @@ Use this current default workflow for workbook data edits:
 8. Review diffs so generated artifacts do not hide unrelated workbook or runtime changes.
 
 Do not solve bad source data by suppressing it in Python or JavaScript. Correct the workbook row unless there is a documented reason not to.
+
+Do not add an extra module, staging sheet, review taxonomy, or duplicate scope column when an existing workbook sheet already carries the relationship. Use the current pipeline first: fill the canonical blank cells, source rows, membership rows, or scope rows that the generator already reads. Add a new layer only after documenting why the existing workbook contract cannot represent the decision.
 
 Do not edit generated `form_*` sheets directly. Change source sheets, then regenerate.
 
