@@ -233,7 +233,7 @@ test("future Corvette normalized source sheets stay compatible and source rows s
       rule_groups: 9,
       rule_group_members: 73,
       exclusive_groups: 12,
-      exclusive_members: 33,
+      exclusive_members: 41,
       variant_overrides: 4,
     },
     zr1: {
@@ -377,6 +377,81 @@ wb.close()
 print(json.dumps(duplicates))
 `);
   assert.deepEqual(duplicates, []);
+});
+
+test("Z06 active replace excludes stay limited to true default-replacement rows", () => {
+  const offenders = pythonJson(`
+import json
+from openpyxl import load_workbook
+
+wb = load_workbook('stingray_master.xlsx', read_only=True, data_only=True)
+
+def clean(value):
+    return '' if value is None else str(value).strip()
+
+def rows(sheet):
+    ws = wb[sheet]
+    raw_rows = list(ws.iter_rows(values_only=True))
+    headers = [clean(value) for value in raw_rows[0]]
+    result = []
+    for row_number, raw in enumerate(raw_rows[1:], start=2):
+        record = {header: raw[index] if index < len(raw) else '' for index, header in enumerate(headers) if header}
+        if any(clean(value) for value in record.values()):
+            record['_row'] = row_number
+            result.append(record)
+    return result
+
+def active(row):
+    value = clean(row.get('active'))
+    return value.lower() not in {'false', '0', 'no', 'inactive'}
+
+def runtime_authored_rule(row):
+    status = clean(row.get('normalization_status')).lower()
+    if status in {'omitted', 'replaced'}:
+        return False
+    if status == 'preserved':
+        return True
+    return not clean(row.get('generation_action')).lower().startswith('omit')
+
+options = {clean(row.get('option_id')): row for row in rows('z06_options')}
+active_group_ids = {clean(row.get('group_id')) for row in rows('z06_exclusive_groups') if active(row)}
+group_by_option = {}
+for row in rows('z06_exclusive_members'):
+    if not active(row):
+        continue
+    group_id = clean(row.get('group_id'))
+    option_id = clean(row.get('option_id'))
+    if group_id in active_group_ids and option_id:
+        group_by_option.setdefault(option_id, set()).add(group_id)
+
+requires_any_sources = {clean(row.get('source_id')): clean(row.get('group_id')) for row in rows('z06_rule_groups') if active(row) and clean(row.get('group_type')) == 'requires_any'}
+allowed_pairs = {('opt_j57_001', 'opt_j6a_001')}
+offenders = []
+for row in rows('z06_rule_mapping'):
+    if not runtime_authored_rule(row):
+        continue
+    if clean(row.get('rule_type')) != 'excludes' or clean(row.get('runtime_action')) != 'replace':
+        continue
+    source_id = clean(row.get('source_id'))
+    target_id = clean(row.get('target_id'))
+    if (source_id, target_id) in allowed_pairs:
+        continue
+    shared_groups = sorted(group_by_option.get(source_id, set()) & group_by_option.get(target_id, set()))
+    offenders.append({
+        'row': row['_row'],
+        'rule_id': clean(row.get('rule_id')),
+        'source_rpo': clean(options.get(source_id, {}).get('rpo')),
+        'source_id': source_id,
+        'target_rpo': clean(options.get(target_id, {}).get('rpo')),
+        'target_id': target_id,
+        'shared_exclusive_groups': shared_groups,
+        'source_requires_any_group': requires_any_sources.get(source_id, ''),
+    })
+
+wb.close()
+print(json.dumps(offenders))
+`);
+  assert.deepEqual(offenders, []);
 });
 
 test("approved one-source blocker clusters use excludes_any groups instead of direct excludes", () => {
