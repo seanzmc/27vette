@@ -174,6 +174,24 @@ ALLOWED_GENERATION_ACTIONS: set[str] = {
 
 ALLOWED_NORMALIZATION_STATUSES: set[str] = {"", "active", "omitted", "replaced", "preserved", "review"}
 
+ALLOWED_PRICE_SEMANTICS: set[str] = {
+    "included_zero",
+    "conditional_component_price",
+    "package_price_by_component",
+    "self_trim_price",
+    "review_required",
+}
+
+PRICE_RULE_SOURCE_SHEETS: tuple[tuple[str, str, str], ...] = (
+    ("stingray", "stingray_options", "price_rules"),
+    ("grandSport", "grandSport_options", "grandSport_price_rules"),
+    ("z06", "z06_options", "z06_price_rules"),
+    ("zr1", "zr1_options", "zr1_price_rules"),
+    ("zr1x", "zr1x_options", "zr1x_price_rules"),
+)
+
+PACKAGE_PRICE_TARGET_RPOS: set[str] = {"PDB", "PDD", "PDF"}
+
 GROUP_REPLACEMENT_ACTIONS: set[str] = {
     "omit_grouped_requirement",
     "omit_grouped_exclusion",
@@ -677,6 +695,99 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                             message=f"{sheet}.{column} must be numeric or blank; blank means null/not-priced and 0 means explicit zero-price.",
                         )
 
+        for model_key, option_sheet, price_sheet in PRICE_RULE_SOURCE_SHEETS:
+            if price_sheet not in wb.sheetnames:
+                continue
+            ws = wb[price_sheet]
+            headers = header_index(ws)
+            if "price_semantic" not in headers:
+                add_issue(
+                    issues,
+                    "error",
+                    "missing_price_semantic_column",
+                    sheet=price_sheet,
+                    column="price_semantic",
+                    value={"model_key": model_key},
+                    message=f"{price_sheet} must classify price-rule business meaning in price_semantic.",
+                )
+                continue
+            option_rows = {
+                clean_text(row.get("option_id")): row
+                for _, row in records(wb[option_sheet])
+                if clean_text(row.get("option_id"))
+            } if option_sheet in wb.sheetnames else {}
+            for row_number, row in records(ws):
+                if not truthy(row.get("active"), default=True):
+                    continue
+                if clean_text(row.get("price_rule_type")) != "override":
+                    continue
+                semantic = clean_text(row.get("price_semantic"))
+                condition_id = clean_text(row.get("condition_option_id"))
+                target_id = clean_text(row.get("target_option_id"))
+                target_rpo = clean_text(option_rows.get(target_id, {}).get("rpo")) or target_id
+                price_value = row.get("price_value")
+                if semantic not in ALLOWED_PRICE_SEMANTICS:
+                    add_issue(
+                        issues,
+                        "error",
+                        "unknown_price_semantic",
+                        sheet=price_sheet,
+                        row=row_number,
+                        column="price_semantic",
+                        value=semantic,
+                        message=f"Unknown price_semantic {semantic!r}; use one of {sorted(ALLOWED_PRICE_SEMANTICS)}.",
+                    )
+                    continue
+                if semantic == "included_zero" and price_value not in {0, 0.0}:
+                    add_issue(
+                        issues,
+                        "error",
+                        "included_zero_price_nonzero",
+                        sheet=price_sheet,
+                        row=row_number,
+                        column="price_value",
+                        value=price_value,
+                        message="included_zero price rules must keep price_value at explicit numeric zero.",
+                    )
+                if semantic == "self_trim_price":
+                    scope_values = [
+                        clean_text(row.get("body_style_scope")),
+                        clean_text(row.get("trim_level_scope")),
+                        clean_text(row.get("variant_scope")),
+                    ]
+                    if condition_id != target_id or not any(scope and scope != "*" for scope in scope_values):
+                        add_issue(
+                            issues,
+                            "error",
+                            "self_trim_price_shape",
+                            sheet=price_sheet,
+                            row=row_number,
+                            column="price_semantic",
+                            value={"condition_option_id": condition_id, "target_option_id": target_id, "scopes": scope_values},
+                            message="self_trim_price rules must target the same option and include a non-wildcard body/trim/variant scope.",
+                        )
+                if semantic == "package_price_by_component" and (target_rpo not in PACKAGE_PRICE_TARGET_RPOS or price_value in {None, 0, 0.0}):
+                    add_issue(
+                        issues,
+                        "error",
+                        "package_price_by_component_shape",
+                        sheet=price_sheet,
+                        row=row_number,
+                        column="price_semantic",
+                        value={"target_rpo": target_rpo, "price_value": price_value},
+                        message="package_price_by_component rules must target an approved package row and carry a nonzero package price.",
+                    )
+                if semantic == "review_required" and not truthy(row.get("review_flag"), default=False):
+                    add_issue(
+                        issues,
+                        "error",
+                        "review_required_price_missing_flag",
+                        sheet=price_sheet,
+                        row=row_number,
+                        column="review_flag",
+                        message="review_required price semantics must also set review_flag=True.",
+                    )
+ 
         rule_mapping_sheets = tuple(source_sheets_by_role.get("rule_mapping_sheet", [])) or (
             "rule_mapping",
             "grandSport_rule_mapping",

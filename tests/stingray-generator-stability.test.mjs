@@ -98,6 +98,7 @@ const priceRuleHeaders = [
   "trim_level_scope",
   "review_flag",
   "notes",
+  "price_semantic",
 ];
 const interiorComponentHeaders = [
   "model_key",
