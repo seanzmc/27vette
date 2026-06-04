@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-04T06:01:06+00:00",
+  "generated_at": "2026-06-04T06:45:59+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "z06",
@@ -99,11 +99,11 @@
     "candidate_standard_equipment_cells": 488,
     "candidate_standard_option_rows": 95,
     "selectable_counts": {
-      "False": 84,
-      "True": 165
+      "False": 88,
+      "True": 161
     },
-    "active_option_rows_available_or_standard": 243,
-    "inactive_option_rows_all_unavailable_or_blank": 6,
+    "active_option_rows_available_or_standard": 239,
+    "inactive_option_rows_all_unavailable_or_blank": 10,
     "status_counts": {
       "available": 821,
       "standard": 490,

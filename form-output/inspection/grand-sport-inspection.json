@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-26T15:51:12+00:00",
+  "generated_at": "2026-06-04T06:45:59+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -11777,6 +11777,6 @@
   "missing_status_cells": [],
   "unknown_status_cells": [],
   "warnings": [
-    "Configured Grand Sport variants are present but inactive in variant_master, preserving the live Stingray-only generator path: 1lt_e07, 1lt_e67, 2lt_e07, 2lt_e67, 3lt_e07, 3lt_e67."
+    "Configured Grand Sport variants are present but inactive in variant_master, preserving the live active-model generator path: 1lt_e07, 1lt_e67, 2lt_e07, 2lt_e67, 3lt_e07, 3lt_e67."
   ]
 }

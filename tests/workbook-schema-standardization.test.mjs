@@ -228,8 +228,8 @@ test("future Corvette normalized source sheets stay compatible and source rows s
   const expectedVariantCounts = { z06: 6, zr1: 4, zr1x: 4 };
   const expectedStagedRowCounts = {
     z06: {
-      rule_mapping: 213,
-      price_rules: 45,
+      rule_mapping: 214,
+      price_rules: 46,
       rule_groups: 9,
       rule_group_members: 73,
       exclusive_groups: 12,

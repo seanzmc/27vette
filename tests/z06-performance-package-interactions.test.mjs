@@ -84,11 +84,14 @@ function loadRuntime() {
 window.__testApi = {
   get state() { return state; },
   get data() { return data; },
+  get elements() { return elements; },
   activateModel,
+  activateStep,
   activeChoiceRows,
   resetDefaults,
   reconcileSelections,
   handleChoice,
+  render,
   currentOrder,
   compactOrder,
   missingRequirementDetails,
@@ -276,7 +279,7 @@ test("Z06 carbon wheel package ROY defaults can switch to ROZ or STZ", () => {
   }
 });
 
-test("Z06 package wheel cards display package-base deltas while package cards stay price-less", () => {
+test("Z06 package cards display their direct package prices", () => {
   for (const [packageRpo, basePrice] of [
     ["PDB", 16000],
     ["PDD", 25495],
@@ -288,20 +291,12 @@ test("Z06 package wheel cards display package-base deltas while package cards st
     runtime.handleChoice(packageChoice);
     runtime.reconcileSelections();
 
-    assert.equal(runtime.choiceDisplayPrice(packageChoice), null, `${packageRpo} package card should not display a direct price`);
-    assert.equal(runtime.choiceDisplayPrice(choice(runtime, "ROY")), 0, `${packageRpo} default ROY wheel should show no delta over package base`);
-    assert.equal(runtime.choiceDisplayPrice(choice(runtime, "ROZ")), 1000, `${packageRpo} ROZ wheel card should show the delta over ${packageRpo} base`);
-    assert.equal(runtime.choiceDisplayPrice(choice(runtime, "STZ")), 1500, `${packageRpo} STZ wheel card should show the delta over ${packageRpo} base`);
-
-    runtime.handleChoice(choice(runtime, "ROZ"));
-    runtime.reconcileSelections();
-    const lineItemsByRpo = new Map(runtime.lineItems().map((item) => [item.rpo, item]));
-    assert.equal(lineItemsByRpo.get(packageRpo)?.price, basePrice, `${packageRpo} order line should carry the package base`);
-    assert.equal(lineItemsByRpo.get("ROZ")?.price, 1000, `${packageRpo}/ROZ order line should carry only the package-base delta`);
+    assert.equal(runtime.choiceDisplayPrice(packageChoice), basePrice, `${packageRpo} package card should display its direct package price`);
+    assert.equal(runtime.optionPrice(packageChoice.option_id), basePrice, `${packageRpo} selected order price should carry the package base`);
   }
 });
 
-test("Z06 selecting BCW alone does not auto-add or zero D3V", () => {
+test("Z06 selecting BCW auto-adds D3V at no additional charge", () => {
   const runtime = z06Runtime();
   const bcw = choice(runtime, "BCW");
   const d3v = choice(runtime, "D3V");
@@ -310,9 +305,13 @@ test("Z06 selecting BCW alone does not auto-add or zero D3V", () => {
   runtime.reconcileSelections();
 
   assert.equal(runtime.state.selected.has(bcw.option_id), true, "BCW should be selected");
-  assert.equal(autoAddedRpos(runtime).includes("D3V"), false, "BCW alone should not auto-add D3V");
-  assert.equal(runtime.state.selected.has(d3v.option_id), false, "D3V should remain unselected when only BCW is chosen");
-  assert.equal(runtime.optionPrice(d3v.option_id), 195, "D3V should keep its standalone price when BCW is the only selected engine option");
+  assert.equal(autoAddedRpos(runtime).includes("D3V"), true, "BCW should auto-add D3V");
+  assert.equal(runtime.state.selected.has(d3v.option_id), false, "D3V should be locked as auto-added, not user-selected");
+  assert.equal(runtime.optionPrice(d3v.option_id), 0, "D3V should be $0 when included by BCW");
+
+  runtime.handleChoice(bcw);
+  runtime.reconcileSelections();
+  assert.equal(autoAddedRpos(runtime).includes("D3V"), false, "D3V should be released after removing BCW if no other source includes it");
 });
 
 test("Z06 B6P changes BCW price without auto-adding BCW", () => {
@@ -329,23 +328,42 @@ test("Z06 B6P changes BCW price without auto-adding BCW", () => {
   assert.equal(runtime.state.selected.has(bcw.option_id), false, "BCW should remain unselected until the user chooses it");
 });
 
-test("Z06 Z07 locks included J57 even when J57 was selected first", () => {
+test("Z06 Z07 locks included J57 and replaces the J56 default brake", () => {
   const runtime = z06Runtime();
+  const j56 = choice(runtime, "J56");
   const j57 = choice(runtime, "J57");
   const z07 = choice(runtime, "Z07");
 
-  runtime.handleChoice(j57);
+  assert.equal(runtime.state.selected.has(j56.option_id), true, "J56 should seed as the default brake before Z07");
+
   runtime.handleChoice(z07);
   runtime.reconcileSelections();
 
   assert.equal(runtime.state.selected.has(z07.option_id), true, "Z07 should be selected");
   assert.equal(autoAddedRpos(runtime).includes("J57"), true, "Z07 should own J57 as included equipment");
+  assert.equal(runtime.optionPrice(j57.option_id), 0, "J57 should be $0 when included by Z07");
+  assert.equal(runtime.state.selected.has(j56.option_id), false, "J56 should not remain the selected brake while Z07 includes J57");
 
   runtime.handleChoice(j57);
   runtime.reconcileSelections();
 
   assert.equal(autoAddedRpos(runtime).includes("J57"), true, "J57 should stay included while Z07 is selected");
   assert.equal(runtime.state.selected.has(j57.option_id), false, "J57 should not remain a user-selected removable item under Z07");
+});
+
+test("Z06 hidden source rows do not render as selectable option-step cards", () => {
+  const runtime = z06Runtime();
+  runtime.activateStep("interior_trim");
+  runtime.render();
+  const interiorTrimHtml = runtime.elements.get("#stepContent").innerHTML;
+  assert.doesNotMatch(interiorTrimHtml, /data-option=\"opt_n26_001\"|>N26</, "N26 should not render as a selectable option card");
+
+  runtime.activateStep("custom_stitch");
+  runtime.render();
+  const stitchHtml = runtime.elements.get("#stepContent").innerHTML;
+  assert.doesNotMatch(stitchHtml, /data-option=\"opt_36s_001\"|>36S</, "36S should not render as a selectable option card");
+  assert.doesNotMatch(stitchHtml, /data-option=\"opt_37s_001\"|>37S</, "37S should not render as a selectable option card");
+  assert.doesNotMatch(stitchHtml, /data-option=\"opt_38s_001\"|>38S</, "38S should not render as a selectable option card");
 });
 
 test("Z06 T0F/T0G included ground effects replace a prior CFL selection", () => {

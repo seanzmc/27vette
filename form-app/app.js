@@ -672,7 +672,7 @@ function adjustedInteriorDisplayPrice(interior) {
 }
 
 function shouldHideChoice(choice) {
-  return choice.active !== "True" || choice.status === "unavailable";
+  return choice.active !== "True" || choice.status === "unavailable" || choice.display_behavior === "hidden";
 }
 
 function optionIsSelectedOrAuto(choice, autoAdded) {
@@ -1038,7 +1038,6 @@ function optionPrice(optionId, candidateIds = []) {
 }
 
 function choiceDisplayPrice(choice) {
-  if (hasPackageComponentPricing(choice.option_id)) return null;
   return optionPrice(choice.option_id, [choice.option_id]);
 }
 

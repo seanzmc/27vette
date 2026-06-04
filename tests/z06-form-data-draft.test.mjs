@@ -97,10 +97,11 @@ test("Z06 draft keeps default-selected options selectable", () => {
 });
 
 
-test("Z06 draft emits approved package/wheel and Z07 price rules", () => {
+test("Z06 draft emits approved package/wheel, Z07, and engine-lighting price rules", () => {
   const priceRuleById = new Map(draft.priceRules.map((rule) => [rule.price_rule_id, rule]));
   for (const [ruleId, conditionOptionId, targetOptionId, priceValue] of [
     ["z06_pr_z07_j57_zero", "opt_z07_001", "opt_j57_001", 0],
+    ["z06_pr_bcw_d3v_zero", "opt_bcw_001", "opt_d3v_001", 0],
     ["z06_pr_roy_pdb_16000", "opt_roy_001", "opt_pdb_001", 16000],
     ["z06_pr_roz_pdb_17000", "opt_roz_001", "opt_pdb_001", 17000],
     ["z06_pr_stz_pdb_17500", "opt_stz_001", "opt_pdb_001", 17500],
@@ -123,6 +124,7 @@ test("Z06 draft emits forced Z07 aero and package wheel defaults", () => {
       .map((rule) => `${rule.source_id}->${rule.target_id}`)
   );
   for (const [sourceId, targetId] of [
+    ["opt_bcw_001", "opt_d3v_001"],
     ["opt_z07_001", "opt_t0f_001"],
     ["opt_t0f_001", "opt_cfz_001"],
     ["opt_t0g_001", "opt_cfv_002"],
@@ -192,12 +194,18 @@ test("Z06 interiors use coded workbook-owned color families and seat hierarchy",
   );
   assert.match(byId.get("1LZ_AQ9_HTA")?.interior_hierarchy_path || "", /AQ9 Seats/);
   assert.match(byId.get("1LZ_AE4_HTJ_N26")?.interior_hierarchy_path || "", /AE4 Seats/);
+  assert.match(byId.get("1LZ_AQ9_HTA")?.interior_parent_group_label || "", /AQ9 Seats/);
+  assert.match(byId.get("1LZ_AE4_HTJ_N26")?.interior_parent_group_label || "", /AE4 Seats/);
 });
 
 test("Z06 N26 and custom stitch source rows do not render as selectable option-step cards", () => {
   for (const rpo of ["N26", "36S", "37S", "38S"]) {
     const choices = draft.choices.filter((choice) => choice.rpo === rpo);
-    assert.ok(choices.length > 0, `${rpo} should remain in source/generated data for dealer/build accuracy`);
+    assert.equal(
+      choices.every((choice) => choice.selectable !== "True" || choice.step_key === "standard_equipment"),
+      true,
+      `${rpo} should not remain a selectable option-step choice`
+    );
     assert.equal(
       choices.every((choice) => choice.display_behavior === "hidden" || choice.step_key === "standard_equipment"),
       true,
@@ -205,12 +213,17 @@ test("Z06 N26 and custom stitch source rows do not render as selectable option-s
     );
   }
 
-  const n26InteriorComponents = draft.interiors.flatMap((interior) =>
-    (interior.interior_components || [])
-      .filter((component) => component.rpo === "N26")
-      .map((component) => `${interior.interior_id}:${component.rpo}:${component.price}`)
+  const componentRpos = new Set(
+    draft.interiors.flatMap((interior) => (interior.interior_components || []).map((component) => component.rpo))
   );
-  assert.ok(n26InteriorComponents.length > 0, "N26 should still auto-add through applicable interior component data");
+  assert.equal(componentRpos.has("N26"), true, "N26 should still auto-add through applicable interior component data");
+  for (const rpo of ["36S", "37S", "38S"]) {
+    assert.equal(
+      draft.interiors.some((interior) => String(interior.interior_id).includes(`_${rpo}`) || interior.stitch === rpo || componentRpos.has(rpo)),
+      true,
+      `${rpo} should remain represented by interior/component source evidence`
+    );
+  }
 });
 
 test("Z06 draft does not emit priced standard-equipment choices", () => {

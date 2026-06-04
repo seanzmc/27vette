@@ -479,7 +479,7 @@ def grouping_fields_for_interior(
     material_family = interior.get("material") or "Standard interior"
     if len(levels) > 3 and levels[-2] != color_family:
         material_family = levels[-2]
-    parent_group = levels[-2] if len(levels) > 1 else color_family
+    parent_group = seat_label if len(levels) > 1 else color_family
     return {
         "interior_trim_level": levels[0] if levels else interior["trim_level"],
         "interior_seat_code": seat_code_from_label(seat_label) or interior["seat_code"],
@@ -735,6 +735,8 @@ def display_behavior_status(
 ) -> tuple[str, str, str]:
     if display_behavior == "auto_only":
         return "unavailable", "False", "False"
+    if display_behavior == "hidden":
+        return "unavailable", "False", "True"
     if display_behavior == "display_only":
         return "standard" if status == "standard" else "available", "False", "True"
     return status, selectable, active

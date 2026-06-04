@@ -1,6 +1,6 @@
 # Grand Sport Inspection
 
-Generated: `2026-06-04T06:01:06+00:00`
+Generated: `2026-06-04T06:45:59+00:00`
 Source sheet: `z06_options`
 Status: `inspection_generated`
 
@@ -19,9 +19,9 @@ Status: `inspection_generated`
 - Candidate choice rows with available/standard status: 1476
 - Candidate standard equipment cells: 488
 - Candidate standard option rows: 95
-- Active option rows with available/standard status: 243
-- Inactive option rows all unavailable/blank: 6
-- Selectable counts: `{"False": 84, "True": 165}`
+- Active option rows with available/standard status: 239
+- Inactive option rows all unavailable/blank: 10
+- Selectable counts: `{"False": 88, "True": 161}`
 - Status counts: `{"available": 821, "standard": 490, "unavailable": 183}`
 - Missing status cells: 0
 - Unknown status cells: 0
