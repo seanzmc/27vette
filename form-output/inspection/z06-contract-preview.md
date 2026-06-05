@@ -1,6 +1,6 @@
 # Grand Sport Contract Preview
 
-Generated: `2026-06-04T06:45:59+00:00`
+Generated: `2026-06-05T03:49:44+00:00`
 Status: `read_only_preview`
 Source sheet: `z06_options`
 
@@ -10,9 +10,9 @@ Source sheet: `z06_options`
 - Context choices: 8
 - Steps: 14
 - Sections: 35
-- Choices: 1293
+- Choices: 1283
 - Candidate standard equipment cells: 488
-- Rule/detail hot spot rows: 106
+- Rule/detail hot spot rows: 110
 - Unresolved normalization issues: 0
 
 ## Variants
@@ -35,13 +35,13 @@ Source sheet: `z06_options`
 
 ## Text Cleanup
 
-- Changed display fields: 6
-- Notes: `{"label:collapsed_repeated_punctuation": 1, "label:normalized_new_prefix": 5}`
+- Changed display fields: 0
+- Notes: `{}`
 
 ## Rule/Detail Hot Spots
 
-- Counts: `{"included_with": 25, "includes": 34, "not_available": 42, "not_recommended": 4, "only": 12, "requires": 18}`
-- Rows: 106
+- Counts: `{"included_with": 25, "includes": 37, "not_available": 42, "not_recommended": 4, "only": 13, "requires": 18}`
+- Rows: 110
 
 ## Unresolved Normalization Issues
 
