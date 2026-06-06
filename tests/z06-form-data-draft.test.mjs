@@ -135,10 +135,30 @@ test("Z06 draft emits forced Z07 aero and package wheel defaults", () => {
     assert.equal(activeIncludePairs.has(`${sourceId}->${targetId}`), true, `${sourceId} should include/default ${targetId}`);
   }
 
-  const requiredGroupsBySource = new Map(draft.ruleGroups.map((group) => [group.source_id, group]));
-  assert.deepEqual(requiredGroupsBySource.get("opt_z07_001")?.target_ids, ["opt_t0f_001", "opt_t0g_001"]);
+  const matchingRequiredGroup = (sourceId, targetIds) => draft.ruleGroups.find((group) => (
+    group.source_id === sourceId
+    && group.group_type === "requires_any"
+    && JSON.stringify(group.target_ids) === JSON.stringify(targetIds)
+  ));
+  assert.ok(matchingRequiredGroup("opt_z07_001", ["opt_t0f_001", "opt_t0g_001"]), "Z07 should require one of T0F/T0G");
   for (const sourceId of ["opt_pdb_001", "opt_pdd_001", "opt_pdf_001"]) {
-    assert.deepEqual(requiredGroupsBySource.get(sourceId)?.target_ids, ["opt_roy_001", "opt_roz_001", "opt_stz_001"]);
+    assert.ok(matchingRequiredGroup(sourceId, ["opt_roy_001", "opt_roz_001", "opt_stz_001"]), `${sourceId} should require one of ROY/ROZ/STZ`);
+  }
+});
+
+test("Z06 draft emits strict Z07/PDB blocker groups for invalid brake and aero peers", () => {
+  const groupsById = new Map(draft.ruleGroups.map((group) => [group.group_id, group]));
+  for (const [groupId, sourceId, targetIds, reasonPattern] of [
+    ["z06_group_z07_excludes_non_z07_aero", "opt_z07_001", ["opt_t0e_001", "opt_5zv_001"], /Z07|T0F|T0G|aero/i],
+    ["z06_group_z07_excludes_j56_brakes", "opt_z07_001", ["opt_j56_001"], /Z07|J57|carbon ceramic/i],
+    ["z06_group_pdb_excludes_j56_brakes", "opt_pdb_001", ["opt_j56_001"], /PDB|J57|carbon ceramic/i],
+  ]) {
+    const group = groupsById.get(groupId);
+    assert.ok(group, `${groupId} should be emitted`);
+    assert.equal(group.group_type, "excludes_any");
+    assert.equal(group.source_id, sourceId);
+    assert.deepEqual(group.target_ids, targetIds);
+    assert.match(group.disabled_reason || "", reasonPattern);
   }
 });
 

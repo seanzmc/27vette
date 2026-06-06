@@ -166,6 +166,99 @@ test("Z06 Z07 defaults T0F, allows T0G switching, and keeps J57 included at zero
   assert.equal(autoAddedRpos(runtime).includes("CFV"), true, "T0G should auto-add CFV");
 });
 
+test("Z06 Z07 locks out J56 while keeping included J57 active", () => {
+  const runtime = z06Runtime();
+  const z07 = choice(runtime, "Z07");
+
+  runtime.handleChoice(z07);
+  runtime.reconcileSelections();
+
+  assert.equal(runtime.state.selected.has(z07.option_id), true, "Z07 should be selected");
+  assert.equal(autoAddedRpos(runtime).includes("J57"), true, "Z07 should auto-add J57");
+  assert.match(
+    runtime.disableReasonForChoice(choice(runtime, "J56")),
+    /Z07|J57|carbon ceramic/i,
+    "J56 should explain that Z07/J57 makes it unavailable"
+  );
+
+  runtime.handleChoice(choice(runtime, "J56"));
+  runtime.reconcileSelections();
+
+  assert.equal(runtime.state.selected.has(choice(runtime, "J56").option_id), false, "J56 should not stick while Z07 remains selected");
+  assert.equal(autoAddedRpos(runtime).includes("J57"), true, "J57 should remain auto-added after clicking J56");
+  for (const carbonWheelRpo of ["ROY", "ROZ", "STZ"]) {
+    assert.equal(runtime.disableReasonForChoice(choice(runtime, carbonWheelRpo)), "", `${carbonWheelRpo} should remain selectable through the J57 carbon-wheel path`);
+  }
+});
+
+test("Z06 PDB locks out J56 while preserving J57 and ROY defaults", () => {
+  const runtime = z06Runtime();
+  const pdb = choice(runtime, "PDB");
+
+  runtime.handleChoice(pdb);
+  runtime.reconcileSelections();
+
+  assert.equal(runtime.state.selected.has(pdb.option_id), true, "PDB should be selected");
+  assert.equal(autoAddedRpos(runtime).includes("J57"), true, "PDB should auto-add J57");
+  assert.equal(autoAddedRpos(runtime).includes("ROY"), true, "PDB should default ROY");
+  assert.match(runtime.disableReasonForChoice(choice(runtime, "J56")), /PDB|J57|carbon ceramic/i, "J56 should be disabled by PDB/J57");
+
+  runtime.handleChoice(choice(runtime, "J56"));
+  runtime.reconcileSelections();
+
+  assert.equal(runtime.state.selected.has(pdb.option_id), true, "PDB should remain selected after clicking disabled J56");
+  assert.equal(runtime.state.selected.has(choice(runtime, "J56").option_id), false, "J56 should not stick while PDB remains selected");
+  assert.equal(autoAddedRpos(runtime).includes("J57"), true, "J57 should remain auto-added after clicking J56");
+  assert.equal(autoAddedRpos(runtime).includes("ROY"), true, "ROY should remain auto-added until switched to ROZ/STZ");
+});
+
+test("Z06 PDD and PDF inherit the Z07 J56 brake lock", () => {
+  for (const rpo of ["PDD", "PDF"]) {
+    const runtime = z06Runtime();
+    const packageChoice = choice(runtime, rpo);
+
+    runtime.handleChoice(packageChoice);
+    runtime.reconcileSelections();
+
+    assert.equal(runtime.state.selected.has(packageChoice.option_id), true, `${rpo} should be selected`);
+    assert.equal(autoAddedRpos(runtime).includes("Z07"), true, `${rpo} should auto-add Z07`);
+    assert.equal(autoAddedRpos(runtime).includes("J57"), true, `${rpo} should auto-add J57 through Z07`);
+    assert.match(runtime.disableReasonForChoice(choice(runtime, "J56")), /Z07|J57|carbon ceramic/i, `${rpo} should disable J56 through Z07`);
+
+    runtime.handleChoice(choice(runtime, "J56"));
+    runtime.reconcileSelections();
+
+    assert.equal(runtime.state.selected.has(packageChoice.option_id), true, `${rpo} should remain selected after clicking disabled J56`);
+    assert.equal(runtime.state.selected.has(choice(runtime, "J56").option_id), false, `${rpo} should not allow J56 to stick`);
+    assert.equal(autoAddedRpos(runtime).includes("J57"), true, `${rpo} should keep J57 auto-added`);
+  }
+});
+
+test("Z06 Z07 keeps non-Z07 aero peers disabled after switching to T0G", () => {
+  for (const blockedRpo of ["T0E", "5ZV"]) {
+    const runtime = z06Runtime();
+    runtime.handleChoice(choice(runtime, "Z07"));
+    runtime.reconcileSelections();
+    runtime.handleChoice(choice(runtime, "T0G"));
+    runtime.reconcileSelections();
+
+    assert.equal(runtime.state.selected.has(choice(runtime, "T0G").option_id), true, "T0G should be selected as the allowed Z07 aero alternate");
+    assert.equal(autoAddedRpos(runtime).includes("T0F"), false, "T0F should not be auto-added while T0G is selected");
+    assert.match(
+      runtime.disableReasonForChoice(choice(runtime, blockedRpo)),
+      /Z07|T0F|T0G|aero/i,
+      `${blockedRpo} should stay disabled while Z07 is selected with T0G`
+    );
+
+    runtime.handleChoice(choice(runtime, blockedRpo));
+    runtime.reconcileSelections();
+
+    assert.equal(runtime.state.selected.has(choice(runtime, blockedRpo).option_id), false, `${blockedRpo} should not stick while disabled by Z07`);
+    assert.equal(runtime.state.selected.has(choice(runtime, "T0G").option_id), true, "clicking a disabled non-Z07 aero peer should leave T0G selected");
+    assert.equal(runtime.state.selected.has(choice(runtime, "Z07").option_id), true, "Z07 should remain selected");
+  }
+});
+
 test("Z06 T0F does not require J57 as a prerequisite", () => {
   const runtime = z06Runtime();
   const t0f = choice(runtime, "T0F");

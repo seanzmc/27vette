@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-06-05T03:49:45+00:00",
+    "generated_at": "2026-06-06T01:03:11+00:00",
     "status": "draft_not_runtime_active"
   },
   "variants": [
@@ -48425,6 +48425,49 @@
       "disabled_reason": "GBA black paint blocks EFY, ZYC, D84, and D86 accent/roof choices.",
       "active": "True",
       "notes": "Pass 2 grouped-excludes normalization: replaces repeated direct excludes with one workbook-owned excludes_any group."
+    },
+    {
+      "group_id": "z06_group_z07_excludes_non_z07_aero",
+      "group_type": "excludes_any",
+      "source_id": "opt_z07_001",
+      "target_ids": [
+        "opt_t0e_001",
+        "opt_5zv_001"
+      ],
+      "body_style_scope": "*",
+      "trim_level_scope": "*",
+      "variant_scope": "*",
+      "disabled_reason": "Not available while Z07 Performance Package is selected. Choose T0F or T0G.",
+      "active": "True",
+      "notes": "Z07 permits only T0F/T0G aero choices; T0E/5ZV should remain disabled even after switching from default T0F to T0G."
+    },
+    {
+      "group_id": "z06_group_z07_excludes_j56_brakes",
+      "group_type": "excludes_any",
+      "source_id": "opt_z07_001",
+      "target_ids": [
+        "opt_j56_001"
+      ],
+      "body_style_scope": "*",
+      "trim_level_scope": "*",
+      "variant_scope": "*",
+      "disabled_reason": "J56 performance brakes are not available while Z07 is selected; Z07 includes J57 carbon ceramic brakes.",
+      "active": "True",
+      "notes": "Z07 always includes J57; J56 must not be selectable or restorable while Z07 remains selected."
+    },
+    {
+      "group_id": "z06_group_pdb_excludes_j56_brakes",
+      "group_type": "excludes_any",
+      "source_id": "opt_pdb_001",
+      "target_ids": [
+        "opt_j56_001"
+      ],
+      "body_style_scope": "*",
+      "trim_level_scope": "*",
+      "variant_scope": "*",
+      "disabled_reason": "J56 performance brakes are not available while PDB is selected; PDB includes J57 carbon ceramic brakes.",
+      "active": "True",
+      "notes": "PDB includes J57 directly and must not allow switching back to J56 while selected."
     }
   ],
   "exclusiveGroups": [
