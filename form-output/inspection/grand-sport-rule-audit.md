@@ -1,13 +1,13 @@
 # Grand Sport Rule Audit
 
-Generated: `2026-05-24T18:43:04+00:00`
+Generated: `2026-06-05T03:49:40+00:00`
 Status: `rule_audit_generated`
 
 ## Summary
 
 - Workbook rule rows: 321
-- Expected draft runtime rules: 196
-- Omitted duplicate exclusive-group rules: 8
+- Expected draft runtime rules: 122
+- Omitted duplicate exclusive-group rules: 82
 - Raw detail candidate keys: 203
 - Workbook rules matching detail raw: 73
 - Workbook manual/approved/copied rules: 248
@@ -91,6 +91,24 @@ Status: `rule_audit_generated`
 
 ## Omitted Duplicate Exclusive Group Rules
 
+- `gs_copy_rule_opt_r88_001_excludes_opt_eyk_001_opt_r88_001_excludes_opt_eyk_001`: opt_r88_001 excludes opt_eyk_001
+- `gs_copy_rule_opt_sfz_001_excludes_opt_eyk_001_opt_sfz_001_excludes_opt_eyk_001`: opt_sfz_001 excludes opt_eyk_001
+- `gs_approved_opt_r88_001_excludes_opt_dmu_001`: opt_r88_001 excludes opt_dmu_001
+- `gs_approved_opt_r88_001_excludes_opt_dmv_001`: opt_r88_001 excludes opt_dmv_001
+- `gs_approved_opt_r88_001_excludes_opt_dmw_001`: opt_r88_001 excludes opt_dmw_001
+- `gs_approved_opt_r88_001_excludes_opt_dmx_001`: opt_r88_001 excludes opt_dmx_001
+- `gs_approved_opt_r88_001_excludes_opt_dmy_001`: opt_r88_001 excludes opt_dmy_001
+- `gs_approved_opt_sfz_001_excludes_opt_dmu_001`: opt_sfz_001 excludes opt_dmu_001
+- `gs_approved_opt_sfz_001_excludes_opt_dmv_001`: opt_sfz_001 excludes opt_dmv_001
+- `gs_approved_opt_sfz_001_excludes_opt_dmw_001`: opt_sfz_001 excludes opt_dmw_001
+- `gs_approved_opt_sfz_001_excludes_opt_dmx_001`: opt_sfz_001 excludes opt_dmx_001
+- `gs_approved_opt_sfz_001_excludes_opt_dmy_001`: opt_sfz_001 excludes opt_dmy_001
+- `gs_rule_opt_cf8_001_excludes_opt_dmu_001`: opt_cf8_001 excludes opt_dmu_001
+- `gs_rule_opt_cf8_001_excludes_opt_dmv_001`: opt_cf8_001 excludes opt_dmv_001
+- `gs_rule_opt_cf8_001_excludes_opt_dmw_001`: opt_cf8_001 excludes opt_dmw_001
+- `gs_rule_opt_cf8_001_excludes_opt_dmx_001`: opt_cf8_001 excludes opt_dmx_001
+- `gs_rule_opt_cf8_001_excludes_opt_dmy_001`: opt_cf8_001 excludes opt_dmy_001
+- `gs_copy_rule_opt_r88_001_excludes_opt_sfz_001_opt_r88_001_excludes_opt_sfz_001`: opt_r88_001 excludes opt_sfz_001
 - `gs_copy_rule_opt_rik_001_excludes_opt_rin_001_opt_rik_001_excludes_opt_rin_001`: opt_rik_001 excludes opt_rin_001
 - `gs_copy_rule_opt_rik_001_excludes_opt_sl8_001_opt_rik_001_excludes_opt_sl8_001`: opt_rik_001 excludes opt_sl8_001
 - `gs_copy_rule_opt_rin_001_excludes_opt_rik_001_opt_rin_001_excludes_opt_rik_001`: opt_rin_001 excludes opt_rik_001
@@ -99,6 +117,15 @@ Status: `rule_audit_generated`
 - `gs_copy_rule_opt_sl8_001_excludes_opt_rin_001_opt_sl8_001_excludes_opt_rin_001`: opt_sl8_001 excludes opt_rin_001
 - `gs_rule_opt_feb_001_excludes_opt_fey_001`: opt_feb_001 excludes opt_fey_001
 - `gs_rule_opt_fey_001_excludes_opt_feb_001`: opt_fey_001 excludes opt_feb_001
+- `gs_copy_rule_opt_r88_001_excludes_opt_dpb_001_opt_r88_001_excludes_opt_dpb_001`: opt_r88_001 excludes opt_dpb_001
+- `gs_copy_rule_opt_r88_001_excludes_opt_dpc_001_opt_r88_001_excludes_opt_dpc_001`: opt_r88_001 excludes opt_dpc_001
+- `gs_copy_rule_opt_r88_001_excludes_opt_dpg_001_opt_r88_001_excludes_opt_dpg_001`: opt_r88_001 excludes opt_dpg_001
+- `gs_copy_rule_opt_r88_001_excludes_opt_dpl_001_opt_r88_001_excludes_opt_dpl_001`: opt_r88_001 excludes opt_dpl_001
+- `gs_copy_rule_opt_r88_001_excludes_opt_dpt_001_opt_r88_001_excludes_opt_dpt_001`: opt_r88_001 excludes opt_dpt_001
+- `gs_copy_rule_opt_r88_001_excludes_opt_dsy_001_opt_r88_001_excludes_opt_dsy_001`: opt_r88_001 excludes opt_dsy_001
+- `gs_copy_rule_opt_r88_001_excludes_opt_dsz_001_opt_r88_001_excludes_opt_dsz_001`: opt_r88_001 excludes opt_dsz_001
+- `gs_copy_rule_opt_r88_001_excludes_opt_dt0_001_opt_r88_001_excludes_opt_dt0_001`: opt_r88_001 excludes opt_dt0_001
+- `gs_copy_rule_opt_r88_001_excludes_opt_dth_001_opt_r88_001_excludes_opt_dth_001`: opt_r88_001 excludes opt_dth_001
 
 ## Skipped Requires Review
 

@@ -244,10 +244,14 @@ def price_ref_prices(rows: list[dict[str, str]]) -> dict[tuple[str, str], int]:
     return prices
 
 
+def price_ref_component_type_key(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", clean(value).lower())
+
+
 def price_ref_component_prices(rows: list[dict[str, str]]) -> dict[tuple[str, str, str], int]:
     prices: dict[tuple[str, str, str], int] = {}
     for row in rows:
-        option_type = clean(row.get("OptionType", "")).lower()
+        option_type = price_ref_component_type_key(row.get("OptionType", ""))
         code = clean(row.get("Code", ""))
         if not option_type or not code:
             continue
@@ -261,7 +265,7 @@ def price_ref_component_price(
     code: str,
     trim: str = "",
 ) -> int:
-    normalized_type = clean(option_type).lower()
+    normalized_type = price_ref_component_type_key(option_type)
     normalized_trim = clean(trim).replace("_", " ")
     normalized_code = clean(code)
     if (normalized_type, normalized_trim, normalized_code) in price_ref:
@@ -427,6 +431,37 @@ def seat_code_from_label(label: str) -> str:
     return clean(label).split(" ", 1)[0]
 
 
+def broad_interior_color_family(label: str) -> str:
+    value = clean(label)
+    if not value:
+        return "Other Interior Choices"
+    lower = value.lower()
+    if "asymmetrical santorini blue" in lower:
+        return "Asymmetrical Santorini Blue / Jet Black"
+    if "asymmetrical adrenaline red" in lower:
+        return "Asymmetrical Adrenaline Red / Jet Black"
+    if "ultimate suede jet black" in lower:
+        return "Ultimate Suede Jet Black"
+    if lower.startswith("sky cool gray"):
+        return "Sky Cool Gray"
+    if lower.startswith("santorini blue"):
+        return "Santorini Blue"
+    for marker in (" interior", " seats"):
+        idx = lower.find(marker)
+        if idx > 0:
+            value = value[:idx]
+            lower = value.lower()
+    for marker in (" with ", " suede", " two tone"):
+        idx = lower.find(marker)
+        if idx > 0:
+            return value[:idx].strip()
+    return value
+
+
+def coded_color_family(interior: dict[str, Any], fallback_label: str) -> str:
+    return broad_interior_color_family(fallback_label)
+
+
 def grouping_fields_for_interior(
     interior: dict[str, Any],
     reference: dict[str, Any] | None,
@@ -434,19 +469,26 @@ def grouping_fields_for_interior(
     fallback: bool = False,
 ) -> dict[str, Any]:
     seat_label = reference["levels"][1] if reference and len(reference["levels"]) > 1 else f"{interior['seat_code']} Seats"
+    fallback_color_family = coded_color_family(interior, interior["interior_name"] or "Other Interior Choices")
     levels = reference["levels"] if reference else [
         interior["trim_level"],
         seat_label,
-        interior["interior_name"] or "Other Interior Choices",
+        fallback_color_family,
         interior["material"] or "Standard interior",
         interior["interior_name"] or interior["interior_id"],
     ]
     leaf_label = levels[-1] if levels else interior["interior_name"] or interior["interior_id"]
-    color_family = levels[2] if len(levels) > 2 else leaf_label
+    color_family = levels[2] if len(levels) > 2 else coded_color_family(interior, leaf_label)
+    trim_value = clean(interior.get("trim_level", ""))
+    interior_id_value = clean(interior.get("interior_id", ""))
+    if "R6X" in trim_value or "R6X" in interior_id_value:
+        color_family = "Custom Interior trim and seat combinations"
+    elif not reference:
+        color_family = fallback_color_family
     material_family = interior.get("material") or "Standard interior"
     if len(levels) > 3 and levels[-2] != color_family:
         material_family = levels[-2]
-    parent_group = levels[-2] if len(levels) > 1 else color_family
+    parent_group = seat_label if len(levels) > 1 else color_family
     return {
         "interior_trim_level": levels[0] if levels else interior["trim_level"],
         "interior_seat_code": seat_code_from_label(seat_label) or interior["seat_code"],
@@ -702,6 +744,8 @@ def display_behavior_status(
 ) -> tuple[str, str, str]:
     if display_behavior == "auto_only":
         return "unavailable", "False", "False"
+    if display_behavior == "hidden":
+        return "unavailable", "False", "True"
     if display_behavior == "display_only":
         return "standard" if status == "standard" else "available", "False", "True"
     return status, selectable, active
@@ -1183,7 +1227,7 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
         warnings.append(f"Expected {config.expected_variant_count} configured variants, found {len(variant_rows)} in variant_master.")
     if configured_variant_ids - active_variant_ids:
         warnings.append(
-            "Configured Grand Sport variants are present but inactive in variant_master, preserving the live Stingray-only generator path: "
+            f"Configured {config.model_label} variants are present but inactive in variant_master, preserving the live active-model generator path: "
             f"{', '.join(sorted(configured_variant_ids - active_variant_ids))}."
         )
     if missing_status_cells:
@@ -1586,7 +1630,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
 
     return {
         "dataset": {
-            "name": "2027 Corvette Grand Sport contract preview",
+            "name": f"{config.model_year} Corvette {config.model_label} contract preview",
             "model": config.model_label,
             "model_year": config.model_year,
             "source_workbook": config.workbook_path.name,
@@ -1755,25 +1799,25 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
 
     validation = [
         {
-            "check_id": "grand_sport_draft_status",
+            "check_id": f"{config.model_key}_draft_status",
             "severity": "warning",
             "entity_type": "dataset",
             "entity_id": "",
-            "message": "Grand Sport form data is a draft inspection artifact and is not runtime active.",
+            "message": f"{config.model_label} form data is a draft inspection artifact and is not runtime active.",
         },
         {
             "check_id": "active_variants",
             "severity": "pass",
             "entity_type": "variant",
             "entity_id": "",
-            "message": f"{len(preview['variants'])} configured Grand Sport variants included by model config; workbook active flags are unchanged.",
+            "message": f"{len(preview['variants'])} configured {config.model_label} variants included by model config; workbook active flags are unchanged.",
         },
         {
             "check_id": "availability_rows",
             "severity": "pass",
             "entity_type": "availability",
             "entity_id": "",
-            "message": f"{len(draft_choices)} draft choice rows exported from the Grand Sport variant matrix.",
+            "message": f"{len(draft_choices)} draft choice rows exported from the {config.model_label} variant matrix.",
         },
         {
             "check_id": "rules",
@@ -1787,7 +1831,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
             "severity": "pass",
             "entity_type": "interior",
             "entity_id": "",
-            "message": f"{len(interiors)} model-scoped Grand Sport LT interiors exported.",
+            "message": f"{len(interiors)} model-scoped {config.model_label} LT interiors exported.",
         },
     ]
     validation.extend(price_rule_validation)
@@ -1808,7 +1852,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
                 "severity": "warning",
                 "entity_type": "price_rule",
                 "entity_id": "",
-                "message": f"No valid Grand Sport price rules exported from {config.price_rules_sheet}; package pricing remains deferred.",
+                "message": f"No valid {config.model_label} price rules exported from {config.price_rules_sheet}; package pricing remains deferred.",
             }
         )
     if color_overrides:
@@ -1824,7 +1868,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
 
     return {
         "dataset": {
-            "name": "2027 Corvette Grand Sport form data draft",
+            "name": f"{config.model_year} Corvette {config.model_label} form data draft",
             "model": config.model_label,
             "model_year": config.model_year,
             "source_workbook": config.workbook_path.name,
@@ -1867,10 +1911,10 @@ def write_form_data_draft_artifacts(draft: dict[str, Any], output_dir: Path, art
     return {"json": str(json_path), "markdown": str(md_path)}
 
 
-def write_inspection_artifacts(report: dict[str, Any], output_dir: Path) -> dict[str, str]:
+def write_inspection_artifacts(report: dict[str, Any], output_dir: Path, artifact_prefix: str = "grand-sport-inspection") -> dict[str, str]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    json_path = output_dir / "grand-sport-inspection.json"
-    md_path = output_dir / "grand-sport-inspection.md"
+    json_path = output_dir / f"{artifact_prefix}.json"
+    md_path = output_dir / f"{artifact_prefix}.md"
     json_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
     md_path.write_text(render_markdown_report(report), encoding="utf-8")
     return {"json": str(json_path), "markdown": str(md_path)}

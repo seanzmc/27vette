@@ -25,6 +25,17 @@ MODEL_REGISTRY_PROMOTION_HEADERS = [
 ]
 DRAFT_ONLY_TOP_LEVEL_FIELDS = ("draftMetadata",)
 DRAFT_ONLY_CHOICE_FIELDS = ("source_option_name", "source_description", "text_cleanup_notes")
+DRAFT_ONLY_PROVENANCE_FIELDS = (
+    "copy_from_model_key",
+    "suggested_copy_from",
+    "raw_source_sheet",
+    "raw_source_sheets",
+    "review_status",
+    "review_flags",
+)
+DRAFT_ONLY_LIVE_CONTRACT_FIELDS = frozenset(
+    (*DRAFT_ONLY_TOP_LEVEL_FIELDS, *DRAFT_ONLY_CHOICE_FIELDS, *DRAFT_ONLY_PROVENANCE_FIELDS)
+)
 VALID_ARTIFACT_TYPES = {"current_generation", "draft_artifact"}
 
 
@@ -50,15 +61,39 @@ def export_slug(model_key: str) -> str:
     return model_key.replace("_", "-")
 
 
+def _strip_live_contract_provenance(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {
+            key: _strip_live_contract_provenance(child)
+            for key, child in value.items()
+            if key not in DRAFT_ONLY_LIVE_CONTRACT_FIELDS
+        }
+    if isinstance(value, list):
+        return [_strip_live_contract_provenance(item) for item in value]
+    return value
+
+
 def live_contract_data(data: dict[str, Any]) -> dict[str, Any]:
     """Strip inspection-only provenance fields before embedding runtime data."""
 
-    cleaned = json.loads(json.dumps(data))
-    for field in DRAFT_ONLY_TOP_LEVEL_FIELDS:
-        cleaned.pop(field, None)
-    for choice in cleaned.get("choices", []):
-        for field in DRAFT_ONLY_CHOICE_FIELDS:
-            choice.pop(field, None)
+    cleaned = _strip_live_contract_provenance(json.loads(json.dumps(data)))
+    dataset = cleaned.get("dataset")
+    if isinstance(dataset, dict) and dataset.get("status") == "draft_not_runtime_active":
+        dataset["status"] = "runtime_active"
+        name = dataset.get("name")
+        if isinstance(name, str):
+            dataset["name"] = name.replace(" form data draft", " operational form")
+    validation = cleaned.get("validation")
+    if isinstance(validation, list):
+        cleaned["validation"] = [
+            row
+            for row in validation
+            if not (
+                isinstance(row, dict)
+                and row.get("severity") == "warning"
+                and str(row.get("check_id", "")).endswith("_draft_status")
+            )
+        ]
     return cleaned
 
 

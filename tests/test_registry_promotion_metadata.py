@@ -134,8 +134,31 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
                 json.dumps(
                     {
                         "draftMetadata": {"inspection": True},
-                        "dataset": {"source_sheet": "grandSport_options"},
-                        "choices": [{"choice_id": "gs-choice", "source_option_name": "draft only"}],
+                        "dataset": {
+                            "source_sheet": "grandSport_options",
+                            "raw_source_sheet": "future_model_source_review",
+                        },
+                        "choices": [
+                            {
+                                "choice_id": "gs-choice",
+                                "source_option_name": "draft only",
+                                "source_description": "draft description",
+                                "text_cleanup_notes": ["draft note"],
+                                "source_detail_raw": "runtime tooltip source detail",
+                                "suggested_copy_from": "grand_sport:opt_abc_001",
+                            }
+                        ],
+                        "rules": [
+                            {
+                                "rule_id": "rule-1",
+                                "source_id": "opt_sht_001",
+                                "source_type": "option",
+                                "source_note": "runtime rule note",
+                                "copy_from_model_key": "grand_sport",
+                                "review_flags": "copied_from_template",
+                                "nested": {"suggested_copy_from": "grand_sport:rule_1"},
+                            }
+                        ],
                     }
                 ),
                 encoding="utf-8",
@@ -172,8 +195,21 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
         self.assertEqual(registry["models"]["grandSport"]["label"], "Grand Sport")
         self.assertEqual(registry["models"]["grandSport"]["exportSlug"], "grand-sport")
         self.assertEqual(registry["models"]["grandSport"]["data"]["dataset"]["source_sheet"], "grandSport_options")
+        self.assertNotIn("raw_source_sheet", registry["models"]["grandSport"]["data"]["dataset"])
         self.assertNotIn("draftMetadata", registry["models"]["grandSport"]["data"])
-        self.assertNotIn("source_option_name", registry["models"]["grandSport"]["data"]["choices"][0])
+        choice = registry["models"]["grandSport"]["data"]["choices"][0]
+        self.assertNotIn("source_option_name", choice)
+        self.assertNotIn("source_description", choice)
+        self.assertNotIn("text_cleanup_notes", choice)
+        self.assertNotIn("suggested_copy_from", choice)
+        self.assertEqual(choice["source_detail_raw"], "runtime tooltip source detail")
+        rule = registry["models"]["grandSport"]["data"]["rules"][0]
+        self.assertEqual(rule["source_id"], "opt_sht_001")
+        self.assertEqual(rule["source_type"], "option")
+        self.assertEqual(rule["source_note"], "runtime rule note")
+        self.assertNotIn("copy_from_model_key", rule)
+        self.assertNotIn("review_flags", rule)
+        self.assertNotIn("suggested_copy_from", rule["nested"])
         self.assertEqual(registry["legacyAliases"], {"STINGRAY_FORM_DATA": "stingray"})
 
     def test_promotions_require_exactly_one_default_model(self) -> None:

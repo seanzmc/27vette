@@ -20,7 +20,7 @@ from corvette_form_generator.mapping import (
 )
 from corvette_form_generator.model_configs import GRAND_SPORT_MODEL, STINGRAY_MODEL
 from corvette_form_generator.output import write_app_data_registry, write_json_output
-from corvette_form_generator.registry_promotion import build_registry_from_promotions
+from corvette_form_generator.registry_promotion import build_registry_from_promotions, live_contract_data
 from corvette_form_generator.runtime_metadata import (
     load_context_sections,
     load_default_selection_rules,
@@ -84,19 +84,6 @@ def workbook_truthy(value: Any) -> bool:
 
 
 ASSET_IMAGE_FIELDS = ("image_url", "image_alt", "image_fit", "image_position")
-DRAFT_ONLY_TOP_LEVEL_FIELDS = ("draftMetadata",)
-DRAFT_ONLY_CHOICE_FIELDS = ("source_option_name", "source_description", "text_cleanup_notes")
-
-
-def live_contract_data(data: dict[str, Any]) -> dict[str, Any]:
-    """Strip inspection-only provenance fields before embedding live app data."""
-    cleaned = json.loads(json.dumps(data))
-    for field in DRAFT_ONLY_TOP_LEVEL_FIELDS:
-        cleaned.pop(field, None)
-    for choice in cleaned.get("choices", []):
-        for field in DRAFT_ONLY_CHOICE_FIELDS:
-            choice.pop(field, None)
-    return cleaned
 
 
 def asset_fields(row: dict[str, Any]) -> dict[str, str]:

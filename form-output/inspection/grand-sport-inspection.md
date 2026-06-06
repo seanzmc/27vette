@@ -1,6 +1,6 @@
 # Grand Sport Inspection
 
-Generated: `2026-05-24T18:43:05+00:00`
+Generated: `2026-06-06T02:35:19+00:00`
 Source sheet: `grandSport_options`
 Status: `inspection_generated`
 
@@ -85,4 +85,4 @@ Status: `inspection_generated`
 
 ## Warnings
 
-- Configured Grand Sport variants are present but inactive in variant_master, preserving the live Stingray-only generator path: 1lt_e07, 1lt_e67, 2lt_e07, 2lt_e67, 3lt_e07, 3lt_e67.
+- Configured Grand Sport variants are present but inactive in variant_master, preserving the live active-model generator path: 1lt_e07, 1lt_e67, 2lt_e07, 2lt_e67, 3lt_e07, 3lt_e67.

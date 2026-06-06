@@ -207,8 +207,6 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
   const draftRuleKeys = new Set(draft.rules.map((rule) => `${rule.source_id}::${rule.rule_type}::${rule.target_id}`));
   for (const key of [
     "opt_bv4_001::excludes::opt_r8c_001",
-    "opt_r88_001::excludes::opt_eyk_001",
-    "opt_sfz_001::excludes::opt_eyk_001",
     "opt_fey_001::includes::opt_cfz_001",
     "opt_bcp_002::includes::opt_d3v_001",
     "opt_bcs_002::includes::opt_d3v_001",
@@ -216,6 +214,19 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
   ]) {
     assert.ok(draftRuleKeys.has(key), `${key} should be present`);
   }
+  const groupedBlockers = new Map(draft.ruleGroups.map((group) => [group.group_id, group]));
+  for (const [groupId, sourceId] of [
+    ["gs_group_r88_excludes_badge_and_stripe_choices", "opt_r88_001"],
+    ["gs_group_sfz_excludes_badge_and_stripe_choices", "opt_sfz_001"],
+  ]) {
+    const group = groupedBlockers.get(groupId);
+    assert.ok(group, `${groupId} should be present`);
+    assert.equal(group.group_type, "excludes_any");
+    assert.equal(group.source_id, sourceId);
+    assert.ok(group.target_ids.includes("opt_eyk_001"), `${groupId} should target EYK`);
+    assert.equal(draftRuleKeys.has(`${sourceId}::excludes::opt_eyk_001`), false, `${sourceId} should use grouped EYK exclusion`);
+  }
+
   assert.equal(draftRuleKeys.has("opt_bcp_002::includes::opt_b6p_001"), false, "BCP should not auto-add B6P");
   assert.equal(draftRuleKeys.has("opt_bcs_002::includes::opt_b6p_001"), false, "BCS should not auto-add B6P");
   assert.equal(draftRuleKeys.has("opt_j57_001::excludes::opt_j56_001"), false, "J56/J57 should use an exclusive group, not one-way replacement");

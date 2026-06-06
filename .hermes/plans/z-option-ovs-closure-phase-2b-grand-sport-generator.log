@@ -1,0 +1,111 @@
+{
+  "model_key": "grand_sport",
+  "model_label": "Grand Sport",
+  "model_year": "2027",
+  "status": "inspection_generated",
+  "source_option_sheet": "grandSport_options",
+  "variant_ids": [
+    "1lt_e07",
+    "2lt_e07",
+    "3lt_e07",
+    "1lt_e67",
+    "2lt_e67",
+    "3lt_e67"
+  ],
+  "expected_variant_count": 6,
+  "counts": {
+    "option_rows": 266,
+    "unique_rpos": 223,
+    "variant_status_cells": 1596,
+    "status_source_rows": 1596,
+    "candidate_choice_rows_available_or_standard": 1380,
+    "candidate_standard_equipment_cells": 455,
+    "candidate_standard_option_rows": 90,
+    "selectable_counts": {
+      "False": 107,
+      "True": 159
+    },
+    "active_option_rows_available_or_standard": 226,
+    "inactive_option_rows_all_unavailable_or_blank": 40,
+    "status_counts": {
+      "available": 861,
+      "standard": 547,
+      "unavailable": 188
+    },
+    "status_counts_by_variant": {
+      "1lt_e07": {
+        "available": 139,
+        "standard": 79,
+        "unavailable": 48
+      },
+      "2lt_e07": {
+        "available": 149,
+        "standard": 98,
+        "unavailable": 19
+      },
+      "3lt_e07": {
+        "available": 151,
+        "standard": 98,
+        "unavailable": 17
+      },
+      "1lt_e67": {
+        "available": 134,
+        "standard": 78,
+        "unavailable": 54
+      },
+      "2lt_e67": {
+        "available": 143,
+        "standard": 97,
+        "unavailable": 26
+      },
+      "3lt_e67": {
+        "available": 145,
+        "standard": 97,
+        "unavailable": 24
+      }
+    },
+    "missing_status_cells": 0,
+    "unknown_status_cells": 0
+  },
+  "blank_section_overrides": {},
+  "warnings": [
+    "Configured Grand Sport variants are present but inactive in variant_master, preserving the live Stingray-only generator path: 1lt_e07, 1lt_e67, 2lt_e07, 2lt_e67, 3lt_e07, 3lt_e67."
+  ],
+  "inspection_artifacts": {
+    "json": "/Users/seandm/Projects/27vette/form-output/inspection/grand-sport-inspection.json",
+    "markdown": "/Users/seandm/Projects/27vette/form-output/inspection/grand-sport-inspection.md"
+  },
+  "preview": {
+    "status": "read_only_preview",
+    "variants": 6,
+    "choices": 1242,
+    "candidate_standard_equipment": 455,
+    "unresolved_issues": 0
+  },
+  "preview_artifacts": {
+    "json": "/Users/seandm/Projects/27vette/form-output/inspection/grand-sport-contract-preview.json",
+    "markdown": "/Users/seandm/Projects/27vette/form-output/inspection/grand-sport-contract-preview.md"
+  },
+  "draft": {
+    "status": "draft_not_runtime_active",
+    "variants": 6,
+    "choices": 1380,
+    "standard_equipment": 455,
+    "rules": 196,
+    "price_rules": 45,
+    "interiors": 132,
+    "validation_warnings": 1
+  },
+  "draft_artifacts": {
+    "json": "/Users/seandm/Projects/27vette/form-output/inspection/grand-sport-form-data-draft.json",
+    "markdown": "/Users/seandm/Projects/27vette/form-output/inspection/grand-sport-form-data-draft.md"
+  },
+  "rule_audit_artifacts": {
+    "json": "/Users/seandm/Projects/27vette/form-output/inspection/grand-sport-rule-audit.json",
+    "markdown": "/Users/seandm/Projects/27vette/form-output/inspection/grand-sport-rule-audit.md"
+  },
+  "notes": [
+    "Read-only inspection only: Grand Sport generation is not activated by the Stingray entrypoint.",
+    "Grand Sport option rows are read from the normalized grandSport_options sheet."
+  ]
+}

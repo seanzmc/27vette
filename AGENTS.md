@@ -22,6 +22,9 @@ Every handoff must report:
 - What did not change: preserved runtime behavior, visual constraints, schemas, deployment paths, and any explicitly excluded work.
 - Gate results: typecheck, lint, tests, generator runs, workbook validation, or `not run` with a reason.
 - Manual verification still pending, residual risks, and follow-up work.
+- Next step guidance: a brief recommended next pass when the task is part of an active multi-pass pathway. Tie the recommendation to current repo evidence, plans/specs, and user-stated goals. If the task is isolated or there is no clear safe continuation, say that no obvious next pass is implied rather than inventing work.
+
+For active migration legs such as adding Z06/ZR1/ZR1X to the form runtime, keep the broader path visible without expanding the current scope. The next-step guidance should name the logical next pass, not implement it, unless the user explicitly approves that pass.
 
 ## Using This File
 
@@ -31,7 +34,7 @@ If a task intentionally migrates away from a documented workflow, call that out 
 
 ## Current Architecture
 
-The live customer app is currently a static Corvette order-form runtime for Stingray and Grand Sport. It is deployed at `order.stingraychevroletcorvette.com` and supports active dealer submissions.
+The live customer app is currently a static Corvette order-form runtime for Stingray, Grand Sport, and Z06. It is deployed at `order.stingraychevroletcorvette.com` and supports active dealer submissions.
 
 The current default architecture is:
 
@@ -46,7 +49,7 @@ stingray_master.xlsx
   -> build download / dealer submission
 ```
 
-`form-app/data.js` currently exposes `window.CORVETTE_FORM_DATA` with model entries for Stingray and Grand Sport. `window.STINGRAY_FORM_DATA` remains as a compatibility alias.
+`form-app/data.js` currently exposes `window.CORVETTE_FORM_DATA` with model entries for Stingray, Grand Sport, and Z06. `window.STINGRAY_FORM_DATA` remains as a compatibility alias.
 
 The project is transitioning to workbook-owned business logic. Some model-specific migration status may drift as work lands, so verify the current workbook sheets, generator code, runtime registry, and tests before assuming one model's workflow applies to another. Do not expand transitional generator/runtime seams unless explicitly approved.
 
@@ -70,6 +73,8 @@ Workbook-owned business data includes:
 
 Scripts should be boring. They should read tables, normalize rows, validate references, emit artifacts, and apply generic runtime concepts. Avoid adding code such as "if this RPO on this model, do special behavior" when a workbook row can express the rule.
 
+Before adding a new helper module, review sheet, parallel taxonomy, or redundant column, first prove the existing workbook pipeline cannot express the decision. Prefer filling canonical workbook blanks/metadata and using current source sheets, generators, and runtime data paths over adding another intermediate layer. If an existing sheet already owns the relationship, use that sheet rather than duplicating its meaning somewhere else.
+
 Runtime JavaScript should render and evaluate generated data. It should not become the source of Corvette product knowledge.
 
 If a proposed change requires hardcoded model-specific business logic, flag it before implementing.
@@ -80,6 +85,8 @@ The canonical workbook is `stingray_master.xlsx`.
 
 Current shared or Stingray-facing sheets include:
 
+- `model_master`
+- `model_registry_promotion`
 - `variant_master`
 - `section_master`
 - `stingray_options`
@@ -108,6 +115,18 @@ Current Grand Sport model-scoped sheets include:
 - `grandSport_exclusive_groups`
 - `grandSport_exclusive_members`
 - `grandSport_variant_overrides`
+
+Current Z06 model-scoped sheets include:
+
+- `z06_options`
+- `z06_ovs`
+- `z06_rule_mapping`
+- `z06_price_rules`
+- `z06_rule_groups`
+- `z06_rule_group_members`
+- `z06_exclusive_groups`
+- `z06_exclusive_members`
+- `z06_variant_overrides`
 
 Current generated sheets are written by the generator and should not be edited manually:
 
@@ -173,6 +192,8 @@ Use this current default workflow for workbook data edits:
 
 Do not solve bad source data by suppressing it in Python or JavaScript. Correct the workbook row unless there is a documented reason not to.
 
+Do not add an extra module, staging sheet, review taxonomy, or duplicate scope column when an existing workbook sheet already carries the relationship. Use the current pipeline first: fill the canonical blank cells, source rows, membership rows, or scope rows that the generator already reads. Add a new layer only after documenting why the existing workbook contract cannot represent the decision.
+
 Do not edit generated `form_*` sheets directly. Change source sheets, then regenerate.
 
 ## Stingray Generator Workflow
@@ -231,6 +252,55 @@ node --test tests/multi-model-runtime-switching.test.mjs
 
 Some Grand Sport artifact names and metadata still reflect the inspection/draft migration path. Do not infer production status from naming alone; inspect the active registry, tests, and deployment intent.
 
+## Z06 Generator Workflow
+
+Current read-only preview/draft command from the repo root:
+
+```sh
+cd <repo-root>
+.venv/bin/python scripts/generate_z06_form.py
+```
+
+Current expected outputs under `form-output/inspection/`:
+
+- `z06-inspection.json`
+- `z06-inspection.md`
+- `z06-contract-preview.json`
+- `z06-contract-preview.md`
+- `z06-form-data-draft.json`
+- `z06-form-data-draft.md`
+
+This script must not mutate `form-app/data.js` or write `stingray_master.xlsx`.
+
+Then run:
+
+```sh
+node --test tests/z06-contract-preview.test.mjs
+node --test tests/z06-form-data-draft.test.mjs
+```
+
+## Z06 Runtime Promotion Workflow
+
+Use the workbook-owned promotion path when Z06 runtime activation needs to be applied or verified:
+
+```sh
+cd <repo-root>
+.venv/bin/python scripts/promote_z06_runtime.py --write
+.venv/bin/python scripts/generate_z06_form.py
+.venv/bin/python scripts/generate_stingray_form.py
+```
+
+`scripts/promote_z06_runtime.py` updates only Z06 rows in `model_master`, `model_registry_promotion`, and the six Z06 rows in `variant_master`. It must use `save_workbook_safely()`, refuse to run while an Excel lock file exists, and verify the saved workbook rows on disk.
+
+After promotion or regeneration, run:
+
+```sh
+node --test tests/z06-runtime-promotion.test.mjs
+node --test tests/multi-model-runtime-switching.test.mjs
+```
+
+Do not promote ZR1 or ZR1X as part of a Z06 pass unless that scope is explicitly approved.
+
 ## Static App Workflow
 
 The app currently has no package install or frontend build step.
@@ -246,7 +316,7 @@ Open `http://localhost:8000`.
 
 For runtime changes, verify:
 
-- model switching between Stingray and Grand Sport
+- model switching between Stingray, Grand Sport, and Z06
 - body style and trim selection
 - required step completion
 - option select/deselect behavior
@@ -293,6 +363,24 @@ node --test tests/grand-sport-draft-data.test.mjs
 node --test tests/grand-sport-rule-audit.test.mjs
 ```
 
+Z06 source/draft refresh:
+
+```sh
+.venv/bin/python scripts/generate_z06_form.py
+node --test tests/z06-contract-preview.test.mjs
+node --test tests/z06-form-data-draft.test.mjs
+```
+
+Z06 runtime promotion:
+
+```sh
+.venv/bin/python scripts/promote_z06_runtime.py --write
+.venv/bin/python scripts/generate_z06_form.py
+.venv/bin/python scripts/generate_stingray_form.py
+node --test tests/z06-runtime-promotion.test.mjs
+node --test tests/multi-model-runtime-switching.test.mjs
+```
+
 Runtime or multi-model behavior:
 
 ```sh
@@ -308,6 +396,9 @@ node --test tests/stingray-generator-stability.test.mjs
 node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
 node --test tests/grand-sport-rule-audit.test.mjs
+node --test tests/z06-contract-preview.test.mjs
+node --test tests/z06-form-data-draft.test.mjs
+node --test tests/z06-runtime-promotion.test.mjs
 node --test tests/multi-model-runtime-switching.test.mjs
 ```
 

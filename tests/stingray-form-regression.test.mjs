@@ -1122,7 +1122,7 @@ test("current order section recap has predictable labels, one interior, and corr
   assert.deepEqual(
     JSON.parse(JSON.stringify(data.orderSummary.sections.map((section) => [section.section_key, section.section_label]))),
     [
-      ["vehicle", "Vehicle"],
+      ["vehicle", "Model"],
       ["exterior_paint", "Exterior Paint"],
       ["exterior_appearance", "Exterior Appearance"],
       ["wheels_brakes", "Wheels & Brakes"],
@@ -1139,7 +1139,7 @@ test("current order section recap has predictable labels, one interior, and corr
   assert.equal(data.orderSummary.stepMap.base_interior, "seats_interior");
   const sectionLabels = order.sections.map((section) => section.section_label);
   assert.deepEqual(JSON.parse(JSON.stringify(sectionLabels)), [
-    "Vehicle",
+    "Model",
     "Exterior Paint",
     "Exterior Appearance",
     "Wheels & Brakes",

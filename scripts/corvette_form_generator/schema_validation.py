@@ -27,10 +27,10 @@ BOOLEAN_COLUMNS: dict[str, tuple[str, ...]] = {
     "grandSport_exclusive_members": ("active",),
     "grandSport_variant_overrides": ("active", "selectable"),
     "lt_interiors": ("active_for_stingray", "requires_r6x"),
-    "LZ_Interiors": ("active_for_stingray", "requires_r6x"),
-    "model_interior_scope": ("active",),
-    "interior_components": ("active",),
     "model_registry_promotion": ("promoted_to_runtime", "default_model", "active"),
+    # NOTE: LZ_Interiors / model_interior_scope / interior_components intentionally
+    # excluded. Their bool cell-typing is cosmetic (generator coerces; data.js is
+    # byte-identical with or without it). Guard kept on live model/rule sheets only.
 }
 
 PRICE_COLUMNS: dict[str, tuple[str, ...]] = {
@@ -40,7 +40,8 @@ PRICE_COLUMNS: dict[str, tuple[str, ...]] = {
     "grandSport_price_rules": ("price_value",),
     "PriceRef": ("Price",),
     "lt_interiors": ("Price",),
-    "LZ_Interiors": ("Price",),
+    # LZ_Interiors excluded: future-model interior scaffold, not read by live
+    # generation (proven). Numeric-price guard stays on live option/price/ref sheets.
 }
 
 RPO_COLUMNS: dict[str, tuple[str, ...]] = {
@@ -174,6 +175,24 @@ ALLOWED_GENERATION_ACTIONS: set[str] = {
 
 ALLOWED_NORMALIZATION_STATUSES: set[str] = {"", "active", "omitted", "replaced", "preserved", "review"}
 
+ALLOWED_PRICE_SEMANTICS: set[str] = {
+    "included_zero",
+    "conditional_component_price",
+    "package_price_by_component",
+    "self_trim_price",
+    "review_required",
+}
+
+PRICE_RULE_SOURCE_SHEETS: tuple[tuple[str, str, str], ...] = (
+    ("stingray", "stingray_options", "price_rules"),
+    ("grandSport", "grandSport_options", "grandSport_price_rules"),
+    ("z06", "z06_options", "z06_price_rules"),
+    ("zr1", "zr1_options", "zr1_price_rules"),
+    ("zr1x", "zr1x_options", "zr1x_price_rules"),
+)
+
+PACKAGE_PRICE_TARGET_RPOS: set[str] = {"PDB", "PDD", "PDF"}
+
 GROUP_REPLACEMENT_ACTIONS: set[str] = {
     "omit_grouped_requirement",
     "omit_grouped_exclusion",
@@ -187,6 +206,17 @@ RULE_REPLACEMENT_ACTIONS: set[str] = {
 }
 
 DRAFT_ONLY_CHOICE_FIELDS: set[str] = {"source_option_name", "source_description", "text_cleanup_notes"}
+DRAFT_ONLY_PROVENANCE_FIELDS: set[str] = {
+    "draftMetadata",
+    "copy_from_model_key",
+    "suggested_copy_from",
+    "raw_source_sheet",
+    "raw_source_sheets",
+    "review_status",
+    "review_flags",
+}
+DRAFT_ONLY_LIVE_CONTRACT_FIELDS: set[str] = DRAFT_ONLY_CHOICE_FIELDS | DRAFT_ONLY_PROVENANCE_FIELDS
+FORBIDDEN_LIVE_LINEAGE_VALUE_TOKENS: tuple[str, ...] = ("grand_sport:",)
 
 MODEL_REGISTRY_PROMOTION_HEADERS: tuple[str, ...] = (
     "model_key",
@@ -256,6 +286,25 @@ def add_issue(
             message=message,
         )
     )
+
+
+def live_contract_provenance_leaks(value: Any, path: str = "$") -> Iterable[tuple[str, str, Any]]:
+    if isinstance(value, dict):
+        for key, child in value.items():
+            child_path = f"{path}.{key}"
+            if key in DRAFT_ONLY_LIVE_CONTRACT_FIELDS:
+                yield (child_path, "field", child)
+                continue
+            yield from live_contract_provenance_leaks(child, child_path)
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            yield from live_contract_provenance_leaks(child, f"{path}[{index}]")
+    elif isinstance(value, str):
+        normalized = value.lower()
+        for token in FORBIDDEN_LIVE_LINEAGE_VALUE_TOKENS:
+            if token in normalized:
+                yield (path, "value", value)
+                break
 
 
 def is_number(value: Any) -> bool:
@@ -647,6 +696,99 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                             message=f"{sheet}.{column} must be numeric or blank; blank means null/not-priced and 0 means explicit zero-price.",
                         )
 
+        for model_key, option_sheet, price_sheet in PRICE_RULE_SOURCE_SHEETS:
+            if price_sheet not in wb.sheetnames:
+                continue
+            ws = wb[price_sheet]
+            headers = header_index(ws)
+            if "price_semantic" not in headers:
+                add_issue(
+                    issues,
+                    "error",
+                    "missing_price_semantic_column",
+                    sheet=price_sheet,
+                    column="price_semantic",
+                    value={"model_key": model_key},
+                    message=f"{price_sheet} must classify price-rule business meaning in price_semantic.",
+                )
+                continue
+            option_rows = {
+                clean_text(row.get("option_id")): row
+                for _, row in records(wb[option_sheet])
+                if clean_text(row.get("option_id"))
+            } if option_sheet in wb.sheetnames else {}
+            for row_number, row in records(ws):
+                if not truthy(row.get("active"), default=True):
+                    continue
+                if clean_text(row.get("price_rule_type")) != "override":
+                    continue
+                semantic = clean_text(row.get("price_semantic"))
+                condition_id = clean_text(row.get("condition_option_id"))
+                target_id = clean_text(row.get("target_option_id"))
+                target_rpo = clean_text(option_rows.get(target_id, {}).get("rpo")) or target_id
+                price_value = row.get("price_value")
+                if semantic not in ALLOWED_PRICE_SEMANTICS:
+                    add_issue(
+                        issues,
+                        "error",
+                        "unknown_price_semantic",
+                        sheet=price_sheet,
+                        row=row_number,
+                        column="price_semantic",
+                        value=semantic,
+                        message=f"Unknown price_semantic {semantic!r}; use one of {sorted(ALLOWED_PRICE_SEMANTICS)}.",
+                    )
+                    continue
+                if semantic == "included_zero" and price_value not in {0, 0.0}:
+                    add_issue(
+                        issues,
+                        "error",
+                        "included_zero_price_nonzero",
+                        sheet=price_sheet,
+                        row=row_number,
+                        column="price_value",
+                        value=price_value,
+                        message="included_zero price rules must keep price_value at explicit numeric zero.",
+                    )
+                if semantic == "self_trim_price":
+                    scope_values = [
+                        clean_text(row.get("body_style_scope")),
+                        clean_text(row.get("trim_level_scope")),
+                        clean_text(row.get("variant_scope")),
+                    ]
+                    if condition_id != target_id or not any(scope and scope != "*" for scope in scope_values):
+                        add_issue(
+                            issues,
+                            "error",
+                            "self_trim_price_shape",
+                            sheet=price_sheet,
+                            row=row_number,
+                            column="price_semantic",
+                            value={"condition_option_id": condition_id, "target_option_id": target_id, "scopes": scope_values},
+                            message="self_trim_price rules must target the same option and include a non-wildcard body/trim/variant scope.",
+                        )
+                if semantic == "package_price_by_component" and (target_rpo not in PACKAGE_PRICE_TARGET_RPOS or price_value in {None, 0, 0.0}):
+                    add_issue(
+                        issues,
+                        "error",
+                        "package_price_by_component_shape",
+                        sheet=price_sheet,
+                        row=row_number,
+                        column="price_semantic",
+                        value={"target_rpo": target_rpo, "price_value": price_value},
+                        message="package_price_by_component rules must target an approved package row and carry a nonzero package price.",
+                    )
+                if semantic == "review_required" and not truthy(row.get("review_flag"), default=False):
+                    add_issue(
+                        issues,
+                        "error",
+                        "review_required_price_missing_flag",
+                        sheet=price_sheet,
+                        row=row_number,
+                        column="review_flag",
+                        message="review_required price semantics must also set review_flag=True.",
+                    )
+ 
         rule_mapping_sheets = tuple(source_sheets_by_role.get("rule_mapping_sheet", [])) or (
             "rule_mapping",
             "grandSport_rule_mapping",
@@ -784,27 +926,20 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                     registry = json.loads(registry_json)
                     for model_key, entry in registry.get("models", {}).items():
                         data = entry.get("data", {})
-                        if "draftMetadata" in data:
+                        for path, leak_type, leaked_value in live_contract_provenance_leaks(data):
                             add_issue(
                                 issues,
                                 "error",
-                                "draft_metadata_in_live_contract",
+                                "draft_provenance_in_live_contract",
                                 sheet="form-app/data.js",
-                                value=model_key,
-                                message="draftMetadata is inspection provenance and must not be emitted in live app data.",
+                                value={
+                                    "model_key": model_key,
+                                    "path": path,
+                                    "leak_type": leak_type,
+                                    "value": leaked_value,
+                                },
+                                message="Draft/review provenance must not leak into live app data.",
                             )
-                        for index, choice in enumerate(data.get("choices", []), start=1):
-                            leaked = sorted(DRAFT_ONLY_CHOICE_FIELDS & set(choice))
-                            if leaked:
-                                add_issue(
-                                    issues,
-                                    "error",
-                                    "draft_choice_fields_in_live_contract",
-                                    sheet="form-app/data.js",
-                                    row=index,
-                                    value={"model_key": model_key, "choice_id": choice.get("choice_id"), "fields": leaked},
-                                    message="Draft/provenance choice fields must not leak into live app data.",
-                                )
                 except (IndexError, json.JSONDecodeError) as exc:
                     add_issue(
                         issues,

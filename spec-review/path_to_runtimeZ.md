@@ -4,6 +4,25 @@ Audit complete. No file or workbook edits made.
 
 Durable project fact recorded: Z06, ZR1, and ZR1X reuse Grand Sport compatibility rules and exclusive groups. Real differences are option set and standard/included availability.
 
+**2026-05-24 raw-source update:** Sean added seven visible raw order-guide sheets that should supersede the older hidden archive ingest sheets as the Phase 7 source for future-model option/OVS migration:
+
+- `price_sched_raw`
+- `z06_standard_raw`
+- `z06_eqgrps_raw`
+- `z06_intextmec_raw`
+- `zr1_zr1x_standard_raw`
+- `zr1_zr1x_eqgrps_raw`
+- `zr1_zr1x_intextmec_raw`
+
+These sheets preserve the true order-guide shape, including vertically merged RPO/status cells that keep disclosure statements attached to the same option block. Phase 7 should parse those merged raw blocks into a workbook-owned review map. Treat `archive_Z06_Ingest`, `archive_ZR1_Ingest`, and `archive_ZR1X_Ingest` as legacy comparison evidence only unless explicitly reapproved.
+
+Confirmed pricing/disclosure rules for this raw-source path:
+
+- Use the section-specific `List Price` value from `price_sched_raw`; do not assume the same physical column in the model and option sections.
+- For base model / variant pricing, add the model-section `DFC` amount to `List Price` for accurate customer-facing variant price evidence.
+- Treat the `$0.00` Gas Guzzler tax as a manufacturer placeholder pending certification, not a confirmed zero-dollar tax.
+- Preserve availability-matrix numeric suffixes such as `S1`, `A1`, `S2`, and `A2`, and map them to the corresponding disclosure statement when an option block contains multiple disclosures.
+
 ---
 
 ## Current State
@@ -56,7 +75,25 @@ Header-only, empty normalized sheets exist for all three:
 
 All are currently **0 data rows**.
 
-### Archive / Preview State
+### Raw Source / Legacy Archive State
+
+**Primary raw source sheets for Phase 7:**
+
+| Sheet | Role |
+|-------|------|
+| `price_sched_raw` | base model prices and option price/application rows |
+| `z06_standard_raw` | Z06 standard-equipment raw status rows |
+| `z06_eqgrps_raw` | Z06 equipment-group raw status/include rows |
+| `z06_intextmec_raw` | Z06 interior/exterior/mechanical raw rows and disclosures |
+| `zr1_zr1x_standard_raw` | combined ZR1/ZR1X standard-equipment raw status rows |
+| `zr1_zr1x_eqgrps_raw` | combined ZR1/ZR1X equipment-group raw status/include rows |
+| `zr1_zr1x_intextmec_raw` | combined ZR1/ZR1X interior/exterior/mechanical raw rows and disclosures |
+
+Raw option sheets use rows 7-9 as multi-row headers and frequently use vertically merged cells in the RPO/status columns. The parser must resolve merged-cell anchors so disclosure rows inside a merged block become option detail/provenance, not separate option rows.
+
+`price_sched_raw` must be parsed by header context rather than fixed column letters. The model-price and option-price sections may put `List Price` in different physical columns, and model rows need DFC added to list price before they become accurate variant-price evidence.
+
+### Legacy Archive / Preview State
 
 **Hidden archive sheets:**
 
@@ -165,9 +202,9 @@ Because Z06, ZR1, and ZR1X share Grand Sport compatibility and exclusive-group b
 
 ---
 
-### 2. Create a Human-Review Mapping Layer for Phase 5 Preview Output
+### 2. Create a Raw-Source Human-Review Mapping Layer
 
-Add a review-owned mapping table before writing normalized rows.
+Add a review-owned mapping table before writing normalized rows. The mapping input should be the seven raw order-guide sheets, not the legacy archive preview artifacts.
 
 **Recommended workbook sheet:** `future_model_source_review`
 
@@ -176,20 +213,41 @@ Add a review-owned mapping table before writing normalized rows.
 | Column | Purpose |
 |--------|---------|
 | `model_key` | |
-| `archive_sheet` | |
-| `archive_row` | |
-| `rpo` | |
-| `source_option_name` | |
-| `source_category` | |
+| `source_group` | raw group such as `standard_equipment`, `equipment_groups`, `interior_exterior_mechanical`, or `price_schedule` |
+| `raw_source_sheets` | contributing raw workbook sheets |
+| `raw_source_spans` | `sheet:start-end` row spans, preserving merged option blocks |
+| `source_orderable_rpo` | raw column A RPO |
+| `source_ref_rpo` | raw column B RPO |
+| `source_primary_rpo` | initial candidate RPO selected from orderable/ref-only columns |
+| `source_option_description` | raw option/block-start description |
+| `source_disclosure_raw` | disclosure rows from inside the same merged option block |
+| `source_detail_raw` | combined raw provenance/detail text |
+| `raw_category_context` | nearest raw category/header context |
 | `candidate_option_id` | |
+| `candidate_section_id` | |
+| `candidate_section_resolution` | |
+| `candidate_section_candidates` | |
+| `candidate_price` | only when raw price schedule evidence is unambiguous |
+| `price_candidate_rows` | raw price schedule row refs |
+| `price_candidate_summary` | price/application evidence |
 | `approved_option_id` | |
+| `approved_rpo` | |
+| `approved_price` | |
 | `approved_section_id` | |
+| `approved_option_name` | |
+| `approved_description` | |
+| `approved_detail_raw` | |
 | `review_status` | |
 | `review_reason` | |
 | `copy_from_model_key` | |
 | `copy_from_option_id` | |
+| `duplicate_group_id` | |
 | `notes` | |
 | `active` | |
+
+The review sheet should also preserve raw and normalized variant status columns for each future variant, e.g. `raw_status_1lz_h07` plus `status_1lz_h07`. Raw tokens such as `S1`, `A1`, `D`, `■`, and `□` carry meaning that normalized OVS statuses cannot fully express, so do not discard them during preview/review-map generation.
+
+When raw status tokens include numeric suffixes, preserve the suffix in a status-note/reference field and map it to the matching disclosure text from the same merged option block. This is especially important when one option block has multiple disclosures.
 
 **This should resolve:**
 
@@ -686,6 +744,6 @@ node --test tests/workbook-schema-standardization.test.mjs
 
 ## Most Important Practical Next Step
 
-**Start Phase 7 with a review-map-driven source population pass.**
+**Start Phase 7 with a raw-merged-cell parser and review-map-driven source population pass.**
 
-That is the bottleneck. Once option IDs and OVS statuses are accurate, the shared Grand Sport compatibility/exclusive behavior becomes a deterministic rebase problem instead of a discovery problem.
+That is the bottleneck. First parse the seven raw order-guide sheets into consolidated option candidates while preserving merged disclosure spans, raw status tokens, and price schedule application rows. Once option IDs and OVS statuses are accurate, the shared Grand Sport compatibility/exclusive behavior becomes a deterministic rebase problem instead of a discovery problem.
