@@ -1,6 +1,6 @@
 # Grand Sport Form Data Draft
 
-Generated: `2026-06-06T02:10:31+00:00`
+Generated: `2026-06-06T02:34:53+00:00`
 Status: `draft_not_runtime_active`
 Source sheet: `z06_options`
 
@@ -16,7 +16,7 @@ Source sheet: `z06_options`
 - Exclusive groups: 12 (workbook-backed)
 - Rules: 53 (workbook-backed)
 - Price rules: 46 (workbook-backed)
-- Interiors: 132 (model-scoped)
+- Interiors: 130 (model-scoped)
 - Color overrides: 0
 
 ## Draft Notes

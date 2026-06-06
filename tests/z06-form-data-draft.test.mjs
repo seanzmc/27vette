@@ -230,6 +230,8 @@ test("Z06 interiors group by customer-facing color family instead of interior co
     "Custom Interior trim and seat combinations",
   ]));
   assert.equal(byId.get("3LZ_R6X_AH2_HZB")?.interior_color_family, "Custom Interior trim and seat combinations");
+  assert.equal(byId.has("3LZ_AH2_EL9"), false, "EL9 Santorini Blue Dipped is Grand Sport-only and should not emit for Z06");
+  assert.equal(byId.has("3LZ_AE4_EL9"), false, "EL9 Santorini Blue Dipped is Grand Sport-only and should not emit for Z06");
   assert.match(byId.get("1LZ_AQ9_HTA")?.interior_hierarchy_path || "", /AQ9 Seats/);
   assert.match(byId.get("1LZ_AE4_HTJ_N26")?.interior_hierarchy_path || "", /AE4 Seats/);
   assert.match(byId.get("1LZ_AQ9_HTA")?.interior_parent_group_label || "", /AQ9 Seats/);

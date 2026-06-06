@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-06T02:10:30+00:00"
+          "generated_at": "2026-06-06T02:34:51+00:00"
         },
         "variants": [
           {
@@ -108790,7 +108790,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-06T02:10:27+00:00",
+          "generated_at": "2026-06-06T02:34:49+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -159589,85 +159589,6 @@ window.CORVETTE_FORM_DATA = {
             "interior_reference_order": 115
           },
           {
-            "interior_id": "3LZ_AH2_EL9",
-            "source_sheet": "LZ_Interiors",
-            "active_for_stingray": false,
-            "active_for_z06": true,
-            "requires_z25": "False",
-            "trim_level": "3LZ",
-            "requires_r6x": "False",
-            "seat_code": "AH2",
-            "interior_code": "EL9",
-            "interior_name": "Santorini Blue Dipped with Torch Red accents",
-            "material": "Napa leather seating surfaces with perforated inserts",
-            "price": 0,
-            "suede": "",
-            "stitch": "",
-            "two_tone": "",
-            "section_id": "sec_lzint_003",
-            "color_overrides_raw": "G26, G4Z, GBK, GPH",
-            "source_note": "Included and only available with (Z25) Grand Sport Launch Edition.",
-            "interior_components": [],
-            "interior_components_json": "[]",
-            "interior_trim_level": "3LZ",
-            "interior_seat_code": "AH2",
-            "interior_seat_label": "AH2 Seats",
-            "interior_color_family": "Santorini Blue",
-            "interior_material_family": "Napa leather seating surfaces with perforated inserts",
-            "interior_variant_label": "Santorini Blue Dipped with Torch Red accents",
-            "interior_group_display_order": 116,
-            "interior_material_display_order": 116,
-            "interior_choice_display_order": 116,
-            "interior_hierarchy_levels": "[\"3LZ\", \"AH2 Seats\", \"Santorini Blue\", \"Napa leather seating surfaces with perforated inserts\", \"Santorini Blue Dipped with Torch Red accents\"]",
-            "interior_hierarchy_path": "3LZ > AH2 Seats > Santorini Blue > Napa leather seating surfaces with perforated inserts > Santorini Blue Dipped with Torch Red accents",
-            "interior_parent_group_label": "AH2 Seats",
-            "interior_leaf_label": "Santorini Blue Dipped with Torch Red accents",
-            "interior_reference_order": 116
-          },
-          {
-            "interior_id": "3LZ_AE4_EL9",
-            "source_sheet": "LZ_Interiors",
-            "active_for_stingray": false,
-            "active_for_z06": true,
-            "requires_z25": "False",
-            "trim_level": "3LZ",
-            "requires_r6x": "False",
-            "seat_code": "AE4",
-            "interior_code": "EL9",
-            "interior_name": "Santorini Blue Dipped with Torch Red accents",
-            "material": "Napa leather seating surfaces with perforated inserts and performance textile",
-            "price": 595,
-            "suede": "",
-            "stitch": "",
-            "two_tone": "",
-            "section_id": "sec_lzint_003",
-            "color_overrides_raw": "G26, G4Z, GBK, GPH",
-            "source_note": "Included and only available with (Z25) Grand Sport Launch Edition.",
-            "interior_components": [
-              {
-                "rpo": "AE4",
-                "label": "AE4 Seat Upgrade",
-                "price": 595,
-                "component_type": "seat"
-              }
-            ],
-            "interior_components_json": "[{\"rpo\":\"AE4\",\"label\":\"AE4 Seat Upgrade\",\"price\":595,\"component_type\":\"seat\"}]",
-            "interior_trim_level": "3LZ",
-            "interior_seat_code": "AE4",
-            "interior_seat_label": "AE4 Seats",
-            "interior_color_family": "Santorini Blue",
-            "interior_material_family": "Napa leather seating surfaces with perforated inserts and performance textile",
-            "interior_variant_label": "Santorini Blue Dipped with Torch Red accents",
-            "interior_group_display_order": 117,
-            "interior_material_display_order": 117,
-            "interior_choice_display_order": 117,
-            "interior_hierarchy_levels": "[\"3LZ\", \"AE4 Seats\", \"Santorini Blue\", \"Napa leather seating surfaces with perforated inserts and performance textile\", \"Santorini Blue Dipped with Torch Red accents\"]",
-            "interior_hierarchy_path": "3LZ > AE4 Seats > Santorini Blue > Napa leather seating surfaces with perforated inserts and performance textile > Santorini Blue Dipped with Torch Red accents",
-            "interior_parent_group_label": "AE4 Seats",
-            "interior_leaf_label": "Santorini Blue Dipped with Torch Red accents",
-            "interior_reference_order": 117
-          },
-          {
             "interior_id": "3LZ_R6X_AH2_HZB",
             "source_sheet": "LZ_Interiors",
             "active_for_stingray": false,
@@ -159701,14 +159622,14 @@ window.CORVETTE_FORM_DATA = {
             "interior_color_family": "Custom Interior trim and seat combinations",
             "interior_material_family": "Napa leather seating surfaces with perforated inserts",
             "interior_variant_label": "Sky Cool Gray interior / Jet Black seats",
-            "interior_group_display_order": 118,
-            "interior_material_display_order": 118,
-            "interior_choice_display_order": 118,
+            "interior_group_display_order": 116,
+            "interior_material_display_order": 116,
+            "interior_choice_display_order": 116,
             "interior_hierarchy_levels": "[\"3LZ\", \"AH2 Seats\", \"Sky Cool Gray\", \"Napa leather seating surfaces with perforated inserts\", \"Sky Cool Gray interior / Jet Black seats\"]",
             "interior_hierarchy_path": "3LZ > AH2 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts > Sky Cool Gray interior / Jet Black seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Sky Cool Gray interior / Jet Black seats",
-            "interior_reference_order": 118
+            "interior_reference_order": 116
           },
           {
             "interior_id": "3LZ_R6X_AH2_HVV",
@@ -159744,14 +159665,14 @@ window.CORVETTE_FORM_DATA = {
             "interior_color_family": "Custom Interior trim and seat combinations",
             "interior_material_family": "Napa leather seating surfaces with perforated inserts",
             "interior_variant_label": "Jet Black interior / Sky Cool Gray seats",
-            "interior_group_display_order": 119,
-            "interior_material_display_order": 119,
-            "interior_choice_display_order": 119,
+            "interior_group_display_order": 117,
+            "interior_material_display_order": 117,
+            "interior_choice_display_order": 117,
             "interior_hierarchy_levels": "[\"3LZ\", \"AH2 Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts\", \"Jet Black interior / Sky Cool Gray seats\"]",
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black interior / Sky Cool Gray seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats",
-            "interior_reference_order": 119
+            "interior_reference_order": 117
           },
           {
             "interior_id": "3LZ_R6X_AH2_HVV_TU7",
@@ -159793,14 +159714,14 @@ window.CORVETTE_FORM_DATA = {
             "interior_color_family": "Custom Interior trim and seat combinations",
             "interior_material_family": "Napa leather seating surfaces with perforated inserts",
             "interior_variant_label": "Jet Black interior / Sky Cool Gray seats two tone",
-            "interior_group_display_order": 120,
-            "interior_material_display_order": 120,
-            "interior_choice_display_order": 120,
+            "interior_group_display_order": 118,
+            "interior_material_display_order": 118,
+            "interior_choice_display_order": 118,
             "interior_hierarchy_levels": "[\"3LZ\", \"AH2 Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts\", \"Jet Black interior / Sky Cool Gray seats two tone\"]",
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black interior / Sky Cool Gray seats two tone",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats two tone",
-            "interior_reference_order": 120
+            "interior_reference_order": 118
           },
           {
             "interior_id": "3LZ_R6X_AH2_HUU",
@@ -159836,14 +159757,14 @@ window.CORVETTE_FORM_DATA = {
             "interior_color_family": "Custom Interior trim and seat combinations",
             "interior_material_family": "Napa leather seating surfaces with perforated inserts",
             "interior_variant_label": "Adrenaline Red interior / Jet Black seats",
-            "interior_group_display_order": 121,
-            "interior_material_display_order": 121,
-            "interior_choice_display_order": 121,
+            "interior_group_display_order": 119,
+            "interior_material_display_order": 119,
+            "interior_choice_display_order": 119,
             "interior_hierarchy_levels": "[\"3LZ\", \"AH2 Seats\", \"Adrenaline Red\", \"Napa leather seating surfaces with perforated inserts\", \"Adrenaline Red interior / Jet Black seats\"]",
             "interior_hierarchy_path": "3LZ > AH2 Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts > Adrenaline Red interior / Jet Black seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats",
-            "interior_reference_order": 121
+            "interior_reference_order": 119
           },
           {
             "interior_id": "3LZ_R6X_AE4_HUU",
@@ -159879,14 +159800,14 @@ window.CORVETTE_FORM_DATA = {
             "interior_color_family": "Custom Interior trim and seat combinations",
             "interior_material_family": "Napa leather seating surfaces with perforated inserts and performance textile",
             "interior_variant_label": "Adrenaline Red interior / Jet Black seats",
-            "interior_group_display_order": 122,
-            "interior_material_display_order": 122,
-            "interior_choice_display_order": 122,
+            "interior_group_display_order": 120,
+            "interior_material_display_order": 120,
+            "interior_choice_display_order": 120,
             "interior_hierarchy_levels": "[\"3LZ\", \"AE4 Seats\", \"Adrenaline Red\", \"Napa leather seating surfaces with perforated inserts and performance textile\", \"Adrenaline Red interior / Jet Black seats\"]",
             "interior_hierarchy_path": "3LZ > AE4 Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts and performance textile > Adrenaline Red interior / Jet Black seats",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats",
-            "interior_reference_order": 122
+            "interior_reference_order": 120
           },
           {
             "interior_id": "3LZ_R6X_AH2_HU0_38S",
@@ -159928,14 +159849,14 @@ window.CORVETTE_FORM_DATA = {
             "interior_color_family": "Custom Interior trim and seat combinations",
             "interior_material_family": "Napa leather seating surfaces with perforated inserts",
             "interior_variant_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_group_display_order": 123,
-            "interior_material_display_order": 123,
-            "interior_choice_display_order": 123,
+            "interior_group_display_order": 121,
+            "interior_material_display_order": 121,
+            "interior_choice_display_order": 121,
             "interior_hierarchy_levels": "[\"3LZ\", \"AH2 Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts\", \"Jet Black interior / Adrenaline Red seats\"]",
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black interior / Adrenaline Red seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_reference_order": 123
+            "interior_reference_order": 121
           },
           {
             "interior_id": "3LZ_R6X_AH2_HU0_38S_TU7",
@@ -159983,14 +159904,14 @@ window.CORVETTE_FORM_DATA = {
             "interior_color_family": "Custom Interior trim and seat combinations",
             "interior_material_family": "Napa leather seating surfaces with perforated inserts",
             "interior_variant_label": "Jet Black interior / Adrenaline Red seats two tone",
-            "interior_group_display_order": 124,
-            "interior_material_display_order": 124,
-            "interior_choice_display_order": 124,
+            "interior_group_display_order": 122,
+            "interior_material_display_order": 122,
+            "interior_choice_display_order": 122,
             "interior_hierarchy_levels": "[\"3LZ\", \"AH2 Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts\", \"Jet Black interior / Adrenaline Red seats two tone\"]",
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black interior / Adrenaline Red seats two tone",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats two tone",
-            "interior_reference_order": 124
+            "interior_reference_order": 122
           },
           {
             "interior_id": "3LZ_R6X_AE4_HU0_38S",
@@ -160032,14 +159953,14 @@ window.CORVETTE_FORM_DATA = {
             "interior_color_family": "Custom Interior trim and seat combinations",
             "interior_material_family": "Napa leather seating surfaces with perforated inserts and performance textile",
             "interior_variant_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_group_display_order": 125,
-            "interior_material_display_order": 125,
-            "interior_choice_display_order": 125,
+            "interior_group_display_order": 123,
+            "interior_material_display_order": 123,
+            "interior_choice_display_order": 123,
             "interior_hierarchy_levels": "[\"3LZ\", \"AE4 Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts and performance textile\", \"Jet Black interior / Adrenaline Red seats\"]",
             "interior_hierarchy_path": "3LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Jet Black interior / Adrenaline Red seats",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_reference_order": 125
+            "interior_reference_order": 123
           },
           {
             "interior_id": "3LZ_R6X_AH2_HVT_N2Z",
@@ -160081,14 +160002,14 @@ window.CORVETTE_FORM_DATA = {
             "interior_color_family": "Custom Interior trim and seat combinations",
             "interior_material_family": "Napa leather seating surfaces with perforated sueded microfiber inserts",
             "interior_variant_label": "Sky Cool Gray interior / Jet Black seats",
-            "interior_group_display_order": 126,
-            "interior_material_display_order": 126,
-            "interior_choice_display_order": 126,
+            "interior_group_display_order": 124,
+            "interior_material_display_order": 124,
+            "interior_choice_display_order": 124,
             "interior_hierarchy_levels": "[\"3LZ\", \"AH2 Seats\", \"Sky Cool Gray\", \"Napa leather seating surfaces with perforated sueded microfiber inserts\", \"Sky Cool Gray interior / Jet Black seats\"]",
             "interior_hierarchy_path": "3LZ > AH2 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated sueded microfiber inserts > Sky Cool Gray interior / Jet Black seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Sky Cool Gray interior / Jet Black seats",
-            "interior_reference_order": 126
+            "interior_reference_order": 124
           },
           {
             "interior_id": "3LZ_R6X_AH2_HMO_N2Z",
@@ -160130,14 +160051,14 @@ window.CORVETTE_FORM_DATA = {
             "interior_color_family": "Custom Interior trim and seat combinations",
             "interior_material_family": "Napa leather seating surfaces with perforated sueded microfiber inserts",
             "interior_variant_label": "Jet Black interior / Sky Cool Gray seats",
-            "interior_group_display_order": 127,
-            "interior_material_display_order": 127,
-            "interior_choice_display_order": 127,
+            "interior_group_display_order": 125,
+            "interior_material_display_order": 125,
+            "interior_choice_display_order": 125,
             "interior_hierarchy_levels": "[\"3LZ\", \"AH2 Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated sueded microfiber inserts\", \"Jet Black interior / Sky Cool Gray seats\"]",
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Jet Black interior / Sky Cool Gray seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats",
-            "interior_reference_order": 127
+            "interior_reference_order": 125
           },
           {
             "interior_id": "3LZ_R6X_AH2_HMO_N2Z_TU7",
@@ -160185,14 +160106,14 @@ window.CORVETTE_FORM_DATA = {
             "interior_color_family": "Custom Interior trim and seat combinations",
             "interior_material_family": "Napa leather seating surfaces with perforated sueded microfiber inserts",
             "interior_variant_label": "Jet Black interior / Sky Cool Gray seats two tone",
-            "interior_group_display_order": 128,
-            "interior_material_display_order": 128,
-            "interior_choice_display_order": 128,
+            "interior_group_display_order": 126,
+            "interior_material_display_order": 126,
+            "interior_choice_display_order": 126,
             "interior_hierarchy_levels": "[\"3LZ\", \"AH2 Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated sueded microfiber inserts\", \"Jet Black interior / Sky Cool Gray seats two tone\"]",
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Jet Black interior / Sky Cool Gray seats two tone",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats two tone",
-            "interior_reference_order": 128
+            "interior_reference_order": 126
           },
           {
             "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
@@ -160234,14 +160155,14 @@ window.CORVETTE_FORM_DATA = {
             "interior_color_family": "Custom Interior trim and seat combinations",
             "interior_material_family": "Napa leather seating surfaces with perforated sueded microfiber inserts",
             "interior_variant_label": "Adrenaline Red interior / Jet Black seats",
-            "interior_group_display_order": 129,
-            "interior_material_display_order": 129,
-            "interior_choice_display_order": 129,
+            "interior_group_display_order": 127,
+            "interior_material_display_order": 127,
+            "interior_choice_display_order": 127,
             "interior_hierarchy_levels": "[\"3LZ\", \"AH2 Seats\", \"Adrenaline Red\", \"Napa leather seating surfaces with perforated sueded microfiber inserts\", \"Adrenaline Red interior / Jet Black seats\"]",
             "interior_hierarchy_path": "3LZ > AH2 Seats > Adrenaline Red > Napa leather seating surfaces with perforated sueded microfiber inserts > Adrenaline Red interior / Jet Black seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats",
-            "interior_reference_order": 129
+            "interior_reference_order": 127
           },
           {
             "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
@@ -160283,14 +160204,14 @@ window.CORVETTE_FORM_DATA = {
             "interior_color_family": "Custom Interior trim and seat combinations",
             "interior_material_family": "Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile",
             "interior_variant_label": "Adrenaline Red interior / Jet Black seats",
-            "interior_group_display_order": 130,
-            "interior_material_display_order": 130,
-            "interior_choice_display_order": 130,
+            "interior_group_display_order": 128,
+            "interior_material_display_order": 128,
+            "interior_choice_display_order": 128,
             "interior_hierarchy_levels": "[\"3LZ\", \"AE4 Seats\", \"Adrenaline Red\", \"Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile\", \"Adrenaline Red interior / Jet Black seats\"]",
             "interior_hierarchy_path": "3LZ > AE4 Seats > Adrenaline Red > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Adrenaline Red interior / Jet Black seats",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats",
-            "interior_reference_order": 130
+            "interior_reference_order": 128
           },
           {
             "interior_id": "3LZ_R6X_AH2_HXO_N2Z_38S_TU7",
@@ -160344,14 +160265,14 @@ window.CORVETTE_FORM_DATA = {
             "interior_color_family": "Custom Interior trim and seat combinations",
             "interior_material_family": "Napa leather seating surfaces with perforated sueded microfiber inserts",
             "interior_variant_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_group_display_order": 131,
-            "interior_material_display_order": 131,
-            "interior_choice_display_order": 131,
+            "interior_group_display_order": 129,
+            "interior_material_display_order": 129,
+            "interior_choice_display_order": 129,
             "interior_hierarchy_levels": "[\"3LZ\", \"AH2 Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated sueded microfiber inserts\", \"Jet Black interior / Adrenaline Red seats\"]",
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Jet Black interior / Adrenaline Red seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_reference_order": 131
+            "interior_reference_order": 129
           },
           {
             "interior_id": "3LZ_R6X_AE4_HXO_N2Z_38S",
@@ -160399,14 +160320,14 @@ window.CORVETTE_FORM_DATA = {
             "interior_color_family": "Custom Interior trim and seat combinations",
             "interior_material_family": "Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile",
             "interior_variant_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_group_display_order": 132,
-            "interior_material_display_order": 132,
-            "interior_choice_display_order": 132,
+            "interior_group_display_order": 130,
+            "interior_material_display_order": 130,
+            "interior_choice_display_order": 130,
             "interior_hierarchy_levels": "[\"3LZ\", \"AE4 Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile\", \"Jet Black interior / Adrenaline Red seats\"]",
             "interior_hierarchy_path": "3LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Jet Black interior / Adrenaline Red seats",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_reference_order": 132
+            "interior_reference_order": 130
           }
         ],
         "colorOverrides": [],
@@ -160472,7 +160393,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "interior",
             "entity_id": "",
-            "message": "132 model-scoped Z06 LT interiors exported."
+            "message": "130 model-scoped Z06 LT interiors exported."
           },
           {
             "check_id": "price_rules",
