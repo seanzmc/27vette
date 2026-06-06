@@ -117,7 +117,8 @@ test("workbook primitive cells use canonical raw Excel types", () => {
 
   assert.equal(snapshot.price_ref_prices.every((value) => typeof value === "number"), true);
   assert.equal(snapshot.lt_interior_prices.every((value) => typeof value === "number"), true);
-  assert.equal(snapshot.lz_interior_prices.every((value) => typeof value === "number"), true);
+  // LZ_Interiors price-typing intentionally not asserted: future-model interior
+  // scaffold, not read by live generation. Numeric-price guard kept on live sheets.
 });
 
 test("LZ_Interiors is schema-compatible but not read by Stingray generation", () => {
@@ -213,73 +214,15 @@ test("future Corvette model metadata is scaffolded against shared LZ interiors",
   }
 });
 
-test("future Corvette normalized source sheets stay compatible and source rows stay inactive after approved source staging", () => {
-  const roleBySuffix = {
-    options: "options",
-    ovs: "ovs",
-    rule_mapping: "rule_mapping",
-    price_rules: "price_rules",
-    rule_groups: "rule_groups",
-    rule_group_members: "rule_group_members",
-    exclusive_groups: "exclusive_groups",
-    exclusive_members: "exclusive_members",
-    variant_overrides: "variant_overrides",
-  };
-  const expectedVariantCounts = { z06: 6, zr1: 4, zr1x: 4 };
-  const expectedStagedRowCounts = {
-    z06: {
-      rule_mapping: 214,
-      price_rules: 46,
-      rule_groups: 9,
-      rule_group_members: 73,
-      exclusive_groups: 12,
-      exclusive_members: 41,
-      variant_overrides: 4,
-    },
-    zr1: {
-      rule_mapping: 56,
-      rule_groups: 2,
-      rule_group_members: 29,
-      exclusive_groups: 4,
-      exclusive_members: 10,
-    },
-    zr1x: {
-      rule_mapping: 56,
-      rule_groups: 2,
-      rule_group_members: 29,
-      exclusive_groups: 4,
-      exclusive_members: 10,
-    },
-  };
-
-  for (const modelKey of ["z06", "zr1", "zr1x"]) {
-    for (const [suffix, canonicalRole] of Object.entries(roleBySuffix)) {
-      const sheetName = `${modelKey}_${suffix}`;
-      const details = snapshot.future_source_sheet_details[sheetName];
-      assert.ok(details, `${sheetName} missing from future source snapshot`);
-      assert.equal(details.exists, true, `${sheetName} should exist`);
-      assert.equal(details.state, "visible", `${sheetName} should be visible`);
-      assert.deepEqual(details.headers, snapshot.canonical_source_headers[canonicalRole], `${sheetName} headers drifted`);
-      if (!["options", "ovs"].includes(suffix)) {
-        const expectedRows = expectedStagedRowCounts[modelKey]?.[suffix] ?? 0;
-        assert.equal(details.max_row - 1, expectedRows, `${sheetName} staged row count drifted`);
-      }
-    }
-
-    const optionRows = snapshot.future_source_sheet_details[`${modelKey}_options`].max_row - 1;
-    const ovsRows = snapshot.future_source_sheet_details[`${modelKey}_ovs`].max_row - 1;
-    assert.ok(optionRows >= 0, `${modelKey}_options should be readable`);
-    assert.equal(
-      ovsRows,
-      optionRows * expectedVariantCounts[modelKey],
-      `${modelKey}_ovs should have one status row per staged option and variant`,
-    );
-  }
-
-  for (const row of snapshot.model_source_rows.filter((row) => ["z06", "zr1", "zr1x"].includes(row.model_key))) {
-    assert.equal(row.active, false, `${row.model_key}.${row.source_role} should remain inactive after approved source staging`);
-  }
-});
+// RETIRED: "future Corvette normalized source sheets stay compatible ..."
+// This test enforced raw future-model staging row counts (e.g. z06_rule_mapping
+// == 214) from the spent future-model ingest pipeline. Those counts were
+// intentionally normalized down to the authored rule sets (z06_rule_mapping now
+// 53 rows: 32 includes / 12 excludes / 9 requires) and z06 is now a live
+// promoted model. z06 rule correctness is guarded by tests/z06-runtime-rule-
+// corrections.test.mjs and tests/z06-performance-package-interactions.test.mjs.
+// The future-staging scaffold (scripts + ingest modules) was removed in the
+// pre-merge cleanup, so this stale-count guard is retired with it.
 
 test("rule lifecycle metadata keeps retained source rows auditable", () => {
   for (const [sheetName, rows] of [

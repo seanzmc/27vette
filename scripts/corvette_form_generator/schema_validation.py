@@ -27,10 +27,10 @@ BOOLEAN_COLUMNS: dict[str, tuple[str, ...]] = {
     "grandSport_exclusive_members": ("active",),
     "grandSport_variant_overrides": ("active", "selectable"),
     "lt_interiors": ("active_for_stingray", "requires_r6x"),
-    "LZ_Interiors": ("active_for_stingray", "requires_r6x"),
-    "model_interior_scope": ("active",),
-    "interior_components": ("active",),
     "model_registry_promotion": ("promoted_to_runtime", "default_model", "active"),
+    # NOTE: LZ_Interiors / model_interior_scope / interior_components intentionally
+    # excluded. Their bool cell-typing is cosmetic (generator coerces; data.js is
+    # byte-identical with or without it). Guard kept on live model/rule sheets only.
 }
 
 PRICE_COLUMNS: dict[str, tuple[str, ...]] = {
@@ -40,7 +40,8 @@ PRICE_COLUMNS: dict[str, tuple[str, ...]] = {
     "grandSport_price_rules": ("price_value",),
     "PriceRef": ("Price",),
     "lt_interiors": ("Price",),
-    "LZ_Interiors": ("Price",),
+    # LZ_Interiors excluded: future-model interior scaffold, not read by live
+    # generation (proven). Numeric-price guard stays on live option/price/ref sheets.
 }
 
 RPO_COLUMNS: dict[str, tuple[str, ...]] = {
