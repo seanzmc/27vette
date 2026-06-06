@@ -436,9 +436,16 @@ def broad_interior_color_family(label: str) -> str:
     if not value:
         return "Other Interior Choices"
     lower = value.lower()
-    if " / " in value:
-        value = value.split(" / ", 1)[0]
-        lower = value.lower()
+    if "asymmetrical santorini blue" in lower:
+        return "Asymmetrical Santorini Blue / Jet Black"
+    if "asymmetrical adrenaline red" in lower:
+        return "Asymmetrical Adrenaline Red / Jet Black"
+    if "ultimate suede jet black" in lower:
+        return "Ultimate Suede Jet Black"
+    if lower.startswith("sky cool gray"):
+        return "Sky Cool Gray"
+    if lower.startswith("santorini blue"):
+        return "Santorini Blue"
     for marker in (" interior", " seats"):
         idx = lower.find(marker)
         if idx > 0:
@@ -452,9 +459,7 @@ def broad_interior_color_family(label: str) -> str:
 
 
 def coded_color_family(interior: dict[str, Any], fallback_label: str) -> str:
-    color = broad_interior_color_family(fallback_label)
-    code = clean(interior.get("interior_code", ""))
-    return f"{code} {color}".strip() if code else color
+    return broad_interior_color_family(fallback_label)
 
 
 def grouping_fields_for_interior(
@@ -474,7 +479,11 @@ def grouping_fields_for_interior(
     ]
     leaf_label = levels[-1] if levels else interior["interior_name"] or interior["interior_id"]
     color_family = levels[2] if len(levels) > 2 else coded_color_family(interior, leaf_label)
-    if not reference:
+    trim_value = clean(interior.get("trim_level", ""))
+    interior_id_value = clean(interior.get("interior_id", ""))
+    if "R6X" in trim_value or "R6X" in interior_id_value:
+        color_family = "Custom Interior trim and seat combinations"
+    elif not reference:
         color_family = fallback_color_family
     material_family = interior.get("material") or "Standard interior"
     if len(levels) > 3 and levels[-2] != color_family:

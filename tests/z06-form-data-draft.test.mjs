@@ -203,23 +203,41 @@ test("Z06 draft keeps suspension out of customer choice sections and in equipmen
   );
 });
 
-test("Z06 interiors use coded workbook-owned color families and seat hierarchy", () => {
+test("Z06 interiors group by customer-facing color family instead of interior code", () => {
   const byId = new Map(draft.interiors.map((interior) => [interior.interior_id, interior]));
-  assert.equal(byId.get("1LZ_AQ9_HTA")?.interior_color_family, "HTA Jet Black");
-  assert.equal(byId.get("1LZ_AE4_HTJ_N26")?.interior_color_family, "HTJ Jet Black");
-  assert.notEqual(
-    byId.get("1LZ_AQ9_HTA")?.interior_color_family,
-    byId.get("1LZ_AE4_HTJ_N26")?.interior_color_family,
-    "AQ9 HTA and AE4 HTJ Jet Black choices should not collapse into one plain Jet Black group"
+  assert.equal(byId.get("1LZ_AQ9_HTA")?.interior_color_family, "Jet Black");
+  assert.equal(byId.get("1LZ_AE4_HTJ_N26")?.interior_color_family, "Jet Black");
+
+  const groupsForTrim = (trimLevel) => new Set(
+    draft.interiors
+      .filter((interior) => interior.trim_level === trimLevel)
+      .map((interior) => interior.interior_color_family)
   );
+
+  assert.deepEqual(groupsForTrim("3LZ"), new Set([
+    "Jet Black",
+    "Sky Cool Gray",
+    "Adrenaline Red",
+    "Adrenaline Red Dipped",
+    "Natural",
+    "Natural Dipped",
+    "Santorini Blue",
+    "Very Dark Atmosphere",
+    "Ultimate Suede Jet Black",
+    "Habanero",
+    "Asymmetrical Santorini Blue / Jet Black",
+    "Asymmetrical Adrenaline Red / Jet Black",
+    "Custom Interior trim and seat combinations",
+  ]));
+  assert.equal(byId.get("3LZ_R6X_AH2_HZB")?.interior_color_family, "Custom Interior trim and seat combinations");
   assert.match(byId.get("1LZ_AQ9_HTA")?.interior_hierarchy_path || "", /AQ9 Seats/);
   assert.match(byId.get("1LZ_AE4_HTJ_N26")?.interior_hierarchy_path || "", /AE4 Seats/);
   assert.match(byId.get("1LZ_AQ9_HTA")?.interior_parent_group_label || "", /AQ9 Seats/);
   assert.match(byId.get("1LZ_AE4_HTJ_N26")?.interior_parent_group_label || "", /AE4 Seats/);
 });
 
-test("Z06 N26 and custom stitch source rows do not render as selectable option-step cards", () => {
-  for (const rpo of ["N26", "36S", "37S", "38S"]) {
+test("Z06 N26, suede, two-tone, and custom stitch source rows do not render as selectable option-step cards", () => {
+  for (const rpo of ["N26", "N2Z", "TU7", "36S", "37S", "38S"]) {
     const choices = draft.choices.filter((choice) => choice.rpo === rpo);
     assert.equal(
       choices.every((choice) => choice.selectable !== "True" || choice.step_key === "standard_equipment"),

@@ -1,6 +1,6 @@
 # Grand Sport Form Data Draft
 
-Generated: `2026-06-06T01:03:11+00:00`
+Generated: `2026-06-06T02:10:31+00:00`
 Status: `draft_not_runtime_active`
 Source sheet: `z06_options`
 
@@ -10,7 +10,7 @@ Source sheet: `z06_options`
 - Context choices: 8
 - Steps: 14
 - Sections: 35
-- Choices: 1434
+- Choices: 1422
 - Standard equipment rows: 488
 - Rule groups: 12 (workbook-backed)
 - Exclusive groups: 12 (workbook-backed)
@@ -21,8 +21,8 @@ Source sheet: `z06_options`
 
 ## Draft Notes
 
-- Candidate available/standard choices from preview: 1283
-- Full variant-matrix draft choices: 1434
+- Candidate available/standard choices from preview: 1277
+- Full variant-matrix draft choices: 1422
 - Rule/detail hot spot rows preserved: 110
 - Unresolved normalization issues: 0
 
