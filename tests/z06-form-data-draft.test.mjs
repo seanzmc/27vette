@@ -64,7 +64,7 @@ test("Z06 draft preserves the live generated-data top-level contract", () => {
   assert.ok(draft.standardEquipment.length > 0, "Z06 draft should include standard equipment rows");
 });
 
-test("Z06 draft emits approved package, wheel, and standalone Z07 placements", () => {
+test("Z06 draft unifies carbon fiber wheels into the Wheels section and keeps package/Z07 placements", () => {
   const sectionsByRpo = new Map();
   for (const choice of draft.choices) {
     if (!sectionsByRpo.has(choice.rpo)) {
@@ -74,10 +74,10 @@ test("Z06 draft emits approved package, wheel, and standalone Z07 placements", (
   }
 
   for (const rpo of ["PDB", "PDD", "PDF"]) {
-    assert.deepEqual([...sectionsByRpo.get(rpo)].sort(), ["sec_z06_pkg_001"], `${rpo} should draft in the Z06 package section`);
+    assert.deepEqual([...sectionsByRpo.get(rpo)].sort(), ["sec_z06_pkg_001"], `${rpo} should draft in the Z06 wheel/brake package section`);
   }
   for (const rpo of ["ROY", "ROZ", "STZ"]) {
-    assert.deepEqual([...sectionsByRpo.get(rpo)].sort(), ["sec_z06_cf_whee_001"], `${rpo} should draft in the Z06 carbon fiber wheel section`);
+    assert.deepEqual([...sectionsByRpo.get(rpo)].sort(), ["sec_whee_002"], `${rpo} should draft in the unified Wheels section`);
   }
   assert.deepEqual([...sectionsByRpo.get("Z07")].sort(), ["sec_perf_z52_001"], "Z07 should stay in the adjacent Z52 package section");
 });

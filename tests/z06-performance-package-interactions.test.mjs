@@ -404,3 +404,46 @@ test("Z06 exhaust tips are mutually exclusive and NWI does not require WUB", () 
   assert.equal(runtime.state.selected.has(nwi.option_id), false, "NWI should be removable as an optional exhaust-tip upgrade");
   assert.equal(runtime.state.selected.has(nga.option_id), true, "NGA should restore when NWI is removed");
 });
+
+test("Z06 carbon fiber wheel packages satisfy the unified Wheels requirement", () => {
+  for (const pkg of ["PDB", "PDD", "PDF"]) {
+    const runtime = z06Runtime();
+    runtime.handleChoice(choice(runtime, pkg));
+    runtime.reconcileSelections();
+    const missingLabels = runtime.missingRequirementDetails().map((item) => item.label);
+    assert.equal(
+      missingLabels.includes("Wheels"),
+      false,
+      `${pkg} auto-adds a carbon fiber wheel, so the Wheels requirement must be satisfied (no stuck required selection)`,
+    );
+  }
+});
+
+test("Z06 carbon fiber wheels live in the unified Wheels section and step", () => {
+  const runtime = z06Runtime();
+  for (const rpo of ["ROY", "ROZ", "STZ"]) {
+    const cfWheel = choice(runtime, rpo);
+    assert.equal(cfWheel.section_id, "sec_whee_002", `${rpo} should be in the unified Wheels section`);
+    assert.equal(cfWheel.step_key, "wheels", `${rpo} should render in the Wheels & Brake Calipers step`);
+  }
+
+  const direct = z06Runtime();
+  direct.handleChoice(choice(direct, "ROY"));
+  direct.reconcileSelections();
+  assert.equal(
+    direct.missingRequirementDetails().map((item) => item.label).includes("Wheels"),
+    false,
+    "Selecting a carbon fiber wheel directly should satisfy the Wheels requirement",
+  );
+});
+
+test("Z06 carbon fiber wheel and brake packages render in the Wheels & Brake Calipers step", () => {
+  const runtime = z06Runtime();
+  for (const rpo of ["PDB", "PDD", "PDF"]) {
+    assert.equal(
+      choice(runtime, rpo).step_key,
+      "wheels",
+      `${rpo} package should render in the wheels/calipers step so the bundled performance choice is pre-set`,
+    );
+  }
+});

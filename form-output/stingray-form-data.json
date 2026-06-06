@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-06-06T02:34:51+00:00"
+    "generated_at": "2026-06-06T23:16:33+00:00"
   },
   "variants": [
     {
@@ -94,14 +94,14 @@
       "step_label": "Wheels & Brake Calipers",
       "runtime_order": 5,
       "source": "workbook_phase6",
-      "section_ids": "sec_cali_001|sec_perf_support_001|sec_whee_001|sec_whee_002"
+      "section_ids": "sec_cali_001|sec_perf_support_001|sec_whee_001|sec_whee_002|sec_z06_pkg_001"
     },
     {
       "step_key": "packages_performance",
       "step_label": "Performance & Aero",
       "runtime_order": 6,
       "source": "workbook_phase6",
-      "section_ids": "sec_exha_001|sec_perf_001|sec_perf_aero_001|sec_perf_brake_001|sec_perf_ground_001|sec_perf_z52_001|sec_spec_001|sec_spoi_001|sec_susp_001|sec_z06_cf_whee_001|sec_z06_pkg_001"
+      "section_ids": "sec_exha_001|sec_perf_001|sec_perf_aero_001|sec_perf_brake_001|sec_perf_ground_001|sec_perf_z52_001|sec_spec_001|sec_spoi_001|sec_susp_001|sec_z06_cf_whee_001"
     },
     {
       "step_key": "aero_exhaust_stripes_accessories",
@@ -735,9 +735,9 @@
       "choice_mode": "single",
       "is_required": "FALSE",
       "standard_behavior": "user_selected",
-      "section_display_order": 12,
-      "step_key": "packages_performance",
-      "step_label": "Performance & Aero"
+      "section_display_order": 15,
+      "step_key": "wheels",
+      "step_label": "Wheels & Brake Calipers"
     },
     {
       "section_id": "sec_z06_cf_whee_001",

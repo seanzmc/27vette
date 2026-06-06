@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-06T02:34:53+00:00",
+  "generated_at": "2026-06-06T23:19:53+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "z06",
@@ -5710,26 +5710,26 @@
       {
         "option_id": "opt_roy_001",
         "rpo": "ROY",
-        "section_id": "sec_z06_cf_whee_001",
-        "original_section_id": "sec_z06_cf_whee_001",
+        "section_id": "sec_whee_002",
+        "original_section_id": "sec_whee_002",
         "section_override_applied": false,
-        "step_key": "packages_performance"
+        "step_key": "wheels"
       },
       {
         "option_id": "opt_roz_001",
         "rpo": "ROZ",
-        "section_id": "sec_z06_cf_whee_001",
-        "original_section_id": "sec_z06_cf_whee_001",
+        "section_id": "sec_whee_002",
+        "original_section_id": "sec_whee_002",
         "section_override_applied": false,
-        "step_key": "packages_performance"
+        "step_key": "wheels"
       },
       {
         "option_id": "opt_stz_001",
         "rpo": "STZ",
-        "section_id": "sec_z06_cf_whee_001",
-        "original_section_id": "sec_z06_cf_whee_001",
+        "section_id": "sec_whee_002",
+        "original_section_id": "sec_whee_002",
         "section_override_applied": false,
-        "step_key": "packages_performance"
+        "step_key": "wheels"
       },
       {
         "option_id": "opt_pdb_001",
@@ -5737,7 +5737,7 @@
         "section_id": "sec_z06_pkg_001",
         "original_section_id": "sec_z06_pkg_001",
         "section_override_applied": false,
-        "step_key": "packages_performance"
+        "step_key": "wheels"
       },
       {
         "option_id": "opt_pdd_001",
@@ -5745,7 +5745,7 @@
         "section_id": "sec_z06_pkg_001",
         "original_section_id": "sec_z06_pkg_001",
         "section_override_applied": false,
-        "step_key": "packages_performance"
+        "step_key": "wheels"
       },
       {
         "option_id": "opt_pdf_001",
@@ -5753,7 +5753,7 @@
         "section_id": "sec_z06_pkg_001",
         "original_section_id": "sec_z06_pkg_001",
         "section_override_applied": false,
-        "step_key": "packages_performance"
+        "step_key": "wheels"
       }
     ],
     "missing_sections": {},
@@ -11367,7 +11367,7 @@
         "option_id": "opt_roy_001",
         "rpo": "ROY",
         "option_name": "Carbon Flash-Painted Carbon Fiber Wheels",
-        "section_id": "sec_z06_cf_whee_001",
+        "section_id": "sec_whee_002",
         "matched_terms": [
           "requires"
         ],
@@ -11378,7 +11378,7 @@
         "option_id": "opt_roz_001",
         "rpo": "ROZ",
         "option_name": "Visible Carbon Fiber Wheels",
-        "section_id": "sec_z06_cf_whee_001",
+        "section_id": "sec_whee_002",
         "matched_terms": [
           "requires"
         ],
@@ -11389,7 +11389,7 @@
         "option_id": "opt_stz_001",
         "rpo": "STZ",
         "option_name": "Visible Carbon Fiber Red Stripe Wheels",
-        "section_id": "sec_z06_cf_whee_001",
+        "section_id": "sec_whee_002",
         "matched_terms": [
           "requires"
         ],
