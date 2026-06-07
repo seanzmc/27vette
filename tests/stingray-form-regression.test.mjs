@@ -877,8 +877,8 @@ test("vehicle setup exposes paced readability hooks without changing option step
   assert.match(stylesSource, /#stepContent\[data-step-kind="model"\] > \.step-header\s*\{[\s\S]*display:\s*none/);
   assert.match(stylesSource, /\.vehicle-setup-stepper\s*\{[\s\S]*display:\s*grid;[\s\S]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\);[\s\S]*width:\s*100%/);
   assert.doesNotMatch(stylesSource.match(/\.vehicle-setup-stepper\s*\{[\s\S]*?\}/)?.[0] || "", /width:\s*fit-content/);
-  assert.match(stylesSource, /\.vehicle-setup-chip\s*\{[\s\S]*min-width:\s*0/);
-  assert.match(stylesSource, /\.choice-card\.selected\s*\{[\s\S]*inset 3px 3px 7px[\s\S]*rgba\(178, 34, 52, 0\.3\)/);
+  assert.match(stylesSource, /\.vehicle-setup-chip\s*\{[\s\S]*justify-self:\s*center;[\s\S]*width:\s*max-content;[\s\S]*max-width:\s*100%;[\s\S]*min-width:\s*0/);
+  assert.match(stylesSource, /\.choice-card\.selected\s*\{[\s\S]*inset 4px 4px 0 rgba\(178, 34, 52, 0\.48\)[\s\S]*inset -2px -2px 0/);
   assert.match(stylesSource, /\.vehicle-setup-equipment-disclosure\s*\{/);
   assert.match(stylesSource, /\.vehicle-setup-next-action\s*\{[\s\S]*justify-content:\s*space-between/);
   assert.doesNotMatch(setupHtml, /Coupe \/ Convertible \| 1LT \/ 2LT \/ 3LT/);
