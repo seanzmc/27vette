@@ -110,11 +110,20 @@ const vehicleSetupHighlights = {
     facts: ["LS6 6.7L V8", "535 hp / 520 lb-ft", "Available center-exit exhaust"],
   },
   grandSport: {
-    eyebrow: "Purist, rear-wheel-drive performance",
-    title: "Grand Sport is the driver’s-car sweet spot",
+    cardSubtitle: "Purist, rear-wheel-drive performance",
+    eyebrow: "PURIST, REAR-WHEEL-DRIVE PERFORMANCE",
+    title: "The reborn legend, tuned for a pure rear-drive sweet spot",
     description:
-      "Grand Sport blends naturally aspirated LS6 power, rear-wheel-drive dynamics, standard Magnetic Ride Control, and available Z52 performance packages for a sharper Corvette foundation.",
-    facts: ["Purist RWD", "Magnetic Ride Control standard", "Available Z52 packages"],
+      "The 2027 Grand Sport pairs Corvette's next-generation LS6 6.7L V8 with a wide-body stance and heritage styling for a focused rear-drive balance of street and track.",
+    facts: ["LS6 6.7L V8", "535 hp / 520 lb-ft", "Available quad center exhaust"],
+  },
+  z06: {
+    cardSubtitle: "Track-born, street-legal supercar",
+    eyebrow: "TRACK-BORN, STREET-LEGAL SUPERCAR",
+    title: "The most powerful naturally aspirated V8 ever built",
+    description:
+      "The Z06 pairs the hand-built LT6 5.5L flat-plane V8 — 670 horsepower to an 8,600 rpm redline — with a wide-body stance, aggressive aero and quad center exhaust.",
+    facts: ["LT6 5.5L V8", "670 hp / 8,600 rpm", "Quad center exhaust"],
   },
 };
 let runtimeSteps = [];
@@ -1963,7 +1972,7 @@ function renderVehicleSetupNextAction(ctaLabel = "") {
   const buttonLabel = /^(Continue|Review)\b/.test(ctaLabel) ? ctaLabel : `Continue to ${ctaLabel}`;
   return `
     <div class="vehicle-setup-next-action">
-      <p>When this foundation feels right, continue with <strong>${escapeHtml(ctaLabel)}</strong>.</p>
+      <p>When this starting point looks right, continue with <strong>${escapeHtml(ctaLabel)}</strong>.</p>
       <button type="button" data-next-step="model">${escapeHtml(buttonLabel)}</button>
     </div>
   `;
@@ -2000,7 +2009,7 @@ function renderModelCard(model) {
     <button class="${classes.join(" ")}" type="button" data-model-choice="${escapeHtml(model.key)}" aria-pressed="${selected ? "true" : "false"}" aria-label="${escapeHtml(descriptor)}">
       ${renderCardMedia(model, model.modelName || model.label)}
       <span class="topline"><span class="rpo">${escapeHtml(model.label)}</span><span class="price">Model</span></span>
-      <span class="choice-name"><span>${escapeHtml(highlight.eyebrow)}</span></span>
+      <span class="choice-name"><span>${escapeHtml(highlight.cardSubtitle || highlight.eyebrow)}</span></span>
       <span class="selection-status" data-selected="${selected ? "true" : "false"}">${selected ? "✓ Selected" : "Select"}</span>
     </button>
   `;

@@ -430,11 +430,11 @@ textarea {
 }
 
 .vehicle-setup-stepper {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
   gap: 8px;
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
   padding: 6px;
 }
@@ -443,6 +443,7 @@ textarea {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
   min-height: 0;
   border-color: transparent;
   border-radius: 999px;
@@ -465,11 +466,15 @@ textarea {
 }
 
 .vehicle-setup-chip strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 13px;
   white-space: nowrap;
 }
 
 .vehicle-setup-chip em {
+  min-width: 0;
   color: var(--muted);
   font-size: 12px;
   font-style: normal;
@@ -943,13 +948,23 @@ textarea {
 }
 
 .choice-card.selected {
-  border-color: var(--accent);
-  background: var(--choice-bg);
-  box-shadow: inset 0 0 0 1px var(--accent);
+  border-color: rgba(178, 34, 52, 0.72);
+  background-color: var(--choice-bg);
+  background-image: linear-gradient(145deg, rgba(178, 34, 52, 0.055), rgba(255, 255, 255, 0.82) 36%, rgba(244, 241, 235, 0.7));
+  box-shadow:
+    inset 3px 3px 7px rgba(41, 35, 28, 0.13),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.82),
+    inset 0 0 0 1px rgba(178, 34, 52, 0.3);
 }
 
 .choice-card.selected:hover {
-  background: var(--choice-bg);
+  border-color: var(--accent);
+  background-color: var(--choice-bg);
+  background-image: linear-gradient(145deg, rgba(178, 34, 52, 0.07), rgba(255, 255, 255, 0.84) 38%, rgba(244, 241, 235, 0.76));
+  box-shadow:
+    inset 4px 4px 8px rgba(41, 35, 28, 0.14),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.86),
+    inset 0 0 0 1px rgba(178, 34, 52, 0.38);
 }
 
 .choice-card.disabled {
@@ -965,8 +980,12 @@ textarea {
 
 .choice-card.selected.auto {
   border-color: var(--ok);
-  background: var(--choice-selected);
-  box-shadow: inset 0 0 0 1px var(--ok);
+  background-color: var(--choice-selected);
+  background-image: linear-gradient(145deg, rgba(31, 122, 77, 0.07), rgba(255, 255, 255, 0.82) 38%, rgba(239, 248, 242, 0.88));
+  box-shadow:
+    inset 3px 3px 7px rgba(41, 35, 28, 0.12),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.82),
+    inset 0 0 0 1px rgba(31, 122, 77, 0.35);
 }
 
 .context-choice-card {
