@@ -260,7 +260,9 @@ test("Z06 Z07 defaults Carbon Flash aero and lets the user switch to visible car
   assert.equal(autoAddedRpos(runtime).includes("CFV"), true, "T0G should auto-add CFV");
 });
 
-test("Z06 carbon wheel package ROY defaults can switch to ROZ or STZ", () => {
+test("Z06 carbon wheel package ROY defaults can switch to ROZ or STZ while aluminum wheels stay disabled", () => {
+  const aluminumWheelRpos = ["SOE", "SRK", "ROU", "SOA", "SRN", "SON", "ROX", "SOM", "STX"];
+
   for (const packageRpo of ["PDB", "PDD", "PDF"]) {
     const runtime = z06Runtime();
     runtime.handleChoice(choice(runtime, packageRpo));
@@ -270,12 +272,28 @@ test("Z06 carbon wheel package ROY defaults can switch to ROZ or STZ", () => {
     assert.equal(runtime.state.selected.has(choice(runtime, "SOE").option_id), false, `${packageRpo} should replace the default aluminum wheel`);
     assert.equal(runtime.disableReasonForChoice(choice(runtime, "ROZ")), "", `${packageRpo} should allow switching the default wheel to ROZ`);
     assert.equal(runtime.disableReasonForChoice(choice(runtime, "STZ")), "", `${packageRpo} should allow switching the default wheel to STZ`);
+    for (const aluminumWheelRpo of aluminumWheelRpos) {
+      assert.notEqual(
+        runtime.disableReasonForChoice(choice(runtime, aluminumWheelRpo)),
+        "",
+        `${aluminumWheelRpo} should be disabled while ${packageRpo} owns the default ROY carbon wheel`
+      );
+    }
 
     runtime.handleChoice(choice(runtime, "ROZ"));
     runtime.reconcileSelections();
     assert.equal(runtime.state.selected.has(choice(runtime, "ROZ").option_id), true, `${packageRpo} should allow ROZ selection`);
     assert.equal(autoAddedRpos(runtime).includes("ROY"), false, `${packageRpo} ROZ selection should suppress the ROY default`);
     assert.doesNotMatch(missingText(runtime), /ROY|ROZ|STZ|carbon fiber wheel/i, `${packageRpo} should remain complete after switching to ROZ`);
+    assert.equal(runtime.disableReasonForChoice(choice(runtime, "ROY")), "", `${packageRpo} should allow switching back to ROY`);
+    assert.equal(runtime.disableReasonForChoice(choice(runtime, "STZ")), "", `${packageRpo} should allow switching from ROZ to STZ`);
+    for (const aluminumWheelRpo of aluminumWheelRpos) {
+      assert.notEqual(
+        runtime.disableReasonForChoice(choice(runtime, aluminumWheelRpo)),
+        "",
+        `${aluminumWheelRpo} should stay disabled after ${packageRpo} switches from ROY to ROZ`
+      );
+    }
   }
 });
 

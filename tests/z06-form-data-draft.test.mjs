@@ -162,6 +162,38 @@ test("Z06 draft emits strict Z07/PDB blocker groups for invalid brake and aero p
   }
 });
 
+test("Z06 draft emits carbon-wheel package blockers for aluminum wheel peers", () => {
+  const groupsById = new Map(draft.ruleGroups.map((group) => [group.group_id, group]));
+  const aluminumWheelIds = [
+    "opt_soe_002",
+    "opt_srk_001",
+    "opt_rou_001",
+    "opt_soa_001",
+    "opt_srn_001",
+    "opt_son_001",
+    "opt_rox_001",
+    "opt_som_001",
+    "opt_stx_001",
+  ];
+  const carbonWheelIds = ["opt_roy_001", "opt_roz_001", "opt_stz_001"];
+
+  for (const [groupId, sourceId, reasonPattern] of [
+    ["z06_group_pdb_excludes_aluminum_wheels", "opt_pdb_001", /PDB|ROY|ROZ|STZ|carbon fiber wheels/i],
+    ["z06_group_pdd_excludes_aluminum_wheels", "opt_pdd_001", /PDD|ROY|ROZ|STZ|carbon fiber wheels/i],
+    ["z06_group_pdf_excludes_aluminum_wheels", "opt_pdf_001", /PDF|ROY|ROZ|STZ|carbon fiber wheels/i],
+  ]) {
+    const group = groupsById.get(groupId);
+    assert.ok(group, `${groupId} should be emitted`);
+    assert.equal(group.group_type, "excludes_any");
+    assert.equal(group.source_id, sourceId);
+    assert.deepEqual(group.target_ids, aluminumWheelIds);
+    assert.match(group.disabled_reason || "", reasonPattern);
+    for (const carbonWheelId of carbonWheelIds) {
+      assert.equal(group.target_ids.includes(carbonWheelId), false, `${groupId} should not block ${carbonWheelId}`);
+    }
+  }
+});
+
 test("Z06 draft keeps BCW price override without auto-adding BCW from B6P", () => {
   const b6pBcwPrice = draft.priceRules.find((rule) => rule.price_rule_id === "z06_pr_b6p_bcw_895_coupe");
   assert.ok(b6pBcwPrice, "B6P should still own the BCW price override");

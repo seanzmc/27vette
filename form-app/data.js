@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-06T23:16:33+00:00"
+          "generated_at": "2026-06-07T03:58:04+00:00"
         },
         "variants": [
           {
@@ -108790,7 +108790,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-06T23:16:30+00:00",
+          "generated_at": "2026-06-07T03:58:02+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -152638,6 +152638,72 @@ window.CORVETTE_FORM_DATA = {
             "disabled_reason": "J56 performance brakes are not available while PDB is selected; PDB includes J57 carbon ceramic brakes.",
             "active": "True",
             "notes": "PDB includes J57 directly and must not allow switching back to J56 while selected."
+          },
+          {
+            "group_id": "z06_group_pdb_excludes_aluminum_wheels",
+            "group_type": "excludes_any",
+            "source_id": "opt_pdb_001",
+            "target_ids": [
+              "opt_soe_002",
+              "opt_srk_001",
+              "opt_rou_001",
+              "opt_soa_001",
+              "opt_srn_001",
+              "opt_son_001",
+              "opt_rox_001",
+              "opt_som_001",
+              "opt_stx_001"
+            ],
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "disabled_reason": "PDB requires ROY, ROZ, or STZ carbon fiber wheels; aluminum wheel choices are not available while PDB is selected.",
+            "active": "True",
+            "notes": "Preserves the carbon-wheel package lock after switching from default ROY to ROZ/STZ."
+          },
+          {
+            "group_id": "z06_group_pdd_excludes_aluminum_wheels",
+            "group_type": "excludes_any",
+            "source_id": "opt_pdd_001",
+            "target_ids": [
+              "opt_soe_002",
+              "opt_srk_001",
+              "opt_rou_001",
+              "opt_soa_001",
+              "opt_srn_001",
+              "opt_son_001",
+              "opt_rox_001",
+              "opt_som_001",
+              "opt_stx_001"
+            ],
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "disabled_reason": "PDD requires ROY, ROZ, or STZ carbon fiber wheels; aluminum wheel choices are not available while PDD is selected.",
+            "active": "True",
+            "notes": "Preserves the carbon-wheel package lock after switching from default ROY to ROZ/STZ."
+          },
+          {
+            "group_id": "z06_group_pdf_excludes_aluminum_wheels",
+            "group_type": "excludes_any",
+            "source_id": "opt_pdf_001",
+            "target_ids": [
+              "opt_soe_002",
+              "opt_srk_001",
+              "opt_rou_001",
+              "opt_soa_001",
+              "opt_srn_001",
+              "opt_son_001",
+              "opt_rox_001",
+              "opt_som_001",
+              "opt_stx_001"
+            ],
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "disabled_reason": "PDF requires ROY, ROZ, or STZ carbon fiber wheels; aluminum wheel choices are not available while PDF is selected.",
+            "active": "True",
+            "notes": "Preserves the carbon-wheel package lock after switching from default ROY to ROZ/STZ."
           }
         ],
         "exclusiveGroups": [
