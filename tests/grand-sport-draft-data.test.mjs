@@ -53,8 +53,10 @@ const heritageCenterStripeOptionIds = ["opt_dmu_001", "opt_dmv_001", "opt_dmw_00
 const nonCenterStripeOptionIds = [
   "opt_dpb_001", "opt_dpc_001", "opt_dpg_001", "opt_dpl_001", "opt_dpt_001", "opt_dsy_001", "opt_dsz_001", "opt_dt0_001",
   "opt_dth_001", "opt_dub_001", "opt_due_001", "opt_duk_001", "opt_duw_001", "opt_dzu_001", "opt_dzv_001", "opt_dzx_001",
-  "opt_sht_001", "opt_vpo_001",
+  "opt_sht_001", "opt_vpo_001", "opt_pda_001", "opt_sne_001", "opt_vpw_001",
 ];
+const fullLengthStripeOptionIds = nonCenterStripeOptionIds.slice(0, 16);
+const grandSportJakeOptionIds = ["opt_pda_001", "opt_sne_001", "opt_vpw_001"];
 const requiredPackagePriceRules = [
   ["gs_pr_fey_j57_001", "opt_fey_001", "opt_j57_001", "override", 0],
   ["gs_pr_fey_t0f_001", "opt_fey_001", "opt_t0f_001", "override", 0],
@@ -169,9 +171,9 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
       ["summary", "Summary"],
     ]
   );
-  assert.equal(draft.choices.length, 1380);
+  assert.equal(draft.choices.length, 1422);
   assert.equal(draft.standardEquipment.length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 763);
+  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 805);
   assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 455);
   assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 162);
 });
@@ -348,6 +350,8 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
   );
 
   for (const key of [
+    "opt_pda_001::includes::opt_sne_001::::active",
+    "opt_pda_001::includes::opt_vpw_001::::active",
     "opt_5jr_001::includes::opt_drg_001::::active",
     "opt_j6l_001::requires::opt_j57_001::::active",
     "opt_j6d_001::requires::opt_j57_001::::active",
@@ -399,6 +403,18 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
   assert.equal(z15Group.group_type, "excludes_any");
   assert.equal(z15Group.source_id, "opt_z15_001");
   assert.deepEqual(JSON.parse(JSON.stringify(z15Group.target_ids)), nonCenterStripeOptionIds);
+
+  for (const [groupId, sourceId, expectedTargets] of [
+    ["gs_group_pda_excludes_stripes_and_z15", "opt_pda_001", [...fullLengthStripeOptionIds, "opt_z15_001"]],
+    ["gs_group_sne_excludes_stripes_and_z15", "opt_sne_001", [...fullLengthStripeOptionIds, "opt_z15_001"]],
+    ["gs_group_vpo_excludes_jake_and_z15", "opt_vpo_001", ["opt_z15_001", "opt_pda_001", "opt_vpw_001"]],
+  ]) {
+    const group = draft.ruleGroups.find((candidate) => candidate.group_id === groupId);
+    assert.ok(group, `${groupId} should be generated`);
+    assert.equal(group.group_type, "excludes_any");
+    assert.equal(group.source_id, sourceId);
+    assert.deepEqual(JSON.parse(JSON.stringify(group.target_ids)), expectedTargets);
+  }
   assert.equal(
     [...ruleKeys].some((key) => key.startsWith("opt_z15_001::requires::")),
     false,
@@ -686,28 +702,48 @@ test("Grand Sport draft standard equipment grouping is workbook-owned", () => {
   assert.equal(trimRows.every((item) => ["sec_1lte_001", "sec_2lte_001", "sec_3lte_001"].includes(item.section_id)), true);
 });
 
-test("Grand Sport wheel choices use workbook display order by ascending price", () => {
+test("Grand Sport wheel choices keep new aluminum wheels in the existing workbook section", () => {
   const wheels = draft.choices
     .filter((choice) => choice.variant_id === "1lt_e07" && choice.section_id === "sec_whee_002")
     .sort((a, b) => Number(a.display_order) - Number(b.display_order))
-    .map((choice) => [choice.rpo, choice.base_price, choice.display_order]);
+    .map((choice) => [choice.rpo, choice.base_price, choice.display_order, choice.label]);
 
   assert.deepEqual(JSON.parse(JSON.stringify(wheels)), [
-    ["SWM", 0, 10],
-    ["SWN", 1095, 20],
-    ["SWO", 1495, 30],
-    ["SWP", 1495, 40],
-    ["ROY", 11995, 50],
-    ["ROZ", 13995, 60],
-    ["STZ", 15500, 70],
+    ["SWM", 0, 10, "Pearl Nickel 10-Spoke Forged Aluminum Wheels"],
+    ["SWN", 1095, 20, "Gloss Black 10-Spoke Forged Aluminum Wheels"],
+    ["SWO", 1495, 30, "High-Polished 10-Spoke Forged Aluminum Wheels"],
+    ["SWP", 1495, 40, "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels"],
+    ["ROU", 995, 41, "Pearl Nickel Forged Aluminum Wheels"],
+    ["SON", 1095, 42, "Gloss Black Forged Aluminum Wheels"],
+    ["SOM", 1495, 43, "Bright Polished Forged Aluminum Wheels"],
+    ["ROX", 995, 44, "Carbon Flash with Machined Edge Forged Aluminum Wheels"],
+    ["ROY", 11995, 50, "Carbon Flash-Painted Carbon Fiber Wheels"],
+    ["ROZ", 13995, 60, "Visible Carbon Fiber Wheels"],
+    ["STZ", 15500, 70, "Visible Carbon Fiber Red Stripe Wheels"],
   ]);
 });
 
+test("Grand Sport Jake graphics are selectable stripe-section choices for every variant", () => {
+  for (const optionId of grandSportJakeOptionIds) {
+    const choices = draft.choices.filter((choice) => choice.option_id === optionId);
+    assert.equal(choices.length, 6, `${optionId} should be emitted for every Grand Sport variant`);
+    assert.equal(choices.every((choice) => choice.section_id === "sec_stri_001"), true);
+    assert.equal(choices.every((choice) => choice.status === "available" && choice.selectable === "True"), true);
+  }
+
+  const pdaPriceRules = new Set(
+    draft.priceRules
+      .filter((rule) => rule.condition_option_id === "opt_pda_001")
+      .map((rule) => `${rule.target_option_id}:${rule.price_value}`)
+  );
+  assert.deepEqual([...pdaPriceRules].sort(), ["opt_sne_001:0", "opt_vpw_001:0"]);
+});
+
 test("Grand Sport draft preserves rule hot spots and normalization metadata for later phases", () => {
-  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1242);
-  assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1380);
-  assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 126);
-  assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 26);
+  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1284);
+  assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1422);
+  assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 129);
+  assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 28);
   assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);
   assert.equal(draft.draftMetadata.priceRuleSourceRows, draft.priceRules.length);
   assert.deepEqual(draft.draftMetadata.deferredSurfaces, []);

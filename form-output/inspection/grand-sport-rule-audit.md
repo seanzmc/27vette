@@ -1,18 +1,18 @@
 # Grand Sport Rule Audit
 
-Generated: `2026-06-05T03:49:40+00:00`
+Generated: `2026-06-07T20:00:33+00:00`
 Status: `rule_audit_generated`
 
 ## Summary
 
-- Workbook rule rows: 321
-- Expected draft runtime rules: 122
-- Omitted duplicate exclusive-group rules: 82
-- Raw detail candidate keys: 203
-- Workbook rules matching detail raw: 73
+- Workbook rule rows: 323
+- Expected draft runtime rules: 123
+- Omitted duplicate exclusive-group rules: 83
+- Raw detail candidate keys: 262
+- Workbook rules matching detail raw: 75
 - Workbook manual/approved/copied rules: 248
-- Skipped/review rows: 3
-- Unresolved non-interior RPO mentions: 4
+- Skipped/review rows: 4
+- Unresolved non-interior RPO mentions: 6
 - Duplicate semantic rule keys: 1
 - Exact duplicate rule rows: 1
 - Overlapping scoped rule rows: 0
@@ -87,7 +87,7 @@ Status: `rule_audit_generated`
 - `gs_rule_opt_cfl_001_excludes_opt_cfz_001`: opt_cfl_001 excludes opt_cfz_001
 - `gs_rule_opt_fey_001_includes_opt_j57_001`: opt_fey_001 includes opt_j57_001
 - `gs_rule_opt_fey_001_includes_opt_t0f_001`: opt_fey_001 includes opt_t0f_001
-- ... 38 more
+- ... 40 more
 
 ## Omitted Duplicate Exclusive Group Rules
 
@@ -132,18 +132,21 @@ Status: `rule_audit_generated`
 - `R8C` opt_r8c_001 [supported_clause_without_resolved_rule]: Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels.
 - `AQ9` opt_aq9_001 [supported_clause_without_resolved_rule]: Not Available with 3LT
 - `AH2` opt_ah2_001 [supported_clause_without_resolved_rule]: Not Available with 1LT
+- `VPW` opt_vpw_001 [supported_clause_without_resolved_rule]: Included with (PDA) Jake C8.R Graphics Package, LPO.
 
 ## Unresolved RPO Mentions
 
 - `SFZ` opt_sfz_001 mentions `DTB`: Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).
 - `R88` opt_r88_001 mentions `DTB`: Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package, any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).
 - `CF8` opt_cf8_001 mentions `DTB`: Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).
-- `SHT` opt_sht_001 mentions `DTB`: Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.
+- `SHT` opt_sht_001 mentions `DTB`: Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX), (Z15) Grand Sport Heritage Graphics, (PDA) Jake C8.R Graphics Package, LPO or (SNE) Jake hood graphic, LPO.
+- `PDA` opt_pda_001 mentions `DTB`: Not available with (Z15) Grand Sport Heritage Graphics or with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Includes (SNE) Jake hood graphic, LPO and (VPW) Jake C8.R rear hash graphic, LPO, Genuine Corvette Accessories.
+- `SNE` opt_sne_001 mentions `DTB`: Included with (PDA) Jake C8.R Graphics Package, LPO. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.
 
 ## Review Hot Spots
 
 - Duplicate active RPOs: 0
-- Special package mention rows: 25
+- Special package mention rows: 27
 
 ## Duplicate Semantic Rule Keys
 

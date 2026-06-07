@@ -6,25 +6,25 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-06-05T03:49:40+00:00",
+    "generated_at": "2026-06-07T20:00:33+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
     "copiedRuleCandidates": 91,
-    "rawDetailRuleCandidates": 203,
-    "rawDetailCandidateKeys": 203,
+    "rawDetailRuleCandidates": 262,
+    "rawDetailCandidateKeys": 262,
     "dedupedOrSelfReferenceCandidates": 2,
-    "finalWorkbookRuleRows": 321,
-    "expectedDraftRuntimeRules": 122,
-    "omittedDuplicateExclusiveGroup": 82,
+    "finalWorkbookRuleRows": 323,
+    "expectedDraftRuntimeRules": 123,
+    "omittedDuplicateExclusiveGroup": 83,
     "omittedInactiveOrUnemitted": 117,
-    "skippedRequiresReview": 3,
-    "unresolvedRpoMentions": 4,
+    "skippedRequiresReview": 4,
+    "unresolvedRpoMentions": 6,
     "exclusiveGroups": 10,
     "exclusiveGroupMembers": 27,
-    "ruleGroups": 6,
-    "ruleGroupMembers": 94,
-    "groupedExclusionPairs": 92,
+    "ruleGroups": 9,
+    "ruleGroupMembers": 136,
+    "groupedExclusionPairs": 134,
     "groupedRequirementPairs": 2,
     "duplicateSemanticRuleKeys": 1,
     "exactDuplicateRuleRows": 1,
@@ -34,7 +34,7 @@
     "inactiveOptionReferences": 5,
     "engineCoverRuleRows": 15,
     "engineCoverInactiveReferences": 0,
-    "workbookRulesMatchingDetailRaw": 73,
+    "workbookRulesMatchingDetailRaw": 75,
     "workbookManualOrApprovedRules": 248
   },
   "sourceSheets": {
@@ -1357,6 +1357,22 @@
       "source_id": "opt_sfe_001",
       "rule_type": "excludes",
       "target_id": "opt_stz_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_pda_001_includes_opt_sne_001",
+      "source_id": "opt_pda_001",
+      "rule_type": "includes",
+      "target_id": "opt_sne_001",
+      "body_style_scope": "",
+      "matched_phrase": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_pda_001_includes_opt_vpw_001",
+      "source_id": "opt_pda_001",
+      "rule_type": "includes",
+      "target_id": "opt_vpw_001",
       "body_style_scope": "",
       "matched_phrase": "workbook_matches_detail_raw"
     }
@@ -3261,6 +3277,29 @@
       "normalization_status": "omitted",
       "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
       "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
+      "replacement_rule_id": "",
+      "_audit_origin": "workbook_matches_detail_raw"
+    },
+    {
+      "rule_id": "gs_rule_opt_vpo_001_excludes_opt_z15_001",
+      "source_id": "opt_vpo_001",
+      "rule_type": "excludes",
+      "target_id": "opt_z15_001",
+      "target_type": "option",
+      "original_detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics.",
+      "review_flag": "False",
+      "source_type": "option",
+      "target_selection_mode": "single_select_opt",
+      "source_selection_mode": "single_select_opt",
+      "target_section": "sec_stri_001",
+      "source_section": "sec_stri_001",
+      "generation_action": "",
+      "body_style_scope": "",
+      "runtime_action": "",
+      "disabled_reason": "",
+      "normalization_status": "active",
+      "normalization_reason": "",
+      "replacement_group_id": "",
       "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     }
@@ -5976,6 +6015,12 @@
       "rpo": "AH2",
       "reason": "supported_clause_without_resolved_rule",
       "fragment": "Not Available with 1LT"
+    },
+    {
+      "option_id": "opt_vpw_001",
+      "rpo": "VPW",
+      "reason": "supported_clause_without_resolved_rule",
+      "fragment": "Included with (PDA) Jake C8.R Graphics Package, LPO."
     }
   ],
   "unresolvedRpoMentions": [
@@ -6001,7 +6046,19 @@
       "option_id": "opt_sht_001",
       "rpo": "SHT",
       "mentioned_rpo": "DTB",
-      "fragment": "Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics."
+      "fragment": "Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX), (Z15) Grand Sport Heritage Graphics, (PDA) Jake C8.R Graphics Package, LPO or (SNE) Jake hood graphic, LPO."
+    },
+    {
+      "option_id": "opt_pda_001",
+      "rpo": "PDA",
+      "mentioned_rpo": "DTB",
+      "fragment": "Not available with (Z15) Grand Sport Heritage Graphics or with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Includes (SNE) Jake hood graphic, LPO and (VPW) Jake C8.R rear hash graphic, LPO, Genuine Corvette Accessories."
+    },
+    {
+      "option_id": "opt_sne_001",
+      "rpo": "SNE",
+      "mentioned_rpo": "DTB",
+      "fragment": "Included with (PDA) Jake C8.R Graphics Package, LPO. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics."
     }
   ],
   "reviewHotSpots": {
@@ -6196,7 +6253,7 @@
         "mentioned_rpos": [
           "Z15"
         ],
-        "detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics."
+        "detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX), (Z15) Grand Sport Heritage Graphics, (PDA) Jake C8.R Graphics Package, LPO or (SNE) Jake hood graphic, LPO."
       },
       {
         "option_id": "opt_vpo_001",
@@ -6204,7 +6261,23 @@
         "mentioned_rpos": [
           "Z15"
         ],
-        "detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics."
+        "detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics, (PDA) Jake C8.R Graphics Package, LPO or (VPW) LPO, Jake C8.R rear hash graphic."
+      },
+      {
+        "option_id": "opt_pda_001",
+        "rpo": "PDA",
+        "mentioned_rpos": [
+          "Z15"
+        ],
+        "detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics or with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Includes (SNE) Jake hood graphic, LPO and (VPW) Jake C8.R rear hash graphic, LPO, Genuine Corvette Accessories."
+      },
+      {
+        "option_id": "opt_sne_001",
+        "rpo": "SNE",
+        "mentioned_rpos": [
+          "Z15"
+        ],
+        "detail_raw": "1. Included with (PDA) Jake C8.R Graphics Package, LPO. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics."
       }
     ]
   },

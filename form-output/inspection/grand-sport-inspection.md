@@ -1,6 +1,6 @@
 # Grand Sport Inspection
 
-Generated: `2026-06-06T02:35:19+00:00`
+Generated: `2026-06-07T20:00:34+00:00`
 Source sheet: `grandSport_options`
 Status: `inspection_generated`
 
@@ -13,16 +13,16 @@ Status: `inspection_generated`
 
 ## Counts
 
-- Option rows: 266
-- Unique RPOs: 223
-- Variant status cells: 1596
-- Candidate choice rows with available/standard status: 1380
+- Option rows: 273
+- Unique RPOs: 230
+- Variant status cells: 1638
+- Candidate choice rows with available/standard status: 1422
 - Candidate standard equipment cells: 455
 - Candidate standard option rows: 90
-- Active option rows with available/standard status: 226
+- Active option rows with available/standard status: 233
 - Inactive option rows all unavailable/blank: 40
-- Selectable counts: `{"False": 107, "True": 159}`
-- Status counts: `{"available": 861, "standard": 547, "unavailable": 188}`
+- Selectable counts: `{"False": 107, "True": 166}`
+- Status counts: `{"available": 903, "standard": 547, "unavailable": 188}`
 - Missing status cells: 0
 - Unknown status cells: 0
 
@@ -36,8 +36,8 @@ Status: `inspection_generated`
 
 ## Rule/Detail Hot Spots
 
-- Hot spot counts: `{"except": 2, "included_with": 17, "includes": 43, "not_available": 49, "not_recommended": 4, "only": 26, "requires": 33}`
-- Rows requiring later rule review: 126
+- Hot spot counts: `{"except": 2, "included_with": 19, "includes": 44, "not_available": 51, "not_recommended": 4, "only": 26, "requires": 33}`
+- Rows requiring later rule review: 129
 
 | RPO | Option | Section | Matched Terms | Special Mentions |
 | --- | --- | --- | --- | --- |
@@ -81,7 +81,7 @@ Status: `inspection_generated`
 | `TR7` | Automatic Leveling Headlamp Control | `sec_incl_001` | only |  |
 | `CFX` | Personalized Corvette Museum Plaque | `sec_incl_001` | includes, only |  |
 | `XFR` | High Performance Tires | `sec_incl_001` | only |  |
-| ... | 86 additional rows in JSON artifact |  |  |  |
+| ... | 89 additional rows in JSON artifact |  |  |  |
 
 ## Warnings
 

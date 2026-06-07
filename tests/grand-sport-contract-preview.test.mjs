@@ -33,7 +33,7 @@ test("Grand Sport contract preview has the expected read-only contract shape", (
   assert.equal(preview.variants.every((variant) => variant.source_active === "False"), true);
   assert.equal(preview.contextChoices.length, 8);
   assert.equal(preview.steps.length, 14);
-  assert.equal(preview.choices.length, 1242);
+  assert.equal(preview.choices.length, 1284);
   assert.equal(preview.candidateStandardEquipment.length, 455);
 });
 
@@ -84,11 +84,11 @@ test("customer-facing text is cleaned while raw source fields stay intact", () =
 });
 
 test("rule/detail hot spot buckets are preserved for later phases", () => {
-  assert.equal(preview.ruleDetailHotSpots.rows.length, 126);
+  assert.equal(preview.ruleDetailHotSpots.rows.length, 129);
   assert.equal(preview.ruleDetailHotSpots.counts.requires, 33);
-  assert.equal(preview.ruleDetailHotSpots.counts.not_available, 49);
-  assert.equal(preview.ruleDetailHotSpots.counts.included_with, 17);
-  assert.equal(preview.ruleDetailHotSpots.counts.includes, 43);
+  assert.equal(preview.ruleDetailHotSpots.counts.not_available, 51);
+  assert.equal(preview.ruleDetailHotSpots.counts.included_with, 19);
+  assert.equal(preview.ruleDetailHotSpots.counts.includes, 44);
   assert.equal(
     preview.ruleDetailHotSpots.rows.some(
       (row) => ["DMU", "DMV", "DMW", "DMX", "DMY"].includes(row.rpo) && /Requires \(D84\)/.test(row.detail_raw)
@@ -98,5 +98,5 @@ test("rule/detail hot spot buckets are preserved for later phases", () => {
   assert.equal(preview.ruleDetailHotSpots.counts.only, 26);
   assert.equal(preview.ruleDetailHotSpots.counts.not_recommended, 4);
   assert.equal(preview.ruleDetailHotSpots.counts.except, 2);
-  assert.equal(preview.ruleDetailHotSpots.counts.special_package_review, 26);
+  assert.equal(preview.ruleDetailHotSpots.counts.special_package_review, 28);
 });

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-06T02:35:19+00:00",
+  "generated_at": "2026-06-07T20:00:34+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -98,52 +98,52 @@
     ]
   },
   "counts": {
-    "option_rows": 266,
-    "unique_rpos": 223,
-    "variant_status_cells": 1596,
-    "status_source_rows": 1596,
-    "candidate_choice_rows_available_or_standard": 1380,
+    "option_rows": 273,
+    "unique_rpos": 230,
+    "variant_status_cells": 1638,
+    "status_source_rows": 1638,
+    "candidate_choice_rows_available_or_standard": 1422,
     "candidate_standard_equipment_cells": 455,
     "candidate_standard_option_rows": 90,
     "selectable_counts": {
       "False": 107,
-      "True": 159
+      "True": 166
     },
-    "active_option_rows_available_or_standard": 226,
+    "active_option_rows_available_or_standard": 233,
     "inactive_option_rows_all_unavailable_or_blank": 40,
     "status_counts": {
-      "available": 861,
+      "available": 903,
       "standard": 547,
       "unavailable": 188
     },
     "status_counts_by_variant": {
       "1lt_e07": {
-        "available": 139,
+        "available": 146,
         "standard": 79,
         "unavailable": 48
       },
       "2lt_e07": {
-        "available": 149,
+        "available": 156,
         "standard": 98,
         "unavailable": 19
       },
       "3lt_e07": {
-        "available": 151,
+        "available": 158,
         "standard": 98,
         "unavailable": 17
       },
       "1lt_e67": {
-        "available": 134,
+        "available": 141,
         "standard": 78,
         "unavailable": 54
       },
       "2lt_e67": {
-        "available": 143,
+        "available": 150,
         "standard": 97,
         "unavailable": 26
       },
       "3lt_e67": {
-        "available": 145,
+        "available": 152,
         "standard": 97,
         "unavailable": 24
       }
@@ -279,6 +279,7 @@
     "NPP",
     "NWI",
     "PCQ",
+    "PDA",
     "PDY",
     "PEF",
     "PIN",
@@ -295,6 +296,8 @@
     "RIA",
     "RIK",
     "RIN",
+    "ROU",
+    "ROX",
     "ROY",
     "ROZ",
     "RWH",
@@ -316,6 +319,9 @@
     "SL9",
     "SLK",
     "SLN",
+    "SNE",
+    "SOM",
+    "SON",
     "SPY",
     "SPZ",
     "STZ",
@@ -359,6 +365,7 @@
     "V8X",
     "VHM",
     "VPO",
+    "VPW",
     "VTB",
     "VUP",
     "VV4",
@@ -4100,6 +4107,104 @@
         "2lt_e67": "available",
         "3lt_e67": "available"
       }
+    },
+    {
+      "option_id": "opt_rou_001",
+      "rpo": "ROU",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
+    },
+    {
+      "option_id": "opt_son_001",
+      "rpo": "SON",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
+    },
+    {
+      "option_id": "opt_som_001",
+      "rpo": "SOM",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
+    },
+    {
+      "option_id": "opt_rox_001",
+      "rpo": "ROX",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
+    },
+    {
+      "option_id": "opt_pda_001",
+      "rpo": "PDA",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
+    },
+    {
+      "option_id": "opt_sne_001",
+      "rpo": "SNE",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
+    },
+    {
+      "option_id": "opt_vpw_001",
+      "rpo": "VPW",
+      "effective_status": "available",
+      "effective_status_label": "Available",
+      "statuses": {
+        "1lt_e07": "available",
+        "2lt_e07": "available",
+        "3lt_e07": "available",
+        "1lt_e67": "available",
+        "2lt_e67": "available",
+        "3lt_e67": "available"
+      }
     }
   ],
   "section_mappings": {
@@ -5943,6 +6048,62 @@
         "original_section_id": "sec_whee_002",
         "section_override_applied": false,
         "step_key": "wheels"
+      },
+      {
+        "option_id": "opt_rou_001",
+        "rpo": "ROU",
+        "section_id": "sec_whee_002",
+        "original_section_id": "sec_whee_002",
+        "section_override_applied": false,
+        "step_key": "wheels"
+      },
+      {
+        "option_id": "opt_son_001",
+        "rpo": "SON",
+        "section_id": "sec_whee_002",
+        "original_section_id": "sec_whee_002",
+        "section_override_applied": false,
+        "step_key": "wheels"
+      },
+      {
+        "option_id": "opt_som_001",
+        "rpo": "SOM",
+        "section_id": "sec_whee_002",
+        "original_section_id": "sec_whee_002",
+        "section_override_applied": false,
+        "step_key": "wheels"
+      },
+      {
+        "option_id": "opt_rox_001",
+        "rpo": "ROX",
+        "section_id": "sec_whee_002",
+        "original_section_id": "sec_whee_002",
+        "section_override_applied": false,
+        "step_key": "wheels"
+      },
+      {
+        "option_id": "opt_pda_001",
+        "rpo": "PDA",
+        "section_id": "sec_stri_001",
+        "original_section_id": "sec_stri_001",
+        "section_override_applied": false,
+        "step_key": "aero_exhaust_stripes_accessories"
+      },
+      {
+        "option_id": "opt_sne_001",
+        "rpo": "SNE",
+        "section_id": "sec_stri_001",
+        "original_section_id": "sec_stri_001",
+        "section_override_applied": false,
+        "step_key": "aero_exhaust_stripes_accessories"
+      },
+      {
+        "option_id": "opt_vpw_001",
+        "rpo": "VPW",
+        "section_id": "sec_stri_001",
+        "original_section_id": "sec_stri_001",
+        "section_override_applied": false,
+        "step_key": "aero_exhaust_stripes_accessories"
       }
     ],
     "missing_sections": {},
@@ -10141,9 +10302,9 @@
   "rule_detail_hot_spots": {
     "counts": {
       "except": 2,
-      "included_with": 17,
-      "includes": 43,
-      "not_available": 49,
+      "included_with": 19,
+      "includes": 44,
+      "not_available": 51,
       "not_recommended": 4,
       "only": 26,
       "requires": 33
@@ -11529,7 +11690,7 @@
         "special_mentions": [
           "Z15"
         ],
-        "detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics."
+        "detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX), (Z15) Grand Sport Heritage Graphics, (PDA) Jake C8.R Graphics Package, LPO or (SNE) Jake hood graphic, LPO."
       },
       {
         "option_id": "opt_vpo_001",
@@ -11542,7 +11703,7 @@
         "special_mentions": [
           "Z15"
         ],
-        "detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics."
+        "detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics, (PDA) Jake C8.R Graphics Package, LPO or (VPW) LPO, Jake C8.R rear hash graphic."
       },
       {
         "option_id": "opt_ive_001",
@@ -11631,6 +11792,45 @@
         ],
         "special_mentions": [],
         "detail_raw": "1. Requires (J57) carbon ceramic brakes."
+      },
+      {
+        "option_id": "opt_pda_001",
+        "rpo": "PDA",
+        "option_name": "Jake C8.R Graphics Package",
+        "section_id": "sec_stri_001",
+        "matched_terms": [
+          "not_available",
+          "includes"
+        ],
+        "special_mentions": [
+          "Z15"
+        ],
+        "detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics or with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Includes (SNE) Jake hood graphic, LPO and (VPW) Jake C8.R rear hash graphic, LPO, Genuine Corvette Accessories."
+      },
+      {
+        "option_id": "opt_sne_001",
+        "rpo": "SNE",
+        "option_name": "Jake Hood Graphic",
+        "section_id": "sec_stri_001",
+        "matched_terms": [
+          "not_available",
+          "included_with"
+        ],
+        "special_mentions": [
+          "Z15"
+        ],
+        "detail_raw": "1. Included with (PDA) Jake C8.R Graphics Package, LPO. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics."
+      },
+      {
+        "option_id": "opt_vpw_001",
+        "rpo": "VPW",
+        "option_name": "Jake C8.R Rear Hash Graphic",
+        "section_id": "sec_stri_001",
+        "matched_terms": [
+          "included_with"
+        ],
+        "special_mentions": [],
+        "detail_raw": "1. Included with (PDA) Jake C8.R Graphics Package, LPO."
       }
     ],
     "special_mentions": {
@@ -11763,6 +11963,16 @@
           "option_id": "opt_vpo_001",
           "rpo": "VPO",
           "option_name": "Tech Bronze Jake C8.R Rear Hash Graphic"
+        },
+        {
+          "option_id": "opt_pda_001",
+          "rpo": "PDA",
+          "option_name": "Jake C8.R Graphics Package"
+        },
+        {
+          "option_id": "opt_sne_001",
+          "rpo": "SNE",
+          "option_name": "Jake Hood Graphic"
         }
       ],
       "Z25": [
