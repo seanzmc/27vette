@@ -17,6 +17,10 @@ const standardSections = new Set([
   "sec_stan_002",
   "sec_tech_001",
 ]);
+const fullLengthStripeOptionIds = [
+  "opt_dpb_001", "opt_dpc_001", "opt_dpg_001", "opt_dpl_001", "opt_dpt_001", "opt_dsy_001", "opt_dsz_001", "opt_dt0_001",
+  "opt_dth_001", "opt_dub_001", "opt_due_001", "opt_duk_001", "opt_duw_001", "opt_dzu_001", "opt_dzv_001", "opt_dzx_001",
+];
 
 function generateDraftWithoutAppMutation() {
   const beforeAppData = fs.readFileSync(appDataPath, "utf8");
@@ -107,6 +111,8 @@ test("Z06 draft emits approved package/wheel, Z07, and engine-lighting price rul
     ["z06_pr_stz_pdb_17500", "opt_stz_001", "opt_pdb_001", 17500],
     ["z06_pr_roy_pdd_25495", "opt_roy_001", "opt_pdd_001", 25495],
     ["z06_pr_roy_pdf_26495", "opt_roy_001", "opt_pdf_001", 26495],
+    ["z06_pr_pda_sne_001", "opt_pda_001", "opt_sne_001", 0],
+    ["z06_pr_pda_vpw_001", "opt_pda_001", "opt_vpw_001", 0],
   ]) {
     const rule = priceRuleById.get(ruleId);
     assert.ok(rule, `${ruleId} should be emitted`);
@@ -144,6 +150,32 @@ test("Z06 draft emits forced Z07 aero and package wheel defaults", () => {
   for (const sourceId of ["opt_pdb_001", "opt_pdd_001", "opt_pdf_001"]) {
     assert.ok(matchingRequiredGroup(sourceId, ["opt_roy_001", "opt_roz_001", "opt_stz_001"]), `${sourceId} should require one of ROY/ROZ/STZ`);
   }
+});
+
+test("Z06 draft emits workbook-owned Jake graphic stripe conflict groups", () => {
+  const groupsById = new Map(draft.ruleGroups.map((group) => [group.group_id, group]));
+  for (const [groupId, sourceId, targetIds] of [
+    ["z06_group_pda_excludes_dual_racing_stripes", "opt_pda_001", fullLengthStripeOptionIds],
+    ["z06_group_sne_excludes_stripes_and_tech_bronze_jake", "opt_sne_001", [...fullLengthStripeOptionIds, "opt_sht_001", "opt_vpo_001"]],
+    ["z06_group_sht_excludes_full_length_stripes", "opt_sht_001", [...fullLengthStripeOptionIds, "opt_sne_001", "opt_vpw_001"]],
+    ["z06_group_vpw_excludes_tech_bronze_jake", "opt_vpw_001", ["opt_sht_001", "opt_vpo_001"]],
+    ["z06_group_vpo_excludes_jake_graphics", "opt_vpo_001", ["opt_sne_001", "opt_vpw_001"]],
+    ["z06_group_dpb_excludes_jake_hood_graphics", "opt_dpb_001", ["opt_sht_001", "opt_sne_001"]],
+  ]) {
+    const group = groupsById.get(groupId);
+    assert.ok(group, `${groupId} should be emitted`);
+    assert.equal(group.group_type, "excludes_any");
+    assert.equal(group.source_id, sourceId);
+    assert.deepEqual(group.target_ids, targetIds);
+  }
+
+  const activeIncludePairs = new Set(
+    draft.rules
+      .filter((rule) => rule.rule_type === "includes" && rule.active === "True")
+      .map((rule) => `${rule.source_id}->${rule.target_id}`)
+  );
+  assert.equal(activeIncludePairs.has("opt_pda_001->opt_sne_001"), true);
+  assert.equal(activeIncludePairs.has("opt_pda_001->opt_vpw_001"), true);
 });
 
 test("Z06 draft emits strict Z07/PDB blocker groups for invalid brake and aero peers", () => {

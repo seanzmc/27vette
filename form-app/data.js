@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-07T20:00:27+00:00"
+          "generated_at": "2026-06-07T22:48:58+00:00"
         },
         "variants": [
           {
@@ -116,7 +116,7 @@ window.CORVETTE_FORM_DATA = {
             "step_label": "Stripes",
             "runtime_order": 7,
             "source": "workbook_phase6",
-            "section_ids": "sec_gsce_001|sec_gsha_001|sec_stri_001"
+            "section_ids": "sec_gsce_001|sec_gsha_001|sec_hash_001|sec_stri_001"
           },
           {
             "step_key": "seat",
@@ -758,6 +758,18 @@ window.CORVETTE_FORM_DATA = {
             "section_display_order": 15,
             "step_key": "packages_performance",
             "step_label": "Performance & Aero"
+          },
+          {
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
+            "selection_mode": "single_select_opt",
+            "selection_mode_label": "Optional single choice",
+            "choice_mode": "single",
+            "is_required": "False",
+            "standard_behavior": "locked_included",
+            "section_display_order": 25,
+            "step_key": "aero_exhaust_stripes_accessories",
+            "step_label": "Stripes"
           }
         ],
         "contextChoices": [
@@ -19294,8 +19306,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SHQ",
             "label": "Silver Fender Hash Stripes with Carbon Flash Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "1lt_c07",
@@ -19318,8 +19330,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SHQ",
             "label": "Silver Fender Hash Stripes with Carbon Flash Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "2lt_c07",
@@ -19342,8 +19354,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SHQ",
             "label": "Silver Fender Hash Stripes with Carbon Flash Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "3lt_c07",
@@ -19366,8 +19378,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SHQ",
             "label": "Silver Fender Hash Stripes with Carbon Flash Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "1lt_c67",
@@ -19390,8 +19402,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SHQ",
             "label": "Silver Fender Hash Stripes with Carbon Flash Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "2lt_c67",
@@ -19414,8 +19426,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SHQ",
             "label": "Silver Fender Hash Stripes with Carbon Flash Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "3lt_c67",
@@ -19438,8 +19450,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SHW",
             "label": "Carbon Flash Fender Hash Stripes with Edge Red Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "1lt_c07",
@@ -19462,8 +19474,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SHW",
             "label": "Carbon Flash Fender Hash Stripes with Edge Red Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "2lt_c07",
@@ -19486,8 +19498,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SHW",
             "label": "Carbon Flash Fender Hash Stripes with Edge Red Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "3lt_c07",
@@ -19510,8 +19522,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SHW",
             "label": "Carbon Flash Fender Hash Stripes with Edge Red Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "1lt_c67",
@@ -19534,8 +19546,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SHW",
             "label": "Carbon Flash Fender Hash Stripes with Edge Red Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "2lt_c67",
@@ -19558,8 +19570,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SHW",
             "label": "Carbon Flash Fender Hash Stripes with Edge Red Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "3lt_c67",
@@ -19582,8 +19594,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SNG",
             "label": "Carbon Flash Fender Hash Stripes with Tech Bronze Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "1lt_c07",
@@ -19606,8 +19618,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SNG",
             "label": "Carbon Flash Fender Hash Stripes with Tech Bronze Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "2lt_c07",
@@ -19630,8 +19642,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SNG",
             "label": "Carbon Flash Fender Hash Stripes with Tech Bronze Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "3lt_c07",
@@ -19654,8 +19666,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SNG",
             "label": "Carbon Flash Fender Hash Stripes with Tech Bronze Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "1lt_c67",
@@ -19678,8 +19690,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SNG",
             "label": "Carbon Flash Fender Hash Stripes with Tech Bronze Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "2lt_c67",
@@ -19702,8 +19714,8 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "SNG",
             "label": "Carbon Flash Fender Hash Stripes with Tech Bronze Accent",
             "description": "LPO. Genuine Corvette Accessory.",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
             "standard_equipment_group_type": "",
             "step_key": "aero_exhaust_stripes_accessories",
             "variant_id": "3lt_c67",
@@ -43472,6 +43484,306 @@ window.CORVETTE_FORM_DATA = {
             "disabled_reason": "CF8 blocks full-length dual racing stripe choices.",
             "active": "True",
             "notes": "Pass 2 grouped-excludes normalization: replaces repeated direct excludes with one workbook-owned excludes_any group."
+          },
+          {
+            "group_id": "grp_sb7_excludes_dual_racing_and_sht",
+            "group_type": "excludes_any",
+            "source_id": "opt_sb7_001",
+            "target_ids": [
+              "opt_dpb_001",
+              "opt_dpc_001",
+              "opt_dpg_001",
+              "opt_dpl_001",
+              "opt_dpt_001",
+              "opt_dsy_001",
+              "opt_dsz_001",
+              "opt_dt0_001",
+              "opt_dth_001",
+              "opt_dub_001",
+              "opt_due_001",
+              "opt_duk_001",
+              "opt_duw_001",
+              "opt_dzu_001",
+              "opt_dzv_001",
+              "opt_dzx_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "SB7 blocks Stingray dual racing stripes and the Tech Bronze Jake hood graphic.",
+            "active": "True",
+            "notes": "Stripe cleanup: Jake graphics conflict with dual racing stripes; SB7 and SHT are Jake peers."
+          },
+          {
+            "group_id": "grp_sht_excludes_dual_racing_and_sb7",
+            "group_type": "excludes_any",
+            "source_id": "opt_sht_001",
+            "target_ids": [
+              "opt_dpb_001",
+              "opt_dpc_001",
+              "opt_dpg_001",
+              "opt_dpl_001",
+              "opt_dpt_001",
+              "opt_dsy_001",
+              "opt_dsz_001",
+              "opt_dt0_001",
+              "opt_dth_001",
+              "opt_dub_001",
+              "opt_due_001",
+              "opt_duk_001",
+              "opt_duw_001",
+              "opt_dzu_001",
+              "opt_dzv_001",
+              "opt_dzx_001",
+              "opt_sb7_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "SHT blocks Stingray dual racing stripes and SB7 Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: Jake graphics conflict with dual racing stripes and each other."
+          },
+          {
+            "group_id": "grp_dpb_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dpb_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DPB blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_dpc_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dpc_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DPC blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_dpg_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dpg_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DPG blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_dpl_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dpl_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DPL blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_dpt_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dpt_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DPT blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_dsy_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dsy_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DSY blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_dsz_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dsz_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DSZ blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_dt0_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dt0_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DT0 blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_dth_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dth_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DTH blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_dub_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dub_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DUB blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_due_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_due_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DUE blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_duk_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_duk_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DUK blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_duw_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_duw_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DUW blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_dzu_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dzu_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DZU blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_dzv_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dzv_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DZV blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_dzx_excludes_stingray_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dzx_001",
+            "target_ids": [
+              "opt_sb7_001",
+              "opt_sht_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DZX blocks Stingray Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
           }
         ],
         "exclusiveGroups": [
@@ -54810,7 +55122,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-07T20:00:04+00:00",
+          "generated_at": "2026-06-07T22:48:54+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -98762,14 +99074,15 @@ window.CORVETTE_FORM_DATA = {
               "opt_dzx_001",
               "opt_z15_001",
               "opt_pda_001",
-              "opt_sne_001"
+              "opt_sne_001",
+              "opt_vpw_001"
             ],
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "disabled_reason": "SHT blocks full-length stripe choices and Z15 Heritage Graphics.",
+            "disabled_reason": "SHT blocks full-length stripe choices, Z15 Heritage Graphics, and conflicting Jake graphics.",
             "active": "True",
-            "notes": "Pass 2 grouped-excludes normalization: replaces repeated direct excludes with one workbook-owned excludes_any group."
+            "notes": "Stripe cleanup: Tech Bronze Jake hood graphic conflicts with dual racing stripes, PDA/SNE, and VPW."
           },
           {
             "group_id": "gs_group_pda_excludes_stripes_and_z15",
@@ -98822,14 +99135,16 @@ window.CORVETTE_FORM_DATA = {
               "opt_dzu_001",
               "opt_dzv_001",
               "opt_dzx_001",
-              "opt_z15_001"
+              "opt_z15_001",
+              "opt_sht_001",
+              "opt_vpo_001"
             ],
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "disabled_reason": "SNE blocks Grand Sport Heritage Graphics and conflicting stripe choices.",
+            "disabled_reason": "SNE blocks Grand Sport Heritage Graphics, conflicting stripe choices, and Tech Bronze Jake graphics.",
             "active": "True",
-            "notes": "5/25 distribution update grouped blocker for Jake Hood Graphic."
+            "notes": "Stripe cleanup: Jake hood graphic conflicts with dual racing stripes, SHT, and VPO."
           },
           {
             "group_id": "gs_group_vpo_excludes_jake_and_z15",
@@ -98838,14 +99153,270 @@ window.CORVETTE_FORM_DATA = {
             "target_ids": [
               "opt_z15_001",
               "opt_pda_001",
+              "opt_sne_001",
               "opt_vpw_001"
             ],
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "disabled_reason": "VPO blocks Grand Sport Heritage Graphics and conflicting Jake rear-hash graphics.",
+            "disabled_reason": "VPO blocks Grand Sport Heritage Graphics and conflicting Jake graphics.",
             "active": "True",
-            "notes": "5/25 distribution update grouped blocker for Tech Bronze Jake rear hash conflicts."
+            "notes": "Stripe cleanup: VPO conflicts with SNE and VPW; retained PDA/Z15 blockers from source copy."
+          },
+          {
+            "group_id": "gs_group_vpw_excludes_jake_rear_hash_peers",
+            "group_type": "excludes_any",
+            "source_id": "opt_vpw_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_vpo_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "VPW blocks conflicting Tech Bronze Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: VPW conflicts with SHT and VPO."
+          },
+          {
+            "group_id": "gs_group_dpb_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dpb_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DPB blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_dpc_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dpc_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DPC blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_dpg_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dpg_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DPG blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_dpl_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dpl_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DPL blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_dpt_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dpt_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DPT blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_dsy_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dsy_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DSY blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_dsz_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dsz_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DSZ blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_dt0_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dt0_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DT0 blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_dth_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dth_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DTH blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_dub_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dub_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DUB blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_due_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_due_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DUE blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_duk_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_duk_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DUK blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_duw_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_duw_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DUW blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_dzu_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dzu_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DZU blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_dzv_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dzv_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DZV blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_dzx_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dzx_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DZX blocks Grand Sport Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
           }
         ],
         "exclusiveGroups": [
@@ -109964,7 +110535,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-07T04:00:08+00:00",
+          "generated_at": "2026-06-07T22:48:55+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -153744,14 +154315,16 @@ window.CORVETTE_FORM_DATA = {
               "opt_duw_001",
               "opt_dzu_001",
               "opt_dzv_001",
-              "opt_dzx_001"
+              "opt_dzx_001",
+              "opt_sne_001",
+              "opt_vpw_001"
             ],
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "disabled_reason": "SHT blocks Z06 full-length stripe choices.",
+            "disabled_reason": "SHT blocks Z06 dual racing stripes and conflicting Jake graphics.",
             "active": "True",
-            "notes": "Pass 2 grouped-excludes normalization: replaces repeated direct excludes with one workbook-owned excludes_any group."
+            "notes": "Stripe cleanup: Tech Bronze Jake hood graphic conflicts with dual racing stripes, SNE, and VPW."
           },
           {
             "group_id": "z06_group_gba_excludes_accent_and_roof_choices",
@@ -153878,6 +154451,336 @@ window.CORVETTE_FORM_DATA = {
             "disabled_reason": "PDF requires ROY, ROZ, or STZ carbon fiber wheels; aluminum wheel choices are not available while PDF is selected.",
             "active": "True",
             "notes": "Preserves the carbon-wheel package lock after switching from default ROY to ROZ/STZ."
+          },
+          {
+            "group_id": "z06_group_pda_excludes_dual_racing_stripes",
+            "group_type": "excludes_any",
+            "source_id": "opt_pda_001",
+            "target_ids": [
+              "opt_dpb_001",
+              "opt_dpc_001",
+              "opt_dpg_001",
+              "opt_dpl_001",
+              "opt_dpt_001",
+              "opt_dsy_001",
+              "opt_dsz_001",
+              "opt_dt0_001",
+              "opt_dth_001",
+              "opt_dub_001",
+              "opt_due_001",
+              "opt_duk_001",
+              "opt_duw_001",
+              "opt_dzu_001",
+              "opt_dzv_001",
+              "opt_dzx_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "PDA blocks Z06 dual racing stripe choices.",
+            "active": "True",
+            "notes": "Stripe cleanup: Jake C8.R package conflicts with dual racing stripes."
+          },
+          {
+            "group_id": "z06_group_sne_excludes_stripes_and_tech_bronze_jake",
+            "group_type": "excludes_any",
+            "source_id": "opt_sne_001",
+            "target_ids": [
+              "opt_dpb_001",
+              "opt_dpc_001",
+              "opt_dpg_001",
+              "opt_dpl_001",
+              "opt_dpt_001",
+              "opt_dsy_001",
+              "opt_dsz_001",
+              "opt_dt0_001",
+              "opt_dth_001",
+              "opt_dub_001",
+              "opt_due_001",
+              "opt_duk_001",
+              "opt_duw_001",
+              "opt_dzu_001",
+              "opt_dzv_001",
+              "opt_dzx_001",
+              "opt_sht_001",
+              "opt_vpo_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "SNE blocks Z06 dual racing stripes and Tech Bronze Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: Jake hood graphic conflicts with dual racing stripes, SHT, and VPO."
+          },
+          {
+            "group_id": "z06_group_vpw_excludes_tech_bronze_jake",
+            "group_type": "excludes_any",
+            "source_id": "opt_vpw_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_vpo_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "VPW blocks Tech Bronze Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: VPW conflicts with SHT and VPO."
+          },
+          {
+            "group_id": "z06_group_vpo_excludes_jake_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_vpo_001",
+            "target_ids": [
+              "opt_sne_001",
+              "opt_vpw_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "VPO blocks conflicting Jake graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: VPO conflicts with SNE and VPW."
+          },
+          {
+            "group_id": "z06_group_dpb_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dpb_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DPB blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "z06_group_dpc_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dpc_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DPC blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "z06_group_dpg_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dpg_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DPG blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "z06_group_dpl_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dpl_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DPL blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "z06_group_dpt_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dpt_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DPT blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "z06_group_dsy_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dsy_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DSY blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "z06_group_dsz_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dsz_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DSZ blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "z06_group_dt0_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dt0_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DT0 blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "z06_group_dth_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dth_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DTH blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "z06_group_dub_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dub_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DUB blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "z06_group_due_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_due_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DUE blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "z06_group_duk_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_duk_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DUK blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "z06_group_duw_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_duw_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DUW blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "z06_group_dzu_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dzu_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DZU blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "z06_group_dzv_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dzv_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DZV blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "z06_group_dzx_excludes_jake_hood_graphics",
+            "group_type": "excludes_any",
+            "source_id": "opt_dzx_001",
+            "target_ids": [
+              "opt_sht_001",
+              "opt_sne_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "DZX blocks Z06 Jake hood graphics.",
+            "active": "True",
+            "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
           }
         ],
         "exclusiveGroups": [
@@ -155026,6 +155929,44 @@ window.CORVETTE_FORM_DATA = {
             "runtime_action": "active",
             "source_note": "BCW Red engine intake includes D3V engine lighting.",
             "review_flag": "False"
+          },
+          {
+            "rule_id": "z06_rule_opt_pda_001_includes_opt_sne_001",
+            "source_id": "opt_pda_001",
+            "rule_type": "includes",
+            "target_id": "opt_sne_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_stri_001",
+            "target_section": "sec_stri_001",
+            "source_selection_mode": "single_select_opt",
+            "target_selection_mode": "single_select_opt",
+            "body_style_scope": "",
+            "disabled_reason": "Included with PDA Jake C8.R Graphics Package.",
+            "auto_add": "True",
+            "active": "True",
+            "runtime_action": "active",
+            "source_note": "PDA includes SNE per Jake C8.R graphics package source rule.",
+            "review_flag": "False"
+          },
+          {
+            "rule_id": "z06_rule_opt_pda_001_includes_opt_vpw_001",
+            "source_id": "opt_pda_001",
+            "rule_type": "includes",
+            "target_id": "opt_vpw_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_stri_001",
+            "target_section": "sec_stri_001",
+            "source_selection_mode": "single_select_opt",
+            "target_selection_mode": "single_select_opt",
+            "body_style_scope": "",
+            "disabled_reason": "Included with PDA Jake C8.R Graphics Package.",
+            "auto_add": "True",
+            "active": "True",
+            "runtime_action": "active",
+            "source_note": "PDA includes VPW per Jake C8.R graphics package source rule.",
+            "review_flag": "False"
           }
         ],
         "priceRules": [
@@ -155580,6 +156521,30 @@ window.CORVETTE_FORM_DATA = {
             "variant_scope": "",
             "review_flag": "False",
             "notes": "BCW includes D3V, so D3V does not add a second charge."
+          },
+          {
+            "price_rule_id": "z06_pr_pda_sne_001",
+            "condition_option_id": "opt_pda_001",
+            "target_option_id": "opt_sne_001",
+            "price_rule_type": "override",
+            "price_value": 0,
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "review_flag": "False",
+            "notes": "PDA includes SNE, so SNE should not add a second charge."
+          },
+          {
+            "price_rule_id": "z06_pr_pda_vpw_001",
+            "condition_option_id": "opt_pda_001",
+            "target_option_id": "opt_vpw_001",
+            "price_rule_type": "override",
+            "price_value": 0,
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "review_flag": "False",
+            "notes": "PDA includes VPW, so VPW should not add a second charge."
           }
         ],
         "interiors": [
@@ -161613,7 +162578,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "53 active compatibility rules exported from z06_rule_mapping."
+            "message": "55 active compatibility rules exported from z06_rule_mapping."
           },
           {
             "check_id": "interior_contract",
@@ -161627,7 +162592,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "price_rule",
             "entity_id": "",
-            "message": "46 active price rules exported from z06_price_rules."
+            "message": "48 active price rules exported from z06_price_rules."
           }
         ]
       },

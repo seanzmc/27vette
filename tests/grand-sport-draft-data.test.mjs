@@ -406,8 +406,11 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
 
   for (const [groupId, sourceId, expectedTargets] of [
     ["gs_group_pda_excludes_stripes_and_z15", "opt_pda_001", [...fullLengthStripeOptionIds, "opt_z15_001"]],
-    ["gs_group_sne_excludes_stripes_and_z15", "opt_sne_001", [...fullLengthStripeOptionIds, "opt_z15_001"]],
-    ["gs_group_vpo_excludes_jake_and_z15", "opt_vpo_001", ["opt_z15_001", "opt_pda_001", "opt_vpw_001"]],
+    ["gs_group_sne_excludes_stripes_and_z15", "opt_sne_001", [...fullLengthStripeOptionIds, "opt_z15_001", "opt_sht_001", "opt_vpo_001"]],
+    ["gs_group_sht_excludes_full_length_stripes", "opt_sht_001", [...fullLengthStripeOptionIds, "opt_z15_001", "opt_pda_001", "opt_sne_001", "opt_vpw_001"]],
+    ["gs_group_vpo_excludes_jake_and_z15", "opt_vpo_001", ["opt_z15_001", "opt_pda_001", "opt_sne_001", "opt_vpw_001"]],
+    ["gs_group_vpw_excludes_jake_rear_hash_peers", "opt_vpw_001", ["opt_sht_001", "opt_vpo_001"]],
+    ["gs_group_dpb_excludes_jake_hood_graphics", "opt_dpb_001", ["opt_sht_001", "opt_sne_001"]],
   ]) {
     const group = draft.ruleGroups.find((candidate) => candidate.group_id === groupId);
     assert.ok(group, `${groupId} should be generated`);

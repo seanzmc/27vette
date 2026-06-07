@@ -2017,9 +2017,39 @@ test("stripe sections use the requested order", () => {
 
   assert.deepEqual(
     JSON.parse(JSON.stringify(sectionNames)),
-    ["Stripes", "GS Hash Marks", "GS Center Stripes"]
+    ["Hash Marks", "Stripes", "GS Hash Marks", "GS Center Stripes"]
   );
   assert.match(appSource, /section_display_order/);
+});
+
+test("Stingray hash marks are independent from dual racing and Jake stripe choices", () => {
+  const sectionById = new Map(data.sections.map((section) => [section.section_id, section]));
+  assert.equal(sectionById.get("sec_hash_001")?.section_name, "Hash Marks");
+  assert.equal(sectionById.get("sec_hash_001")?.selection_mode, "single_select_opt");
+
+  const hashChoices = data.choices.filter((choice) => ["opt_shq_001", "opt_shw_001", "opt_sng_001"].includes(choice.option_id));
+  assert.equal(hashChoices.length, 18);
+  assert.equal(hashChoices.every((choice) => choice.section_id === "sec_hash_001"), true);
+
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const choiceByRpo = (rpo) => runtime.activeChoiceRows().find((choice) => choice.rpo === rpo);
+  const shq = choiceByRpo("SHQ");
+  const dpb = choiceByRpo("DPB");
+  const sht = choiceByRpo("SHT");
+  assert.ok(shq, "SHQ should be active");
+  assert.ok(dpb, "DPB should be active");
+  assert.ok(sht, "SHT should be active");
+
+  runtime.handleChoice(shq);
+  runtime.handleChoice(dpb);
+  assert.equal(runtime.state.selected.has(shq.option_id), true, "hash mark should remain selected with dual racing stripe");
+  assert.equal(runtime.state.selected.has(dpb.option_id), true, "dual racing stripe should remain selected with hash mark");
+  assert.match(runtime.disableReasonForChoice(sht), /DPB blocks Stingray Jake graphics/);
 });
 
 test("Stingray section placement follows workbook step ownership", () => {

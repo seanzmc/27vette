@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-06-07T20:00:34+00:00",
+    "generated_at": "2026-06-07T22:51:30+00:00",
     "status": "draft_not_runtime_active"
   },
   "variants": [
@@ -48223,14 +48223,15 @@
         "opt_dzx_001",
         "opt_z15_001",
         "opt_pda_001",
-        "opt_sne_001"
+        "opt_sne_001",
+        "opt_vpw_001"
       ],
       "body_style_scope": "",
       "trim_level_scope": "",
       "variant_scope": "",
-      "disabled_reason": "SHT blocks full-length stripe choices and Z15 Heritage Graphics.",
+      "disabled_reason": "SHT blocks full-length stripe choices, Z15 Heritage Graphics, and conflicting Jake graphics.",
       "active": "True",
-      "notes": "Pass 2 grouped-excludes normalization: replaces repeated direct excludes with one workbook-owned excludes_any group."
+      "notes": "Stripe cleanup: Tech Bronze Jake hood graphic conflicts with dual racing stripes, PDA/SNE, and VPW."
     },
     {
       "group_id": "gs_group_pda_excludes_stripes_and_z15",
@@ -48283,14 +48284,16 @@
         "opt_dzu_001",
         "opt_dzv_001",
         "opt_dzx_001",
-        "opt_z15_001"
+        "opt_z15_001",
+        "opt_sht_001",
+        "opt_vpo_001"
       ],
       "body_style_scope": "",
       "trim_level_scope": "",
       "variant_scope": "",
-      "disabled_reason": "SNE blocks Grand Sport Heritage Graphics and conflicting stripe choices.",
+      "disabled_reason": "SNE blocks Grand Sport Heritage Graphics, conflicting stripe choices, and Tech Bronze Jake graphics.",
       "active": "True",
-      "notes": "5/25 distribution update grouped blocker for Jake Hood Graphic."
+      "notes": "Stripe cleanup: Jake hood graphic conflicts with dual racing stripes, SHT, and VPO."
     },
     {
       "group_id": "gs_group_vpo_excludes_jake_and_z15",
@@ -48299,14 +48302,270 @@
       "target_ids": [
         "opt_z15_001",
         "opt_pda_001",
+        "opt_sne_001",
         "opt_vpw_001"
       ],
       "body_style_scope": "",
       "trim_level_scope": "",
       "variant_scope": "",
-      "disabled_reason": "VPO blocks Grand Sport Heritage Graphics and conflicting Jake rear-hash graphics.",
+      "disabled_reason": "VPO blocks Grand Sport Heritage Graphics and conflicting Jake graphics.",
       "active": "True",
-      "notes": "5/25 distribution update grouped blocker for Tech Bronze Jake rear hash conflicts."
+      "notes": "Stripe cleanup: VPO conflicts with SNE and VPW; retained PDA/Z15 blockers from source copy."
+    },
+    {
+      "group_id": "gs_group_vpw_excludes_jake_rear_hash_peers",
+      "group_type": "excludes_any",
+      "source_id": "opt_vpw_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_vpo_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "VPW blocks conflicting Tech Bronze Jake graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: VPW conflicts with SHT and VPO."
+    },
+    {
+      "group_id": "gs_group_dpb_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_dpb_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DPB blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "gs_group_dpc_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_dpc_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DPC blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "gs_group_dpg_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_dpg_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DPG blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "gs_group_dpl_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_dpl_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DPL blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "gs_group_dpt_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_dpt_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DPT blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "gs_group_dsy_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_dsy_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DSY blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "gs_group_dsz_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_dsz_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DSZ blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "gs_group_dt0_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_dt0_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DT0 blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "gs_group_dth_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_dth_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DTH blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "gs_group_dub_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_dub_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DUB blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "gs_group_due_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_due_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DUE blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "gs_group_duk_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_duk_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DUK blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "gs_group_duw_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_duw_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DUW blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "gs_group_dzu_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_dzu_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DZU blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "gs_group_dzv_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_dzv_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DZV blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "gs_group_dzx_excludes_jake_hood_graphics",
+      "group_type": "excludes_any",
+      "source_id": "opt_dzx_001",
+      "target_ids": [
+        "opt_sht_001",
+        "opt_sne_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DZX blocks Grand Sport Jake hood graphics.",
+      "active": "True",
+      "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
     }
   ],
   "exclusiveGroups": [
