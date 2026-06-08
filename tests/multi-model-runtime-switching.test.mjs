@@ -324,6 +324,28 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
   );
 });
 
+test("Z06 trim selector and build summary render workbook-owned standard equipment", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("z06");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "2LZ";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.activateStep("trim_level");
+
+  const trimHtml = runtime.elements.get("#stepContent").innerHTML;
+  assert.match(trimHtml, /See what this trim includes/);
+  assert.match(trimHtml, /20 included items/);
+  assert.doesNotMatch(trimHtml, /No standard equipment rows for this variant/);
+
+  const order = runtime.currentOrder();
+  assert.equal(order.standard_equipment_summary.count > 0, true);
+  assert.equal(
+    order.standard_equipment_summary.groups.some((group) => group.section_label === "2LZ Equipment"),
+    true
+  );
+});
+
 test("generated app data applies active model assets from asset_map", () => {
   const dataWindow = loadDataWindow();
   const registry = dataWindow.CORVETTE_FORM_DATA;

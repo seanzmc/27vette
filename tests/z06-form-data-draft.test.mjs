@@ -68,6 +68,38 @@ test("Z06 draft preserves the live generated-data top-level contract", () => {
   assert.ok(draft.standardEquipment.length > 0, "Z06 draft should include standard equipment rows");
 });
 
+test("Z06 standard equipment marks trim-equipment sections with LZ labels", () => {
+  const trimRows = draft.standardEquipment.filter(
+    (row) => row.standard_equipment_group_type === "trim_equipment"
+  );
+  assert.ok(trimRows.length > 0, "Z06 should emit trim equipment rows for the trim selector");
+
+  const expectedLabelsByTrim = new Map([
+    ["1LZ", "1LZ Equipment"],
+    ["2LZ", "2LZ Equipment"],
+    ["3LZ", "3LZ Equipment"],
+  ]);
+
+  const allowedLabels = new Set(expectedLabelsByTrim.values());
+  for (const variantId of expectedVariantIds) {
+    const variant = draft.variants.find((row) => row.variant_id === variantId);
+    const rows = trimRows.filter((row) => row.variant_id === variantId);
+    assert.ok(rows.length > 0, `${variantId} should include trim-equipment standard rows`);
+    assert.equal(
+      rows.some((row) => row.section_name === expectedLabelsByTrim.get(variant.trim_level)),
+      true,
+      `${variantId} should include the selected ${variant.trim_level} equipment group`
+    );
+    assert.equal(
+      rows.every((row) => allowedLabels.has(row.section_name)),
+      true,
+      `${variantId} trim-equipment rows should use LZ labels`
+    );
+  }
+
+  assert.equal(trimRows.some((row) => /^\dLT Equipment$/.test(row.section_name)), false);
+});
+
 test("Z06 rear hash graphics draft outside the stripe radio section", () => {
   const sectionsByRpo = new Map();
   for (const choice of draft.choices) {
