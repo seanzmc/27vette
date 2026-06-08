@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-08T02:01:13+00:00"
+          "generated_at": "2026-06-08T02:17:36+00:00"
         },
         "variants": [
           {
@@ -767,7 +767,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "single",
             "is_required": "False",
             "standard_behavior": "locked_included",
-            "section_display_order": 25,
+            "section_display_order": 35,
             "step_key": "aero_exhaust_stripes_accessories",
             "step_label": "Stripes"
           },
@@ -779,7 +779,7 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "is_required": "False",
             "standard_behavior": "locked_included",
-            "section_display_order": 27,
+            "section_display_order": 34,
             "step_key": "aero_exhaust_stripes_accessories",
             "step_label": "Stripes"
           }
@@ -55134,7 +55134,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-08T02:01:10+00:00",
+          "generated_at": "2026-06-08T02:17:32+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -55560,32 +55560,6 @@ window.CORVETTE_FORM_DATA = {
             "step_label": "Standard Equipment"
           },
           {
-            "section_id": "sec_hash_001",
-            "section_name": "Hash Marks",
-            "source_section_name": "Hash Marks",
-            "selection_mode": "single_select_opt",
-            "selection_mode_label": "Optional single choice",
-            "choice_mode": "single",
-            "is_required": "False",
-            "standard_behavior": "locked_included",
-            "section_display_order": 25,
-            "step_key": "aero_exhaust_stripes_accessories",
-            "step_label": "Stripes"
-          },
-          {
-            "section_id": "sec_jake_001",
-            "section_name": "Jake Graphics Package",
-            "source_section_name": "Jake Graphics Package",
-            "selection_mode": "multi_select_opt",
-            "selection_mode_label": "Optional multiple choice",
-            "choice_mode": "multi",
-            "is_required": "False",
-            "standard_behavior": "locked_included",
-            "section_display_order": 27,
-            "step_key": "aero_exhaust_stripes_accessories",
-            "step_label": "Stripes"
-          },
-          {
             "section_id": "sec_badg_001",
             "section_name": "Badges",
             "source_section_name": "Badges",
@@ -55662,6 +55636,32 @@ window.CORVETTE_FORM_DATA = {
             "section_display_order": 30,
             "step_key": "standard_equipment",
             "step_label": "Standard Equipment"
+          },
+          {
+            "section_id": "sec_jake_001",
+            "section_name": "Jake Graphics Package",
+            "source_section_name": "Jake Graphics Package",
+            "selection_mode": "multi_select_opt",
+            "selection_mode_label": "Optional multiple choice",
+            "choice_mode": "multi",
+            "is_required": "False",
+            "standard_behavior": "locked_included",
+            "section_display_order": 34,
+            "step_key": "aero_exhaust_stripes_accessories",
+            "step_label": "Stripes"
+          },
+          {
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
+            "source_section_name": "Hash Marks",
+            "selection_mode": "single_select_opt",
+            "selection_mode_label": "Optional single choice",
+            "choice_mode": "single",
+            "is_required": "False",
+            "standard_behavior": "locked_included",
+            "section_display_order": 35,
+            "step_key": "aero_exhaust_stripes_accessories",
+            "step_label": "Stripes"
           },
           {
             "section_id": "sec_engi_001",
@@ -110573,7 +110573,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-08T02:01:11+00:00",
+          "generated_at": "2026-06-08T02:17:33+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -110997,32 +110997,6 @@ window.CORVETTE_FORM_DATA = {
             "step_label": "Standard Equipment"
           },
           {
-            "section_id": "sec_hash_001",
-            "section_name": "Hash Marks",
-            "source_section_name": "Hash Marks",
-            "selection_mode": "single_select_opt",
-            "selection_mode_label": "Optional single choice",
-            "choice_mode": "single",
-            "is_required": "False",
-            "standard_behavior": "locked_included",
-            "section_display_order": 25,
-            "step_key": "aero_exhaust_stripes_accessories",
-            "step_label": "Stripes"
-          },
-          {
-            "section_id": "sec_jake_001",
-            "section_name": "Jake Graphics Package",
-            "source_section_name": "Jake Graphics Package",
-            "selection_mode": "multi_select_opt",
-            "selection_mode_label": "Optional multiple choice",
-            "choice_mode": "multi",
-            "is_required": "False",
-            "standard_behavior": "locked_included",
-            "section_display_order": 27,
-            "step_key": "aero_exhaust_stripes_accessories",
-            "step_label": "Stripes"
-          },
-          {
             "section_id": "sec_badg_001",
             "section_name": "Badges",
             "source_section_name": "Badges",
@@ -111099,6 +111073,32 @@ window.CORVETTE_FORM_DATA = {
             "section_display_order": 30,
             "step_key": "standard_equipment",
             "step_label": "Standard Equipment"
+          },
+          {
+            "section_id": "sec_jake_001",
+            "section_name": "Jake Graphics Package",
+            "source_section_name": "Jake Graphics Package",
+            "selection_mode": "multi_select_opt",
+            "selection_mode_label": "Optional multiple choice",
+            "choice_mode": "multi",
+            "is_required": "False",
+            "standard_behavior": "locked_included",
+            "section_display_order": 34,
+            "step_key": "aero_exhaust_stripes_accessories",
+            "step_label": "Stripes"
+          },
+          {
+            "section_id": "sec_hash_001",
+            "section_name": "Hash Marks",
+            "source_section_name": "Hash Marks",
+            "selection_mode": "single_select_opt",
+            "selection_mode_label": "Optional single choice",
+            "choice_mode": "single",
+            "is_required": "False",
+            "standard_behavior": "locked_included",
+            "section_display_order": 35,
+            "step_key": "aero_exhaust_stripes_accessories",
+            "step_label": "Stripes"
           },
           {
             "section_id": "sec_engi_001",

@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-06-08T02:01:13+00:00"
+    "generated_at": "2026-06-08T02:17:36+00:00"
   },
   "variants": [
     {
@@ -759,7 +759,7 @@
       "choice_mode": "single",
       "is_required": "False",
       "standard_behavior": "locked_included",
-      "section_display_order": 25,
+      "section_display_order": 35,
       "step_key": "aero_exhaust_stripes_accessories",
       "step_label": "Stripes"
     },
@@ -771,7 +771,7 @@
       "choice_mode": "multi",
       "is_required": "False",
       "standard_behavior": "locked_included",
-      "section_display_order": 27,
+      "section_display_order": 34,
       "step_key": "aero_exhaust_stripes_accessories",
       "step_label": "Stripes"
     }
