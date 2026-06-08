@@ -2055,7 +2055,7 @@ test("stripe sections use the requested order", () => {
 
   assert.deepEqual(
     JSON.parse(JSON.stringify(sectionNames)),
-    ["Hash Marks", "Jake Graphics Package", "Stripes", "GS Hash Marks", "GS Center Stripes"]
+    ["Stripes", "Jake Graphics Package", "Hash Marks", "GS Hash Marks", "GS Center Stripes"]
   );
   assert.match(appSource, /section_display_order/);
 });

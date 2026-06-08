@@ -266,16 +266,16 @@ const expectedTrimTooltips = {
 };
 
 const expectedPaintImages = {
-  GEC: ["opt_gec_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_269_gec.png", "Pitch Gray Metallic"],
-  GPH: ["opt_gph_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_268_gph.png", "Red Mist Metallic Tintcoat"],
-  G26: ["opt_g26_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_267_g26.png", "Sebring Orange Tintcoat"],
-  GBK: ["opt_gbk_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_266_gbk.png", "Competition Yellow Tintcoat Metallic"],
-  G4Z: ["opt_g4z_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_265_g4z.png", "Roswell Green Metallic"],
-  GKA: ["opt_gka_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_264_gka.png", "Blade Silver Metallic"],
-  GBA: ["opt_gba_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_263_gba.png", "Black"],
-  G8G: ["opt_g8g_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_262_g8g.png", "Arctic White"],
-  GKZ: ["opt_gkz_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_261_gkz.png", "Torch Red"],
-  GTR: ["opt_gtr_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/expt_260_gtr.png", "Admiral Blue Metallic"],
+  GEC: ["opt_gec_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_11_gec.png", "Pitch Gray Metallic"],
+  GPH: ["opt_gph_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_17_gph.png", "Red Mist Metallic Tintcoat"],
+  G26: ["opt_g26_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_16_g26.png", "Sebring Orange Tintcoat"],
+  GBK: ["opt_gbk_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_15_gbk.png", "Competition Yellow Tintcoat Metallic"],
+  G4Z: ["opt_g4z_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_13_g4z.png", "Roswell Green Metallic"],
+  GKA: ["opt_gka_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_12_gka.png", "Blade Silver Metallic"],
+  GBA: ["opt_gba_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_10_gba.png", "Black"],
+  G8G: ["opt_g8g_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_9_g8g.png", "Arctic White"],
+  GKZ: ["opt_gkz_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_8_gkz.png", "Torch Red"],
+  GTR: ["opt_gtr_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_14_gtr.png", "Admiral Blue Metallic"],
 };
 
 test("generated app data exposes a multi-model registry with Stingray compatibility alias", () => {
@@ -338,7 +338,7 @@ test("generated app data applies active model assets from asset_map", () => {
 
   assert.equal(
     registry.models.grandSport.image_url,
-    "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/gs-copy.png"
+    "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/gs_v2.png"
   );
   assert.equal(registry.models.grandSport.image_alt, "Corvette Grand Sport");
   assert.equal(registry.models.grandSport.image_fit, "cover");
@@ -534,7 +534,7 @@ test("runtime renders Stingray paint image media from generated choice data", ()
 
   const html = runtime.renderChoiceCard(paintChoice, new Map());
   assert.match(html, /choice-media/);
-  assert.match(html, /expt_262_g8g\.png/);
+  assert.match(html, /imgi_9_g8g\.png/);
   assert.match(html, /Arctic White/);
 });
 

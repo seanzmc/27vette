@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-06-08T02:17:33+00:00",
+    "generated_at": "2026-06-08T03:27:42+00:00",
     "status": "draft_not_runtime_active"
   },
   "variants": [
@@ -17767,7 +17767,11 @@
       "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ.",
       "source_option_name": "Satin Graphite Spider Wheels with Red Stripe",
       "source_description": "20\" front / 21\" rear forged aluminum; Black lug nuts and wheel locks. Accessory second set of wheels \u2014 confirm two sets are desired; wheel caps not included",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-5dh.png",
+      "image_alt": "Satin Graphite Spider Wheels with Red Stripe",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_5dh_001",
@@ -17795,7 +17799,11 @@
       "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ.",
       "source_option_name": "Satin Graphite Spider Wheels with Red Stripe",
       "source_description": "20\" front / 21\" rear forged aluminum; Black lug nuts and wheel locks. Accessory second set of wheels \u2014 confirm two sets are desired; wheel caps not included",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-5dh.png",
+      "image_alt": "Satin Graphite Spider Wheels with Red Stripe",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_5dh_001",
@@ -17823,7 +17831,11 @@
       "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ.",
       "source_option_name": "Satin Graphite Spider Wheels with Red Stripe",
       "source_description": "20\" front / 21\" rear forged aluminum; Black lug nuts and wheel locks. Accessory second set of wheels \u2014 confirm two sets are desired; wheel caps not included",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-5dh.png",
+      "image_alt": "Satin Graphite Spider Wheels with Red Stripe",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_5dh_001",
@@ -17851,7 +17863,11 @@
       "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ.",
       "source_option_name": "Satin Graphite Spider Wheels with Red Stripe",
       "source_description": "20\" front / 21\" rear forged aluminum; Black lug nuts and wheel locks. Accessory second set of wheels \u2014 confirm two sets are desired; wheel caps not included",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-5dh.png",
+      "image_alt": "Satin Graphite Spider Wheels with Red Stripe",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_5dh_001",
@@ -17879,7 +17895,11 @@
       "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ.",
       "source_option_name": "Satin Graphite Spider Wheels with Red Stripe",
       "source_description": "20\" front / 21\" rear forged aluminum; Black lug nuts and wheel locks. Accessory second set of wheels \u2014 confirm two sets are desired; wheel caps not included",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-5dh.png",
+      "image_alt": "Satin Graphite Spider Wheels with Red Stripe",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_5dh_001",
@@ -17907,7 +17927,11 @@
       "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ.",
       "source_option_name": "Satin Graphite Spider Wheels with Red Stripe",
       "source_description": "20\" front / 21\" rear forged aluminum; Black lug nuts and wheel locks. Accessory second set of wheels \u2014 confirm two sets are desired; wheel caps not included",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-5dh.png",
+      "image_alt": "Satin Graphite Spider Wheels with Red Stripe",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_5dk_001",
@@ -17935,7 +17959,11 @@
       "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ. Included with (PCZ) Tech Bronze Accent Package, LPO.",
       "source_option_name": "Tech Bronze Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum; Black lug nuts and wheel locks, Tech Bronze center caps. Accessory second set of wheels \u2014 confirm two sets are desired",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-5dk.png",
+      "image_alt": "Tech Bronze Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_5dk_001",
@@ -17963,7 +17991,11 @@
       "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ. Included with (PCZ) Tech Bronze Accent Package, LPO.",
       "source_option_name": "Tech Bronze Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum; Black lug nuts and wheel locks, Tech Bronze center caps. Accessory second set of wheels \u2014 confirm two sets are desired",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-5dk.png",
+      "image_alt": "Tech Bronze Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_5dk_001",
@@ -17991,7 +18023,11 @@
       "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ. Included with (PCZ) Tech Bronze Accent Package, LPO.",
       "source_option_name": "Tech Bronze Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum; Black lug nuts and wheel locks, Tech Bronze center caps. Accessory second set of wheels \u2014 confirm two sets are desired",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-5dk.png",
+      "image_alt": "Tech Bronze Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_5dk_001",
@@ -18019,7 +18055,11 @@
       "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ. Included with (PCZ) Tech Bronze Accent Package, LPO.",
       "source_option_name": "Tech Bronze Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum; Black lug nuts and wheel locks, Tech Bronze center caps. Accessory second set of wheels \u2014 confirm two sets are desired",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-5dk.png",
+      "image_alt": "Tech Bronze Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_5dk_001",
@@ -18047,7 +18087,11 @@
       "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ. Included with (PCZ) Tech Bronze Accent Package, LPO.",
       "source_option_name": "Tech Bronze Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum; Black lug nuts and wheel locks, Tech Bronze center caps. Accessory second set of wheels \u2014 confirm two sets are desired",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-5dk.png",
+      "image_alt": "Tech Bronze Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_5dk_001",
@@ -18075,7 +18119,11 @@
       "source_detail_raw": "Not available with R8C, SPZ, SFE, SPY, S47, ROY, ROZ, STZ. Included with (PCZ) Tech Bronze Accent Package, LPO.",
       "source_option_name": "Tech Bronze Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum; Black lug nuts and wheel locks, Tech Bronze center caps. Accessory second set of wheels \u2014 confirm two sets are desired",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-5dk.png",
+      "image_alt": "Tech Bronze Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_g26_001",
@@ -18103,7 +18151,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Sebring Orange Tintcoat",
       "source_description": "Touch-Up Paint Number WA-418C",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_16_g26.png",
+      "image_alt": "Sebring Orange Tintcoat",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_g26_001",
@@ -18131,7 +18183,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Sebring Orange Tintcoat",
       "source_description": "Touch-Up Paint Number WA-418C",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_16_g26.png",
+      "image_alt": "Sebring Orange Tintcoat",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_g26_001",
@@ -18159,7 +18215,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Sebring Orange Tintcoat",
       "source_description": "Touch-Up Paint Number WA-418C",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_16_g26.png",
+      "image_alt": "Sebring Orange Tintcoat",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_g26_001",
@@ -18187,7 +18247,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Sebring Orange Tintcoat",
       "source_description": "Touch-Up Paint Number WA-418C",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_16_g26.png",
+      "image_alt": "Sebring Orange Tintcoat",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_g26_001",
@@ -18215,7 +18279,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Sebring Orange Tintcoat",
       "source_description": "Touch-Up Paint Number WA-418C",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_16_g26.png",
+      "image_alt": "Sebring Orange Tintcoat",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_g26_001",
@@ -18243,7 +18311,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Sebring Orange Tintcoat",
       "source_description": "Touch-Up Paint Number WA-418C",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_16_g26.png",
+      "image_alt": "Sebring Orange Tintcoat",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_g4z_001",
@@ -18271,7 +18343,11 @@
       "source_detail_raw": "Additional charge - premium color.",
       "source_option_name": "Roswell Green Metallic",
       "source_description": "Touch-Up Paint Number WA-247L",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_13_g4z.png",
+      "image_alt": "Roswell Green Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_g4z_001",
@@ -18299,7 +18375,11 @@
       "source_detail_raw": "Additional charge - premium color.",
       "source_option_name": "Roswell Green Metallic",
       "source_description": "Touch-Up Paint Number WA-247L",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_13_g4z.png",
+      "image_alt": "Roswell Green Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_g4z_001",
@@ -18327,7 +18407,11 @@
       "source_detail_raw": "Additional charge - premium color.",
       "source_option_name": "Roswell Green Metallic",
       "source_description": "Touch-Up Paint Number WA-247L",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_13_g4z.png",
+      "image_alt": "Roswell Green Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_g4z_001",
@@ -18355,7 +18439,11 @@
       "source_detail_raw": "Additional charge - premium color.",
       "source_option_name": "Roswell Green Metallic",
       "source_description": "Touch-Up Paint Number WA-247L",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_13_g4z.png",
+      "image_alt": "Roswell Green Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_g4z_001",
@@ -18383,7 +18471,11 @@
       "source_detail_raw": "Additional charge - premium color.",
       "source_option_name": "Roswell Green Metallic",
       "source_description": "Touch-Up Paint Number WA-247L",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_13_g4z.png",
+      "image_alt": "Roswell Green Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_g4z_001",
@@ -18411,7 +18503,11 @@
       "source_detail_raw": "Additional charge - premium color.",
       "source_option_name": "Roswell Green Metallic",
       "source_description": "Touch-Up Paint Number WA-247L",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_13_g4z.png",
+      "image_alt": "Roswell Green Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_g8g_001",
@@ -18439,7 +18535,11 @@
       "source_detail_raw": "",
       "source_option_name": "Arctic White",
       "source_description": "Touch-Up Paint Number WA-9567",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_9_g8g.png",
+      "image_alt": "Arctic White",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_g8g_001",
@@ -18467,7 +18567,11 @@
       "source_detail_raw": "",
       "source_option_name": "Arctic White",
       "source_description": "Touch-Up Paint Number WA-9567",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_9_g8g.png",
+      "image_alt": "Arctic White",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_g8g_001",
@@ -18495,7 +18599,11 @@
       "source_detail_raw": "",
       "source_option_name": "Arctic White",
       "source_description": "Touch-Up Paint Number WA-9567",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_9_g8g.png",
+      "image_alt": "Arctic White",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_g8g_001",
@@ -18523,7 +18631,11 @@
       "source_detail_raw": "",
       "source_option_name": "Arctic White",
       "source_description": "Touch-Up Paint Number WA-9567",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_9_g8g.png",
+      "image_alt": "Arctic White",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_g8g_001",
@@ -18551,7 +18663,11 @@
       "source_detail_raw": "",
       "source_option_name": "Arctic White",
       "source_description": "Touch-Up Paint Number WA-9567",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_9_g8g.png",
+      "image_alt": "Arctic White",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_g8g_001",
@@ -18579,7 +18695,11 @@
       "source_detail_raw": "",
       "source_option_name": "Arctic White",
       "source_description": "Touch-Up Paint Number WA-9567",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_9_g8g.png",
+      "image_alt": "Arctic White",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_gba_001",
@@ -18607,7 +18727,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black",
       "source_description": "Touch-Up Paint Number WA-8555",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_10_gba.png",
+      "image_alt": "Black",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_gba_001",
@@ -18635,7 +18759,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black",
       "source_description": "Touch-Up Paint Number WA-8555",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_10_gba.png",
+      "image_alt": "Black",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_gba_001",
@@ -18663,7 +18791,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black",
       "source_description": "Touch-Up Paint Number WA-8555",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_10_gba.png",
+      "image_alt": "Black",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_gba_001",
@@ -18691,7 +18823,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black",
       "source_description": "Touch-Up Paint Number WA-8555",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_10_gba.png",
+      "image_alt": "Black",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_gba_001",
@@ -18719,7 +18855,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black",
       "source_description": "Touch-Up Paint Number WA-8555",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_10_gba.png",
+      "image_alt": "Black",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_gba_001",
@@ -18747,7 +18887,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black",
       "source_description": "Touch-Up Paint Number WA-8555",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_10_gba.png",
+      "image_alt": "Black",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_gbk_001",
@@ -18775,7 +18919,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Competition Yellow Tintcoat Metallic",
       "source_description": "Touch-Up Paint Number WA-233K",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_15_gbk.png",
+      "image_alt": "Competition Yellow Tintcoat Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_gbk_001",
@@ -18803,7 +18951,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Competition Yellow Tintcoat Metallic",
       "source_description": "Touch-Up Paint Number WA-233K",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_15_gbk.png",
+      "image_alt": "Competition Yellow Tintcoat Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_gbk_001",
@@ -18831,7 +18983,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Competition Yellow Tintcoat Metallic",
       "source_description": "Touch-Up Paint Number WA-233K",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_15_gbk.png",
+      "image_alt": "Competition Yellow Tintcoat Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_gbk_001",
@@ -18859,7 +19015,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Competition Yellow Tintcoat Metallic",
       "source_description": "Touch-Up Paint Number WA-233K",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_15_gbk.png",
+      "image_alt": "Competition Yellow Tintcoat Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_gbk_001",
@@ -18887,7 +19047,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Competition Yellow Tintcoat Metallic",
       "source_description": "Touch-Up Paint Number WA-233K",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_15_gbk.png",
+      "image_alt": "Competition Yellow Tintcoat Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_gbk_001",
@@ -18915,7 +19079,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Competition Yellow Tintcoat Metallic",
       "source_description": "Touch-Up Paint Number WA-233K",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_15_gbk.png",
+      "image_alt": "Competition Yellow Tintcoat Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_gec_001",
@@ -18943,7 +19111,11 @@
       "source_detail_raw": "",
       "source_option_name": "Pitch Gray Metallic",
       "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_11_gec.png",
+      "image_alt": "Pitch Gray Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_gec_001",
@@ -18971,7 +19143,11 @@
       "source_detail_raw": "",
       "source_option_name": "Pitch Gray Metallic",
       "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_11_gec.png",
+      "image_alt": "Pitch Gray Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_gec_001",
@@ -18999,7 +19175,11 @@
       "source_detail_raw": "",
       "source_option_name": "Pitch Gray Metallic",
       "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_11_gec.png",
+      "image_alt": "Pitch Gray Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_gec_001",
@@ -19027,7 +19207,11 @@
       "source_detail_raw": "",
       "source_option_name": "Pitch Gray Metallic",
       "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_11_gec.png",
+      "image_alt": "Pitch Gray Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_gec_001",
@@ -19055,7 +19239,11 @@
       "source_detail_raw": "",
       "source_option_name": "Pitch Gray Metallic",
       "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_11_gec.png",
+      "image_alt": "Pitch Gray Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_gec_001",
@@ -19083,7 +19271,11 @@
       "source_detail_raw": "",
       "source_option_name": "Pitch Gray Metallic",
       "source_description": "New for 2027. Touch-Up Paint Number WA-243F.",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_11_gec.png",
+      "image_alt": "Pitch Gray Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_gka_001",
@@ -19111,7 +19303,11 @@
       "source_detail_raw": "",
       "source_option_name": "Blade Silver Metallic",
       "source_description": "Touch-Up Paint Number WA-240K",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_12_gka.png",
+      "image_alt": "Blade Silver Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_gka_001",
@@ -19139,7 +19335,11 @@
       "source_detail_raw": "",
       "source_option_name": "Blade Silver Metallic",
       "source_description": "Touch-Up Paint Number WA-240K",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_12_gka.png",
+      "image_alt": "Blade Silver Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_gka_001",
@@ -19167,7 +19367,11 @@
       "source_detail_raw": "",
       "source_option_name": "Blade Silver Metallic",
       "source_description": "Touch-Up Paint Number WA-240K",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_12_gka.png",
+      "image_alt": "Blade Silver Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_gka_001",
@@ -19195,7 +19399,11 @@
       "source_detail_raw": "",
       "source_option_name": "Blade Silver Metallic",
       "source_description": "Touch-Up Paint Number WA-240K",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_12_gka.png",
+      "image_alt": "Blade Silver Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_gka_001",
@@ -19223,7 +19431,11 @@
       "source_detail_raw": "",
       "source_option_name": "Blade Silver Metallic",
       "source_description": "Touch-Up Paint Number WA-240K",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_12_gka.png",
+      "image_alt": "Blade Silver Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_gka_001",
@@ -19251,7 +19463,11 @@
       "source_detail_raw": "",
       "source_option_name": "Blade Silver Metallic",
       "source_description": "Touch-Up Paint Number WA-240K",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_12_gka.png",
+      "image_alt": "Blade Silver Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_gkz_001",
@@ -19279,7 +19495,11 @@
       "source_detail_raw": "",
       "source_option_name": "Torch Red",
       "source_description": "Touch-Up Paint Number WA-9075",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_8_gkz.png",
+      "image_alt": "Torch Red",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_gkz_001",
@@ -19307,7 +19527,11 @@
       "source_detail_raw": "",
       "source_option_name": "Torch Red",
       "source_description": "Touch-Up Paint Number WA-9075",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_8_gkz.png",
+      "image_alt": "Torch Red",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_gkz_001",
@@ -19335,7 +19559,11 @@
       "source_detail_raw": "",
       "source_option_name": "Torch Red",
       "source_description": "Touch-Up Paint Number WA-9075",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_8_gkz.png",
+      "image_alt": "Torch Red",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_gkz_001",
@@ -19363,7 +19591,11 @@
       "source_detail_raw": "",
       "source_option_name": "Torch Red",
       "source_description": "Touch-Up Paint Number WA-9075",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_8_gkz.png",
+      "image_alt": "Torch Red",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_gkz_001",
@@ -19391,7 +19623,11 @@
       "source_detail_raw": "",
       "source_option_name": "Torch Red",
       "source_description": "Touch-Up Paint Number WA-9075",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_8_gkz.png",
+      "image_alt": "Torch Red",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_gkz_001",
@@ -19419,7 +19655,11 @@
       "source_detail_raw": "",
       "source_option_name": "Torch Red",
       "source_description": "Touch-Up Paint Number WA-9075",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_8_gkz.png",
+      "image_alt": "Torch Red",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_gph_001",
@@ -19447,7 +19687,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Red Mist Metallic Tintcoat",
       "source_description": "Touch-Up Paint Number WA-245F",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_17_gph.png",
+      "image_alt": "Red Mist Metallic Tintcoat",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_gph_001",
@@ -19475,7 +19719,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Red Mist Metallic Tintcoat",
       "source_description": "Touch-Up Paint Number WA-245F",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_17_gph.png",
+      "image_alt": "Red Mist Metallic Tintcoat",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_gph_001",
@@ -19503,7 +19751,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Red Mist Metallic Tintcoat",
       "source_description": "Touch-Up Paint Number WA-245F",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_17_gph.png",
+      "image_alt": "Red Mist Metallic Tintcoat",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_gph_001",
@@ -19531,7 +19783,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Red Mist Metallic Tintcoat",
       "source_description": "Touch-Up Paint Number WA-245F",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_17_gph.png",
+      "image_alt": "Red Mist Metallic Tintcoat",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_gph_001",
@@ -19559,7 +19815,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Red Mist Metallic Tintcoat",
       "source_description": "Touch-Up Paint Number WA-245F",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_17_gph.png",
+      "image_alt": "Red Mist Metallic Tintcoat",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_gph_001",
@@ -19587,7 +19847,11 @@
       "source_detail_raw": "Additional charge - premium tintcoat color.",
       "source_option_name": "Red Mist Metallic Tintcoat",
       "source_description": "Touch-Up Paint Number WA-245F",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_17_gph.png",
+      "image_alt": "Red Mist Metallic Tintcoat",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_gtr_001",
@@ -19615,7 +19879,11 @@
       "source_detail_raw": "Additional charge - premium color.",
       "source_option_name": "Admiral Blue Metallic",
       "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_14_gtr.png",
+      "image_alt": "Admiral Blue Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_gtr_001",
@@ -19643,7 +19911,11 @@
       "source_detail_raw": "Additional charge - premium color.",
       "source_option_name": "Admiral Blue Metallic",
       "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_14_gtr.png",
+      "image_alt": "Admiral Blue Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_gtr_001",
@@ -19671,7 +19943,11 @@
       "source_detail_raw": "Additional charge - premium color.",
       "source_option_name": "Admiral Blue Metallic",
       "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_14_gtr.png",
+      "image_alt": "Admiral Blue Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_gtr_001",
@@ -19699,7 +19975,11 @@
       "source_detail_raw": "Additional charge - premium color.",
       "source_option_name": "Admiral Blue Metallic",
       "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_14_gtr.png",
+      "image_alt": "Admiral Blue Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_gtr_001",
@@ -19727,7 +20007,11 @@
       "source_detail_raw": "Additional charge - premium color.",
       "source_option_name": "Admiral Blue Metallic",
       "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_14_gtr.png",
+      "image_alt": "Admiral Blue Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_gtr_001",
@@ -19755,7 +20039,11 @@
       "source_detail_raw": "Additional charge - premium color.",
       "source_option_name": "Admiral Blue Metallic",
       "source_description": "New for 2027. Touch-Up Paint Number WA-705U.",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_14_gtr.png",
+      "image_alt": "Admiral Blue Metallic",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_5zv_001",
@@ -38095,7 +38383,11 @@
       "source_detail_raw": "",
       "source_option_name": "Pearl Nickel Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/rou.png",
+      "image_alt": "Pearl Nickel Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_rou_001",
@@ -38123,7 +38415,11 @@
       "source_detail_raw": "",
       "source_option_name": "Pearl Nickel Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/rou.png",
+      "image_alt": "Pearl Nickel Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_rou_001",
@@ -38151,7 +38447,11 @@
       "source_detail_raw": "",
       "source_option_name": "Pearl Nickel Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/rou.png",
+      "image_alt": "Pearl Nickel Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_rou_001",
@@ -38179,7 +38479,11 @@
       "source_detail_raw": "",
       "source_option_name": "Pearl Nickel Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/rou.png",
+      "image_alt": "Pearl Nickel Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_rou_001",
@@ -38207,7 +38511,11 @@
       "source_detail_raw": "",
       "source_option_name": "Pearl Nickel Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/rou.png",
+      "image_alt": "Pearl Nickel Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_rou_001",
@@ -38235,7 +38543,11 @@
       "source_detail_raw": "",
       "source_option_name": "Pearl Nickel Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/rou.png",
+      "image_alt": "Pearl Nickel Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_rox_001",
@@ -38263,7 +38575,11 @@
       "source_detail_raw": "",
       "source_option_name": "Carbon Flash Machined-Edge Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/rox.png",
+      "image_alt": "Carbon Flash Machined-Edge Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_rox_001",
@@ -38291,7 +38607,11 @@
       "source_detail_raw": "",
       "source_option_name": "Carbon Flash Machined-Edge Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/rox.png",
+      "image_alt": "Carbon Flash Machined-Edge Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_rox_001",
@@ -38319,7 +38639,11 @@
       "source_detail_raw": "",
       "source_option_name": "Carbon Flash Machined-Edge Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/rox.png",
+      "image_alt": "Carbon Flash Machined-Edge Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_rox_001",
@@ -38347,7 +38671,11 @@
       "source_detail_raw": "",
       "source_option_name": "Carbon Flash Machined-Edge Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/rox.png",
+      "image_alt": "Carbon Flash Machined-Edge Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_rox_001",
@@ -38375,7 +38703,11 @@
       "source_detail_raw": "",
       "source_option_name": "Carbon Flash Machined-Edge Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/rox.png",
+      "image_alt": "Carbon Flash Machined-Edge Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_rox_001",
@@ -38403,7 +38735,11 @@
       "source_detail_raw": "",
       "source_option_name": "Carbon Flash Machined-Edge Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/rox.png",
+      "image_alt": "Carbon Flash Machined-Edge Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_soa_001",
@@ -38431,7 +38767,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-soa.png",
+      "image_alt": "Black Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_soa_001",
@@ -38459,7 +38799,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-soa.png",
+      "image_alt": "Black Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_soa_001",
@@ -38487,7 +38831,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-soa.png",
+      "image_alt": "Black Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_soa_001",
@@ -38515,7 +38863,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-soa.png",
+      "image_alt": "Black Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_soa_001",
@@ -38543,7 +38895,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-soa.png",
+      "image_alt": "Black Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_soa_001",
@@ -38571,7 +38927,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-soa.png",
+      "image_alt": "Black Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_soe_002",
@@ -38599,7 +38959,11 @@
       "source_detail_raw": "",
       "source_option_name": "Titanium Satin Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-soe.png",
+      "image_alt": "Titanium Satin Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_soe_002",
@@ -38627,7 +38991,11 @@
       "source_detail_raw": "",
       "source_option_name": "Titanium Satin Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-soe.png",
+      "image_alt": "Titanium Satin Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_soe_002",
@@ -38655,7 +39023,11 @@
       "source_detail_raw": "",
       "source_option_name": "Titanium Satin Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-soe.png",
+      "image_alt": "Titanium Satin Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_soe_002",
@@ -38683,7 +39055,11 @@
       "source_detail_raw": "",
       "source_option_name": "Titanium Satin Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-soe.png",
+      "image_alt": "Titanium Satin Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_soe_002",
@@ -38711,7 +39087,11 @@
       "source_detail_raw": "",
       "source_option_name": "Titanium Satin Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-soe.png",
+      "image_alt": "Titanium Satin Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_soe_002",
@@ -38739,7 +39119,11 @@
       "source_detail_raw": "",
       "source_option_name": "Titanium Satin Spider Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-soe.png",
+      "image_alt": "Titanium Satin Spider Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_som_001",
@@ -38767,7 +39151,11 @@
       "source_detail_raw": "",
       "source_option_name": "Bright Polished Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/som.png",
+      "image_alt": "Bright Polished Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_som_001",
@@ -38795,7 +39183,11 @@
       "source_detail_raw": "",
       "source_option_name": "Bright Polished Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/som.png",
+      "image_alt": "Bright Polished Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_som_001",
@@ -38823,7 +39215,11 @@
       "source_detail_raw": "",
       "source_option_name": "Bright Polished Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/som.png",
+      "image_alt": "Bright Polished Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_som_001",
@@ -38851,7 +39247,11 @@
       "source_detail_raw": "",
       "source_option_name": "Bright Polished Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/som.png",
+      "image_alt": "Bright Polished Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_som_001",
@@ -38879,7 +39279,11 @@
       "source_detail_raw": "",
       "source_option_name": "Bright Polished Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/som.png",
+      "image_alt": "Bright Polished Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_som_001",
@@ -38907,7 +39311,11 @@
       "source_detail_raw": "",
       "source_option_name": "Bright Polished Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/som.png",
+      "image_alt": "Bright Polished Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_son_001",
@@ -38935,7 +39343,11 @@
       "source_detail_raw": "",
       "source_option_name": "Gloss Black Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/son.png",
+      "image_alt": "Gloss Black Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_son_001",
@@ -38963,7 +39375,11 @@
       "source_detail_raw": "",
       "source_option_name": "Gloss Black Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/son.png",
+      "image_alt": "Gloss Black Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_son_001",
@@ -38991,7 +39407,11 @@
       "source_detail_raw": "",
       "source_option_name": "Gloss Black Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/son.png",
+      "image_alt": "Gloss Black Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_son_001",
@@ -39019,7 +39439,11 @@
       "source_detail_raw": "",
       "source_option_name": "Gloss Black Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/son.png",
+      "image_alt": "Gloss Black Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_son_001",
@@ -39047,7 +39471,11 @@
       "source_detail_raw": "",
       "source_option_name": "Gloss Black Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/son.png",
+      "image_alt": "Gloss Black Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_son_001",
@@ -39075,7 +39503,11 @@
       "source_detail_raw": "",
       "source_option_name": "Gloss Black Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/son.png",
+      "image_alt": "Gloss Black Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_srk_001",
@@ -39103,7 +39535,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Pearl Nickel Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-srk.png",
+      "image_alt": "10-Spoke Pearl Nickel Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_srk_001",
@@ -39131,7 +39567,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Pearl Nickel Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-srk.png",
+      "image_alt": "10-Spoke Pearl Nickel Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_srk_001",
@@ -39159,7 +39599,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Pearl Nickel Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-srk.png",
+      "image_alt": "10-Spoke Pearl Nickel Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_srk_001",
@@ -39187,7 +39631,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Pearl Nickel Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-srk.png",
+      "image_alt": "10-Spoke Pearl Nickel Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_srk_001",
@@ -39215,7 +39663,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Pearl Nickel Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-srk.png",
+      "image_alt": "10-Spoke Pearl Nickel Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_srk_001",
@@ -39243,7 +39695,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Pearl Nickel Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-srk.png",
+      "image_alt": "10-Spoke Pearl Nickel Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_srn_001",
@@ -39271,7 +39727,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Gloss Black Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-srn.png",
+      "image_alt": "10-Spoke Gloss Black Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_srn_001",
@@ -39299,7 +39759,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Gloss Black Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-srn.png",
+      "image_alt": "10-Spoke Gloss Black Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_srn_001",
@@ -39327,7 +39791,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Gloss Black Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-srn.png",
+      "image_alt": "10-Spoke Gloss Black Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_srn_001",
@@ -39355,7 +39823,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Gloss Black Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-srn.png",
+      "image_alt": "10-Spoke Gloss Black Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_srn_001",
@@ -39383,7 +39855,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Gloss Black Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-srn.png",
+      "image_alt": "10-Spoke Gloss Black Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_srn_001",
@@ -39411,7 +39887,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Gloss Black Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-srn.png",
+      "image_alt": "10-Spoke Gloss Black Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_stx_001",
@@ -39439,7 +39919,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Bright Polished Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum with Carbon Flash-painted pockets",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-stx.png",
+      "image_alt": "10-Spoke Bright Polished Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_stx_001",
@@ -39467,7 +39951,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Bright Polished Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum with Carbon Flash-painted pockets",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-stx.png",
+      "image_alt": "10-Spoke Bright Polished Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_stx_001",
@@ -39495,7 +39983,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Bright Polished Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum with Carbon Flash-painted pockets",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-stx.png",
+      "image_alt": "10-Spoke Bright Polished Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_stx_001",
@@ -39523,7 +40015,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Bright Polished Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum with Carbon Flash-painted pockets",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-stx.png",
+      "image_alt": "10-Spoke Bright Polished Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_stx_001",
@@ -39551,7 +40047,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Bright Polished Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum with Carbon Flash-painted pockets",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-stx.png",
+      "image_alt": "10-Spoke Bright Polished Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_stx_001",
@@ -39579,7 +40079,11 @@
       "source_detail_raw": "",
       "source_option_name": "10-Spoke Bright Polished Wheels",
       "source_description": "20\" front / 21\" rear forged aluminum with Carbon Flash-painted pockets",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-stx.png",
+      "image_alt": "10-Spoke Bright Polished Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_roy_001",
@@ -39607,7 +40111,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Carbon Flash-Painted Carbon Fiber Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/roy.png",
+      "image_alt": "Carbon Flash-Painted Carbon Fiber Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_roy_001",
@@ -39635,7 +40143,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Carbon Flash-Painted Carbon Fiber Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/roy.png",
+      "image_alt": "Carbon Flash-Painted Carbon Fiber Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_roy_001",
@@ -39663,7 +40175,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Carbon Flash-Painted Carbon Fiber Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/roy.png",
+      "image_alt": "Carbon Flash-Painted Carbon Fiber Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_roy_001",
@@ -39691,7 +40207,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Carbon Flash-Painted Carbon Fiber Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/roy.png",
+      "image_alt": "Carbon Flash-Painted Carbon Fiber Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_roy_001",
@@ -39719,7 +40239,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Carbon Flash-Painted Carbon Fiber Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/roy.png",
+      "image_alt": "Carbon Flash-Painted Carbon Fiber Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_roy_001",
@@ -39747,7 +40271,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Carbon Flash-Painted Carbon Fiber Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/roy.png",
+      "image_alt": "Carbon Flash-Painted Carbon Fiber Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_roz_001",
@@ -39775,7 +40303,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Visible Carbon Fiber Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/roz.png",
+      "image_alt": "Visible Carbon Fiber Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_roz_001",
@@ -39803,7 +40335,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Visible Carbon Fiber Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/roz.png",
+      "image_alt": "Visible Carbon Fiber Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_roz_001",
@@ -39831,7 +40367,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Visible Carbon Fiber Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/roz.png",
+      "image_alt": "Visible Carbon Fiber Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_roz_001",
@@ -39859,7 +40399,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Visible Carbon Fiber Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/roz.png",
+      "image_alt": "Visible Carbon Fiber Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_roz_001",
@@ -39887,7 +40431,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Visible Carbon Fiber Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/roz.png",
+      "image_alt": "Visible Carbon Fiber Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_roz_001",
@@ -39915,7 +40463,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Visible Carbon Fiber Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/roz.png",
+      "image_alt": "Visible Carbon Fiber Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_stz_001",
@@ -39943,7 +40495,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Visible Carbon Fiber Red Stripe Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/stz.png",
+      "image_alt": "Visible Carbon Fiber Red Stripe Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_stz_001",
@@ -39971,7 +40527,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Visible Carbon Fiber Red Stripe Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/stz.png",
+      "image_alt": "Visible Carbon Fiber Red Stripe Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_stz_001",
@@ -39999,7 +40559,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Visible Carbon Fiber Red Stripe Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/stz.png",
+      "image_alt": "Visible Carbon Fiber Red Stripe Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_stz_001",
@@ -40027,7 +40591,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Visible Carbon Fiber Red Stripe Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/stz.png",
+      "image_alt": "Visible Carbon Fiber Red Stripe Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_stz_001",
@@ -40055,7 +40623,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Visible Carbon Fiber Red Stripe Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/stz.png",
+      "image_alt": "Visible Carbon Fiber Red Stripe Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_stz_001",
@@ -40083,7 +40655,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Visible Carbon Fiber Red Stripe Wheels",
       "source_description": "Size: 20\" x 10\" (50.8 cm x 25.4 cm) front and 21\" x 13\" (53.3 cm x 33 cm) rear",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/stz.png",
+      "image_alt": "Visible Carbon Fiber Red Stripe Wheels",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_pdb_001",
