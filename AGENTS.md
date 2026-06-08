@@ -101,8 +101,20 @@ Current shared or Stingray-facing sheets include:
 - `lt_interiors`
 - `LZ_Interiors`
 - `PriceRef`
+- `asset_map`
 
 `archive_category_master` is retained as historical evidence only; `category_master` is not an active source sheet.
+
+Current workbook-owned runtime metadata and audit sheets include:
+
+- `model_workbook_sources`
+- `model_variants`
+- `model_interior_scope`
+- `interior_components`
+- `rule_phrase_map`
+- `option_audit_groups`
+- `option_audit_group_members`
+- `rule_review_groups`
 
 Current Grand Sport model-scoped sheets include:
 
@@ -195,6 +207,18 @@ Do not solve bad source data by suppressing it in Python or JavaScript. Correct 
 Do not add an extra module, staging sheet, review taxonomy, or duplicate scope column when an existing workbook sheet already carries the relationship. Use the current pipeline first: fill the canonical blank cells, source rows, membership rows, or scope rows that the generator already reads. Add a new layer only after documenting why the existing workbook contract cannot represent the decision.
 
 Do not edit generated `form_*` sheets directly. Change source sheets, then regenerate.
+
+For workbook schema and live-contract validation, run:
+
+```sh
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+```
+
+To compare generated JSON contracts while ignoring timestamp fields, run:
+
+```sh
+node scripts/compare-generated-contracts.mjs before.json after.json
+```
 
 ## Stingray Generator Workflow
 
@@ -350,6 +374,7 @@ Stingray data refresh:
 
 ```sh
 .venv/bin/python scripts/generate_stingray_form.py
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
 node --test tests/stingray-form-regression.test.mjs
 node --test tests/stingray-generator-stability.test.mjs
 ```
@@ -361,6 +386,7 @@ Grand Sport source/draft refresh:
 node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
 node --test tests/grand-sport-rule-audit.test.mjs
+node --test tests/audit-parser-metadata-loaders.test.mjs
 ```
 
 Z06 source/draft refresh:
@@ -369,6 +395,9 @@ Z06 source/draft refresh:
 .venv/bin/python scripts/generate_z06_form.py
 node --test tests/z06-contract-preview.test.mjs
 node --test tests/z06-form-data-draft.test.mjs
+node --test tests/z06-interior-accessory-cleanup.test.mjs
+node --test tests/z06-performance-package-interactions.test.mjs
+node --test tests/z06-runtime-rule-corrections.test.mjs
 ```
 
 Z06 runtime promotion:
@@ -377,6 +406,7 @@ Z06 runtime promotion:
 .venv/bin/python scripts/promote_z06_runtime.py --write
 .venv/bin/python scripts/generate_z06_form.py
 .venv/bin/python scripts/generate_stingray_form.py
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
 node --test tests/z06-runtime-promotion.test.mjs
 node --test tests/multi-model-runtime-switching.test.mjs
 ```
@@ -391,15 +421,23 @@ node --test tests/multi-model-runtime-switching.test.mjs
 Full current suite:
 
 ```sh
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
 node --test tests/stingray-form-regression.test.mjs
 node --test tests/stingray-generator-stability.test.mjs
 node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
 node --test tests/grand-sport-rule-audit.test.mjs
+node --test tests/audit-parser-metadata-loaders.test.mjs
+node --test tests/workbook-schema-standardization.test.mjs
+node --test tests/workbook-visual-copy-standardization.test.mjs
 node --test tests/z06-contract-preview.test.mjs
 node --test tests/z06-form-data-draft.test.mjs
 node --test tests/z06-runtime-promotion.test.mjs
+node --test tests/z06-interior-accessory-cleanup.test.mjs
+node --test tests/z06-performance-package-interactions.test.mjs
+node --test tests/z06-runtime-rule-corrections.test.mjs
 node --test tests/multi-model-runtime-switching.test.mjs
+.venv/bin/python -m pytest tests/test_model_config_metadata.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py -q
 ```
 
 ## Boundaries
