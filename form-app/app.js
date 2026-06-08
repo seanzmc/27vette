@@ -325,6 +325,10 @@ function renderStatePill(label, className, tooltip) {
   `;
 }
 
+function renderChoiceAvailability(content = "") {
+  return `<div class="choice-availability">${content}</div>`;
+}
+
 function cardImageFit(value) {
   return ["cover", "contain", "swatch"].includes(value) ? value : "cover";
 }
@@ -1740,8 +1744,13 @@ function renderChoiceCard(choice, autoAdded) {
       <span class="topline"><span class="rpo">${escapeHtml(choice.rpo || choice.option_id)}</span>${priceMarkup}</span>
       <span class="choice-name"><span>${escapeHtml(choice.label)}</span>${renderInfoTooltip(detail, "Option details", { focusable: false })}</span>
       ${renderChoiceRelationshipBadges(choice, { disabled })}
-      ${disabledReason ? renderStatePill("Unavailable", "disabled-reason", disabledReason) : ""}
-      ${autoReason ? renderStatePill("Auto-added", "auto-reason", autoReason) : ""}
+      ${renderChoiceAvailability(
+        disabledReason
+          ? renderStatePill("Unavailable", "disabled-reason", disabledReason)
+          : autoReason
+            ? renderStatePill("Auto-added", "auto-reason", autoReason)
+            : ""
+      )}
     </button>
   `;
 }
@@ -1781,7 +1790,7 @@ function renderInteriorCard(interior) {
       ${renderCardMedia(interior, label, { disabled: Boolean(disabledReason) })}
       <span class="topline"><span class="rpo">${interior.interior_code}</span><span class="price">${formatMoney(adjustedInteriorDisplayPrice(interior))}</span></span>
       <span class="choice-name"><span>${escapeHtml(label)}</span>${renderInfoTooltip(detail || interior.interior_id, "Interior details", { focusable: false })}</span>
-      ${disabledReason ? renderStatePill("Unavailable", "disabled-reason", disabledReason) : ""}
+      ${renderChoiceAvailability(disabledReason ? renderStatePill("Unavailable", "disabled-reason", disabledReason) : "")}
     </button>
   `;
 }
@@ -1880,7 +1889,11 @@ function renderContextCard(choice, { setup = false, compact = false } = {}) {
       <span class="topline"><span class="rpo">${escapeHtml(choice.label)}</span><span class="price">${price}</span></span>
       ${choiceName}
       <span class="selection-status" data-selected="${selected ? "true" : "false"}">${selected ? "✓ " : ""}${statusLabel}</span>
-      ${disabled ? renderStatePill(`Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} first`, "disabled-reason", `Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} body style first.`) : ""}
+      ${renderChoiceAvailability(
+        disabled
+          ? renderStatePill(`Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} first`, "disabled-reason", `Choose ${choice.body_style[0].toUpperCase() + choice.body_style.slice(1)} body style first.`)
+          : ""
+      )}
     </button>
   `;
 }

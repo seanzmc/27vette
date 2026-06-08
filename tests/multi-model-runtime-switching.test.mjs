@@ -557,7 +557,7 @@ test("runtime renders disabled media and active tooltip pills for disabled conte
 
   assert.match(html, /choice-card context-choice-card has-media disabled/);
   assert.match(html, /choice-media disabled/);
-  assert.match(html, /choice-state disabled-reason info-tooltip" tabindex="0"/);
+  assert.match(html, /<div class="choice-availability">[\s\S]*choice-state disabled-reason info-tooltip" tabindex="0"/);
 });
 
 test("runtime renders context choice tooltips without replacing visible trim descriptions", () => {
