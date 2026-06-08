@@ -57,6 +57,11 @@ const nonCenterStripeOptionIds = [
 ];
 const fullLengthStripeOptionIds = nonCenterStripeOptionIds.slice(0, 16);
 const grandSportJakeOptionIds = ["opt_pda_001", "opt_sne_001", "opt_vpw_001"];
+const jakeGraphicSectionByOptionId = new Map([
+  ["opt_pda_001", "sec_jake_001"],
+  ["opt_sne_001", "sec_stri_001"],
+  ["opt_vpw_001", "sec_hash_001"],
+]);
 const requiredPackagePriceRules = [
   ["gs_pr_fey_j57_001", "opt_fey_001", "opt_j57_001", "override", 0],
   ["gs_pr_fey_t0f_001", "opt_fey_001", "opt_t0f_001", "override", 0],
@@ -705,6 +710,30 @@ test("Grand Sport draft standard equipment grouping is workbook-owned", () => {
   assert.equal(trimRows.every((item) => ["sec_1lte_001", "sec_2lte_001", "sec_3lte_001"].includes(item.section_id)), true);
 });
 
+test("Grand Sport and Z06 workbook place rear hash graphics outside the stripe radio section", () => {
+  for (const [sheetName, modelLabel] of [["grandSport_options", "Grand Sport"], ["z06_options", "Z06"]]) {
+    const rowsByOptionId = new Map(workbookRows(sheetName).map((row) => [row.option_id, row]));
+    assert.equal(rowsByOptionId.get("opt_vpo_001")?.section_id, "sec_hash_001", `${modelLabel} VPO should be a rear hash choice`);
+    assert.equal(rowsByOptionId.get("opt_vpw_001")?.section_id, "sec_hash_001", `${modelLabel} VPW should be a rear hash choice`);
+    assert.equal(rowsByOptionId.get("opt_sht_001")?.section_id, "sec_stri_001", `${modelLabel} SHT should stay in the stripe section`);
+    assert.equal(rowsByOptionId.get("opt_pda_001")?.section_id, "sec_jake_001", `${modelLabel} PDA should live outside stripe/hash radio sections so its includes can auto-add`);
+    assert.equal(rowsByOptionId.get("opt_sne_001")?.section_id, "sec_stri_001", `${modelLabel} SNE should stay in the stripe section`);
+  }
+
+  for (const [sheetName, ruleIds] of [
+    ["grandSport_rule_mapping", ["gs_rule_opt_pda_001_includes_opt_sne_001", "gs_rule_opt_pda_001_includes_opt_vpw_001"]],
+    ["z06_rule_mapping", ["z06_rule_opt_pda_001_includes_opt_sne_001", "z06_rule_opt_pda_001_includes_opt_vpw_001"]],
+  ]) {
+    const rowsByRuleId = new Map(workbookRows(sheetName).map((row) => [row.rule_id, row]));
+    for (const ruleId of ruleIds) {
+      const row = rowsByRuleId.get(ruleId);
+      assert.equal(row?.rule_type, "includes", `${ruleId} should remain an include rule`);
+      assert.notEqual(row?.generation_action, "omit", `${ruleId} should not be omitted`);
+      assert.notEqual(row?.normalization_status, "omitted", `${ruleId} should not be normalized out`);
+    }
+  }
+});
+
 test("Grand Sport wheel choices keep new aluminum wheels in the existing workbook section", () => {
   const wheels = draft.choices
     .filter((choice) => choice.variant_id === "1lt_e07" && choice.section_id === "sec_whee_002")
@@ -726,12 +755,18 @@ test("Grand Sport wheel choices keep new aluminum wheels in the existing workboo
   ]);
 });
 
-test("Grand Sport Jake graphics are selectable stripe-section choices for every variant", () => {
+test("Grand Sport Jake graphics are selectable choices with rear hash graphics in the hash section", () => {
   for (const optionId of grandSportJakeOptionIds) {
     const choices = draft.choices.filter((choice) => choice.option_id === optionId);
     assert.equal(choices.length, 6, `${optionId} should be emitted for every Grand Sport variant`);
-    assert.equal(choices.every((choice) => choice.section_id === "sec_stri_001"), true);
+    assert.equal(choices.every((choice) => choice.section_id === jakeGraphicSectionByOptionId.get(optionId)), true);
     assert.equal(choices.every((choice) => choice.status === "available" && choice.selectable === "True"), true);
+  }
+
+  for (const optionId of ["opt_vpo_001", "opt_vpw_001"]) {
+    const choices = draft.choices.filter((choice) => choice.option_id === optionId);
+    assert.equal(choices.length, 6, `${optionId} should be emitted for every Grand Sport variant`);
+    assert.equal(choices.every((choice) => choice.section_id === "sec_hash_001"), true);
   }
 
   const pdaPriceRules = new Set(

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-07T22:51:29+00:00",
+  "generated_at": "2026-06-08T02:06:14+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -5908,8 +5908,8 @@
       {
         "option_id": "opt_vpo_001",
         "rpo": "VPO",
-        "section_id": "sec_stri_001",
-        "original_section_id": "sec_stri_001",
+        "section_id": "sec_hash_001",
+        "original_section_id": "sec_hash_001",
         "section_override_applied": false,
         "step_key": "aero_exhaust_stripes_accessories"
       },
@@ -6084,8 +6084,8 @@
       {
         "option_id": "opt_pda_001",
         "rpo": "PDA",
-        "section_id": "sec_stri_001",
-        "original_section_id": "sec_stri_001",
+        "section_id": "sec_jake_001",
+        "original_section_id": "sec_jake_001",
         "section_override_applied": false,
         "step_key": "aero_exhaust_stripes_accessories"
       },
@@ -6100,8 +6100,8 @@
       {
         "option_id": "opt_vpw_001",
         "rpo": "VPW",
-        "section_id": "sec_stri_001",
-        "original_section_id": "sec_stri_001",
+        "section_id": "sec_hash_001",
+        "original_section_id": "sec_hash_001",
         "section_override_applied": false,
         "step_key": "aero_exhaust_stripes_accessories"
       }
@@ -11696,7 +11696,7 @@
         "option_id": "opt_vpo_001",
         "rpo": "VPO",
         "option_name": "Tech Bronze Jake C8.R Rear Hash Graphic",
-        "section_id": "sec_stri_001",
+        "section_id": "sec_hash_001",
         "matched_terms": [
           "not_available"
         ],
@@ -11797,7 +11797,7 @@
         "option_id": "opt_pda_001",
         "rpo": "PDA",
         "option_name": "Jake C8.R Graphics Package",
-        "section_id": "sec_stri_001",
+        "section_id": "sec_jake_001",
         "matched_terms": [
           "not_available",
           "includes"
@@ -11825,7 +11825,7 @@
         "option_id": "opt_vpw_001",
         "rpo": "VPW",
         "option_name": "Jake C8.R Rear Hash Graphic",
-        "section_id": "sec_stri_001",
+        "section_id": "sec_hash_001",
         "matched_terms": [
           "included_with"
         ],

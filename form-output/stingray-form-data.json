@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-06-07T22:48:58+00:00"
+    "generated_at": "2026-06-08T02:01:13+00:00"
   },
   "variants": [
     {
@@ -108,7 +108,7 @@
       "step_label": "Stripes",
       "runtime_order": 7,
       "source": "workbook_phase6",
-      "section_ids": "sec_gsce_001|sec_gsha_001|sec_hash_001|sec_stri_001"
+      "section_ids": "sec_gsce_001|sec_gsha_001|sec_hash_001|sec_jake_001|sec_stri_001"
     },
     {
       "step_key": "seat",
@@ -760,6 +760,18 @@
       "is_required": "False",
       "standard_behavior": "locked_included",
       "section_display_order": 25,
+      "step_key": "aero_exhaust_stripes_accessories",
+      "step_label": "Stripes"
+    },
+    {
+      "section_id": "sec_jake_001",
+      "section_name": "Jake Graphics Package",
+      "selection_mode": "multi_select_opt",
+      "selection_mode_label": "Optional multiple choice",
+      "choice_mode": "multi",
+      "is_required": "False",
+      "standard_behavior": "locked_included",
+      "section_display_order": 27,
       "step_key": "aero_exhaust_stripes_accessories",
       "step_label": "Stripes"
     }
