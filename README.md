@@ -47,7 +47,7 @@ The runtime should render and evaluate the generated contract. It should not inf
 - `scripts/corvette_form_generator/` - shared model configuration, workbook, runtime metadata, mapping, inspection, output, and validation utilities.
 - `scripts/migrations/` - workbook metadata backfills and one-off migration helpers.
 - `tests/` - Node and Python tests for generated data, runtime behavior, multi-model switching, dealer submission payloads, workbook-owned metadata, and Grand Sport draft/contract checks.
-- `spec-review/` and `architectureAudit/` - active specs, audits, and migration notes.
+- `architectureAudit/` - retained audits and migration notes.
 - `archived/` - retained historical plans, reference workbooks, skills, and deprecated source-transformation materials.
 
 ## Workbook Source Surfaces

@@ -1,9 +1,14 @@
 .venv/
+.DS_Store
 __pycache__/
 *.pyc
+.pytest_cache/
+.playwright-mcp/
 build/
 backups/*.xlsx
+backups/**/*.xlsx
 ~$*.xlsx
 archived/docs
 .worktrees/
 archive/workbook-backups/*.xlsx
+archive-2026-05-29/archive/workbook-backups/*.xlsx
