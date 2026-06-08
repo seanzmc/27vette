@@ -557,7 +557,7 @@ test("runtime renders disabled media and active tooltip pills for disabled conte
 
   assert.match(html, /choice-card context-choice-card has-media disabled/);
   assert.match(html, /choice-media disabled/);
-  assert.match(html, /choice-state disabled-reason info-tooltip" tabindex="0"/);
+  assert.match(html, /<div class="choice-availability">[\s\S]*choice-state disabled-reason info-tooltip" tabindex="0"/);
 });
 
 test("runtime renders context choice tooltips without replacing visible trim descriptions", () => {
@@ -1435,4 +1435,52 @@ test("Grand Sport 3LT interiors auto-add included color seatbelts from workbook 
   runtime.reconcileSelections();
   assert.equal(runtime.state.selected.has("opt_719_001"), true, "3LT interior without included color seatbelt should keep 719 default");
   assert.equal(runtime.currentOrder().auto_added_options.some((item) => ["3N9", "3F9", "3A9", "379"].includes(item.rpo)), false);
+});
+
+test("Grand Sport and Z06 stripe runtime allows rear hash graphics with dual stripes and PDA auto-adds package graphics", () => {
+  for (const [modelKey, trimLevel] of [["grandSport", "1LT"], ["z06", "1LZ"]]) {
+    const runtime = loadRuntime();
+    runtime.activateModel(modelKey);
+    runtime.state.bodyStyle = "coupe";
+    runtime.state.trimLevel = trimLevel;
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+
+    const choiceByRpo = (rpo) => runtime.activeChoiceRows().find((choice) => choice.rpo === rpo);
+    const dpb = choiceByRpo("DPB");
+    const vpo = choiceByRpo("VPO");
+    const vpw = choiceByRpo("VPW");
+    const sht = choiceByRpo("SHT");
+    const pda = choiceByRpo("PDA");
+    const sne = choiceByRpo("SNE");
+    assert.ok(dpb && vpo && vpw && sht && pda && sne, `${modelKey} should expose target stripe choices`);
+    assert.equal(vpo.section_id, "sec_hash_001", `${modelKey} VPO should render as rear hash`);
+    assert.equal(vpw.section_id, "sec_hash_001", `${modelKey} VPW should render as rear hash`);
+
+    runtime.handleChoice(dpb);
+    runtime.handleChoice(vpo);
+    assert.equal(runtime.state.selected.has(dpb.option_id), true, `${modelKey} dual racing stripe should remain with VPO`);
+    assert.equal(runtime.state.selected.has(vpo.option_id), true, `${modelKey} VPO should remain with dual racing stripe`);
+
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+    runtime.handleChoice(dpb);
+    runtime.handleChoice(vpw);
+    assert.equal(runtime.state.selected.has(dpb.option_id), true, `${modelKey} dual racing stripe should remain with VPW`);
+    assert.equal(runtime.state.selected.has(vpw.option_id), true, `${modelKey} VPW should remain with dual racing stripe`);
+
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+    runtime.handleChoice(sht);
+    runtime.handleChoice(vpo);
+    assert.equal(runtime.state.selected.has(sht.option_id), true, `${modelKey} SHT should remain with VPO`);
+    assert.equal(runtime.state.selected.has(vpo.option_id), true, `${modelKey} VPO should remain with SHT`);
+
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+    runtime.handleChoice(pda);
+    const autoAdded = runtime.computeAutoAdded();
+    assert.equal(autoAdded.has(sne.option_id), true, `${modelKey} PDA should auto-add SNE`);
+    assert.equal(autoAdded.has(vpw.option_id), true, `${modelKey} PDA should auto-add VPW`);
+  }
 });

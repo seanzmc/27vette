@@ -21,6 +21,11 @@ function cssOrderFor(selector, source = stylesSource) {
   return match ? Number(match[1]) : Number.NaN;
 }
 
+function cssBlock(selector, source = stylesSource) {
+  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return source.match(new RegExp(`${escapedSelector}\\s*\\{[\\s\\S]*?\\}`))?.[0] || "";
+}
+
 function parseCsv(source) {
   const rows = [];
   let row = [];
@@ -878,7 +883,18 @@ test("vehicle setup exposes paced readability hooks without changing option step
   assert.match(stylesSource, /\.vehicle-setup-stepper\s*\{[\s\S]*display:\s*grid;[\s\S]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\);[\s\S]*width:\s*100%/);
   assert.doesNotMatch(stylesSource.match(/\.vehicle-setup-stepper\s*\{[\s\S]*?\}/)?.[0] || "", /width:\s*fit-content/);
   assert.match(stylesSource, /\.vehicle-setup-chip\s*\{[\s\S]*justify-self:\s*center;[\s\S]*width:\s*max-content;[\s\S]*max-width:\s*100%;[\s\S]*min-width:\s*0/);
-  assert.match(stylesSource, /\.choice-card\.selected\s*\{[\s\S]*inset 4px 4px 0 rgba\(178, 34, 52, 0\.48\)[\s\S]*inset -2px -2px 0/);
+  assert.match(cssBlock(".choice-card"), /outline:\s*2px solid transparent/);
+  assert.match(cssBlock(".choice-card"), /outline-offset:\s*3px/);
+  assert.match(cssBlock(".choice-card"), /outline-color 140ms ease/);
+  assert.match(cssBlock(".choice-card.selected"), /outline-color:\s*var\(--accent\)/);
+  assert.doesNotMatch(cssBlock(".choice-card.selected"), /border-color|background-image|box-shadow|inset/);
+  assert.match(cssBlock(".choice-card.selected:hover"), /outline-color:\s*var\(--accent-dark\)/);
+  assert.doesNotMatch(cssBlock(".choice-card.selected:hover"), /background-image|inset/);
+  assert.match(cssBlock(".choice-card.auto"), /outline-color:\s*var\(--ok\)/);
+  assert.doesNotMatch(cssBlock(".choice-card.selected.auto"), /background-image|box-shadow|inset/);
+  assert.match(cssBlock(".choice-card:focus-visible"), /outline-color:\s*transparent/);
+  assert.match(cssBlock(".choice-card:focus-visible"), /box-shadow:\s*0 0 0 3px rgba\(178, 34, 52, 0\.35\)/);
+  assert.match(cssBlock(".choice-availability"), /min-height:\s*24px/);
   assert.match(stylesSource, /\.vehicle-setup-equipment-disclosure\s*\{/);
   assert.match(stylesSource, /\.vehicle-setup-next-action\s*\{[\s\S]*justify-content:\s*space-between/);
   assert.doesNotMatch(setupHtml, /Coupe \/ Convertible \| 1LT \/ 2LT \/ 3LT/);
@@ -966,6 +982,28 @@ test("card media support is optional and data-driven", () => {
   html = runtime.elements.get("#stepContent").innerHTML;
   assert.match(html, /<span class="choice-media" data-fit="cover">/);
   assert.match(html, /object-position: center;/);
+});
+
+test("choice cards reserve availability slot and move disabled reason into tooltip pill", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  const paint = runtime.activeChoiceRows().find((choice) => choice.step_key === "paint" && choice.selectable === "True");
+  assert.ok(paint, "paint choice should exist for availability-slot test");
+
+  const availableHtml = runtime.renderChoiceCard(paint, new Map());
+  assert.match(availableHtml, /<div class="choice-availability"><\/div>/);
+  assert.doesNotMatch(availableHtml, /choice-state disabled-reason/);
+
+  const unavailableHtml = runtime.renderChoiceCard({ ...paint, status: "unavailable" }, new Map());
+  assert.match(unavailableHtml, /<div class="choice-availability">[\s\S]*choice-state disabled-reason info-tooltip/);
+  assert.match(unavailableHtml, /tooltip-panel" role="tooltip">Not available for this body and trim\./);
+  assert.doesNotMatch(unavailableHtml, /<p class="disabled-reason"/);
+
+  const autoHtml = runtime.renderChoiceCard(paint, new Map([[paint.option_id, "Included with package."]]));
+  assert.match(autoHtml, /<div class="choice-availability">[\s\S]*choice-state auto-reason info-tooltip/);
 });
 
 test("mobile drawers expose route and summary state without changing form logic", () => {
@@ -2017,7 +2055,7 @@ test("stripe sections use the requested order", () => {
 
   assert.deepEqual(
     JSON.parse(JSON.stringify(sectionNames)),
-    ["Hash Marks", "Stripes", "GS Hash Marks", "GS Center Stripes"]
+    ["Hash Marks", "Jake Graphics Package", "Stripes", "GS Hash Marks", "GS Center Stripes"]
   );
   assert.match(appSource, /section_display_order/);
 });

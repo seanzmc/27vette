@@ -68,6 +68,20 @@ test("Z06 draft preserves the live generated-data top-level contract", () => {
   assert.ok(draft.standardEquipment.length > 0, "Z06 draft should include standard equipment rows");
 });
 
+test("Z06 rear hash graphics draft outside the stripe radio section", () => {
+  const sectionsByRpo = new Map();
+  for (const choice of draft.choices) {
+    if (!sectionsByRpo.has(choice.rpo)) sectionsByRpo.set(choice.rpo, new Set());
+    sectionsByRpo.get(choice.rpo).add(choice.section_id);
+  }
+
+  assert.deepEqual([...sectionsByRpo.get("VPO")].sort(), ["sec_hash_001"]);
+  assert.deepEqual([...sectionsByRpo.get("VPW")].sort(), ["sec_hash_001"]);
+  assert.deepEqual([...sectionsByRpo.get("SHT")].sort(), ["sec_stri_001"]);
+  assert.deepEqual([...sectionsByRpo.get("SNE")].sort(), ["sec_stri_001"]);
+  assert.deepEqual([...sectionsByRpo.get("PDA")].sort(), ["sec_jake_001"]);
+});
+
 test("Z06 draft unifies carbon fiber wheels into the Wheels section and keeps package/Z07 placements", () => {
   const sectionsByRpo = new Map();
   for (const choice of draft.choices) {
