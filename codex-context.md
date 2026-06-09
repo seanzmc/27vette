@@ -17,8 +17,8 @@
 stingray_master.xlsx
   -> source sheets
   -> scripts/corvette_form_generator shared helpers
-  -> scripts/generate_stingray_form.py production app-data writer
-  -> scripts/generate_grand_sport_form.py Grand Sport inspection/draft writer
+  -> scripts/generate_form.py --model stingray production app-data writer
+  -> scripts/generate_form.py --model grand_sport Grand Sport inspection/draft writer
   -> generated form_* workbook sheets
   -> form-output artifacts
   -> form-app/data.js registry
@@ -40,8 +40,8 @@ The workbook should own business data. Scripts should read, validate, normalize,
 - `form-output/stingray-form-data.json` - generated Stingray JSON contract.
 - `form-output/stingray-form-data.csv` - generated Stingray CSV inspection/export artifact.
 - `form-output/inspection/` - Grand Sport inspection, contract preview, rule audit, and draft artifacts.
-- `scripts/generate_stingray_form.py` - production generator for workbook form sheets and app data.
-- `scripts/generate_grand_sport_form.py` - Grand Sport inspection/draft generator; does not directly mutate app data.
+- `scripts/generate_form.py --model stingray` - production generator for workbook form sheets and app data.
+- `scripts/generate_form.py --model grand_sport` - Grand Sport inspection/draft generator; does not directly mutate app data.
 - `scripts/corvette_form_generator/model_configs.py` - Stingray and Grand Sport model configuration.
 - `scripts/corvette_form_generator/workbook.py` - workbook helpers, including safe save behavior.
 - `tests/` - current regression and contract tests.
@@ -73,8 +73,8 @@ Already workbook-backed or actively represented in generated data:
 
 Remaining transitional seams:
 
-- `scripts/generate_stingray_form.py` is still the production app-data writer and contains Stingray-specific normalization paths.
-- `scripts/generate_grand_sport_form.py` still uses inspection/draft naming even though Grand Sport is live in the deployed app.
+- `scripts/generate_form.py --model stingray` is still the production app-data writer and contains Stingray-specific normalization paths.
+- `scripts/generate_form.py --model grand_sport` still uses inspection/draft naming even though Grand Sport is live in the deployed app.
 - Some generated Grand Sport metadata may still contain draft/inspection language. Inspect active registry data and tests before drawing conclusions from artifact names.
 - Some runtime behavior in `form-app/app.js` still combines generic mechanics with legacy model-specific assumptions. Do not expand this pattern.
 
@@ -102,7 +102,7 @@ Use the project virtual environment:
 
 ```sh
 cd <repo-root>
-.venv/bin/python scripts/generate_stingray_form.py
+.venv/bin/python scripts/generate_form.py --model stingray
 ```
 
 Stingray tests:
@@ -115,7 +115,7 @@ node --test tests/stingray-generator-stability.test.mjs
 Grand Sport inspection/draft refresh:
 
 ```sh
-.venv/bin/python scripts/generate_grand_sport_form.py
+.venv/bin/python scripts/generate_form.py --model grand_sport
 ```
 
 Grand Sport tests:

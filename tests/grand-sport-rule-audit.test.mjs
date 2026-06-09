@@ -44,7 +44,7 @@ const buildOutput = JSON.parse(
   })
 );
 const generateOutput = JSON.parse(
-  execFileSync(".venv/bin/python", ["scripts/generate_grand_sport_form.py"], {
+  execFileSync(".venv/bin/python", ["scripts/generate_form.py", "--model", "grand_sport"], {
     encoding: "utf8",
   })
 );

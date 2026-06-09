@@ -24,7 +24,7 @@ function loadAppData() {
 
 const jsonData = JSON.parse(fs.readFileSync("form-output/stingray-form-data.json", "utf8"));
 const appData = loadAppData();
-const generatorSource = fs.readFileSync("scripts/generate_stingray_form.py", "utf8");
+const generatorSource = fs.readFileSync("scripts/corvette_form_generator/production.py", "utf8");
 const stingrayVariantIds = ["1lt_c07", "2lt_c07", "3lt_c07", "1lt_c67", "2lt_c67", "3lt_c67"];
 const grandSportVariantIds = ["1lt_e07", "2lt_e07", "3lt_e07", "1lt_e67", "2lt_e67", "3lt_e67"];
 const optionSourceHeaders = [
