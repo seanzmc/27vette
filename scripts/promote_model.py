@@ -85,7 +85,7 @@ def model_promotion_plan(wb, model_key: str) -> dict[str, Any]:
         "dataset_name": f"{model_year} Corvette {model_label} operational form",
         "registry_key": registry_key,
         "export_slug": slug,
-        "artifact_path": f"form-output/inspection/{slug}-form-data-draft.json",
+        "artifact_path": f"form-output/inspection/{slug}-runtime-contract.json",
         "variant_ids": variant_ids,
         "model_notes": f"{model_label} promoted to runtime after source data review.",
         "promotion_notes": f"{model_label} draft artifact promoted to branch runtime registry.",

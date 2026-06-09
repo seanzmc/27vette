@@ -26,6 +26,7 @@ from corvette_form_generator.inspection import (
     write_contract_preview_artifacts,
     write_form_data_draft_artifacts,
     write_inspection_artifacts,
+    write_runtime_contract_artifact,
 )
 from corvette_form_generator.model_config import ModelConfig
 from corvette_form_generator.model_configs import GRAND_SPORT_MODEL, STINGRAY_MODEL, Z06_MODEL
@@ -79,6 +80,11 @@ def run_draft(base_config: ModelConfig) -> None:
         config.output_dir / "inspection",
         config.draft_artifact_prefix,
     )
+    runtime_contract_paths = write_runtime_contract_artifact(
+        draft,
+        config.output_dir / "inspection",
+        f"{slug}-runtime-contract",
+    )
     print(
         json.dumps(
             {
@@ -112,6 +118,7 @@ def run_draft(base_config: ModelConfig) -> None:
                     "validation_warnings": sum(1 for row in draft["validation"] if row["severity"] == "warning"),
                 },
                 "draft_artifacts": draft_artifact_paths,
+                "runtime_contract_artifacts": runtime_contract_paths,
                 "rule_audit_artifacts": rule_audit_artifacts,
                 "notes": list(config.notes),
             },

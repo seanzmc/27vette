@@ -73,8 +73,53 @@ def _strip_live_contract_provenance(value: Any) -> Any:
     return value
 
 
+def find_draft_only_fields(value: Any, path: str = "$") -> list[str]:
+    """Return JSON paths of draft-only fields present in a runtime contract."""
+
+    leaks: list[str] = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            child_path = f"{path}.{key}"
+            if key in DRAFT_ONLY_LIVE_CONTRACT_FIELDS:
+                leaks.append(child_path)
+            else:
+                leaks.extend(find_draft_only_fields(child, child_path))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            leaks.extend(find_draft_only_fields(child, f"{path}[{index}]"))
+    return leaks
+
+
+def assert_runtime_contract(data: dict[str, Any], *, source: str) -> None:
+    """Fail fast when a promoted artifact still carries draft-only content.
+
+    Promotion no longer strips draft provenance at load time; the draft
+    generation pathway emits a clean ``*-runtime-contract.json`` alongside the
+    draft artifacts, and that contract is embedded verbatim.
+    """
+
+    problems: list[str] = []
+    leaks = find_draft_only_fields(data)
+    if leaks:
+        problems.append(f"draft-only fields present: {', '.join(leaks[:5])}{'...' if len(leaks) > 5 else ''}")
+    dataset = data.get("dataset")
+    status = dataset.get("status") if isinstance(dataset, dict) else None
+    if status != "runtime_active":
+        problems.append(f"dataset.status is {status!r}, expected 'runtime_active'")
+    if problems:
+        raise ValueError(
+            f"Promoted artifact {source} is not a clean runtime contract ({'; '.join(problems)}). "
+            "Regenerate it with scripts/generate_form.py --model <key>."
+        )
+
+
 def live_contract_data(data: dict[str, Any]) -> dict[str, Any]:
-    """Strip inspection-only provenance fields before embedding runtime data."""
+    """Derive the clean runtime contract from a draft dataset.
+
+    Runs at draft-generation emit time (see
+    ``inspection.write_runtime_contract_artifact``); promotion loads the
+    emitted contract verbatim and only validates it.
+    """
 
     cleaned = _strip_live_contract_provenance(json.loads(json.dumps(data)))
     dataset = cleaned.get("dataset")
@@ -202,7 +247,9 @@ def load_promotion_data(
     artifact = resolve_artifact_path(root, promotion.artifact_path)
     if not artifact.exists():
         raise FileNotFoundError(f"Promoted model artifact does not exist for {promotion.model_key}: {artifact}")
-    return live_contract_data(json.loads(artifact.read_text(encoding="utf-8")))
+    data = json.loads(artifact.read_text(encoding="utf-8"))
+    assert_runtime_contract(data, source=str(artifact))
+    return data
 
 
 def model_registry_entry(

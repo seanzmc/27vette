@@ -293,6 +293,7 @@ Current expected outputs under `form-output/inspection/`:
 - `z06-contract-preview.md`
 - `z06-form-data-draft.json`
 - `z06-form-data-draft.md`
+- `z06-runtime-contract.json` (clean contract embedded verbatim by registry promotion)
 
 This script must not mutate `form-app/data.js` or write `stingray_master.xlsx`.
 

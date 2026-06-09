@@ -22,6 +22,7 @@ from corvette_form_generator.contract import (
     load_model_asset_map,
     option_asset_map,
 )
+from corvette_form_generator.inspection import section_step_resolution_source
 from corvette_form_generator.interiors import (
     grouping_fields_for_interior,
     interior_component_metadata,
@@ -644,6 +645,24 @@ def main() -> None:
     ]
     for row in interiors:
         row.pop("_included_option_id", None)
+
+    # Heuristic step placement is a validation error on every pathway: the
+    # workbook owns placement via section_presentation / section_master /
+    # model config overrides, matching the draft path's contract preview check.
+    sections_with_choices = {
+        option["section_id"] for option in options_by_id.values() if option["active"] == "True" and option["section_id"]
+    }
+    for section_id in sorted(sections_with_choices):
+        if section_step_resolution_source(section_id, sections, MODEL_CONFIG, section_presentation) == "heuristic":
+            validation_rows.append(
+                {
+                    "check_id": f"heuristic_section_step_key_{section_id}",
+                    "severity": "error",
+                    "entity_type": "section",
+                    "entity_id": section_id,
+                    "message": f"Active {MODEL_CONFIG.model_label} choices fell back to heuristic step placement instead of workbook-owned placement.",
+                }
+            )
 
     # Validation floor
     if len(active_variants) != MODEL_CONFIG.expected_variant_count:

@@ -1194,6 +1194,22 @@ def write_form_data_draft_artifacts(draft: dict[str, Any], output_dir: Path, art
     return {"json": str(json_path), "markdown": str(md_path)}
 
 
+def write_runtime_contract_artifact(draft: dict[str, Any], output_dir: Path, artifact_prefix: str) -> dict[str, str]:
+    """Emit the clean runtime contract that registry promotion embeds verbatim.
+
+    Draft-only decoration (draftMetadata, source_* provenance, cleanup notes,
+    draft status wording) lives only in the draft artifacts; this contract is
+    what ``model_registry_promotion`` rows should reference via artifact_path.
+    """
+
+    from corvette_form_generator.registry_promotion import live_contract_data
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    json_path = output_dir / f"{artifact_prefix}.json"
+    json_path.write_text(json.dumps(live_contract_data(draft), indent=2), encoding="utf-8")
+    return {"json": str(json_path)}
+
+
 def write_inspection_artifacts(report: dict[str, Any], output_dir: Path, artifact_prefix: str) -> dict[str, str]:
     output_dir.mkdir(parents=True, exist_ok=True)
     json_path = output_dir / f"{artifact_prefix}.json"

@@ -220,7 +220,7 @@ node --test tests/grand-sport-draft-data.test.mjs
 node --test tests/grand-sport-rule-audit.test.mjs
 ```
 
-The Grand Sport generator writes inspection, contract preview, rule-audit, and draft artifacts under `form-output/inspection/`. By design, that script does not directly mutate `form-app/data.js`; production registry updates are handled by the app-data generation path.
+The Grand Sport generator writes inspection, contract preview, rule-audit, draft, and runtime-contract artifacts under `form-output/inspection/`. Registry promotion embeds the `*-runtime-contract.json` artifacts verbatim; draft-only provenance never reaches `form-app/data.js`. By design, that script does not directly mutate `form-app/data.js`; production registry updates are handled by the app-data generation path.
 
 Full model/runtime validation:
 
