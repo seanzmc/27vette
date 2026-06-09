@@ -42,7 +42,8 @@ The runtime should render and evaluate the generated contract. It should not inf
 - `form-app/` - static app shell, styles, runtime behavior, and generated data bundle.
 - `form-output/` - generated Stingray JSON/CSV outputs plus Grand Sport inspection, contract preview, rule-audit, and draft artifacts.
 - `scripts/generate_form.py` - single generator entry point for every model. `--model stingray` runs the production pathway (form sheets, output artifacts, app data registry); `--model grand_sport` and `--model z06` run the read-only inspection/draft pathway and do not mutate `form-app/data.js`.
-- `scripts/build_grand_sport_rule_sources.py` - Grand Sport workbook rule-source audit helper.
+- `scripts/build_rule_sources.py` - workbook rule-source audit helper (`--model grand_sport`).
+- `scripts/promote_model.py` - workbook-driven runtime promotion (`--model <key> --write`).
 - `scripts/corvette_form_generator/` - shared model configuration, workbook, runtime metadata, mapping, pricing, interiors, rules, contract, production, inspection, output, and validation utilities.
 - `scripts/migrations/` - workbook metadata backfills and one-off migration helpers.
 - `tests/` - Node and Python tests for generated data, runtime behavior, multi-model switching, dealer submission payloads, workbook-owned metadata, and Grand Sport draft/contract checks.

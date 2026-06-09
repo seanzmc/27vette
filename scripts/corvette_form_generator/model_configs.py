@@ -1,4 +1,12 @@
-"""Model-specific generator configuration."""
+"""Model configuration: shared constants plus workbook-first base configs.
+
+The workbook owns model-specific metadata through ``model_master``,
+``model_workbook_sources``, ``model_variants``, and
+``model_registry_promotion``; resolve a base config against it with
+``runtime_metadata.load_model_config_overrides``. Python keeps only what the
+workbook cannot express: filesystem paths, cross-model presentation
+constants, and the small per-model extras below.
+"""
 
 from __future__ import annotations
 
@@ -140,6 +148,14 @@ STANDARD_SECTIONS = frozenset(
     }
 )
 
+DEFAULT_TEXT_CLEANUP = {
+    "enabled": True,
+    "normalize_new_prefix": True,
+    "collapse_whitespace": True,
+    "collapse_repeated_punctuation": True,
+    "remove_adjacent_duplicate_phrases": True,
+}
+
 GRAND_SPORT_SECTION_LABEL_OVERRIDES = {
     "sec_gsce_001": "Grand Sport Center Stripes",
     "sec_gsha_001": "Grand Sport Heritage Hash Marks",
@@ -147,117 +163,63 @@ GRAND_SPORT_SECTION_LABEL_OVERRIDES = {
     "sec_colo_001": "Color Combination Override",
 }
 
-STINGRAY_MODEL = ModelConfig(
-    model_key="stingray",
-    model_label="Stingray",
-    model_year="2027",
-    dataset_name="2027 Corvette Stingray operational form",
-    source_option_sheet="stingray_options",
-    status_sheet="stingray_ovs",
-    variant_ids=("1lt_c07", "2lt_c07", "3lt_c07", "1lt_c67", "2lt_c67", "3lt_c67"),
-    expected_variant_count=6,
-    root=ROOT,
-    workbook_path=WORKBOOK_PATH,
-    output_dir=OUTPUT_DIR,
-    app_dir=APP_DIR,
-    interior_reference_path=ROOT / "architectureAudit" / "stingray_interiors_refactor.csv",
-    generated_sheets=GENERATED_SHEETS,
-    step_order=STEP_ORDER,
-    step_labels=STEP_LABELS,
-    context_sections=CONTEXT_SECTIONS,
-    body_style_display_order=BODY_STYLE_DISPLAY_ORDER,
-    selection_mode_labels=SELECTION_MODE_LABELS,
-    standard_sections=STANDARD_SECTIONS,
-    section_step_overrides=SECTION_STEP_OVERRIDES,
-)
+_SECTION_LABEL_OVERRIDES_BY_MODEL = {
+    "grand_sport": GRAND_SPORT_SECTION_LABEL_OVERRIDES,
+}
 
-GRAND_SPORT_MODEL = ModelConfig(
-    model_key="grand_sport",
-    model_label="Grand Sport",
-    model_year="2027",
-    dataset_name="2027 Corvette Grand Sport operational form",
-    source_option_sheet="grandSport_options",
-    status_sheet="grandSport_ovs",
-    variant_ids=("1lt_e07", "2lt_e07", "3lt_e07", "1lt_e67", "2lt_e67", "3lt_e67"),
-    expected_variant_count=6,
-    root=ROOT,
-    workbook_path=WORKBOOK_PATH,
-    output_dir=OUTPUT_DIR,
-    app_dir=APP_DIR,
-    interior_reference_path=ROOT / "architectureAudit" / "grand_sport_interiors_refactor.csv",
-    generated_sheets=GENERATED_SHEETS,
-    step_order=STEP_ORDER,
-    step_labels=STEP_LABELS,
-    context_sections=CONTEXT_SECTIONS,
-    body_style_display_order=BODY_STYLE_DISPLAY_ORDER,
-    selection_mode_labels=SELECTION_MODE_LABELS,
-    standard_sections=STANDARD_SECTIONS,
-    section_step_overrides=SECTION_STEP_OVERRIDES,
-    section_label_overrides=GRAND_SPORT_SECTION_LABEL_OVERRIDES,
-    preview_artifact_prefix="grand-sport-contract-preview",
-    draft_artifact_prefix="grand-sport-form-data-draft",
-    rule_mapping_sheet="grandSport_rule_mapping",
-    price_rules_sheet="grandSport_price_rules",
-    rule_groups_sheet="grandSport_rule_groups",
-    rule_group_members_sheet="grandSport_rule_group_members",
-    exclusive_groups_sheet="grandSport_exclusive_groups",
-    exclusive_group_members_sheet="grandSport_exclusive_members",
-    variant_option_overrides_sheet="grandSport_variant_overrides",
-    text_cleanup={
-        "enabled": True,
-        "normalize_new_prefix": True,
-        "collapse_whitespace": True,
-        "collapse_repeated_punctuation": True,
-        "remove_adjacent_duplicate_phrases": True,
-    },
-    special_rule_review_rpos=("EL9", "Z25", "FEY", "Z15"),
-    notes=(
+_MODEL_NOTES = {
+    "grand_sport": (
         "Read-only inspection only: Grand Sport generation is not activated by the Stingray entrypoint.",
         "Grand Sport option rows are read from the normalized grandSport_options sheet.",
     ),
-)
-
-Z06_MODEL = ModelConfig(
-    model_key="z06",
-    model_label="Z06",
-    model_year="2027",
-    dataset_name="2027 Corvette Z06 operational form",
-    source_option_sheet="z06_options",
-    status_sheet="z06_ovs",
-    variant_ids=("1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"),
-    expected_variant_count=6,
-    root=ROOT,
-    workbook_path=WORKBOOK_PATH,
-    output_dir=OUTPUT_DIR,
-    app_dir=APP_DIR,
-    interior_reference_path=ROOT / "architectureAudit" / "z06_interiors_refactor.csv",
-    generated_sheets=GENERATED_SHEETS,
-    step_order=STEP_ORDER,
-    step_labels=STEP_LABELS,
-    context_sections=CONTEXT_SECTIONS,
-    body_style_display_order=BODY_STYLE_DISPLAY_ORDER,
-    selection_mode_labels=SELECTION_MODE_LABELS,
-    standard_sections=STANDARD_SECTIONS,
-    section_step_overrides=SECTION_STEP_OVERRIDES,
-    interior_source_sheet="LZ_Interiors",
-    preview_artifact_prefix="z06-contract-preview",
-    draft_artifact_prefix="z06-form-data-draft",
-    rule_mapping_sheet="z06_rule_mapping",
-    price_rules_sheet="z06_price_rules",
-    rule_groups_sheet="z06_rule_groups",
-    rule_group_members_sheet="z06_rule_group_members",
-    exclusive_groups_sheet="z06_exclusive_groups",
-    exclusive_group_members_sheet="z06_exclusive_members",
-    variant_option_overrides_sheet="z06_variant_overrides",
-    text_cleanup={
-        "enabled": True,
-        "normalize_new_prefix": True,
-        "collapse_whitespace": True,
-        "collapse_repeated_punctuation": True,
-        "remove_adjacent_duplicate_phrases": True,
-    },
-    notes=(
+    "z06": (
         "Z06 is eligible for runtime promotion through workbook-owned model_registry_promotion rows.",
         "Z06 option rows are read from normalized z06_options source rows.",
     ),
-)
+}
+
+
+def base_model_config(model_key: str) -> ModelConfig:
+    """Build the Python-side base config for any model key.
+
+    Every workbook-expressible field (label, year, dataset name, sheet roles,
+    variants) carries only a conventional default here; the workbook metadata
+    sheets are authoritative once the config is resolved through
+    ``load_model_config_overrides``.
+    """
+
+    label = model_key.replace("_", " ").title()
+    slug = model_key.replace("_", "-")
+    return ModelConfig(
+        model_key=model_key,
+        model_label=label,
+        model_year="2027",
+        dataset_name=f"2027 Corvette {label} operational form",
+        source_option_sheet=f"{model_key}_options",
+        status_sheet=f"{model_key}_ovs",
+        variant_ids=(),
+        expected_variant_count=0,
+        root=ROOT,
+        workbook_path=WORKBOOK_PATH,
+        output_dir=OUTPUT_DIR,
+        app_dir=APP_DIR,
+        interior_reference_path=ROOT / "architectureAudit" / f"{model_key}_interiors_refactor.csv",
+        generated_sheets=GENERATED_SHEETS,
+        step_order=STEP_ORDER,
+        step_labels=STEP_LABELS,
+        context_sections=CONTEXT_SECTIONS,
+        body_style_display_order=BODY_STYLE_DISPLAY_ORDER,
+        selection_mode_labels=SELECTION_MODE_LABELS,
+        standard_sections=STANDARD_SECTIONS,
+        section_step_overrides=SECTION_STEP_OVERRIDES,
+        section_label_overrides=_SECTION_LABEL_OVERRIDES_BY_MODEL.get(model_key, {}),
+        preview_artifact_prefix=f"{slug}-contract-preview",
+        draft_artifact_prefix=f"{slug}-form-data-draft",
+        text_cleanup=dict(DEFAULT_TEXT_CLEANUP),
+        notes=_MODEL_NOTES.get(model_key, ()),
+    )
+
+
+STINGRAY_MODEL = base_model_config("stingray")
+GRAND_SPORT_MODEL = base_model_config("grand_sport")
+Z06_MODEL = base_model_config("z06")

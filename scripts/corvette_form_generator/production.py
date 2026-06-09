@@ -35,19 +35,14 @@ from corvette_form_generator.mapping import (
     status_to_label,
     step_for_section as shared_step_for_section,
 )
-from corvette_form_generator.model_configs import GRAND_SPORT_MODEL, STINGRAY_MODEL
+from corvette_form_generator.model_configs import STINGRAY_MODEL
 from corvette_form_generator.output import write_app_data_registry, write_json_output
 from corvette_form_generator.pricing import (
     generated_interior_price,
     price_ref_component_prices,
     price_ref_prices,
 )
-from corvette_form_generator.registry_promotion import (
-    build_registry_from_promotions,
-    export_slug,
-    live_contract_data,
-    registry_model_key,
-)
+from corvette_form_generator.registry_promotion import build_registry_from_promotions, registry_model_key
 from corvette_form_generator.rules import (
     exclusive_group_pairs,
     grouped_exclusion_pairs,
@@ -89,42 +84,6 @@ SELECTION_MODE_LABELS = dict(MODEL_CONFIG.selection_mode_labels)
 STANDARD_SECTIONS = set(MODEL_CONFIG.standard_sections)
 
 
-def model_registry_entry(
-    model_key: str,
-    model_label: str,
-    data: dict[str, Any],
-    asset: dict[str, str] | None = None,
-) -> dict[str, Any]:
-    entry = {
-        "key": registry_model_key(model_key),
-        "label": model_label,
-        "modelName": f"Corvette {model_label}",
-        "exportSlug": export_slug(model_key),
-        "data": data,
-    }
-    if asset and asset.get("image_url"):
-        entry.update(asset)
-    return entry
-
-
-def load_grand_sport_registry_data() -> dict[str, Any] | None:
-    draft_path = OUTPUT_DIR / "inspection" / f"{GRAND_SPORT_MODEL.draft_artifact_prefix}.json"
-    if draft_path.exists():
-        return json.loads(draft_path.read_text(encoding="utf-8"))
-    app_data_path = APP_DIR / "data.js"
-    if app_data_path.exists():
-        app_data = app_data_path.read_text(encoding="utf-8")
-        try:
-            registry_json = app_data.split("window.CORVETTE_FORM_DATA = ", 1)[1].split(
-                ";\nwindow.STINGRAY_FORM_DATA",
-                1,
-            )[0]
-            return json.loads(registry_json).get("models", {}).get("grandSport", {}).get("data")
-        except (IndexError, json.JSONDecodeError):
-            pass
-    return None
-
-
 def build_app_data_registry(stingray_data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, str]]:
     wb = load_workbook(WORKBOOK_PATH, read_only=True, data_only=True)
     try:
@@ -138,33 +97,14 @@ def build_app_data_registry(stingray_data: dict[str, Any]) -> tuple[dict[str, An
         )
     finally:
         wb.close()
-    if promoted_registry is not None:
-        legacy_aliases = promoted_registry.pop("legacyAliases", {})
-        return promoted_registry, legacy_aliases
-
-    stingray_key = registry_model_key(MODEL_CONFIG.model_key)
-    models = {
-        stingray_key: model_registry_entry(
-            MODEL_CONFIG.model_key,
-            MODEL_CONFIG.model_label,
-            stingray_data,
-            model_assets.get(stingray_key),
-        ),
-    }
-    grand_sport_data = load_grand_sport_registry_data()
-    if grand_sport_data is not None:
-        grand_sport_data = live_contract_data(grand_sport_data)
-        grand_sport_key = registry_model_key(GRAND_SPORT_MODEL.model_key)
-        models[grand_sport_key] = model_registry_entry(
-            GRAND_SPORT_MODEL.model_key,
-            GRAND_SPORT_MODEL.model_label,
-            grand_sport_data,
-            model_assets.get(grand_sport_key),
+    if promoted_registry is None:
+        raise RuntimeError(
+            "model_registry_promotion has no promoted rows; refusing to guess the app registry. "
+            "Author the promotion rows in the workbook before regenerating app data."
         )
-    return {
-        "defaultModelKey": "stingray",
-        "models": models,
-    }, {"STINGRAY_FORM_DATA": "stingray"}
+    legacy_aliases = promoted_registry.pop("legacyAliases", {})
+    return promoted_registry, legacy_aliases
+
 
 def step_for_section(
     section_id: str,
@@ -706,14 +646,14 @@ def main() -> None:
         row.pop("_included_option_id", None)
 
     # Validation floor
-    if len(active_variants) != 6:
+    if len(active_variants) != MODEL_CONFIG.expected_variant_count:
         validation_rows.append(
             {
                 "check_id": "active_variant_count",
                 "severity": "error",
                 "entity_type": "variant",
                 "entity_id": "",
-                "message": f"Expected 6 active Stingray variants; found {len(active_variants)}.",
+                "message": f"Expected {MODEL_CONFIG.expected_variant_count} active {MODEL_CONFIG.model_label} variants; found {len(active_variants)}.",
             }
         )
     expected_status_rows = len(active_variants) * len(options_by_id)
@@ -763,7 +703,7 @@ def main() -> None:
                 "severity": "pass",
                 "entity_type": "variant",
                 "entity_id": "",
-                "message": f"{len(active_variants)} active Stingray variants exported.",
+                "message": f"{len(active_variants)} active {MODEL_CONFIG.model_label} variants exported.",
             },
             {
                 "check_id": "availability_rows",

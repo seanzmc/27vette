@@ -26,7 +26,7 @@ from corvette_form_generator.runtime_metadata import (
     load_rule_phrase_map,
     load_rule_review_rpos,
 )
-from build_grand_sport_rule_sources import RULE_PHRASES, candidate_rule_keys
+from build_rule_sources import RULE_PHRASES, candidate_rule_keys
 
 def workbook_with_sheet(sheet_name, headers, rows):
     wb = Workbook()

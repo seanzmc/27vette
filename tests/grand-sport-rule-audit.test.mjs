@@ -39,7 +39,7 @@ function workbookRows(sheetName) {
 }
 
 const buildOutput = JSON.parse(
-  execFileSync(".venv/bin/python", ["scripts/build_grand_sport_rule_sources.py"], {
+  execFileSync(".venv/bin/python", ["scripts/build_rule_sources.py", "--model", "grand_sport"], {
     encoding: "utf8",
   })
 );
@@ -50,7 +50,7 @@ const generateOutput = JSON.parse(
 );
 const audit = JSON.parse(fs.readFileSync(auditPath, "utf8"));
 const draft = JSON.parse(fs.readFileSync(draftPath, "utf8"));
-const ruleSource = fs.readFileSync("scripts/build_grand_sport_rule_sources.py", "utf8");
+const ruleSource = fs.readFileSync("scripts/build_rule_sources.py", "utf8");
 
 test("Grand Sport rule audit reads interior suppression codes from model metadata", () => {
   assert.match(ruleSource, /load_model_config_overrides/);
@@ -342,7 +342,7 @@ test("Grand Sport rule audit classifies scoped duplicate cleanup separately", ()
 });
 
 test("Grand Sport rule audit script remains read-only", () => {
-  const source = fs.readFileSync("scripts/build_grand_sport_rule_sources.py", "utf8");
+  const source = fs.readFileSync("scripts/build_rule_sources.py", "utf8");
   for (const forbidden of [
     "APPROVED_EXCLUSIVE_GROUPS",
     "INACTIVE_OPTION_RPOS",

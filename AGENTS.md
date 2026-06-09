@@ -309,12 +309,12 @@ Use the workbook-owned promotion path when Z06 runtime activation needs to be ap
 
 ```sh
 cd <repo-root>
-.venv/bin/python scripts/promote_z06_runtime.py --write
+.venv/bin/python scripts/promote_model.py --model z06 --write
 .venv/bin/python scripts/generate_form.py --model z06
 .venv/bin/python scripts/generate_form.py --model stingray
 ```
 
-`scripts/promote_z06_runtime.py` updates only Z06 rows in `model_master`, `model_registry_promotion`, and the six Z06 rows in `variant_master`. It must use `save_workbook_safely()`, refuse to run while an Excel lock file exists, and verify the saved workbook rows on disk.
+`scripts/promote_model.py --model z06` updates only Z06 rows in `model_master`, `model_registry_promotion`, and the six Z06 rows in `variant_master`. It must use `save_workbook_safely()`, refuse to run while an Excel lock file exists, and verify the saved workbook rows on disk.
 
 After promotion or regeneration, run:
 
@@ -403,7 +403,7 @@ node --test tests/z06-runtime-rule-corrections.test.mjs
 Z06 runtime promotion:
 
 ```sh
-.venv/bin/python scripts/promote_z06_runtime.py --write
+.venv/bin/python scripts/promote_model.py --model z06 --write
 .venv/bin/python scripts/generate_form.py --model z06
 .venv/bin/python scripts/generate_form.py --model stingray
 .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
