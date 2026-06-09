@@ -22,7 +22,6 @@ from corvette_form_generator.interiors import build_model_interiors
 from corvette_form_generator.mapping import best_status, normalize_mode, selection_mode_label, status_to_label, step_for_section
 from corvette_form_generator.model_config import ModelConfig
 from corvette_form_generator.rules import (
-    active_source_row,
     build_draft_rules,
     exclusive_group_pairs,
     grouped_exclusion_pairs,
@@ -36,6 +35,7 @@ from corvette_form_generator.runtime_metadata import (
     load_rule_review_rpos,
     load_runtime_steps,
     load_section_presentation,
+    load_variant_option_overrides,
     presentation_bool,
 )
 from corvette_form_generator.workbook import clean, intish, money, rows_from_optional_sheet, rows_from_sheet
@@ -282,24 +282,11 @@ def display_behavior_status(
     return status, selectable, active
 
 
-def load_variant_option_overrides(wb, config: ModelConfig) -> dict[tuple[str, str], dict[str, str]]:
-    overrides: dict[tuple[str, str], dict[str, str]] = {}
-    if not config.variant_option_overrides_sheet:
-        return overrides
-    for row in rows_from_optional_sheet(wb, config.variant_option_overrides_sheet):
-        if not active_source_row(row):
-            continue
-        option_id = clean(row.get("option_id", ""))
-        variant_id = clean(row.get("variant_id", ""))
-        if not option_id or not variant_id:
-            continue
-        overrides[(option_id, variant_id)] = {
-            "selectable": normalize_selectable(row.get("selectable", "")),
-            "display_behavior": clean(row.get("display_behavior", "")),
-            "section_id": clean(row.get("section_id", "")),
-            "note": clean(row.get("note", "")),
-        }
-    return overrides
+def keyed_variant_option_overrides(wb, config: ModelConfig) -> dict[tuple[str, str], dict[str, str]]:
+    return {
+        (row["option_id"], row["variant_id"]): row
+        for row in load_variant_option_overrides(wb, config.model_key, config.variant_option_overrides_sheet)
+    }
 
 
 def apply_variant_option_override(
@@ -668,7 +655,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     ]
     rows = [normalized_option_row(row, config) for row in raw_rows]
     apply_status_lookup(rows, status_lookup_from_sheet(wb, config), config)
-    variant_option_overrides = load_variant_option_overrides(wb, config)
+    variant_option_overrides = keyed_variant_option_overrides(wb, config)
     context_copy_rows = context_choice_copy_rows(wb, config.model_key)
     special_review_rpos = load_rule_review_rpos(wb, config.model_key, config.special_rule_review_rpos)
 
@@ -794,20 +781,19 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
         }
 
         for variant_id, status in row["statuses"].items():
-            choice_row = apply_variant_option_override(
-                row,
-                variant_option_overrides.get((row["option_id"], variant_id), {}),
-            )
+            override = variant_option_overrides.get((row["option_id"], variant_id), {})
+            choice_row = apply_variant_option_override(row, override)
             choice_section_id = choice_row["section_id"]
             if choice_section_id not in sections:
                 continue
-            choice_section = sections.get(choice_section_id, {})
             choice_step_key = resolved_step_key(choice_section_id, sections, config, section_presentation)
             choice_section_name = section_display_label(choice_section_id, sections, section_presentation, config)
+            if override.get("status"):
+                status = override["status"].lower()
             status, selectable, active = display_behavior_status(
                 status,
                 choice_row["selectable"],
-                row["active"],
+                override.get("active") or row["active"],
                 choice_row["display_behavior"],
             )
             if status not in {"available", "standard"} and choice_row["display_behavior"] != "auto_only":

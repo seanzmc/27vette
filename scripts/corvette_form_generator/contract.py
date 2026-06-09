@@ -189,13 +189,10 @@ def label_for(
     entity_id: str,
     options: dict[str, dict[str, Any]],
     interiors_by_id: dict[str, dict[str, Any]],
-    *,
-    rpo_fallback_to_id: bool = False,
 ) -> str:
     if entity_id in options:
         option = options[entity_id]
-        rpo = option.get("rpo") or (entity_id if rpo_fallback_to_id else "")
-        return f"{rpo} {option.get('label', '')}".strip()
+        return f"{option.get('rpo') or ''} {option.get('label', '')}".strip()
     if entity_id in interiors_by_id:
         interior = interiors_by_id[entity_id]
         return f"{interior.get('interior_id')} {interior.get('interior_name')}".strip()

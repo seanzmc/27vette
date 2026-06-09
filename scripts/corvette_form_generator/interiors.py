@@ -205,52 +205,28 @@ def grouping_fields_for_interior(
     reference: dict[str, Any] | None,
     reference_order: int,
     fallback: bool = False,
-    *,
-    legacy_stingray: bool = False,
 ) -> dict[str, Any]:
-    """Derive interior grouping/hierarchy fields.
-
-    ``legacy_stingray=True`` preserves the historical Stingray production
-    grouping (no broad color-family normalization, no R6X custom family,
-    ``levels[-2]`` parent grouping). The flag exists only to keep the Phase 2
-    refactor output-identical; Phase 4 ratifies a single policy and removes it.
-    """
-
     seat_label = reference["levels"][1] if reference and len(reference["levels"]) > 1 else f"{interior['seat_code']} Seats"
-    if legacy_stingray:
-        levels = reference["levels"] if reference else [
-            interior["trim_level"],
-            seat_label,
-            "Other Interior Choices",
-            interior["interior_name"] or interior["interior_id"],
-        ]
-        leaf_label = levels[-1] if levels else interior["interior_name"] or interior["interior_id"]
-        color_family = levels[2] if len(levels) > 2 else leaf_label
-        material_family = interior.get("material") or "Standard interior"
-        if len(levels) > 3 and levels[-2] != color_family:
-            material_family = levels[-2]
-        parent_group = levels[-2] if len(levels) > 1 else color_family
-    else:
-        fallback_color_family = broad_interior_color_family(interior["interior_name"] or "Other Interior Choices")
-        levels = reference["levels"] if reference else [
-            interior["trim_level"],
-            seat_label,
-            fallback_color_family,
-            interior["material"] or "Standard interior",
-            interior["interior_name"] or interior["interior_id"],
-        ]
-        leaf_label = levels[-1] if levels else interior["interior_name"] or interior["interior_id"]
-        color_family = levels[2] if len(levels) > 2 else broad_interior_color_family(leaf_label)
-        trim_value = clean(interior.get("trim_level", ""))
-        interior_id_value = clean(interior.get("interior_id", ""))
-        if "R6X" in trim_value or "R6X" in interior_id_value:
-            color_family = "Custom Interior trim and seat combinations"
-        elif not reference:
-            color_family = fallback_color_family
-        material_family = interior.get("material") or "Standard interior"
-        if len(levels) > 3 and levels[-2] != color_family:
-            material_family = levels[-2]
-        parent_group = seat_label if len(levels) > 1 else color_family
+    fallback_color_family = broad_interior_color_family(interior["interior_name"] or "Other Interior Choices")
+    levels = reference["levels"] if reference else [
+        interior["trim_level"],
+        seat_label,
+        fallback_color_family,
+        interior["material"] or "Standard interior",
+        interior["interior_name"] or interior["interior_id"],
+    ]
+    leaf_label = levels[-1] if levels else interior["interior_name"] or interior["interior_id"]
+    color_family = levels[2] if len(levels) > 2 else broad_interior_color_family(leaf_label)
+    trim_value = clean(interior.get("trim_level", ""))
+    interior_id_value = clean(interior.get("interior_id", ""))
+    if "R6X" in trim_value or "R6X" in interior_id_value:
+        color_family = "Custom Interior trim and seat combinations"
+    elif not reference:
+        color_family = fallback_color_family
+    material_family = interior.get("material") or "Standard interior"
+    if len(levels) > 3 and levels[-2] != color_family:
+        material_family = levels[-2]
+    parent_group = seat_label if len(levels) > 1 else color_family
     return {
         "interior_trim_level": levels[0] if levels else interior["trim_level"],
         "interior_seat_code": seat_code_from_label(seat_label) or interior["seat_code"],

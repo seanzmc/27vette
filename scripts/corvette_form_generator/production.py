@@ -49,6 +49,8 @@ from corvette_form_generator.registry_promotion import (
     registry_model_key,
 )
 from corvette_form_generator.rules import (
+    exclusive_group_pairs,
+    grouped_exclusion_pairs,
     grouped_requirement_pairs,
     load_exclusive_groups,
     load_rule_groups,
@@ -280,7 +282,9 @@ def main() -> None:
         for section_id, presentation in section_presentation.items()
         if presentation_bool(presentation, "standard_equipment_bucket", default=False)
     } or set(STANDARD_SECTIONS)
-    variant_option_override_rows = load_variant_option_overrides(wb, MODEL_CONFIG.model_key)
+    variant_option_override_rows = load_variant_option_overrides(
+        wb, MODEL_CONFIG.model_key, MODEL_CONFIG.variant_option_overrides_sheet
+    )
     variant_option_overrides = {
         (row["option_id"], row["variant_id"]): row
         for row in variant_option_override_rows
@@ -288,6 +292,7 @@ def main() -> None:
     workbook_components_by_interior_id = load_interior_components(wb, MODEL_CONFIG.model_key)
     option_assets = option_asset_map(wb, MODEL_CONFIG.model_key)
     grouped_requires = grouped_requirement_pairs(rule_groups)
+    grouped_excludes = grouped_exclusion_pairs(rule_groups) | exclusive_group_pairs(exclusive_groups)
     interior_reference_by_id, interior_reference_rows = read_interior_reference(INTERIOR_REFERENCE_PATH)
 
     display_behavior_by_option_id = {
@@ -324,7 +329,6 @@ def main() -> None:
         for row in variants_raw
         if row.get("active") == "True" and row.get("variant_id", "") in MODEL_CONFIG.variant_ids
     ]
-    variant_by_id = {row["variant_id"]: row for row in active_variants}
 
     section_rows: list[dict[str, Any]] = [dict(row) for row in context_sections]
     for section_id, section in sections.items():
@@ -564,13 +568,9 @@ def main() -> None:
             continue
         reference = interior_reference_by_id.get(row["interior_id"])
         if row["active_for_stingray"] and reference:
-            row.update(
-                grouping_fields_for_interior(
-                    row, reference, reference_order_by_id[row["interior_id"]], legacy_stingray=True
-                )
-            )
+            row.update(grouping_fields_for_interior(row, reference, reference_order_by_id[row["interior_id"]]))
         elif row["active_for_stingray"]:
-            row.update(grouping_fields_for_interior(row, None, fallback_order, fallback=True, legacy_stingray=True))
+            row.update(grouping_fields_for_interior(row, None, fallback_order, fallback=True))
             fallback_order += 1
             validation_rows.append(
                 {
@@ -587,49 +587,28 @@ def main() -> None:
                     row,
                     reference,
                     reference_order_by_id.get(row["interior_id"], fallback_order),
-                    legacy_stingray=True,
                 )
             )
 
     interiors_by_id = {row["interior_id"]: row for row in interiors if row["interior_id"]}
-    interior_include_ids = [
-        (row["interior_id"], row.get("_included_option_id", ""))
-        for row in interiors
-        if row["interior_id"]
-        and row["active_for_stingray"]
-        and row.get("_included_option_id", "")
-        and options_by_id.get(row.get("_included_option_id", ""), {}).get("rpo")
-        not in {component.get("rpo") for component in row.get("interior_components", [])}
-    ]
 
     raw_rules: list[dict[str, Any]] = []
-    manual_rules = []
-    for interior_id, included_option_id in interior_include_ids:
-        manual_rules.append(
-            {
-                "rule_id": f"rule_{interior_id.lower()}_includes_{included_option_id}",
-                "source_id": interior_id,
-                "rule_type": "includes",
-                "target_id": included_option_id,
-                "target_type": "option",
-                "source_type": "interior",
-                "source_section": interiors_by_id[interior_id].get("section_id", ""),
-                "target_section": "sec_colo_001",
-                "source_selection_mode": "single_select_req",
-                "target_selection_mode": "multi_select_opt",
-                "original_detail_raw": "R6X is included with this custom interior trim and seat combination."
-                if included_option_id == "opt_r6x_001"
-                else f"{included_option_id} is included with this custom interior trim and seat combination.",
-                "review_flag": "False",
-            }
-        )
-    for rule in rules_raw + manual_rules:
+    for rule in rules_raw:
         rule_type = rule.get("rule_type", "").lower()
         source_id = rule.get("source_id", "")
         target_id = rule.get("target_id", "")
         if not runtime_authored_rule(rule):
             continue
         if rule_type == "requires" and (source_id, target_id) in grouped_requires:
+            continue
+        if (
+            rule_type == "excludes"
+            and (source_id, target_id) in grouped_excludes
+            and rule.get("generation_action", "") != "preserve_runtime_exclude"
+            # Replace rules carry default-removal semantics that exclusive
+            # groups do not express; they must survive group-based dedupe.
+            and rule.get("runtime_action", "") != "replace"
+        ):
             continue
         if source_id in hidden_option_ids or target_id in hidden_option_ids:
             continue
@@ -660,8 +639,8 @@ def main() -> None:
             )
         disabled_reason = ""
         auto_add = "False"
-        source_label = label_for(source_id, options_by_id, interiors_by_id, rpo_fallback_to_id=True)
-        target_label = label_for(target_id, options_by_id, interiors_by_id, rpo_fallback_to_id=True)
+        source_label = label_for(source_id, options_by_id, interiors_by_id)
+        target_label = label_for(target_id, options_by_id, interiors_by_id)
         if rule.get("disabled_reason", ""):
             disabled_reason = rule.get("disabled_reason", "")
         elif replaces_t0a:

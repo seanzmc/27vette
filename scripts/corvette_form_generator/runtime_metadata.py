@@ -197,21 +197,28 @@ def load_variant_option_overrides(
     model_key: str,
     fallback_sheet: str = "",
 ) -> list[dict[str, Any]]:
-    # The workbook-owned variant_option_overrides sheet uses the ``active``
-    # column as the override value for the generated choice, not as row
-    # activation.  Do not read it through active_rows(), or rows that set a
-    # choice inactive would filter themselves out.
+    """Single loader for variant option overrides across both sheet contracts.
+
+    The workbook-global ``variant_option_overrides`` sheet uses the ``active``
+    column as the override value for the generated choice, not as row
+    activation, so it must not be read through active_rows(). Model-scoped
+    fallback sheets (e.g. ``grandSport_variant_overrides``) use ``active`` as
+    row activation and carry ``section_id``/``note`` columns instead of
+    ``status``/``active`` override values; the loader normalizes both
+    contracts into one field set.
+    """
+
     model = clean(model_key).lower()
     allowed_model_keys = _GLOBAL_MODEL_KEYS | {model}
-    rows = [
-        row
+    sourced_rows = [
+        (row, True)
         for row in optional_rows(wb, "variant_option_overrides")
         if clean(row.get("model_key", "")).lower() in allowed_model_keys
     ]
-    if not rows and fallback_sheet:
-        rows = active_rows(wb, fallback_sheet, model_key=None)
+    if not sourced_rows and fallback_sheet:
+        sourced_rows = [(row, False) for row in active_rows(wb, fallback_sheet, model_key=None)]
     overrides: list[dict[str, Any]] = []
-    for row in rows:
+    for row, value_active in sourced_rows:
         option_id = clean(row.get("option_id") or row.get("rpo"))
         variant_id = clean(row.get("variant_id"))
         if not option_id or not variant_id:
@@ -220,11 +227,13 @@ def load_variant_option_overrides(
             {
                 "option_id": option_id,
                 "variant_id": variant_id,
-                "status": clean(row.get("status")),
+                "status": clean(row.get("status")) if value_active else "",
                 "selectable": clean(row.get("selectable")),
-                "active": clean(row.get("active")),
+                "active": clean(row.get("active")) if value_active else "",
                 "display_behavior": clean(row.get("display_behavior")),
-                "notes": clean(row.get("notes")),
+                "section_id": clean(row.get("section_id")),
+                "note": clean(row.get("note") or row.get("notes")),
+                "notes": clean(row.get("notes") or row.get("note")),
             }
         )
     return overrides

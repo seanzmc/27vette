@@ -142,6 +142,9 @@ def build_draft_rules(
             rule_type == "excludes"
             and (source_id, target_id) in grouped_excludes
             and rule.get("generation_action", "") != "preserve_runtime_exclude"
+            # Replace rules carry default-removal semantics that exclusive
+            # groups do not express; they must survive group-based dedupe.
+            and rule.get("runtime_action", "") != "replace"
         ):
             continue
         source_section = rule.get("source_section", "")
