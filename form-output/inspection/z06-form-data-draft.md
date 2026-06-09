@@ -1,6 +1,6 @@
-# Grand Sport Form Data Draft
+# Z06 Form Data Draft
 
-Generated: `2026-06-08T19:15:22+00:00`
+Generated: `2026-06-09T20:03:37+00:00`
 Status: `draft_not_runtime_active`
 Source sheet: `z06_options`
 
@@ -33,4 +33,4 @@ Source sheet: `z06_options`
 ## Live Output Safety
 
 - This draft writes only inspection artifacts under `form-output/inspection/`.
-- It does not write `form-app/data.js` or activate Grand Sport in the app.
+- It does not write `form-app/data.js` or activate Z06 in the app.

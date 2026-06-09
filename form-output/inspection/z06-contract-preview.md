@@ -1,6 +1,6 @@
-# Grand Sport Contract Preview
+# Z06 Contract Preview
 
-Generated: `2026-06-08T19:15:21+00:00`
+Generated: `2026-06-09T20:03:37+00:00`
 Status: `read_only_preview`
 Source sheet: `z06_options`
 
@@ -49,5 +49,5 @@ Source sheet: `z06_options`
 
 ## Live Output Safety
 
-- Grand Sport preview generation writes only inspection artifacts under `form-output/inspection/`.
-- It does not write `form-app/data.js` or final Grand Sport app data.
+- Z06 preview generation writes only inspection artifacts under `form-output/inspection/`.
+- It does not write `form-app/data.js` or final Z06 app data.

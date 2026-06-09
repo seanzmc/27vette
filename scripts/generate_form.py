@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
-"""Read-only scaffold for future Grand Sport form generation."""
+"""Single entry point for Corvette form-data generation.
+
+Usage:
+    python scripts/generate_form.py --model stingray      # production: form_* sheets, JSON/CSV, app registry
+    python scripts/generate_form.py --model grand_sport   # draft: inspection/preview/draft artifacts only
+    python scripts/generate_form.py --model z06           # draft: inspection/preview/draft artifacts only
+
+The production pathway runs for the current-generation model (Stingray) and is
+the only pathway that writes the workbook, form-output root artifacts, and
+form-app/data.js. All other models run the read-only draft pathway, which
+writes artifacts under form-output/inspection/ and never mutates app data.
+"""
 
 from __future__ import annotations
 
+import argparse
 import json
 
 from openpyxl import load_workbook
@@ -15,25 +27,46 @@ from corvette_form_generator.inspection import (
     write_form_data_draft_artifacts,
     write_inspection_artifacts,
 )
-from corvette_form_generator.model_configs import GRAND_SPORT_MODEL
+from corvette_form_generator.model_config import ModelConfig
+from corvette_form_generator.model_configs import GRAND_SPORT_MODEL, STINGRAY_MODEL, Z06_MODEL
+from corvette_form_generator.registry_promotion import export_slug
 from corvette_form_generator.runtime_metadata import load_model_config_overrides
 
+MODEL_CONFIGS: dict[str, ModelConfig] = {
+    "stingray": STINGRAY_MODEL,
+    "grand_sport": GRAND_SPORT_MODEL,
+    "z06": Z06_MODEL,
+}
+PRODUCTION_MODEL_KEYS = {"stingray"}
 
-def main() -> None:
-    wb = load_workbook(GRAND_SPORT_MODEL.workbook_path, read_only=True, data_only=True)
+
+def resolve_config(base_config: ModelConfig) -> ModelConfig:
+    wb = load_workbook(base_config.workbook_path, read_only=True, data_only=True)
     try:
-        config = load_model_config_overrides(wb, GRAND_SPORT_MODEL)
+        return load_model_config_overrides(wb, base_config)
     finally:
         wb.close()
-    rule_audit_path = config.output_dir / "inspection" / "grand-sport-rule-audit.json"
-    rule_audit_markdown_path = config.output_dir / "inspection" / "grand-sport-rule-audit.md"
+
+
+def run_production(base_config: ModelConfig) -> None:
+    from corvette_form_generator import production
+
+    production.main()
+
+
+def run_draft(base_config: ModelConfig) -> None:
+    config = resolve_config(base_config)
+    slug = export_slug(config.model_key)
+    inspection_prefix = f"{slug}-inspection"
+    rule_audit_path = config.output_dir / "inspection" / f"{slug}-rule-audit.json"
+    rule_audit_markdown_path = config.output_dir / "inspection" / f"{slug}-rule-audit.md"
     rule_audit_artifacts = {}
     if rule_audit_path.exists():
         rule_audit_artifacts["json"] = str(rule_audit_path)
     if rule_audit_markdown_path.exists():
         rule_audit_artifacts["markdown"] = str(rule_audit_markdown_path)
     report = inspect_model_sources(config)
-    artifact_paths = write_inspection_artifacts(report, config.output_dir / "inspection", "grand-sport-inspection")
+    artifact_paths = write_inspection_artifacts(report, config.output_dir / "inspection", inspection_prefix)
     preview = build_contract_preview(config)
     preview_artifact_paths = write_contract_preview_artifacts(
         preview,
@@ -85,6 +118,23 @@ def main() -> None:
             indent=2,
         )
     )
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument(
+        "--model",
+        required=True,
+        choices=sorted(MODEL_CONFIGS),
+        help="model key to generate",
+    )
+    args = parser.parse_args()
+
+    base_config = MODEL_CONFIGS[args.model]
+    if args.model in PRODUCTION_MODEL_KEYS:
+        run_production(base_config)
+    else:
+        run_draft(base_config)
 
 
 if __name__ == "__main__":
