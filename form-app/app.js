@@ -833,9 +833,15 @@ function sameExclusiveGroupPeer(optionId, peerId) {
 
 function requiresAnyReason(choice, selectedIds) {
   const groups = ruleGroupsBySource.get(choice.option_id) || [];
+  if (!groups.some((group) => group.group_type === "requires_any" && ruleGroupAppliesToCurrentVariant(group))) return "";
+  const candidateSelectedIds = new Set(selectedIds);
+  if (!candidateSelectedIds.has(choice.option_id)) {
+    candidateSelectedIds.add(choice.option_id);
+    for (const id of computeAutoAdded([choice.option_id]).keys()) candidateSelectedIds.add(id);
+  }
   for (const group of groups) {
     if (group.group_type !== "requires_any" || !ruleGroupAppliesToCurrentVariant(group)) continue;
-    if ((group.target_ids || []).some((targetId) => selectedIds.has(targetId))) continue;
+    if ((group.target_ids || []).some((targetId) => candidateSelectedIds.has(targetId))) continue;
     return group.disabled_reason || `Requires one of ${(group.target_ids || []).map(getEntityLabel).join(", ")}.`;
   }
   return "";
@@ -865,10 +871,13 @@ function excludesAnyReason(choice, selectedIds) {
   return "";
 }
 
-function computeAutoAdded() {
+function computeAutoAdded(extraIds = []) {
   const autoAdded = new Map();
   const autoAddedSources = new Map();
   const selectedIds = new Set(state.selected);
+  for (const id of extraIds) {
+    if (id) selectedIds.add(id);
+  }
   if (state.selectedInterior) selectedIds.add(state.selectedInterior);
 
   let changed = true;
