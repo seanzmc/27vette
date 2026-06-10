@@ -569,6 +569,21 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
       notes: "T0F is available with FEB plus required J57, or included by FEY.",
     }
   );
+  assert.deepEqual(
+    draft.ruleGroups.find((group) => group.group_id === "gs_group_j57_z52_requirement"),
+    {
+      group_id: "gs_group_j57_z52_requirement",
+      group_type: "requires_any",
+      source_id: "opt_j57_001",
+      target_ids: ["opt_feb_001", "opt_fey_001"],
+      body_style_scope: "",
+      trim_level_scope: "",
+      variant_scope: "",
+      disabled_reason: "Requires FEB Z52 Sport Performance Package or FEY Z52 Track Performance Package.",
+      active: "True",
+      notes: "J57 is selectable with FEB, or included by FEY.",
+    }
+  );
   assert.equal(draft.rules.some((rule) => rule.source_id === "opt_j57_001" && rule.rule_type === "includes" && rule.target_id === "opt_j6d_001"), false);
   assert.equal(
     draft.defaultSelectionRules.some(
