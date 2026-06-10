@@ -85,6 +85,8 @@ Conflict note: AGENTS.md lists "validation and review metadata" as workbook-owne
 
 ## 5. Phase 3 — Sheet reorganization (functional grouping)
 
+> **STATUS: COMPLETED 2026-06-10.** All 81 sheets reordered into the 9 groups below with tab colors (model control blue `4472C4`, shared structure teal `2E9E9E`, interiors/pricing green `70AD47`, the three model blocks yellow `FFC000`, ZR1/ZR1X scaffolds gray `A6A6A6`, parser/audit orange `ED7D31`, generated red `C00000`). `write_sheet()` in `scripts/corvette_form_generator/workbook.py` now stamps the red tab on every regenerated `form_*` sheet, and the generator's append-at-end behavior keeps the generated group last — order and colors verified to survive full regeneration. Sheet renames remain deferred as specified.
+
 Reorder tabs into the following groups, in this order, with one tab color per group. Reordering is safe: every consumer addresses sheets by name. Run `repair_workbook_tables.py` + `validate_workbook_package.py` after the move.
 
 1. **Model control** (blue): `model_master`, `model_registry_promotion`, `model_workbook_sources`, `model_variants`, `variant_master`
