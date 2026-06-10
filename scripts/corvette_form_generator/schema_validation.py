@@ -562,7 +562,7 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                 "error",
                 "category_master_active",
                 sheet="category_master",
-                message="category_master should not be an active source sheet; keep only archive_category_master if historical context is needed.",
+                message="category_master should not be an active source sheet; historical category evidence lives in archive/stingray_archive.xlsx.",
             )
 
         source_graph = metadata_source_graph(wb, issues)

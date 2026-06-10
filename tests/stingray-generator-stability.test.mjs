@@ -143,16 +143,6 @@ const sectionPresentationHeaders = [
   "active",
   "notes",
 ];
-const standardEquipmentGroupHeaders = [
-  "model_key",
-  "section_id",
-  "group_type",
-  "default_open",
-  "canonical_rank",
-  "duplicate_group_key",
-  "active",
-  "notes",
-];
 const expectedRuntimeStepKeys = [
   "body_style",
   "trim_level",
@@ -436,7 +426,6 @@ test("Phase 6 step and presentation metadata are workbook-owned", () => {
   assert.deepEqual(workbookHeaders("runtime_steps"), runtimeStepHeaders);
   assert.deepEqual(workbookHeaders("context_section_master"), contextSectionHeaders);
   assert.deepEqual(workbookHeaders("section_presentation"), sectionPresentationHeaders);
-  assert.deepEqual(workbookHeaders("standard_equipment_groups"), standardEquipmentGroupHeaders);
 
   for (const modelKey of ["stingray", "grand_sport"]) {
     const runtimeRows = workbookRows("runtime_steps")

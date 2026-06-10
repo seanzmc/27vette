@@ -289,49 +289,6 @@ def load_order_summary_metadata(wb: Any, model_key: str) -> dict[str, Any]:
     }
 
 
-def load_standard_equipment_groups(wb: Any, model_key: str) -> list[dict[str, Any]]:
-    groups: list[dict[str, Any]] = []
-    for row in active_rows(wb, "standard_equipment_groups", model_key):
-        section_id = clean(row.get("section_id"))
-        if not section_id:
-            continue
-        groups.append(
-            {
-                "section_id": section_id,
-                "group_type": clean(row.get("group_type")),
-                "default_open": truthy(row.get("default_open"), default=False),
-                "canonical_rank": intish(row.get("canonical_rank"), 0),
-                "duplicate_group_key": clean(row.get("duplicate_group_key")),
-                "notes": clean(row.get("notes")),
-            }
-        )
-    return sorted(groups, key=lambda row: (row["canonical_rank"], row["section_id"]))
-
-
-def load_component_price_rules(wb: Any, model_key: str) -> list[dict[str, Any]]:
-    """Load generic component price rule rows without applying business behavior."""
-
-    rules: list[dict[str, Any]] = []
-    for row in active_rows(wb, "component_price_rules", model_key):
-        rule_id = clean(row.get("price_rule_id"))
-        if not rule_id:
-            continue
-        rules.append(
-            {
-                "price_rule_id": rule_id,
-                "condition_option_id": clean(row.get("condition_option_id")),
-                "target_component_rpo": clean(row.get("target_component_rpo")),
-                "price_rule_type": clean(row.get("price_rule_type")),
-                "price_value": intish(row.get("price_value"), 0),
-                "body_style_scope": clean(row.get("body_style_scope")),
-                "trim_level_scope": clean(row.get("trim_level_scope")),
-                "variant_scope": clean(row.get("variant_scope")),
-                "notes": clean(row.get("notes")),
-            }
-        )
-    return rules
-
-
 def load_interior_components(wb: Any, model_key: str) -> dict[str, list[dict[str, Any]]]:
     """Load workbook-owned interior component rows grouped by interior_id."""
 

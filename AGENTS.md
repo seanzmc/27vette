@@ -103,7 +103,7 @@ Current shared or Stingray-facing sheets include:
 - `PriceRef`
 - `asset_map`
 
-`archive_category_master` is retained as historical evidence only; `category_master` is not an active source sheet.
+`category_master` is not an active source sheet. Historical evidence sheets (`archive_*` and `*_raw`, including `archive_category_master`) were extracted to `archive/stingray_archive.xlsx` and no longer live in `stingray_master.xlsx`.
 
 Current workbook-owned runtime metadata and audit sheets include:
 

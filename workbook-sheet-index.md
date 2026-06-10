@@ -2,6 +2,8 @@
 
 Generated from read-only inspection of `stingray_master.xlsx` on 2026-06-09.
 
+> **Phase 1 cleanup (2026-06-10):** the workbook now has 81 sheets. The 13 `archive_*`/`*_raw` evidence sheets listed below were extracted to `archive/stingray_archive.xlsx`, and the dead `component_price_rules` and `standard_equipment_groups` sheets were deleted (see `workbook-cleanup-spec.md`). Rows below describing those sheets are historical.
+
 This index describes what each workbook sheet currently does, which model or models it serves in the current runtime path, and notes about source-of-truth status.
 
 Current browser runtime registry, verified from `form-app/data.js`:

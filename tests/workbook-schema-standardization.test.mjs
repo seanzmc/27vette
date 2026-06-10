@@ -597,7 +597,9 @@ print(json.dumps(issues))
 
 test("category_master is retired from the active source graph and draft provenance is not live app data", () => {
   assert.equal(snapshot.sheetnames.includes("category_master"), false);
-  assert.equal(snapshot.sheetnames.includes("archive_category_master"), true);
+  // Historical evidence sheets (including archive_category_master) were
+  // extracted to archive/stingray_archive.xlsx in the workbook cleanup.
+  assert.equal(snapshot.sheetnames.includes("archive_category_master"), false);
 
   const registry = liveRegistry();
   for (const [modelKey, entry] of Object.entries(registry.models)) {
