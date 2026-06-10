@@ -73,6 +73,9 @@ def write_sheet(wb, name: str, headers: list[str], rows: list[dict[str, Any]]) -
     if name in wb.sheetnames:
         del wb[name]
     ws = wb.create_sheet(name)
+    # Generated form_* sheets carry a red tab so the "do not hand-edit" group
+    # stays visually distinct after every regeneration (workbook-cleanup-spec.md §5).
+    ws.sheet_properties.tabColor = "C00000"
     ws.append(headers)
     for row in rows:
         ws.append([row.get(header, "") for header in headers])
