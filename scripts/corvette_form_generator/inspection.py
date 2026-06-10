@@ -415,7 +415,6 @@ def build_draft_price_rules(
                 "body_style_scope": clean(row.get("body_style_scope", "")),
                 "trim_level_scope": clean(row.get("trim_level_scope", "")),
                 "variant_scope": clean(row.get("variant_scope", "")),
-                "review_flag": clean(row.get("review_flag", "")),
                 "notes": clean(row.get("notes", "")),
             }
         )

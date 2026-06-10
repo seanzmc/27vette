@@ -47,6 +47,8 @@ Result: 96 → 81 sheets.
 
 ### Tier A — dead columns (no functional reader; only header-lock checks)
 
+> **STATUS: COMPLETED 2026-06-10.** 24 columns deleted across 14 sheets; Excel tables on `rule_mapping`, `grandSport_rule_mapping`, `price_rules`, `grandSport_price_rules`, `section_master` rebuilt with shrunk refs. Correction: `option_audit_group_members.option_id` was **retained** — contrary to the original analysis, it is part of the `load_audit_group_members()` contract (returns `option_ids`, consumed by `build_rule_sources.py` and locked by `audit-parser-metadata-loaders.test.mjs`). All other Tier A columns were deleted as specified.
+
 | Sheet(s) | Column | Evidence |
 |---|---|---|
 | `rule_mapping`, `grandSport_rule_mapping`, `z06_rule_mapping`, `zr1_rule_mapping`, `zr1x_rule_mapping` | `normalization_reason`, `replacement_group_id`, `replacement_rule_id` | read only by `schema_validation.py` header checks; `replacement_rule_id` is 0-filled in 4 of 5 sheets (4/323 in Grand Sport); migration audit residue from `build_rule_sources.py` passes |
@@ -55,11 +57,13 @@ Result: 96 → 81 sheets.
 | `section_presentation` | `presentation_bucket` | 0/33 filled; loaded then never consumed |
 | `context_choice_copy` | `copy_id` | zero readers (rows are matched by `model_key`+`context_type`+`value`) |
 | `asset_map` | `asset_id` | zero readers (rows matched by `model_key`+`target_type`+`target_id`) |
-| `option_audit_group_members` | `option_id` | 0/8 filled; loader matches on `rpo` only |
+| ~~`option_audit_group_members`~~ | ~~`option_id`~~ | **RETAINED** — original claim wrong: `load_audit_group_members()` reads it and returns `option_ids` (test-locked contract) |
 
 Required updates for Tier A: remove the columns from `schema_validation.py` expected-header tables (lines ~16–19, 97–98, 160–162, 704+), `tests/stingray-generator-stability.test.mjs` header constants (`ruleMappingHeaders`, `priceRuleHeaders`, `sectionMasterHeaders`, `sectionPresentationHeaders`), `tests/workbook-schema-standardization.test.mjs` (normalization_reason assertion at :237, price_semantic block at :565–589), and `build_rule_sources.py` emit schema so a re-run does not recreate them.
 
 ### Tier B — administrative review columns (threaded through audit tooling)
+
+> **STATUS: COMPLETED 2026-06-10.** `review_flag` deleted from all 11 sheets; emission removed from `rules.py`, `production.py` (form_rules/form_price_rules headers), and `inspection.py`; schema checks removed from `BOOLEAN_COLUMNS`/`ROLE_BOOLEAN_COLUMNS`; header locks updated. Generated contracts and `data.js` verified identical to baseline except the removed `review_flag` keys. Notes: (1) the Grand Sport rule-audit gate was unaffected — audit classification is driven by `rule_phrase_map.review_flag_default` and `rule_review_groups`, not the sheet column, so both were retained; (2) the `review_flags` (plural) strip-guards in `registry_promotion.py`/`schema_validation.py` and the z06-runtime-promotion assertion were kept as contract guards.
 
 `review_flag` on `rule_mapping`×5, `price_rules`×5, and `asset_map` is pure review metadata: it is copied into `form_rules`/`form_price_rules` and the JSON artifacts, but `form-app/app.js` never reads it (0 references), and `z06-runtime-promotion.test.mjs:160` already asserts runtime choices carry no review flags.
 
@@ -99,8 +103,8 @@ Deferred (separate approval): renaming Stingray's unprefixed sheets (`rule_mappi
 
 | # | Inconsistency | Location | Follow-up |
 |---|---|---|---|
-| 1 | Z06 promoted in `model_registry_promotion` + `form-app/data.js`, but `model_workbook_sources` Z06 rows are `active=False`; Z06 generator config names sheets directly | `model_workbook_sources` | reconcile source registry with promotion state |
-| 2 | `variant_master` has active Z06 variants while `model_variants` marks Z06 (and ZR1/ZR1X) inactive | `model_variants` | align variant membership with promotion |
+| 1 | ~~Z06 rows inactive in `model_workbook_sources`~~ **RESOLVED upstream** — rows are `active=True`; residual: their `notes` still read "Phase 3 inactive scaffold target; not consumed until model is promoted" (stale text) | `model_workbook_sources` | refresh stale `notes` text |
+| 2 | ~~`model_variants` marks Z06 inactive~~ **RESOLVED upstream** — Z06 variant rows are `active=True` real booleans; ZR1/ZR1X correctly inactive | `model_variants` | none |
 | 3 | Two variant-override contracts: global `variant_option_overrides` treats `active` as an override *value*; model sheets (`grandSport/z06/zr1/zr1x_variant_overrides`) treat `active` as row activation and use `note` vs `notes` (documented in `load_variant_option_overrides` docstring) | both sheet families | converge on one contract |
 | 4 | Interior availability has two pathways: Stingray via `lt_interiors.active_for_stingray`; Grand Sport/Z06 via `model_interior_scope` rows | `lt_interiors`, `model_interior_scope` | migrate Stingray to `model_interior_scope` |
 | 5 | `active_for_stingray` column exists (and is read) in `LZ_Interiors`, a Z-family sheet — model-misnamed gating column | `LZ_Interiors` | rename with pathway #4 |
@@ -110,7 +114,7 @@ Deferred (separate approval): renaming Stingray's unprefixed sheets (`rule_mappi
 | 9 | `z06_rule_mapping` is partially normalized vs Stingray/Grand Sport: `generation_action` 0/55, `source_type` 51/55, `target_selection_mode` 36/55 filled | `z06_rule_mapping` | complete Z06 normalization |
 | 10 | `LZ_Interiors.included_option_id` 0/130 vs `lt_interiors` 15/132 — same schema, divergent use of the R6X include pathway | `LZ_Interiors` | confirm Z06 include semantics |
 | 11 | `asset_map` has 1–3 rows missing `model_key`/`target_type`/`image_url`/`target_id` | `asset_map` | repair or deactivate rows |
-| 12 | Cell-type drift: 767 cells in Z06-family sheets + `LZ_Interiors` store booleans as text (`"True"`) and prices as text instead of real Excel types. Pre-existing (verified against pre-Phase-1 backup); causes `validate_workbook_schema` error_count=767 and 2 failing subtests in `workbook-schema-standardization.test.mjs` (`schema validation CLI accepts...`, `future Corvette model metadata is scaffolded...`) | `z06_options`, `z06_rule_groups`, `z06_rule_group_members`, `z06_exclusive_groups`, `z06_exclusive_members`, `z06_rule_mapping`, `LZ_Interiors`, `model_variants` Z06/ZR1/ZR1X rows | retype cells to real Excel booleans/numbers |
+| 12 | ~~Cell-type drift: 767 cells storing booleans/prices as text~~ **RESOLVED 2026-06-10** — all 767 cells retyped to real Excel booleans/numbers (626 bool, 141 price); `validate_workbook_schema` error_count now 0; generated contracts verified byte-identical. The 2 failing `workbook-schema-standardization` subtests turned out to be stale Z06 expectations (test asserted Z06 `model_variants`/`model_workbook_sources` rows inactive, contradicting promotion) and were updated to expect the promoted state | `z06_options`, `z06_rule_groups`, `z06_rule_group_members`, `z06_exclusive_groups`, `z06_exclusive_members`, `z06_rule_mapping`, `LZ_Interiors` | none |
 
 ## 7. Constraints (repeated back)
 

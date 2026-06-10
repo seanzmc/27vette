@@ -611,7 +611,6 @@ def main() -> None:
                 "active": "False" if redundant else "True",
                 "runtime_action": action,
                 "source_note": truncate_reason(rule.get("original_detail_raw", ""), 500),
-                "review_flag": rule.get("review_flag", ""),
             }
         )
 
@@ -625,7 +624,6 @@ def main() -> None:
             "body_style_scope": row.get("body_style_scope", ""),
             "trim_level_scope": row.get("trim_level_scope", ""),
             "variant_scope": row.get("variant_scope", ""),
-            "review_flag": row.get("review_flag", ""),
             "notes": row.get("notes", ""),
         }
         for row in price_rules_raw
@@ -860,7 +858,6 @@ def main() -> None:
             "active",
             "runtime_action",
             "source_note",
-            "review_flag",
         ],
         raw_rules,
     )
@@ -876,7 +873,6 @@ def main() -> None:
             "body_style_scope",
             "trim_level_scope",
             "variant_scope",
-            "review_flag",
             "notes",
         ],
         price_rules,

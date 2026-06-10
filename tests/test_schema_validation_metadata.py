@@ -25,14 +25,10 @@ RULE_MAPPING_HEADERS = [
     "source_id",
     "target_id",
     "rule_type",
-    "review_flag",
     "generation_action",
     "normalization_status",
-    "normalization_reason",
-    "replacement_group_id",
-    "replacement_rule_id",
 ]
-PRICE_RULE_HEADERS = ["rule_id", "target_id", "price_rule_type", "price_value", "review_flag"]
+PRICE_RULE_HEADERS = ["rule_id", "target_id", "price_rule_type", "price_value"]
 ACTIVE_GROUP_HEADERS = ["group_id", "active"]
 ACTIVE_MEMBER_HEADERS = ["group_id", "option_id", "active"]
 VARIANT_OVERRIDE_HEADERS = ["option_id", "variant_id", "active", "selectable"]

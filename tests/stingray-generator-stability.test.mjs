@@ -48,7 +48,6 @@ const sectionMasterHeaders = [
   "is_required",
   "display_order",
   "standard_behavior",
-  "help_text",
   "step_key",
 ];
 const optionVariantStatuses = new Set(["available", "standard", "unavailable"]);
@@ -73,7 +72,6 @@ const ruleMappingHeaders = [
   "target_id",
   "target_type",
   "original_detail_raw",
-  "review_flag",
   "source_type",
   "target_selection_mode",
   "source_selection_mode",
@@ -84,9 +82,6 @@ const ruleMappingHeaders = [
   "runtime_action",
   "disabled_reason",
   "normalization_status",
-  "normalization_reason",
-  "replacement_group_id",
-  "replacement_rule_id",
 ];
 const priceRuleHeaders = [
   "price_rule_id",
@@ -96,9 +91,7 @@ const priceRuleHeaders = [
   "price_value",
   "body_style_scope",
   "trim_level_scope",
-  "review_flag",
   "notes",
-  "price_semantic",
 ];
 const interiorComponentHeaders = [
   "model_key",
@@ -135,7 +128,6 @@ const sectionPresentationHeaders = [
   "section_id",
   "display_label",
   "step_key",
-  "presentation_bucket",
   "display_behavior",
   "section_display_order",
   "standard_equipment_bucket",

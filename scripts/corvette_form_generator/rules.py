@@ -193,7 +193,6 @@ def build_draft_rules(
                 "active": "False" if redundant else "True",
                 "runtime_action": "replace" if replaces_default else "omit_redundant_same_section_exclude" if redundant else "active",
                 "source_note": truncate_reason(rule.get("original_detail_raw", ""), 500),
-                "review_flag": rule.get("review_flag", ""),
             }
         )
     return raw_rules

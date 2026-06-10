@@ -171,7 +171,6 @@ def load_section_presentation(wb: Any, model_key: str) -> list[dict[str, Any]]:
                 "section_id": section_id,
                 "display_label": clean(row.get("display_label")),
                 "step_key": clean(row.get("step_key")),
-                "presentation_bucket": clean(row.get("presentation_bucket")),
                 "display_behavior": clean(row.get("display_behavior")),
                 "section_display_order": clean(row.get("section_display_order")),
                 "standard_equipment_bucket": clean(row.get("standard_equipment_bucket")),

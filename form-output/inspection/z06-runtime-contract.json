@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-06-10T03:14:51+00:00",
+    "generated_at": "2026-06-10T04:42:11+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -45011,8 +45011,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Available on SOLD orders only. Not available with (R8C) Corvette Museum Delivery.",
-      "review_flag": "False"
+      "source_note": "1. Available on SOLD orders only. Not available with (R8C) Corvette Museum Delivery."
     },
     {
       "rule_id": "z06_rule_opt_b6p_001_includes_opt_d3v_001",
@@ -45030,8 +45029,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-      "review_flag": "False"
+      "source_note": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers."
     },
     {
       "rule_id": "z06_copy_rule_opt_b6p_001_includes_opt_sl9_001_opt_b6p_001_includes_opt_sl9_001",
@@ -45049,8 +45047,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package.",
-      "review_flag": "False"
+      "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package."
     },
     {
       "rule_id": "z06_copy_rule_opt_zz3_001_includes_opt_sl9_001_opt_zz3_001_includes_opt_sl9_001",
@@ -45068,8 +45065,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package.",
-      "review_flag": "False"
+      "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package."
     },
     {
       "rule_id": "z06_copy_rule_opt_r8c_001_includes_opt_cfx_001_opt_r8c_001_includes_opt_cfx_001",
@@ -45087,8 +45083,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN",
-      "review_flag": "False"
+      "source_note": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
     },
     {
       "rule_id": "z06_copy_rule_opt_5jr_001_includes_opt_drg_001_opt_5jr_001_includes_opt_drg_001",
@@ -45106,8 +45101,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors, Genuine Corvette Accessory",
-      "review_flag": "False"
+      "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors, Genuine Corvette Accessory"
     },
     {
       "rule_id": "z06_copy_rule_opt_e60_001_includes_opt_tr7_001_opt_e60_001_includes_opt_tr7_001",
@@ -45125,8 +45119,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "includes (TR7) automatic headlamp leveling system",
-      "review_flag": "False"
+      "source_note": "includes (TR7) automatic headlamp leveling system"
     },
     {
       "rule_id": "z06_copy_rule_opt_zyc_001_includes_opt_drg_001_opt_zyc_001_includes_opt_drg_001",
@@ -45144,8 +45137,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors. Also includes Carbon Flash Metallic-painted spoiler when (Z51) Z51 Performance Package or (TVS) low-profile rear spoiler and front splitter is ordered. Not available with exterior color (GBA) Black.",
-      "review_flag": "False"
+      "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors. Also includes Carbon Flash Metallic-painted spoiler when (Z51) Z51 Performance Package or (TVS) low-profile rear spoiler and front splitter is ordered. Not available with exterior color (GBA) Black."
     },
     {
       "rule_id": "z06_rule_opt_pcq_001_includes_opt_vwe_001",
@@ -45163,8 +45155,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-      "review_flag": "False"
+      "source_note": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
     },
     {
       "rule_id": "z06_rule_opt_pcq_001_includes_opt_vwt_001",
@@ -45182,8 +45173,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-      "review_flag": "False"
+      "source_note": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
     },
     {
       "rule_id": "z06_copy_rule_opt_pdy_001_includes_opt_ryt_001_opt_pdy_001_includes_opt_ryt_001",
@@ -45201,8 +45191,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Included with (PDY) Roadside Safety Package.",
-      "review_flag": "False"
+      "source_note": "1. Included with (PDY) Roadside Safety Package."
     },
     {
       "rule_id": "z06_copy_rule_opt_pdy_001_includes_opt_s08_001_opt_pdy_001_includes_opt_s08_001",
@@ -45220,8 +45209,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Included with (PDY) Roadside Safety Package.",
-      "review_flag": "False"
+      "source_note": "1. Included with (PDY) Roadside Safety Package."
     },
     {
       "rule_id": "z06_copy_rule_opt_sbt_001_includes_opt_sc7_001_opt_sbt_001_includes_opt_sc7_001",
@@ -45239,8 +45227,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Included with (SBT) dual roof, LPO.",
-      "review_flag": "False"
+      "source_note": "1. Included with (SBT) dual roof, LPO."
     },
     {
       "rule_id": "z06_copy_rule_opt_pef_001_includes_opt_cav_001_opt_pef_001_includes_opt_cav_001",
@@ -45258,8 +45245,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-      "review_flag": "False"
+      "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
     },
     {
       "rule_id": "z06_copy_rule_opt_pef_001_includes_opt_ria_001_opt_pef_001_includes_opt_ria_001",
@@ -45277,8 +45263,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-      "review_flag": "False"
+      "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
     },
     {
       "rule_id": "z06_rule_opt_j6l_001_requires_opt_j57_001",
@@ -45296,8 +45281,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Requires (J57) carbon ceramic brakes.",
-      "review_flag": "False"
+      "source_note": "1. Requires (J57) carbon ceramic brakes."
     },
     {
       "rule_id": "z06_rule_opt_t0f_001_includes_opt_cfz_001",
@@ -45315,8 +45299,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package.",
-      "review_flag": "False"
+      "source_note": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package."
     },
     {
       "rule_id": "z06_rule_opt_roy_001_requires_opt_j57_001",
@@ -45334,8 +45317,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Requires (J57) carbon ceramic brakes.",
-      "review_flag": "False"
+      "source_note": "1. Requires (J57) carbon ceramic brakes."
     },
     {
       "rule_id": "z06_rule_opt_roz_001_requires_opt_j57_001",
@@ -45353,8 +45335,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Requires (J57) carbon ceramic brakes.",
-      "review_flag": "False"
+      "source_note": "1. Requires (J57) carbon ceramic brakes."
     },
     {
       "rule_id": "z06_rule_opt_stz_001_requires_opt_j57_001",
@@ -45372,8 +45353,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Requires (J57) carbon ceramic brakes.",
-      "review_flag": "False"
+      "source_note": "1. Requires (J57) carbon ceramic brakes."
     },
     {
       "rule_id": "z06_copy_rule_opt_sbt_001_excludes_opt_cc3_001_opt_sbt_001_excludes_opt_cc3_001",
@@ -45391,8 +45371,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Not available with (CC3) transparent, removable roof panel. adds transparent removable roof panel and includes (SC7) roof panel storage pouch, Genuine Corvette Accessories",
-      "review_flag": "False"
+      "source_note": "1. Not available with (CC3) transparent, removable roof panel. adds transparent removable roof panel and includes (SC7) roof panel storage pouch, Genuine Corvette Accessories"
     },
     {
       "rule_id": "z06_rule_opt_sig_001_requires_opt_t0e_001",
@@ -45410,8 +45389,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Requires (T0E) rear spoiler.",
-      "review_flag": "False"
+      "source_note": "1. Requires (T0E) rear spoiler."
     },
     {
       "rule_id": "z06_copy_rule_opt_s47_001_excludes_opt_spy_001_opt_s47_001_excludes_opt_spy_001",
@@ -45429,8 +45407,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Not available with (SPY) Black lug nuts, LPO.",
-      "review_flag": "False"
+      "source_note": "1. Not available with (SPY) Black lug nuts, LPO."
     },
     {
       "rule_id": "z06_copy_rule_opt_sfe_001_excludes_opt_spy_001_opt_sfe_001_excludes_opt_spy_001",
@@ -45448,8 +45425,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Not available with (SPY) Black lug nuts, LPO.",
-      "review_flag": "False"
+      "source_note": "1. Not available with (SPY) Black lug nuts, LPO."
     },
     {
       "rule_id": "z06_copy_rule_opt_spy_001_excludes_opt_s47_001_opt_spy_001_excludes_opt_s47_001",
@@ -45467,8 +45443,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Not available with (S47) Chrome lug nuts, LPO.",
-      "review_flag": "False"
+      "source_note": "1. Not available with (S47) Chrome lug nuts, LPO."
     },
     {
       "rule_id": "z06_copy_rule_opt_spz_001_requires_opt_spy_001_opt_spz_001_requires_opt_spy_001",
@@ -45486,8 +45461,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Requires (SPY) Black lug nuts, LPO.",
-      "review_flag": "False"
+      "source_note": "1. Requires (SPY) Black lug nuts, LPO."
     },
     {
       "rule_id": "z06_rule_opt_s47_001_excludes_opt_roy_001",
@@ -45505,8 +45479,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-      "review_flag": "False"
+      "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
     },
     {
       "rule_id": "z06_rule_opt_s47_001_excludes_opt_roz_001",
@@ -45524,8 +45497,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-      "review_flag": "False"
+      "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
     },
     {
       "rule_id": "z06_rule_opt_s47_001_excludes_opt_stz_001",
@@ -45543,8 +45515,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-      "review_flag": "False"
+      "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
     },
     {
       "rule_id": "z06_rule_opt_sfe_001_excludes_opt_roy_001",
@@ -45562,8 +45533,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-      "review_flag": "False"
+      "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
     },
     {
       "rule_id": "z06_rule_opt_sfe_001_excludes_opt_roz_001",
@@ -45581,8 +45551,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-      "review_flag": "False"
+      "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
     },
     {
       "rule_id": "z06_rule_opt_sfe_001_excludes_opt_stz_001",
@@ -45600,8 +45569,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-      "review_flag": "False"
+      "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
     },
     {
       "rule_id": "z06_rule_opt_j6d_001_requires_opt_j57_001",
@@ -45619,8 +45587,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "J6D Dark Gray Metallic-painted calipers require J57 carbon ceramic brakes.",
-      "review_flag": "False"
+      "source_note": "J6D Dark Gray Metallic-painted calipers require J57 carbon ceramic brakes."
     },
     {
       "rule_id": "z06_rule_opt_pdb_001_includes_opt_j57_001",
@@ -45638,8 +45605,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "PDB includes J57 carbon ceramic brakes.",
-      "review_flag": "False"
+      "source_note": "PDB includes J57 carbon ceramic brakes."
     },
     {
       "rule_id": "z06_rule_opt_pdb_001_includes_opt_j6d_001",
@@ -45657,8 +45623,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "PDB includes J6D Dark Gray Metallic-painted calipers.",
-      "review_flag": "False"
+      "source_note": "PDB includes J6D Dark Gray Metallic-painted calipers."
     },
     {
       "rule_id": "z06_rule_opt_pdd_001_includes_opt_z07_001",
@@ -45676,8 +45641,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "PDD includes Z07 Performance Package.",
-      "review_flag": "False"
+      "source_note": "PDD includes Z07 Performance Package."
     },
     {
       "rule_id": "z06_rule_opt_pdd_001_includes_opt_t0f_001",
@@ -45695,8 +45659,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "PDD includes Carbon Flash-painted Carbon Fiber Aero Package.",
-      "review_flag": "False"
+      "source_note": "PDD includes Carbon Flash-painted Carbon Fiber Aero Package."
     },
     {
       "rule_id": "z06_rule_opt_pdd_001_includes_opt_cfz_001",
@@ -45714,8 +45677,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "PDD includes Carbon Flash-painted carbon fiber ground effects.",
-      "review_flag": "False"
+      "source_note": "PDD includes Carbon Flash-painted carbon fiber ground effects."
     },
     {
       "rule_id": "z06_rule_opt_pdf_001_includes_opt_z07_001",
@@ -45733,8 +45695,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "PDF includes Z07 Performance Package.",
-      "review_flag": "False"
+      "source_note": "PDF includes Z07 Performance Package."
     },
     {
       "rule_id": "z06_rule_opt_pdf_001_includes_opt_t0g_001",
@@ -45752,8 +45713,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "PDF includes visible Carbon Fiber Aero Package.",
-      "review_flag": "False"
+      "source_note": "PDF includes visible Carbon Fiber Aero Package."
     },
     {
       "rule_id": "z06_rule_opt_pdf_001_includes_opt_cfv_002",
@@ -45771,8 +45731,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "PDF includes visible carbon fiber ground effects.",
-      "review_flag": "False"
+      "source_note": "PDF includes visible carbon fiber ground effects."
     },
     {
       "rule_id": "z06_rule_opt_z07_001_includes_opt_j57_001",
@@ -45790,8 +45749,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "Z07 includes J57 carbon ceramic brakes.",
-      "review_flag": "False"
+      "source_note": "Z07 includes J57 carbon ceramic brakes."
     },
     {
       "rule_id": "z06_rule_opt_z07_001_includes_opt_fe7_001",
@@ -45809,8 +45767,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "Z07 includes FE7 suspension.",
-      "review_flag": "False"
+      "source_note": "Z07 includes FE7 suspension."
     },
     {
       "rule_id": "z06_rule_opt_z07_001_includes_opt_xfs_001",
@@ -45828,8 +45785,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "Z07 includes XFS Michelin Pilot Sport Cup 2 R tires.",
-      "review_flag": "False"
+      "source_note": "Z07 includes XFS Michelin Pilot Sport Cup 2 R tires."
     },
     {
       "rule_id": "z06_rule_opt_t0g_001_includes_opt_cfv_002",
@@ -45847,8 +45803,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "T0G includes visible carbon fiber ground effects.",
-      "review_flag": "False"
+      "source_note": "T0G includes visible carbon fiber ground effects."
     },
     {
       "rule_id": "z06_rule_opt_bcw_001_requires_opt_zz3_001_convertible",
@@ -45866,8 +45821,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "BCW red engine intake is available on convertible only with ZZ3.",
-      "review_flag": "False"
+      "source_note": "BCW red engine intake is available on convertible only with ZZ3."
     },
     {
       "rule_id": "z06_rule_opt_j57_001_excludes_opt_j6a_001",
@@ -45885,8 +45839,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "replace",
-      "source_note": "J57 carbon ceramic brakes replace the default J6A black calipers.",
-      "review_flag": "False"
+      "source_note": "J57 carbon ceramic brakes replace the default J6A black calipers."
     },
     {
       "rule_id": "z06_rule_opt_pbc_001_requires_opt_zz3_001_convertible",
@@ -45904,8 +45857,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "PBC requires ZZ3 on convertible.",
-      "review_flag": "False"
+      "source_note": "PBC requires ZZ3 on convertible."
     },
     {
       "rule_id": "z06_rule_opt_z07_001_includes_opt_t0f_001",
@@ -45923,8 +45875,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "Z07 defaults Carbon Flash aero T0F while allowing the user to switch to T0G.",
-      "review_flag": ""
+      "source_note": "Z07 defaults Carbon Flash aero T0F while allowing the user to switch to T0G."
     },
     {
       "rule_id": "z06_rule_opt_pdb_001_includes_opt_roy_001",
@@ -45942,8 +45893,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "PDB defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches.",
-      "review_flag": ""
+      "source_note": "PDB defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches."
     },
     {
       "rule_id": "z06_rule_opt_pdd_001_includes_opt_roy_001",
@@ -45961,8 +45911,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "PDD defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches.",
-      "review_flag": ""
+      "source_note": "PDD defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches."
     },
     {
       "rule_id": "z06_rule_opt_pdf_001_includes_opt_roy_001",
@@ -45980,8 +45929,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "PDF defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches.",
-      "review_flag": ""
+      "source_note": "PDF defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches."
     },
     {
       "rule_id": "z06_rule_opt_bcw_001_includes_opt_d3v_001",
@@ -45999,8 +45947,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "BCW Red engine intake includes D3V engine lighting.",
-      "review_flag": "False"
+      "source_note": "BCW Red engine intake includes D3V engine lighting."
     },
     {
       "rule_id": "z06_rule_opt_pda_001_includes_opt_sne_001",
@@ -46018,8 +45965,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "PDA includes SNE per Jake C8.R graphics package source rule.",
-      "review_flag": "False"
+      "source_note": "PDA includes SNE per Jake C8.R graphics package source rule."
     },
     {
       "rule_id": "z06_rule_opt_pda_001_includes_opt_vpw_001",
@@ -46037,8 +45983,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "PDA includes VPW per Jake C8.R graphics package source rule.",
-      "review_flag": "False"
+      "source_note": "PDA includes VPW per Jake C8.R graphics package source rule."
     }
   ],
   "priceRules": [
@@ -46051,7 +45996,6 @@
       "body_style_scope": "coupe",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "BCW is $895 on coupe when B6P is selected."
     },
     {
@@ -46063,7 +46007,6 @@
       "body_style_scope": "convertible",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "BCW is $895 on convertible when ZZ3 is selected."
     },
     {
@@ -46075,7 +46018,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "T0F includes CFZ, so CFZ does not add a second charge."
     },
     {
@@ -46087,7 +46029,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "T0G includes CFV, so CFV does not add a second charge."
     },
     {
@@ -46099,7 +46040,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "Z07 includes J57, so J57 does not add a second charge."
     },
     {
@@ -46111,7 +46051,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDB package price includes J57, so J57 does not add a second charge."
     },
     {
@@ -46123,7 +46062,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDB package price includes J6D, so J6D does not add a second charge."
     },
     {
@@ -46135,7 +46073,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDB package price includes ROY, so ROY does not add a second charge."
     },
     {
@@ -46147,7 +46084,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDB package price includes ROZ, so ROZ does not add a second charge."
     },
     {
@@ -46159,7 +46095,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDB package price includes STZ, so STZ does not add a second charge."
     },
     {
@@ -46171,7 +46106,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDD package price includes Z07, so Z07 does not add a second charge."
     },
     {
@@ -46183,7 +46117,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDD package price includes J57, so J57 does not add a second charge."
     },
     {
@@ -46195,7 +46128,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDD package price includes T0F, so T0F does not add a second charge."
     },
     {
@@ -46207,7 +46139,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDD package price includes CFZ, so CFZ does not add a second charge."
     },
     {
@@ -46219,7 +46150,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDD package price includes ROY, so ROY does not add a second charge."
     },
     {
@@ -46231,7 +46161,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDD package price includes ROZ, so ROZ does not add a second charge."
     },
     {
@@ -46243,7 +46172,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDD package price includes STZ, so STZ does not add a second charge."
     },
     {
@@ -46255,7 +46183,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDF package price includes Z07, so Z07 does not add a second charge."
     },
     {
@@ -46267,7 +46194,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDF package price includes J57, so J57 does not add a second charge."
     },
     {
@@ -46279,7 +46205,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDF package price includes T0G, so T0G does not add a second charge."
     },
     {
@@ -46291,7 +46216,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDF package price includes CFV, so CFV does not add a second charge."
     },
     {
@@ -46303,7 +46227,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDF package price includes ROY, so ROY does not add a second charge."
     },
     {
@@ -46315,7 +46238,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDF package price includes ROZ, so ROZ does not add a second charge."
     },
     {
@@ -46327,7 +46249,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDF package price includes STZ, so STZ does not add a second charge."
     },
     {
@@ -46339,7 +46260,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDB package price with ROY carbon fiber wheels from the raw price schedule."
     },
     {
@@ -46351,7 +46271,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDB package price with ROZ carbon fiber wheels from the raw price schedule."
     },
     {
@@ -46363,7 +46282,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDB package price with STZ carbon fiber wheels from the raw price schedule."
     },
     {
@@ -46375,7 +46293,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDD package price with ROY carbon fiber wheels from the raw price schedule."
     },
     {
@@ -46387,7 +46304,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDD package price with ROZ carbon fiber wheels from the raw price schedule."
     },
     {
@@ -46399,7 +46315,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDD package price with STZ carbon fiber wheels from the raw price schedule."
     },
     {
@@ -46411,7 +46326,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDF package price with ROY carbon fiber wheels from the raw price schedule."
     },
     {
@@ -46423,7 +46337,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDF package price with ROZ carbon fiber wheels from the raw price schedule."
     },
     {
@@ -46435,7 +46348,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDF package price with STZ carbon fiber wheels from the raw price schedule."
     },
     {
@@ -46447,7 +46359,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "B6P includes D3V, so D3V does not add a second charge."
     },
     {
@@ -46459,7 +46370,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "B6P includes SL9, so SL9 does not add a second charge."
     },
     {
@@ -46471,7 +46381,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "ZZ3 includes SL9, so SL9 does not add a second charge."
     },
     {
@@ -46483,7 +46392,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "3LZ",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "3LZ standard AH2 GT2 seats should not add a charge."
     },
     {
@@ -46495,7 +46403,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "3LZ",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "3LZ AE4 Competition Sport seats should add $595."
     },
     {
@@ -46507,7 +46414,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PCQ includes VWE, so VWE does not add a second charge."
     },
     {
@@ -46519,7 +46425,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PCQ includes VWT, so VWT does not add a second charge."
     },
     {
@@ -46531,7 +46436,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDY includes RYT, so RYT does not add a second charge."
     },
     {
@@ -46543,7 +46447,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDY includes S08, so S08 does not add a second charge."
     },
     {
@@ -46555,7 +46458,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PEF includes CAV, so CAV does not add a second charge."
     },
     {
@@ -46567,7 +46469,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PEF includes RIA, so RIA does not add a second charge."
     },
     {
@@ -46579,7 +46480,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "1LZ",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "1LZ selectable UQT should retain its approved charge while 2LZ/3LZ standard UQT stays unpriced."
     },
     {
@@ -46591,7 +46491,6 @@
       "body_style_scope": "*",
       "trim_level_scope": "*",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "BCW includes D3V, so D3V does not add a second charge."
     },
     {
@@ -46603,7 +46502,6 @@
       "body_style_scope": "",
       "trim_level_scope": "",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDA includes SNE, so SNE should not add a second charge."
     },
     {
@@ -46615,7 +46513,6 @@
       "body_style_scope": "",
       "trim_level_scope": "",
       "variant_scope": "",
-      "review_flag": "False",
       "notes": "PDA includes VPW, so VPW should not add a second charge."
     }
   ],

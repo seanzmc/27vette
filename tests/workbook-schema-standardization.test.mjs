@@ -201,7 +201,10 @@ test("future Corvette model metadata is scaffolded against shared LZ interiors",
       variantRows.map((row) => row.display_order),
       expectedVariants[modelKey].map((_, index) => index + 1),
     );
-    assert.equal(variantRows.every((row) => row.active === false), true);
+    // z06 is a live promoted runtime model; its model_variants and
+    // model_workbook_sources rows are active. ZR1/ZR1X remain inactive scaffolds.
+    const expectActive = expected.active ?? false;
+    assert.equal(variantRows.every((row) => row.active === expectActive), true);
 
     const sourceRows = snapshot.model_source_rows.filter((row) => row.model_key === modelKey);
     assert.equal(sourceRows.length, Object.keys(sourceSheetNames[modelKey]).length);
@@ -209,7 +212,7 @@ test("future Corvette model metadata is scaffolded against shared LZ interiors",
       const sourceRow = sourceRows.find((row) => row.source_role === sourceRole);
       assert.ok(sourceRow, `${modelKey} missing ${sourceRole}`);
       assert.equal(sourceRow.sheet_name, sheetName);
-      assert.equal(sourceRow.active, false, `${modelKey}.${sourceRole} should stay inactive`);
+      assert.equal(sourceRow.active, expectActive, `${modelKey}.${sourceRole} should match promotion state`);
     }
   }
 });
@@ -234,7 +237,6 @@ test("rule lifecycle metadata keeps retained source rows auditable", () => {
       assert.ok("normalization_status" in row, `${sheetName}.${row.rule_id} missing normalization_status`);
       if (String(row.generation_action || "").startsWith("omit")) {
         assert.ok(["omitted", "replaced"].includes(row.normalization_status), `${sheetName}.${row.rule_id} bad status`);
-        assert.ok(row.normalization_reason, `${sheetName}.${row.rule_id} missing reason`);
       }
     }
   }
@@ -517,83 +519,11 @@ print(json.dumps(issues))
   assert.deepEqual(ungrouped, []);
 });
 
-test("price rule source sheets classify override semantics explicitly", () => {
-  const issues = pythonJson(`
-import json
-from openpyxl import load_workbook
-
-wb = load_workbook('stingray_master.xlsx', read_only=True, data_only=True)
-
-ALLOWED = {
-    'included_zero',
-    'conditional_component_price',
-    'package_price_by_component',
-    'self_trim_price',
-    'review_required',
-}
-PRICE_SHEETS = [
-    ('stingray', 'stingray_options', 'price_rules'),
-    ('grandSport', 'grandSport_options', 'grandSport_price_rules'),
-    ('z06', 'z06_options', 'z06_price_rules'),
-    ('zr1', 'zr1_options', 'zr1_price_rules'),
-    ('zr1x', 'zr1x_options', 'zr1x_price_rules'),
-]
-PACKAGE_RPOS = {'PDB', 'PDD', 'PDF'}
-
-def clean(value):
-    return '' if value is None else str(value).strip()
-
-def rows(sheet):
-    ws = wb[sheet]
-    raw_rows = list(ws.iter_rows(values_only=True))
-    headers = [clean(value) for value in raw_rows[0]]
-    result = []
-    for row_number, raw in enumerate(raw_rows[1:], start=2):
-        record = {header: raw[index] if index < len(raw) else '' for index, header in enumerate(headers) if header}
-        if any(clean(value) for value in record.values()):
-            record['_row'] = row_number
-            result.append(record)
-    return headers, result
-
-def active(row):
-    value = clean(row.get('active'))
-    return value.lower() not in {'false', '0', 'no', 'inactive'}
-
-issues = []
-for model_key, option_sheet, price_sheet in PRICE_SHEETS:
-    headers, price_rows = rows(price_sheet)
-    if 'price_semantic' not in headers:
-        issues.append({'model': model_key, 'sheet': price_sheet, 'issue': 'missing_price_semantic_header'})
-        continue
-    _, option_rows = rows(option_sheet)
-    option_by_id = {clean(row.get('option_id')): row for row in option_rows}
-    for row in price_rows:
-        if not active(row) or clean(row.get('price_rule_type')) != 'override':
-            continue
-        semantic = clean(row.get('price_semantic'))
-        condition_id = clean(row.get('condition_option_id'))
-        target_id = clean(row.get('target_option_id'))
-        condition_rpo = clean(option_by_id.get(condition_id, {}).get('rpo')) or condition_id
-        target_rpo = clean(option_by_id.get(target_id, {}).get('rpo')) or target_id
-        price_value = clean(row.get('price_value'))
-        scope_values = [clean(row.get('body_style_scope')), clean(row.get('trim_level_scope')), clean(row.get('variant_scope'))]
-        if semantic not in ALLOWED:
-            issues.append({'model': model_key, 'sheet': price_sheet, 'row': row['_row'], 'price_rule_id': clean(row.get('price_rule_id')), 'issue': 'bad_price_semantic', 'semantic': semantic})
-            continue
-        if semantic == 'included_zero' and price_value not in {'0', '0.0'}:
-            issues.append({'model': model_key, 'sheet': price_sheet, 'row': row['_row'], 'price_rule_id': clean(row.get('price_rule_id')), 'issue': 'included_zero_not_zero', 'price_value': price_value})
-        if semantic == 'self_trim_price' and (condition_id != target_id or not any(scope and scope != '*' for scope in scope_values)):
-            issues.append({'model': model_key, 'sheet': price_sheet, 'row': row['_row'], 'price_rule_id': clean(row.get('price_rule_id')), 'issue': 'bad_self_trim_shape', 'condition_rpo': condition_rpo, 'target_rpo': target_rpo})
-        if semantic == 'package_price_by_component' and (target_rpo not in PACKAGE_RPOS or price_value in {'', '0', '0.0'}):
-            issues.append({'model': model_key, 'sheet': price_sheet, 'row': row['_row'], 'price_rule_id': clean(row.get('price_rule_id')), 'issue': 'bad_package_component_shape', 'condition_rpo': condition_rpo, 'target_rpo': target_rpo, 'price_value': price_value})
-        if semantic == 'review_required' and clean(row.get('review_flag')).lower() not in {'true', '1', 'yes'}:
-            issues.append({'model': model_key, 'sheet': price_sheet, 'row': row['_row'], 'price_rule_id': clean(row.get('price_rule_id')), 'issue': 'review_required_without_flag'})
-
-wb.close()
-print(json.dumps(issues))
-`);
-  assert.deepEqual(issues, []);
-});
+// RETIRED: "price rule source sheets classify override semantics explicitly".
+// The price_semantic review column was removed in the Phase 2 workbook cleanup
+// (workbook-cleanup-spec.md Tier A); it was never consumed by generation or the
+// runtime app. Price-rule typing remains guarded by the numeric price_value
+// checks in validate_workbook_schema.
 
 test("category_master is retired from the active source graph and draft provenance is not live app data", () => {
   assert.equal(snapshot.sheetnames.includes("category_master"), false);

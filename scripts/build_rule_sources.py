@@ -33,7 +33,6 @@ RULE_MAPPING_HEADERS = [
     "target_id",
     "target_type",
     "original_detail_raw",
-    "review_flag",
     "source_type",
     "target_selection_mode",
     "source_selection_mode",
