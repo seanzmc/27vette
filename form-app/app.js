@@ -832,7 +832,6 @@ function sameExclusiveGroupPeer(optionId, peerId) {
 }
 
 function requiresAnyReason(choice, selectedIds) {
-  if (!selectedIds.has(choice.option_id)) return "";
   const groups = ruleGroupsBySource.get(choice.option_id) || [];
   for (const group of groups) {
     if (group.group_type !== "requires_any" || !ruleGroupAppliesToCurrentVariant(group)) continue;

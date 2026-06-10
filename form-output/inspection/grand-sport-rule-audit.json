@@ -6,7 +6,7 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-06-08T03:27:38+00:00",
+    "generated_at": "2026-06-09T23:29:05+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
@@ -22,10 +22,10 @@
     "unresolvedRpoMentions": 6,
     "exclusiveGroups": 10,
     "exclusiveGroupMembers": 27,
-    "ruleGroups": 26,
-    "ruleGroupMembers": 174,
+    "ruleGroups": 27,
+    "ruleGroupMembers": 176,
     "groupedExclusionPairs": 172,
-    "groupedRequirementPairs": 2,
+    "groupedRequirementPairs": 4,
     "duplicateSemanticRuleKeys": 1,
     "exactDuplicateRuleRows": 1,
     "overlappingScopedRuleRows": 0,
