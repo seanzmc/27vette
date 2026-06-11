@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-10T22:48:21+00:00"
+          "generated_at": "2026-06-11T00:44:57+00:00"
         },
         "variants": [
           {
@@ -52440,7 +52440,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -52450,7 +52450,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "stitching"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -52487,11 +52487,11 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -52528,7 +52528,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -52544,7 +52544,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -52581,7 +52581,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -52591,7 +52591,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -55134,7 +55134,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-10T22:47:41+00:00",
+          "generated_at": "2026-06-11T00:44:07+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -107808,7 +107808,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -107818,7 +107818,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "stitching"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -107857,11 +107857,11 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -107900,7 +107900,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -107916,7 +107916,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -107955,7 +107955,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -107965,7 +107965,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -110586,7 +110586,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-10T17:07:55+00:00",
+          "generated_at": "2026-06-11T00:44:08+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -116603,6 +116603,156 @@ window.CORVETTE_FORM_DATA = {
             "display_behavior": "auto_only",
             "display_order": 10,
             "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
+          },
+          {
+            "choice_id": "1lz_h07__opt_r6x_001",
+            "option_id": "opt_r6x_001",
+            "rpo": "R6X",
+            "label": "Custom Interior Trim and Seat Combination",
+            "description": "",
+            "section_id": "sec_colo_001",
+            "section_name": "Color Override",
+            "standard_equipment_group_type": "",
+            "step_key": "interior_trim",
+            "variant_id": "1lz_h07",
+            "body_style": "coupe",
+            "trim_level": "1LZ",
+            "status": "unavailable",
+            "status_label": "Not Available",
+            "selectable": "False",
+            "active": "False",
+            "choice_mode": "multi",
+            "selection_mode": "multi_select_opt",
+            "selection_mode_label": "Optional multiple choice",
+            "base_price": 995,
+            "display_behavior": "auto_only",
+            "display_order": 20,
+            "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+          },
+          {
+            "choice_id": "2lz_h07__opt_r6x_001",
+            "option_id": "opt_r6x_001",
+            "rpo": "R6X",
+            "label": "Custom Interior Trim and Seat Combination",
+            "description": "",
+            "section_id": "sec_colo_001",
+            "section_name": "Color Override",
+            "standard_equipment_group_type": "",
+            "step_key": "interior_trim",
+            "variant_id": "2lz_h07",
+            "body_style": "coupe",
+            "trim_level": "2LZ",
+            "status": "unavailable",
+            "status_label": "Not Available",
+            "selectable": "False",
+            "active": "False",
+            "choice_mode": "multi",
+            "selection_mode": "multi_select_opt",
+            "selection_mode_label": "Optional multiple choice",
+            "base_price": 995,
+            "display_behavior": "auto_only",
+            "display_order": 20,
+            "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+          },
+          {
+            "choice_id": "3lz_h07__opt_r6x_001",
+            "option_id": "opt_r6x_001",
+            "rpo": "R6X",
+            "label": "Custom Interior Trim and Seat Combination",
+            "description": "",
+            "section_id": "sec_colo_001",
+            "section_name": "Color Override",
+            "standard_equipment_group_type": "",
+            "step_key": "interior_trim",
+            "variant_id": "3lz_h07",
+            "body_style": "coupe",
+            "trim_level": "3LZ",
+            "status": "unavailable",
+            "status_label": "Not Available",
+            "selectable": "False",
+            "active": "False",
+            "choice_mode": "multi",
+            "selection_mode": "multi_select_opt",
+            "selection_mode_label": "Optional multiple choice",
+            "base_price": 995,
+            "display_behavior": "auto_only",
+            "display_order": 20,
+            "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+          },
+          {
+            "choice_id": "1lz_h67__opt_r6x_001",
+            "option_id": "opt_r6x_001",
+            "rpo": "R6X",
+            "label": "Custom Interior Trim and Seat Combination",
+            "description": "",
+            "section_id": "sec_colo_001",
+            "section_name": "Color Override",
+            "standard_equipment_group_type": "",
+            "step_key": "interior_trim",
+            "variant_id": "1lz_h67",
+            "body_style": "convertible",
+            "trim_level": "1LZ",
+            "status": "unavailable",
+            "status_label": "Not Available",
+            "selectable": "False",
+            "active": "False",
+            "choice_mode": "multi",
+            "selection_mode": "multi_select_opt",
+            "selection_mode_label": "Optional multiple choice",
+            "base_price": 995,
+            "display_behavior": "auto_only",
+            "display_order": 20,
+            "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+          },
+          {
+            "choice_id": "2lz_h67__opt_r6x_001",
+            "option_id": "opt_r6x_001",
+            "rpo": "R6X",
+            "label": "Custom Interior Trim and Seat Combination",
+            "description": "",
+            "section_id": "sec_colo_001",
+            "section_name": "Color Override",
+            "standard_equipment_group_type": "",
+            "step_key": "interior_trim",
+            "variant_id": "2lz_h67",
+            "body_style": "convertible",
+            "trim_level": "2LZ",
+            "status": "unavailable",
+            "status_label": "Not Available",
+            "selectable": "False",
+            "active": "False",
+            "choice_mode": "multi",
+            "selection_mode": "multi_select_opt",
+            "selection_mode_label": "Optional multiple choice",
+            "base_price": 995,
+            "display_behavior": "auto_only",
+            "display_order": 20,
+            "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+          },
+          {
+            "choice_id": "3lz_h67__opt_r6x_001",
+            "option_id": "opt_r6x_001",
+            "rpo": "R6X",
+            "label": "Custom Interior Trim and Seat Combination",
+            "description": "",
+            "section_id": "sec_colo_001",
+            "section_name": "Color Override",
+            "standard_equipment_group_type": "",
+            "step_key": "interior_trim",
+            "variant_id": "3lz_h67",
+            "body_style": "convertible",
+            "trim_level": "3LZ",
+            "status": "unavailable",
+            "status_label": "Not Available",
+            "selectable": "False",
+            "active": "False",
+            "choice_mode": "multi",
+            "selection_mode": "multi_select_opt",
+            "selection_mode_label": "Optional multiple choice",
+            "base_price": 995,
+            "display_behavior": "auto_only",
+            "display_order": 20,
+            "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
           },
           {
             "choice_id": "1lz_h07__opt_bv4_001",
@@ -162353,11 +162503,11 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -162396,11 +162546,11 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -162439,7 +162589,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -162449,7 +162599,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "two_tone"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -162488,11 +162638,11 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -162531,11 +162681,11 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Seats",
@@ -162574,7 +162724,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -162584,7 +162734,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "stitching"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -162623,7 +162773,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -162639,7 +162789,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "two_tone"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -162678,7 +162828,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -162688,7 +162838,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "stitching"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Seats",
@@ -162727,7 +162877,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -162737,7 +162887,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -162776,7 +162926,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -162786,7 +162936,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -162825,7 +162975,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -162841,7 +162991,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "two_tone"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -162880,7 +163030,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -162890,7 +163040,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -162929,7 +163079,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -162939,7 +163089,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Seats",
@@ -162978,7 +163128,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -163000,7 +163150,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "two_tone"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -163039,7 +163189,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -163055,7 +163205,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Seats",
@@ -163121,7 +163271,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "availability",
             "entity_id": "",
-            "message": "1422 draft choice rows exported from the Z06 variant matrix."
+            "message": "1428 draft choice rows exported from the Z06 variant matrix."
           },
           {
             "check_id": "rules",

@@ -1,6 +1,6 @@
 # Z06 Contract Preview
 
-Generated: `2026-06-10T17:07:54+00:00`
+Generated: `2026-06-11T00:46:38+00:00`
 Status: `read_only_preview`
 Source sheet: `z06_options`
 
@@ -10,7 +10,7 @@ Source sheet: `z06_options`
 - Context choices: 8
 - Steps: 14
 - Sections: 36
-- Choices: 1277
+- Choices: 1283
 - Candidate standard equipment cells: 488
 - Rule/detail hot spot rows: 110
 - Unresolved normalization issues: 0

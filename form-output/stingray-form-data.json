@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-06-10T22:48:21+00:00"
+    "generated_at": "2026-06-11T00:44:57+00:00"
   },
   "variants": [
     {
@@ -52432,7 +52432,7 @@
         {
           "rpo": "R6X",
           "label": "Custom Interior Trim and Seat Combination",
-          "price": 1590,
+          "price": 995,
           "component_type": "r6x"
         },
         {
@@ -52442,7 +52442,7 @@
           "component_type": "stitching"
         }
       ],
-      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -52479,11 +52479,11 @@
         {
           "rpo": "R6X",
           "label": "Custom Interior Trim and Seat Combination",
-          "price": 1590,
+          "price": 995,
           "component_type": "r6x"
         }
       ],
-      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"}]",
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -52520,7 +52520,7 @@
         {
           "rpo": "R6X",
           "label": "Custom Interior Trim and Seat Combination",
-          "price": 1590,
+          "price": 995,
           "component_type": "r6x"
         },
         {
@@ -52536,7 +52536,7 @@
           "component_type": "suede"
         }
       ],
-      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",
@@ -52573,7 +52573,7 @@
         {
           "rpo": "R6X",
           "label": "Custom Interior Trim and Seat Combination",
-          "price": 1590,
+          "price": 995,
           "component_type": "r6x"
         },
         {
@@ -52583,7 +52583,7 @@
           "component_type": "suede"
         }
       ],
-      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
+      "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
       "interior_trim_level": "3LT",
       "interior_seat_code": "AE4",
       "interior_seat_label": "AE4 Competition Seats",

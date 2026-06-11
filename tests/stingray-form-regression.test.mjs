@@ -1647,7 +1647,7 @@ test("generated interiors expose priced component metadata from PriceRef", () =>
     ["2LT_AH2_HTP_N26", [{ rpo: "N26", label: "Sueded Microfiber", price: 695, component_type: "suede" }]],
     ["2LT_AH2_HTN_TU7", [{ rpo: "TU7", label: "Two-Tone", price: 595, component_type: "two_tone" }]],
     ["3LT_R6X_AH2_HUU", [{ rpo: "R6X", label: "Custom Interior Trim and Seat Combination", price: 995, component_type: "r6x" }]],
-    ["3LT_R6X_AE4_HUU", [{ rpo: "R6X", label: "Custom Interior Trim and Seat Combination", price: 1590, component_type: "r6x" }]],
+    ["3LT_R6X_AE4_HUU", [{ rpo: "R6X", label: "Custom Interior Trim and Seat Combination", price: 995, component_type: "r6x" }]],
   ];
 
   for (const [interiorId, expectedComponents] of expectations) {
@@ -1731,8 +1731,8 @@ test("R6X component order output uses PriceRef pricing and D30 does not alter it
 
   const ae4Runtime = configureInteriorOrder({ trimLevel: "3LT", interiorId: "3LT_R6X_AE4_HUU", seatRpo: "AE4" });
   assert.ok(
-    compactSeatInteriorItems(ae4Runtime).some((item) => item.rpo === "R6X" && item.label === "Custom Interior Trim and Seat Combination" && item.price === 1590),
-    "3LT R6X AE4 should show R6X at $1,590"
+    compactSeatInteriorItems(ae4Runtime).some((item) => item.rpo === "R6X" && item.label === "Custom Interior Trim and Seat Combination" && item.price === 995),
+    "3LT R6X AE4 should show R6X at its flat $995 PriceRef component price"
   );
 
   const d30Runtime = configureInteriorOrder({
