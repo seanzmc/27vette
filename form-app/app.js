@@ -674,14 +674,17 @@ function userSelectedInSection(sectionId, exceptId = "") {
   return [...state.userSelected].some((id) => id !== exceptId && optionSectionId(id) === sectionId);
 }
 
-function adjustedInteriorPrice(interior) {
+function selectedSeatResolvedPrice() {
   const seat = selectedSeatChoice();
-  return Math.max(0, Number(interior.price || 0) - Number(seat?.base_price || 0));
+  return seat ? optionPrice(seat.option_id) : 0;
+}
+
+function adjustedInteriorPrice(interior) {
+  return Math.max(0, Number(interior.price || 0) - selectedSeatResolvedPrice());
 }
 
 function adjustedInteriorDisplayPrice(interior) {
-  const seat = selectedSeatChoice();
-  return Math.max(0, Number(interior.price || 0) - (seat ? optionPrice(seat.option_id) : 0));
+  return adjustedInteriorPrice(interior);
 }
 
 function shouldHideChoice(choice) {
@@ -1151,8 +1154,7 @@ function lineItemsFromInterior(interior, autoAdded) {
   const components = interiorComponents(interior);
   if (!components.length) return [lineItemFromInterior(interior)];
 
-  const seat = selectedSeatChoice();
-  const replacedSeatPrice = selectedInteriorReplacesSeat(interior) ? Number(seat?.base_price || 0) : 0;
+  const replacedSeatPrice = selectedInteriorReplacesSeat(interior) ? selectedSeatResolvedPrice() : 0;
   const componentBaseTotal = components.reduce((sum, component) => sum + Number(component.price || 0), 0);
   const identityPrice = Math.max(0, replacedSeatPrice + adjustedInteriorPrice(interior) - componentBaseTotal);
   return [

@@ -2182,10 +2182,12 @@ test("step rendering resets scroll to the top after content replacement", () => 
   assert.match(appSource, /window\.scrollTo\(\{ top: 0, left: 0 \}\)/);
 });
 
-test("interior pricing subtracts the selected seat price", () => {
+test("interior pricing subtracts the resolved selected seat price", () => {
   assert.match(appSource, /function selectedSeatChoice/);
+  assert.match(appSource, /function selectedSeatResolvedPrice/);
+  assert.match(appSource, /seat \? optionPrice\(seat\.option_id\) : 0/);
   assert.match(appSource, /function adjustedInteriorPrice/);
-  assert.match(appSource, /Math\.max\(0, Number\(interior\.price \|\| 0\) - Number\(seat\?\.base_price \|\| 0\)\)/);
+  assert.match(appSource, /Math\.max\(0, Number\(interior\.price \|\| 0\) - selectedSeatResolvedPrice\(\)\)/);
   assert.match(appSource, /price: adjustedInteriorPrice\(interior\)/);
 });
 
