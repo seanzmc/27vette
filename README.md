@@ -55,7 +55,8 @@ The runtime should render and evaluate the generated contract. It should not inf
 - `archive/` - extracted historical workbook evidence (`stingray_archive.xlsx`).
 - `archive-2026-05-29/`, `backups/` - retained historical snapshots and workbook backups.
 - `product/`, `dist_updates/` - GM product reference PDFs and distribution updates.
-- `visualizer/`, `src/` - 2D visualizer scripts and exterior/wheel image assets (separate from the order-form runtime).
+- `visualizer/`, `src/` - 2D visualizer scripts, exterior/wheel image assets, and the local workbook review tool under `visualizer/workbook-editor/` (separate from the order-form runtime).
+- `scripts/workbook_editor_server.py` - localhost-only, read-only server for the workbook review UI (`.venv/bin/python scripts/workbook_editor_server.py`, then open `http://127.0.0.1:8027/`).
 
 ## Workbook Source Surfaces
 

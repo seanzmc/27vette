@@ -220,6 +220,17 @@ To compare generated JSON contracts while ignoring timestamp fields, run:
 node scripts/compare-generated-contracts.mjs before.json after.json
 ```
 
+## Workbook Review Tool (dev only)
+
+`scripts/workbook_editor_server.py` serves a localhost read-only UI for reviewing `stingray_master.xlsx`:
+
+```sh
+.venv/bin/python scripts/workbook_editor_server.py
+# open http://127.0.0.1:8027/
+```
+
+It derives models, sheet registries, schemas, and reference domains live from the workbook (`model_master`, `model_workbook_sources`, `runtime_steps`, `section_master`/`section_presentation`); nothing is hardcoded that a workbook sheet owns. Phase 1 has no write surface — it never modifies the workbook. See `workbook-editor-integration-spec.md` for the phased plan (Phase 2 adds a gated, non-breaking write path).
+
 ## Stingray Generator Workflow
 
 Current default command from the repo root:
