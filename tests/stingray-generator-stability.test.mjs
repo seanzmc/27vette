@@ -419,9 +419,9 @@ test("Stingray Phase 5 interior components are workbook-owned", () => {
     }
   }
 
-  assert.match(generatorSource, /load_interior_components/);
-  assert.match(generatorSource, /workbook_interior_component_metadata/);
-  assert.match(generatorSource, /missing_workbook_components_/);
+  assert.match(generatorSource, /build_model_interiors\(MODEL_CONFIG\)/);
+  assert.doesNotMatch(generatorSource, /workbook_interior_component_metadata/);
+  assert.doesNotMatch(generatorSource, /missing_workbook_components_/);
 });
 
 test("section_master owns section step placement without category", () => {

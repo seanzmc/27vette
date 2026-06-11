@@ -2220,7 +2220,7 @@ test("Grand Sport EL9 interiors are inactive for Stingray and H8T is in the AE4 
   assert.equal(h8tInterior?.interior_color_family, "Santorini Blue");
 });
 
-test("active interiors have stable CSV-derived grouping fields", () => {
+test("active interiors have stable workbook-owned grouping fields", () => {
   const requiredFields = [
     "interior_trim_level",
     "interior_seat_code",

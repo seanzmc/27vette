@@ -23,14 +23,7 @@ from corvette_form_generator.contract import (
     option_asset_map,
 )
 from corvette_form_generator.inspection import section_step_resolution_source
-from corvette_form_generator.interiors import (
-    grouping_fields_for_interior,
-    grouping_fields_from_scope,
-    has_workbook_grouping_fields,
-    interior_component_metadata,
-    read_interior_reference,
-    workbook_interior_component_metadata,
-)
+from corvette_form_generator.interiors import build_model_interiors
 from corvette_form_generator.mapping import (
     best_status,
     normalize_mode,
@@ -40,11 +33,6 @@ from corvette_form_generator.mapping import (
 )
 from corvette_form_generator.model_configs import STINGRAY_MODEL
 from corvette_form_generator.output import write_app_data_registry, write_json_output
-from corvette_form_generator.pricing import (
-    generated_interior_price,
-    price_ref_component_prices,
-    price_ref_prices,
-)
 from corvette_form_generator.registry_promotion import build_registry_from_promotions, registry_model_key
 from corvette_form_generator.rules import (
     exclusive_group_pairs,
@@ -58,9 +46,7 @@ from corvette_form_generator.rules import (
 from corvette_form_generator.runtime_metadata import (
     load_context_sections,
     load_default_selection_rules,
-    load_interior_components,
     load_model_config_overrides,
-    load_model_interior_scope_map,
     load_order_summary_metadata,
     load_runtime_rule_exceptions,
     load_runtime_steps,
@@ -77,7 +63,6 @@ ROOT = MODEL_CONFIG.root
 WORKBOOK_PATH = MODEL_CONFIG.workbook_path
 OUTPUT_DIR = MODEL_CONFIG.output_dir
 APP_DIR = MODEL_CONFIG.app_dir
-INTERIOR_REFERENCE_PATH = MODEL_CONFIG.interior_reference_path
 GENERATED_SHEETS = list(MODEL_CONFIG.generated_sheets)
 STEP_ORDER = list(MODEL_CONFIG.step_order)
 STEP_LABELS = dict(MODEL_CONFIG.step_labels)
@@ -204,10 +189,6 @@ def main() -> None:
     context_copy_rows = context_choice_copy_rows(wb, MODEL_CONFIG.model_key)
     rules_raw = rows_from_sheet(wb, MODEL_CONFIG.rule_mapping_sheet)
     price_rules_raw = rows_from_sheet(wb, MODEL_CONFIG.price_rules_sheet)
-    lt_interiors_raw = rows_from_sheet(wb, MODEL_CONFIG.interior_source_sheet)
-    price_ref_rows = rows_from_sheet(wb, "PriceRef")
-    price_ref = price_ref_prices(price_ref_rows)
-    interior_component_price_ref = price_ref_component_prices(price_ref_rows)
     color_overrides_raw = rows_from_sheet(wb, MODEL_CONFIG.color_overrides_sheet)
     rule_groups = load_rule_groups(wb, MODEL_CONFIG)
     exclusive_groups = load_exclusive_groups(wb, MODEL_CONFIG)
@@ -233,12 +214,9 @@ def main() -> None:
         (row["option_id"], row["variant_id"]): row
         for row in variant_option_override_rows
     }
-    workbook_components_by_interior_id = load_interior_components(wb, MODEL_CONFIG.model_key)
-    model_interior_scope = load_model_interior_scope_map(wb, MODEL_CONFIG.model_key)
     option_assets = option_asset_map(wb, MODEL_CONFIG.model_key)
     grouped_requires = grouped_requirement_pairs(rule_groups)
     grouped_excludes = grouped_exclusion_pairs(rule_groups) | exclusive_group_pairs(exclusive_groups)
-    interior_reference_by_id, interior_reference_rows = read_interior_reference(INTERIOR_REFERENCE_PATH)
 
     display_behavior_by_option_id = {
         row["option_id"]: clean(row.get("display_behavior", "")).lower()
@@ -414,20 +392,13 @@ def main() -> None:
             choices.append(choice)
 
     validation_rows: list[dict[str, Any]] = []
-    interiors: list[dict[str, Any]] = []
-    for row in lt_interiors_raw:
-        trim = row.get("Trim", "")
+    source_interior_ids: set[str] = set()
+    for row in rows_from_sheet(wb, MODEL_CONFIG.interior_source_sheet):
         interior_id = row.get("interior_id", "")
-        active_for_stingray = workbook_bool(
-            row,
-            "active_for_stingray",
-            False,
-        )
-        requires_r6x = workbook_bool(
-            row,
-            "requires_r6x",
-            False,
-        )
+        if interior_id:
+            source_interior_ids.add(interior_id)
+        active_for_stingray = workbook_bool(row, "active_for_stingray", False)
+        requires_r6x = workbook_bool(row, "requires_r6x", False)
         included_option_id = clean(row.get("included_option_id", ""))
         if active_for_stingray and requires_r6x and not included_option_id:
             validation_rows.append(
@@ -439,115 +410,12 @@ def main() -> None:
                     "message": "R6X interior requires included_option_id in lt_interiors.",
                 }
             )
-        components = workbook_interior_component_metadata(row, workbook_components_by_interior_id, interior_component_price_ref)
-        if not active_for_stingray and not components:
-            components = interior_component_metadata(row, interior_component_price_ref)
-        if active_for_stingray and not components and interior_component_metadata(row, interior_component_price_ref):
-            validation_rows.append(
-                {
-                    "check_id": f"missing_workbook_components_{interior_id}",
-                    "severity": "error",
-                    "entity_type": "interior",
-                    "entity_id": interior_id,
-                    "message": "Active Stingray interior has component-bearing legacy output but no active interior_components workbook rows.",
-                }
-            )
-        interiors.append(
-            {
-                "interior_id": interior_id,
-                "source_sheet": MODEL_CONFIG.interior_source_sheet,
-                "active_for_stingray": active_for_stingray,
-                "trim_level": trim.replace("_R6X", ""),
-                "requires_r6x": "True" if requires_r6x else "False",
-                "_included_option_id": included_option_id,
-                "seat_code": row.get("Seat", ""),
-                "interior_code": row.get("Interior Code", ""),
-                "interior_name": row.get("Interior Name", ""),
-                "material": row.get("Material", ""),
-                "price": generated_interior_price(row, price_ref),
-                "suede": row.get("Suede", ""),
-                "stitch": row.get("Stitch", ""),
-                "two_tone": row.get("Two Tone", ""),
-                "section_id": row.get("section_id", ""),
-                "color_overrides_raw": row.get("Color Overrides", ""),
-                "source_note": row.get("Detail from Disclosure", ""),
-                "interior_components": components,
-                "interior_components_json": json.dumps(components, separators=(",", ":")),
-            }
-        )
-    reference_order_by_id = {
-        row["interior_id"]: index
-        for index, row in enumerate((row for row in interior_reference_rows if row["interior_id"]), start=1)
-    }
-    active_interior_ids = {
-        row["interior_id"]
-        for row in interiors
-        if row["interior_id"] and row["active_for_stingray"]
-    }
-    all_interior_ids = {row["interior_id"] for row in interiors if row["interior_id"]}
-    for interior_id, reference in interior_reference_by_id.items():
-        if interior_id not in all_interior_ids:
-            validation_rows.append(
-                {
-                    "check_id": f"missing_reference_interior_{interior_id}",
-                    "severity": "error",
-                    "entity_type": "interior",
-                    "entity_id": interior_id,
-                    "message": f"Interior reference row {reference['row_number']} does not resolve to generated interior data.",
-                }
-            )
-        elif interior_id not in active_interior_ids:
-            validation_rows.append(
-                {
-                    "check_id": f"inactive_reference_interior_{interior_id}",
-                    "severity": "error",
-                    "entity_type": "interior",
-                    "entity_id": interior_id,
-                    "message": f"Interior reference row {reference['row_number']} resolves to an inactive Stingray interior.",
-                }
-            )
 
-    fallback_order = len(reference_order_by_id) + 1
+    interiors = build_model_interiors(MODEL_CONFIG)
     for row in interiors:
-        if not row["interior_id"]:
-            continue
-        scope_row = model_interior_scope.get(row["interior_id"])
-        reference = interior_reference_by_id.get(row["interior_id"])
-        if row["active_for_stingray"] and has_workbook_grouping_fields(scope_row):
-            if scope_row is None:
-                raise RuntimeError("has_workbook_grouping_fields returned true for a missing scope row")
-            row.update(grouping_fields_from_scope(scope_row, row))
-        elif row["active_for_stingray"] and reference:
-            row.update(grouping_fields_for_interior(row, reference, reference_order_by_id[row["interior_id"]]))
-            validation_rows.append(
-                {
-                    "check_id": f"csv_grouping_fallback_{row['interior_id']}",
-                    "severity": "error",
-                    "entity_type": "interior",
-                    "entity_id": row["interior_id"],
-                    "message": "Active Stingray interior is missing workbook-owned grouping metadata and fell back to the CSV hierarchy.",
-                }
-            )
-        elif row["active_for_stingray"]:
-            row.update(grouping_fields_for_interior(row, None, fallback_order, fallback=True))
-            fallback_order += 1
-            validation_rows.append(
-                {
-                    "check_id": f"unmapped_active_interior_{row['interior_id']}",
-                    "severity": "error",
-                    "entity_type": "interior",
-                    "entity_id": row["interior_id"],
-                    "message": "Active Stingray interior is missing workbook-owned grouping metadata and CSV hierarchy mapping.",
-                }
-            )
-        else:
-            row.update(
-                grouping_fields_for_interior(
-                    row,
-                    reference,
-                    reference_order_by_id.get(row["interior_id"], fallback_order),
-                )
-            )
+        # Keep the existing Stingray runtime contract byte-for-byte compatible
+        # while sharing the workbook-owned interior builder with draft models.
+        row.pop("requires_z25", None)
 
     interiors_by_id = {row["interior_id"]: row for row in interiors if row["interior_id"]}
 
@@ -648,7 +516,7 @@ def main() -> None:
         if row.get("condition_option_id", "") not in hidden_option_ids and row.get("target_option_id", "") not in hidden_option_ids
     ]
 
-    known_interior_ids = {row["interior_id"] for row in interiors if row.get("interior_id")}
+    known_interior_ids = source_interior_ids
     color_overrides = [
         {
             "override_id": f"co_{idx:03d}",
