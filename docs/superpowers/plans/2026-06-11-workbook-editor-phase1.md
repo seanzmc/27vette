@@ -26,7 +26,7 @@
 - Create: `visualizer/workbook-editor/vendor/hooks.module.js`
 - Create: `visualizer/workbook-editor/vendor/htm.module.js`
 
-- [ ] **Step 1: Download pinned versions**
+- [x] **Step 1: Download pinned versions**
 
 ```bash
 mkdir -p visualizer/workbook-editor/vendor
@@ -35,14 +35,14 @@ curl -sL -o visualizer/workbook-editor/vendor/hooks.module.js https://unpkg.com/
 curl -sL -o visualizer/workbook-editor/vendor/htm.module.js https://unpkg.com/htm@3.1.1/dist/htm.module.js
 ```
 
-- [ ] **Step 2: Verify sizes and module shape**
+- [x] **Step 2: Verify sizes and module shape**
 
 Run: `wc -c visualizer/workbook-editor/vendor/*.js && grep -c "export" visualizer/workbook-editor/vendor/preact.module.js`
 Expected: ~11581 / ~3753 / ~1207 bytes; export count ≥ 1.
 
 Note: `hooks.module.js` contains `from"preact"` — the import map in Task 6 resolves that bare specifier.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add visualizer/workbook-editor/vendor
@@ -57,7 +57,7 @@ git commit -m "chore: vendor preact 10.27.2 and htm 3.1.1 for workbook editor UI
 - Create: `scripts/corvette_form_generator/editor_ops.py`
 - Test: `tests/test_editor_ops_meta.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```python
 #!/usr/bin/env python3
@@ -122,12 +122,12 @@ if __name__ == "__main__":
     unittest.main()
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `.venv/bin/python -m unittest tests.test_editor_ops_meta -v`
 Expected: FAIL with `ModuleNotFoundError: No module named 'corvette_form_generator.editor_ops'`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 `scripts/corvette_form_generator/editor_ops.py`:
 
@@ -271,12 +271,12 @@ EDITOR_SHEET_META: dict[str, dict] = {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `.venv/bin/python -m unittest tests.test_editor_ops_meta -v`
 Expected: PASS (5 tests)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/corvette_form_generator/editor_ops.py tests/test_editor_ops_meta.py
@@ -291,7 +291,7 @@ git commit -m "feat: add workbook-editor sheet meta registry (Phase 1)"
 - Create: `scripts/workbook_editor_server.py` (derivation functions only; HTTP wiring is Task 5)
 - Test: `tests/test_editor_server_payload.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_editor_server_payload.py`:
 
@@ -588,12 +588,12 @@ if __name__ == "__main__":
     unittest.main()
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `.venv/bin/python -m unittest tests.test_editor_server_payload -v`
 Expected: FAIL with `ModuleNotFoundError: No module named 'workbook_editor_server'`
 
-- [ ] **Step 3: Write the derivation implementation**
+- [x] **Step 3: Write the derivation implementation**
 
 `scripts/workbook_editor_server.py` (HTTP wiring added in Task 5; this task ends the file after `sheet_payload`):
 
@@ -848,17 +848,17 @@ def sheet_payload(extract: dict, name: str) -> dict | None:
     return {"name": name, "headers": data["headers"], "rows": data["rows"]}
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `.venv/bin/python -m unittest tests.test_editor_server_payload -v`
 Expected: PASS (synthetic tests + 4 real-workbook integration tests)
 
-- [ ] **Step 5: Run existing python tests to confirm no regression**
+- [x] **Step 5: Run existing python tests to confirm no regression**
 
 Run: `.venv/bin/python -m unittest tests.test_model_config_metadata tests.test_registry_promotion_metadata tests.test_schema_validation_metadata -v`
 Expected: PASS
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/workbook_editor_server.py tests/test_editor_server_payload.py
@@ -876,7 +876,7 @@ git commit -m "feat: derive workbook-editor payload live from workbook metadata"
 **Files:**
 - Modify: `scripts/workbook_editor_server.py` (append below `sheet_payload`)
 
-- [ ] **Step 1: Append HTTP wiring**
+- [x] **Step 1: Append HTTP wiring**
 
 ```python
 import argparse  # noqa: E402
@@ -976,7 +976,7 @@ if __name__ == "__main__":
     main()
 ```
 
-- [ ] **Step 2: Verify endpoints with curl**
+- [x] **Step 2: Verify endpoints with curl**
 
 ```bash
 .venv/bin/python scripts/workbook_editor_server.py --port 8027 &
@@ -990,12 +990,12 @@ kill %1
 
 Expected: `5 81` (models include zr1/zr1x scaffolds), `270` (stingray_options rows), `404`, `404`.
 
-- [ ] **Step 3: Re-run payload tests (import side effects)**
+- [x] **Step 3: Re-run payload tests (import side effects)**
 
 Run: `.venv/bin/python -m unittest tests.test_editor_server_payload -v`
 Expected: PASS
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add scripts/workbook_editor_server.py
@@ -1010,7 +1010,7 @@ git commit -m "feat: serve workbook payload and static UI over localhost HTTP"
 - Create: `visualizer/workbook-editor/index.html`
 - Create: `visualizer/workbook-editor/editor.css`
 
-- [ ] **Step 1: Write index.html**
+- [x] **Step 1: Write index.html**
 
 ```html
 <!doctype html>
@@ -1037,7 +1037,7 @@ git commit -m "feat: serve workbook payload and static UI over localhost HTTP"
 </html>
 ```
 
-- [ ] **Step 2: Write editor.css** (dark slate theme matching the original component)
+- [x] **Step 2: Write editor.css** (dark slate theme matching the original component)
 
 ```css
 :root {
@@ -1175,7 +1175,7 @@ tr.detail td { white-space: normal; background: #0b1222; }
 .loading { color: var(--dim); padding: 18px; font-style: italic; }
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add visualizer/workbook-editor/index.html visualizer/workbook-editor/editor.css
@@ -1189,7 +1189,7 @@ git commit -m "feat: workbook editor UI shell (import map + styles)"
 **Files:**
 - Create: `visualizer/workbook-editor/editor.js`
 
-- [ ] **Step 1: Write the component**
+- [x] **Step 1: Write the component**
 
 ```javascript
 import { h, render } from "preact";
@@ -1435,7 +1435,7 @@ function App() {
 render(html`<${App} />`, document.getElementById("app"));
 ```
 
-- [ ] **Step 2: Verify in a real browser**
+- [x] **Step 2: Verify in a real browser**
 
 ```bash
 .venv/bin/python scripts/workbook_editor_server.py --port 8027 &
@@ -1447,7 +1447,7 @@ Then load `http://127.0.0.1:8027/` with the available browser tooling (Claude Pr
 - Sheet Browser: model pills switch sheet pill sets; `stingray_ovs` paginates (1,621 rows, 17 pages); the filter box narrows rows; clicking a row expands full-column detail; "other sheets…" reaches `form_steps` with a read-only badge;
 - zero console errors. Then `kill %1`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add visualizer/workbook-editor/editor.js
@@ -1463,13 +1463,13 @@ git commit -m "feat: read-only workbook review UI (Preact/htm port)"
 - Modify: `README.md` (Repository Structure bullet for `visualizer/`)
 - Modify: `AGENTS.md` (new short workflow section)
 
-- [ ] **Step 1: Delete the dead component**
+- [x] **Step 1: Delete the dead component**
 
 ```bash
 git rm visualizer/workbook-editor.jsx
 ```
 
-- [ ] **Step 2: Update README.md**
+- [x] **Step 2: Update README.md**
 
 Change the `visualizer/` bullet under Repository Structure to:
 
@@ -1478,7 +1478,7 @@ Change the `visualizer/` bullet under Repository Structure to:
 - `scripts/workbook_editor_server.py` - localhost-only, read-only server for the workbook review UI (`.venv/bin/python scripts/workbook_editor_server.py`, then open `http://127.0.0.1:8027/`).
 ```
 
-- [ ] **Step 3: Add AGENTS.md section** (after "Workbook Update Workflow")
+- [x] **Step 3: Add AGENTS.md section** (after "Workbook Update Workflow")
 
 ```markdown
 ## Workbook Review Tool (dev only)
@@ -1493,7 +1493,7 @@ Change the `visualizer/` bullet under Repository Structure to:
 It derives models, sheet registries, schemas, and reference domains live from the workbook (`model_master`, `model_workbook_sources`, `runtime_steps`, `section_master`/`section_presentation`); nothing is hardcoded that a workbook sheet owns. Phase 1 has no write surface — it never modifies the workbook. See `workbook-editor-integration-spec.md` for the phased plan (Phase 2 adds a gated, non-breaking write path).
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add README.md AGENTS.md
@@ -1504,17 +1504,17 @@ git commit -m "docs: document workbook review tool; remove unintegrated JSX arti
 
 ### Task 9: Final gates
 
-- [ ] **Step 1: Full python test pass**
+- [x] **Step 1: Full python test pass**
 
 Run: `.venv/bin/python -m unittest discover -s tests -p "test_*.py" -v`
 Expected: PASS (existing metadata tests + new editor tests)
 
-- [ ] **Step 2: Workbook untouched**
+- [x] **Step 2: Workbook untouched**
 
 Run: `git status --short stingray_master.xlsx && .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx | tail -3`
 Expected: no workbook diff; schema `status: valid`.
 
-- [ ] **Step 3: Node test spot-check (no generator code changed, regression evidence only)**
+- [x] **Step 3: Node test spot-check (no generator code changed, regression evidence only)**
 
 Run: `node --test tests/workbook-schema-standardization.test.mjs`
 Expected: PASS
