@@ -1,6 +1,6 @@
 # Z06 Inspection
 
-Generated: `2026-06-11T00:46:38+00:00`
+Generated: `2026-06-11T01:14:55+00:00`
 Source sheet: `z06_options`
 Status: `inspection_generated`
 
@@ -19,9 +19,9 @@ Status: `inspection_generated`
 - Candidate choice rows with available/standard status: 1428
 - Candidate standard equipment cells: 488
 - Candidate standard option rows: 95
-- Active option rows with available/standard status: 235
-- Inactive option rows all unavailable/blank: 14
-- Selectable counts: `{"False": 89, "True": 160}`
+- Active option rows with available/standard status: 236
+- Inactive option rows all unavailable/blank: 13
+- Selectable counts: `{"False": 90, "True": 159}`
 - Status counts: `{"available": 821, "standard": 490, "unavailable": 183}`
 - Missing status cells: 0
 - Unknown status cells: 0

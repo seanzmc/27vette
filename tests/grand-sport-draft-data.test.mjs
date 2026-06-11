@@ -179,9 +179,9 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
   );
   assert.equal(draft.choices.length, 1422);
   assert.equal(draft.standardEquipment.length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 805);
+  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 811);
   assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 162);
+  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 156);
 });
 
 test("Grand Sport standard equipment is preserved after standard mirror rows are inactive", () => {
@@ -584,9 +584,9 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
   );
 
   const d30 = draft.choices.find((choice) => choice.option_id === "opt_d30_001");
-  assert.equal(d30.active, "False");
+  assert.equal(d30.active, "True");
   assert.equal(d30.selectable, "False");
-  assert.equal(d30.display_behavior, "auto_only");
+  assert.equal(d30.display_behavior, "display_only");
 
   const z15 = draft.choices.find((choice) => choice.option_id === "opt_z15_001");
   assert.equal(z15.active, "False");

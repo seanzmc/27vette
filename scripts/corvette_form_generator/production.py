@@ -630,6 +630,7 @@ def main() -> None:
         if row.get("condition_option_id", "") not in hidden_option_ids and row.get("target_option_id", "") not in hidden_option_ids
     ]
 
+    known_interior_ids = {row["interior_id"] for row in interiors if row.get("interior_id")}
     color_overrides = [
         {
             "override_id": f"co_{idx:03d}",
@@ -639,7 +640,10 @@ def main() -> None:
             "adds_rpo": row.get("adds_rpo", ""),
             "notes": "Exterior/interior pairing requires the listed override RPO.",
         }
-        for idx, row in enumerate(color_overrides_raw, start=1)
+        for idx, row in enumerate(
+            (row for row in color_overrides_raw if row.get("interior_id", "") in known_interior_ids),
+            start=1,
+        )
     ]
     for row in interiors:
         row.pop("_included_option_id", None)

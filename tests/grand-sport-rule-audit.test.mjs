@@ -176,7 +176,7 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
 
   const optionByRpo = new Map(workbookOptions.map((row) => [row.rpo, row]));
   assert.equal(normalizedBool(optionByRpo.get("D30").selectable), "false");
-  assert.equal(optionByRpo.get("D30").display_behavior, "auto_only");
+  assert.equal(optionByRpo.get("D30").display_behavior, "display_only");
   assert.equal(normalizedBool(optionByRpo.get("Z15").selectable), "false");
   assert.equal(optionByRpo.get("Z15").display_behavior, "auto_only");
   assert.equal(optionByRpo.get("R6X").display_behavior, "auto_only");

@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-06-11T00:46:38+00:00",
+    "generated_at": "2026-06-11T01:14:55+00:00",
     "status": "read_only_preview"
   },
   "variants": [
@@ -4670,7 +4670,7 @@
       "source_description": "Provides the opportunity to individualize vehicle appearance by overriding recommended restrictions to exterior, interior and seat belt color combinations",
       "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
       "source_section_id": "sec_colo_001",
-      "active": "False",
+      "active": "True",
       "base_price": 1495,
       "display_order": 10,
       "text_cleanup_notes": [],
@@ -4683,10 +4683,10 @@
       "variant_id": "1lz_h07",
       "body_style": "coupe",
       "trim_level": "1LZ",
-      "status": "unavailable",
-      "status_label": "Not Available",
+      "status": "available",
+      "status_label": "Available",
       "selectable": "False",
-      "display_behavior": "auto_only"
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_d30_001",
@@ -4697,7 +4697,7 @@
       "source_description": "Provides the opportunity to individualize vehicle appearance by overriding recommended restrictions to exterior, interior and seat belt color combinations",
       "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
       "source_section_id": "sec_colo_001",
-      "active": "False",
+      "active": "True",
       "base_price": 1495,
       "display_order": 10,
       "text_cleanup_notes": [],
@@ -4710,10 +4710,10 @@
       "variant_id": "2lz_h07",
       "body_style": "coupe",
       "trim_level": "2LZ",
-      "status": "unavailable",
-      "status_label": "Not Available",
+      "status": "available",
+      "status_label": "Available",
       "selectable": "False",
-      "display_behavior": "auto_only"
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_d30_001",
@@ -4724,7 +4724,7 @@
       "source_description": "Provides the opportunity to individualize vehicle appearance by overriding recommended restrictions to exterior, interior and seat belt color combinations",
       "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
       "source_section_id": "sec_colo_001",
-      "active": "False",
+      "active": "True",
       "base_price": 1495,
       "display_order": 10,
       "text_cleanup_notes": [],
@@ -4737,10 +4737,10 @@
       "variant_id": "3lz_h07",
       "body_style": "coupe",
       "trim_level": "3LZ",
-      "status": "unavailable",
-      "status_label": "Not Available",
+      "status": "available",
+      "status_label": "Available",
       "selectable": "False",
-      "display_behavior": "auto_only"
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_d30_001",
@@ -4751,7 +4751,7 @@
       "source_description": "Provides the opportunity to individualize vehicle appearance by overriding recommended restrictions to exterior, interior and seat belt color combinations",
       "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
       "source_section_id": "sec_colo_001",
-      "active": "False",
+      "active": "True",
       "base_price": 1495,
       "display_order": 10,
       "text_cleanup_notes": [],
@@ -4764,10 +4764,10 @@
       "variant_id": "1lz_h67",
       "body_style": "convertible",
       "trim_level": "1LZ",
-      "status": "unavailable",
-      "status_label": "Not Available",
+      "status": "available",
+      "status_label": "Available",
       "selectable": "False",
-      "display_behavior": "auto_only"
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_d30_001",
@@ -4778,7 +4778,7 @@
       "source_description": "Provides the opportunity to individualize vehicle appearance by overriding recommended restrictions to exterior, interior and seat belt color combinations",
       "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
       "source_section_id": "sec_colo_001",
-      "active": "False",
+      "active": "True",
       "base_price": 1495,
       "display_order": 10,
       "text_cleanup_notes": [],
@@ -4791,10 +4791,10 @@
       "variant_id": "2lz_h67",
       "body_style": "convertible",
       "trim_level": "2LZ",
-      "status": "unavailable",
-      "status_label": "Not Available",
+      "status": "available",
+      "status_label": "Available",
       "selectable": "False",
-      "display_behavior": "auto_only"
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_d30_001",
@@ -4805,7 +4805,7 @@
       "source_description": "Provides the opportunity to individualize vehicle appearance by overriding recommended restrictions to exterior, interior and seat belt color combinations",
       "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge.",
       "source_section_id": "sec_colo_001",
-      "active": "False",
+      "active": "True",
       "base_price": 1495,
       "display_order": 10,
       "text_cleanup_notes": [],
@@ -4818,10 +4818,10 @@
       "variant_id": "3lz_h67",
       "body_style": "convertible",
       "trim_level": "3LZ",
-      "status": "unavailable",
-      "status_label": "Not Available",
+      "status": "available",
+      "status_label": "Available",
       "selectable": "False",
-      "display_behavior": "auto_only"
+      "display_behavior": "display_only"
     },
     {
       "option_id": "opt_r6x_001",

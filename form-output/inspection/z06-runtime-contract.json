@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-06-11T00:46:39+00:00",
+    "generated_at": "2026-06-11T01:14:56+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -5886,15 +5886,15 @@
       "variant_id": "1lz_h07",
       "body_style": "coupe",
       "trim_level": "1LZ",
-      "status": "unavailable",
-      "status_label": "Not Available",
+      "status": "available",
+      "status_label": "Available",
       "selectable": "False",
-      "active": "False",
+      "active": "True",
       "choice_mode": "multi",
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1495,
-      "display_behavior": "auto_only",
+      "display_behavior": "display_only",
       "display_order": 10,
       "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
     },
@@ -5911,15 +5911,15 @@
       "variant_id": "2lz_h07",
       "body_style": "coupe",
       "trim_level": "2LZ",
-      "status": "unavailable",
-      "status_label": "Not Available",
+      "status": "available",
+      "status_label": "Available",
       "selectable": "False",
-      "active": "False",
+      "active": "True",
       "choice_mode": "multi",
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1495,
-      "display_behavior": "auto_only",
+      "display_behavior": "display_only",
       "display_order": 10,
       "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
     },
@@ -5936,15 +5936,15 @@
       "variant_id": "3lz_h07",
       "body_style": "coupe",
       "trim_level": "3LZ",
-      "status": "unavailable",
-      "status_label": "Not Available",
+      "status": "available",
+      "status_label": "Available",
       "selectable": "False",
-      "active": "False",
+      "active": "True",
       "choice_mode": "multi",
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1495,
-      "display_behavior": "auto_only",
+      "display_behavior": "display_only",
       "display_order": 10,
       "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
     },
@@ -5961,15 +5961,15 @@
       "variant_id": "1lz_h67",
       "body_style": "convertible",
       "trim_level": "1LZ",
-      "status": "unavailable",
-      "status_label": "Not Available",
+      "status": "available",
+      "status_label": "Available",
       "selectable": "False",
-      "active": "False",
+      "active": "True",
       "choice_mode": "multi",
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1495,
-      "display_behavior": "auto_only",
+      "display_behavior": "display_only",
       "display_order": 10,
       "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
     },
@@ -5986,15 +5986,15 @@
       "variant_id": "2lz_h67",
       "body_style": "convertible",
       "trim_level": "2LZ",
-      "status": "unavailable",
-      "status_label": "Not Available",
+      "status": "available",
+      "status_label": "Available",
       "selectable": "False",
-      "active": "False",
+      "active": "True",
       "choice_mode": "multi",
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1495,
-      "display_behavior": "auto_only",
+      "display_behavior": "display_only",
       "display_order": 10,
       "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
     },
@@ -6011,15 +6011,15 @@
       "variant_id": "3lz_h67",
       "body_style": "convertible",
       "trim_level": "3LZ",
-      "status": "unavailable",
-      "status_label": "Not Available",
+      "status": "available",
+      "status_label": "Available",
       "selectable": "False",
-      "active": "False",
+      "active": "True",
       "choice_mode": "multi",
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1495,
-      "display_behavior": "auto_only",
+      "display_behavior": "display_only",
       "display_order": 10,
       "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
     },
@@ -52641,7 +52641,1104 @@
       "interior_reference_order": 130
     }
   ],
-  "colorOverrides": [],
+  "colorOverrides": [
+    {
+      "override_id": "co_001",
+      "interior_id": "1LZ_AQ9_HUQ",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_002",
+      "interior_id": "1LZ_AQ9_HUQ",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_003",
+      "interior_id": "1LZ_AQ9_HUQ",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_004",
+      "interior_id": "1LZ_AQ9_HUQ",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_005",
+      "interior_id": "2LZ_AQ9_HUR",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_006",
+      "interior_id": "2LZ_AQ9_HUR",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_007",
+      "interior_id": "2LZ_AQ9_HUR",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_008",
+      "interior_id": "2LZ_AQ9_HUR",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_009",
+      "interior_id": "2LZ_AH2_HUL",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_010",
+      "interior_id": "2LZ_AH2_HUL",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_011",
+      "interior_id": "2LZ_AH2_HUL",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_012",
+      "interior_id": "2LZ_AH2_HUL",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_013",
+      "interior_id": "2LZ_AH2_HUL_TU7",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_014",
+      "interior_id": "2LZ_AH2_HUL_TU7",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_015",
+      "interior_id": "2LZ_AH2_HUL_TU7",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_016",
+      "interior_id": "2LZ_AH2_HUL_TU7",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_017",
+      "interior_id": "2LZ_AE4_HUL",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_018",
+      "interior_id": "2LZ_AE4_HUL",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_019",
+      "interior_id": "2LZ_AE4_HUL",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_020",
+      "interior_id": "2LZ_AE4_HUL",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_021",
+      "interior_id": "2LZ_AH2_HU7_N26_TU7",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_022",
+      "interior_id": "2LZ_AH2_HU7_N26_TU7",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_023",
+      "interior_id": "2LZ_AH2_HU7_N26_TU7",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_024",
+      "interior_id": "2LZ_AH2_HU7_N26_TU7",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_025",
+      "interior_id": "2LZ_AE4_HU7_N26",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_026",
+      "interior_id": "2LZ_AE4_HU7_N26",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_027",
+      "interior_id": "2LZ_AE4_HU7_N26",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_028",
+      "interior_id": "2LZ_AE4_HU7_N26",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_029",
+      "interior_id": "3LZ_AH2_HU2",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_030",
+      "interior_id": "3LZ_AH2_HU2",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_031",
+      "interior_id": "3LZ_AH2_HU2",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_032",
+      "interior_id": "3LZ_AH2_HU2",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_033",
+      "interior_id": "3LZ_AH2_HU2_TU7",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_034",
+      "interior_id": "3LZ_AH2_HU2_TU7",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_035",
+      "interior_id": "3LZ_AH2_HU2_TU7",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_036",
+      "interior_id": "3LZ_AH2_HU2_TU7",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_037",
+      "interior_id": "3LZ_AE4_HU2",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_038",
+      "interior_id": "3LZ_AE4_HU2",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_039",
+      "interior_id": "3LZ_AE4_HU2",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_040",
+      "interior_id": "3LZ_AE4_HU2",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_041",
+      "interior_id": "3LZ_AH2_HNK",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_042",
+      "interior_id": "3LZ_AH2_HNK",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_043",
+      "interior_id": "3LZ_AH2_HNK",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_044",
+      "interior_id": "3LZ_AH2_HNK",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_045",
+      "interior_id": "3LZ_AE4_HNK",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_046",
+      "interior_id": "3LZ_AE4_HNK",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_047",
+      "interior_id": "3LZ_AE4_HNK",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_048",
+      "interior_id": "3LZ_AE4_HNK",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_049",
+      "interior_id": "3LZ_AH2_H8T",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_050",
+      "interior_id": "3LZ_AH2_H8T",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_051",
+      "interior_id": "3LZ_AH2_H8T",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_052",
+      "interior_id": "3LZ_AH2_H8T",
+      "option_id": "opt_gkz_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_053",
+      "interior_id": "3LZ_AH2_H8T",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_054",
+      "interior_id": "3LZ_AE4_H8T",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_055",
+      "interior_id": "3LZ_AE4_H8T",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_056",
+      "interior_id": "3LZ_AE4_H8T",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_057",
+      "interior_id": "3LZ_AE4_H8T",
+      "option_id": "opt_gkz_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_058",
+      "interior_id": "3LZ_AE4_H8T",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_059",
+      "interior_id": "3LZ_AH2_HUW",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_060",
+      "interior_id": "3LZ_AH2_HUW",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_061",
+      "interior_id": "3LZ_AH2_HUW",
+      "option_id": "opt_gkz_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_062",
+      "interior_id": "3LZ_AH2_HUW",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_063",
+      "interior_id": "3LZ_AH2_HUW",
+      "option_id": "opt_gtr_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_064",
+      "interior_id": "3LZ_AE4_HUW",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_065",
+      "interior_id": "3LZ_AE4_HUW",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_066",
+      "interior_id": "3LZ_AE4_HUW",
+      "option_id": "opt_gkz_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_067",
+      "interior_id": "3LZ_AE4_HUW",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_068",
+      "interior_id": "3LZ_AE4_HUW",
+      "option_id": "opt_gtr_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_069",
+      "interior_id": "3LZ_AH2_EJH",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_070",
+      "interior_id": "3LZ_AH2_EJH",
+      "option_id": "opt_gkz_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_071",
+      "interior_id": "3LZ_AE4_EJH",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_072",
+      "interior_id": "3LZ_AE4_EJH",
+      "option_id": "opt_gkz_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_073",
+      "interior_id": "3LZ_AH2_HVZ",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_074",
+      "interior_id": "3LZ_AH2_HVZ",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_075",
+      "interior_id": "3LZ_AH2_HVZ",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_076",
+      "interior_id": "3LZ_AH2_HVZ",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_077",
+      "interior_id": "3LZ_AE4_HVZ",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_078",
+      "interior_id": "3LZ_AE4_HVZ",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_079",
+      "interior_id": "3LZ_AE4_HVZ",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_080",
+      "interior_id": "3LZ_AE4_HVZ",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_081",
+      "interior_id": "3LZ_AH2_HAG",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_082",
+      "interior_id": "3LZ_AH2_HAG",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_083",
+      "interior_id": "3LZ_AH2_HAG",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_084",
+      "interior_id": "3LZ_AH2_HAG",
+      "option_id": "opt_gkz_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_085",
+      "interior_id": "3LZ_AH2_HAG",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_086",
+      "interior_id": "3LZ_AE4_HAG",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_087",
+      "interior_id": "3LZ_AE4_HAG",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_088",
+      "interior_id": "3LZ_AE4_HAG",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_089",
+      "interior_id": "3LZ_AE4_HAG",
+      "option_id": "opt_gkz_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_090",
+      "interior_id": "3LZ_AE4_HAG",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_091",
+      "interior_id": "3LZ_AH2_HUA_N2Z_TU7",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_092",
+      "interior_id": "3LZ_AH2_HUA_N2Z_TU7",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_093",
+      "interior_id": "3LZ_AH2_HUA_N2Z_TU7",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_094",
+      "interior_id": "3LZ_AH2_HUA_N2Z_TU7",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_095",
+      "interior_id": "3LZ_AE4_HUA_N2Z",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_096",
+      "interior_id": "3LZ_AE4_HUA_N2Z",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_097",
+      "interior_id": "3LZ_AE4_HUA_N2Z",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_098",
+      "interior_id": "3LZ_AE4_HUA_N2Z",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_099",
+      "interior_id": "3LZ_AH2_HUX_N2Z",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_100",
+      "interior_id": "3LZ_AH2_HUX_N2Z",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_101",
+      "interior_id": "3LZ_AH2_HUX_N2Z",
+      "option_id": "opt_gkz_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_102",
+      "interior_id": "3LZ_AH2_HUX_N2Z",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_103",
+      "interior_id": "3LZ_AH2_HUX_N2Z",
+      "option_id": "opt_gtr_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_104",
+      "interior_id": "3LZ_AE4_HUX_N2Z",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_105",
+      "interior_id": "3LZ_AE4_HUX_N2Z",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_106",
+      "interior_id": "3LZ_AE4_HUX_N2Z",
+      "option_id": "opt_gkz_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_107",
+      "interior_id": "3LZ_AE4_HUX_N2Z",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_108",
+      "interior_id": "3LZ_AE4_HUX_N2Z",
+      "option_id": "opt_gtr_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_109",
+      "interior_id": "3LZ_AH2_EPX_N2Z",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_110",
+      "interior_id": "3LZ_AH2_EPX_N2Z",
+      "option_id": "opt_gkz_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_111",
+      "interior_id": "3LZ_AE4_EPX_N2Z",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_112",
+      "interior_id": "3LZ_AE4_EPX_N2Z",
+      "option_id": "opt_gkz_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_113",
+      "interior_id": "3LZ_AUP_HVZ",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_114",
+      "interior_id": "3LZ_AUP_HVZ",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_115",
+      "interior_id": "3LZ_AUP_HVZ",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_116",
+      "interior_id": "3LZ_AUP_HVZ",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_117",
+      "interior_id": "3LZ_AUP_HAG",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_118",
+      "interior_id": "3LZ_AUP_HAG",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_119",
+      "interior_id": "3LZ_AUP_HAG",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_120",
+      "interior_id": "3LZ_AUP_HAG",
+      "option_id": "opt_gkz_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_121",
+      "interior_id": "3LZ_AUP_HAG",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_122",
+      "interior_id": "3LZ_R6X_AH2_HUU",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_123",
+      "interior_id": "3LZ_R6X_AH2_HUU",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_124",
+      "interior_id": "3LZ_R6X_AH2_HUU",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_125",
+      "interior_id": "3LZ_R6X_AH2_HUU",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_126",
+      "interior_id": "3LZ_R6X_AE4_HUU",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_127",
+      "interior_id": "3LZ_R6X_AE4_HUU",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_128",
+      "interior_id": "3LZ_R6X_AE4_HUU",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_129",
+      "interior_id": "3LZ_R6X_AE4_HUU",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_130",
+      "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_131",
+      "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_132",
+      "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_133",
+      "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_134",
+      "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
+      "option_id": "opt_g26_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_135",
+      "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
+      "option_id": "opt_g4z_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_136",
+      "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
+      "option_id": "opt_gbk_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_137",
+      "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
+      "option_id": "opt_gph_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    }
+  ],
   "defaultSelectionRules": [
     {
       "rule_id": "z06_default_719",
@@ -52712,6 +53809,13 @@
       "entity_type": "price_rule",
       "entity_id": "",
       "message": "48 active price rules exported from z06_price_rules."
+    },
+    {
+      "check_id": "color_overrides",
+      "severity": "pass",
+      "entity_type": "color_override",
+      "entity_id": "",
+      "message": "137 color override rows exported from color_overrides."
     }
   ]
 }
