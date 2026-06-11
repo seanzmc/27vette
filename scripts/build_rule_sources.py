@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
-"""Audit workbook-authored Grand Sport rule source sheets."""
+"""Audit workbook-authored model rule source sheets.
+
+Usage:
+    python scripts/build_rule_sources.py --model grand_sport
+"""
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 from collections import Counter, defaultdict
@@ -11,7 +16,7 @@ from typing import Any
 
 from openpyxl import load_workbook
 
-from corvette_form_generator.model_configs import GRAND_SPORT_MODEL
+from corvette_form_generator.model_configs import base_model_config
 from corvette_form_generator.runtime_metadata import (
     load_audit_group_members,
     load_model_config_overrides,
@@ -28,7 +33,6 @@ RULE_MAPPING_HEADERS = [
     "target_id",
     "target_type",
     "original_detail_raw",
-    "review_flag",
     "source_type",
     "target_selection_mode",
     "source_selection_mode",
@@ -636,6 +640,7 @@ def review_hot_spots(
     options: list[dict[str, str]],
     option_ids_by_rpo: dict[str, list[str]],
     special_review_rpos: tuple[str, ...],
+    model_label: str = "Grand Sport",
 ) -> dict[str, Any]:
     duplicate_rpos = []
     for rpo, option_ids in sorted(option_ids_by_rpo.items()):
@@ -645,7 +650,7 @@ def review_hot_spots(
             {
                 "rpo": rpo,
                 "option_ids": option_ids,
-                "reason": "Duplicate active Grand Sport RPO; verify workbook rules point at the intended option variant.",
+                "reason": f"Duplicate active {model_label} RPO; verify workbook rules point at the intended option variant.",
             }
         )
 
@@ -672,7 +677,7 @@ def review_hot_spots(
 def render_audit_markdown(audit: dict[str, Any]) -> str:
     summary = audit["summary"]
     lines = [
-        "# Grand Sport Rule Audit",
+        f"# {audit['dataset']['model']} Rule Audit",
         "",
         f"Generated: `{audit['dataset']['generated_at']}`",
         f"Status: `{audit['dataset']['status']}`",
@@ -862,7 +867,7 @@ def write_rule_audit(
     origin_counts = Counter(row["_audit_origin"] for row in annotated_rules)
     audit = {
         "dataset": {
-            "name": "2027 Corvette Grand Sport rule audit",
+            "name": f"{config.model_year} Corvette {config.model_label} rule audit",
             "model": config.model_label,
             "model_year": config.model_year,
             "source_workbook": config.workbook_path.name,
@@ -918,7 +923,7 @@ def write_rule_audit(
         "omittedInactiveOrUnemitted": omitted_inactive_or_unemitted,
         "skippedRequiresReview": review_rows,
         "unresolvedRpoMentions": unresolved_mentions,
-        "reviewHotSpots": review_hot_spots(options, option_ids_by_rpo, tuple(sorted(special_review_rpos))),
+        "reviewHotSpots": review_hot_spots(options, option_ids_by_rpo, tuple(sorted(special_review_rpos)), config.model_label),
         "focusedReview": {
             "duplicateSemanticRuleKeys": duplicate_semantic_rule_keys,
             "exactDuplicateRuleRows": duplicate_semantic_rule_keys,
@@ -931,15 +936,19 @@ def write_rule_audit(
     }
     output_dir = config.output_dir / "inspection"
     output_dir.mkdir(parents=True, exist_ok=True)
-    json_path = output_dir / "grand-sport-rule-audit.json"
-    md_path = output_dir / "grand-sport-rule-audit.md"
+    slug = config.model_key.replace("_", "-")
+    json_path = output_dir / f"{slug}-rule-audit.json"
+    md_path = output_dir / f"{slug}-rule-audit.md"
     json_path.write_text(json.dumps(audit, indent=2), encoding="utf-8")
     md_path.write_text(render_audit_markdown(audit), encoding="utf-8")
     return {"json": str(json_path), "markdown": str(md_path)}
 
 
 def main() -> None:
-    base_config = GRAND_SPORT_MODEL
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model", default="grand_sport", help="model key to audit")
+    args = parser.parse_args()
+    base_config = base_model_config(args.model)
     wb = load_workbook(base_config.workbook_path, data_only=True, read_only=True)
     config = load_model_config_overrides(wb, base_config)
     all_grand_sport_options = rows_from_sheet(wb, config.source_option_sheet)

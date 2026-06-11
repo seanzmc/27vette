@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-08T19:15:21+00:00",
+  "generated_at": "2026-06-11T01:14:55+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "z06",
@@ -95,15 +95,15 @@
     "unique_rpos": 223,
     "variant_status_cells": 1494,
     "status_source_rows": 1494,
-    "candidate_choice_rows_available_or_standard": 1422,
+    "candidate_choice_rows_available_or_standard": 1428,
     "candidate_standard_equipment_cells": 488,
     "candidate_standard_option_rows": 95,
     "selectable_counts": {
-      "False": 88,
-      "True": 161
+      "False": 90,
+      "True": 159
     },
-    "active_option_rows_available_or_standard": 235,
-    "inactive_option_rows_all_unavailable_or_blank": 14,
+    "active_option_rows_available_or_standard": 236,
+    "inactive_option_rows_all_unavailable_or_blank": 13,
     "status_counts": {
       "available": 821,
       "standard": 490,
@@ -4134,6 +4134,14 @@
       {
         "option_id": "opt_d30_001",
         "rpo": "D30",
+        "section_id": "sec_colo_001",
+        "original_section_id": "sec_colo_001",
+        "section_override_applied": false,
+        "step_key": "interior_trim"
+      },
+      {
+        "option_id": "opt_r6x_001",
+        "rpo": "R6X",
         "section_id": "sec_colo_001",
         "original_section_id": "sec_colo_001",
         "section_override_applied": false,

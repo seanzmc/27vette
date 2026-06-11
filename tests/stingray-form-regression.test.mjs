@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
@@ -13,7 +14,36 @@ const data = loadData();
 const appSource = fs.readFileSync("form-app/app.js", "utf8");
 const htmlSource = fs.readFileSync("form-app/index.html", "utf8");
 const stylesSource = fs.readFileSync("form-app/styles.css", "utf8");
-const interiorReferenceSource = fs.readFileSync("architectureAudit/stingray_interiors_refactor.csv", "utf8");
+
+function workbookRows(sheetName) {
+  const output = execFileSync(
+    ".venv/bin/python",
+    [
+      "-c",
+      [
+        "import json",
+        "from openpyxl import load_workbook",
+        "wb = load_workbook('stingray_master.xlsx', read_only=True, data_only=True)",
+        `ws = wb['${sheetName}']`,
+        "headers = [ws.cell(1, col).value for col in range(1, ws.max_column + 1)]",
+        "rows = []",
+        "def legacy_value(value):",
+        "    return 'True' if value is True else 'False' if value is False else value",
+        "for raw in ws.iter_rows(min_row=2, values_only=True):",
+        "    record = {header: legacy_value(value) for header, value in zip(headers, raw) if header and value is not None}",
+        "    if record:",
+        "        rows.append(record)",
+        "print(json.dumps(rows))",
+      ].join("\n"),
+    ],
+    { encoding: "utf8" }
+  );
+  return JSON.parse(output);
+}
+
+const stingrayScopeRows = workbookRows("model_interior_scope").filter((row) => row.model_key === "stingray" && row.active === "True");
+const stingrayScopeIds = new Set(stingrayScopeRows.map((row) => row.interior_id));
+const activeInteriors = data.interiors.filter((interior) => interior.active_for_stingray === true);
 
 function cssOrderFor(selector, source = stylesSource) {
   const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -25,45 +55,6 @@ function cssBlock(selector, source = stylesSource) {
   const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return source.match(new RegExp(`${escapedSelector}\\s*\\{[\\s\\S]*?\\}`))?.[0] || "";
 }
-
-function parseCsv(source) {
-  const rows = [];
-  let row = [];
-  let field = "";
-  let inQuotes = false;
-  for (let index = 0; index < source.length; index++) {
-    const char = source[index];
-    const next = source[index + 1];
-    if (char === '"' && inQuotes && next === '"') {
-      field += '"';
-      index++;
-    } else if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === "," && !inQuotes) {
-      row.push(field);
-      field = "";
-    } else if ((char === "\n" || char === "\r") && !inQuotes) {
-      if (char === "\r" && next === "\n") index++;
-      row.push(field);
-      if (row.some((value) => value !== "")) rows.push(row);
-      row = [];
-      field = "";
-    } else {
-      field += char;
-    }
-  }
-  if (field || row.length) {
-    row.push(field);
-    rows.push(row);
-  }
-  const [headers, ...records] = rows;
-  return records.map((record) => Object.fromEntries(headers.map((header, index) => [header, record[index] || ""])));
-}
-
-const interiorReferenceRows = parseCsv(interiorReferenceSource);
-const interiorReferenceFinalRows = interiorReferenceRows.filter((row) => row.interior_id);
-const interiorReferenceIds = new Set(interiorReferenceFinalRows.map((row) => row.interior_id));
-const activeInteriors = data.interiors.filter((interior) => interior.active_for_stingray === true);
 
 function makeElement() {
   return {
@@ -1647,7 +1638,7 @@ test("generated interiors expose priced component metadata from PriceRef", () =>
     ["2LT_AH2_HTP_N26", [{ rpo: "N26", label: "Sueded Microfiber", price: 695, component_type: "suede" }]],
     ["2LT_AH2_HTN_TU7", [{ rpo: "TU7", label: "Two-Tone", price: 595, component_type: "two_tone" }]],
     ["3LT_R6X_AH2_HUU", [{ rpo: "R6X", label: "Custom Interior Trim and Seat Combination", price: 995, component_type: "r6x" }]],
-    ["3LT_R6X_AE4_HUU", [{ rpo: "R6X", label: "Custom Interior Trim and Seat Combination", price: 1590, component_type: "r6x" }]],
+    ["3LT_R6X_AE4_HUU", [{ rpo: "R6X", label: "Custom Interior Trim and Seat Combination", price: 995, component_type: "r6x" }]],
   ];
 
   for (const [interiorId, expectedComponents] of expectations) {
@@ -1731,8 +1722,8 @@ test("R6X component order output uses PriceRef pricing and D30 does not alter it
 
   const ae4Runtime = configureInteriorOrder({ trimLevel: "3LT", interiorId: "3LT_R6X_AE4_HUU", seatRpo: "AE4" });
   assert.ok(
-    compactSeatInteriorItems(ae4Runtime).some((item) => item.rpo === "R6X" && item.label === "Custom Interior Trim and Seat Combination" && item.price === 1590),
-    "3LT R6X AE4 should show R6X at $1,590"
+    compactSeatInteriorItems(ae4Runtime).some((item) => item.rpo === "R6X" && item.label === "Custom Interior Trim and Seat Combination" && item.price === 995),
+    "3LT R6X AE4 should show R6X at its flat $995 PriceRef component price"
   );
 
   const d30Runtime = configureInteriorOrder({
@@ -2182,22 +2173,22 @@ test("step rendering resets scroll to the top after content replacement", () => 
   assert.match(appSource, /window\.scrollTo\(\{ top: 0, left: 0 \}\)/);
 });
 
-test("interior pricing subtracts the selected seat price", () => {
+test("interior pricing subtracts the resolved selected seat price", () => {
   assert.match(appSource, /function selectedSeatChoice/);
+  assert.match(appSource, /function selectedSeatResolvedPrice/);
+  assert.match(appSource, /seat \? optionPrice\(seat\.option_id\) : 0/);
   assert.match(appSource, /function adjustedInteriorPrice/);
-  assert.match(appSource, /Math\.max\(0, Number\(interior\.price \|\| 0\) - Number\(seat\?\.base_price \|\| 0\)\)/);
+  assert.match(appSource, /Math\.max\(0, Number\(interior\.price \|\| 0\) - selectedSeatResolvedPrice\(\)\)/);
   assert.match(appSource, /price: adjustedInteriorPrice\(interior\)/);
 });
 
-test("interior reference maps every final CSV id and active Stingray interior", () => {
-  for (const row of interiorReferenceFinalRows) {
+test("model_interior_scope maps every active Stingray interior", () => {
+  assert.equal(stingrayScopeRows.length, activeInteriors.length);
+  for (const row of stingrayScopeRows) {
     assert.ok(data.interiors.some((interior) => interior.interior_id === row.interior_id), `${row.interior_id} should map to generated interiors`);
   }
   for (const interior of activeInteriors) {
-    assert.ok(
-      interiorReferenceIds.has(interior.interior_id) || interior.interior_color_family === "Other Interior Choices",
-      `${interior.interior_id} should be represented by the CSV hierarchy or explicit fallback group`
-    );
+    assert.ok(stingrayScopeIds.has(interior.interior_id), `${interior.interior_id} should be represented by model_interior_scope`);
   }
 });
 
@@ -2210,15 +2201,15 @@ test("Grand Sport EL9 interiors are inactive for Stingray and H8T is in the AE4 
     );
   }
 
-  const h8tReference = interiorReferenceFinalRows.find((row) => row.interior_id === "3LT_AE4_H8T");
-  assert.ok(h8tReference, "3LT_AE4_H8T should be represented in the reference CSV");
+  const h8tScope = stingrayScopeRows.find((row) => row.interior_id === "3LT_AE4_H8T");
+  assert.ok(h8tScope, "3LT_AE4_H8T should be represented in model_interior_scope");
   const h8tInterior = data.interiors.find((interior) => interior.interior_id === "3LT_AE4_H8T");
   assert.equal(h8tInterior?.interior_trim_level, "3LT");
   assert.equal(h8tInterior?.interior_seat_label, "AE4 Competition Seats");
   assert.equal(h8tInterior?.interior_color_family, "Santorini Blue");
 });
 
-test("active interiors have stable CSV-derived grouping fields", () => {
+test("active interiors have stable workbook-owned grouping fields", () => {
   const requiredFields = [
     "interior_trim_level",
     "interior_seat_code",

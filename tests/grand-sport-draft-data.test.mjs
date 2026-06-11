@@ -9,7 +9,7 @@ const appDataPath = "form-app/data.js";
 
 function generateDraftWithoutAppMutation() {
   const beforeAppData = fs.readFileSync(appDataPath, "utf8");
-  execFileSync(".venv/bin/python", ["scripts/generate_grand_sport_form.py"], {
+  execFileSync(".venv/bin/python", ["scripts/generate_form.py", "--model", "grand_sport"], {
     encoding: "utf8",
     stdio: "pipe",
   });
@@ -48,6 +48,7 @@ function workbookRows(sheetName) {
 
 const draft = generateDraftWithoutAppMutation();
 const inspectionSource = fs.readFileSync("scripts/corvette_form_generator/inspection.py", "utf8");
+const interiorsSource = fs.readFileSync("scripts/corvette_form_generator/interiors.py", "utf8");
 const heritageHashOptionIds = ["opt_17a_001", "opt_20a_001", "opt_55a_001", "opt_75a_001", "opt_97a_001", "opt_dx4_001"];
 const heritageCenterStripeOptionIds = ["opt_dmu_001", "opt_dmv_001", "opt_dmw_001", "opt_dmx_001", "opt_dmy_001"];
 const nonCenterStripeOptionIds = [
@@ -178,9 +179,9 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
   );
   assert.equal(draft.choices.length, 1422);
   assert.equal(draft.standardEquipment.length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 805);
+  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 811);
   assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 162);
+  assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 156);
 });
 
 test("Grand Sport standard equipment is preserved after standard mirror rows are inactive", () => {
@@ -598,9 +599,9 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
   );
 
   const d30 = draft.choices.find((choice) => choice.option_id === "opt_d30_001");
-  assert.equal(d30.active, "False");
+  assert.equal(d30.active, "True");
   assert.equal(d30.selectable, "False");
-  assert.equal(d30.display_behavior, "auto_only");
+  assert.equal(d30.display_behavior, "display_only");
 
   const z15 = draft.choices.find((choice) => choice.option_id === "opt_z15_001");
   assert.equal(z15.active, "False");
@@ -610,6 +611,31 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
   const r6xChoices = draft.choices.filter((choice) => choice.option_id === "opt_r6x_001");
   assert.equal(r6xChoices.length, 6);
   assert.equal(r6xChoices.every((choice) => choice.active === "False" && choice.selectable === "False" && choice.display_behavior === "auto_only"), true);
+});
+
+test("interior grouping metadata is workbook-owned for active runtime models", () => {
+  const scopeRows = workbookRows("model_interior_scope").filter((row) => ["stingray", "grand_sport", "z06"].includes(row.model_key) && row.active === "True");
+  const requiredFields = [
+    "interior_seat_label",
+    "interior_color_family",
+    "interior_material_family",
+    "interior_leaf_label",
+    "interior_group_display_order",
+    "interior_hierarchy_levels",
+    "grouping_source",
+  ];
+  for (const modelKey of ["stingray", "grand_sport", "z06"]) {
+    const rows = scopeRows.filter((row) => row.model_key === modelKey);
+    assert.ok(rows.length > 0, `${modelKey} should have active interior scope rows`);
+    assert.equal(
+      rows.every((row) => requiredFields.every((field) => row[field] !== undefined && String(row[field]).trim() !== "")),
+      true,
+      `${modelKey} active interior scope rows should carry workbook-owned grouping metadata`
+    );
+  }
+  const z06Custom = scopeRows.find((row) => row.model_key === "z06" && row.interior_id === "3LZ_R6X_AH2_HUU");
+  assert.equal(z06Custom?.interior_color_family, "Custom Interior trim and seat combinations");
+  assert.equal(z06Custom?.interior_leaf_label, "Adrenaline Red interior / Jet Black seats");
 });
 
 test("Grand Sport draft includes model-scoped LT interiors with EL9 launch edition metadata", () => {
@@ -634,10 +660,14 @@ test("Grand Sport draft includes model-scoped LT interiors with EL9 launch editi
     componentRows.length,
     "active Grand Sport interior component keys should be unique"
   );
-  assert.match(inspectionSource, /load_model_interior_scope_map/);
-  assert.match(inspectionSource, /load_interior_components/);
+  assert.match(interiorsSource, /load_model_interior_scope_map/);
+  assert.match(interiorsSource, /load_interior_components/);
+  assert.match(interiorsSource, /build_model_interiors/);
+  assert.match(interiorsSource, /config\.interior_source_sheet/);
   assert.match(inspectionSource, /build_model_interiors/);
-  assert.match(inspectionSource, /config\.interior_source_sheet/);
+  assert.doesNotMatch(interiorsSource, /rows_from_sheet\(wb, ["']lt_interiors["']\)/);
+  assert.doesNotMatch(interiorsSource, /source_sheet["']?: ["']lt_interiors["']/);
+  assert.doesNotMatch(interiorsSource, /read_interior_reference|grouping_fields_for_interior|fallback_interior_trims|interior_component_metadata/);
   assert.doesNotMatch(inspectionSource, /rows_from_sheet\(wb, ["']lt_interiors["']\)/);
   assert.doesNotMatch(inspectionSource, /source_sheet["']?: ["']lt_interiors["']/);
 

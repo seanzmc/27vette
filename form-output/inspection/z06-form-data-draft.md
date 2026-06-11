@@ -1,6 +1,6 @@
-# Grand Sport Form Data Draft
+# Z06 Form Data Draft
 
-Generated: `2026-06-08T19:15:22+00:00`
+Generated: `2026-06-11T01:14:56+00:00`
 Status: `draft_not_runtime_active`
 Source sheet: `z06_options`
 
@@ -10,19 +10,19 @@ Source sheet: `z06_options`
 - Context choices: 8
 - Steps: 14
 - Sections: 36
-- Choices: 1422
+- Choices: 1428
 - Standard equipment rows: 488
 - Rule groups: 35 (workbook-backed)
 - Exclusive groups: 12 (workbook-backed)
 - Rules: 55 (workbook-backed)
 - Price rules: 48 (workbook-backed)
 - Interiors: 130 (model-scoped)
-- Color overrides: 0
+- Color overrides: 137
 
 ## Draft Notes
 
-- Candidate available/standard choices from preview: 1277
-- Full variant-matrix draft choices: 1422
+- Candidate available/standard choices from preview: 1283
+- Full variant-matrix draft choices: 1428
 - Rule/detail hot spot rows preserved: 110
 - Unresolved normalization issues: 0
 
@@ -33,4 +33,4 @@ Source sheet: `z06_options`
 ## Live Output Safety
 
 - This draft writes only inspection artifacts under `form-output/inspection/`.
-- It does not write `form-app/data.js` or activate Grand Sport in the app.
+- It does not write `form-app/data.js` or activate Z06 in the app.

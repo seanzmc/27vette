@@ -45,6 +45,10 @@ def intish(value: Any, default: int = 0) -> int:
         return default
 
 
+def workbook_truthy(value: Any) -> bool:
+    return clean(value).lower() in {"true", "yes", "1", "y"}
+
+
 def rows_from_sheet(wb, sheet_name: str) -> list[dict[str, str]]:
     ws = wb[sheet_name]
     headers = [clean(ws.cell(1, col).value) for col in range(1, ws.max_column + 1)]
@@ -59,10 +63,19 @@ def rows_from_sheet(wb, sheet_name: str) -> list[dict[str, str]]:
     return rows
 
 
+def rows_from_optional_sheet(wb, sheet_name: str) -> list[dict[str, str]]:
+    if sheet_name not in wb.sheetnames:
+        return []
+    return rows_from_sheet(wb, sheet_name)
+
+
 def write_sheet(wb, name: str, headers: list[str], rows: list[dict[str, Any]]) -> None:
     if name in wb.sheetnames:
         del wb[name]
     ws = wb.create_sheet(name)
+    # Generated form_* sheets carry a red tab so the "do not hand-edit" group
+    # stays visually distinct after every regeneration (workbook-cleanup-spec.md §5).
+    ws.sheet_properties.tabColor = "C00000"
     ws.append(headers)
     for row in rows:
         ws.append([row.get(header, "") for header in headers])

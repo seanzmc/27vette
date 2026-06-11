@@ -1,6 +1,6 @@
-# Grand Sport Contract Preview
+# Z06 Contract Preview
 
-Generated: `2026-06-08T19:15:21+00:00`
+Generated: `2026-06-11T01:14:55+00:00`
 Status: `read_only_preview`
 Source sheet: `z06_options`
 
@@ -10,7 +10,7 @@ Source sheet: `z06_options`
 - Context choices: 8
 - Steps: 14
 - Sections: 36
-- Choices: 1277
+- Choices: 1283
 - Candidate standard equipment cells: 488
 - Rule/detail hot spot rows: 110
 - Unresolved normalization issues: 0
@@ -49,5 +49,5 @@ Source sheet: `z06_options`
 
 ## Live Output Safety
 
-- Grand Sport preview generation writes only inspection artifacts under `form-output/inspection/`.
-- It does not write `form-app/data.js` or final Grand Sport app data.
+- Z06 preview generation writes only inspection artifacts under `form-output/inspection/`.
+- It does not write `form-app/data.js` or final Z06 app data.

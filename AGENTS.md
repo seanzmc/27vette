@@ -103,7 +103,7 @@ Current shared or Stingray-facing sheets include:
 - `PriceRef`
 - `asset_map`
 
-`archive_category_master` is retained as historical evidence only; `category_master` is not an active source sheet.
+`category_master` is not an active source sheet. Historical evidence sheets (`archive_*` and `*_raw`, including `archive_category_master`) were extracted to `archive/stingray_archive.xlsx` and no longer live in `stingray_master.xlsx`.
 
 Current workbook-owned runtime metadata and audit sheets include:
 
@@ -226,7 +226,7 @@ Current default command from the repo root:
 
 ```sh
 cd <repo-root>
-.venv/bin/python scripts/generate_stingray_form.py
+.venv/bin/python scripts/generate_form.py --model stingray
 ```
 
 Current expected outputs:
@@ -251,7 +251,7 @@ Current default command from the repo root:
 
 ```sh
 cd <repo-root>
-.venv/bin/python scripts/generate_grand_sport_form.py
+.venv/bin/python scripts/generate_form.py --model grand_sport
 ```
 
 Current expected outputs under `form-output/inspection/`:
@@ -282,7 +282,7 @@ Current read-only preview/draft command from the repo root:
 
 ```sh
 cd <repo-root>
-.venv/bin/python scripts/generate_z06_form.py
+.venv/bin/python scripts/generate_form.py --model z06
 ```
 
 Current expected outputs under `form-output/inspection/`:
@@ -293,6 +293,7 @@ Current expected outputs under `form-output/inspection/`:
 - `z06-contract-preview.md`
 - `z06-form-data-draft.json`
 - `z06-form-data-draft.md`
+- `z06-runtime-contract.json` (clean contract embedded verbatim by registry promotion)
 
 This script must not mutate `form-app/data.js` or write `stingray_master.xlsx`.
 
@@ -309,12 +310,12 @@ Use the workbook-owned promotion path when Z06 runtime activation needs to be ap
 
 ```sh
 cd <repo-root>
-.venv/bin/python scripts/promote_z06_runtime.py --write
-.venv/bin/python scripts/generate_z06_form.py
-.venv/bin/python scripts/generate_stingray_form.py
+.venv/bin/python scripts/promote_model.py --model z06 --write
+.venv/bin/python scripts/generate_form.py --model z06
+.venv/bin/python scripts/generate_form.py --model stingray
 ```
 
-`scripts/promote_z06_runtime.py` updates only Z06 rows in `model_master`, `model_registry_promotion`, and the six Z06 rows in `variant_master`. It must use `save_workbook_safely()`, refuse to run while an Excel lock file exists, and verify the saved workbook rows on disk.
+`scripts/promote_model.py --model z06` updates only Z06 rows in `model_master`, `model_registry_promotion`, and the six Z06 rows in `variant_master`. It must use `save_workbook_safely()`, refuse to run while an Excel lock file exists, and verify the saved workbook rows on disk.
 
 After promotion or regeneration, run:
 
@@ -373,7 +374,7 @@ rg -n "stale text or deprecated claim" README.md AGENTS.md codex-context.md
 Stingray data refresh:
 
 ```sh
-.venv/bin/python scripts/generate_stingray_form.py
+.venv/bin/python scripts/generate_form.py --model stingray
 .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
 node --test tests/stingray-form-regression.test.mjs
 node --test tests/stingray-generator-stability.test.mjs
@@ -382,7 +383,7 @@ node --test tests/stingray-generator-stability.test.mjs
 Grand Sport source/draft refresh:
 
 ```sh
-.venv/bin/python scripts/generate_grand_sport_form.py
+.venv/bin/python scripts/generate_form.py --model grand_sport
 node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
 node --test tests/grand-sport-rule-audit.test.mjs
@@ -392,7 +393,7 @@ node --test tests/audit-parser-metadata-loaders.test.mjs
 Z06 source/draft refresh:
 
 ```sh
-.venv/bin/python scripts/generate_z06_form.py
+.venv/bin/python scripts/generate_form.py --model z06
 node --test tests/z06-contract-preview.test.mjs
 node --test tests/z06-form-data-draft.test.mjs
 node --test tests/z06-interior-accessory-cleanup.test.mjs
@@ -403,9 +404,9 @@ node --test tests/z06-runtime-rule-corrections.test.mjs
 Z06 runtime promotion:
 
 ```sh
-.venv/bin/python scripts/promote_z06_runtime.py --write
-.venv/bin/python scripts/generate_z06_form.py
-.venv/bin/python scripts/generate_stingray_form.py
+.venv/bin/python scripts/promote_model.py --model z06 --write
+.venv/bin/python scripts/generate_form.py --model z06
+.venv/bin/python scripts/generate_form.py --model stingray
 .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
 node --test tests/z06-runtime-promotion.test.mjs
 node --test tests/multi-model-runtime-switching.test.mjs

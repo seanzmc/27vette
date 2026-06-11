@@ -24,7 +24,7 @@ function loadAppData() {
 
 const jsonData = JSON.parse(fs.readFileSync("form-output/stingray-form-data.json", "utf8"));
 const appData = loadAppData();
-const generatorSource = fs.readFileSync("scripts/generate_stingray_form.py", "utf8");
+const generatorSource = fs.readFileSync("scripts/corvette_form_generator/production.py", "utf8");
 const stingrayVariantIds = ["1lt_c07", "2lt_c07", "3lt_c07", "1lt_c67", "2lt_c67", "3lt_c67"];
 const grandSportVariantIds = ["1lt_e07", "2lt_e07", "3lt_e07", "1lt_e67", "2lt_e67", "3lt_e67"];
 const optionSourceHeaders = [
@@ -48,7 +48,6 @@ const sectionMasterHeaders = [
   "is_required",
   "display_order",
   "standard_behavior",
-  "help_text",
   "step_key",
 ];
 const optionVariantStatuses = new Set(["available", "standard", "unavailable"]);
@@ -73,7 +72,6 @@ const ruleMappingHeaders = [
   "target_id",
   "target_type",
   "original_detail_raw",
-  "review_flag",
   "source_type",
   "target_selection_mode",
   "source_selection_mode",
@@ -84,9 +82,6 @@ const ruleMappingHeaders = [
   "runtime_action",
   "disabled_reason",
   "normalization_status",
-  "normalization_reason",
-  "replacement_group_id",
-  "replacement_rule_id",
 ];
 const priceRuleHeaders = [
   "price_rule_id",
@@ -96,9 +91,7 @@ const priceRuleHeaders = [
   "price_value",
   "body_style_scope",
   "trim_level_scope",
-  "review_flag",
   "notes",
-  "price_semantic",
 ];
 const interiorComponentHeaders = [
   "model_key",
@@ -113,7 +106,26 @@ const interiorComponentHeaders = [
   "active",
   "notes",
 ];
-const modelInteriorScopeHeaders = ["model_key", "interior_id", "trim_level", "active", "requires_option_id", "notes"];
+const modelInteriorScopeHeaders = [
+  "model_key",
+  "interior_id",
+  "trim_level",
+  "active",
+  "requires_option_id",
+  "notes",
+  "interior_seat_label",
+  "interior_color_family",
+  "interior_material_family",
+  "interior_variant_label",
+  "interior_group_display_order",
+  "interior_material_display_order",
+  "interior_choice_display_order",
+  "interior_hierarchy_levels",
+  "interior_parent_group_label",
+  "interior_leaf_label",
+  "interior_reference_order",
+  "grouping_source",
+];
 const runtimeStepHeaders = ["model_key", "step_key", "step_label", "runtime_order", "source", "active", "notes"];
 const contextSectionHeaders = [
   "model_key",
@@ -135,21 +147,10 @@ const sectionPresentationHeaders = [
   "section_id",
   "display_label",
   "step_key",
-  "presentation_bucket",
   "display_behavior",
   "section_display_order",
   "standard_equipment_bucket",
   "standard_equipment_group_type",
-  "active",
-  "notes",
-];
-const standardEquipmentGroupHeaders = [
-  "model_key",
-  "section_id",
-  "group_type",
-  "default_open",
-  "canonical_rank",
-  "duplicate_group_key",
   "active",
   "notes",
 ];
@@ -418,9 +419,9 @@ test("Stingray Phase 5 interior components are workbook-owned", () => {
     }
   }
 
-  assert.match(generatorSource, /load_interior_components/);
-  assert.match(generatorSource, /workbook_interior_component_metadata/);
-  assert.match(generatorSource, /missing_workbook_components_/);
+  assert.match(generatorSource, /build_model_interiors\(MODEL_CONFIG\)/);
+  assert.doesNotMatch(generatorSource, /workbook_interior_component_metadata/);
+  assert.doesNotMatch(generatorSource, /missing_workbook_components_/);
 });
 
 test("section_master owns section step placement without category", () => {
@@ -436,7 +437,6 @@ test("Phase 6 step and presentation metadata are workbook-owned", () => {
   assert.deepEqual(workbookHeaders("runtime_steps"), runtimeStepHeaders);
   assert.deepEqual(workbookHeaders("context_section_master"), contextSectionHeaders);
   assert.deepEqual(workbookHeaders("section_presentation"), sectionPresentationHeaders);
-  assert.deepEqual(workbookHeaders("standard_equipment_groups"), standardEquipmentGroupHeaders);
 
   for (const modelKey of ["stingray", "grand_sport"]) {
     const runtimeRows = workbookRows("runtime_steps")

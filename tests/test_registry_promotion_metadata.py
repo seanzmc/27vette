@@ -99,7 +99,7 @@ def promoted_grand_sport_row(**overrides: object) -> dict[str, object]:
         "registry_key": "grandSport",
         "promoted_to_runtime": True,
         "default_model": False,
-        "artifact_path": "form-output/inspection/grand-sport-form-data-draft.json",
+        "artifact_path": "form-output/inspection/grand-sport-runtime-contract.json",
         "artifact_type": "draft_artifact",
         "legacy_alias": "",
         "active": True,
@@ -128,24 +128,19 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
     def test_promoted_rows_build_ordered_registry_and_aliases_from_workbook_metadata(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
-            artifact_path = root / "form-output" / "inspection" / "grand-sport-form-data-draft.json"
+            artifact_path = root / "form-output" / "inspection" / "grand-sport-runtime-contract.json"
             artifact_path.parent.mkdir(parents=True)
             artifact_path.write_text(
                 json.dumps(
                     {
-                        "draftMetadata": {"inspection": True},
                         "dataset": {
                             "source_sheet": "grandSport_options",
-                            "raw_source_sheet": "future_model_source_review",
+                            "status": "runtime_active",
                         },
                         "choices": [
                             {
                                 "choice_id": "gs-choice",
-                                "source_option_name": "draft only",
-                                "source_description": "draft description",
-                                "text_cleanup_notes": ["draft note"],
                                 "source_detail_raw": "runtime tooltip source detail",
-                                "suggested_copy_from": "grand_sport:opt_abc_001",
                             }
                         ],
                         "rules": [
@@ -154,9 +149,6 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
                                 "source_id": "opt_sht_001",
                                 "source_type": "option",
                                 "source_note": "runtime rule note",
-                                "copy_from_model_key": "grand_sport",
-                                "review_flags": "copied_from_template",
-                                "nested": {"suggested_copy_from": "grand_sport:rule_1"},
                             }
                         ],
                     }
@@ -165,7 +157,7 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
             )
             wb = workbook_with_promotions(
                 [
-                    promoted_grand_sport_row(artifact_path="form-output/inspection/grand-sport-form-data-draft.json", display_order=2),
+                    promoted_grand_sport_row(display_order=2),
                     {**promoted_stingray_row(display_order=1)},
                     {
                         "model_key": "z06",
@@ -195,22 +187,36 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
         self.assertEqual(registry["models"]["grandSport"]["label"], "Grand Sport")
         self.assertEqual(registry["models"]["grandSport"]["exportSlug"], "grand-sport")
         self.assertEqual(registry["models"]["grandSport"]["data"]["dataset"]["source_sheet"], "grandSport_options")
-        self.assertNotIn("raw_source_sheet", registry["models"]["grandSport"]["data"]["dataset"])
-        self.assertNotIn("draftMetadata", registry["models"]["grandSport"]["data"])
         choice = registry["models"]["grandSport"]["data"]["choices"][0]
-        self.assertNotIn("source_option_name", choice)
-        self.assertNotIn("source_description", choice)
-        self.assertNotIn("text_cleanup_notes", choice)
-        self.assertNotIn("suggested_copy_from", choice)
         self.assertEqual(choice["source_detail_raw"], "runtime tooltip source detail")
-        rule = registry["models"]["grandSport"]["data"]["rules"][0]
-        self.assertEqual(rule["source_id"], "opt_sht_001")
-        self.assertEqual(rule["source_type"], "option")
-        self.assertEqual(rule["source_note"], "runtime rule note")
-        self.assertNotIn("copy_from_model_key", rule)
-        self.assertNotIn("review_flags", rule)
-        self.assertNotIn("suggested_copy_from", rule["nested"])
         self.assertEqual(registry["legacyAliases"], {"STINGRAY_FORM_DATA": "stingray"})
+
+    def test_promoted_artifact_with_draft_fields_fails_fast(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            artifact_path = root / "form-output" / "inspection" / "grand-sport-runtime-contract.json"
+            artifact_path.parent.mkdir(parents=True)
+            artifact_path.write_text(
+                json.dumps(
+                    {
+                        "draftMetadata": {"inspection": True},
+                        "dataset": {"status": "draft_not_runtime_active"},
+                        "choices": [{"choice_id": "gs-choice", "source_option_name": "draft only"}],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            wb = workbook_with_promotions(
+                [promoted_grand_sport_row(display_order=2), promoted_stingray_row(display_order=1)]
+            )
+            with self.assertRaisesRegex(ValueError, "not a clean runtime contract"):
+                build_registry_from_promotions(
+                    wb,
+                    current_model_key="stingray",
+                    current_data={"dataset": {"source_sheet": "stingray_options"}, "choices": []},
+                    model_assets={},
+                    root=root,
+                )
 
     def test_promotions_require_exactly_one_default_model(self) -> None:
         wb = workbook_with_promotions([promoted_stingray_row(default_model=False), promoted_grand_sport_row()])

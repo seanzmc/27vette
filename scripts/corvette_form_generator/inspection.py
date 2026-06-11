@@ -11,19 +11,34 @@ from typing import Any
 
 from openpyxl import load_workbook
 
+from corvette_form_generator.contract import (
+    ASSET_IMAGE_FIELDS,
+    build_body_context_choices,
+    build_trim_context_choices,
+    context_choice_copy_rows,
+    load_asset_map,
+)
+from corvette_form_generator.interiors import build_model_interiors
 from corvette_form_generator.mapping import best_status, normalize_mode, selection_mode_label, status_to_label, step_for_section
 from corvette_form_generator.model_config import ModelConfig
+from corvette_form_generator.rules import (
+    build_draft_rules,
+    exclusive_group_pairs,
+    grouped_exclusion_pairs,
+    grouped_requirement_pairs,
+    load_exclusive_groups,
+    load_rule_groups,
+)
 from corvette_form_generator.runtime_metadata import (
     load_context_sections,
     load_default_selection_rules,
-    load_interior_components,
-    load_model_interior_scope_map,
     load_rule_review_rpos,
     load_runtime_steps,
     load_section_presentation,
+    load_variant_option_overrides,
     presentation_bool,
 )
-from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet
+from corvette_form_generator.workbook import clean, intish, money, rows_from_optional_sheet, rows_from_sheet
 
 
 ALLOWED_STATUSES = {"available", "standard", "unavailable"}
@@ -44,16 +59,6 @@ RULE_HOT_SPOT_PATTERNS = {
     "except": re.compile(r"\bexcept\b", re.IGNORECASE),
 }
 SPECIAL_REVIEW_RPOS = {"EL9", "Z25", "FEY", "Z15"}
-INTERIOR_COMPONENT_LABELS = {
-    "36S": "Yellow Stitching",
-    "37S": "Blue Stitching",
-    "38S": "Red Stitching",
-    "N26": "Sueded Microfiber",
-    "N2Z": "Sueded Microfiber",
-    "TU7": "Two-Tone",
-    "R6X": "Custom Interior Trim and Seat Combination",
-}
-ASSET_IMAGE_FIELDS = ("image_url", "image_alt", "image_fit", "image_position")
 
 
 def normalize_status(value: Any) -> str:
@@ -68,79 +73,6 @@ def normalize_selectable(value: Any) -> str:
     if text in {"no", "false", "0", "n"}:
         return "False"
     return clean(value)
-
-
-def truthy_workbook_value(value: Any) -> bool:
-    return clean(value).lower() in {"true", "yes", "1", "y"}
-
-
-def load_asset_map(wb, model_key: str) -> dict[tuple[str, str], dict[str, str]]:
-    if "asset_map" not in wb.sheetnames:
-        return {}
-
-    assets: dict[tuple[str, str], dict[str, str]] = {}
-    for row in rows_from_sheet(wb, "asset_map"):
-        if not truthy_workbook_value(row.get("active")):
-            continue
-        if clean(row.get("model_key")) != model_key:
-            continue
-        target_type = clean(row.get("target_type"))
-        target_id = clean(row.get("target_id"))
-        image_url = clean(row.get("image_url"))
-        if not target_type or not target_id or not image_url:
-            continue
-        assets[(target_type, target_id)] = {
-            "image_url": image_url,
-            "image_alt": clean(row.get("image_alt")),
-            "image_fit": clean(row.get("image_fit")),
-            "image_position": clean(row.get("image_position")),
-        }
-    return assets
-
-
-def context_choice_copy_rows(wb, model_key: str) -> list[dict[str, str]]:
-    if "context_choice_copy" not in wb.sheetnames:
-        return []
-    rows: list[dict[str, str]] = []
-    for row in rows_from_sheet(wb, "context_choice_copy"):
-        if not truthy_workbook_value(row.get("active")):
-            continue
-        row_model = clean(row.get("model_key")) or "*"
-        if row_model not in {"*", model_key}:
-            continue
-        if clean(row.get("info_tooltip")):
-            rows.append(row)
-    return rows
-
-
-def context_choice_info_tooltip(
-    copy_rows: list[dict[str, str]],
-    *,
-    model_key: str,
-    context_type: str,
-    value: str,
-    body_style: str = "",
-) -> str:
-    context_type_key = clean(context_type).lower()
-    value_key = clean(value).lower()
-    body_style_key = clean(body_style).lower()
-    best: tuple[int, str] = (-1, "")
-    for row in copy_rows:
-        row_context_type = clean(row.get("context_type")).lower()
-        row_value = clean(row.get("value")).lower()
-        row_model = clean(row.get("model_key")) or "*"
-        row_body_style = (clean(row.get("body_style")) or "*").lower()
-        if row_context_type != context_type_key or row_value != value_key:
-            continue
-        if row_model not in {"*", model_key}:
-            continue
-        if row_body_style not in {"*", body_style_key}:
-            continue
-        score = (2 if row_model == model_key else 0) + (1 if row_body_style == body_style_key else 0)
-        tooltip = clean(row.get("info_tooltip"))
-        if tooltip and score > best[0]:
-            best = (score, tooltip)
-    return best[1]
 
 
 def normalized_option_row(row: dict[str, str], config: ModelConfig) -> dict[str, Any]:
@@ -226,388 +158,6 @@ def cleanup_display_text(value: str, config: ModelConfig) -> tuple[str, list[str
             text = deduped
 
     return text, notes
-
-
-def price_ref_key(trim: str, code: str) -> tuple[str, str]:
-    return (clean(trim).replace("_", " "), clean(code))
-
-
-def price_ref_prices(rows: list[dict[str, str]]) -> dict[tuple[str, str], int]:
-    prices: dict[tuple[str, str], int] = {}
-    for row in rows:
-        if clean(row.get("OptionType", "")).lower() != "seat":
-            continue
-        trim = clean(row.get("Trim", ""))
-        code = clean(row.get("Code", ""))
-        if trim and code:
-            prices[price_ref_key(trim, code)] = money(row.get("Price"))
-    return prices
-
-
-def price_ref_component_type_key(value: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "", clean(value).lower())
-
-
-def price_ref_component_prices(rows: list[dict[str, str]]) -> dict[tuple[str, str, str], int]:
-    prices: dict[tuple[str, str, str], int] = {}
-    for row in rows:
-        option_type = price_ref_component_type_key(row.get("OptionType", ""))
-        code = clean(row.get("Code", ""))
-        if not option_type or not code:
-            continue
-        prices[(option_type, clean(row.get("Trim", "")).replace("_", " "), code)] = money(row.get("Price"))
-    return prices
-
-
-def price_ref_component_price(
-    price_ref: dict[tuple[str, str, str], int],
-    option_type: str,
-    code: str,
-    trim: str = "",
-) -> int:
-    normalized_type = price_ref_component_type_key(option_type)
-    normalized_trim = clean(trim).replace("_", " ")
-    normalized_code = clean(code)
-    if (normalized_type, normalized_trim, normalized_code) in price_ref:
-        return price_ref[(normalized_type, normalized_trim, normalized_code)]
-    return price_ref.get((normalized_type, "", normalized_code), 0)
-
-
-def r6x_price_component(row: dict[str, str], price_ref: dict[tuple[str, str], int]) -> int:
-    trim = clean(row.get("Trim", ""))
-    interior_id = clean(row.get("interior_id", "") or row.get("ID", ""))
-    if "R6X" not in trim and "R6X" not in interior_id:
-        return 0
-
-    seat = clean(row.get("Seat", ""))
-    r6x_trim = trim if "R6X" in trim else f"{trim}_R6X"
-    base_trim = r6x_trim.replace("_R6X", "")
-    r6x_price = price_ref.get(price_ref_key(r6x_trim, seat))
-    if r6x_price is None:
-        return 0
-    return max(0, r6x_price - price_ref.get(price_ref_key(base_trim, seat), 0))
-
-
-def generated_interior_price(row: dict[str, str], price_ref: dict[tuple[str, str], int]) -> int:
-    return money(row.get("Price") or row.get("Cost")) + r6x_price_component(row, price_ref)
-
-
-def interior_component_metadata(
-    row: dict[str, str],
-    price_ref: dict[tuple[str, str, str], int],
-) -> list[dict[str, Any]]:
-    trim = clean(row.get("Trim", ""))
-    interior_id = clean(row.get("interior_id", "") or row.get("ID", ""))
-    seat = clean(row.get("Seat", ""))
-    tokens = set(interior_id.split("_"))
-    components: list[dict[str, Any]] = []
-
-    if "R6X" in trim or "R6X" in tokens:
-        r6x_trim = trim if "R6X" in trim else f"{trim}_R6X"
-        components.append(
-            {
-                "rpo": "R6X",
-                "label": INTERIOR_COMPONENT_LABELS["R6X"],
-                "price": price_ref_component_price(price_ref, "seat", seat, r6x_trim),
-                "component_type": "r6x",
-            }
-        )
-    else:
-        seat_price = price_ref_component_price(price_ref, "seat", seat, trim)
-        if seat_price:
-            components.append(
-                {
-                    "rpo": seat,
-                    "label": f"{seat} Seat Upgrade",
-                    "price": seat_price,
-                    "component_type": "seat",
-                }
-            )
-
-    for rpo in ("36S", "37S", "38S"):
-        if rpo in tokens:
-            components.append(
-                {
-                    "rpo": rpo,
-                    "label": INTERIOR_COMPONENT_LABELS[rpo],
-                    "price": price_ref_component_price(price_ref, "stitching", rpo),
-                    "component_type": "stitching",
-                }
-            )
-
-    for rpo in ("N26", "N2Z"):
-        if rpo in tokens:
-            components.append(
-                {
-                    "rpo": rpo,
-                    "label": INTERIOR_COMPONENT_LABELS[rpo],
-                    "price": price_ref_component_price(price_ref, "suede", rpo),
-                    "component_type": "suede",
-                }
-            )
-
-    if "TU7" in tokens:
-        components.append(
-            {
-                "rpo": "TU7",
-                "label": INTERIOR_COMPONENT_LABELS["TU7"],
-                "price": price_ref_component_price(price_ref, "twotone", "TU7"),
-                "component_type": "two_tone",
-            }
-        )
-
-    return [component for component in components if component["price"] or component["rpo"] == "R6X"]
-
-
-def workbook_interior_component_metadata(
-    row: dict[str, str],
-    workbook_components_by_interior_id: dict[str, list[dict[str, Any]]],
-    price_ref: dict[tuple[str, str, str], int],
-) -> list[dict[str, Any]]:
-    interior_id = clean(row.get("interior_id", "") or row.get("ID", ""))
-    component_rows = workbook_components_by_interior_id.get(interior_id, [])
-    if not component_rows:
-        return []
-    trim = clean(row.get("Trim", ""))
-    components: list[dict[str, Any]] = []
-    for component in component_rows:
-        price_ref_type = clean(component.get("price_ref_type"))
-        price_ref_code = clean(component.get("price_ref_code")) or clean(component.get("rpo"))
-        price_trim_scope = clean(component.get("price_trim_scope")) or trim
-        price = price_ref_component_price(price_ref, price_ref_type, price_ref_code, price_trim_scope)
-        normalized = {
-            "rpo": clean(component.get("rpo")),
-            "label": clean(component.get("label")),
-            "price": price,
-            "component_type": clean(component.get("component_type")),
-        }
-        if normalized["price"] or normalized["rpo"] == "R6X":
-            components.append(normalized)
-    return components
-
-
-def clean_reference_label(value: str) -> str:
-    label = clean(value)
-    if " - " in label:
-        head, tail = label.split(" - ", 1)
-        if re.search(r"\b(option|expandable|choice|card)\b", tail, re.IGNORECASE):
-            label = head
-    label = re.sub(r"\s*\([^)]*(?:expandable|only one option|no need)[^)]*\)\s*$", "", label, flags=re.IGNORECASE)
-    return label.strip()
-
-
-def read_interior_reference(config: ModelConfig) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
-    reference_by_id: dict[str, dict[str, Any]] = {}
-    reference_rows: list[dict[str, Any]] = []
-    current_levels = [""] * 6
-    if not config.interior_reference_path.exists():
-        return reference_by_id, reference_rows
-    with config.interior_reference_path.open(newline="", encoding="utf-8") as handle:
-        import csv
-
-        reader = csv.DictReader(handle)
-        for row_number, row in enumerate(reader, start=2):
-            for index in range(6):
-                key = f"level{index}"
-                value = clean_reference_label(row.get(key, ""))
-                if value:
-                    current_levels[index] = value
-                    for deeper in range(index + 1, 6):
-                        current_levels[deeper] = ""
-            interior_id = clean(row.get("interior_id", ""))
-            levels = [level for level in current_levels if level]
-            record = {
-                "row_number": row_number,
-                "interior_id": interior_id,
-                "levels": levels,
-            }
-            reference_rows.append(record)
-            if interior_id:
-                reference_by_id[interior_id] = record
-    return reference_by_id, reference_rows
-
-
-def seat_code_from_label(label: str) -> str:
-    return clean(label).split(" ", 1)[0]
-
-
-def broad_interior_color_family(label: str) -> str:
-    value = clean(label)
-    if not value:
-        return "Other Interior Choices"
-    lower = value.lower()
-    if "asymmetrical santorini blue" in lower:
-        return "Asymmetrical Santorini Blue / Jet Black"
-    if "asymmetrical adrenaline red" in lower:
-        return "Asymmetrical Adrenaline Red / Jet Black"
-    if "ultimate suede jet black" in lower:
-        return "Ultimate Suede Jet Black"
-    if lower.startswith("sky cool gray"):
-        return "Sky Cool Gray"
-    if lower.startswith("santorini blue"):
-        return "Santorini Blue"
-    for marker in (" interior", " seats"):
-        idx = lower.find(marker)
-        if idx > 0:
-            value = value[:idx]
-            lower = value.lower()
-    for marker in (" with ", " suede", " two tone"):
-        idx = lower.find(marker)
-        if idx > 0:
-            return value[:idx].strip()
-    return value
-
-
-def coded_color_family(interior: dict[str, Any], fallback_label: str) -> str:
-    return broad_interior_color_family(fallback_label)
-
-
-def grouping_fields_for_interior(
-    interior: dict[str, Any],
-    reference: dict[str, Any] | None,
-    reference_order: int,
-    fallback: bool = False,
-) -> dict[str, Any]:
-    seat_label = reference["levels"][1] if reference and len(reference["levels"]) > 1 else f"{interior['seat_code']} Seats"
-    fallback_color_family = coded_color_family(interior, interior["interior_name"] or "Other Interior Choices")
-    levels = reference["levels"] if reference else [
-        interior["trim_level"],
-        seat_label,
-        fallback_color_family,
-        interior["material"] or "Standard interior",
-        interior["interior_name"] or interior["interior_id"],
-    ]
-    leaf_label = levels[-1] if levels else interior["interior_name"] or interior["interior_id"]
-    color_family = levels[2] if len(levels) > 2 else coded_color_family(interior, leaf_label)
-    trim_value = clean(interior.get("trim_level", ""))
-    interior_id_value = clean(interior.get("interior_id", ""))
-    if "R6X" in trim_value or "R6X" in interior_id_value:
-        color_family = "Custom Interior trim and seat combinations"
-    elif not reference:
-        color_family = fallback_color_family
-    material_family = interior.get("material") or "Standard interior"
-    if len(levels) > 3 and levels[-2] != color_family:
-        material_family = levels[-2]
-    parent_group = seat_label if len(levels) > 1 else color_family
-    return {
-        "interior_trim_level": levels[0] if levels else interior["trim_level"],
-        "interior_seat_code": seat_code_from_label(seat_label) or interior["seat_code"],
-        "interior_seat_label": seat_label,
-        "interior_color_family": "Other Interior Choices" if fallback else color_family,
-        "interior_material_family": material_family,
-        "interior_variant_label": leaf_label,
-        "interior_group_display_order": reference_order,
-        "interior_material_display_order": reference_order,
-        "interior_choice_display_order": reference_order,
-        "interior_hierarchy_levels": json.dumps(levels, ensure_ascii=False),
-        "interior_hierarchy_path": " > ".join(levels),
-        "interior_parent_group_label": parent_group,
-        "interior_leaf_label": leaf_label,
-        "interior_reference_order": reference_order,
-    }
-
-
-def fallback_interior_trims(config: ModelConfig) -> set[str]:
-    trims: set[str] = set()
-    for variant_id in config.variant_ids:
-        trim = clean(variant_id.split("_", 1)[0]).upper()
-        if not trim:
-            continue
-        trims.add(trim)
-        if trim.startswith("3"):
-            trims.add(f"{trim}_R6X")
-    return trims
-
-
-def active_interior_flags(config: ModelConfig) -> dict[str, bool]:
-    flags = {"active_for_stingray": config.model_key == "stingray"}
-    flags[f"active_for_{config.model_key}"] = True
-    return flags
-
-
-def build_model_interiors(config: ModelConfig) -> list[dict[str, Any]]:
-    wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
-    try:
-        interior_rows = rows_from_sheet(wb, config.interior_source_sheet)
-        price_ref_rows = rows_from_sheet(wb, "PriceRef")
-        rule_rows = rows_from_sheet(wb, config.rule_mapping_sheet)
-        z25_interior_ids = {
-            row.get("source_id", "")
-            for row in rule_rows
-            if row.get("rule_type", "").lower() == "includes"
-            and row.get("target_id", "") == "opt_z25_001"
-            and runtime_authored_rule(row)
-        }
-        interior_price_ref = price_ref_prices(price_ref_rows)
-        interior_component_price_ref = price_ref_component_prices(price_ref_rows)
-        workbook_components_by_interior_id = load_interior_components(wb, config.model_key)
-        model_interior_scope = load_model_interior_scope_map(wb, config.model_key)
-    finally:
-        wb.close()
-
-    reference_by_id, reference_rows = read_interior_reference(config)
-    reference_order_by_id = {
-        row["interior_id"]: index
-        for index, row in enumerate((row for row in reference_rows if row["interior_id"]), start=1)
-    }
-    fallback_order = len(reference_order_by_id) + 1
-    fallback_trims = fallback_interior_trims(config)
-    active_flags = active_interior_flags(config)
-    interiors: list[dict[str, Any]] = []
-
-    for row in interior_rows:
-        trim = clean(row.get("Trim", ""))
-        interior_id = clean(row.get("interior_id", ""))
-        scope_row = model_interior_scope.get(interior_id)
-        if model_interior_scope:
-            if not scope_row:
-                continue
-        elif fallback_trims and trim not in fallback_trims:
-            continue
-        components = workbook_interior_component_metadata(row, workbook_components_by_interior_id, interior_component_price_ref)
-        legacy_components = interior_component_metadata(row, interior_component_price_ref)
-        if not components and legacy_components:
-            if model_interior_scope:
-                raise ValueError(
-                    f"{config.model_label} interior {interior_id} has component-bearing legacy output but no active interior_components workbook rows."
-                )
-            components = legacy_components
-        trim_level = clean(scope_row.get("trim_level")) if scope_row else ""
-        requires_option_id = clean(scope_row.get("requires_option_id")) if scope_row else ""
-        interior = {
-            "interior_id": interior_id,
-            "source_sheet": config.interior_source_sheet,
-            **active_flags,
-            "requires_z25": "True" if requires_option_id == "opt_z25_001" or interior_id in z25_interior_ids else "False",
-            "trim_level": trim_level or trim.replace("_R6X", ""),
-            "requires_r6x": "True" if "_R6X" in trim or interior_id.endswith("_R6X") else "False",
-            "seat_code": clean(row.get("Seat", "")),
-            "interior_code": clean(row.get("Interior Code", "")),
-            "interior_name": clean(row.get("Interior Name", "")),
-            "material": clean(row.get("Material", "")),
-            "price": generated_interior_price(row, interior_price_ref),
-            "suede": clean(row.get("Suede", "")),
-            "stitch": clean(row.get("Stitch", "")),
-            "two_tone": clean(row.get("Two Tone", "")),
-            "section_id": clean(row.get("section_id", "")),
-            "color_overrides_raw": clean(row.get("Color Overrides", "")),
-            "source_note": clean(row.get("Detail from Disclosure", "")),
-            "interior_components": components,
-            "interior_components_json": json.dumps(components, separators=(",", ":")),
-        }
-        reference = reference_by_id.get(interior_id)
-        if reference:
-            interior.update(grouping_fields_for_interior(interior, reference, reference_order_by_id[interior_id]))
-        else:
-            interior.update(grouping_fields_for_interior(interior, None, fallback_order, fallback=False))
-            fallback_order += 1
-        interiors.append(interior)
-
-    return interiors
-
-
-def build_grand_sport_interiors(config: ModelConfig) -> list[dict[str, Any]]:
-    return build_model_interiors(config)
 
 
 def resolved_step_key(
@@ -717,25 +267,6 @@ def classify_rule_hot_spots(
     }
 
 
-def rows_from_optional_sheet(wb, sheet_name: str) -> list[dict[str, str]]:
-    if sheet_name not in wb.sheetnames:
-        return []
-    return rows_from_sheet(wb, sheet_name)
-
-
-def active_source_row(row: dict[str, str]) -> bool:
-    return clean(row.get("active", "True")) == "True"
-
-
-def runtime_authored_rule(row: dict[str, str]) -> bool:
-    status = clean(row.get("normalization_status", "")).lower()
-    if status in {"omitted", "replaced"}:
-        return False
-    if status == "preserved":
-        return True
-    return not clean(row.get("generation_action", "")).lower().startswith("omit")
-
-
 def display_behavior_status(
     status: str,
     selectable: str,
@@ -751,24 +282,11 @@ def display_behavior_status(
     return status, selectable, active
 
 
-def load_variant_option_overrides(wb, config: ModelConfig) -> dict[tuple[str, str], dict[str, str]]:
-    overrides: dict[tuple[str, str], dict[str, str]] = {}
-    if not config.variant_option_overrides_sheet:
-        return overrides
-    for row in rows_from_optional_sheet(wb, config.variant_option_overrides_sheet):
-        if not active_source_row(row):
-            continue
-        option_id = clean(row.get("option_id", ""))
-        variant_id = clean(row.get("variant_id", ""))
-        if not option_id or not variant_id:
-            continue
-        overrides[(option_id, variant_id)] = {
-            "selectable": normalize_selectable(row.get("selectable", "")),
-            "display_behavior": clean(row.get("display_behavior", "")),
-            "section_id": clean(row.get("section_id", "")),
-            "note": clean(row.get("note", "")),
-        }
-    return overrides
+def keyed_variant_option_overrides(wb, config: ModelConfig) -> dict[tuple[str, str], dict[str, str]]:
+    return {
+        (row["option_id"], row["variant_id"]): row
+        for row in load_variant_option_overrides(wb, config.model_key, config.variant_option_overrides_sheet)
+    }
 
 
 def apply_variant_option_override(
@@ -809,188 +327,6 @@ def build_color_overrides(
             }
         )
     return rows
-
-
-def load_rule_groups(wb, config: ModelConfig) -> list[dict[str, Any]]:
-    members_by_group: dict[str, list[dict[str, str]]] = defaultdict(list)
-    for row in rows_from_optional_sheet(wb, config.rule_group_members_sheet):
-        if active_source_row(row):
-            members_by_group[row.get("group_id", "")].append(row)
-
-    rule_groups: list[dict[str, Any]] = []
-    for row in rows_from_optional_sheet(wb, config.rule_groups_sheet):
-        if not active_source_row(row):
-            continue
-        group_id = row.get("group_id", "")
-        members = sorted(members_by_group.get(group_id, []), key=lambda member: intish(member.get("display_order")))
-        rule_groups.append(
-            {
-                "group_id": group_id,
-                "group_type": row.get("group_type", ""),
-                "source_id": row.get("source_id", ""),
-                "target_ids": [member.get("target_id", "") for member in members if member.get("target_id", "")],
-                "body_style_scope": row.get("body_style_scope", ""),
-                "trim_level_scope": row.get("trim_level_scope", ""),
-                "variant_scope": row.get("variant_scope", ""),
-                "disabled_reason": row.get("disabled_reason", ""),
-                "active": row.get("active", ""),
-                "notes": row.get("notes", ""),
-            }
-        )
-    return rule_groups
-
-
-def load_exclusive_groups(wb, config: ModelConfig) -> list[dict[str, Any]]:
-    members_by_group: dict[str, list[dict[str, str]]] = defaultdict(list)
-    for row in rows_from_optional_sheet(wb, config.exclusive_group_members_sheet):
-        if active_source_row(row):
-            members_by_group[row.get("group_id", "")].append(row)
-
-    exclusive_groups: list[dict[str, Any]] = []
-    for row in rows_from_optional_sheet(wb, config.exclusive_groups_sheet):
-        if not active_source_row(row):
-            continue
-        group_id = row.get("group_id", "")
-        members = sorted(members_by_group.get(group_id, []), key=lambda member: intish(member.get("display_order")))
-        exclusive_groups.append(
-            {
-                "group_id": group_id,
-                "option_ids": [member.get("option_id", "") for member in members if member.get("option_id", "")],
-                "selection_mode": row.get("selection_mode", ""),
-                "active": row.get("active", ""),
-                "notes": row.get("notes", ""),
-            }
-        )
-    return exclusive_groups
-
-
-def grouped_requirement_pairs(rule_groups: list[dict[str, Any]]) -> set[tuple[str, str]]:
-    return grouped_rule_pairs(rule_groups, "requires_any")
-
-
-def grouped_exclusion_pairs(rule_groups: list[dict[str, Any]]) -> set[tuple[str, str]]:
-    return grouped_rule_pairs(rule_groups, "excludes_any")
-
-
-def grouped_rule_pairs(rule_groups: list[dict[str, Any]], group_type: str) -> set[tuple[str, str]]:
-    pairs: set[tuple[str, str]] = set()
-    for group in rule_groups:
-        if group.get("active") != "True" or group.get("group_type") != group_type:
-            continue
-        source_id = group.get("source_id", "")
-        for target_id in group.get("target_ids", []):
-            pairs.add((source_id, target_id))
-    return pairs
-
-
-def exclusive_group_pairs(exclusive_groups: list[dict[str, Any]]) -> set[tuple[str, str]]:
-    pairs: set[tuple[str, str]] = set()
-    for group in exclusive_groups:
-        if group.get("active") != "True":
-            continue
-        option_ids = [option_id for option_id in group.get("option_ids", []) if option_id]
-        for source_id in option_ids:
-            for target_id in option_ids:
-                if source_id != target_id:
-                    pairs.add((source_id, target_id))
-    return pairs
-
-
-def truncate_reason(text: str, limit: int = 180) -> str:
-    text = re.sub(r"\s+", " ", text).strip()
-    if len(text) <= limit:
-        return text
-    return text[: limit - 1].rstrip() + "..."
-
-
-def draft_label_for(entity_id: str, option_rows: dict[str, dict[str, Any]], interiors_by_id: dict[str, dict[str, Any]]) -> str:
-    if entity_id in option_rows:
-        option = option_rows[entity_id]
-        return f"{option.get('rpo')} {option.get('label')}".strip()
-    if entity_id in interiors_by_id:
-        interior = interiors_by_id[entity_id]
-        return f"{interior.get('interior_id')} {interior.get('interior_name')}".strip()
-    return entity_id
-
-
-def build_draft_rules(
-    wb,
-    config: ModelConfig,
-    option_rows: dict[str, dict[str, Any]],
-    sections_by_id: dict[str, dict[str, Any]],
-    interiors: list[dict[str, Any]],
-    grouped_requires: set[tuple[str, str]],
-    grouped_excludes: set[tuple[str, str]],
-) -> list[dict[str, Any]]:
-    interiors_by_id = {row["interior_id"]: row for row in interiors if row.get("interior_id")}
-    valid_ids = set(option_rows) | set(interiors_by_id)
-    raw_rules: list[dict[str, Any]] = []
-    for rule in rows_from_optional_sheet(wb, config.rule_mapping_sheet):
-        rule_type = rule.get("rule_type", "").lower()
-        source_id = rule.get("source_id", "")
-        target_id = rule.get("target_id", "")
-        if not rule_type or source_id not in valid_ids or target_id not in valid_ids:
-            continue
-        if not runtime_authored_rule(rule):
-            continue
-        if rule_type == "requires" and (source_id, target_id) in grouped_requires:
-            continue
-        if (
-            rule_type == "excludes"
-            and (source_id, target_id) in grouped_excludes
-            and rule.get("generation_action", "") != "preserve_runtime_exclude"
-        ):
-            continue
-        source_section = rule.get("source_section", "")
-        target_section = rule.get("target_section", "")
-        source_mode = sections_by_id.get(source_section, {}).get("selection_mode") or rule.get("source_selection_mode", "")
-        target_mode = sections_by_id.get(target_section, {}).get("selection_mode") or rule.get("target_selection_mode", "")
-        replaces_default = rule.get("runtime_action", "") == "replace"
-        redundant = (
-            rule_type == "excludes"
-            and source_section
-            and source_section == target_section
-            and source_mode.startswith("single")
-            and target_mode.startswith("single")
-            and not replaces_default
-        )
-        source_label = draft_label_for(source_id, option_rows, interiors_by_id)
-        target_label = draft_label_for(target_id, option_rows, interiors_by_id)
-        disabled_reason = rule.get("disabled_reason", "")
-        auto_add = "False"
-        if not disabled_reason and replaces_default:
-            disabled_reason = f"{source_label} removes this default."
-        elif not disabled_reason and rule_type == "excludes":
-            disabled_reason = f"Blocked by {source_label}."
-        elif not disabled_reason and rule_type == "requires":
-            disabled_reason = f"Requires {target_label}."
-        elif not disabled_reason and rule_type == "includes":
-            disabled_reason = f"Included with {source_label}."
-            auto_add = "True"
-        elif rule_type == "includes":
-            auto_add = "True"
-        raw_rules.append(
-            {
-                "rule_id": rule.get("rule_id", ""),
-                "source_id": source_id,
-                "rule_type": rule_type,
-                "target_id": target_id,
-                "target_type": rule.get("target_type", ""),
-                "source_type": rule.get("source_type", ""),
-                "source_section": source_section,
-                "target_section": target_section,
-                "source_selection_mode": source_mode,
-                "target_selection_mode": target_mode,
-                "body_style_scope": rule.get("body_style_scope", ""),
-                "disabled_reason": disabled_reason,
-                "auto_add": auto_add,
-                "active": "False" if redundant else "True",
-                "runtime_action": "replace" if replaces_default else "omit_redundant_same_section_exclude" if redundant else "active",
-                "source_note": truncate_reason(rule.get("original_detail_raw", ""), 500),
-                "review_flag": rule.get("review_flag", ""),
-            }
-        )
-    return raw_rules
 
 
 def build_draft_price_rules(
@@ -1079,7 +415,6 @@ def build_draft_price_rules(
                 "body_style_scope": clean(row.get("body_style_scope", "")),
                 "trim_level_scope": clean(row.get("trim_level_scope", "")),
                 "variant_scope": clean(row.get("variant_scope", "")),
-                "review_flag": clean(row.get("review_flag", "")),
                 "notes": clean(row.get("notes", "")),
             }
         )
@@ -1319,7 +654,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     ]
     rows = [normalized_option_row(row, config) for row in raw_rows]
     apply_status_lookup(rows, status_lookup_from_sheet(wb, config), config)
-    variant_option_overrides = load_variant_option_overrides(wb, config)
+    variant_option_overrides = keyed_variant_option_overrides(wb, config)
     context_copy_rows = context_choice_copy_rows(wb, config.model_key)
     special_review_rpos = load_rule_review_rpos(wb, config.model_key, config.special_rule_review_rpos)
 
@@ -1342,61 +677,9 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             }
         )
 
-    body_context_choices = []
-    body_styles = sorted(
-        {row["body_style"] for row in variants},
-        key=lambda body_style: config.body_style_display_order.get(body_style, 99),
-    )
-    for body_style in body_styles:
-        body_variants = [row for row in variants if row["body_style"] == body_style]
-        body_context_choices.append(
-            {
-                "context_choice_id": f"body_style__{body_style}",
-                "context_type": "body_style",
-                "value": body_style,
-                "label": body_style.title(),
-                "description": f"{len(body_variants)} trims available",
-                "info_tooltip": context_choice_info_tooltip(
-                    context_copy_rows,
-                    model_key=config.model_key,
-                    context_type="body_style",
-                    value=body_style,
-                    body_style=body_style,
-                ),
-                "section_id": "sec_context_body_style",
-                "step_key": "body_style",
-                "body_style": body_style,
-                "trim_level": "",
-                "variant_id": "",
-                "base_price": "",
-                "display_order": config.body_style_display_order.get(body_style, 99),
-            }
-        )
-    trim_context_choices = [
-        {
-            "context_choice_id": f"trim_level__{variant['body_style']}__{variant['trim_level'].lower()}",
-            "context_type": "trim_level",
-            "value": variant["trim_level"],
-            "label": variant["trim_level"],
-            "description": variant["display_name"],
-            "info_tooltip": context_choice_info_tooltip(
-                context_copy_rows,
-                model_key=config.model_key,
-                context_type="trim_level",
-                value=variant["trim_level"],
-                body_style=variant["body_style"],
-            ),
-            "section_id": "sec_context_trim_level",
-            "step_key": "trim_level",
-            "body_style": variant["body_style"],
-            "trim_level": variant["trim_level"],
-            "variant_id": variant["variant_id"],
-            "base_price": variant["base_price"],
-            "display_order": variant["display_order"],
-        }
-        for variant in variants
-    ]
-    context_choices = body_context_choices + trim_context_choices
+    context_choices = build_body_context_choices(
+        variants, context_copy_rows, config.model_key, config.body_style_display_order
+    ) + build_trim_context_choices(variants, context_copy_rows, config.model_key)
     variants_by_id = {row["variant_id"]: row for row in variants}
 
     choices: list[dict[str, Any]] = []
@@ -1459,7 +742,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
                 "issue_type": "unresolved_section",
                 "option_id": row["option_id"],
                 "rpo": row["rpo"],
-                "message": "Grand Sport row has no resolved section.",
+                "message": f"{config.model_label} row has no resolved section.",
             }
             unresolved_issues.append(issue)
             validation_rows.append({**issue, "severity": "error"})
@@ -1470,7 +753,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
                 "option_id": row["option_id"],
                 "rpo": row["rpo"],
                 "section_id": section_id,
-                "message": "Grand Sport row resolves to a section id missing from section_master.",
+                "message": f"{config.model_label} row resolves to a section id missing from section_master.",
             }
             unresolved_issues.append(issue)
             validation_rows.append({**issue, "severity": "error"})
@@ -1497,20 +780,19 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
         }
 
         for variant_id, status in row["statuses"].items():
-            choice_row = apply_variant_option_override(
-                row,
-                variant_option_overrides.get((row["option_id"], variant_id), {}),
-            )
+            override = variant_option_overrides.get((row["option_id"], variant_id), {})
+            choice_row = apply_variant_option_override(row, override)
             choice_section_id = choice_row["section_id"]
             if choice_section_id not in sections:
                 continue
-            choice_section = sections.get(choice_section_id, {})
             choice_step_key = resolved_step_key(choice_section_id, sections, config, section_presentation)
             choice_section_name = section_display_label(choice_section_id, sections, section_presentation, config)
+            if override.get("status"):
+                status = override["status"].lower()
             status, selectable, active = display_behavior_status(
                 status,
                 choice_row["selectable"],
-                row["active"],
+                override.get("active") or row["active"],
                 choice_row["display_behavior"],
             )
             if status not in {"available", "standard"} and choice_row["display_behavior"] != "auto_only":
@@ -1545,7 +827,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             issue = {
                 "issue_type": "missing_section_step_key",
                 "section_id": section_id,
-                "message": "Active Grand Sport choices resolve to a section without section_master.step_key.",
+                "message": f"Active {config.model_label} choices resolve to a section without section_master.step_key.",
             }
             unresolved_issues.append(issue)
             validation_rows.append({**issue, "severity": "error"})
@@ -1557,7 +839,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
                 "issue_type": "heuristic_section_step_key",
                 "section_id": section_id,
                 "step_key": resolved_step_key(section_id, sections, config, section_presentation),
-                "message": "Active Grand Sport choices fell back to heuristic step placement instead of workbook-owned placement.",
+                "message": f"Active {config.model_label} choices fell back to heuristic step placement instead of workbook-owned placement.",
             }
             unresolved_issues.append(issue)
             validation_rows.append({**issue, "severity": "error"})
@@ -1667,7 +949,7 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
     preview = build_contract_preview(config)
     variants_by_id = {row["variant_id"]: row for row in preview["variants"]}
     sections_by_id = {row["section_id"]: row for row in preview["sections"]}
-    interiors = build_grand_sport_interiors(config)
+    interiors = build_model_interiors(config)
     wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
     asset_map = load_asset_map(wb, config.model_key)
     wb.close()
@@ -1911,7 +1193,23 @@ def write_form_data_draft_artifacts(draft: dict[str, Any], output_dir: Path, art
     return {"json": str(json_path), "markdown": str(md_path)}
 
 
-def write_inspection_artifacts(report: dict[str, Any], output_dir: Path, artifact_prefix: str = "grand-sport-inspection") -> dict[str, str]:
+def write_runtime_contract_artifact(draft: dict[str, Any], output_dir: Path, artifact_prefix: str) -> dict[str, str]:
+    """Emit the clean runtime contract that registry promotion embeds verbatim.
+
+    Draft-only decoration (draftMetadata, source_* provenance, cleanup notes,
+    draft status wording) lives only in the draft artifacts; this contract is
+    what ``model_registry_promotion`` rows should reference via artifact_path.
+    """
+
+    from corvette_form_generator.registry_promotion import live_contract_data
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    json_path = output_dir / f"{artifact_prefix}.json"
+    json_path.write_text(json.dumps(live_contract_data(draft), indent=2), encoding="utf-8")
+    return {"json": str(json_path)}
+
+
+def write_inspection_artifacts(report: dict[str, Any], output_dir: Path, artifact_prefix: str) -> dict[str, str]:
     output_dir.mkdir(parents=True, exist_ok=True)
     json_path = output_dir / f"{artifact_prefix}.json"
     md_path = output_dir / f"{artifact_prefix}.md"
@@ -1925,8 +1223,9 @@ def render_markdown_report(report: dict[str, Any]) -> str:
     warnings = report["warnings"]
     section_mappings = report["section_mappings"]
     hot_spots = report["rule_detail_hot_spots"]
+    model_label = report["config"]["model_label"]
     lines = [
-        "# Grand Sport Inspection",
+        f"# {model_label} Inspection",
         "",
         f"Generated: `{report['generated_at']}`",
         f"Source sheet: `{report['config']['source_option_sheet']}`",
@@ -2010,8 +1309,9 @@ def render_contract_preview_markdown(preview: dict[str, Any]) -> str:
     hot_spots = preview["ruleDetailHotSpots"]
     unresolved = normalization["unresolvedIssues"]
     text_cleanup = normalization["textCleanupSummary"]
+    model_label = preview["dataset"]["model"]
     lines = [
-        "# Grand Sport Contract Preview",
+        f"# {model_label} Contract Preview",
         "",
         f"Generated: `{preview['dataset']['generated_at']}`",
         f"Status: `{preview['dataset']['status']}`",
@@ -2075,8 +1375,8 @@ def render_contract_preview_markdown(preview: dict[str, Any]) -> str:
             "",
             "## Live Output Safety",
             "",
-            "- Grand Sport preview generation writes only inspection artifacts under `form-output/inspection/`.",
-            "- It does not write `form-app/data.js` or final Grand Sport app data.",
+            f"- {model_label} preview generation writes only inspection artifacts under `form-output/inspection/`.",
+            f"- It does not write `form-app/data.js` or final {model_label} app data.",
             "",
         ]
     )
@@ -2086,8 +1386,9 @@ def render_contract_preview_markdown(preview: dict[str, Any]) -> str:
 def render_form_data_draft_markdown(draft: dict[str, Any]) -> str:
     metadata = draft["draftMetadata"]
     warning_rows = [row for row in draft["validation"] if row["severity"] == "warning"]
+    model_label = draft["dataset"]["model"]
     lines = [
-        "# Grand Sport Form Data Draft",
+        f"# {model_label} Form Data Draft",
         "",
         f"Generated: `{draft['dataset']['generated_at']}`",
         f"Status: `{draft['dataset']['status']}`",
@@ -2128,7 +1429,7 @@ def render_form_data_draft_markdown(draft: dict[str, Any]) -> str:
             "## Live Output Safety",
             "",
             "- This draft writes only inspection artifacts under `form-output/inspection/`.",
-            "- It does not write `form-app/data.js` or activate Grand Sport in the app.",
+            f"- It does not write `form-app/data.js` or activate {model_label} in the app.",
             "",
         ]
     )

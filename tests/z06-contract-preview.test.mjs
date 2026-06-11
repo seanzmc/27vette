@@ -10,7 +10,7 @@ const expectedVariantIds = ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67
 
 function generatePreviewWithoutAppMutation() {
   const beforeAppData = fs.readFileSync(appDataPath, "utf8");
-  execFileSync(".venv/bin/python", ["scripts/generate_z06_form.py"], {
+  execFileSync(".venv/bin/python", ["scripts/generate_form.py", "--model", "z06"], {
     encoding: "utf8",
     stdio: "pipe",
   });

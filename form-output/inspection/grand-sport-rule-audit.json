@@ -6,7 +6,7 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-06-09T23:29:05+00:00",
+    "generated_at": "2026-06-11T01:14:55+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
@@ -1401,7 +1401,6 @@
       "target_id": "opt_eyk_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_req",
       "source_selection_mode": "multi_select_opt",
@@ -1412,9 +1411,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -1424,7 +1420,6 @@
       "target_id": "opt_eyk_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_req",
       "source_selection_mode": "multi_select_opt",
@@ -1435,9 +1430,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -1447,7 +1439,6 @@
       "target_id": "opt_dmu_001",
       "target_type": "option",
       "original_detail_raw": "R88 is not available with EYK or stripe options.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1458,9 +1449,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_approved_manual"
     },
     {
@@ -1470,7 +1458,6 @@
       "target_id": "opt_dmv_001",
       "target_type": "option",
       "original_detail_raw": "R88 is not available with EYK or stripe options.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1481,9 +1468,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_approved_manual"
     },
     {
@@ -1493,7 +1477,6 @@
       "target_id": "opt_dmw_001",
       "target_type": "option",
       "original_detail_raw": "R88 is not available with EYK or stripe options.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1504,9 +1487,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_approved_manual"
     },
     {
@@ -1516,7 +1496,6 @@
       "target_id": "opt_dmx_001",
       "target_type": "option",
       "original_detail_raw": "R88 is not available with EYK or stripe options.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1527,9 +1506,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_approved_manual"
     },
     {
@@ -1539,7 +1515,6 @@
       "target_id": "opt_dmy_001",
       "target_type": "option",
       "original_detail_raw": "R88 is not available with EYK or stripe options.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1550,9 +1525,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_approved_manual"
     },
     {
@@ -1562,7 +1534,6 @@
       "target_id": "opt_dmu_001",
       "target_type": "option",
       "original_detail_raw": "SFZ is not available with EYK or stripe options.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1573,9 +1544,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_approved_manual"
     },
     {
@@ -1585,7 +1553,6 @@
       "target_id": "opt_dmv_001",
       "target_type": "option",
       "original_detail_raw": "SFZ is not available with EYK or stripe options.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1596,9 +1563,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_approved_manual"
     },
     {
@@ -1608,7 +1572,6 @@
       "target_id": "opt_dmw_001",
       "target_type": "option",
       "original_detail_raw": "SFZ is not available with EYK or stripe options.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1619,9 +1582,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_approved_manual"
     },
     {
@@ -1631,7 +1591,6 @@
       "target_id": "opt_dmx_001",
       "target_type": "option",
       "original_detail_raw": "SFZ is not available with EYK or stripe options.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1642,9 +1601,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_approved_manual"
     },
     {
@@ -1654,7 +1610,6 @@
       "target_id": "opt_dmy_001",
       "target_type": "option",
       "original_detail_raw": "SFZ is not available with EYK or stripe options.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1665,9 +1620,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_approved_manual"
     },
     {
@@ -1677,7 +1629,6 @@
       "target_id": "opt_dmu_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -1688,9 +1639,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -1700,7 +1648,6 @@
       "target_id": "opt_dmv_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -1711,9 +1658,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -1723,7 +1667,6 @@
       "target_id": "opt_dmw_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -1734,9 +1677,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -1746,7 +1686,6 @@
       "target_id": "opt_dmx_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -1757,9 +1696,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -1769,7 +1705,6 @@
       "target_id": "opt_dmy_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW) or Grand Sport Heritage Center Stripes (DMU, DMV, DMW, DMX, DMY).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -1780,9 +1715,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -1792,7 +1724,6 @@
       "target_id": "opt_sfz_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1803,9 +1734,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -1815,7 +1743,6 @@
       "target_id": "opt_rin_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RIN, SL8.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1826,9 +1753,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Redundant peer exclusion is represented by the active Grand Sport exclusive group; Pass 1 keeps exclusive_groups as the canonical mutual-exclusion pathway.",
-      "replacement_group_id": "gs_excl_rear_script_badges",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -1838,7 +1762,6 @@
       "target_id": "opt_sl8_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RIN, SL8.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1849,9 +1772,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Redundant peer exclusion is represented by the active Grand Sport exclusive group; Pass 1 keeps exclusive_groups as the canonical mutual-exclusion pathway.",
-      "replacement_group_id": "gs_excl_rear_script_badges",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -1861,7 +1781,6 @@
       "target_id": "opt_rik_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RIK, SL8.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1872,9 +1791,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Redundant peer exclusion is represented by the active Grand Sport exclusive group; Pass 1 keeps exclusive_groups as the canonical mutual-exclusion pathway.",
-      "replacement_group_id": "gs_excl_rear_script_badges",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -1884,7 +1800,6 @@
       "target_id": "opt_sl8_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RIK, SL8.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1895,9 +1810,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Redundant peer exclusion is represented by the active Grand Sport exclusive group; Pass 1 keeps exclusive_groups as the canonical mutual-exclusion pathway.",
-      "replacement_group_id": "gs_excl_rear_script_badges",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -1907,7 +1819,6 @@
       "target_id": "opt_rik_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RIK, RIN.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1918,9 +1829,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Redundant peer exclusion is represented by the active Grand Sport exclusive group; Pass 1 keeps exclusive_groups as the canonical mutual-exclusion pathway.",
-      "replacement_group_id": "gs_excl_rear_script_badges",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -1930,7 +1838,6 @@
       "target_id": "opt_rin_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RIK, RIN.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1941,9 +1848,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Redundant peer exclusion is represented by the active Grand Sport exclusive group; Pass 1 keeps exclusive_groups as the canonical mutual-exclusion pathway.",
-      "replacement_group_id": "gs_excl_rear_script_badges",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -1953,7 +1857,6 @@
       "target_id": "opt_fey_001",
       "target_type": "option",
       "original_detail_raw": "FEB Z52 Sport Performance Package and FEY Z52 Track Performance Package are mutually exclusive.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1964,9 +1867,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Redundant peer exclusion is represented by the active Grand Sport exclusive group; Pass 1 keeps exclusive_groups as the canonical mutual-exclusion pathway.",
-      "replacement_group_id": "gs_excl_z52_packages",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -1976,7 +1876,6 @@
       "target_id": "opt_feb_001",
       "target_type": "option",
       "original_detail_raw": "FEY Z52 Track Performance Package and FEB Z52 Sport Performance Package are mutually exclusive.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -1987,9 +1886,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Redundant peer exclusion is represented by the active Grand Sport exclusive group; Pass 1 keeps exclusive_groups as the canonical mutual-exclusion pathway.",
-      "replacement_group_id": "gs_excl_z52_packages",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -1999,7 +1895,6 @@
       "target_id": "opt_dpb_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2010,9 +1905,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2022,7 +1914,6 @@
       "target_id": "opt_dpc_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2033,9 +1924,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2045,7 +1933,6 @@
       "target_id": "opt_dpg_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2056,9 +1943,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2068,7 +1952,6 @@
       "target_id": "opt_dpl_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2079,9 +1962,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2091,7 +1971,6 @@
       "target_id": "opt_dpt_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2102,9 +1981,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2114,7 +1990,6 @@
       "target_id": "opt_dsy_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2125,9 +2000,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2137,7 +2009,6 @@
       "target_id": "opt_dsz_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2148,9 +2019,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2160,7 +2028,6 @@
       "target_id": "opt_dt0_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2171,9 +2038,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2183,7 +2047,6 @@
       "target_id": "opt_dth_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2194,9 +2057,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2206,7 +2066,6 @@
       "target_id": "opt_dub_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2217,9 +2076,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2229,7 +2085,6 @@
       "target_id": "opt_due_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2240,9 +2095,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2252,7 +2104,6 @@
       "target_id": "opt_duk_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2263,9 +2114,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2275,7 +2123,6 @@
       "target_id": "opt_duw_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (SFZ) Dark Stealth crossed flags emblems, LPO, (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2286,9 +2133,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_r88_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_r88_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2298,7 +2142,6 @@
       "target_id": "opt_dpb_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2309,9 +2152,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2321,7 +2161,6 @@
       "target_id": "opt_dpc_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2332,9 +2171,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2344,7 +2180,6 @@
       "target_id": "opt_dpg_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2355,9 +2190,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2367,7 +2199,6 @@
       "target_id": "opt_dpl_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2378,9 +2209,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2390,7 +2218,6 @@
       "target_id": "opt_dpt_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2401,9 +2228,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2413,7 +2237,6 @@
       "target_id": "opt_dsy_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2424,9 +2247,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2436,7 +2256,6 @@
       "target_id": "opt_dsz_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2447,9 +2266,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2459,7 +2275,6 @@
       "target_id": "opt_dt0_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2470,9 +2285,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2482,7 +2294,6 @@
       "target_id": "opt_dth_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2493,9 +2304,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2505,7 +2313,6 @@
       "target_id": "opt_dub_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2516,9 +2323,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2528,7 +2332,6 @@
       "target_id": "opt_due_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2539,9 +2342,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2551,7 +2351,6 @@
       "target_id": "opt_duk_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2562,9 +2361,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2574,7 +2370,6 @@
       "target_id": "opt_duw_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -2585,9 +2380,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sfz_excludes_badge_and_stripe_choices.",
-      "replacement_group_id": "gs_group_sfz_excludes_badge_and_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2597,7 +2389,6 @@
       "target_id": "opt_dpb_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -2608,9 +2399,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2620,7 +2408,6 @@
       "target_id": "opt_dpc_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -2631,9 +2418,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2643,7 +2427,6 @@
       "target_id": "opt_dpg_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -2654,9 +2437,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2666,7 +2446,6 @@
       "target_id": "opt_dpl_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -2677,9 +2456,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2689,7 +2465,6 @@
       "target_id": "opt_dpt_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -2700,9 +2475,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2712,7 +2484,6 @@
       "target_id": "opt_dsy_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -2723,9 +2494,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2735,7 +2503,6 @@
       "target_id": "opt_dsz_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -2746,9 +2513,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2758,7 +2522,6 @@
       "target_id": "opt_dt0_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -2769,9 +2532,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2781,7 +2541,6 @@
       "target_id": "opt_dth_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -2792,9 +2551,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2804,7 +2560,6 @@
       "target_id": "opt_dub_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -2815,9 +2570,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2827,7 +2579,6 @@
       "target_id": "opt_due_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -2838,9 +2589,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2850,7 +2598,6 @@
       "target_id": "opt_duk_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -2861,9 +2608,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2873,7 +2617,6 @@
       "target_id": "opt_duw_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available at start of production. Not available with any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW).",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_req",
@@ -2884,9 +2627,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_cf8_excludes_stripe_choices.",
-      "replacement_group_id": "gs_group_cf8_excludes_stripe_choices",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -2896,7 +2636,6 @@
       "target_id": "opt_dpb_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -2907,9 +2646,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -2919,7 +2655,6 @@
       "target_id": "opt_dpc_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -2930,9 +2665,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -2942,7 +2674,6 @@
       "target_id": "opt_dpg_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -2953,9 +2684,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -2965,7 +2693,6 @@
       "target_id": "opt_dpl_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -2976,9 +2703,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -2988,7 +2712,6 @@
       "target_id": "opt_dpt_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -2999,9 +2722,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3011,7 +2731,6 @@
       "target_id": "opt_dsy_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3022,9 +2741,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3034,7 +2750,6 @@
       "target_id": "opt_dsz_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3045,9 +2760,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3057,7 +2769,6 @@
       "target_id": "opt_dt0_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3068,9 +2779,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3080,7 +2788,6 @@
       "target_id": "opt_dth_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3091,9 +2798,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3103,7 +2807,6 @@
       "target_id": "opt_dub_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3114,9 +2817,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3126,7 +2826,6 @@
       "target_id": "opt_due_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3137,9 +2836,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3149,7 +2845,6 @@
       "target_id": "opt_duk_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3160,9 +2855,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3172,7 +2864,6 @@
       "target_id": "opt_duw_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3183,9 +2874,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3195,7 +2883,6 @@
       "target_id": "opt_dzu_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3206,9 +2893,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3218,7 +2902,6 @@
       "target_id": "opt_dzv_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3229,9 +2912,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3241,7 +2921,6 @@
       "target_id": "opt_dzx_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3252,9 +2931,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3264,7 +2940,6 @@
       "target_id": "opt_z15_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX) or (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3275,9 +2950,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "omitted",
-      "normalization_reason": "Pass 2: blocker set is represented by active excludes_any rule group gs_group_sht_excludes_full_length_stripes.",
-      "replacement_group_id": "gs_group_sht_excludes_full_length_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3287,7 +2959,6 @@
       "target_id": "opt_z15_001",
       "target_type": "option",
       "original_detail_raw": "1. Not available with (Z15) Grand Sport Heritage Graphics.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3298,9 +2969,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "active",
-      "normalization_reason": "",
-      "replacement_group_id": "",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     }
   ],
@@ -3312,7 +2980,6 @@
       "target_id": "opt_j6d_001",
       "target_type": "option",
       "original_detail_raw": "1. Included and only available with (J57) carbon ceramic brakes.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_req",
       "source_selection_mode": "multi_select_opt",
@@ -3323,9 +2990,6 @@
       "runtime_action": "",
       "disabled_reason": "J57 soft-defaults J6D as a customer-selected caliper choice rather than a hard auto-add.",
       "normalization_status": "replaced",
-      "normalization_reason": "J57 soft-defaults J6D as a customer-selected caliper choice rather than a hard auto-add.",
-      "replacement_group_id": "",
-      "replacement_rule_id": "gs_default_j6d_with_j57",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3335,7 +2999,6 @@
       "target_id": "opt_d3v_001",
       "target_type": "option",
       "original_detail_raw": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -3346,9 +3009,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "replaced",
-      "normalization_reason": "Retained source row is a scoped duplicate of an active workbook rule.",
-      "replacement_group_id": "",
-      "replacement_rule_id": "gs_rule_opt_b6p_001_includes_opt_d3v_001",
       "_audit_origin": "workbook_copied_from_stingray"
     },
     {
@@ -3358,7 +3018,6 @@
       "target_id": "opt_b6p_001",
       "target_type": "option",
       "original_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -3369,9 +3028,6 @@
       "runtime_action": "",
       "disabled_reason": "BCP/BCS include D3V directly; they do not include B6P.",
       "normalization_status": "replaced",
-      "normalization_reason": "BCP/BCS include D3V directly; they do not include B6P.",
-      "replacement_group_id": "",
-      "replacement_rule_id": "gs_rule_opt_bcp_002_includes_opt_d3v_001",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3381,7 +3037,6 @@
       "target_id": "opt_b6p_001",
       "target_type": "option",
       "original_detail_raw": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -3392,9 +3047,6 @@
       "runtime_action": "",
       "disabled_reason": "BCP/BCS include D3V directly; they do not include B6P.",
       "normalization_status": "replaced",
-      "normalization_reason": "BCP/BCS include D3V directly; they do not include B6P.",
-      "replacement_group_id": "",
-      "replacement_rule_id": "gs_rule_opt_bcs_002_includes_opt_d3v_001",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3404,7 +3056,6 @@
       "target_id": "opt_t0e_002",
       "target_type": "option",
       "original_detail_raw": "1. Requires (T0E) rear spoiler.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "display_only",
       "source_selection_mode": "multi_select_opt",
@@ -3415,9 +3066,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "active",
-      "normalization_reason": "",
-      "replacement_group_id": "",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3427,7 +3075,6 @@
       "target_id": "opt_ue1_001",
       "target_type": "option",
       "original_detail_raw": "1. Requires (UE1) OnStar. OnStar Basics is standard for 8 years; working electrical system, cell reception and GPS signal required. OnStar links to emergency services. Service coverage varies with conditions and location. Service availability, features and functionality vary by device and software version. Subject to user terms. See onstar.com for details and limitations. Removed with a ship-to of Guam, Puerto Rico or the Virgin Islands.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3438,9 +3085,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "active",
-      "normalization_reason": "",
-      "replacement_group_id": "",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3450,7 +3094,6 @@
       "target_id": "opt_ue1_001",
       "target_type": "option",
       "original_detail_raw": "1. Requires (UE1) OnStar and a Retail order type. Not available on vehicles being shipped to Puerto Rico, the Virgin Islands, or Guam. OnStar plan, working electrical system, cell reception and GPS signal required. OnStar links to emergency services. Not all vehicles may transmit all crash data. Service coverage varies with conditions and location. Service availability, features and functionality vary by device and software version. Subject to user terms. See onstar.com for details and limitations.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3461,9 +3104,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "active",
-      "normalization_reason": "",
-      "replacement_group_id": "",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3473,7 +3113,6 @@
       "target_id": "opt_feb_001",
       "target_type": "option",
       "original_detail_raw": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -3484,9 +3123,6 @@
       "runtime_action": "",
       "disabled_reason": "",
       "normalization_status": "active",
-      "normalization_reason": "",
-      "replacement_group_id": "",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_matches_detail_raw"
     },
     {
@@ -3496,7 +3132,6 @@
       "target_id": "opt_dpb_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPB non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3507,9 +3142,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3519,7 +3151,6 @@
       "target_id": "opt_dpc_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPC non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3530,9 +3161,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3542,7 +3170,6 @@
       "target_id": "opt_dpg_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPG non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3553,9 +3180,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3565,7 +3189,6 @@
       "target_id": "opt_dpl_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPL non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3576,9 +3199,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3588,7 +3208,6 @@
       "target_id": "opt_dpt_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPT non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3599,9 +3218,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3611,7 +3227,6 @@
       "target_id": "opt_dsy_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DSY non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3622,9 +3237,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3634,7 +3246,6 @@
       "target_id": "opt_dsz_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DSZ non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3645,9 +3256,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3657,7 +3265,6 @@
       "target_id": "opt_dt0_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DT0 non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3668,9 +3275,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3680,7 +3284,6 @@
       "target_id": "opt_dth_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DTH non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3691,9 +3294,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3703,7 +3303,6 @@
       "target_id": "opt_dub_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUB non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3714,9 +3313,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3726,7 +3322,6 @@
       "target_id": "opt_due_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUE non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3737,9 +3332,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3749,7 +3341,6 @@
       "target_id": "opt_duk_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUK non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3760,9 +3351,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3772,7 +3360,6 @@
       "target_id": "opt_duw_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUW non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3783,9 +3370,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3795,7 +3379,6 @@
       "target_id": "opt_dzu_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZU non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3806,9 +3389,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3818,7 +3398,6 @@
       "target_id": "opt_dzv_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZV non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3829,9 +3408,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3841,7 +3417,6 @@
       "target_id": "opt_dzx_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZX non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3852,9 +3427,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3864,7 +3436,6 @@
       "target_id": "opt_sht_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with SHT non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3875,9 +3446,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3887,7 +3455,6 @@
       "target_id": "opt_vpo_001",
       "target_type": "option",
       "original_detail_raw": "17A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with VPO non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3898,9 +3465,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3910,7 +3474,6 @@
       "target_id": "opt_dpb_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPB non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3921,9 +3484,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3933,7 +3493,6 @@
       "target_id": "opt_dpc_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPC non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3944,9 +3503,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3956,7 +3512,6 @@
       "target_id": "opt_dpg_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPG non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3967,9 +3522,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -3979,7 +3531,6 @@
       "target_id": "opt_dpl_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPL non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -3990,9 +3541,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4002,7 +3550,6 @@
       "target_id": "opt_dpt_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPT non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4013,9 +3560,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4025,7 +3569,6 @@
       "target_id": "opt_dsy_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DSY non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4036,9 +3579,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4048,7 +3588,6 @@
       "target_id": "opt_dsz_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DSZ non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4059,9 +3598,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4071,7 +3607,6 @@
       "target_id": "opt_dt0_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DT0 non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4082,9 +3617,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4094,7 +3626,6 @@
       "target_id": "opt_dth_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DTH non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4105,9 +3636,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4117,7 +3645,6 @@
       "target_id": "opt_dub_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUB non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4128,9 +3655,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4140,7 +3664,6 @@
       "target_id": "opt_due_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUE non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4151,9 +3674,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4163,7 +3683,6 @@
       "target_id": "opt_duk_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUK non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4174,9 +3693,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4186,7 +3702,6 @@
       "target_id": "opt_duw_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUW non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4197,9 +3712,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4209,7 +3721,6 @@
       "target_id": "opt_dzu_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZU non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4220,9 +3731,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4232,7 +3740,6 @@
       "target_id": "opt_dzv_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZV non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4243,9 +3750,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4255,7 +3759,6 @@
       "target_id": "opt_dzx_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZX non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4266,9 +3769,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4278,7 +3778,6 @@
       "target_id": "opt_sht_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with SHT non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4289,9 +3788,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4301,7 +3797,6 @@
       "target_id": "opt_vpo_001",
       "target_type": "option",
       "original_detail_raw": "20A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with VPO non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4312,9 +3807,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4324,7 +3816,6 @@
       "target_id": "opt_dpb_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPB non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4335,9 +3826,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4347,7 +3835,6 @@
       "target_id": "opt_dpc_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPC non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4358,9 +3845,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4370,7 +3854,6 @@
       "target_id": "opt_dpg_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPG non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4381,9 +3864,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4393,7 +3873,6 @@
       "target_id": "opt_dpl_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPL non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4404,9 +3883,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4416,7 +3892,6 @@
       "target_id": "opt_dpt_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPT non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4427,9 +3902,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4439,7 +3911,6 @@
       "target_id": "opt_dsy_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DSY non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4450,9 +3921,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4462,7 +3930,6 @@
       "target_id": "opt_dsz_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DSZ non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4473,9 +3940,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4485,7 +3949,6 @@
       "target_id": "opt_dt0_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DT0 non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4496,9 +3959,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4508,7 +3968,6 @@
       "target_id": "opt_dth_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DTH non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4519,9 +3978,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4531,7 +3987,6 @@
       "target_id": "opt_dub_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUB non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4542,9 +3997,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4554,7 +4006,6 @@
       "target_id": "opt_due_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUE non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4565,9 +4016,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4577,7 +4025,6 @@
       "target_id": "opt_duk_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUK non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4588,9 +4035,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4600,7 +4044,6 @@
       "target_id": "opt_duw_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUW non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4611,9 +4054,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4623,7 +4063,6 @@
       "target_id": "opt_dzu_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZU non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4634,9 +4073,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4646,7 +4082,6 @@
       "target_id": "opt_dzv_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZV non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4657,9 +4092,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4669,7 +4101,6 @@
       "target_id": "opt_dzx_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZX non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4680,9 +4111,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4692,7 +4120,6 @@
       "target_id": "opt_sht_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with SHT non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4703,9 +4130,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4715,7 +4139,6 @@
       "target_id": "opt_vpo_001",
       "target_type": "option",
       "original_detail_raw": "55A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with VPO non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4726,9 +4149,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4738,7 +4158,6 @@
       "target_id": "opt_dpb_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPB non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4749,9 +4168,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4761,7 +4177,6 @@
       "target_id": "opt_dpc_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPC non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4772,9 +4187,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4784,7 +4196,6 @@
       "target_id": "opt_dpg_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPG non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4795,9 +4206,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4807,7 +4215,6 @@
       "target_id": "opt_dpl_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPL non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4818,9 +4225,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4830,7 +4234,6 @@
       "target_id": "opt_dpt_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPT non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4841,9 +4244,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4853,7 +4253,6 @@
       "target_id": "opt_dsy_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DSY non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4864,9 +4263,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4876,7 +4272,6 @@
       "target_id": "opt_dsz_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DSZ non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4887,9 +4282,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4899,7 +4291,6 @@
       "target_id": "opt_dt0_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DT0 non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4910,9 +4301,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4922,7 +4310,6 @@
       "target_id": "opt_dth_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DTH non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4933,9 +4320,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4945,7 +4329,6 @@
       "target_id": "opt_dub_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUB non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4956,9 +4339,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4968,7 +4348,6 @@
       "target_id": "opt_due_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUE non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -4979,9 +4358,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -4991,7 +4367,6 @@
       "target_id": "opt_duk_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUK non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5002,9 +4377,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5014,7 +4386,6 @@
       "target_id": "opt_duw_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUW non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5025,9 +4396,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5037,7 +4405,6 @@
       "target_id": "opt_dzu_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZU non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5048,9 +4415,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5060,7 +4424,6 @@
       "target_id": "opt_dzv_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZV non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5071,9 +4434,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5083,7 +4443,6 @@
       "target_id": "opt_dzx_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZX non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5094,9 +4453,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5106,7 +4462,6 @@
       "target_id": "opt_sht_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with SHT non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5117,9 +4472,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5129,7 +4481,6 @@
       "target_id": "opt_vpo_001",
       "target_type": "option",
       "original_detail_raw": "75A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with VPO non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5140,9 +4491,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5152,7 +4500,6 @@
       "target_id": "opt_dpb_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPB non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5163,9 +4510,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5175,7 +4519,6 @@
       "target_id": "opt_dpc_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPC non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5186,9 +4529,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5198,7 +4538,6 @@
       "target_id": "opt_dpg_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPG non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5209,9 +4548,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5221,7 +4557,6 @@
       "target_id": "opt_dpl_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPL non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5232,9 +4567,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5244,7 +4576,6 @@
       "target_id": "opt_dpt_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPT non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5255,9 +4586,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5267,7 +4595,6 @@
       "target_id": "opt_dsy_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DSY non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5278,9 +4605,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5290,7 +4614,6 @@
       "target_id": "opt_dsz_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DSZ non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5301,9 +4624,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5313,7 +4633,6 @@
       "target_id": "opt_dt0_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DT0 non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5324,9 +4643,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5336,7 +4652,6 @@
       "target_id": "opt_dth_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DTH non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5347,9 +4662,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5359,7 +4671,6 @@
       "target_id": "opt_dub_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUB non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5370,9 +4681,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5382,7 +4690,6 @@
       "target_id": "opt_due_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUE non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5393,9 +4700,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5405,7 +4709,6 @@
       "target_id": "opt_duk_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUK non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5416,9 +4719,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5428,7 +4728,6 @@
       "target_id": "opt_duw_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUW non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5439,9 +4738,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5451,7 +4747,6 @@
       "target_id": "opt_dzu_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZU non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5462,9 +4757,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5474,7 +4766,6 @@
       "target_id": "opt_dzv_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZV non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5485,9 +4776,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5497,7 +4785,6 @@
       "target_id": "opt_dzx_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZX non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5508,9 +4795,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5520,7 +4804,6 @@
       "target_id": "opt_sht_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with SHT non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5531,9 +4814,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5543,7 +4823,6 @@
       "target_id": "opt_vpo_001",
       "target_type": "option",
       "original_detail_raw": "97A Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with VPO non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5554,9 +4833,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5566,7 +4842,6 @@
       "target_id": "opt_dpb_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPB non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5577,9 +4852,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5589,7 +4861,6 @@
       "target_id": "opt_dpc_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPC non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5600,9 +4871,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5612,7 +4880,6 @@
       "target_id": "opt_dpg_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPG non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5623,9 +4890,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5635,7 +4899,6 @@
       "target_id": "opt_dpl_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPL non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5646,9 +4909,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5658,7 +4918,6 @@
       "target_id": "opt_dpt_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DPT non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5669,9 +4928,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5681,7 +4937,6 @@
       "target_id": "opt_dsy_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DSY non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5692,9 +4947,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5704,7 +4956,6 @@
       "target_id": "opt_dsz_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DSZ non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5715,9 +4966,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5727,7 +4975,6 @@
       "target_id": "opt_dt0_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DT0 non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5738,9 +4985,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5750,7 +4994,6 @@
       "target_id": "opt_dth_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DTH non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5761,9 +5004,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5773,7 +5013,6 @@
       "target_id": "opt_dub_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUB non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5784,9 +5023,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5796,7 +5032,6 @@
       "target_id": "opt_due_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUE non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5807,9 +5042,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5819,7 +5051,6 @@
       "target_id": "opt_duk_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUK non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5830,9 +5061,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5842,7 +5070,6 @@
       "target_id": "opt_duw_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DUW non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5853,9 +5080,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5865,7 +5089,6 @@
       "target_id": "opt_dzu_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZU non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5876,9 +5099,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5888,7 +5108,6 @@
       "target_id": "opt_dzv_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZV non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5899,9 +5118,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5911,7 +5127,6 @@
       "target_id": "opt_dzx_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with DZX non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5922,9 +5137,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5934,7 +5146,6 @@
       "target_id": "opt_sht_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with SHT non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5945,9 +5156,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5957,7 +5165,6 @@
       "target_id": "opt_vpo_001",
       "target_type": "option",
       "original_detail_raw": "DX4 Grand Sport Heritage Hash Marks are only compatible with Grand Sport Heritage Center Stripes; not available with VPO non-center stripe/graphic option.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "single_select_opt",
       "source_selection_mode": "single_select_opt",
@@ -5968,9 +5175,6 @@
       "runtime_action": "",
       "disabled_reason": "Z15 grouped exclusion blocks non-center stripes.",
       "normalization_status": "omitted",
-      "normalization_reason": "Z15 grouped exclusion blocks non-center stripes.",
-      "replacement_group_id": "gs_group_z15_excludes_non_center_stripes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     },
     {
@@ -5980,7 +5184,6 @@
       "target_id": "opt_j56_001",
       "target_type": "option",
       "original_detail_raw": "J57 replaces performance disc brakes.",
-      "review_flag": "False",
       "source_type": "option",
       "target_selection_mode": "multi_select_opt",
       "source_selection_mode": "multi_select_opt",
@@ -5991,9 +5194,6 @@
       "runtime_action": "replace",
       "disabled_reason": "J56 and J57 are handled by the performance brakes exclusive group.",
       "normalization_status": "replaced",
-      "normalization_reason": "J56 and J57 are handled by the performance brakes exclusive group.",
-      "replacement_group_id": "gs_excl_performance_brakes",
-      "replacement_rule_id": "",
       "_audit_origin": "workbook_manual_or_normalized"
     }
   ],

@@ -240,3 +240,31 @@ test("Z06 chargeable interior cards and selected component line items agree", ()
   assert.ok(order.interior_components.some((item) => item.rpo === "N2Z" && Number(item.price) === 895));
   assert.equal(order.pricing.selected_options_total >= 1490, true);
 });
+
+test("Z06 3LZ R6X AH2 interior summary does not re-add the raw AH2 seat price", () => {
+  const runtime = z06Runtime({ trimLevel: "3LZ" });
+  const ah2 = choice(runtime, "AH2");
+  const interior = runtime.data.interiors.find((item) => item.interior_id === "3LZ_R6X_AH2_HUU");
+  assert.ok(interior, "test expects the reported 3LZ R6X AH2 interior fixture");
+  assert.equal(Number(ah2.base_price), 1695, "fixture should preserve the raw AH2 source price that caused the regression");
+  assert.equal(runtime.optionPrice(ah2.option_id), 0, "3LZ AH2 should resolve to its trim-scoped zero-price override");
+  assert.equal(Number(interior.price), 995);
+  assert.ok(interior.interior_components.some((item) => item.rpo === "R6X" && Number(item.price) === 995));
+
+  runtime.handleChoice(ah2);
+  runtime.reconcileSelections();
+  runtime.state.selectedInterior = interior.interior_id;
+  runtime.reconcileSelections();
+
+  const order = runtime.currentOrder();
+  assert.equal(order.selected_interior.rpo, "HUU");
+  assert.equal(Number(order.selected_interior.price), 0, "interior identity line should not carry the old $700 AH2 remainder");
+  const r6xLines = order.interior_components.filter((item) => item.rpo === "R6X");
+  assert.equal(r6xLines.length, 1, "R6X should appear once for the selected custom interior");
+  assert.equal(Number(r6xLines[0].price), 995, "R6X should remain the only priced line for the selected custom interior");
+  assert.equal(
+    order.selected_options.some((item) => item.rpo === "AH2"),
+    false,
+    "the replaced AH2 seat line should stay suppressed when the selected interior replaces the seat"
+  );
+});

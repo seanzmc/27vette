@@ -10,13 +10,6 @@ def write_json_output(path: Path, data: dict[str, Any]) -> None:
     path.write_text(to_pretty_json(data), encoding="utf-8")
 
 
-def write_app_data(path: Path, global_name: str, data: dict[str, Any]) -> None:
-    path.write_text(
-        f"window.{global_name} = {to_pretty_json(data)};\n",
-        encoding="utf-8",
-    )
-
-
 def write_app_data_registry(
     path: Path,
     registry: dict[str, Any],

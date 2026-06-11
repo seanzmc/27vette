@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-09T23:24:43+00:00"
+          "generated_at": "2026-06-11T01:13:04+00:00"
         },
         "variants": [
           {
@@ -44090,8 +44090,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "review_flag": "False"
+            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "rule_id": "rule_3lt_ae4_hag_includes_opt_3a9_001",
@@ -44109,8 +44108,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "review_flag": "False"
+            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "rule_id": "rule_3lt_ae4_hnk_includes_opt_3f9_001",
@@ -44128,8 +44126,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior.",
-            "review_flag": "False"
+            "source_note": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior."
           },
           {
             "rule_id": "rule_3lt_ae4_huf_n26_includes_opt_3n9_001",
@@ -44147,8 +44144,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Recommended with (HTA, HTJ) Jet Black interior. 2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior. 3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
-            "review_flag": "False"
+            "source_note": "1. Recommended with (HTA, HTJ) Jet Black interior. 2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior. 3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors."
           },
           {
             "rule_id": "rule_3lt_ae4_huw_includes_opt_379_001",
@@ -44166,8 +44162,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors.",
-            "review_flag": "False"
+            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors."
           },
           {
             "rule_id": "rule_3lt_ae4_hux_n26_includes_opt_379_001",
@@ -44185,8 +44180,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors.",
-            "review_flag": "False"
+            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors."
           },
           {
             "rule_id": "rule_3lt_ae4_hzn_includes_opt_3n9_001",
@@ -44204,8 +44198,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Recommended with (HTA, HTJ) Jet Black interior. 2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior. 3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
-            "review_flag": "False"
+            "source_note": "1. Recommended with (HTA, HTJ) Jet Black interior. 2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior. 3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors."
           },
           {
             "rule_id": "rule_3lt_ah2_h8t_includes_opt_3a9_001",
@@ -44223,8 +44216,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "review_flag": "False"
+            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "rule_id": "rule_3lt_ah2_hag_includes_opt_3a9_001",
@@ -44242,8 +44234,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "review_flag": "False"
+            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "rule_id": "rule_3lt_ah2_hnk_includes_opt_3f9_001",
@@ -44261,8 +44252,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior.",
-            "review_flag": "False"
+            "source_note": "1. Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior."
           },
           {
             "rule_id": "rule_3lt_ah2_huf_n26_includes_opt_3n9_001",
@@ -44280,8 +44270,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Recommended with (HTA, HTJ) Jet Black interior. 2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior. 3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
-            "review_flag": "False"
+            "source_note": "1. Recommended with (HTA, HTJ) Jet Black interior. 2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior. 3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors."
           },
           {
             "rule_id": "rule_3lt_ah2_huw_includes_opt_379_001",
@@ -44299,8 +44288,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors.",
-            "review_flag": "False"
+            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors."
           },
           {
             "rule_id": "rule_3lt_ah2_hux_n26_includes_opt_379_001",
@@ -44318,8 +44306,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors.",
-            "review_flag": "False"
+            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors."
           },
           {
             "rule_id": "rule_3lt_ah2_hzn_includes_opt_3n9_001",
@@ -44337,8 +44324,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Recommended with (HTA, HTJ) Jet Black interior. 2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior. 3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
-            "review_flag": "False"
+            "source_note": "1. Recommended with (HTA, HTJ) Jet Black interior. 2. Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior. 3. Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors."
           },
           {
             "rule_id": "rule_3lt_aup_hag_includes_opt_3a9_001",
@@ -44356,8 +44342,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "review_flag": "False"
+            "source_note": "1. Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors. 2. Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "rule_id": "rule_opt_5dg_001_excludes_opt_r8c_001",
@@ -44375,8 +44360,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47. Included with (PCX) Tech Bronze Accent Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47. Included with (PCX) Tech Bronze Accent Package, LPO."
           },
           {
             "rule_id": "rule_opt_5dg_001_excludes_opt_s47_001",
@@ -44394,8 +44378,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47. Included with (PCX) Tech Bronze Accent Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47. Included with (PCX) Tech Bronze Accent Package, LPO."
           },
           {
             "rule_id": "rule_opt_5dg_001_excludes_opt_sfe_001",
@@ -44413,8 +44396,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47. Included with (PCX) Tech Bronze Accent Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47. Included with (PCX) Tech Bronze Accent Package, LPO."
           },
           {
             "rule_id": "rule_opt_5dg_001_excludes_opt_spy_001",
@@ -44432,8 +44414,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47. Included with (PCX) Tech Bronze Accent Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47. Included with (PCX) Tech Bronze Accent Package, LPO."
           },
           {
             "rule_id": "rule_opt_5dg_001_excludes_opt_spz_001",
@@ -44451,8 +44432,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47. Included with (PCX) Tech Bronze Accent Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47. Included with (PCX) Tech Bronze Accent Package, LPO."
           },
           {
             "rule_id": "rule_opt_5do_001_excludes_opt_r8c_001",
@@ -44470,8 +44450,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47.",
-            "review_flag": "False"
+            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47."
           },
           {
             "rule_id": "rule_opt_5do_001_excludes_opt_s47_001",
@@ -44489,8 +44468,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47.",
-            "review_flag": "False"
+            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47."
           },
           {
             "rule_id": "rule_opt_5do_001_excludes_opt_sfe_001",
@@ -44508,8 +44486,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47.",
-            "review_flag": "False"
+            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47."
           },
           {
             "rule_id": "rule_opt_5do_001_excludes_opt_spy_001",
@@ -44527,8 +44504,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47.",
-            "review_flag": "False"
+            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47."
           },
           {
             "rule_id": "rule_opt_5do_001_excludes_opt_spz_001",
@@ -44546,8 +44522,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47.",
-            "review_flag": "False"
+            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47."
           },
           {
             "rule_id": "rule_opt_5jr_001_includes_opt_drg_001",
@@ -44565,8 +44540,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors, Genuine Corvette Accessory",
-            "review_flag": "False"
+            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors, Genuine Corvette Accessory"
           },
           {
             "rule_id": "rule_opt_5v7_001_excludes_opt_5vm_001",
@@ -44584,8 +44558,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires 5ZU, 5ZW or 5ZZ. Not available with STI, TVS, Z51. 2. Requires 5ZU, 5ZW or 5ZZ. Not available with 5VM, 5W8, STI, TVS, Z51.",
-            "review_flag": "False"
+            "source_note": "1. Requires 5ZU, 5ZW or 5ZZ. Not available with STI, TVS, Z51. 2. Requires 5ZU, 5ZW or 5ZZ. Not available with 5VM, 5W8, STI, TVS, Z51."
           },
           {
             "rule_id": "rule_opt_5v7_001_excludes_opt_5w8_001",
@@ -44603,8 +44576,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires 5ZU, 5ZW or 5ZZ. Not available with STI, TVS, Z51. 2. Requires 5ZU, 5ZW or 5ZZ. Not available with 5VM, 5W8, STI, TVS, Z51.",
-            "review_flag": "False"
+            "source_note": "1. Requires 5ZU, 5ZW or 5ZZ. Not available with STI, TVS, Z51. 2. Requires 5ZU, 5ZW or 5ZZ. Not available with 5VM, 5W8, STI, TVS, Z51."
           },
           {
             "rule_id": "rule_opt_5v7_001_excludes_opt_sti_001",
@@ -44622,8 +44594,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires 5ZU, 5ZW or 5ZZ. Not available with STI, TVS, Z51. 2. Requires 5ZU, 5ZW or 5ZZ. Not available with 5VM, 5W8, STI, TVS, Z51.",
-            "review_flag": "False"
+            "source_note": "1. Requires 5ZU, 5ZW or 5ZZ. Not available with STI, TVS, Z51. 2. Requires 5ZU, 5ZW or 5ZZ. Not available with 5VM, 5W8, STI, TVS, Z51."
           },
           {
             "rule_id": "rule_opt_5v7_001_excludes_opt_tvs_001",
@@ -44641,8 +44612,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires 5ZU, 5ZW or 5ZZ. Not available with STI, TVS, Z51. 2. Requires 5ZU, 5ZW or 5ZZ. Not available with 5VM, 5W8, STI, TVS, Z51.",
-            "review_flag": "False"
+            "source_note": "1. Requires 5ZU, 5ZW or 5ZZ. Not available with STI, TVS, Z51. 2. Requires 5ZU, 5ZW or 5ZZ. Not available with 5VM, 5W8, STI, TVS, Z51."
           },
           {
             "rule_id": "rule_opt_5v7_001_excludes_opt_z51_001",
@@ -44660,8 +44630,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires 5ZU, 5ZW or 5ZZ. Not available with STI, TVS, Z51. 2. Requires 5ZU, 5ZW or 5ZZ. Not available with 5VM, 5W8, STI, TVS, Z51.",
-            "review_flag": "False"
+            "source_note": "1. Requires 5ZU, 5ZW or 5ZZ. Not available with STI, TVS, Z51. 2. Requires 5ZU, 5ZW or 5ZZ. Not available with 5VM, 5W8, STI, TVS, Z51."
           },
           {
             "rule_id": "rule_opt_5vm_001_excludes_opt_5v7_001",
@@ -44679,8 +44648,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5vm_001_excludes_opt_5w8_001",
@@ -44698,8 +44666,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5vm_001_excludes_opt_sti_001",
@@ -44717,8 +44684,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5vm_001_excludes_opt_tvs_001",
@@ -44736,8 +44702,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5vm_001_excludes_opt_zf1_001",
@@ -44755,8 +44720,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5vm_001_requires_opt_5zu_001",
@@ -44774,8 +44738,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5vm_001_requires_opt_5zw_001",
@@ -44793,8 +44756,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5vm_001_requires_opt_5zz_001",
@@ -44812,8 +44774,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5vm_001_requires_opt_z51_001",
@@ -44831,8 +44792,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5W8, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5w8_001_excludes_opt_5v7_001",
@@ -44850,8 +44810,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5w8_001_excludes_opt_5vm_001",
@@ -44869,8 +44828,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5w8_001_excludes_opt_sti_001",
@@ -44888,8 +44846,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5w8_001_excludes_opt_tvs_001",
@@ -44907,8 +44864,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5w8_001_excludes_opt_zf1_001",
@@ -44926,8 +44882,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5w8_001_requires_opt_5zu_001",
@@ -44945,8 +44900,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5w8_001_requires_opt_5zw_001",
@@ -44964,8 +44918,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5w8_001_requires_opt_5zz_001",
@@ -44983,8 +44936,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5w8_001_requires_opt_z51_001",
@@ -45002,8 +44954,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1.",
-            "review_flag": "False"
+            "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1."
           },
           {
             "rule_id": "rule_opt_5zu_001_excludes_opt_t0a_001",
@@ -45021,8 +44972,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "replace",
-            "source_note": "1. Requires exterior color (G8G) Arctic White, (GBA) Black or (GKZ) Torch Red. Not available with 5ZW, 5ZZ, TVS. Deletes (T0A) Z51 rear spoiler when ordered with (Z51) Z51 Performance Package.",
-            "review_flag": "False"
+            "source_note": "1. Requires exterior color (G8G) Arctic White, (GBA) Black or (GKZ) Torch Red. Not available with 5ZW, 5ZZ, TVS. Deletes (T0A) Z51 rear spoiler when ordered with (Z51) Z51 Performance Package."
           },
           {
             "rule_id": "rule_opt_5zw_001_excludes_opt_t0a_001",
@@ -45040,8 +44990,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "replace",
-            "source_note": "1. Not available at this time. Not available with 5ZU, 5ZZ, TVS. Deletes (T0A) Z51 rear spoiler when ordered with (Z51) Z51 Performance Package.",
-            "review_flag": "False"
+            "source_note": "1. Not available at this time. Not available with 5ZU, 5ZZ, TVS. Deletes (T0A) Z51 rear spoiler when ordered with (Z51) Z51 Performance Package."
           },
           {
             "rule_id": "rule_opt_5zz_001_excludes_opt_t0a_001",
@@ -45059,8 +45008,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "replace",
-            "source_note": "1. Not available with 5ZW, 5ZU, TVS. Deletes (T0A) Z51 rear spoiler when ordered with (Z51) Z51 Performance Package.",
-            "review_flag": "False"
+            "source_note": "1. Not available with 5ZW, 5ZU, TVS. Deletes (T0A) Z51 rear spoiler when ordered with (Z51) Z51 Performance Package."
           },
           {
             "rule_id": "rule_opt_b6p_001_includes_opt_d3v_001",
@@ -45078,8 +45026,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-            "review_flag": "False"
+            "source_note": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers."
           },
           {
             "rule_id": "rule_opt_b6p_001_includes_opt_sl9_001",
@@ -45097,8 +45044,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package."
           },
           {
             "rule_id": "rule_opt_bc4_001_includes_opt_d3v_001",
@@ -45116,8 +45062,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-            "review_flag": "False"
+            "source_note": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers."
           },
           {
             "rule_id": "rule_opt_bc4_002_requires_opt_zz3_001",
@@ -45135,8 +45080,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Includes (D3V) engine lighting. Requires (B6P) on Coupe 2. Requires (ZZ3) Convertible Engine Appearance Package.",
-            "review_flag": "False"
+            "source_note": "1. Includes (D3V) engine lighting. Requires (B6P) on Coupe 2. Requires (ZZ3) Convertible Engine Appearance Package."
           },
           {
             "rule_id": "rule_opt_bcp_001_includes_opt_d3v_001",
@@ -45154,8 +45098,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-            "review_flag": "False"
+            "source_note": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers."
           },
           {
             "rule_id": "rule_opt_bcp_002_requires_opt_zz3_001",
@@ -45173,8 +45116,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting. 2. Requires (ZZ3) Convertible Engine Appearance Package.",
-            "review_flag": "False"
+            "source_note": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting. 2. Requires (ZZ3) Convertible Engine Appearance Package."
           },
           {
             "rule_id": "rule_opt_bcs_001_includes_opt_d3v_001",
@@ -45192,8 +45134,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-            "review_flag": "False"
+            "source_note": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers."
           },
           {
             "rule_id": "rule_opt_bcs_002_requires_opt_zz3_001",
@@ -45211,8 +45152,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting. 2. Requires (ZZ3) Convertible Engine Appearance Package.",
-            "review_flag": "False"
+            "source_note": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting. 2. Requires (ZZ3) Convertible Engine Appearance Package."
           },
           {
             "rule_id": "rule_opt_bv4_001_excludes_opt_r8c_001",
@@ -45230,8 +45170,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Available on SOLD orders only. Not available with (R8C) Corvette Museum Delivery.",
-            "review_flag": "False"
+            "source_note": "1. Available on SOLD orders only. Not available with (R8C) Corvette Museum Delivery."
           },
           {
             "rule_id": "rule_opt_d84_001_excludes_opt_gba_001",
@@ -45249,8 +45188,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GBA) Black.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GBA) Black."
           },
           {
             "rule_id": "rule_opt_d86_001_excludes_opt_gba_001",
@@ -45268,8 +45206,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GBA) Black.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GBA) Black."
           },
           {
             "rule_id": "rule_opt_dpb_001_excludes_opt_gtr_001",
@@ -45287,8 +45224,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "rule_id": "rule_opt_dpc_001_excludes_opt_gbk_001",
@@ -45306,8 +45242,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "rule_id": "rule_opt_dpg_001_excludes_opt_g26_001",
@@ -45325,8 +45260,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "rule_id": "rule_opt_dpl_001_excludes_opt_gkz_001",
@@ -45344,8 +45278,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "rule_opt_dpl_001_excludes_opt_gph_001",
@@ -45363,8 +45296,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "rule_opt_dsy_001_excludes_opt_g26_001",
@@ -45382,8 +45314,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "rule_id": "rule_opt_dsz_001_excludes_opt_gkz_001",
@@ -45401,8 +45332,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "rule_opt_dsz_001_excludes_opt_gph_001",
@@ -45420,8 +45350,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "rule_opt_dt0_001_excludes_opt_gbk_001",
@@ -45439,8 +45368,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "rule_id": "rule_opt_due_001_excludes_opt_gtr_001",
@@ -45458,8 +45386,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "rule_id": "rule_opt_duk_001_excludes_opt_gkz_001",
@@ -45477,8 +45404,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "rule_opt_duk_001_excludes_opt_gph_001",
@@ -45496,8 +45422,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "rule_opt_duw_001_excludes_opt_gtr_001",
@@ -45515,8 +45440,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "rule_id": "rule_opt_dzu_001_excludes_opt_gbk_001",
@@ -45534,8 +45458,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "rule_id": "rule_opt_dzx_001_excludes_opt_gkz_001",
@@ -45553,8 +45476,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "rule_opt_dzx_001_excludes_opt_gph_001",
@@ -45572,8 +45494,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "rule_opt_e60_001_includes_opt_tr7_001",
@@ -45591,8 +45512,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (TR7) automatic headlamp leveling system",
-            "review_flag": "False"
+            "source_note": "includes (TR7) automatic headlamp leveling system"
           },
           {
             "rule_id": "rule_opt_efy_001_excludes_opt_gba_001",
@@ -45610,8 +45530,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GBA) Black. 2. Not available with exterior color (GBA) Black. Also includes tonneau grille.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GBA) Black. 2. Not available with exterior color (GBA) Black. Also includes tonneau grille."
           },
           {
             "rule_id": "rule_opt_fe2_001_excludes_opt_z51_001",
@@ -45629,8 +45548,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (Z51) Z51 Performance Package.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (Z51) Z51 Performance Package."
           },
           {
             "rule_id": "rule_opt_fe4_001_includes_opt_b4z_001",
@@ -45648,8 +45566,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (B4Z) Performance Traction Management 1. Requires (Z51) Z51 Performance Package.",
-            "review_flag": "False"
+            "source_note": "includes (B4Z) Performance Traction Management 1. Requires (Z51) Z51 Performance Package."
           },
           {
             "rule_id": "rule_opt_fe4_001_requires_opt_z51_001",
@@ -45667,8 +45584,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (B4Z) Performance Traction Management 1. Requires (Z51) Z51 Performance Package.",
-            "review_flag": "False"
+            "source_note": "includes (B4Z) Performance Traction Management 1. Requires (Z51) Z51 Performance Package."
           },
           {
             "rule_id": "rule_opt_nwi_001_requires_opt_wub_001",
@@ -45686,8 +45602,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (WUB) quad center exit exhaust.",
-            "review_flag": "False"
+            "source_note": "1. Requires (WUB) quad center exit exhaust."
           },
           {
             "rule_id": "rule_opt_pcu_001_excludes_opt_5v7_001",
@@ -45705,8 +45620,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (VWE) front radiator grille screens LPO, (STI) Black composite rocker extensions LPO, and (VQK) Black custom splash guards LPO, Genuine Corvette Accessories 1. Not available with (5V7) Black Ground Effects, LPO. 2. Not available with 5V7, 5VM, 5W8.",
-            "review_flag": "False"
+            "source_note": "includes (VWE) front radiator grille screens LPO, (STI) Black composite rocker extensions LPO, and (VQK) Black custom splash guards LPO, Genuine Corvette Accessories 1. Not available with (5V7) Black Ground Effects, LPO. 2. Not available with 5V7, 5VM, 5W8."
           },
           {
             "rule_id": "rule_opt_pcu_001_excludes_opt_5vm_001",
@@ -45724,8 +45638,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (VWE) front radiator grille screens LPO, (STI) Black composite rocker extensions LPO, and (VQK) Black custom splash guards LPO, Genuine Corvette Accessories 1. Not available with (5V7) Black Ground Effects, LPO. 2. Not available with 5V7, 5VM, 5W8.",
-            "review_flag": "False"
+            "source_note": "includes (VWE) front radiator grille screens LPO, (STI) Black composite rocker extensions LPO, and (VQK) Black custom splash guards LPO, Genuine Corvette Accessories 1. Not available with (5V7) Black Ground Effects, LPO. 2. Not available with 5V7, 5VM, 5W8."
           },
           {
             "rule_id": "rule_opt_pcu_001_excludes_opt_5w8_001",
@@ -45743,8 +45656,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (VWE) front radiator grille screens LPO, (STI) Black composite rocker extensions LPO, and (VQK) Black custom splash guards LPO, Genuine Corvette Accessories 1. Not available with (5V7) Black Ground Effects, LPO. 2. Not available with 5V7, 5VM, 5W8.",
-            "review_flag": "False"
+            "source_note": "includes (VWE) front radiator grille screens LPO, (STI) Black composite rocker extensions LPO, and (VQK) Black custom splash guards LPO, Genuine Corvette Accessories 1. Not available with (5V7) Black Ground Effects, LPO. 2. Not available with 5V7, 5VM, 5W8."
           },
           {
             "rule_id": "rule_opt_pcu_001_includes_opt_sti_001",
@@ -45762,8 +45674,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (5V7) Black Ground Effects, LPO. Included with (PCU) Stingray Protection Package, LPO. 2. Not available with 5V7, 5VM, 5W8. Included with (PCU) Stingray Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (5V7) Black Ground Effects, LPO. Included with (PCU) Stingray Protection Package, LPO. 2. Not available with 5V7, 5VM, 5W8. Included with (PCU) Stingray Protection Package, LPO."
           },
           {
             "rule_id": "rule_opt_pcu_001_includes_opt_vqk_001",
@@ -45781,8 +45692,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PCU) Stingray Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PCU) Stingray Protection Package, LPO."
           },
           {
             "rule_id": "rule_opt_pcu_001_includes_opt_vwe_001",
@@ -45800,8 +45710,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PCU) Stingray Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PCU) Stingray Protection Package, LPO."
           },
           {
             "rule_id": "rule_opt_pcx_001_includes_opt_5dg_001",
@@ -45819,8 +45728,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47. Included with (PCX) Tech Bronze Accent Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with R8C, SPZ, SFE, SPY, S47. Included with (PCX) Tech Bronze Accent Package, LPO."
           },
           {
             "rule_id": "rule_opt_pcx_001_includes_opt_sfz_001",
@@ -45838,8 +45746,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO."
           },
           {
             "rule_id": "rule_opt_pcx_001_includes_opt_sht_001",
@@ -45857,8 +45764,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with PDV, SB7 or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCX) Tech Bronze Accent Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with PDV, SB7 or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCX) Tech Bronze Accent Package, LPO."
           },
           {
             "rule_id": "rule_opt_pcx_001_includes_opt_sng_001",
@@ -45876,8 +45782,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PCX) Tech Bronze Accent Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PCX) Tech Bronze Accent Package, LPO."
           },
           {
             "rule_id": "rule_opt_pdv_001_includes_opt_sb7_001",
@@ -45895,8 +45800,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PDV) Stingray R Appearance Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PDV) Stingray R Appearance Package, LPO."
           },
           {
             "rule_id": "rule_opt_pdv_001_includes_opt_vwd_001",
@@ -45914,8 +45818,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PDV) Stingray R Appearance Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PDV) Stingray R Appearance Package, LPO."
           },
           {
             "rule_id": "rule_opt_pdy_001_includes_opt_ryt_001",
@@ -45933,8 +45836,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PDY) Roadside Safety Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "rule_id": "rule_opt_pdy_001_includes_opt_s08_001",
@@ -45952,8 +45854,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PDY) Roadside Safety Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "rule_id": "rule_opt_pef_001_includes_opt_cav_001",
@@ -45971,8 +45872,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "rule_id": "rule_opt_pef_001_includes_opt_ria_001",
@@ -45990,8 +45890,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "rule_id": "rule_opt_r8c_001_includes_opt_cfx_001",
@@ -46009,8 +45908,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN",
-            "review_flag": "False"
+            "source_note": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
           },
           {
             "rule_id": "rule_opt_rik_001_excludes_opt_rin_001",
@@ -46028,8 +45926,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with RIN, SL8.",
-            "review_flag": "False"
+            "source_note": "1. Not available with RIN, SL8."
           },
           {
             "rule_id": "rule_opt_rik_001_excludes_opt_sl8_001",
@@ -46047,8 +45944,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with RIN, SL8.",
-            "review_flag": "False"
+            "source_note": "1. Not available with RIN, SL8."
           },
           {
             "rule_id": "rule_opt_rin_001_excludes_opt_rik_001",
@@ -46066,8 +45962,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with RIK, SL8.",
-            "review_flag": "False"
+            "source_note": "1. Not available with RIK, SL8."
           },
           {
             "rule_id": "rule_opt_rin_001_excludes_opt_sl8_001",
@@ -46085,8 +45980,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with RIK, SL8.",
-            "review_flag": "False"
+            "source_note": "1. Not available with RIK, SL8."
           },
           {
             "rule_id": "rule_opt_rnx_001_excludes_opt_5zu_001",
@@ -46104,8 +45998,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with 5ZU, 5ZW, 5ZZ, Z51.",
-            "review_flag": "False"
+            "source_note": "1. Not available with 5ZU, 5ZW, 5ZZ, Z51."
           },
           {
             "rule_id": "rule_opt_rnx_001_excludes_opt_5zw_001",
@@ -46123,8 +46016,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with 5ZU, 5ZW, 5ZZ, Z51.",
-            "review_flag": "False"
+            "source_note": "1. Not available with 5ZU, 5ZW, 5ZZ, Z51."
           },
           {
             "rule_id": "rule_opt_rnx_001_excludes_opt_5zz_001",
@@ -46142,8 +46034,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with 5ZU, 5ZW, 5ZZ, Z51.",
-            "review_flag": "False"
+            "source_note": "1. Not available with 5ZU, 5ZW, 5ZZ, Z51."
           },
           {
             "rule_id": "rule_opt_rnx_001_excludes_opt_z51_001",
@@ -46161,8 +46052,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with 5ZU, 5ZW, 5ZZ, Z51.",
-            "review_flag": "False"
+            "source_note": "1. Not available with 5ZU, 5ZW, 5ZZ, Z51."
           },
           {
             "rule_id": "rule_opt_rwj_001_excludes_opt_z51_001",
@@ -46180,8 +46070,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (Z51) Z51 Performance Package.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (Z51) Z51 Performance Package."
           },
           {
             "rule_id": "rule_opt_ryq_001_excludes_opt_efy_001",
@@ -46199,8 +46088,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available at this time. Not available with (EFY) body-color exterior accents.",
-            "review_flag": "False"
+            "source_note": "1. Not available at this time. Not available with (EFY) body-color exterior accents."
           },
           {
             "rule_id": "rule_opt_rz9_001_excludes_opt_efy_001",
@@ -46218,8 +46106,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (EFY) body-color exterior accents.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (EFY) body-color exterior accents."
           },
           {
             "rule_id": "rule_opt_s47_001_excludes_opt_spy_001",
@@ -46237,8 +46124,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO."
           },
           {
             "rule_id": "rule_opt_sbt_001_excludes_opt_cc3_001",
@@ -46256,8 +46142,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (CC3) transparent, removable roof panel. adds transparent removable roof panel and includes (SC7) roof panel storage pouch, Genuine Corvette Accessories",
-            "review_flag": "False"
+            "source_note": "1. Not available with (CC3) transparent, removable roof panel. adds transparent removable roof panel and includes (SC7) roof panel storage pouch, Genuine Corvette Accessories"
           },
           {
             "rule_id": "rule_opt_sbt_001_includes_opt_sc7_001",
@@ -46275,8 +46160,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (SBT) dual roof, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (SBT) dual roof, LPO."
           },
           {
             "rule_id": "rule_opt_sfe_001_excludes_opt_spy_001",
@@ -46294,8 +46178,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO."
           },
           {
             "rule_id": "rule_opt_sht_001_excludes_opt_pdv_001",
@@ -46313,8 +46196,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with PDV, SB7 or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCX) Tech Bronze Accent Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with PDV, SB7 or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCX) Tech Bronze Accent Package, LPO."
           },
           {
             "rule_id": "rule_opt_sl8_001_excludes_opt_rik_001",
@@ -46332,8 +46214,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with RIK, RIN.",
-            "review_flag": "False"
+            "source_note": "1. Not available with RIK, RIN."
           },
           {
             "rule_id": "rule_opt_sl8_001_excludes_opt_rin_001",
@@ -46351,8 +46232,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with RIK, RIN.",
-            "review_flag": "False"
+            "source_note": "1. Not available with RIK, RIN."
           },
           {
             "rule_id": "rule_opt_spy_001_excludes_opt_s47_001",
@@ -46370,8 +46250,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (S47) Chrome lug nuts, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (S47) Chrome lug nuts, LPO."
           },
           {
             "rule_id": "rule_opt_spz_001_requires_opt_spy_001",
@@ -46389,8 +46268,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (SPY) Black lug nuts, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Requires (SPY) Black lug nuts, LPO."
           },
           {
             "rule_id": "rule_opt_sti_001_excludes_opt_5v7_001",
@@ -46408,8 +46286,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (5V7) Black Ground Effects, LPO. Included with (PCU) Stingray Protection Package, LPO. 2. Not available with 5V7, 5VM, 5W8. Included with (PCU) Stingray Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (5V7) Black Ground Effects, LPO. Included with (PCU) Stingray Protection Package, LPO. 2. Not available with 5V7, 5VM, 5W8. Included with (PCU) Stingray Protection Package, LPO."
           },
           {
             "rule_id": "rule_opt_sti_001_excludes_opt_5vm_001",
@@ -46427,8 +46304,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (5V7) Black Ground Effects, LPO. Included with (PCU) Stingray Protection Package, LPO. 2. Not available with 5V7, 5VM, 5W8. Included with (PCU) Stingray Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (5V7) Black Ground Effects, LPO. Included with (PCU) Stingray Protection Package, LPO. 2. Not available with 5V7, 5VM, 5W8. Included with (PCU) Stingray Protection Package, LPO."
           },
           {
             "rule_id": "rule_opt_sti_001_excludes_opt_5w8_001",
@@ -46446,8 +46322,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (5V7) Black Ground Effects, LPO. Included with (PCU) Stingray Protection Package, LPO. 2. Not available with 5V7, 5VM, 5W8. Included with (PCU) Stingray Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (5V7) Black Ground Effects, LPO. Included with (PCU) Stingray Protection Package, LPO. 2. Not available with 5V7, 5VM, 5W8. Included with (PCU) Stingray Protection Package, LPO."
           },
           {
             "rule_id": "rule_opt_wkq_001_excludes_opt_5zu_001",
@@ -46465,8 +46340,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with 5ZU, 5ZW, 5ZZ.",
-            "review_flag": "False"
+            "source_note": "1. Not available with 5ZU, 5ZW, 5ZZ."
           },
           {
             "rule_id": "rule_opt_wkq_001_excludes_opt_5zw_001",
@@ -46484,8 +46358,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with 5ZU, 5ZW, 5ZZ.",
-            "review_flag": "False"
+            "source_note": "1. Not available with 5ZU, 5ZW, 5ZZ."
           },
           {
             "rule_id": "rule_opt_wkq_001_excludes_opt_5zz_001",
@@ -46503,8 +46376,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with 5ZU, 5ZW, 5ZZ.",
-            "review_flag": "False"
+            "source_note": "1. Not available with 5ZU, 5ZW, 5ZZ."
           },
           {
             "rule_id": "rule_opt_z51_001_includes_opt_fe3_001",
@@ -46522,8 +46394,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system",
-            "review_flag": "False"
+            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system"
           },
           {
             "rule_id": "rule_opt_z51_001_includes_opt_g0k_001",
@@ -46541,8 +46412,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system",
-            "review_flag": "False"
+            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system"
           },
           {
             "rule_id": "rule_opt_z51_001_includes_opt_g96_001",
@@ -46560,8 +46430,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system",
-            "review_flag": "False"
+            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system"
           },
           {
             "rule_id": "rule_opt_z51_001_includes_opt_j55_001",
@@ -46579,8 +46448,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system",
-            "review_flag": "False"
+            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system"
           },
           {
             "rule_id": "rule_opt_z51_001_includes_opt_m1n_001",
@@ -46598,8 +46466,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system",
-            "review_flag": "False"
+            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system"
           },
           {
             "rule_id": "rule_opt_z51_001_includes_opt_qtu_001",
@@ -46617,8 +46484,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system",
-            "review_flag": "False"
+            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system"
           },
           {
             "rule_id": "rule_opt_z51_001_includes_opt_t0a_001",
@@ -46636,8 +46502,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system",
-            "review_flag": "False"
+            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system"
           },
           {
             "rule_id": "rule_opt_z51_001_includes_opt_v08_001",
@@ -46655,8 +46520,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system",
-            "review_flag": "False"
+            "source_note": "includes (J55) Z51 performance brakes, (FE3) Z51 performance suspension, (G0K) 5.56 rear axle ratio, (G96) Electronic Limited Slip Differential (eLSD), (M1N) 8-speed dual clutch transmission, (T0A) Z51 rear spoiler, front splitter, (QTU) 245/35ZR19 XL front and 305/30ZR20 XL rear, blackwall, high performance tires and (V08) heavy-duty cooling system"
           },
           {
             "rule_id": "rule_opt_zf1_001_excludes_opt_5vm_001",
@@ -46674,8 +46538,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "removes (T0A) Z51 rear spoiler and front splitter from Z51 Performance Package 1. Requires (Z51) Z51 Performance Package. Not available with 5ZU, 5ZW, 5ZZ, 5VM, 5W8.",
-            "review_flag": "False"
+            "source_note": "removes (T0A) Z51 rear spoiler and front splitter from Z51 Performance Package 1. Requires (Z51) Z51 Performance Package. Not available with 5ZU, 5ZW, 5ZZ, 5VM, 5W8."
           },
           {
             "rule_id": "rule_opt_zf1_001_excludes_opt_5w8_001",
@@ -46693,8 +46556,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "removes (T0A) Z51 rear spoiler and front splitter from Z51 Performance Package 1. Requires (Z51) Z51 Performance Package. Not available with 5ZU, 5ZW, 5ZZ, 5VM, 5W8.",
-            "review_flag": "False"
+            "source_note": "removes (T0A) Z51 rear spoiler and front splitter from Z51 Performance Package 1. Requires (Z51) Z51 Performance Package. Not available with 5ZU, 5ZW, 5ZZ, 5VM, 5W8."
           },
           {
             "rule_id": "rule_opt_zf1_001_excludes_opt_t0a_001",
@@ -46712,8 +46574,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "replace",
-            "source_note": "removes (T0A) Z51 rear spoiler and front splitter from Z51 Performance Package 1. Requires (Z51) Z51 Performance Package. Not available with 5ZU, 5ZW, 5ZZ, 5VM, 5W8.",
-            "review_flag": "False"
+            "source_note": "removes (T0A) Z51 rear spoiler and front splitter from Z51 Performance Package 1. Requires (Z51) Z51 Performance Package. Not available with 5ZU, 5ZW, 5ZZ, 5VM, 5W8."
           },
           {
             "rule_id": "rule_opt_zf1_001_requires_opt_z51_001",
@@ -46731,8 +46592,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "removes (T0A) Z51 rear spoiler and front splitter from Z51 Performance Package 1. Requires (Z51) Z51 Performance Package. Not available with 5ZU, 5ZW, 5ZZ, 5VM, 5W8.",
-            "review_flag": "False"
+            "source_note": "removes (T0A) Z51 rear spoiler and front splitter from Z51 Performance Package 1. Requires (Z51) Z51 Performance Package. Not available with 5ZU, 5ZW, 5ZZ, 5VM, 5W8."
           },
           {
             "rule_id": "rule_opt_zyc_001_excludes_opt_gba_001",
@@ -46750,8 +46610,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors. Also includes Carbon Flash Metallic-painted spoiler when (Z51) Z51 Performance Package or (TVS) low-profile rear spoiler and front splitter is ordered. Not available with exterior color (GBA) Black.",
-            "review_flag": "False"
+            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors. Also includes Carbon Flash Metallic-painted spoiler when (Z51) Z51 Performance Package or (TVS) low-profile rear spoiler and front splitter is ordered. Not available with exterior color (GBA) Black."
           },
           {
             "rule_id": "rule_opt_zyc_001_includes_opt_drg_001",
@@ -46769,8 +46628,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors. Also includes Carbon Flash Metallic-painted spoiler when (Z51) Z51 Performance Package or (TVS) low-profile rear spoiler and front splitter is ordered. Not available with exterior color (GBA) Black.",
-            "review_flag": "False"
+            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors. Also includes Carbon Flash Metallic-painted spoiler when (Z51) Z51 Performance Package or (TVS) low-profile rear spoiler and front splitter is ordered. Not available with exterior color (GBA) Black."
           },
           {
             "rule_id": "rule_opt_zz3_001_includes_opt_bc7_002",
@@ -46788,8 +46646,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes window under tonneau cover, (BC7) Black LS6 engine cover and (SL9) engine specification plaque, LPO",
-            "review_flag": "False"
+            "source_note": "includes window under tonneau cover, (BC7) Black LS6 engine cover and (SL9) engine specification plaque, LPO"
           },
           {
             "rule_id": "rule_opt_zz3_001_includes_opt_sl9_001",
@@ -46807,8 +46664,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package."
           },
           {
             "rule_id": "rule_opt_t0a_001_requires_opt_z51_001",
@@ -46826,8 +46682,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "T0A is available only when Z51 is selected.",
-            "review_flag": "False"
+            "source_note": "T0A is available only when Z51 is selected."
           },
           {
             "rule_id": "rule_opt_tvs_001_excludes_opt_t0a_001",
@@ -46845,8 +46700,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "replace",
-            "source_note": "TVS replaces the default T0A Z51 spoiler when selected.",
-            "review_flag": "False"
+            "source_note": "TVS replaces the default T0A Z51 spoiler when selected."
           },
           {
             "rule_id": "rule_opt_bc7_001_requires_opt_zz3_001_convertible",
@@ -46864,8 +46718,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "BC7 requires ZZ3 Convertible Engine Appearance Package on Convertible.",
-            "review_flag": "False"
+            "source_note": "BC7 requires ZZ3 Convertible Engine Appearance Package on Convertible."
           },
           {
             "rule_id": "rule_opt_5zz_001_includes_opt_zf1_001",
@@ -46883,8 +46736,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Auto-add ZF1 Aero Delete when 5ZZ is selected with Z51 Performance Package.",
-            "review_flag": "False"
+            "source_note": "Auto-add ZF1 Aero Delete when 5ZZ is selected with Z51 Performance Package."
           },
           {
             "rule_id": "rule_opt_5zu_001_includes_opt_zf1_001",
@@ -46902,8 +46754,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Auto-add ZF1 Aero Delete when 5ZU is selected with Z51 Performance Package.",
-            "review_flag": "False"
+            "source_note": "Auto-add ZF1 Aero Delete when 5ZU is selected with Z51 Performance Package."
           },
           {
             "rule_id": "rule_opt_5zw_001_includes_opt_zf1_001",
@@ -46921,8 +46772,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Auto-add ZF1 Aero Delete when 5ZW is selected with Z51 Performance Package.",
-            "review_flag": "False"
+            "source_note": "Auto-add ZF1 Aero Delete when 5ZW is selected with Z51 Performance Package."
           }
         ],
         "priceRules": [
@@ -46935,7 +46785,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Z51 selected sets TVS price to 0"
           },
           {
@@ -46947,7 +46796,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Santorini Blue interior includes blue seatbelt"
           },
           {
@@ -46959,7 +46807,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Santorini Blue interior includes blue seatbelt"
           },
           {
@@ -46971,7 +46818,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Adrenaline Red dipped includes red seatbelt"
           },
           {
@@ -46983,7 +46829,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Natural dipped includes natural seatbelt"
           },
           {
@@ -46995,7 +46840,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Habanero includes orange seatbelt"
           },
           {
@@ -47007,7 +46851,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Habanero includes orange seatbelt"
           },
           {
@@ -47019,7 +46862,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Natural dipped includes natural seatbelt"
           },
           {
@@ -47031,7 +46873,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Santorini Blue interior includes blue seatbelt"
           },
           {
@@ -47043,7 +46884,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Santorini Blue interior includes blue seatbelt"
           },
           {
@@ -47055,7 +46895,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Adrenaline Red dipped includes red seatbelt"
           },
           {
@@ -47067,7 +46906,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Natural dipped includes natural seatbelt"
           },
           {
@@ -47079,7 +46917,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Habanero includes orange seatbelt"
           },
           {
@@ -47091,7 +46928,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Habanero includes orange seatbelt"
           },
           {
@@ -47103,7 +46939,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Natural dipped includes natural seatbelt"
           },
           {
@@ -47115,7 +46950,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Santorini Blue interior includes blue seatbelt"
           },
           {
@@ -47127,7 +46961,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Engine appearance includes engine lighting"
           },
           {
@@ -47139,7 +46972,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Engine appearance includes engine plaque"
           },
           {
@@ -47151,7 +46983,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Engine appearance includes engine lighting"
           },
           {
@@ -47163,7 +46994,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Engine appearance includes engine lighting"
           },
           {
@@ -47175,7 +47005,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Engine appearance includes engine lighting"
           },
           {
@@ -47187,7 +47016,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Stingray protection package includes composite rocker extentions"
           },
           {
@@ -47199,7 +47027,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Stingray protection includes splash guards"
           },
           {
@@ -47211,7 +47038,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Stingray protection includes grille screens"
           },
           {
@@ -47223,7 +47049,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Tech bronze package includes 5DG"
           },
           {
@@ -47235,7 +47060,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Tech bronze package includes SFZ"
           },
           {
@@ -47247,7 +47071,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Tech bronze package includes SHT"
           },
           {
@@ -47259,7 +47082,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Tech bronze package includes SNG"
           },
           {
@@ -47271,7 +47093,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Stingray R package includes stingray R graphics"
           },
           {
@@ -47283,7 +47104,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Stingray R package includes Stingray R center caps"
           },
           {
@@ -47295,7 +47115,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "includes (RYT) First Aid Kit, LPO and (S08) Highway Safety Kit, LPO, Genuine Corvette Accessory"
           },
           {
@@ -47307,7 +47126,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "includes (RYT) First Aid Kit, LPO and (S08) Highway Safety Kit, LPO, Genuine Corvette Accessory"
           },
           {
@@ -47319,7 +47137,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "includes (CAV) contoured cargo area liners with Jake logo and (RIA) all-weather floor liners with Jake logo, Genuine Corvette Accessory"
           },
           {
@@ -47331,7 +47148,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "includes (CAV) contoured cargo area liners with Jake logo and (RIA) all-weather floor liners with Jake logo, Genuine Corvette Accessory"
           },
           {
@@ -47343,7 +47159,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "1. Included with (SBT) dual roof, LPO."
           },
           {
@@ -47355,7 +47170,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "1. Included with (B6P/ZZ3) Engine Appearance Package."
           },
           {
@@ -47367,7 +47181,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "coupe",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "B6P selected sets coupe LS6 engine cover price to 595"
           },
           {
@@ -47379,7 +47192,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "convertible",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "ZZ3 selected sets convertible LS6 engine cover price to 595"
           },
           {
@@ -47391,7 +47203,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "coupe",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "B6P selected sets coupe LS6 engine cover price to 595"
           },
           {
@@ -47403,7 +47214,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "convertible",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "ZZ3 selected sets convertible LS6 engine cover price to 595"
           },
           {
@@ -47415,7 +47225,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "coupe",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "B6P selected sets coupe LS6 engine cover price to 595"
           },
           {
@@ -47427,7 +47236,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "convertible",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "ZZ3 selected sets convertible LS6 engine cover price to 595"
           }
         ],
@@ -47795,7 +47603,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 12,
             "interior_hierarchy_levels": "[\"2LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black\"]",
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black",
             "interior_reference_order": 12
           },
@@ -47842,7 +47650,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 13,
             "interior_hierarchy_levels": "[\"2LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black with Yellow Stitching\"]",
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Yellow Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
             "interior_reference_order": 13
           },
@@ -47889,7 +47697,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 14,
             "interior_hierarchy_levels": "[\"2LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black with Blue Stitching\"]",
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Blue Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
             "interior_reference_order": 14
           },
@@ -47936,7 +47744,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 15,
             "interior_hierarchy_levels": "[\"2LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black with Red Stitching\"]",
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Red Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
             "interior_reference_order": 15
           },
@@ -47977,7 +47785,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 24,
             "interior_hierarchy_levels": "[\"2LT\", \"AE4 Competition Seats\", \"Natural\", \"Napa leather seating surfaces with perforated inserts.\", \"Natural\"]",
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural",
             "interior_reference_order": 24
           },
@@ -48024,7 +47832,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 16,
             "interior_hierarchy_levels": "[\"2LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede\"]",
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede",
             "interior_reference_order": 16
           },
@@ -48077,7 +47885,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 17,
             "interior_hierarchy_levels": "[\"2LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede with Yellow Stitching\"]",
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Yellow Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Yellow Stitching",
             "interior_reference_order": 17
           },
@@ -48130,7 +47938,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 18,
             "interior_hierarchy_levels": "[\"2LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede with Blue Stitching\"]",
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Blue Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Blue Stitching",
             "interior_reference_order": 18
           },
@@ -48183,7 +47991,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 19,
             "interior_hierarchy_levels": "[\"2LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede with Red Stitching\"]",
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Red Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Red Stitching",
             "interior_reference_order": 19
           },
@@ -48230,7 +48038,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 25,
             "interior_hierarchy_levels": "[\"2LT\", \"AE4 Competition Seats\", \"Natural\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Natural Suede\"]",
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural Suede",
             "interior_reference_order": 25
           },
@@ -48277,7 +48085,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 21,
             "interior_hierarchy_levels": "[\"2LT\", \"AE4 Competition Seats\", \"Sky Cool Gray\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Sky Cool Gray Suede\"]",
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
             "interior_reference_order": 21
           },
@@ -48324,7 +48132,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 23,
             "interior_hierarchy_levels": "[\"2LT\", \"AE4 Competition Seats\", \"Adrenaline Red\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Adrenaline Red Suede\"]",
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Adrenaline Red > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red Suede",
             "interior_reference_order": 23
           },
@@ -48365,7 +48173,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 20,
             "interior_hierarchy_levels": "[\"2LT\", \"AE4 Competition Seats\", \"Sky Cool Gray\", \"Napa leather seating surfaces with perforated inserts.\", \"Sky Cool Gray\"]",
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Sky Cool Gray",
             "interior_reference_order": 20
           },
@@ -48406,7 +48214,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 22,
             "interior_hierarchy_levels": "[\"2LT\", \"AE4 Competition Seats\", \"Adrenaline Red\", \"Napa leather seating surfaces with perforated inserts.\", \"Adrenaline Red\"]",
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red",
             "interior_reference_order": 22
           },
@@ -48447,7 +48255,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 26,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black",
             "interior_reference_order": 26
           },
@@ -48494,7 +48302,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 27,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black with Yellow Stitching\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Yellow Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
             "interior_reference_order": 27
           },
@@ -48541,7 +48349,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 28,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black with Blue Stitching\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Blue Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
             "interior_reference_order": 28
           },
@@ -48588,7 +48396,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 29,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black with Red Stitching\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Red Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
             "interior_reference_order": 29
           },
@@ -48629,7 +48437,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 41,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Natural\", \"Napa leather seating surfaces with perforated inserts.\", \"Natural\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural",
             "interior_reference_order": 41
           },
@@ -48676,7 +48484,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 42,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Natural\", \"Napa leather seating surfaces with perforated inserts.\", \"Natural Two Tone\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural Two Tone",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Two Tone",
             "interior_reference_order": 42
           },
@@ -48723,7 +48531,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 30,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede",
             "interior_reference_order": 30
           },
@@ -48776,7 +48584,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 31,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede with Yellow Stitching\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Yellow Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Yellow Stitching",
             "interior_reference_order": 31
           },
@@ -48829,7 +48637,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 32,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede with Blue Stitching\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Blue Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Blue Stitching",
             "interior_reference_order": 32
           },
@@ -48882,7 +48690,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 33,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede with Red Stitching\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Red Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Red Stitching",
             "interior_reference_order": 33
           },
@@ -48929,7 +48737,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 43,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Natural\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Natural Suede\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Suede",
             "interior_reference_order": 43
           },
@@ -48982,7 +48790,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 44,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Natural\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Natural Suede Two Tone\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede Two Tone",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Suede Two Tone",
             "interior_reference_order": 44
           },
@@ -49029,7 +48837,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 36,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Sky Cool Gray\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Sky Cool Gray Suede\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
             "interior_reference_order": 36
           },
@@ -49082,7 +48890,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 37,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Sky Cool Gray\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Sky Cool Gray Suede Two Tone\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede Two Tone",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Suede Two Tone",
             "interior_reference_order": 37
           },
@@ -49135,7 +48943,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 40,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Adrenaline Red\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Adrenaline Red Suede Two Tone\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Adrenaline Red > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red Suede Two Tone",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red Suede Two Tone",
             "interior_reference_order": 40
           },
@@ -49176,7 +48984,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 34,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Sky Cool Gray\", \"Napa leather seating surfaces with perforated inserts.\", \"Sky Cool Gray\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray",
             "interior_reference_order": 34
           },
@@ -49223,7 +49031,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 35,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Sky Cool Gray\", \"Napa leather seating surfaces with perforated inserts.\", \"Sky Cool Gray Two Tone\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray Two Tone",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Two Tone",
             "interior_reference_order": 35
           },
@@ -49264,7 +49072,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 38,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Adrenaline Red\", \"Napa leather seating surfaces with perforated inserts.\", \"Adrenaline Red\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red",
             "interior_reference_order": 38
           },
@@ -49311,7 +49119,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 39,
             "interior_hierarchy_levels": "[\"2LT\", \"AH2 GT2 Bucket Seats\", \"Adrenaline Red\", \"Napa leather seating surfaces with perforated inserts.\", \"Adrenaline Red Two Tone\"]",
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red Two Tone",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red Two Tone",
             "interior_reference_order": 39
           },
@@ -49345,7 +49153,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 5,
             "interior_hierarchy_levels": "[\"2LT\", \"AQ9 GT1 Bucket Seats\", \"Jet Black\", \"Jet Black\"]",
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Jet Black > Jet Black",
-            "interior_parent_group_label": "Jet Black",
+            "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Jet Black",
             "interior_reference_order": 5
           },
@@ -49386,7 +49194,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 6,
             "interior_hierarchy_levels": "[\"2LT\", \"AQ9 GT1 Bucket Seats\", \"Jet Black\", \"Jet Black with Yellow Stitching\"]",
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Jet Black > Jet Black with Yellow Stitching",
-            "interior_parent_group_label": "Jet Black",
+            "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
             "interior_reference_order": 6
           },
@@ -49427,7 +49235,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 7,
             "interior_hierarchy_levels": "[\"2LT\", \"AQ9 GT1 Bucket Seats\", \"Jet Black\", \"Jet Black with Blue Stitching\"]",
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Jet Black > Jet Black with Blue Stitching",
-            "interior_parent_group_label": "Jet Black",
+            "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
             "interior_reference_order": 7
           },
@@ -49468,7 +49276,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 8,
             "interior_hierarchy_levels": "[\"2LT\", \"AQ9 GT1 Bucket Seats\", \"Jet Black\", \"Jet Black with Red Stitching\"]",
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Jet Black > Jet Black with Red Stitching",
-            "interior_parent_group_label": "Jet Black",
+            "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
             "interior_reference_order": 8
           },
@@ -49611,7 +49419,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 115,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Very Dark Atmosphere\", \"Napa leather seating surfaces with perforated inserts.\", \"Very Dark Atmosphere\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Very Dark Atmosphere > Napa leather seating surfaces with perforated inserts. > Very Dark Atmosphere",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Very Dark Atmosphere",
             "interior_reference_order": 115
           },
@@ -49658,7 +49466,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 116,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Very Dark Atmosphere\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Very Dark Atmosphere Suede\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Very Dark Atmosphere > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Very Dark Atmosphere Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Very Dark Atmosphere Suede",
             "interior_reference_order": 116
           },
@@ -49699,7 +49507,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 112,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Santorini Blue\", \"Santorini Blue\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Santorini Blue > Santorini Blue",
-            "interior_parent_group_label": "Santorini Blue",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Santorini Blue",
             "interior_reference_order": 112
           },
@@ -49740,7 +49548,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 126,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Asymmetrical Santorini Blue / Jet Black\", \"Asymmetrical Santorini Blue / Jet Black\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Asymmetrical Santorini Blue / Jet Black > Asymmetrical Santorini Blue / Jet Black",
-            "interior_parent_group_label": "Asymmetrical Santorini Blue / Jet Black",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Asymmetrical Santorini Blue / Jet Black",
             "interior_reference_order": 126
           },
@@ -49781,7 +49589,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 107,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Adrenaline Red Dipped\", \"Adrenaline Red Dipped\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Adrenaline Red Dipped > Adrenaline Red Dipped",
-            "interior_parent_group_label": "Adrenaline Red Dipped",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red Dipped",
             "interior_reference_order": 107
           },
@@ -49822,7 +49630,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 95,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black",
             "interior_reference_order": 95
           },
@@ -49869,7 +49677,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 96,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black with Yellow Stitching\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Yellow Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
             "interior_reference_order": 96
           },
@@ -49916,7 +49724,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 97,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black with Blue Stitching\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Blue Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
             "interior_reference_order": 97
           },
@@ -49963,7 +49771,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 98,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black with Red Stitching\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Red Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
             "interior_reference_order": 98
           },
@@ -50010,7 +49818,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 109,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Natural\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Natural Suede\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural Suede",
             "interior_reference_order": 109
           },
@@ -50057,7 +49865,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 99,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede",
             "interior_reference_order": 99
           },
@@ -50110,7 +49918,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 100,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede with Yellow Stitching\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Yellow Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Yellow Stitching",
             "interior_reference_order": 100
           },
@@ -50163,7 +49971,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 101,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede with Blue Stitching\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Blue Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Blue Stitching",
             "interior_reference_order": 101
           },
@@ -50216,7 +50024,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 102,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede with Red Stitching\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Red Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Red Stitching",
             "interior_reference_order": 102
           },
@@ -50257,7 +50065,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 103,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Sky Cool Gray\", \"Napa leather seating surfaces with perforated inserts.\", \"Sky Cool Gray\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Sky Cool Gray",
             "interior_reference_order": 103
           },
@@ -50298,7 +50106,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 105,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Adrenaline Red\", \"Napa leather seating surfaces with perforated inserts.\", \"Adrenaline Red\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red",
             "interior_reference_order": 105
           },
@@ -50345,7 +50153,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 104,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Sky Cool Gray\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Sky Cool Gray Suede\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
             "interior_reference_order": 104
           },
@@ -50392,7 +50200,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 106,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Adrenaline Red\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Adrenaline Red Suede\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Adrenaline Red > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red Suede",
             "interior_reference_order": 106
           },
@@ -50439,7 +50247,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 121,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Ultimate Suede Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Ultimate Suede Jet Black\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black",
             "interior_reference_order": 121
           },
@@ -50492,7 +50300,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 122,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Ultimate Suede Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Ultimate Suede Jet Black with Yellow Stitching\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black with Yellow Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Yellow Stitching",
             "interior_reference_order": 122
           },
@@ -50545,7 +50353,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 123,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Ultimate Suede Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Ultimate Suede Jet Black with Blue Stitching\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black with Blue Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Blue Stitching",
             "interior_reference_order": 123
           },
@@ -50598,7 +50406,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 124,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Ultimate Suede Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Ultimate Suede Jet Black with Red Stitching\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black with Red Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Red Stitching",
             "interior_reference_order": 124
           },
@@ -50639,7 +50447,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 117,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Ultimate Suede Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Ultimate Suede Jet Black\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black",
             "interior_reference_order": 117
           },
@@ -50686,7 +50494,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 118,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Ultimate Suede Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Ultimate Suede Jet Black with Yellow Stitching\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Yellow Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Yellow Stitching",
             "interior_reference_order": 118
           },
@@ -50733,7 +50541,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 119,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Ultimate Suede Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Ultimate Suede Jet Black with Blue Stitching\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Blue Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Blue Stitching",
             "interior_reference_order": 119
           },
@@ -50780,7 +50588,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 120,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Ultimate Suede Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Ultimate Suede Jet Black with Red Stitching\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Red Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Red Stitching",
             "interior_reference_order": 120
           },
@@ -50821,7 +50629,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 108,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Natural\", \"Napa leather seating surfaces with perforated inserts.\", \"Natural\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural",
             "interior_reference_order": 108
           },
@@ -50868,7 +50676,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 111,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Natural Dipped\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Natural Dipped Suede\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Natural Dipped > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Dipped Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural Dipped Suede",
             "interior_reference_order": 111
           },
@@ -50909,7 +50717,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 113,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Habanero\", \"Napa leather seating surfaces with perforated inserts.\", \"Habanero\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Habanero > Napa leather seating surfaces with perforated inserts. > Habanero",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Habanero",
             "interior_reference_order": 113
           },
@@ -50956,7 +50764,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 114,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Habanero\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Habanero Suede\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Habanero > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Habanero Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Habanero Suede",
             "interior_reference_order": 114
           },
@@ -50997,7 +50805,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 125,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Asymmetrical Adrenaline Red / Jet Black\", \"Asymmetrical Adrenaline Red / Jet Black\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Asymmetrical Adrenaline Red / Jet Black > Asymmetrical Adrenaline Red / Jet Black",
-            "interior_parent_group_label": "Asymmetrical Adrenaline Red / Jet Black",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Asymmetrical Adrenaline Red / Jet Black",
             "interior_reference_order": 125
           },
@@ -51038,7 +50846,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 110,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Natural Dipped\", \"Napa leather seating surfaces with perforated inserts.\", \"Natural Dipped\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Natural Dipped > Napa leather seating surfaces with perforated inserts. > Natural Dipped",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural Dipped",
             "interior_reference_order": 110
           },
@@ -51072,7 +50880,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 70,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Very Dark Atmosphere\", \"Napa leather seating surfaces with perforated inserts.\", \"Very Dark Atmosphere\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Very Dark Atmosphere > Napa leather seating surfaces with perforated inserts. > Very Dark Atmosphere",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Very Dark Atmosphere",
             "interior_reference_order": 70
           },
@@ -51113,7 +50921,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 71,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Very Dark Atmosphere\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Very Dark Atmosphere Suede\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Very Dark Atmosphere > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Very Dark Atmosphere Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Very Dark Atmosphere Suede",
             "interior_reference_order": 71
           },
@@ -51147,7 +50955,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 67,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Santorini Blue\", \"Santorini Blue\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Santorini Blue > Santorini Blue",
-            "interior_parent_group_label": "Santorini Blue",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Santorini Blue",
             "interior_reference_order": 67
           },
@@ -51181,7 +50989,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 81,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Asymmetrical Santorini Blue / Jet Black\", \"Asymmetrical Santorini Blue / Jet Black\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Asymmetrical Santorini Blue / Jet Black > Asymmetrical Santorini Blue / Jet Black",
-            "interior_parent_group_label": "Asymmetrical Santorini Blue / Jet Black",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Asymmetrical Santorini Blue / Jet Black",
             "interior_reference_order": 81
           },
@@ -51215,7 +51023,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 60,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Adrenaline Red Dipped\", \"Adrenaline Red Dipped\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Adrenaline Red Dipped > Adrenaline Red Dipped",
-            "interior_parent_group_label": "Adrenaline Red Dipped",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red Dipped",
             "interior_reference_order": 60
           },
@@ -51249,7 +51057,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 45,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black",
             "interior_reference_order": 45
           },
@@ -51290,7 +51098,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 46,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black with Yellow Stitching\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Yellow Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
             "interior_reference_order": 46
           },
@@ -51331,7 +51139,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 47,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black with Blue Stitching\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Blue Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
             "interior_reference_order": 47
           },
@@ -51372,7 +51180,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 48,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black with Red Stitching\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Red Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
             "interior_reference_order": 48
           },
@@ -51413,7 +51221,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 63,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Natural\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Natural Suede\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Suede",
             "interior_reference_order": 63
           },
@@ -51460,7 +51268,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 64,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Natural\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Natural Suede Two Tone\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede Two Tone",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Suede Two Tone",
             "interior_reference_order": 64
           },
@@ -51501,7 +51309,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 49,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede",
             "interior_reference_order": 49
           },
@@ -51548,7 +51356,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 50,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede with Yellow Stitching\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Yellow Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Yellow Stitching",
             "interior_reference_order": 50
           },
@@ -51595,7 +51403,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 51,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede with Blue Stitching\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Blue Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Blue Stitching",
             "interior_reference_order": 51
           },
@@ -51642,7 +51450,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 52,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black Suede with Red Stitching\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Red Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Red Stitching",
             "interior_reference_order": 52
           },
@@ -51676,7 +51484,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 53,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Sky Cool Gray\", \"Napa leather seating surfaces with perforated inserts.\", \"Sky Cool Gray\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray",
             "interior_reference_order": 53
           },
@@ -51717,7 +51525,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 54,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Sky Cool Gray\", \"Napa leather seating surfaces with perforated inserts.\", \"Sky Cool Gray Two Tone\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray Two Tone",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Two Tone",
             "interior_reference_order": 54
           },
@@ -51751,7 +51559,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 57,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Adrenaline Red\", \"Napa leather seating surfaces with perforated inserts.\", \"Adrenaline Red\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red",
             "interior_reference_order": 57
           },
@@ -51792,7 +51600,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 58,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Adrenaline Red\", \"Napa leather seating surfaces with perforated inserts.\", \"Adrenaline Red Two Tone\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red Two Tone",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red Two Tone",
             "interior_reference_order": 58
           },
@@ -51833,7 +51641,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 55,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Sky Cool Gray\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Sky Cool Gray Suede\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
             "interior_reference_order": 55
           },
@@ -51880,7 +51688,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 56,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Sky Cool Gray\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Sky Cool Gray Suede Two Tone\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede Two Tone",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Suede Two Tone",
             "interior_reference_order": 56
           },
@@ -51927,7 +51735,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 59,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Adrenaline Red\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Adrenaline Red Suede Two Tone\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Adrenaline Red > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red Suede Two Tone",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red Suede Two Tone",
             "interior_reference_order": 59
           },
@@ -51968,7 +51776,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 76,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Ultimate Suede Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Ultimate Suede Jet Black suede\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black suede",
             "interior_reference_order": 76
           },
@@ -52015,7 +51823,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 77,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Ultimate Suede Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Ultimate Suede Jet Black suede with Yellow Stitching\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black suede with Yellow Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black suede with Yellow Stitching",
             "interior_reference_order": 77
           },
@@ -52062,7 +51870,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 78,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Ultimate Suede Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Ultimate Suede Jet Black suede with Blue Stitching\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black suede with Blue Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black suede with Blue Stitching",
             "interior_reference_order": 78
           },
@@ -52109,7 +51917,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 79,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Ultimate Suede Jet Black\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Ultimate Suede Jet Black suede with Red Stitching\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black suede with Red Stitching",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black suede with Red Stitching",
             "interior_reference_order": 79
           },
@@ -52143,7 +51951,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 72,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Ultimate Suede Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Ultimate Suede Jet Black\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black",
             "interior_reference_order": 72
           },
@@ -52184,7 +51992,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 73,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Ultimate Suede Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Ultimate Suede Jet Black with Yellow Stitching\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Yellow Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Yellow Stitching",
             "interior_reference_order": 73
           },
@@ -52225,7 +52033,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 74,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Ultimate Suede Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Ultimate Suede Jet Black with Blue Stitching\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Blue Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Blue Stitching",
             "interior_reference_order": 74
           },
@@ -52266,7 +52074,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 75,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Ultimate Suede Jet Black\", \"Napa leather seating surfaces with perforated inserts.\", \"Ultimate Suede Jet Black with Red Stitching\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Red Stitching",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Red Stitching",
             "interior_reference_order": 75
           },
@@ -52300,7 +52108,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 61,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Natural\", \"Napa leather seating surfaces with perforated inserts.\", \"Natural\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural",
             "interior_reference_order": 61
           },
@@ -52341,7 +52149,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 62,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Natural\", \"Napa leather seating surfaces with perforated inserts.\", \"Natural Two Tone\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural Two Tone",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Two Tone",
             "interior_reference_order": 62
           },
@@ -52382,7 +52190,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 66,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Natural Dipped\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Natural Dipped Suede\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural Dipped > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Dipped Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Dipped Suede",
             "interior_reference_order": 66
           },
@@ -52416,7 +52224,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 68,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Habanero\", \"Napa leather seating surfaces with perforated inserts.\", \"Habanero\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Habanero > Napa leather seating surfaces with perforated inserts. > Habanero",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Habanero",
             "interior_reference_order": 68
           },
@@ -52457,7 +52265,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 69,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Habanero\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Habanero Suede\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Habanero > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Habanero Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Habanero Suede",
             "interior_reference_order": 69
           },
@@ -52491,7 +52299,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 80,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Asymmetrical Adrenaline Red / Jet Black\", \"Asymmetrical Adrenaline Red / Jet Black\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Asymmetrical Adrenaline Red / Jet Black > Asymmetrical Adrenaline Red / Jet Black",
-            "interior_parent_group_label": "Asymmetrical Adrenaline Red / Jet Black",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Asymmetrical Adrenaline Red / Jet Black",
             "interior_reference_order": 80
           },
@@ -52525,7 +52333,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 65,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Natural Dipped\", \"Napa leather seating surfaces with perforated inserts.\", \"Natural Dipped\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural Dipped > Napa leather seating surfaces with perforated inserts. > Natural Dipped",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Dipped",
             "interior_reference_order": 65
           },
@@ -52632,7 +52440,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -52642,7 +52450,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "stitching"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -52654,7 +52462,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 129,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Custom Interior trim and seat combinations\", \"Jet Black interior / Adrenaline Red seats\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black interior / Adrenaline Red seats\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Custom Interior trim and seat combinations > Jet Black interior / Adrenaline Red seats > Napa leather seating surfaces with perforated inserts. > Jet Black interior / Adrenaline Red seats",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats",
             "interior_reference_order": 129
           },
@@ -52679,11 +52487,11 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -52695,7 +52503,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 127,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Custom Interior trim and seat combinations\", \"Adrenaline Red interior / Jet Black seats\", \"Napa leather seating surfaces with perforated inserts.\", \"Adrenaline Red interior / Jet Black seats\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Custom Interior trim and seat combinations > Adrenaline Red interior / Jet Black seats > Napa leather seating surfaces with perforated inserts. > Adrenaline Red interior / Jet Black seats",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats",
             "interior_reference_order": 127
           },
@@ -52720,7 +52528,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -52736,7 +52544,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -52748,7 +52556,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 130,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Custom Interior trim and seat combinations\", \"Jet Black interior / Adrenaline Red seats\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black interior / Adrenaline Red seats Suede\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Custom Interior trim and seat combinations > Jet Black interior / Adrenaline Red seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black interior / Adrenaline Red seats Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats Suede",
             "interior_reference_order": 130
           },
@@ -52773,7 +52581,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -52783,7 +52591,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -52795,7 +52603,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 128,
             "interior_hierarchy_levels": "[\"3LT\", \"AE4 Competition Seats\", \"Custom Interior trim and seat combinations\", \"Adrenaline Red interior / Jet Black seats\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Adrenaline Red interior / Jet Black seats Suede\"]",
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Custom Interior trim and seat combinations > Adrenaline Red interior / Jet Black seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red interior / Jet Black seats Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats Suede",
             "interior_reference_order": 128
           },
@@ -52842,7 +52650,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 86,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Custom Interior trim and seat combinations\", \"Jet Black interior / Sky Cool Gray seats\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black interior / Sky Cool Gray seats Suede\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Sky Cool Gray seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black interior / Sky Cool Gray seats Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats Suede",
             "interior_reference_order": 86
           },
@@ -52895,7 +52703,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 87,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Custom Interior trim and seat combinations\", \"Jet Black interior / Sky Cool Gray seats\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black interior / Sky Cool Gray seats Suede Two Tone\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Sky Cool Gray seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black interior / Sky Cool Gray seats Suede Two Tone",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats Suede Two Tone",
             "interior_reference_order": 87
           },
@@ -52942,7 +52750,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 90,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Custom Interior trim and seat combinations\", \"Jet Black interior / Adrenaline Red seats\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black interior / Adrenaline Red seats\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Adrenaline Red seats > Napa leather seating surfaces with perforated inserts. > Jet Black interior / Adrenaline Red seats",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats",
             "interior_reference_order": 90
           },
@@ -52995,7 +52803,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 91,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Custom Interior trim and seat combinations\", \"Jet Black interior / Adrenaline Red seats\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black interior / Adrenaline Red seats Two Tone\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Adrenaline Red seats > Napa leather seating surfaces with perforated inserts. > Jet Black interior / Adrenaline Red seats Two Tone",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats Two Tone",
             "interior_reference_order": 91
           },
@@ -53036,7 +52844,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 88,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Custom Interior trim and seat combinations\", \"Adrenaline Red interior / Jet Black seats\", \"Napa leather seating surfaces with perforated inserts.\", \"Adrenaline Red interior / Jet Black seats (HUU)\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Adrenaline Red interior / Jet Black seats > Napa leather seating surfaces with perforated inserts. > Adrenaline Red interior / Jet Black seats (HUU)",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats (HUU)",
             "interior_reference_order": 88
           },
@@ -53083,7 +52891,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 83,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Custom Interior trim and seat combinations\", \"Sky Cool Gray interior / Jet Black seats\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Sky Cool Gray interior / Jet Black seats Suede (HVT)\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Sky Cool Gray interior / Jet Black seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray interior / Jet Black seats Suede (HVT)",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray interior / Jet Black seats Suede (HVT)",
             "interior_reference_order": 83
           },
@@ -53124,7 +52932,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 84,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Custom Interior trim and seat combinations\", \"Jet Black interior / Sky Cool Gray seats\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black interior / Sky Cool Gray seats (HVV)\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Sky Cool Gray seats > Napa leather seating surfaces with perforated inserts. > Jet Black interior / Sky Cool Gray seats (HVV)",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats (HVV)",
             "interior_reference_order": 84
           },
@@ -53171,7 +52979,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 85,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Custom Interior trim and seat combinations\", \"Jet Black interior / Sky Cool Gray seats\", \"Napa leather seating surfaces with perforated inserts.\", \"Jet Black interior / Sky Cool Gray seats Two Tone\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Sky Cool Gray seats > Napa leather seating surfaces with perforated inserts. > Jet Black interior / Sky Cool Gray seats Two Tone",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats Two Tone",
             "interior_reference_order": 85
           },
@@ -53230,7 +53038,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 92,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Custom Interior trim and seat combinations\", \"Jet Black interior / Adrenaline Red seats\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Jet Black interior / Adrenaline Red seats Suede HXO\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Adrenaline Red seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black interior / Adrenaline Red seats Suede HXO",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats Suede HXO",
             "interior_reference_order": 92
           },
@@ -53271,7 +53079,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 82,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Custom Interior trim and seat combinations\", \"Sky Cool Gray interior / Jet Black seats\", \"Napa leather seating surfaces with perforated inserts.\", \"Sky Cool Gray interior / Jet Black seats (HZB)\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Sky Cool Gray interior / Jet Black seats > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray interior / Jet Black seats (HZB)",
-            "interior_parent_group_label": "Napa leather seating surfaces with perforated inserts.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray interior / Jet Black seats (HZB)",
             "interior_reference_order": 82
           },
@@ -53318,7 +53126,7 @@ window.CORVETTE_FORM_DATA = {
             "interior_choice_display_order": 89,
             "interior_hierarchy_levels": "[\"3LT\", \"AH2 GT2 Bucket Seats\", \"Custom Interior trim and seat combinations\", \"Adrenaline Red interior / Jet Black seats\", \"Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.\", \"Adrenaline Red interior / Jet Black seats Suede\"]",
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Adrenaline Red interior / Jet Black seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red interior / Jet Black seats Suede",
-            "interior_parent_group_label": "Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel.",
+            "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats Suede",
             "interior_reference_order": 89
           }
@@ -55326,7 +55134,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-09T23:24:40+00:00",
+          "generated_at": "2026-06-11T01:11:58+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -61390,15 +61198,15 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "1lt_e07",
             "body_style": "coupe",
             "trim_level": "1LT",
-            "status": "unavailable",
-            "status_label": "Not Available",
+            "status": "available",
+            "status_label": "Available",
             "selectable": "False",
-            "active": "False",
+            "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1495,
-            "display_behavior": "auto_only",
+            "display_behavior": "display_only",
             "display_order": 10,
             "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
@@ -61415,15 +61223,15 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "2lt_e07",
             "body_style": "coupe",
             "trim_level": "2LT",
-            "status": "unavailable",
-            "status_label": "Not Available",
+            "status": "available",
+            "status_label": "Available",
             "selectable": "False",
-            "active": "False",
+            "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1495,
-            "display_behavior": "auto_only",
+            "display_behavior": "display_only",
             "display_order": 10,
             "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
@@ -61440,15 +61248,15 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "3lt_e07",
             "body_style": "coupe",
             "trim_level": "3LT",
-            "status": "unavailable",
-            "status_label": "Not Available",
+            "status": "available",
+            "status_label": "Available",
             "selectable": "False",
-            "active": "False",
+            "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1495,
-            "display_behavior": "auto_only",
+            "display_behavior": "display_only",
             "display_order": 10,
             "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
@@ -61465,15 +61273,15 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "1lt_e67",
             "body_style": "convertible",
             "trim_level": "1LT",
-            "status": "unavailable",
-            "status_label": "Not Available",
+            "status": "available",
+            "status_label": "Available",
             "selectable": "False",
-            "active": "False",
+            "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1495,
-            "display_behavior": "auto_only",
+            "display_behavior": "display_only",
             "display_order": 10,
             "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
@@ -61490,15 +61298,15 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "2lt_e67",
             "body_style": "convertible",
             "trim_level": "2LT",
-            "status": "unavailable",
-            "status_label": "Not Available",
+            "status": "available",
+            "status_label": "Available",
             "selectable": "False",
-            "active": "False",
+            "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1495,
-            "display_behavior": "auto_only",
+            "display_behavior": "display_only",
             "display_order": 10,
             "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
@@ -61515,15 +61323,15 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "3lt_e67",
             "body_style": "convertible",
             "trim_level": "3LT",
-            "status": "unavailable",
-            "status_label": "Not Available",
+            "status": "available",
+            "status_label": "Available",
             "selectable": "False",
-            "active": "False",
+            "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1495,
-            "display_behavior": "auto_only",
+            "display_behavior": "display_only",
             "display_order": 10,
             "source_detail_raw": "1. To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
@@ -99947,8 +99755,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Available on SOLD orders only. Not available with (R8C) Corvette Museum Delivery.",
-            "review_flag": "False"
+            "source_note": "1. Available on SOLD orders only. Not available with (R8C) Corvette Museum Delivery."
           },
           {
             "rule_id": "gs_rule_opt_b6p_001_includes_opt_d3v_001",
@@ -99966,8 +99773,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-            "review_flag": "False"
+            "source_note": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers."
           },
           {
             "rule_id": "gs_copy_rule_opt_b6p_001_includes_opt_sl9_001_opt_b6p_001_includes_opt_sl9_001",
@@ -99985,8 +99791,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package."
           },
           {
             "rule_id": "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_002_requires_opt_zz3_001_convertible",
@@ -100004,8 +99809,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Includes (D3V) engine lighting. Requires (B6P) on Coupe 2. Requires (ZZ3) Convertible Engine Appearance Package.",
-            "review_flag": "False"
+            "source_note": "1. Includes (D3V) engine lighting. Requires (B6P) on Coupe 2. Requires (ZZ3) Convertible Engine Appearance Package."
           },
           {
             "rule_id": "gs_rule_opt_bc4_002_includes_opt_d3v_001",
@@ -100023,8 +99827,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "review_flag": "False"
+            "source_note": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "rule_id": "gs_copy_rule_opt_bc7_001_requires_opt_zz3_001_convertible_opt_bc7_001_requires_opt_zz3_001_convertible",
@@ -100042,8 +99845,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "BC7 requires ZZ3 Convertible Engine Appearance Package on Convertible.",
-            "review_flag": "False"
+            "source_note": "BC7 requires ZZ3 Convertible Engine Appearance Package on Convertible."
           },
           {
             "rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_002_requires_opt_zz3_001_convertible",
@@ -100061,8 +99863,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting. 2. Requires (ZZ3) Convertible Engine Appearance Package.",
-            "review_flag": "False"
+            "source_note": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting. 2. Requires (ZZ3) Convertible Engine Appearance Package."
           },
           {
             "rule_id": "gs_rule_opt_bcp_002_includes_opt_d3v_001",
@@ -100080,8 +99881,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "review_flag": "False"
+            "source_note": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_002_requires_opt_zz3_001_convertible",
@@ -100099,8 +99899,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting. 2. Requires (ZZ3) Convertible Engine Appearance Package.",
-            "review_flag": "False"
+            "source_note": "1. Requires (B6P) on Coupe. Includes (D3V) engine lighting. 2. Requires (ZZ3) Convertible Engine Appearance Package."
           },
           {
             "rule_id": "gs_rule_opt_bcs_002_includes_opt_d3v_001",
@@ -100118,8 +99917,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Includes (D3V) engine lighting. This option is without (B6P)",
-            "review_flag": "False"
+            "source_note": "1. Includes (D3V) engine lighting. This option is without (B6P)"
           },
           {
             "rule_id": "gs_copy_rule_opt_zz3_001_includes_opt_bc7_002_opt_zz3_001_includes_opt_bc7_001",
@@ -100137,8 +99935,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes window under tonneau cover, (BC7) Black LS6 engine cover and (SL9) engine specification plaque, LPO",
-            "review_flag": "False"
+            "source_note": "includes window under tonneau cover, (BC7) Black LS6 engine cover and (SL9) engine specification plaque, LPO"
           },
           {
             "rule_id": "gs_copy_rule_opt_zz3_001_includes_opt_sl9_001_opt_zz3_001_includes_opt_sl9_001",
@@ -100156,8 +99953,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package."
           },
           {
             "rule_id": "gs_copy_rule_opt_nwi_001_requires_opt_wub_001_opt_nwi_001_requires_opt_wub_001",
@@ -100175,8 +99971,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (WUB) quad center exit exhaust.",
-            "review_flag": "False"
+            "source_note": "1. Requires (WUB) quad center exit exhaust."
           },
           {
             "rule_id": "gs_rule_opt_fey_001_includes_opt_wub_001",
@@ -100194,8 +99989,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (FEY) Z52 Track Performance Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (FEY) Z52 Track Performance Package."
           },
           {
             "rule_id": "gs_copy_rule_opt_r8c_001_includes_opt_cfx_001_opt_r8c_001_includes_opt_cfx_001",
@@ -100213,8 +100007,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN",
-            "review_flag": "False"
+            "source_note": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
           },
           {
             "rule_id": "gs_copy_rule_opt_5jr_001_includes_opt_drg_001_opt_5jr_001_includes_opt_drg_001",
@@ -100232,8 +100025,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors, Genuine Corvette Accessory",
-            "review_flag": "False"
+            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors, Genuine Corvette Accessory"
           },
           {
             "rule_id": "gs_copy_rule_opt_e60_001_includes_opt_tr7_001_opt_e60_001_includes_opt_tr7_001",
@@ -100251,8 +100043,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (TR7) automatic headlamp leveling system",
-            "review_flag": "False"
+            "source_note": "includes (TR7) automatic headlamp leveling system"
           },
           {
             "rule_id": "gs_rule_opt_feb_001_includes_opt_j56_001",
@@ -100270,8 +100061,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "review_flag": "False"
+            "source_note": "1. Included and only available with (FEB) Z52 Sport Performance Package."
           },
           {
             "rule_id": "gs_rule_opt_feb_001_includes_opt_xfr_001",
@@ -100289,8 +100079,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included and only available with (FEB) Z52 Sport Performance Package.",
-            "review_flag": "False"
+            "source_note": "1. Included and only available with (FEB) Z52 Sport Performance Package."
           },
           {
             "rule_id": "gs_rule_opt_fey_001_includes_opt_xfs_001",
@@ -100308,8 +100097,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included and only available with (FEY) Z52 Track Performance Package.",
-            "review_flag": "False"
+            "source_note": "1. Included and only available with (FEY) Z52 Track Performance Package."
           },
           {
             "rule_id": "gs_copy_rule_opt_zyc_001_includes_opt_drg_001_opt_zyc_001_includes_opt_drg_001",
@@ -100327,8 +100115,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors. Also includes Carbon Flash Metallic-painted spoiler when (Z51) Z51 Performance Package or (TVS) low-profile rear spoiler and front splitter is ordered. Not available with exterior color (GBA) Black.",
-            "review_flag": "False"
+            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors. Also includes Carbon Flash Metallic-painted spoiler when (Z51) Z51 Performance Package or (TVS) low-profile rear spoiler and front splitter is ordered. Not available with exterior color (GBA) Black."
           },
           {
             "rule_id": "gs_rule_opt_pcq_001_includes_opt_vwe_001",
@@ -100346,8 +100133,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "rule_id": "gs_rule_opt_pcq_001_includes_opt_vwt_001",
@@ -100365,8 +100151,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "rule_id": "gs_copy_rule_opt_pdy_001_includes_opt_ryt_001_opt_pdy_001_includes_opt_ryt_001",
@@ -100384,8 +100169,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PDY) Roadside Safety Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "rule_id": "gs_copy_rule_opt_pdy_001_includes_opt_s08_001_opt_pdy_001_includes_opt_s08_001",
@@ -100403,8 +100187,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PDY) Roadside Safety Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "rule_id": "gs_copy_rule_opt_sbt_001_includes_opt_sc7_001_opt_sbt_001_includes_opt_sc7_001",
@@ -100422,8 +100205,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (SBT) dual roof, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (SBT) dual roof, LPO."
           },
           {
             "rule_id": "gs_copy_rule_opt_pef_001_includes_opt_cav_001_opt_pef_001_includes_opt_cav_001",
@@ -100441,8 +100223,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "rule_id": "gs_copy_rule_opt_pef_001_includes_opt_ria_001_opt_pef_001_includes_opt_ria_001",
@@ -100460,8 +100241,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "rule_id": "gs_rule_opt_dmv_001_excludes_opt_gka_001",
@@ -100479,8 +100259,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
           },
           {
             "rule_id": "gs_rule_opt_dmw_001_excludes_opt_g8g_001",
@@ -100498,8 +100277,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White.",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White."
           },
           {
             "rule_id": "gs_rule_opt_dmx_001_excludes_opt_gtr_001",
@@ -100517,8 +100295,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "rule_id": "gs_rule_opt_dmy_001_excludes_opt_gkz_001",
@@ -100536,8 +100313,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "gs_rule_opt_dmy_001_excludes_opt_gph_001",
@@ -100555,8 +100331,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "gs_rule_opt_17a_001_excludes_opt_gka_001",
@@ -100574,8 +100349,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
           },
           {
             "rule_id": "gs_rule_opt_20a_001_excludes_opt_gtr_001",
@@ -100593,8 +100367,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "rule_id": "gs_rule_opt_55a_001_excludes_opt_gbk_001",
@@ -100612,8 +100385,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "rule_id": "gs_rule_opt_75a_001_excludes_opt_gkz_001",
@@ -100631,8 +100403,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "rule_id": "gs_rule_opt_75a_001_excludes_opt_gph_001",
@@ -100650,8 +100421,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "rule_id": "gs_rule_opt_dx4_001_excludes_opt_gkz_001",
@@ -100669,8 +100439,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "rule_id": "gs_rule_opt_dx4_001_excludes_opt_gph_001",
@@ -100688,8 +100457,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat"
           },
           {
             "rule_id": "gs_copy_rule_opt_d84_001_excludes_opt_gba_001_opt_d84_001_excludes_opt_gba_001",
@@ -100707,8 +100475,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GBA) Black.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GBA) Black."
           },
           {
             "rule_id": "gs_copy_rule_opt_d86_001_excludes_opt_gba_001_opt_d86_001_excludes_opt_gba_001",
@@ -100726,8 +100493,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GBA) Black.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GBA) Black."
           },
           {
             "rule_id": "gs_copy_rule_opt_zyc_001_excludes_opt_gba_001_opt_zyc_001_excludes_opt_gba_001",
@@ -100745,8 +100511,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors. Also includes Carbon Flash Metallic-painted spoiler when (Z51) Z51 Performance Package or (TVS) low-profile rear spoiler and front splitter is ordered. Not available with exterior color (GBA) Black.",
-            "review_flag": "False"
+            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors. Also includes Carbon Flash Metallic-painted spoiler when (Z51) Z51 Performance Package or (TVS) low-profile rear spoiler and front splitter is ordered. Not available with exterior color (GBA) Black."
           },
           {
             "rule_id": "gs_copy_rule_opt_dpb_001_excludes_opt_gtr_001_opt_dpb_001_excludes_opt_gtr_001",
@@ -100764,8 +100529,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "rule_id": "gs_copy_rule_opt_dpc_001_excludes_opt_gbk_001_opt_dpc_001_excludes_opt_gbk_001",
@@ -100783,8 +100547,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "rule_id": "gs_copy_rule_opt_dpg_001_excludes_opt_g26_001_opt_dpg_001_excludes_opt_g26_001",
@@ -100802,8 +100565,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "rule_id": "gs_copy_rule_opt_dpl_001_excludes_opt_gkz_001_opt_dpl_001_excludes_opt_gkz_001",
@@ -100821,8 +100583,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "gs_copy_rule_opt_dpl_001_excludes_opt_gph_001_opt_dpl_001_excludes_opt_gph_001",
@@ -100840,8 +100601,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "gs_copy_rule_opt_dsy_001_excludes_opt_g26_001_opt_dsy_001_excludes_opt_g26_001",
@@ -100859,8 +100619,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (G26) Sebring Orange Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (G26) Sebring Orange Tintcoat."
           },
           {
             "rule_id": "gs_copy_rule_opt_dsz_001_excludes_opt_gkz_001_opt_dsz_001_excludes_opt_gkz_001",
@@ -100878,8 +100637,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "gs_copy_rule_opt_dsz_001_excludes_opt_gph_001_opt_dsz_001_excludes_opt_gph_001",
@@ -100897,8 +100655,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "gs_copy_rule_opt_dt0_001_excludes_opt_gbk_001_opt_dt0_001_excludes_opt_gbk_001",
@@ -100916,8 +100673,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "rule_id": "gs_copy_rule_opt_due_001_excludes_opt_gtr_001_opt_due_001_excludes_opt_gtr_001",
@@ -100935,8 +100691,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "rule_id": "gs_copy_rule_opt_duk_001_excludes_opt_gkz_001_opt_duk_001_excludes_opt_gkz_001",
@@ -100954,8 +100709,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "gs_copy_rule_opt_duk_001_excludes_opt_gph_001_opt_duk_001_excludes_opt_gph_001",
@@ -100973,8 +100727,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "gs_copy_rule_opt_duw_001_excludes_opt_gtr_001_opt_duw_001_excludes_opt_gtr_001",
@@ -100992,8 +100745,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "rule_id": "gs_copy_rule_opt_dzu_001_excludes_opt_gbk_001_opt_dzu_001_excludes_opt_gbk_001",
@@ -101011,8 +100763,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GBK) Competition Yellow Tintcoat Metallic."
           },
           {
             "rule_id": "gs_copy_rule_opt_dzx_001_excludes_opt_gkz_001_opt_dzx_001_excludes_opt_gkz_001",
@@ -101030,8 +100781,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "gs_copy_rule_opt_dzx_001_excludes_opt_gph_001_opt_dzx_001_excludes_opt_gph_001",
@@ -101049,8 +100799,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "gs_rule_opt_j6l_001_requires_opt_j57_001",
@@ -101068,8 +100817,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (J57) carbon ceramic brakes.",
-            "review_flag": "False"
+            "source_note": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "rule_id": "gs_rule_opt_cfl_001_excludes_opt_cfz_001",
@@ -101087,8 +100835,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "False",
             "runtime_action": "omit_redundant_same_section_exclude",
-            "source_note": "1. Not available with (CFV/CFZ) ground effects.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (CFV/CFZ) ground effects."
           },
           {
             "rule_id": "gs_rule_opt_fey_001_includes_opt_j57_001",
@@ -101106,8 +100853,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (FEY) Z52 Track Performance Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (FEY) Z52 Track Performance Package."
           },
           {
             "rule_id": "gs_rule_opt_fey_001_includes_opt_t0f_001",
@@ -101125,8 +100871,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package.",
-            "review_flag": "False"
+            "source_note": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package."
           },
           {
             "rule_id": "gs_rule_opt_fey_001_includes_opt_cfz_001",
@@ -101144,8 +100889,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "FEY Z52 Track Performance Package includes CFZ ground effects through the included T0F aero package.",
-            "review_flag": "False"
+            "source_note": "FEY Z52 Track Performance Package includes CFZ ground effects through the included T0F aero package."
           },
           {
             "rule_id": "gs_rule_opt_t0f_001_includes_opt_cfz_001",
@@ -101163,8 +100907,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package."
           },
           {
             "rule_id": "gs_rule_opt_t0f_001_requires_opt_j57_001",
@@ -101182,8 +100925,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package.",
-            "review_flag": "False"
+            "source_note": "1. Requires (FEB) Z52 Sport Performance Package and (J57) carbon ceramic brakes or Included with (FEY) Z52 Track Performance Package."
           },
           {
             "rule_id": "gs_rule_opt_5zv_001_excludes_opt_fey_001",
@@ -101201,8 +100943,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
           },
           {
             "rule_id": "gs_rule_opt_5zv_001_excludes_opt_t0f_001",
@@ -101220,8 +100961,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "False",
             "runtime_action": "omit_redundant_same_section_exclude",
-            "source_note": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
           },
           {
             "rule_id": "gs_rule_opt_roy_001_requires_opt_j57_001",
@@ -101239,8 +100979,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (J57) carbon ceramic brakes.",
-            "review_flag": "False"
+            "source_note": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "rule_id": "gs_rule_opt_roz_001_requires_opt_j57_001",
@@ -101258,8 +100997,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (J57) carbon ceramic brakes.",
-            "review_flag": "False"
+            "source_note": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "rule_id": "gs_rule_opt_stz_001_requires_opt_j57_001",
@@ -101277,8 +101015,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (J57) carbon ceramic brakes.",
-            "review_flag": "False"
+            "source_note": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "rule_id": "gs_copy_rule_opt_sbt_001_excludes_opt_cc3_001_opt_sbt_001_excludes_opt_cc3_001",
@@ -101296,8 +101033,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (CC3) transparent, removable roof panel. adds transparent removable roof panel and includes (SC7) roof panel storage pouch, Genuine Corvette Accessories",
-            "review_flag": "False"
+            "source_note": "1. Not available with (CC3) transparent, removable roof panel. adds transparent removable roof panel and includes (SC7) roof panel storage pouch, Genuine Corvette Accessories"
           },
           {
             "rule_id": "gs_rule_opt_sig_001_requires_opt_t0e_001",
@@ -101315,8 +101051,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (T0E) rear spoiler.",
-            "review_flag": "False"
+            "source_note": "1. Requires (T0E) rear spoiler."
           },
           {
             "rule_id": "gs_rule_opt_dmu_001_requires_opt_z15_001",
@@ -101334,8 +101069,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics.",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics."
           },
           {
             "rule_id": "gs_rule_opt_dmv_001_requires_opt_z15_001",
@@ -101353,8 +101087,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKA) Blade Silver Metallic."
           },
           {
             "rule_id": "gs_rule_opt_dmw_001_requires_opt_z15_001",
@@ -101372,8 +101105,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White.",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (G8G) Arctic White."
           },
           {
             "rule_id": "gs_rule_opt_dmx_001_requires_opt_z15_001",
@@ -101391,8 +101123,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic.",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GTR) Admiral Blue Metallic."
           },
           {
             "rule_id": "gs_rule_opt_dmy_001_requires_opt_z15_001",
@@ -101410,8 +101141,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat.",
-            "review_flag": "False"
+            "source_note": "1. Requires (Z15) Grand Sport Heritage Graphics. Not available with exterior color (GKZ) Torch Red or (GPH) Red Mist Metallic Tintcoat."
           },
           {
             "rule_id": "gs_rule_opt_17a_001_includes_opt_z15_001",
@@ -101429,8 +101159,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "17A Grand Sport Heritage Hash Marks auto-add (Z15) Grand Sport Heritage Graphics.",
-            "review_flag": "False"
+            "source_note": "17A Grand Sport Heritage Hash Marks auto-add (Z15) Grand Sport Heritage Graphics."
           },
           {
             "rule_id": "gs_rule_opt_20a_001_includes_opt_z15_001",
@@ -101448,8 +101177,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "20A Grand Sport Heritage Hash Marks auto-add (Z15) Grand Sport Heritage Graphics.",
-            "review_flag": "False"
+            "source_note": "20A Grand Sport Heritage Hash Marks auto-add (Z15) Grand Sport Heritage Graphics."
           },
           {
             "rule_id": "gs_rule_opt_55a_001_includes_opt_z15_001",
@@ -101467,8 +101195,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "55A Grand Sport Heritage Hash Marks auto-add (Z15) Grand Sport Heritage Graphics.",
-            "review_flag": "False"
+            "source_note": "55A Grand Sport Heritage Hash Marks auto-add (Z15) Grand Sport Heritage Graphics."
           },
           {
             "rule_id": "gs_rule_opt_75a_001_includes_opt_z15_001",
@@ -101486,8 +101213,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "75A Grand Sport Heritage Hash Marks auto-add (Z15) Grand Sport Heritage Graphics.",
-            "review_flag": "False"
+            "source_note": "75A Grand Sport Heritage Hash Marks auto-add (Z15) Grand Sport Heritage Graphics."
           },
           {
             "rule_id": "gs_rule_opt_97a_001_includes_opt_z15_001",
@@ -101505,8 +101231,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "97A Grand Sport Heritage Hash Marks auto-add (Z15) Grand Sport Heritage Graphics.",
-            "review_flag": "False"
+            "source_note": "97A Grand Sport Heritage Hash Marks auto-add (Z15) Grand Sport Heritage Graphics."
           },
           {
             "rule_id": "gs_rule_opt_dx4_001_includes_opt_z15_001",
@@ -101524,8 +101249,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "DX4 Grand Sport Heritage Hash Marks auto-add (Z15) Grand Sport Heritage Graphics.",
-            "review_flag": "False"
+            "source_note": "DX4 Grand Sport Heritage Hash Marks auto-add (Z15) Grand Sport Heritage Graphics."
           },
           {
             "rule_id": "gs_copy_rule_opt_s47_001_excludes_opt_spy_001_opt_s47_001_excludes_opt_spy_001",
@@ -101543,8 +101267,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO."
           },
           {
             "rule_id": "gs_copy_rule_opt_sfe_001_excludes_opt_spy_001_opt_sfe_001_excludes_opt_spy_001",
@@ -101562,8 +101285,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO."
           },
           {
             "rule_id": "gs_copy_rule_opt_spy_001_excludes_opt_s47_001_opt_spy_001_excludes_opt_s47_001",
@@ -101581,8 +101303,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (S47) Chrome lug nuts, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (S47) Chrome lug nuts, LPO."
           },
           {
             "rule_id": "gs_copy_rule_opt_spz_001_requires_opt_spy_001_opt_spz_001_requires_opt_spy_001",
@@ -101600,8 +101321,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (SPY) Black lug nuts, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Requires (SPY) Black lug nuts, LPO."
           },
           {
             "rule_id": "gs_rule_opt_s47_001_excludes_opt_roy_001",
@@ -101619,8 +101339,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "rule_id": "gs_rule_opt_s47_001_excludes_opt_roz_001",
@@ -101638,8 +101357,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "rule_id": "gs_rule_opt_s47_001_excludes_opt_stz_001",
@@ -101657,8 +101375,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "rule_id": "gs_rule_opt_sfe_001_excludes_opt_roy_001",
@@ -101676,8 +101393,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "rule_id": "gs_rule_opt_sfe_001_excludes_opt_roz_001",
@@ -101695,8 +101411,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "rule_id": "gs_rule_opt_sfe_001_excludes_opt_stz_001",
@@ -101714,8 +101429,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "rule_id": "gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible",
@@ -101733,8 +101447,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "BC4 requires ZZ3 Convertible Engine Appearance Package on Convertible.",
-            "review_flag": "False"
+            "source_note": "BC4 requires ZZ3 Convertible Engine Appearance Package on Convertible."
           },
           {
             "rule_id": "gs_rule_opt_j6d_001_requires_opt_j57_001",
@@ -101752,8 +101465,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "J6D Dark Gray Metallic-painted calipers require J57 carbon ceramic brakes.",
-            "review_flag": "False"
+            "source_note": "J6D Dark Gray Metallic-painted calipers require J57 carbon ceramic brakes."
           },
           {
             "rule_id": "gs_rule_opt_j57_001_excludes_opt_j6a_001_replace",
@@ -101771,8 +101483,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "replace",
-            "source_note": "J57 replaces black painted calipers.",
-            "review_flag": "False"
+            "source_note": "J57 replaces black painted calipers."
           },
           {
             "rule_id": "gs_rule_opt_fey_001_excludes_opt_t0e_001_replace",
@@ -101790,8 +101501,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "replace",
-            "source_note": "FEY includes T0F Carbon Fiber Aero Package and replaces T0E Low Rear Spoiler.",
-            "review_flag": "False"
+            "source_note": "FEY includes T0F Carbon Fiber Aero Package and replaces T0E Low Rear Spoiler."
           },
           {
             "rule_id": "gs_rule_3lt_ae4_el9_includes_opt_z25_001",
@@ -101809,8 +101519,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "EL9 Launch Edition interior includes Z25 Grand Sport Launch Edition.",
-            "review_flag": "False"
+            "source_note": "EL9 Launch Edition interior includes Z25 Grand Sport Launch Edition."
           },
           {
             "rule_id": "gs_rule_3lt_ah2_el9_includes_opt_z25_001",
@@ -101828,8 +101537,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "EL9 Launch Edition interior includes Z25 Grand Sport Launch Edition.",
-            "review_flag": "False"
+            "source_note": "EL9 Launch Edition interior includes Z25 Grand Sport Launch Edition."
           },
           {
             "rule_id": "gs_rule_3lt_ae4_h8t_includes_opt_3a9_001",
@@ -101847,8 +101555,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "review_flag": "False"
+            "source_note": "Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "rule_id": "gs_rule_3lt_ae4_hag_includes_opt_3a9_001",
@@ -101866,8 +101573,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "review_flag": "False"
+            "source_note": "Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "rule_id": "gs_rule_3lt_ae4_hnk_includes_opt_3f9_001",
@@ -101885,8 +101591,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
-            "review_flag": "False"
+            "source_note": "Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition."
           },
           {
             "rule_id": "gs_rule_3lt_ae4_huf_n26_includes_opt_3n9_001",
@@ -101904,8 +101609,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (HUF, HZN) Natural Dipped interiors.",
-            "review_flag": "False"
+            "source_note": "Included with (HUF, HZN) Natural Dipped interiors."
           },
           {
             "rule_id": "gs_rule_3lt_ae4_huw_includes_opt_379_001",
@@ -101923,8 +101627,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (HUW, HUX) Habanero interiors.",
-            "review_flag": "False"
+            "source_note": "Included with (HUW, HUX) Habanero interiors."
           },
           {
             "rule_id": "gs_rule_3lt_ae4_hux_n26_includes_opt_379_001",
@@ -101942,8 +101645,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (HUW, HUX) Habanero interiors.",
-            "review_flag": "False"
+            "source_note": "Included with (HUW, HUX) Habanero interiors."
           },
           {
             "rule_id": "gs_rule_3lt_ae4_hzn_includes_opt_3n9_001",
@@ -101961,8 +101663,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (HUF, HZN) Natural Dipped interiors.",
-            "review_flag": "False"
+            "source_note": "Included with (HUF, HZN) Natural Dipped interiors."
           },
           {
             "rule_id": "gs_rule_3lt_ae4_el9_includes_opt_3f9_001",
@@ -101980,8 +101681,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
-            "review_flag": "False"
+            "source_note": "Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition."
           },
           {
             "rule_id": "gs_rule_3lt_ah2_h8t_includes_opt_3a9_001",
@@ -101999,8 +101699,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "review_flag": "False"
+            "source_note": "Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "rule_id": "gs_rule_3lt_ah2_hag_includes_opt_3a9_001",
@@ -102018,8 +101717,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "review_flag": "False"
+            "source_note": "Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "rule_id": "gs_rule_3lt_ah2_hnk_includes_opt_3f9_001",
@@ -102037,8 +101735,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
-            "review_flag": "False"
+            "source_note": "Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition."
           },
           {
             "rule_id": "gs_rule_3lt_ah2_huf_n26_includes_opt_3n9_001",
@@ -102056,8 +101753,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (HUF, HZN) Natural Dipped interiors.",
-            "review_flag": "False"
+            "source_note": "Included with (HUF, HZN) Natural Dipped interiors."
           },
           {
             "rule_id": "gs_rule_3lt_ah2_huw_includes_opt_379_001",
@@ -102075,8 +101771,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (HUW, HUX) Habanero interiors.",
-            "review_flag": "False"
+            "source_note": "Included with (HUW, HUX) Habanero interiors."
           },
           {
             "rule_id": "gs_rule_3lt_ah2_hux_n26_includes_opt_379_001",
@@ -102094,8 +101789,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (HUW, HUX) Habanero interiors.",
-            "review_flag": "False"
+            "source_note": "Included with (HUW, HUX) Habanero interiors."
           },
           {
             "rule_id": "gs_rule_3lt_ah2_hzn_includes_opt_3n9_001",
@@ -102113,8 +101807,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (HUF, HZN) Natural Dipped interiors.",
-            "review_flag": "False"
+            "source_note": "Included with (HUF, HZN) Natural Dipped interiors."
           },
           {
             "rule_id": "gs_rule_3lt_ah2_el9_includes_opt_3f9_001",
@@ -102132,8 +101825,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.",
-            "review_flag": "False"
+            "source_note": "Included with (HNK) Adrenaline Red Dipped interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition."
           },
           {
             "rule_id": "gs_rule_3lt_aup_hag_includes_opt_3a9_001",
@@ -102151,8 +101843,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
-            "review_flag": "False"
+            "source_note": "Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
           },
           {
             "rule_id": "gs_rule_opt_feb_001_excludes_opt_jx6_001_replace",
@@ -102170,8 +101861,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "replace",
-            "source_note": "FEB Z52 Sport Performance Package includes J56 performance disc brakes and replaces JX6 low-dust touring brakes.",
-            "review_flag": "False"
+            "source_note": "FEB Z52 Sport Performance Package includes J56 performance disc brakes and replaces JX6 low-dust touring brakes."
           },
           {
             "rule_id": "gs_rule_opt_fey_001_excludes_opt_jx6_001_replace",
@@ -102189,8 +101879,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "replace",
-            "source_note": "FEY Z52 Track Performance Package includes J57 carbon ceramic brakes and replaces JX6 low-dust touring brakes.",
-            "review_flag": "False"
+            "source_note": "FEY Z52 Track Performance Package includes J57 carbon ceramic brakes and replaces JX6 low-dust touring brakes."
           },
           {
             "rule_id": "gs_rule_opt_fey_001_excludes_opt_j56_001_replace",
@@ -102208,8 +101897,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "replace",
-            "source_note": "FEY Z52 Track Performance Package includes J57 carbon ceramic brakes and replaces J56 performance disc brakes.",
-            "review_flag": "False"
+            "source_note": "FEY Z52 Track Performance Package includes J57 carbon ceramic brakes and replaces J56 performance disc brakes."
           },
           {
             "rule_id": "gs_rule_opt_nwi_001_excludes_opt_nga_001_replace",
@@ -102227,8 +101915,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "replace",
-            "source_note": "NWI bright chrome exhaust tips replace standard NGA black exhaust tips when selected.",
-            "review_flag": "False"
+            "source_note": "NWI bright chrome exhaust tips replace standard NGA black exhaust tips when selected."
           },
           {
             "rule_id": "gs_rule_opt_pda_001_includes_opt_sne_001",
@@ -102246,8 +101933,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PDA includes SNE per 5/25 distribution update.",
-            "review_flag": "False"
+            "source_note": "PDA includes SNE per 5/25 distribution update."
           },
           {
             "rule_id": "gs_rule_opt_pda_001_includes_opt_vpw_001",
@@ -102265,8 +101951,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PDA includes VPW per 5/25 distribution update.",
-            "review_flag": "False"
+            "source_note": "PDA includes VPW per 5/25 distribution update."
           }
         ],
         "priceRules": [
@@ -102279,7 +101964,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "FEY includes J57, so J57 should not add a second charge."
           },
           {
@@ -102291,7 +101975,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "FEY includes T0F, so T0F should not add a second charge."
           },
           {
@@ -102303,7 +101986,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "FEY includes WUB, so WUB should not add a second charge."
           },
           {
@@ -102315,7 +101997,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "FEY includes CFZ through included T0F."
           },
           {
@@ -102327,7 +102008,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PCQ includes VWE, so VWE should not add a second charge."
           },
           {
@@ -102339,7 +102019,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PCQ includes VWT, so VWT should not add a second charge."
           },
           {
@@ -102351,7 +102030,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PEF includes RIA, so RIA should not add a second charge."
           },
           {
@@ -102363,7 +102041,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PEF includes CAV, so CAV should not add a second charge."
           },
           {
@@ -102375,7 +102052,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "coupe",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": ""
           },
           {
@@ -102387,7 +102063,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "coupe",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": ""
           },
           {
@@ -102399,7 +102074,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "coupe",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": ""
           },
           {
@@ -102411,7 +102085,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "convertible",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": ""
           },
           {
@@ -102423,7 +102096,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "convertible",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": ""
           },
           {
@@ -102435,7 +102107,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "convertible",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": ""
           },
           {
@@ -102447,7 +102118,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "coupe",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": ""
           },
           {
@@ -102459,7 +102129,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "coupe",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": ""
           },
           {
@@ -102471,7 +102140,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "convertible",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": ""
           },
           {
@@ -102483,7 +102151,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "coupe",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "1. Included with (SBT) dual roof, LPO."
           },
           {
@@ -102495,7 +102162,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Santorini Blue interior includes blue seatbelt"
           },
           {
@@ -102507,7 +102173,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Santorini Blue interior includes blue seatbelt"
           },
           {
@@ -102519,7 +102184,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Adrenaline Red dipped includes red seatbelt"
           },
           {
@@ -102531,7 +102195,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Natural dipped includes natural seatbelt"
           },
           {
@@ -102543,7 +102206,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Habanero includes orange seatbelt"
           },
           {
@@ -102555,7 +102217,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Habanero includes orange seatbelt"
           },
           {
@@ -102567,7 +102228,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Natural dipped includes natural seatbelt"
           },
           {
@@ -102579,7 +102239,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Santorini Blue interior includes blue seatbelt"
           },
           {
@@ -102591,7 +102250,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Santorini Blue interior includes blue seatbelt"
           },
           {
@@ -102603,7 +102261,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Adrenaline Red dipped includes red seatbelt"
           },
           {
@@ -102615,7 +102272,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Natural dipped includes natural seatbelt"
           },
           {
@@ -102627,7 +102283,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Habanero includes orange seatbelt"
           },
           {
@@ -102639,7 +102294,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Habanero includes orange seatbelt"
           },
           {
@@ -102651,7 +102305,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Natural dipped includes natural seatbelt"
           },
           {
@@ -102663,7 +102316,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Santorini Blue interior includes blue seatbelt"
           },
           {
@@ -102675,7 +102327,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Santorini Blue dipped interior includes red seatbelt"
           },
           {
@@ -102687,7 +102338,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "T0F includes CFZ, so CFZ should not add a second charge."
           },
           {
@@ -102699,7 +102349,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "coupe",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "BCP includes D3V engine lighting at no additional charge."
           },
           {
@@ -102711,7 +102360,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "coupe",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "BCS includes D3V engine lighting at no additional charge."
           },
           {
@@ -102723,7 +102371,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "coupe",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "BC4 includes D3V engine lighting at no additional charge."
           },
           {
@@ -102735,7 +102382,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Interior includes red seatbelt"
           },
           {
@@ -102747,7 +102393,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "2LT",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "2LT AH2 seat price"
           },
           {
@@ -102759,7 +102404,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "2LT",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "2LT AE4 seat price"
           },
           {
@@ -102771,7 +102415,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "3LT",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "3LT AE4 seat price"
           },
           {
@@ -102783,7 +102426,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "3LT",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "3LT AUP seat price"
           },
           {
@@ -102795,7 +102437,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "includes (RYT) First Aid Kit, LPO and (S08) Highway Safety Kit, LPO, Genuine Corvette Accessory"
           },
           {
@@ -102807,7 +102448,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "includes (RYT) First Aid Kit, LPO and (S08) Highway Safety Kit, LPO, Genuine Corvette Accessory"
           },
           {
@@ -102819,7 +102459,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDA includes SNE, so SNE should not add a second charge."
           },
           {
@@ -102831,7 +102470,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDA includes VPW, so VPW should not add a second charge."
           }
         ],
@@ -108170,7 +107808,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -108180,7 +107818,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "stitching"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -108219,11 +107857,11 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -108262,7 +107900,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -108278,7 +107916,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -108317,7 +107955,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 1590,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -108327,7 +107965,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":1590,\"component_type\":\"r6x\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N26\",\"label\":\"Sueded Microfiber\",\"price\":695,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LT",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Competition Seats",
@@ -110948,7 +110586,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-08T19:15:22+00:00",
+          "generated_at": "2026-06-11T01:11:59+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -116829,15 +116467,15 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "1lz_h07",
             "body_style": "coupe",
             "trim_level": "1LZ",
-            "status": "unavailable",
-            "status_label": "Not Available",
+            "status": "available",
+            "status_label": "Available",
             "selectable": "False",
-            "active": "False",
+            "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1495,
-            "display_behavior": "auto_only",
+            "display_behavior": "display_only",
             "display_order": 10,
             "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
@@ -116854,15 +116492,15 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "2lz_h07",
             "body_style": "coupe",
             "trim_level": "2LZ",
-            "status": "unavailable",
-            "status_label": "Not Available",
+            "status": "available",
+            "status_label": "Available",
             "selectable": "False",
-            "active": "False",
+            "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1495,
-            "display_behavior": "auto_only",
+            "display_behavior": "display_only",
             "display_order": 10,
             "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
@@ -116879,15 +116517,15 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "3lz_h07",
             "body_style": "coupe",
             "trim_level": "3LZ",
-            "status": "unavailable",
-            "status_label": "Not Available",
+            "status": "available",
+            "status_label": "Available",
             "selectable": "False",
-            "active": "False",
+            "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1495,
-            "display_behavior": "auto_only",
+            "display_behavior": "display_only",
             "display_order": 10,
             "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
@@ -116904,15 +116542,15 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "1lz_h67",
             "body_style": "convertible",
             "trim_level": "1LZ",
-            "status": "unavailable",
-            "status_label": "Not Available",
+            "status": "available",
+            "status_label": "Available",
             "selectable": "False",
-            "active": "False",
+            "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1495,
-            "display_behavior": "auto_only",
+            "display_behavior": "display_only",
             "display_order": 10,
             "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
@@ -116929,15 +116567,15 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "2lz_h67",
             "body_style": "convertible",
             "trim_level": "2LZ",
-            "status": "unavailable",
-            "status_label": "Not Available",
+            "status": "available",
+            "status_label": "Available",
             "selectable": "False",
-            "active": "False",
+            "active": "True",
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1495,
-            "display_behavior": "auto_only",
+            "display_behavior": "display_only",
             "display_order": 10,
             "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
           },
@@ -116954,6 +116592,31 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "3lz_h67",
             "body_style": "convertible",
             "trim_level": "3LZ",
+            "status": "available",
+            "status_label": "Available",
+            "selectable": "False",
+            "active": "True",
+            "choice_mode": "multi",
+            "selection_mode": "multi_select_opt",
+            "selection_mode_label": "Optional multiple choice",
+            "base_price": 1495,
+            "display_behavior": "display_only",
+            "display_order": 10,
+            "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
+          },
+          {
+            "choice_id": "1lz_h07__opt_r6x_001",
+            "option_id": "opt_r6x_001",
+            "rpo": "R6X",
+            "label": "Custom Interior Trim and Seat Combination",
+            "description": "",
+            "section_id": "sec_colo_001",
+            "section_name": "Color Override",
+            "standard_equipment_group_type": "",
+            "step_key": "interior_trim",
+            "variant_id": "1lz_h07",
+            "body_style": "coupe",
+            "trim_level": "1LZ",
             "status": "unavailable",
             "status_label": "Not Available",
             "selectable": "False",
@@ -116961,10 +116624,135 @@ window.CORVETTE_FORM_DATA = {
             "choice_mode": "multi",
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
-            "base_price": 1495,
+            "base_price": 995,
             "display_behavior": "auto_only",
-            "display_order": 10,
-            "source_detail_raw": "To be used exclusively to override exterior, interior and seat belt color combinations. SOLD orders only. Color Combination Override is available at an additional charge."
+            "display_order": 20,
+            "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+          },
+          {
+            "choice_id": "2lz_h07__opt_r6x_001",
+            "option_id": "opt_r6x_001",
+            "rpo": "R6X",
+            "label": "Custom Interior Trim and Seat Combination",
+            "description": "",
+            "section_id": "sec_colo_001",
+            "section_name": "Color Override",
+            "standard_equipment_group_type": "",
+            "step_key": "interior_trim",
+            "variant_id": "2lz_h07",
+            "body_style": "coupe",
+            "trim_level": "2LZ",
+            "status": "unavailable",
+            "status_label": "Not Available",
+            "selectable": "False",
+            "active": "False",
+            "choice_mode": "multi",
+            "selection_mode": "multi_select_opt",
+            "selection_mode_label": "Optional multiple choice",
+            "base_price": 995,
+            "display_behavior": "auto_only",
+            "display_order": 20,
+            "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+          },
+          {
+            "choice_id": "3lz_h07__opt_r6x_001",
+            "option_id": "opt_r6x_001",
+            "rpo": "R6X",
+            "label": "Custom Interior Trim and Seat Combination",
+            "description": "",
+            "section_id": "sec_colo_001",
+            "section_name": "Color Override",
+            "standard_equipment_group_type": "",
+            "step_key": "interior_trim",
+            "variant_id": "3lz_h07",
+            "body_style": "coupe",
+            "trim_level": "3LZ",
+            "status": "unavailable",
+            "status_label": "Not Available",
+            "selectable": "False",
+            "active": "False",
+            "choice_mode": "multi",
+            "selection_mode": "multi_select_opt",
+            "selection_mode_label": "Optional multiple choice",
+            "base_price": 995,
+            "display_behavior": "auto_only",
+            "display_order": 20,
+            "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+          },
+          {
+            "choice_id": "1lz_h67__opt_r6x_001",
+            "option_id": "opt_r6x_001",
+            "rpo": "R6X",
+            "label": "Custom Interior Trim and Seat Combination",
+            "description": "",
+            "section_id": "sec_colo_001",
+            "section_name": "Color Override",
+            "standard_equipment_group_type": "",
+            "step_key": "interior_trim",
+            "variant_id": "1lz_h67",
+            "body_style": "convertible",
+            "trim_level": "1LZ",
+            "status": "unavailable",
+            "status_label": "Not Available",
+            "selectable": "False",
+            "active": "False",
+            "choice_mode": "multi",
+            "selection_mode": "multi_select_opt",
+            "selection_mode_label": "Optional multiple choice",
+            "base_price": 995,
+            "display_behavior": "auto_only",
+            "display_order": 20,
+            "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+          },
+          {
+            "choice_id": "2lz_h67__opt_r6x_001",
+            "option_id": "opt_r6x_001",
+            "rpo": "R6X",
+            "label": "Custom Interior Trim and Seat Combination",
+            "description": "",
+            "section_id": "sec_colo_001",
+            "section_name": "Color Override",
+            "standard_equipment_group_type": "",
+            "step_key": "interior_trim",
+            "variant_id": "2lz_h67",
+            "body_style": "convertible",
+            "trim_level": "2LZ",
+            "status": "unavailable",
+            "status_label": "Not Available",
+            "selectable": "False",
+            "active": "False",
+            "choice_mode": "multi",
+            "selection_mode": "multi_select_opt",
+            "selection_mode_label": "Optional multiple choice",
+            "base_price": 995,
+            "display_behavior": "auto_only",
+            "display_order": 20,
+            "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
+          },
+          {
+            "choice_id": "3lz_h67__opt_r6x_001",
+            "option_id": "opt_r6x_001",
+            "rpo": "R6X",
+            "label": "Custom Interior Trim and Seat Combination",
+            "description": "",
+            "section_id": "sec_colo_001",
+            "section_name": "Color Override",
+            "standard_equipment_group_type": "",
+            "step_key": "interior_trim",
+            "variant_id": "3lz_h67",
+            "body_style": "convertible",
+            "trim_level": "3LZ",
+            "status": "unavailable",
+            "status_label": "Not Available",
+            "selectable": "False",
+            "active": "False",
+            "choice_mode": "multi",
+            "selection_mode": "multi_select_opt",
+            "selection_mode_label": "Optional multiple choice",
+            "base_price": 995,
+            "display_behavior": "auto_only",
+            "display_order": 20,
+            "source_detail_raw": "SOLD orders only. Requires (HMO/HVV) Jet Black/Sky Cool Gray, (HZB/HVT) Sky Cool Gray/Jet Black, (HU0/HXO) Jet Black/Adrenaline Red, (HUU/HZP) Adrenaline Red/Jet Black interiors. See Custom Interior Trim and Seat Combinations color and trim chart."
           },
           {
             "choice_id": "1lz_h07__opt_bv4_001",
@@ -155954,8 +155742,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Available on SOLD orders only. Not available with (R8C) Corvette Museum Delivery.",
-            "review_flag": "False"
+            "source_note": "1. Available on SOLD orders only. Not available with (R8C) Corvette Museum Delivery."
           },
           {
             "rule_id": "z06_rule_opt_b6p_001_includes_opt_d3v_001",
@@ -155973,8 +155760,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers.",
-            "review_flag": "False"
+            "source_note": "1. Included with (B6P) Coupe Engine Appearance Package or (BC4/BCP/BCS) LS6 engine covers."
           },
           {
             "rule_id": "z06_copy_rule_opt_b6p_001_includes_opt_sl9_001_opt_b6p_001_includes_opt_sl9_001",
@@ -155992,8 +155778,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package."
           },
           {
             "rule_id": "z06_copy_rule_opt_zz3_001_includes_opt_sl9_001_opt_zz3_001_includes_opt_sl9_001",
@@ -156011,8 +155796,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (B6P/ZZ3) Engine Appearance Package."
           },
           {
             "rule_id": "z06_copy_rule_opt_r8c_001_includes_opt_cfx_001_opt_r8c_001_includes_opt_cfx_001",
@@ -156030,8 +155814,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN",
-            "review_flag": "False"
+            "source_note": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
           },
           {
             "rule_id": "z06_copy_rule_opt_5jr_001_includes_opt_drg_001_opt_5jr_001_includes_opt_drg_001",
@@ -156049,8 +155832,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors, Genuine Corvette Accessory",
-            "review_flag": "False"
+            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors, Genuine Corvette Accessory"
           },
           {
             "rule_id": "z06_copy_rule_opt_e60_001_includes_opt_tr7_001_opt_e60_001_includes_opt_tr7_001",
@@ -156068,8 +155850,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (TR7) automatic headlamp leveling system",
-            "review_flag": "False"
+            "source_note": "includes (TR7) automatic headlamp leveling system"
           },
           {
             "rule_id": "z06_copy_rule_opt_zyc_001_includes_opt_drg_001_opt_zyc_001_includes_opt_drg_001",
@@ -156087,8 +155868,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors. Also includes Carbon Flash Metallic-painted spoiler when (Z51) Z51 Performance Package or (TVS) low-profile rear spoiler and front splitter is ordered. Not available with exterior color (GBA) Black.",
-            "review_flag": "False"
+            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors. Also includes Carbon Flash Metallic-painted spoiler when (Z51) Z51 Performance Package or (TVS) low-profile rear spoiler and front splitter is ordered. Not available with exterior color (GBA) Black."
           },
           {
             "rule_id": "z06_rule_opt_pcq_001_includes_opt_vwe_001",
@@ -156106,8 +155886,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "rule_id": "z06_rule_opt_pcq_001_includes_opt_vwt_001",
@@ -156125,8 +155904,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PCQ) Grille Screen Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PCQ) Grille Screen Protection Package, LPO."
           },
           {
             "rule_id": "z06_copy_rule_opt_pdy_001_includes_opt_ryt_001_opt_pdy_001_includes_opt_ryt_001",
@@ -156144,8 +155922,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PDY) Roadside Safety Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "rule_id": "z06_copy_rule_opt_pdy_001_includes_opt_s08_001_opt_pdy_001_includes_opt_s08_001",
@@ -156163,8 +155940,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PDY) Roadside Safety Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PDY) Roadside Safety Package."
           },
           {
             "rule_id": "z06_copy_rule_opt_sbt_001_includes_opt_sc7_001_opt_sbt_001_includes_opt_sc7_001",
@@ -156182,8 +155958,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (SBT) dual roof, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (SBT) dual roof, LPO."
           },
           {
             "rule_id": "z06_copy_rule_opt_pef_001_includes_opt_cav_001_opt_pef_001_includes_opt_cav_001",
@@ -156201,8 +155976,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "rule_id": "z06_copy_rule_opt_pef_001_includes_opt_ria_001_opt_pef_001_includes_opt_ria_001",
@@ -156220,8 +155994,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Included with (PEF) Contoured Liner Protection Package, LPO."
           },
           {
             "rule_id": "z06_rule_opt_j6l_001_requires_opt_j57_001",
@@ -156239,8 +156012,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (J57) carbon ceramic brakes.",
-            "review_flag": "False"
+            "source_note": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "rule_id": "z06_rule_opt_t0f_001_includes_opt_cfz_001",
@@ -156258,8 +156030,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package.",
-            "review_flag": "False"
+            "source_note": "1. Included with (T0F) Carbon Flash-painted Carbon Fiber Aero Package."
           },
           {
             "rule_id": "z06_rule_opt_roy_001_requires_opt_j57_001",
@@ -156277,8 +156048,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (J57) carbon ceramic brakes.",
-            "review_flag": "False"
+            "source_note": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "rule_id": "z06_rule_opt_roz_001_requires_opt_j57_001",
@@ -156296,8 +156066,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (J57) carbon ceramic brakes.",
-            "review_flag": "False"
+            "source_note": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "rule_id": "z06_rule_opt_stz_001_requires_opt_j57_001",
@@ -156315,8 +156084,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (J57) carbon ceramic brakes.",
-            "review_flag": "False"
+            "source_note": "1. Requires (J57) carbon ceramic brakes."
           },
           {
             "rule_id": "z06_copy_rule_opt_sbt_001_excludes_opt_cc3_001_opt_sbt_001_excludes_opt_cc3_001",
@@ -156334,8 +156102,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (CC3) transparent, removable roof panel. adds transparent removable roof panel and includes (SC7) roof panel storage pouch, Genuine Corvette Accessories",
-            "review_flag": "False"
+            "source_note": "1. Not available with (CC3) transparent, removable roof panel. adds transparent removable roof panel and includes (SC7) roof panel storage pouch, Genuine Corvette Accessories"
           },
           {
             "rule_id": "z06_rule_opt_sig_001_requires_opt_t0e_001",
@@ -156353,8 +156120,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (T0E) rear spoiler.",
-            "review_flag": "False"
+            "source_note": "1. Requires (T0E) rear spoiler."
           },
           {
             "rule_id": "z06_copy_rule_opt_s47_001_excludes_opt_spy_001_opt_s47_001_excludes_opt_spy_001",
@@ -156372,8 +156138,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO."
           },
           {
             "rule_id": "z06_copy_rule_opt_sfe_001_excludes_opt_spy_001_opt_sfe_001_excludes_opt_spy_001",
@@ -156391,8 +156156,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO."
           },
           {
             "rule_id": "z06_copy_rule_opt_spy_001_excludes_opt_s47_001_opt_spy_001_excludes_opt_s47_001",
@@ -156410,8 +156174,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (S47) Chrome lug nuts, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (S47) Chrome lug nuts, LPO."
           },
           {
             "rule_id": "z06_copy_rule_opt_spz_001_requires_opt_spy_001_opt_spz_001_requires_opt_spy_001",
@@ -156429,8 +156192,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Requires (SPY) Black lug nuts, LPO.",
-            "review_flag": "False"
+            "source_note": "1. Requires (SPY) Black lug nuts, LPO."
           },
           {
             "rule_id": "z06_rule_opt_s47_001_excludes_opt_roy_001",
@@ -156448,8 +156210,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "rule_id": "z06_rule_opt_s47_001_excludes_opt_roz_001",
@@ -156467,8 +156228,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "rule_id": "z06_rule_opt_s47_001_excludes_opt_stz_001",
@@ -156486,8 +156246,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "rule_id": "z06_rule_opt_sfe_001_excludes_opt_roy_001",
@@ -156505,8 +156264,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "rule_id": "z06_rule_opt_sfe_001_excludes_opt_roz_001",
@@ -156524,8 +156282,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "rule_id": "z06_rule_opt_sfe_001_excludes_opt_stz_001",
@@ -156543,8 +156300,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels.",
-            "review_flag": "False"
+            "source_note": "1. Not available with (SPY) Black lug nuts, LPO or (ROY/ROZ/STZ) wheels."
           },
           {
             "rule_id": "z06_rule_opt_j6d_001_requires_opt_j57_001",
@@ -156562,8 +156318,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "J6D Dark Gray Metallic-painted calipers require J57 carbon ceramic brakes.",
-            "review_flag": "False"
+            "source_note": "J6D Dark Gray Metallic-painted calipers require J57 carbon ceramic brakes."
           },
           {
             "rule_id": "z06_rule_opt_pdb_001_includes_opt_j57_001",
@@ -156581,8 +156336,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PDB includes J57 carbon ceramic brakes.",
-            "review_flag": "False"
+            "source_note": "PDB includes J57 carbon ceramic brakes."
           },
           {
             "rule_id": "z06_rule_opt_pdb_001_includes_opt_j6d_001",
@@ -156600,8 +156354,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PDB includes J6D Dark Gray Metallic-painted calipers.",
-            "review_flag": "False"
+            "source_note": "PDB includes J6D Dark Gray Metallic-painted calipers."
           },
           {
             "rule_id": "z06_rule_opt_pdd_001_includes_opt_z07_001",
@@ -156619,8 +156372,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PDD includes Z07 Performance Package.",
-            "review_flag": "False"
+            "source_note": "PDD includes Z07 Performance Package."
           },
           {
             "rule_id": "z06_rule_opt_pdd_001_includes_opt_t0f_001",
@@ -156638,8 +156390,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PDD includes Carbon Flash-painted Carbon Fiber Aero Package.",
-            "review_flag": "False"
+            "source_note": "PDD includes Carbon Flash-painted Carbon Fiber Aero Package."
           },
           {
             "rule_id": "z06_rule_opt_pdd_001_includes_opt_cfz_001",
@@ -156657,8 +156408,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PDD includes Carbon Flash-painted carbon fiber ground effects.",
-            "review_flag": "False"
+            "source_note": "PDD includes Carbon Flash-painted carbon fiber ground effects."
           },
           {
             "rule_id": "z06_rule_opt_pdf_001_includes_opt_z07_001",
@@ -156676,8 +156426,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PDF includes Z07 Performance Package.",
-            "review_flag": "False"
+            "source_note": "PDF includes Z07 Performance Package."
           },
           {
             "rule_id": "z06_rule_opt_pdf_001_includes_opt_t0g_001",
@@ -156695,8 +156444,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PDF includes visible Carbon Fiber Aero Package.",
-            "review_flag": "False"
+            "source_note": "PDF includes visible Carbon Fiber Aero Package."
           },
           {
             "rule_id": "z06_rule_opt_pdf_001_includes_opt_cfv_002",
@@ -156714,8 +156462,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PDF includes visible carbon fiber ground effects.",
-            "review_flag": "False"
+            "source_note": "PDF includes visible carbon fiber ground effects."
           },
           {
             "rule_id": "z06_rule_opt_z07_001_includes_opt_j57_001",
@@ -156733,8 +156480,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Z07 includes J57 carbon ceramic brakes.",
-            "review_flag": "False"
+            "source_note": "Z07 includes J57 carbon ceramic brakes."
           },
           {
             "rule_id": "z06_rule_opt_z07_001_includes_opt_fe7_001",
@@ -156752,8 +156498,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Z07 includes FE7 suspension.",
-            "review_flag": "False"
+            "source_note": "Z07 includes FE7 suspension."
           },
           {
             "rule_id": "z06_rule_opt_z07_001_includes_opt_xfs_001",
@@ -156771,8 +156516,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Z07 includes XFS Michelin Pilot Sport Cup 2 R tires.",
-            "review_flag": "False"
+            "source_note": "Z07 includes XFS Michelin Pilot Sport Cup 2 R tires."
           },
           {
             "rule_id": "z06_rule_opt_t0g_001_includes_opt_cfv_002",
@@ -156790,8 +156534,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "T0G includes visible carbon fiber ground effects.",
-            "review_flag": "False"
+            "source_note": "T0G includes visible carbon fiber ground effects."
           },
           {
             "rule_id": "z06_rule_opt_bcw_001_requires_opt_zz3_001_convertible",
@@ -156809,8 +156552,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "BCW red engine intake is available on convertible only with ZZ3.",
-            "review_flag": "False"
+            "source_note": "BCW red engine intake is available on convertible only with ZZ3."
           },
           {
             "rule_id": "z06_rule_opt_j57_001_excludes_opt_j6a_001",
@@ -156828,8 +156570,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "replace",
-            "source_note": "J57 carbon ceramic brakes replace the default J6A black calipers.",
-            "review_flag": "False"
+            "source_note": "J57 carbon ceramic brakes replace the default J6A black calipers."
           },
           {
             "rule_id": "z06_rule_opt_pbc_001_requires_opt_zz3_001_convertible",
@@ -156847,8 +156588,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PBC requires ZZ3 on convertible.",
-            "review_flag": "False"
+            "source_note": "PBC requires ZZ3 on convertible."
           },
           {
             "rule_id": "z06_rule_opt_z07_001_includes_opt_t0f_001",
@@ -156866,8 +156606,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "Z07 defaults Carbon Flash aero T0F while allowing the user to switch to T0G.",
-            "review_flag": ""
+            "source_note": "Z07 defaults Carbon Flash aero T0F while allowing the user to switch to T0G."
           },
           {
             "rule_id": "z06_rule_opt_pdb_001_includes_opt_roy_001",
@@ -156885,8 +156624,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PDB defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches.",
-            "review_flag": ""
+            "source_note": "PDB defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches."
           },
           {
             "rule_id": "z06_rule_opt_pdd_001_includes_opt_roy_001",
@@ -156904,8 +156642,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PDD defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches.",
-            "review_flag": ""
+            "source_note": "PDD defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches."
           },
           {
             "rule_id": "z06_rule_opt_pdf_001_includes_opt_roy_001",
@@ -156923,8 +156660,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PDF defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches.",
-            "review_flag": ""
+            "source_note": "PDF defaults the required carbon-fiber wheel choice to ROY while allowing ROZ/STZ switches."
           },
           {
             "rule_id": "z06_rule_opt_bcw_001_includes_opt_d3v_001",
@@ -156942,8 +156678,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "BCW Red engine intake includes D3V engine lighting.",
-            "review_flag": "False"
+            "source_note": "BCW Red engine intake includes D3V engine lighting."
           },
           {
             "rule_id": "z06_rule_opt_pda_001_includes_opt_sne_001",
@@ -156961,8 +156696,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PDA includes SNE per Jake C8.R graphics package source rule.",
-            "review_flag": "False"
+            "source_note": "PDA includes SNE per Jake C8.R graphics package source rule."
           },
           {
             "rule_id": "z06_rule_opt_pda_001_includes_opt_vpw_001",
@@ -156980,8 +156714,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "PDA includes VPW per Jake C8.R graphics package source rule.",
-            "review_flag": "False"
+            "source_note": "PDA includes VPW per Jake C8.R graphics package source rule."
           }
         ],
         "priceRules": [
@@ -156994,7 +156727,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "coupe",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "BCW is $895 on coupe when B6P is selected."
           },
           {
@@ -157006,7 +156738,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "convertible",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "BCW is $895 on convertible when ZZ3 is selected."
           },
           {
@@ -157018,7 +156749,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "T0F includes CFZ, so CFZ does not add a second charge."
           },
           {
@@ -157030,7 +156760,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "T0G includes CFV, so CFV does not add a second charge."
           },
           {
@@ -157042,7 +156771,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "Z07 includes J57, so J57 does not add a second charge."
           },
           {
@@ -157054,7 +156782,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDB package price includes J57, so J57 does not add a second charge."
           },
           {
@@ -157066,7 +156793,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDB package price includes J6D, so J6D does not add a second charge."
           },
           {
@@ -157078,7 +156804,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDB package price includes ROY, so ROY does not add a second charge."
           },
           {
@@ -157090,7 +156815,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDB package price includes ROZ, so ROZ does not add a second charge."
           },
           {
@@ -157102,7 +156826,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDB package price includes STZ, so STZ does not add a second charge."
           },
           {
@@ -157114,7 +156837,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDD package price includes Z07, so Z07 does not add a second charge."
           },
           {
@@ -157126,7 +156848,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDD package price includes J57, so J57 does not add a second charge."
           },
           {
@@ -157138,7 +156859,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDD package price includes T0F, so T0F does not add a second charge."
           },
           {
@@ -157150,7 +156870,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDD package price includes CFZ, so CFZ does not add a second charge."
           },
           {
@@ -157162,7 +156881,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDD package price includes ROY, so ROY does not add a second charge."
           },
           {
@@ -157174,7 +156892,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDD package price includes ROZ, so ROZ does not add a second charge."
           },
           {
@@ -157186,7 +156903,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDD package price includes STZ, so STZ does not add a second charge."
           },
           {
@@ -157198,7 +156914,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDF package price includes Z07, so Z07 does not add a second charge."
           },
           {
@@ -157210,7 +156925,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDF package price includes J57, so J57 does not add a second charge."
           },
           {
@@ -157222,7 +156936,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDF package price includes T0G, so T0G does not add a second charge."
           },
           {
@@ -157234,7 +156947,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDF package price includes CFV, so CFV does not add a second charge."
           },
           {
@@ -157246,7 +156958,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDF package price includes ROY, so ROY does not add a second charge."
           },
           {
@@ -157258,7 +156969,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDF package price includes ROZ, so ROZ does not add a second charge."
           },
           {
@@ -157270,7 +156980,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDF package price includes STZ, so STZ does not add a second charge."
           },
           {
@@ -157282,7 +156991,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDB package price with ROY carbon fiber wheels from the raw price schedule."
           },
           {
@@ -157294,7 +157002,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDB package price with ROZ carbon fiber wheels from the raw price schedule."
           },
           {
@@ -157306,7 +157013,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDB package price with STZ carbon fiber wheels from the raw price schedule."
           },
           {
@@ -157318,7 +157024,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDD package price with ROY carbon fiber wheels from the raw price schedule."
           },
           {
@@ -157330,7 +157035,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDD package price with ROZ carbon fiber wheels from the raw price schedule."
           },
           {
@@ -157342,7 +157046,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDD package price with STZ carbon fiber wheels from the raw price schedule."
           },
           {
@@ -157354,7 +157057,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDF package price with ROY carbon fiber wheels from the raw price schedule."
           },
           {
@@ -157366,7 +157068,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDF package price with ROZ carbon fiber wheels from the raw price schedule."
           },
           {
@@ -157378,7 +157079,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDF package price with STZ carbon fiber wheels from the raw price schedule."
           },
           {
@@ -157390,7 +157090,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "B6P includes D3V, so D3V does not add a second charge."
           },
           {
@@ -157402,7 +157101,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "B6P includes SL9, so SL9 does not add a second charge."
           },
           {
@@ -157414,7 +157112,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "ZZ3 includes SL9, so SL9 does not add a second charge."
           },
           {
@@ -157426,7 +157123,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "3LZ",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "3LZ standard AH2 GT2 seats should not add a charge."
           },
           {
@@ -157438,7 +157134,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "3LZ",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "3LZ AE4 Competition Sport seats should add $595."
           },
           {
@@ -157450,7 +157145,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PCQ includes VWE, so VWE does not add a second charge."
           },
           {
@@ -157462,7 +157156,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PCQ includes VWT, so VWT does not add a second charge."
           },
           {
@@ -157474,7 +157167,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDY includes RYT, so RYT does not add a second charge."
           },
           {
@@ -157486,7 +157178,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDY includes S08, so S08 does not add a second charge."
           },
           {
@@ -157498,7 +157189,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PEF includes CAV, so CAV does not add a second charge."
           },
           {
@@ -157510,7 +157200,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PEF includes RIA, so RIA does not add a second charge."
           },
           {
@@ -157522,7 +157211,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "1LZ",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "1LZ selectable UQT should retain its approved charge while 2LZ/3LZ standard UQT stays unpriced."
           },
           {
@@ -157534,7 +157222,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "*",
             "trim_level_scope": "*",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "BCW includes D3V, so D3V does not add a second charge."
           },
           {
@@ -157546,7 +157233,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDA includes SNE, so SNE should not add a second charge."
           },
           {
@@ -157558,7 +157244,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "review_flag": "False",
             "notes": "PDA includes VPW, so VPW should not add a second charge."
           }
         ],
@@ -162818,11 +162503,11 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -162861,11 +162546,11 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -162904,7 +162589,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -162914,7 +162599,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "two_tone"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -162953,11 +162638,11 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -162996,11 +162681,11 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Seats",
@@ -163039,7 +162724,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -163049,7 +162734,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "stitching"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -163088,7 +162773,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -163104,7 +162789,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "two_tone"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -163143,7 +162828,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -163153,7 +162838,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "stitching"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Seats",
@@ -163192,7 +162877,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -163202,7 +162887,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -163241,7 +162926,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -163251,7 +162936,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -163290,7 +162975,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -163306,7 +162991,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "two_tone"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -163345,7 +163030,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -163355,7 +163040,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -163394,7 +163079,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -163404,7 +163089,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Seats",
@@ -163443,7 +163128,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -163465,7 +163150,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "two_tone"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"},{\"rpo\":\"TU7\",\"label\":\"Two-Tone\",\"price\":595,\"component_type\":\"two_tone\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AH2",
             "interior_seat_label": "AH2 Seats",
@@ -163504,7 +163189,7 @@ window.CORVETTE_FORM_DATA = {
               {
                 "rpo": "R6X",
                 "label": "Custom Interior Trim and Seat Combination",
-                "price": 0,
+                "price": 995,
                 "component_type": "r6x"
               },
               {
@@ -163520,7 +163205,7 @@ window.CORVETTE_FORM_DATA = {
                 "component_type": "suede"
               }
             ],
-            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":0,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
+            "interior_components_json": "[{\"rpo\":\"R6X\",\"label\":\"Custom Interior Trim and Seat Combination\",\"price\":995,\"component_type\":\"r6x\"},{\"rpo\":\"38S\",\"label\":\"Red Stitching\",\"price\":495,\"component_type\":\"stitching\"},{\"rpo\":\"N2Z\",\"label\":\"Sueded Microfiber\",\"price\":895,\"component_type\":\"suede\"}]",
             "interior_trim_level": "3LZ",
             "interior_seat_code": "AE4",
             "interior_seat_label": "AE4 Seats",
@@ -163537,7 +163222,1104 @@ window.CORVETTE_FORM_DATA = {
             "interior_reference_order": 130
           }
         ],
-        "colorOverrides": [],
+        "colorOverrides": [
+          {
+            "override_id": "co_001",
+            "interior_id": "1LZ_AQ9_HUQ",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_002",
+            "interior_id": "1LZ_AQ9_HUQ",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_003",
+            "interior_id": "1LZ_AQ9_HUQ",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_004",
+            "interior_id": "1LZ_AQ9_HUQ",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_005",
+            "interior_id": "2LZ_AQ9_HUR",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_006",
+            "interior_id": "2LZ_AQ9_HUR",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_007",
+            "interior_id": "2LZ_AQ9_HUR",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_008",
+            "interior_id": "2LZ_AQ9_HUR",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_009",
+            "interior_id": "2LZ_AH2_HUL",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_010",
+            "interior_id": "2LZ_AH2_HUL",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_011",
+            "interior_id": "2LZ_AH2_HUL",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_012",
+            "interior_id": "2LZ_AH2_HUL",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_013",
+            "interior_id": "2LZ_AH2_HUL_TU7",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_014",
+            "interior_id": "2LZ_AH2_HUL_TU7",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_015",
+            "interior_id": "2LZ_AH2_HUL_TU7",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_016",
+            "interior_id": "2LZ_AH2_HUL_TU7",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_017",
+            "interior_id": "2LZ_AE4_HUL",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_018",
+            "interior_id": "2LZ_AE4_HUL",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_019",
+            "interior_id": "2LZ_AE4_HUL",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_020",
+            "interior_id": "2LZ_AE4_HUL",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_021",
+            "interior_id": "2LZ_AH2_HU7_N26_TU7",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_022",
+            "interior_id": "2LZ_AH2_HU7_N26_TU7",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_023",
+            "interior_id": "2LZ_AH2_HU7_N26_TU7",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_024",
+            "interior_id": "2LZ_AH2_HU7_N26_TU7",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_025",
+            "interior_id": "2LZ_AE4_HU7_N26",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_026",
+            "interior_id": "2LZ_AE4_HU7_N26",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_027",
+            "interior_id": "2LZ_AE4_HU7_N26",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_028",
+            "interior_id": "2LZ_AE4_HU7_N26",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_029",
+            "interior_id": "3LZ_AH2_HU2",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_030",
+            "interior_id": "3LZ_AH2_HU2",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_031",
+            "interior_id": "3LZ_AH2_HU2",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_032",
+            "interior_id": "3LZ_AH2_HU2",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_033",
+            "interior_id": "3LZ_AH2_HU2_TU7",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_034",
+            "interior_id": "3LZ_AH2_HU2_TU7",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_035",
+            "interior_id": "3LZ_AH2_HU2_TU7",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_036",
+            "interior_id": "3LZ_AH2_HU2_TU7",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_037",
+            "interior_id": "3LZ_AE4_HU2",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_038",
+            "interior_id": "3LZ_AE4_HU2",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_039",
+            "interior_id": "3LZ_AE4_HU2",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_040",
+            "interior_id": "3LZ_AE4_HU2",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_041",
+            "interior_id": "3LZ_AH2_HNK",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_042",
+            "interior_id": "3LZ_AH2_HNK",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_043",
+            "interior_id": "3LZ_AH2_HNK",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_044",
+            "interior_id": "3LZ_AH2_HNK",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_045",
+            "interior_id": "3LZ_AE4_HNK",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_046",
+            "interior_id": "3LZ_AE4_HNK",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_047",
+            "interior_id": "3LZ_AE4_HNK",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_048",
+            "interior_id": "3LZ_AE4_HNK",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_049",
+            "interior_id": "3LZ_AH2_H8T",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_050",
+            "interior_id": "3LZ_AH2_H8T",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_051",
+            "interior_id": "3LZ_AH2_H8T",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_052",
+            "interior_id": "3LZ_AH2_H8T",
+            "option_id": "opt_gkz_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_053",
+            "interior_id": "3LZ_AH2_H8T",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_054",
+            "interior_id": "3LZ_AE4_H8T",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_055",
+            "interior_id": "3LZ_AE4_H8T",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_056",
+            "interior_id": "3LZ_AE4_H8T",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_057",
+            "interior_id": "3LZ_AE4_H8T",
+            "option_id": "opt_gkz_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_058",
+            "interior_id": "3LZ_AE4_H8T",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_059",
+            "interior_id": "3LZ_AH2_HUW",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_060",
+            "interior_id": "3LZ_AH2_HUW",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_061",
+            "interior_id": "3LZ_AH2_HUW",
+            "option_id": "opt_gkz_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_062",
+            "interior_id": "3LZ_AH2_HUW",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_063",
+            "interior_id": "3LZ_AH2_HUW",
+            "option_id": "opt_gtr_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_064",
+            "interior_id": "3LZ_AE4_HUW",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_065",
+            "interior_id": "3LZ_AE4_HUW",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_066",
+            "interior_id": "3LZ_AE4_HUW",
+            "option_id": "opt_gkz_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_067",
+            "interior_id": "3LZ_AE4_HUW",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_068",
+            "interior_id": "3LZ_AE4_HUW",
+            "option_id": "opt_gtr_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_069",
+            "interior_id": "3LZ_AH2_EJH",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_070",
+            "interior_id": "3LZ_AH2_EJH",
+            "option_id": "opt_gkz_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_071",
+            "interior_id": "3LZ_AE4_EJH",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_072",
+            "interior_id": "3LZ_AE4_EJH",
+            "option_id": "opt_gkz_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_073",
+            "interior_id": "3LZ_AH2_HVZ",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_074",
+            "interior_id": "3LZ_AH2_HVZ",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_075",
+            "interior_id": "3LZ_AH2_HVZ",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_076",
+            "interior_id": "3LZ_AH2_HVZ",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_077",
+            "interior_id": "3LZ_AE4_HVZ",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_078",
+            "interior_id": "3LZ_AE4_HVZ",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_079",
+            "interior_id": "3LZ_AE4_HVZ",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_080",
+            "interior_id": "3LZ_AE4_HVZ",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_081",
+            "interior_id": "3LZ_AH2_HAG",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_082",
+            "interior_id": "3LZ_AH2_HAG",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_083",
+            "interior_id": "3LZ_AH2_HAG",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_084",
+            "interior_id": "3LZ_AH2_HAG",
+            "option_id": "opt_gkz_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_085",
+            "interior_id": "3LZ_AH2_HAG",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_086",
+            "interior_id": "3LZ_AE4_HAG",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_087",
+            "interior_id": "3LZ_AE4_HAG",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_088",
+            "interior_id": "3LZ_AE4_HAG",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_089",
+            "interior_id": "3LZ_AE4_HAG",
+            "option_id": "opt_gkz_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_090",
+            "interior_id": "3LZ_AE4_HAG",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_091",
+            "interior_id": "3LZ_AH2_HUA_N2Z_TU7",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_092",
+            "interior_id": "3LZ_AH2_HUA_N2Z_TU7",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_093",
+            "interior_id": "3LZ_AH2_HUA_N2Z_TU7",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_094",
+            "interior_id": "3LZ_AH2_HUA_N2Z_TU7",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_095",
+            "interior_id": "3LZ_AE4_HUA_N2Z",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_096",
+            "interior_id": "3LZ_AE4_HUA_N2Z",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_097",
+            "interior_id": "3LZ_AE4_HUA_N2Z",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_098",
+            "interior_id": "3LZ_AE4_HUA_N2Z",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_099",
+            "interior_id": "3LZ_AH2_HUX_N2Z",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_100",
+            "interior_id": "3LZ_AH2_HUX_N2Z",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_101",
+            "interior_id": "3LZ_AH2_HUX_N2Z",
+            "option_id": "opt_gkz_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_102",
+            "interior_id": "3LZ_AH2_HUX_N2Z",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_103",
+            "interior_id": "3LZ_AH2_HUX_N2Z",
+            "option_id": "opt_gtr_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_104",
+            "interior_id": "3LZ_AE4_HUX_N2Z",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_105",
+            "interior_id": "3LZ_AE4_HUX_N2Z",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_106",
+            "interior_id": "3LZ_AE4_HUX_N2Z",
+            "option_id": "opt_gkz_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_107",
+            "interior_id": "3LZ_AE4_HUX_N2Z",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_108",
+            "interior_id": "3LZ_AE4_HUX_N2Z",
+            "option_id": "opt_gtr_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_109",
+            "interior_id": "3LZ_AH2_EPX_N2Z",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_110",
+            "interior_id": "3LZ_AH2_EPX_N2Z",
+            "option_id": "opt_gkz_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_111",
+            "interior_id": "3LZ_AE4_EPX_N2Z",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_112",
+            "interior_id": "3LZ_AE4_EPX_N2Z",
+            "option_id": "opt_gkz_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_113",
+            "interior_id": "3LZ_AUP_HVZ",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_114",
+            "interior_id": "3LZ_AUP_HVZ",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_115",
+            "interior_id": "3LZ_AUP_HVZ",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_116",
+            "interior_id": "3LZ_AUP_HVZ",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_117",
+            "interior_id": "3LZ_AUP_HAG",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_118",
+            "interior_id": "3LZ_AUP_HAG",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_119",
+            "interior_id": "3LZ_AUP_HAG",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_120",
+            "interior_id": "3LZ_AUP_HAG",
+            "option_id": "opt_gkz_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_121",
+            "interior_id": "3LZ_AUP_HAG",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_122",
+            "interior_id": "3LZ_R6X_AH2_HUU",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_123",
+            "interior_id": "3LZ_R6X_AH2_HUU",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_124",
+            "interior_id": "3LZ_R6X_AH2_HUU",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_125",
+            "interior_id": "3LZ_R6X_AH2_HUU",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_126",
+            "interior_id": "3LZ_R6X_AE4_HUU",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_127",
+            "interior_id": "3LZ_R6X_AE4_HUU",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_128",
+            "interior_id": "3LZ_R6X_AE4_HUU",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_129",
+            "interior_id": "3LZ_R6X_AE4_HUU",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_130",
+            "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_131",
+            "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_132",
+            "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_133",
+            "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_134",
+            "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
+            "option_id": "opt_g26_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_135",
+            "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
+            "option_id": "opt_g4z_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_136",
+            "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
+            "option_id": "opt_gbk_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          },
+          {
+            "override_id": "co_137",
+            "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
+            "option_id": "opt_gph_001",
+            "rule_type": "requires",
+            "adds_rpo": "opt_d30_001",
+            "notes": "Exterior/interior pairing requires the listed override RPO."
+          }
+        ],
         "defaultSelectionRules": [
           {
             "rule_id": "z06_default_719",
@@ -163586,7 +164368,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "availability",
             "entity_id": "",
-            "message": "1422 draft choice rows exported from the Z06 variant matrix."
+            "message": "1428 draft choice rows exported from the Z06 variant matrix."
           },
           {
             "check_id": "rules",
@@ -163608,6 +164390,13 @@ window.CORVETTE_FORM_DATA = {
             "entity_type": "price_rule",
             "entity_id": "",
             "message": "48 active price rules exported from z06_price_rules."
+          },
+          {
+            "check_id": "color_overrides",
+            "severity": "pass",
+            "entity_type": "color_override",
+            "entity_id": "",
+            "message": "137 color override rows exported from color_overrides."
           }
         ]
       },

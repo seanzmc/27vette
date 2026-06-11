@@ -171,7 +171,6 @@ def load_section_presentation(wb: Any, model_key: str) -> list[dict[str, Any]]:
                 "section_id": section_id,
                 "display_label": clean(row.get("display_label")),
                 "step_key": clean(row.get("step_key")),
-                "presentation_bucket": clean(row.get("presentation_bucket")),
                 "display_behavior": clean(row.get("display_behavior")),
                 "section_display_order": clean(row.get("section_display_order")),
                 "standard_equipment_bucket": clean(row.get("standard_equipment_bucket")),
@@ -197,21 +196,28 @@ def load_variant_option_overrides(
     model_key: str,
     fallback_sheet: str = "",
 ) -> list[dict[str, Any]]:
-    # The workbook-owned variant_option_overrides sheet uses the ``active``
-    # column as the override value for the generated choice, not as row
-    # activation.  Do not read it through active_rows(), or rows that set a
-    # choice inactive would filter themselves out.
+    """Single loader for variant option overrides across both sheet contracts.
+
+    The workbook-global ``variant_option_overrides`` sheet uses the ``active``
+    column as the override value for the generated choice, not as row
+    activation, so it must not be read through active_rows(). Model-scoped
+    fallback sheets (e.g. ``grandSport_variant_overrides``) use ``active`` as
+    row activation and carry ``section_id``/``note`` columns instead of
+    ``status``/``active`` override values; the loader normalizes both
+    contracts into one field set.
+    """
+
     model = clean(model_key).lower()
     allowed_model_keys = _GLOBAL_MODEL_KEYS | {model}
-    rows = [
-        row
+    sourced_rows = [
+        (row, True)
         for row in optional_rows(wb, "variant_option_overrides")
         if clean(row.get("model_key", "")).lower() in allowed_model_keys
     ]
-    if not rows and fallback_sheet:
-        rows = active_rows(wb, fallback_sheet, model_key=None)
+    if not sourced_rows and fallback_sheet:
+        sourced_rows = [(row, False) for row in active_rows(wb, fallback_sheet, model_key=None)]
     overrides: list[dict[str, Any]] = []
-    for row in rows:
+    for row, value_active in sourced_rows:
         option_id = clean(row.get("option_id") or row.get("rpo"))
         variant_id = clean(row.get("variant_id"))
         if not option_id or not variant_id:
@@ -220,11 +226,13 @@ def load_variant_option_overrides(
             {
                 "option_id": option_id,
                 "variant_id": variant_id,
-                "status": clean(row.get("status")),
+                "status": clean(row.get("status")) if value_active else "",
                 "selectable": clean(row.get("selectable")),
-                "active": clean(row.get("active")),
+                "active": clean(row.get("active")) if value_active else "",
                 "display_behavior": clean(row.get("display_behavior")),
-                "notes": clean(row.get("notes")),
+                "section_id": clean(row.get("section_id")),
+                "note": clean(row.get("note") or row.get("notes")),
+                "notes": clean(row.get("notes") or row.get("note")),
             }
         )
     return overrides
@@ -280,49 +288,6 @@ def load_order_summary_metadata(wb: Any, model_key: str) -> dict[str, Any]:
     }
 
 
-def load_standard_equipment_groups(wb: Any, model_key: str) -> list[dict[str, Any]]:
-    groups: list[dict[str, Any]] = []
-    for row in active_rows(wb, "standard_equipment_groups", model_key):
-        section_id = clean(row.get("section_id"))
-        if not section_id:
-            continue
-        groups.append(
-            {
-                "section_id": section_id,
-                "group_type": clean(row.get("group_type")),
-                "default_open": truthy(row.get("default_open"), default=False),
-                "canonical_rank": intish(row.get("canonical_rank"), 0),
-                "duplicate_group_key": clean(row.get("duplicate_group_key")),
-                "notes": clean(row.get("notes")),
-            }
-        )
-    return sorted(groups, key=lambda row: (row["canonical_rank"], row["section_id"]))
-
-
-def load_component_price_rules(wb: Any, model_key: str) -> list[dict[str, Any]]:
-    """Load generic component price rule rows without applying business behavior."""
-
-    rules: list[dict[str, Any]] = []
-    for row in active_rows(wb, "component_price_rules", model_key):
-        rule_id = clean(row.get("price_rule_id"))
-        if not rule_id:
-            continue
-        rules.append(
-            {
-                "price_rule_id": rule_id,
-                "condition_option_id": clean(row.get("condition_option_id")),
-                "target_component_rpo": clean(row.get("target_component_rpo")),
-                "price_rule_type": clean(row.get("price_rule_type")),
-                "price_value": intish(row.get("price_value"), 0),
-                "body_style_scope": clean(row.get("body_style_scope")),
-                "trim_level_scope": clean(row.get("trim_level_scope")),
-                "variant_scope": clean(row.get("variant_scope")),
-                "notes": clean(row.get("notes")),
-            }
-        )
-    return rules
-
-
 def load_interior_components(wb: Any, model_key: str) -> dict[str, list[dict[str, Any]]]:
     """Load workbook-owned interior component rows grouped by interior_id."""
 
@@ -375,6 +340,18 @@ def load_model_interior_scope(wb: Any, model_key: str) -> list[dict[str, Any]]:
                 "interior_id": interior_id,
                 "trim_level": clean(row.get("trim_level")),
                 "requires_option_id": clean(row.get("requires_option_id")),
+                "interior_seat_label": clean(row.get("interior_seat_label")),
+                "interior_color_family": clean(row.get("interior_color_family")),
+                "interior_material_family": clean(row.get("interior_material_family")),
+                "interior_variant_label": clean(row.get("interior_variant_label")),
+                "interior_group_display_order": clean(row.get("interior_group_display_order")),
+                "interior_material_display_order": clean(row.get("interior_material_display_order")),
+                "interior_choice_display_order": clean(row.get("interior_choice_display_order")),
+                "interior_hierarchy_levels": clean(row.get("interior_hierarchy_levels")),
+                "interior_parent_group_label": clean(row.get("interior_parent_group_label")),
+                "interior_leaf_label": clean(row.get("interior_leaf_label")),
+                "interior_reference_order": clean(row.get("interior_reference_order")),
+                "grouping_source": clean(row.get("grouping_source")),
                 "notes": clean(row.get("notes")),
             }
         )

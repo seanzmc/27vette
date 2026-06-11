@@ -24,7 +24,7 @@ const fullLengthStripeOptionIds = [
 
 function generateDraftWithoutAppMutation() {
   const beforeAppData = fs.readFileSync(appDataPath, "utf8");
-  execFileSync(".venv/bin/python", ["scripts/generate_z06_form.py"], {
+  execFileSync(".venv/bin/python", ["scripts/generate_form.py", "--model", "z06"], {
     encoding: "utf8",
     stdio: "pipe",
   });
