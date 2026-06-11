@@ -57,7 +57,8 @@ stingray_master.xlsx  (canonical, unchanged role)
         ▼
 scripts/workbook_editor_server.py        stdlib http.server, localhost only
   GET  /                                 serves visualizer/workbook-editor/ static UI
-  GET  /api/workbook                     models, sheet registry, schemas, rows, lints
+  GET  /api/workbook                     models, sheet registry, schemas, reference domains, lints
+  GET  /api/sheet/<name>                 rows for one sheet (on demand; keeps the registry payload small)
   POST /api/validate                     dry-run: apply ops to a temp copy, run schema validation
   POST /api/apply                        apply ops via save_workbook_safely(), return gate results
         │ shared logic
@@ -86,13 +87,22 @@ The original `visualizer/workbook-editor.jsx` is deleted once the port lands (it
 - **Per-model sheet registry** from `model_workbook_sources`, with the known transition-state caveat (Z06 rows marked inactive there) handled the same way the generator handles it — fall back to the model config in `corvette_form_generator/model_configs.py`. (Replaces `MODEL_SHEETS`.)
 - **Schemas** derived per sheet: headers from row 1; primary-key columns, enum domains, and column types from a single new `editor_sheet_meta` registry — a small Python dict in `editor_ops.py` (key columns + type per column: str/int/bool/enum), seeded from the current `SCHEMAS` constant and extended to all active source/metadata sheets. Enum domains are computed from observed column values plus the declared allowlist, so the UI dropdowns reflect reality.
 - **Read-only classification**: generated `form_*` sheets and any sheet not in the editable registry are served with `readOnly: true`; the UI shows them (review value) but disables editing.
+- **Reference domains** for guided editing: the pick lists structured inputs need — sections from `section_master`, variants per model from `variant_master`/`model_variants`, options per model (`option_id` + RPO + name), step keys from `runtime_steps`, group ids from the group sheets. Phase 1 serves them; Phase 2's guided forms consume them.
 - **Lints** (Phase 3, §5): display-order collisions per (sheet, section), duplicate primary keys, cross-model copy/order drift for shared option_ids, orphan references — the checks the 2026-06-11 consistency review performed by hand.
 
 Hardcoding is eliminated except for the one thing the workbook genuinely doesn't own: which columns form each sheet's primary key and their types (`editor_sheet_meta`). That lives in Python next to the generator, in one place, not in the UI.
 
 ### 4.4 Edit and apply path
 
-- The UI keeps the queue model: edits accumulate as ops `{action: add|update|delete, sheet, key, row}` and nothing touches the workbook until apply.
+**Non-breaking writes are a hard rule.** The tool may only produce edits that leave the workbook referentially intact and schema-valid. That is enforced at both ends:
+
+- **Guided structure in the UI — no free text for schema-constrained fields.** Enum columns render as selects from the served domain; reference columns (`section_id`, `option_id`, `variant_id`, `group_id`, `target_id`, step keys, interior ids) render as pickers fed by the reference domains in §4.3; numeric columns are numeric inputs. Free text is reserved for genuinely free-text columns: names, descriptions, notes, raw-detail copy.
+- **Composite guided flows for multi-sheet facts.** Some business facts span sheets, and a partial write is a broken write. "Add Option" is a wizard, not a row form: the option row, plus a required OVS status (from the `status` enum) for **every active variant of the model** — no partial OVS coverage — plus optional rule rows, rule-group memberships, and exclusive-group memberships attached in the same flow with picker-driven fields. The queue stores the result as one grouped op set; it applies atomically or not at all. The same pattern covers "add rule group" (group + at least one member) and "add exclusive group" (group + ≥2 members).
+- **Server-side non-breaking validation.** Apply runs the dry-run pipeline internally and refuses the whole batch on any error: unknown sheet/column, unknown reference (option, section, variant, group), duplicate primary key, missing OVS coverage for a new option, type violation, or schema-validator failure on the temp copy. Display-order collisions and deletes of still-referenced keys surface as warnings requiring explicit confirmation. The server is the authority; a hand-edited ops.json fed to the CLI passes through the identical checks in `editor_ops.py`.
+
+Mechanics:
+
+- The UI keeps the queue model: edits accumulate as ops `{action: add|update|delete, sheet, key, row}` — optionally grouped into composite sets — and nothing touches the workbook until apply.
 - **Typed values end-to-end.** The server emits cell values with their types; the UI edits ints as ints, booleans as real booleans (checkbox/select), enums from the served domain; ops carry JSON types; `editor_ops.py` coerces per `editor_sheet_meta` before writing. This makes the tool fix-shaped, not S-1-shaped.
 - **Queue coalescing** in `editor_ops.py` (shared by server and CLI): multiple updates to one key collapse to the last; add+update collapses into the add; add+delete cancels; update+delete collapses to delete.
 - **Update semantics:** ops carry only changed columns (not the full row) so an apply against a workbook that moved under you doesn't silently revert other cells; key columns stay immutable on update (the UI already enforces this).
@@ -132,7 +142,7 @@ The overall three-tab shape, the queue-then-apply mental model, key-field requir
 
 **Phase 1 — Read-only review tool.** Server with `GET /api/workbook` only; UI port (Preact/htm/CSS) with browse, full-column view (expandable row detail instead of the current 6-column truncation), text search/filter per sheet, and pagination or windowing for the 1,600-row OVS sheets. No write surface at all. *This already replaces ad-hoc scripting for review work and carries zero workbook risk.*
 
-**Phase 2 — Edit queue + safe apply.** `editor_ops.py`, typed editing, coalescing, dry-run validate, apply endpoint, `apply_workbook_ops.py` CLI, ops-JSON export, apply log, delete-reference warnings.
+**Phase 2 — Edit queue + safe apply.** `editor_ops.py` op logic, typed editing, coalescing, the guided forms and composite flows from §4.4 (Add Option with full OVS coverage, group + members), server-side non-breaking validation, dry-run validate, apply endpoint, `apply_workbook_ops.py` CLI, ops-JSON export, apply log, delete-reference warnings.
 
 **Phase 3 — Review enhancements (each independently shippable).**
 - **Lint panel:** display-order collisions, duplicate keys, orphan `option_id`/`section_id`/group references — surfaced per sheet and as a summary.
@@ -150,11 +160,11 @@ Phases 2 and 3 each get their own approval per spec-first rules; this spec autho
 | `visualizer/workbook-editor/index.html`, `editor.js`, `editor.css`, `vendor/preact.mjs`, `vendor/htm.mjs` | 1 | new — ported UI |
 | `visualizer/workbook-editor.jsx` | 1 | delete after port |
 | `scripts/workbook_editor_server.py` | 1 (GET) / 2 (POST) | new |
-| `scripts/corvette_form_generator/editor_ops.py` | 2 | new — op schema, coalesce, typed apply, `editor_sheet_meta` |
+| `scripts/corvette_form_generator/editor_ops.py` | 1 (`editor_sheet_meta`) / 2 (op logic) | new — sheet meta registry in Phase 1; op schema, coalesce, typed apply, non-breaking validation in Phase 2 |
 | `scripts/apply_workbook_ops.py` | 2 | new CLI |
 | `tests/test_editor_ops.py` | 2 | new — coalescing, typed coercion, apply-to-temp-workbook round-trip, table-range extension, lock/mtime refusal |
 | `tests/test_editor_server_payload.py` | 1 | new — payload derivation matches workbook metadata (models, steps, schemas, read-only flags) |
-| `form-output/workbook-edit-log.jsonl` | 2 | new generated log (gitignored or committed — user decision, see §9) |
+| `form-output/workbook-edit-log.jsonl` | 2 | new generated log, committed (workbook edits affect runtime and must be traceable — §9) |
 | `README.md`, `AGENTS.md` | 1–2 | document the tool, its boundaries, and the apply workflow |
 
 ---
@@ -165,6 +175,7 @@ Phases 2 and 3 each get their own approval per spec-first rules; this spec autho
 - No new pip dependencies (stdlib + existing openpyxl); no npm/node_modules/build step (vendored Preact+htm are static files, not a toolchain).
 - Nothing in `form-app/` changes; the dealer-submission endpoint, payload, and Turnstile behavior are untouched.
 - All workbook writes go through `save_workbook_safely()` with lock and mtime checks; no write path may bypass it.
+- Writes are non-breaking only: server-side referential/coverage validation gates every apply (whole batch refused on error), and schema-constrained fields are never free text in the UI (§4.4).
 - Generated `form_*` sheets are never editable through the tool.
 - Scripts stay procedural and generic — no model-specific business exceptions in the server or ops code.
 - Server binds to localhost only; it is a dev tool, never deployed.
@@ -185,12 +196,13 @@ Phases 2 and 3 each get their own approval per spec-first rules; this spec autho
 - Fixing the consistency-review findings themselves (the tool is how those passes get easier, not the pass).
 - Visualizer (`visualizer.js`) integration — separate concern, shared folder only.
 
-## 9. Open Questions (user decisions)
+## 9. Decisions (resolved 2026-06-11)
 
-1. **Vendored Preact+htm vs. plain-JS rewrite** of the UI (zero vendored files, more port effort) — spec recommends vendored Preact+htm.
-2. **Apply log location/tracking:** commit `form-output/workbook-edit-log.jsonl` or gitignore it? Committed gives handoff evidence in history; spec leans committed.
-3. **Should the server expose archive sheets read-only** for evidence lookups (reading `archive/stingray_archive.xlsx`), or stay strictly on the master workbook? Spec defaults to master-only.
-4. Phase 1 scope check: is the Form Structure tab worth keeping at all, or should Phase 1 ship only the sheet browser? Spec keeps it (cheap once metadata is served).
+1. **UI runtime:** vendored Preact+htm, as recommended.
+2. **Apply log:** committed — workbook edits affect runtime, so the trail must be traceable in history.
+3. **Scope:** master workbook only; the server never reads `archive/stingray_archive.xlsx`.
+4. **Form Structure tab:** kept as a simple read-only reference.
+5. **Write posture (added requirement):** non-breaking writes only, with guided structure — composite Add Option flow with full OVS coverage, picker/enum inputs for all schema-constrained fields, server-side batch validation. Folded into §4.4 and §7.
 
 ## 10. Validation Plan
 
