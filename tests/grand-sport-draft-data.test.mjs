@@ -652,6 +652,7 @@ test("Grand Sport draft includes model-scoped LT interiors with EL9 launch editi
   assert.match(inspectionSource, /build_model_interiors/);
   assert.doesNotMatch(interiorsSource, /rows_from_sheet\(wb, ["']lt_interiors["']\)/);
   assert.doesNotMatch(interiorsSource, /source_sheet["']?: ["']lt_interiors["']/);
+  assert.doesNotMatch(interiorsSource, /read_interior_reference|grouping_fields_for_interior|fallback_interior_trims|interior_component_metadata/);
   assert.doesNotMatch(inspectionSource, /rows_from_sheet\(wb, ["']lt_interiors["']\)/);
   assert.doesNotMatch(inspectionSource, /source_sheet["']?: ["']lt_interiors["']/);
 
