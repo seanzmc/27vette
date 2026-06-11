@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-10T17:07:58+00:00"
+          "generated_at": "2026-06-10T22:48:21+00:00"
         },
         "variants": [
           {
@@ -55134,7 +55134,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-10T17:07:53+00:00",
+          "generated_at": "2026-06-10T22:47:41+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -99623,6 +99623,21 @@ window.CORVETTE_FORM_DATA = {
             "disabled_reason": "DZX blocks Grand Sport Jake hood graphics.",
             "active": "True",
             "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+          },
+          {
+            "group_id": "gs_group_j57_z52_requirement",
+            "group_type": "requires_any",
+            "source_id": "opt_j57_001",
+            "target_ids": [
+              "opt_feb_001",
+              "opt_fey_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "Requires FEB Z52 Sport Performance Package or FEY Z52 Track Performance Package.",
+            "active": "True",
+            "notes": "J57 is selectable with FEB, or included by FEY."
           }
         ],
         "exclusiveGroups": [

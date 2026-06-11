@@ -763,6 +763,11 @@ test("Grand Sport exclusive group selections remove peer options without runtime
       assert.ok(coupeEngineAppearance, "B6P should be active before testing Grand Sport coupe LS6 engine covers");
       runtime.handleChoice(coupeEngineAppearance);
     }
+    if (expected.groupId === "gs_excl_performance_brakes") {
+      const feb = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_feb_001");
+      assert.ok(feb, "FEB should be active before testing J57 as a Grand Sport performance brake peer");
+      runtime.handleChoice(feb);
+    }
 
     const activeGroupChoices = expected.optionIds
       .map((optionId) => runtime.activeChoiceRows().find((choice) => choice.option_id === optionId))
@@ -794,7 +799,9 @@ test("Grand Sport required exclusive groups cannot be left empty", () => {
   runtime.resetDefaults();
   runtime.reconcileSelections();
 
-  for (const expected of expectedGrandSportExclusiveGroups.filter((group) => group.selectionMode === "required_single_within_group")) {
+  for (const expected of expectedGrandSportExclusiveGroups.filter(
+    (group) => group.selectionMode === "required_single_within_group" && group.groupId !== "gs_excl_performance_brakes"
+  )) {
     if (expected.groupId === "gs_excl_ls6_engine_covers") {
       const coupeEngineAppearance = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_b6p_001");
       assert.ok(coupeEngineAppearance, "B6P should be active before testing Grand Sport coupe LS6 engine covers");
@@ -969,13 +976,13 @@ test("Grand Sport workbook default_selected rows seed and reconcile defaults gen
   const j56 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j56_001");
   const j57 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j57_001");
   assert.ok(j56, "J56 should render as a visible brake card");
-  assert.ok(j57, "J57 should render as a selectable brake card");
+  assert.ok(j57, "J57 should render as a visible brake card");
   assert.equal(j56.active, "True");
   assert.equal(j56.status, "available");
   assert.equal(j56.selectable, "False");
   assert.equal(j56.display_behavior, "display_only");
   assert.equal(runtime.disableReasonForChoice(j56), "Included with FEB Z52 Sport Performance Package.");
-  assert.equal(runtime.disableReasonForChoice(j57), "");
+  assert.equal(runtime.disableReasonForChoice(j57), "Requires FEB Z52 Sport Performance Package or FEY Z52 Track Performance Package.");
 
   const febRuntime = loadRuntime();
   febRuntime.activateModel("grandSport");
@@ -1105,10 +1112,18 @@ test("Grand Sport J57 soft-defaults J6D into selected RPOs instead of auto-added
   runtime.reconcileSelections();
 
   const j57 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j57_001");
-  assert.ok(j57, "J57 should be selectable");
+  const feb = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_feb_001");
+  assert.ok(j57, "J57 should render as a visible brake card");
+  assert.equal(runtime.disableReasonForChoice(j57), "Requires FEB Z52 Sport Performance Package or FEY Z52 Track Performance Package.");
   runtime.handleChoice(j57);
   let order = runtime.currentOrder();
-  assert.equal(order.selected_options.some((item) => item.rpo === "J57"), true, "J57 should be selected");
+  assert.equal(order.selected_options.some((item) => item.rpo === "J57"), false, "J57 should not be selectable before FEB/FEY");
+
+  runtime.handleChoice(feb);
+  assert.equal(runtime.disableReasonForChoice(j57), "", "FEB should make J57 selectable");
+  runtime.handleChoice(j57);
+  order = runtime.currentOrder();
+  assert.equal(order.selected_options.some((item) => item.rpo === "J57"), true, "J57 should be selected after FEB");
   assert.equal(order.selected_options.some((item) => item.rpo === "J6D"), true, "J6D should land in selected options as a soft default");
   assert.equal(order.auto_added_options.some((item) => item.rpo === "J6D"), false, "J6D should not be a hard auto-add");
 
@@ -1176,10 +1191,11 @@ test("Grand Sport Pass 1 workbook rules drive engine, brake, ground-effect, and 
   const j57 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j57_001");
   const j56 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j56_001");
   assert.equal(runtime.state.selected.has("opt_jx6_001"), true, "JX6 should be the default Grand Sport brake");
+  assert.equal(runtime.disableReasonForChoice(j57), "Requires FEB Z52 Sport Performance Package or FEY Z52 Track Performance Package.");
   runtime.handleChoice(j57);
-  assert.equal(runtime.state.selected.has("opt_j57_001"), true, "J57 should be selected");
-  assert.equal(runtime.state.selected.has("opt_jx6_001"), false, "J57 should replace JX6");
-  assert.equal(runtime.state.selected.has("opt_j56_001"), false, "J57 should not leave J56 selected");
+  assert.equal(runtime.state.selected.has("opt_j57_001"), false, "J57 should not be selectable before FEB/FEY");
+  assert.equal(runtime.state.selected.has("opt_jx6_001"), true, "JX6 should remain selected when blocked J57 is clicked");
+  assert.equal(runtime.state.selected.has("opt_j56_001"), false, "blocked J57 click should not select J56");
 
   runtime.resetDefaults();
   runtime.reconcileSelections();

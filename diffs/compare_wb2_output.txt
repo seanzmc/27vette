@@ -1,0 +1,51 @@
+[model_master] IDENTICAL on common columns (type-normalized)
+[variant_master] IDENTICAL on common columns (type-normalized)
+[stingray_options] IDENTICAL on common columns (type-normalized)
+[rule_mapping] IDENTICAL on common columns (type-normalized)
+[price_rules] IDENTICAL on common columns (type-normalized)
+[grandSport_price_rules] IDENTICAL on common columns (type-normalized)
+[grandSport_rule_mapping] IDENTICAL on common columns (type-normalized)
+[grandSport_rule_groups] only-live=1 only-local=0 changed=0
+   only LIVE: ['gs_group_j57_z52_requirement|requires_any']
+[grandSport_rule_group_members] only-live=2 only-local=0 changed=0
+   only LIVE: ['gs_group_j57_z52_requirement|opt_feb_001', 'gs_group_j57_z52_requirement|opt_fey_001']
+[z06_rule_mapping] IDENTICAL on common columns (type-normalized)
+[z06_price_rules] IDENTICAL on common columns (type-normalized)
+[z06_options] IDENTICAL on common columns (type-normalized)
+[z06_rule_groups] IDENTICAL on common columns (type-normalized)
+[z06_rule_group_members] IDENTICAL on common columns (type-normalized)
+[z06_exclusive_groups] IDENTICAL on common columns (type-normalized)
+[z06_exclusive_members] IDENTICAL on common columns (type-normalized)
+[lt_interiors] IDENTICAL on common columns (type-normalized)
+[LZ_Interiors] IDENTICAL on common columns (type-normalized)
+[model_registry_promotion] only-live=0 only-local=0 changed=2
+   changed cells by column: {'artifact_path': 2}
+   key=grand_sport|grandSport
+      artifact_path: live='form-output/inspection/grand-sport-form-data-draft.json' -> local='form-output/inspection/grand-sport-runtime-contract.json'
+   key=z06|z06
+      artifact_path: live='form-output/inspection/z06-form-data-draft.json' -> local='form-output/inspection/z06-runtime-contract.json'
+[form_rules] IDENTICAL on common columns (type-normalized)
+[form_price_rules] IDENTICAL on common columns (type-normalized)
+[form_interiors] only-live=0 only-local=0 changed=123
+   changed cells by column: {'interior_parent_group_label': 123, 'interior_color_family': 2, 'interior_hierarchy_levels': 2, 'interior_hierarchy_path': 2}
+   key=2LT_AE4_HTM|lt_interiors
+      interior_parent_group_label: live='Napa leather seating surfaces with perforated inserts.' -> local='AE4 Competition Seats'
+   key=2LT_AE4_HTM_36S|lt_interiors
+      interior_parent_group_label: live='Napa leather seating surfaces with perforated inserts.' -> local='AE4 Competition Seats'
+   key=2LT_AE4_HTM_37S|lt_interiors
+      interior_parent_group_label: live='Napa leather seating surfaces with perforated inserts.' -> local='AE4 Competition Seats'
+   key=2LT_AE4_HTM_38S|lt_interiors
+      interior_parent_group_label: live='Napa leather seating surfaces with perforated inserts.' -> local='AE4 Competition Seats'
+   key=2LT_AE4_HTN|lt_interiors
+      interior_parent_group_label: live='Napa leather seating surfaces with perforated inserts.' -> local='AE4 Competition Seats'
+   ... 118 more
+[section_master] IDENTICAL on common columns (type-normalized)
+[section_presentation] IDENTICAL on common columns (type-normalized)
+[asset_map] IDENTICAL on common columns (type-normalized)
+[context_choice_copy] IDENTICAL on common columns (type-normalized)
+[zr1_rule_mapping] IDENTICAL on common columns (type-normalized)
+[zr1x_rule_mapping] IDENTICAL on common columns (type-normalized)
+[zr1_price_rules] IDENTICAL on common columns (type-normalized)
+[zr1x_price_rules] IDENTICAL on common columns (type-normalized)
+
+Done (no writes).

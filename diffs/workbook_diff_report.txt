@@ -1,0 +1,109 @@
+WORKBOOK COMPARISON REPORT
+LIVE  = diffs/stingray_master.xlsx  (production main snapshot, 990 KB)
+LOCAL = stingray_master.xlsx        (local divergent copy,    702 KB)
+Method: .venv/bin/python + openpyxl 3.1.5, read-only opens, no saves.
+Row diffs keyed on first column (pass 1 exact, pass 2 type-normalized strings).
+
+================================================================
+1. SHEETS
+================================================================
+LIVE: 96 sheets.  LOCAL: 81 sheets.  No renames detected.
+
+Removed in LOCAL (15) -- all raw-ingest/archive/orphan sheets:
+  archive_IDs, archive_stingray, archive_Z06_Ingest, archive_ZR1_Ingest,
+  archive_ZR1X_Ingest, archive_category_master,
+  z06_standard_raw, z06_eqgrps_raw, z06_intextmec_raw,
+  zr1_zr1x_standard_raw, zr1_zr1x_eqgrps_raw, zr1_zr1x_intextmec_raw,
+  price_sched_raw, component_price_rules, standard_equipment_groups
+
+Added in LOCAL: none.
+
+Sheet ORDER fully reorganized in LOCAL into logical groups:
+  registry/model sheets -> runtime/presentation -> interiors -> stingray ->
+  grandSport -> z06 -> zr1 -> zr1x -> audit/review -> form_* outputs.
+Tab colors: LIVE has 5/96 colored tabs; LOCAL has 81/81 colored
+(confirms the local "reorg + tab colors" work).
+
+================================================================
+2. HEADER & ROW-COUNT DIFFERENCES (common sheets)
+================================================================
+Row counts: identical on all common sheets EXCEPT
+  grandSport_rule_groups         live 33->local 32 data rows (-1)
+  grandSport_rule_group_members  live 177->175 (-2)
+
+Header changes -- LOCAL drops audit/scratch columns; no columns added:
+  section_master           - help_text
+  section_presentation     - presentation_bucket
+  context_choice_copy      - copy_id
+  asset_map                - asset_id, review_flag
+  price_rules, grandSport/z06/zr1/zr1x_price_rules
+                           - review_flag, price_semantic
+  rule_mapping, grandSport/z06/zr1/zr1x_rule_mapping
+                           - review_flag, normalization_reason,
+                             replacement_group_id, replacement_rule_id
+  form_rules, form_price_rules - review_flag
+All other common sheets: headers identical.
+
+================================================================
+3. DATA DIFFERENCES (key sheets, common columns, type-normalized)
+================================================================
+After normalizing types, almost everything is data-identical. The only
+"changes" pass 1 flagged in z06_* / LZ_Interiors / z06_options were
+TYPE-ONLY: LIVE stores booleans/prices as text ('True', '0', '1790'),
+LOCAL stores real bools/numbers (True, 0, 1790). Affected columns:
+active (z06_options 237 rows, z06_rule_groups/members, z06_exclusive_*),
+LZ_Interiors Price/active_for_stingray/requires_r6x (130 rows),
+z06_options price (11 rows). Values are semantically identical.
+
+Real content differences:
+
+a) grandSport_rule_groups / grandSport_rule_group_members
+   LIVE has rule group 'gs_group_j57_z52_requirement' (requires_any) with
+   2 members (opt_feb_001, opt_fey_001). REMOVED in LOCAL.
+   -> Only true rules-logic difference in the whole workbook.
+
+b) model_registry_promotion (2 rows changed, artifact_path only)
+   grand_sport: form-output/inspection/grand-sport-form-data-draft.json
+             -> form-output/inspection/grand-sport-runtime-contract.json
+   z06:        form-output/inspection/z06-form-data-draft.json
+             -> form-output/inspection/z06-runtime-contract.json
+
+c) Identical (common cols, normalized): model_master, variant_master,
+   stingray_options, stingray/grandSport/z06/zr1/zr1x rule_mapping &
+   price_rules, z06_options, all *_ovs, lt_interiors, LZ_Interiors,
+   exclusive groups/members, section_master, section_presentation,
+   asset_map, context_choice_copy, variant_overrides.
+
+================================================================
+4. form_* GENERATED SHEETS (summary only)
+================================================================
+11 form_* sheets on both sides; identical row counts everywhere.
+Byte-identical: form_steps, form_context_choices, form_choices,
+  form_standard_equipment, form_rule_groups, form_exclusive_groups,
+  form_color_overrides, form_validation.
+Differ:
+  form_rules / form_price_rules  -- header-only (review_flag dropped in
+    LOCAL); data identical on common columns.
+  form_interiors -- 123 rows changed, all presentation regeneration:
+    * interior_parent_group_label rewritten from long descriptive text
+      ("Napa leather seating surfaces with perforated inserts.",
+       "Sueded microfiber seat inserts...") to short seat-package names
+      ("AH2 GT2 Bucket Seats" x66, "AE4 Competition Seats" x51,
+       "AQ9 GT1 Bucket Seats" x4, etc.)
+    * 2 rows (3LT_AE4_EL9, 3LT_AH2_EL9): color_family
+      'Other Interior Choices' -> 'Santorini Blue' with deeper
+      hierarchy_levels/hierarchy_path (4 -> 5 levels).
+
+================================================================
+MERGE-PLANNING TAKEAWAYS
+================================================================
+- LOCAL is a cleanup/reorg: drops 15 archive/raw sheets, drops audit
+  columns, reorders + colors all tabs, fixes cell types (str->bool/num).
+- Substantive deltas to reconcile against LIVE main:
+  1. Deleted GS rule group gs_group_j57_z52_requirement (+2 members)
+     -- confirm intentional before merging.
+  2. model_registry_promotion artifact_path rename to
+     *-runtime-contract.json for grand_sport and z06.
+  3. form_interiors regenerated labels/hierarchy (visualizer work).
+- Everything else is structurally cosmetic; no price or active-flag
+  changes in real terms anywhere.
