@@ -22,7 +22,7 @@ from corvette_form_generator.runtime_metadata import (
     load_interior_components,
     load_model_interior_scope_map,
 )
-from corvette_form_generator.workbook import clean, rows_from_sheet
+from corvette_form_generator.workbook import clean, intish, rows_from_sheet
 
 
 INTERIOR_COMPONENT_LABELS = {
@@ -245,6 +245,68 @@ def grouping_fields_for_interior(
     }
 
 
+WORKBOOK_GROUPING_REQUIRED_FIELDS = (
+    "interior_seat_label",
+    "interior_color_family",
+    "interior_material_family",
+    "interior_leaf_label",
+    "interior_group_display_order",
+    "interior_hierarchy_levels",
+)
+
+
+def has_workbook_grouping_fields(scope_row: dict[str, Any] | None) -> bool:
+    if not scope_row:
+        return False
+    return all(clean(scope_row.get(field)) for field in WORKBOOK_GROUPING_REQUIRED_FIELDS)
+
+
+def grouping_fields_from_scope(scope_row: dict[str, Any], interior: dict[str, Any]) -> dict[str, Any]:
+    missing = [field for field in WORKBOOK_GROUPING_REQUIRED_FIELDS if not clean(scope_row.get(field))]
+    if missing:
+        raise ValueError(
+            f"Active model_interior_scope row for {scope_row.get('interior_id') or interior.get('interior_id')} "
+            f"is missing workbook-owned grouping metadata: {', '.join(missing)}"
+        )
+    levels_text = clean(scope_row.get("interior_hierarchy_levels"))
+    try:
+        levels = json.loads(levels_text)
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            f"model_interior_scope interior_hierarchy_levels is not valid JSON for "
+            f"{scope_row.get('interior_id') or interior.get('interior_id')}: {levels_text}"
+        ) from exc
+    if not isinstance(levels, list) or not all(isinstance(level, str) for level in levels):
+        raise ValueError(
+            f"model_interior_scope interior_hierarchy_levels must be a JSON string array for "
+            f"{scope_row.get('interior_id') or interior.get('interior_id')}"
+        )
+    group_order = intish(scope_row.get("interior_group_display_order"))
+    material_order = intish(scope_row.get("interior_material_display_order"), group_order)
+    choice_order = intish(scope_row.get("interior_choice_display_order"), group_order)
+    reference_order = intish(scope_row.get("interior_reference_order"), choice_order)
+    seat_label = clean(scope_row.get("interior_seat_label"))
+    color_family = clean(scope_row.get("interior_color_family"))
+    material_family = clean(scope_row.get("interior_material_family"))
+    leaf_label = clean(scope_row.get("interior_leaf_label"))
+    return {
+        "interior_trim_level": levels[0] if levels else interior["trim_level"],
+        "interior_seat_code": seat_code_from_label(seat_label) or interior["seat_code"],
+        "interior_seat_label": seat_label,
+        "interior_color_family": color_family,
+        "interior_material_family": material_family,
+        "interior_variant_label": clean(scope_row.get("interior_variant_label")) or leaf_label,
+        "interior_group_display_order": group_order,
+        "interior_material_display_order": material_order,
+        "interior_choice_display_order": choice_order,
+        "interior_hierarchy_levels": json.dumps(levels, ensure_ascii=False),
+        "interior_hierarchy_path": " > ".join(levels),
+        "interior_parent_group_label": clean(scope_row.get("interior_parent_group_label")) or seat_label,
+        "interior_leaf_label": leaf_label,
+        "interior_reference_order": reference_order,
+    }
+
+
 def fallback_interior_trims(config: ModelConfig) -> set[str]:
     trims: set[str] = set()
     for variant_id in config.variant_ids:
@@ -333,12 +395,17 @@ def build_model_interiors(config: ModelConfig) -> list[dict[str, Any]]:
             "interior_components": components,
             "interior_components_json": json.dumps(components, separators=(",", ":")),
         }
-        reference = reference_by_id.get(interior_id)
-        if reference:
-            interior.update(grouping_fields_for_interior(interior, reference, reference_order_by_id[interior_id]))
+        if model_interior_scope:
+            if scope_row is None:
+                raise ValueError(f"Missing active model_interior_scope row for {config.model_label} interior {interior_id}")
+            interior.update(grouping_fields_from_scope(scope_row, interior))
         else:
-            interior.update(grouping_fields_for_interior(interior, None, fallback_order, fallback=False))
-            fallback_order += 1
+            reference = reference_by_id.get(interior_id)
+            if reference:
+                interior.update(grouping_fields_for_interior(interior, reference, reference_order_by_id[interior_id]))
+            else:
+                interior.update(grouping_fields_for_interior(interior, None, fallback_order, fallback=False))
+                fallback_order += 1
         interiors.append(interior)
 
     return interiors

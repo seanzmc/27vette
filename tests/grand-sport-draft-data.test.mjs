@@ -598,6 +598,31 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
   assert.equal(r6xChoices.every((choice) => choice.active === "False" && choice.selectable === "False" && choice.display_behavior === "auto_only"), true);
 });
 
+test("interior grouping metadata is workbook-owned for active runtime models", () => {
+  const scopeRows = workbookRows("model_interior_scope").filter((row) => ["stingray", "grand_sport", "z06"].includes(row.model_key) && row.active === "True");
+  const requiredFields = [
+    "interior_seat_label",
+    "interior_color_family",
+    "interior_material_family",
+    "interior_leaf_label",
+    "interior_group_display_order",
+    "interior_hierarchy_levels",
+    "grouping_source",
+  ];
+  for (const modelKey of ["stingray", "grand_sport", "z06"]) {
+    const rows = scopeRows.filter((row) => row.model_key === modelKey);
+    assert.ok(rows.length > 0, `${modelKey} should have active interior scope rows`);
+    assert.equal(
+      rows.every((row) => requiredFields.every((field) => row[field] !== undefined && String(row[field]).trim() !== "")),
+      true,
+      `${modelKey} active interior scope rows should carry workbook-owned grouping metadata`
+    );
+  }
+  const z06Custom = scopeRows.find((row) => row.model_key === "z06" && row.interior_id === "3LZ_R6X_AH2_HUU");
+  assert.equal(z06Custom?.interior_color_family, "Custom Interior trim and seat combinations");
+  assert.equal(z06Custom?.interior_leaf_label, "Adrenaline Red interior / Jet Black seats");
+});
+
 test("Grand Sport draft includes model-scoped LT interiors with EL9 launch edition metadata", () => {
   assert.equal(draft.interiors.length, 132);
   assert.equal(draft.interiors.every((interior) => interior.active_for_grand_sport === true), true);

@@ -25,6 +25,8 @@ from corvette_form_generator.contract import (
 from corvette_form_generator.inspection import section_step_resolution_source
 from corvette_form_generator.interiors import (
     grouping_fields_for_interior,
+    grouping_fields_from_scope,
+    has_workbook_grouping_fields,
     interior_component_metadata,
     read_interior_reference,
     workbook_interior_component_metadata,
@@ -58,6 +60,7 @@ from corvette_form_generator.runtime_metadata import (
     load_default_selection_rules,
     load_interior_components,
     load_model_config_overrides,
+    load_model_interior_scope_map,
     load_order_summary_metadata,
     load_runtime_rule_exceptions,
     load_runtime_steps,
@@ -231,6 +234,7 @@ def main() -> None:
         for row in variant_option_override_rows
     }
     workbook_components_by_interior_id = load_interior_components(wb, MODEL_CONFIG.model_key)
+    model_interior_scope = load_model_interior_scope_map(wb, MODEL_CONFIG.model_key)
     option_assets = option_asset_map(wb, MODEL_CONFIG.model_key)
     grouped_requires = grouped_requirement_pairs(rule_groups)
     grouped_excludes = grouped_exclusion_pairs(rule_groups) | exclusive_group_pairs(exclusive_groups)
@@ -507,19 +511,33 @@ def main() -> None:
     for row in interiors:
         if not row["interior_id"]:
             continue
+        scope_row = model_interior_scope.get(row["interior_id"])
         reference = interior_reference_by_id.get(row["interior_id"])
-        if row["active_for_stingray"] and reference:
+        if row["active_for_stingray"] and has_workbook_grouping_fields(scope_row):
+            if scope_row is None:
+                raise RuntimeError("has_workbook_grouping_fields returned true for a missing scope row")
+            row.update(grouping_fields_from_scope(scope_row, row))
+        elif row["active_for_stingray"] and reference:
             row.update(grouping_fields_for_interior(row, reference, reference_order_by_id[row["interior_id"]]))
+            validation_rows.append(
+                {
+                    "check_id": f"csv_grouping_fallback_{row['interior_id']}",
+                    "severity": "error",
+                    "entity_type": "interior",
+                    "entity_id": row["interior_id"],
+                    "message": "Active Stingray interior is missing workbook-owned grouping metadata and fell back to the CSV hierarchy.",
+                }
+            )
         elif row["active_for_stingray"]:
             row.update(grouping_fields_for_interior(row, None, fallback_order, fallback=True))
             fallback_order += 1
             validation_rows.append(
                 {
                     "check_id": f"unmapped_active_interior_{row['interior_id']}",
-                    "severity": "warning",
+                    "severity": "error",
                     "entity_type": "interior",
                     "entity_id": row["interior_id"],
-                    "message": "Active Stingray interior is not represented in the CSV hierarchy and was placed in Other Interior Choices.",
+                    "message": "Active Stingray interior is missing workbook-owned grouping metadata and CSV hierarchy mapping.",
                 }
             )
         else:

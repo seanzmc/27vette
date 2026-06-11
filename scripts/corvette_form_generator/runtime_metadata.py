@@ -340,6 +340,18 @@ def load_model_interior_scope(wb: Any, model_key: str) -> list[dict[str, Any]]:
                 "interior_id": interior_id,
                 "trim_level": clean(row.get("trim_level")),
                 "requires_option_id": clean(row.get("requires_option_id")),
+                "interior_seat_label": clean(row.get("interior_seat_label")),
+                "interior_color_family": clean(row.get("interior_color_family")),
+                "interior_material_family": clean(row.get("interior_material_family")),
+                "interior_variant_label": clean(row.get("interior_variant_label")),
+                "interior_group_display_order": clean(row.get("interior_group_display_order")),
+                "interior_material_display_order": clean(row.get("interior_material_display_order")),
+                "interior_choice_display_order": clean(row.get("interior_choice_display_order")),
+                "interior_hierarchy_levels": clean(row.get("interior_hierarchy_levels")),
+                "interior_parent_group_label": clean(row.get("interior_parent_group_label")),
+                "interior_leaf_label": clean(row.get("interior_leaf_label")),
+                "interior_reference_order": clean(row.get("interior_reference_order")),
+                "grouping_source": clean(row.get("grouping_source")),
                 "notes": clean(row.get("notes")),
             }
         )

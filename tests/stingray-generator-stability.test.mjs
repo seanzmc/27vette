@@ -106,7 +106,26 @@ const interiorComponentHeaders = [
   "active",
   "notes",
 ];
-const modelInteriorScopeHeaders = ["model_key", "interior_id", "trim_level", "active", "requires_option_id", "notes"];
+const modelInteriorScopeHeaders = [
+  "model_key",
+  "interior_id",
+  "trim_level",
+  "active",
+  "requires_option_id",
+  "notes",
+  "interior_seat_label",
+  "interior_color_family",
+  "interior_material_family",
+  "interior_variant_label",
+  "interior_group_display_order",
+  "interior_material_display_order",
+  "interior_choice_display_order",
+  "interior_hierarchy_levels",
+  "interior_parent_group_label",
+  "interior_leaf_label",
+  "interior_reference_order",
+  "grouping_source",
+];
 const runtimeStepHeaders = ["model_key", "step_key", "step_label", "runtime_order", "source", "active", "notes"];
 const contextSectionHeaders = [
   "model_key",
