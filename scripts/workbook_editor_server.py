@@ -22,6 +22,7 @@ if str(SCRIPTS_DIR) not in sys.path:
 
 from corvette_form_generator.editor_ops import (  # noqa: E402
     EDITOR_SHEET_META,
+    apply_batch,
     extract_workbook,
     jsonable,
     model_sheet_registry,
@@ -246,6 +247,53 @@ class WorkbookCache:
 
 class EditorHandler(BaseHTTPRequestHandler):
     cache: WorkbookCache  # assigned in main()
+    log_path: Path | None = None  # test override; None -> editor_ops default
+    MAX_BODY = 10_000_000
+
+    def _allowed_origins(self):
+        port = self.server.server_address[1]
+        return {f"http://127.0.0.1:{port}", f"http://localhost:{port}"}
+
+    def do_POST(self):  # noqa: N802 (stdlib API name)
+        path = urlsplit(self.path).path
+        if path not in ("/api/validate", "/api/apply"):
+            self._send_json({"error": "not found"}, status=404)
+            return
+        origin = self.headers.get("Origin")
+        if origin and origin not in self._allowed_origins():
+            self._send_json({"error": "forbidden origin"}, status=403)
+            return
+        if "application/json" not in (self.headers.get("Content-Type") or ""):
+            self._send_json({"error": "expected application/json"}, status=415)
+            return
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            length = 0
+        if not 0 < length <= self.MAX_BODY:
+            self._send_json({"error": "missing or oversized body"}, status=400)
+            return
+        try:
+            body = json.loads(self.rfile.read(length))
+        except (ValueError, UnicodeDecodeError):
+            self._send_json({"error": "invalid JSON body"}, status=400)
+            return
+        batch = body.get("batch") or {}
+        try:
+            if path == "/api/validate":
+                result = apply_batch(self.cache.path, batch, write=False, source="server",
+                                     log_path=self.log_path)
+                self._send_json(result)
+            else:
+                result = apply_batch(self.cache.path, batch, write=True, source="server",
+                                     confirmed_warnings=body.get("confirmedWarnings") or [],
+                                     log_path=self.log_path)
+                status = 200 if result["ok"] else (409 if result["status"] == "stale" else 422)
+                self._send_json(result, status=status)
+        except BrokenPipeError:
+            pass
+        except Exception as exc:
+            self._send_json({"error": f"{type(exc).__name__}: {exc}"}, status=500)
 
     def do_GET(self):  # noqa: N802 (stdlib API name)
         path = urlsplit(self.path).path
