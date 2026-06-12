@@ -221,6 +221,22 @@ def build_payload(extract: dict) -> dict:
         | {s["stepKey"] for s in sections if s["stepKey"]}
     )
 
+    def _ids_by_model(family: str, id_col: str, name_col: str | None = None) -> dict:
+        out: dict[str, list[dict]] = {}
+        for model_key, entries in model_sheets.items():
+            src = next((e["sheet"] for e in entries if e["family"] == family), None)
+            if not src:
+                continue
+            rows = [
+                ({"id": row.get(id_col), "name": row.get(name_col)} if name_col
+                 else {"id": row.get(id_col)})
+                for row in _rows_of(extract, src)
+                if row.get(id_col)
+            ]
+            if rows:
+                out[model_key] = rows
+        return out
+
     return {
         "workbook": {
             "path": extract["path"],
@@ -240,6 +256,9 @@ def build_payload(extract: dict) -> dict:
             ],
             "variantsByModel": variants_by_model,
             "optionsByModel": options_by_model,
+            "ruleGroupsByModel": _ids_by_model("rule_groups", "group_id"),
+            "exclusiveGroupsByModel": _ids_by_model("exclusive_groups", "group_id"),
+            "interiorsByModel": _ids_by_model("interiors", "interior_id", "Interior Name"),
             "stepKeys": step_keys,
         },
     }

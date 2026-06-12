@@ -70,7 +70,22 @@ def build_fixture_workbook() -> Workbook:
              "sheet_name": "zr1_options", "active": False},
             {"model_key": "stingray", "source_role": "mystery_role",
              "sheet_name": "stingray_options", "active": True},
+            {"model_key": "stingray", "source_role": "rule_groups_sheet",
+             "sheet_name": "rule_groups", "active": True},
+            {"model_key": "stingray", "source_role": "rule_group_members_sheet",
+             "sheet_name": "rule_group_members", "active": True},
         ],
+    )
+    append_sheet(
+        wb, "rule_groups",
+        ["group_id", "group_type", "source_id", "active", "notes"],
+        [{"group_id": "grp_alpha", "group_type": "requires_any",
+          "source_id": "opt_z51_001", "active": True}],
+    )
+    append_sheet(
+        wb, "rule_group_members",
+        ["group_id", "target_id", "display_order", "active"],
+        [{"group_id": "grp_alpha", "target_id": "opt_gkz_001", "display_order": 10, "active": True}],
     )
     append_sheet(
         wb, "runtime_steps",
@@ -196,7 +211,10 @@ class ModelSheetsTest(PayloadTestBase):
     def test_active_rows_with_known_roles_only(self):
         sheets = self.payload["modelSheets"]
         stingray = {e["sheet"]: e for e in sheets["stingray"]}
-        self.assertEqual(set(stingray), {"stingray_options", "stingray_ovs"})
+        self.assertEqual(
+            set(stingray),
+            {"stingray_options", "stingray_ovs", "rule_groups", "rule_group_members"},
+        )
         self.assertEqual(stingray["stingray_options"]["family"], "options")
         self.assertNotIn("zr1", sheets)
 
@@ -245,6 +263,12 @@ class ReferenceDomainsTest(PayloadTestBase):
         self.assertEqual(len(options["stingray"]), 2)
         self.assertEqual(options["z06"][0]["rpo"], "Z07")
 
+    def test_group_and_interior_domains(self):
+        dom = self.payload["referenceDomains"]
+        self.assertEqual([g["id"] for g in dom["ruleGroupsByModel"]["stingray"]], ["grp_alpha"])
+        self.assertEqual(dom["exclusiveGroupsByModel"], {})
+        self.assertEqual(dom["interiorsByModel"], {})
+
 
 class SheetPayloadTest(PayloadTestBase):
     def test_rows_preserve_json_types(self):
@@ -284,6 +308,11 @@ class RealWorkbookIntegrationTest(unittest.TestCase):
         for entry in self.payload["sheets"]:
             if entry["name"].startswith("form_"):
                 self.assertTrue(entry["readOnly"], entry["name"])
+
+    def test_group_domains_real(self):
+        dom = self.payload["referenceDomains"]
+        self.assertTrue(any(g["id"] for g in dom["exclusiveGroupsByModel"]["z06"]))
+        self.assertTrue(any(i["id"] for i in dom["interiorsByModel"]["stingray"]))
 
 
 if __name__ == "__main__":
