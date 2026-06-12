@@ -286,18 +286,16 @@ class RealWorkbookLintTest(unittest.TestCase):
         self.assertIn("opt_wks_001", keys)
         self.assertTrue(all("72" in l["message"] for l in hits))
 
-    def test_s1_s2_display_order_typing(self):
-        rows = self.by_id.get("display_order_type", [])
-        z06_options = [l for l in rows if l["sheet"] == "z06_options"]
-        z06_members = [l for l in rows if l["sheet"] == "z06_exclusive_members"]
-        self.assertEqual(len(z06_options), 245)  # S-1
-        self.assertEqual(len(z06_members), 16)   # S-2 (rows 2-17)
+    def test_s1_s2_display_order_typing_clean(self):
+        # S-1/S-2 (and the z06_rule_group_members rows this lint surfaced)
+        # were retyped to integers on 2026-06-12 via the editor op pipeline;
+        # the lint that found them now guards the fix workbook-wide.
+        self.assertEqual(self.by_id.get("display_order_type", []), [])
 
-    def test_s10_boolean_text_order_summary(self):
-        hits = [l for l in self.by_id.get("boolean_text", [])
-                if l["sheet"] == "order_summary_sections"]
-        self.assertTrue(hits)
-        self.assertTrue(all(l["cells"] == ["active"] for l in hits))
+    def test_s10_boolean_text_clean(self):
+        # S-10 boolean-as-text rows were converted to real Excel booleans on
+        # 2026-06-12. Keep the workbook-wide lint as a regression guard.
+        self.assertEqual(self.by_id.get("boolean_text", []), [])
 
     def test_negative_no_duplicate_keys_or_orphan_refs(self):
         # schema-validator baseline: the current workbook is referentially clean

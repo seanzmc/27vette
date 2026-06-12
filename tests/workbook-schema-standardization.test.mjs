@@ -70,6 +70,24 @@ payload = {
     'lt_interior_prices': column_values('lt_interiors', 'Price'),
     'lz_interior_prices': column_values('LZ_Interiors', 'Price'),
     'grand_sport_selectable': column_values('grandSport_options', 'selectable'),
+    'display_order_columns': {sheet: column_values(sheet, 'display_order') for sheet in [
+        'stingray_options', 'grandSport_options', 'z06_options',
+        'rule_group_members', 'exclusive_group_members',
+        'grandSport_rule_group_members', 'grandSport_exclusive_members',
+        'z06_rule_group_members', 'z06_exclusive_members']},
+    'boolean_columns': {
+        'asset_map.active': column_values('asset_map', 'active'),
+        'default_selection_rules.active': column_values('default_selection_rules', 'active'),
+        'option_audit_group_members.active': column_values('option_audit_group_members', 'active'),
+        'option_audit_groups.active': column_values('option_audit_groups', 'active'),
+        'order_summary_sections.active': column_values('order_summary_sections', 'active'),
+        'rule_phrase_map.active': column_values('rule_phrase_map', 'active'),
+        'rule_phrase_map.review_flag_default': column_values('rule_phrase_map', 'review_flag_default'),
+        'rule_review_groups.active': column_values('rule_review_groups', 'active'),
+        'runtime_rule_exceptions.active': column_values('runtime_rule_exceptions', 'active'),
+        'section_master.is_required': column_values('section_master', 'is_required'),
+        'step_order_summary_map.active': column_values('step_order_summary_map', 'active'),
+    },
     'grand_sport_variant_active': column_values('grandSport_variant_overrides', 'active'),
     'grand_sport_variant_selectable': column_values('grandSport_variant_overrides', 'selectable'),
     'rule_mapping_rows': records('rule_mapping'),
@@ -119,6 +137,25 @@ test("workbook primitive cells use canonical raw Excel types", () => {
   assert.equal(snapshot.lt_interior_prices.every((value) => typeof value === "number"), true);
   // LZ_Interiors price-typing intentionally not asserted: future-model interior
   // scaffold, not read by live generation. Numeric-price guard kept on live sheets.
+
+  // display_order must be numeric on every live option/member sheet (review
+  // 2026-06-11 S-1/S-2; Z06 ingest-era string cells retyped 2026-06-12).
+  for (const [sheet, values] of Object.entries(snapshot.display_order_columns)) {
+    assert.equal(
+      values.every((value) => typeof value === "number"),
+      true,
+      `${sheet}: display_order cells must be integer-typed, not text`,
+    );
+  }
+
+  // Boolean-like metadata cells should be real Excel booleans, not text TRUE/FALSE.
+  for (const [column, values] of Object.entries(snapshot.boolean_columns)) {
+    assert.equal(
+      values.every((value) => typeof value === "boolean"),
+      true,
+      `${column}: cells must be boolean-typed, not text`,
+    );
+  }
 });
 
 test("LZ_Interiors is schema-compatible but not read by Stingray generation", () => {

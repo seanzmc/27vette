@@ -411,8 +411,16 @@ class RealWorkbookApplyTest(unittest.TestCase):
         self._dir.cleanup()
 
     def test_gs_update_heals_stale_table_refs(self):
+        # Inject the ingest-era stale ref on the temp copy: the canonical
+        # workbook's own ref was healed by a real editor apply on 2026-06-12,
+        # so the stale precondition can no longer be assumed from the file.
         wb = load_workbook(self.path)
-        self.assertEqual(wb["grandSport_options"].tables["tbl_grandSport_options"].ref, "A1:K267")
+        ws = wb["grandSport_options"]
+        ws.tables["tbl_grandSport_options"].ref = "A1:K267"
+        last_data_row = max(
+            (r for r in range(1, ws.max_row + 1)
+             if any(c.value is not None for c in ws[r])), default=2)
+        wb.save(self.path)
         wb.close()
         b = {"version": 1, "workbookMtimeNs": self.path.stat().st_mtime_ns, "items": [
             {"action": "update", "sheet": "grandSport_options", "key": {"option_id": "opt_fey_001"},
@@ -421,7 +429,8 @@ class RealWorkbookApplyTest(unittest.TestCase):
         self.assertTrue(result["ok"], result)
         self.assertEqual((result["schemaResult"] or {}).get("error_count"), 0)
         wb = load_workbook(self.path)
-        self.assertEqual(wb["grandSport_options"].tables["tbl_grandSport_options"].ref, "A1:K274")
+        self.assertEqual(wb["grandSport_options"].tables["tbl_grandSport_options"].ref,
+                         f"A1:K{max(last_data_row, 2)}")
         wb.close()
 
     def test_bad_ref_refused_on_real_workbook(self):
