@@ -11,7 +11,6 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import date, datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
@@ -21,51 +20,19 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from openpyxl import load_workbook  # noqa: E402
-
 from corvette_form_generator.editor_ops import (  # noqa: E402
     EDITOR_SHEET_META,
-    SOURCE_ROLE_FAMILIES,
+    extract_workbook,
+    jsonable,
+    model_sheet_registry,
+    rows_of,
 )
 from corvette_form_generator.workbook import workbook_truthy  # noqa: E402
 
 UI_DIR = ROOT / "visualizer" / "workbook-editor"
 DEFAULT_WORKBOOK = ROOT / "stingray_master.xlsx"
 
-
-def jsonable(value):
-    if isinstance(value, (datetime, date)):
-        return value.isoformat()
-    return value
-
-
-def extract_workbook(path: Path) -> dict:
-    """Load the whole workbook into plain dicts and close the file."""
-    path = Path(path)
-    mtime_ns = path.stat().st_mtime_ns
-    wb = load_workbook(path, read_only=True, data_only=True)
-    sheets: dict[str, dict] = {}
-    for ws in wb.worksheets:
-        rows_iter = ws.iter_rows(values_only=True)
-        header_row = next(rows_iter, None) or ()
-        cols = [(i, str(v)) for i, v in enumerate(header_row) if v is not None]
-        rows = []
-        for raw in rows_iter:
-            row = {
-                name: jsonable(raw[i]) if i < len(raw) else None
-                for i, name in cols
-            }
-            if all(v in (None, "") for v in row.values()):
-                continue
-            rows.append(row)
-        sheets[ws.title] = {"headers": [name for _, name in cols], "rows": rows}
-    wb.close()
-    return {"path": str(path), "mtime_ns": mtime_ns, "sheets": sheets}
-
-
-def _rows_of(extract: dict, name: str) -> list[dict]:
-    sheet = extract["sheets"].get(name)
-    return sheet["rows"] if sheet else []
+_rows_of = rows_of
 
 
 def _models(extract: dict) -> list[dict]:
@@ -93,25 +60,7 @@ def _models(extract: dict) -> list[dict]:
     return models
 
 
-def _model_sheets(extract: dict) -> tuple[dict, dict]:
-    """Per-model sheet registry plus a sheet-name -> family reverse map."""
-    registry: dict[str, list[dict]] = {}
-    sheet_family: dict[str, str] = {}
-    for row in _rows_of(extract, "model_workbook_sources"):
-        if not workbook_truthy(row.get("active")):
-            continue
-        family = SOURCE_ROLE_FAMILIES.get(row.get("source_role"))
-        sheet_name = row.get("sheet_name")
-        model_key = row.get("model_key")
-        if not (family and sheet_name and model_key):
-            continue
-        registry.setdefault(model_key, []).append({
-            "sheet": sheet_name,
-            "role": row.get("source_role"),
-            "family": family,
-        })
-        sheet_family.setdefault(sheet_name, family)
-    return registry, sheet_family
+_model_sheets = model_sheet_registry
 
 
 def _sheet_list(extract: dict, sheet_family: dict) -> list[dict]:
