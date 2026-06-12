@@ -207,9 +207,8 @@ All parent-spec §7 constraints hold, plus the Phase 2 specifics:
 - **Repo gates before merge:** full Python unittest discovery; `node --test` suites untouched by this work but run once as regression evidence; canonical workbook untouched during development (`git status stingray_master.xlsx` clean — all write tests run on temp copies).
 - **First real apply after merge** (whenever a real edit happens): follows the AGENTS.md Workbook Update Workflow — regenerate affected model, run its gates, review diffs — exactly as if the edit had been made by hand, with the apply-log line as evidence.
 
-## 7. Open Questions
+## 7. Decisions (approved 2026-06-11)
 
-None blocking. Two decisions made in this spec that you can veto cheaply now:
-
-1. **OVS grid starts blank and forces a choice per variant** (with a bulk "set all to…" helper) rather than prefilling a default status. Rationale: §4.4's "the user sets" + a wrong prefilled `available` is a silent business error.
-2. **Editable surface stays at the 11 families** (no metadata-sheet editing) for this phase — §2.9.
+1. **OVS grid starts blank and forces a choice per variant** (with a bulk "set all to…" helper) rather than prefilling a default status — approved.
+2. **Editable surface stays at the 11 families** (no metadata-sheet editing) for this phase — approved.
+3. **CLI staleness amendment:** the §2.5 mtime guard refuses any batch whose `workbookMtimeNs` no longer matches — which would break §2.7's export-now-apply-later workflow. The CLI therefore gets `--allow-stale`, which skips only the mtime equality check; full validation still runs against the *current* workbook state, which is the real safety. The server never allows stale batches.
