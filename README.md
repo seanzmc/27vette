@@ -39,11 +39,11 @@ The runtime should render and evaluate the generated contract. It should not inf
 
 - `README.md` - project overview, architecture, local run, workflows, and roadmap.
 - `AGENTS.md` - granular developer workflows, source-of-truth rules, validation gates, and handoff requirements.
-- `codex-context.md` - short current operational context for implementation passes.
+- `docs/` - current planning, review, workbook editor, and workbook inventory docs, including `docs/workbook-sheet-index.md` and workbook editor phase specs.
 - `stingray_master.xlsx` - canonical workbook, source/metadata sheets, and generated `form_*` sheets.
 - `form-app/` - static app shell, styles, runtime behavior, and generated data bundle.
-- `form-output/` - generated Stingray JSON/CSV outputs plus Grand Sport and Z06 inspection, contract preview, draft, rule-audit, and runtime-contract artifacts under `form-output/inspection/`.
-- `scripts/generate_form.py` - single generator entry point for every model. `--model stingray` runs the production pathway (form sheets, output artifacts, app data registry); `--model grand_sport` and `--model z06` run the read-only inspection/draft pathway and do not mutate `form-app/data.js`.
+- `form-output/` - generated Stingray JSON/CSV outputs plus Grand Sport and Z06 inspection, contract preview, draft, rule-audit, and clean runtime-contract artifacts under `form-output/inspection/`.
+- `scripts/generate_form.py` - single generator entry point for every model. `--model stingray` runs the production pathway (form sheets, output artifacts, app data registry); `--model grand_sport` and `--model z06` emit inspection/preview/draft artifacts plus clean `*-runtime-contract.json` artifacts and do not directly mutate `form-app/data.js`.
 - `scripts/promote_model.py` - workbook-driven runtime promotion (`--model <key> --write`).
 - `scripts/build_rule_sources.py` - workbook rule-source audit helper.
 - `scripts/validate_workbook_schema.py` - workbook schema and live-contract validation.
@@ -56,7 +56,7 @@ The runtime should render and evaluate the generated contract. It should not inf
 - `archive-2026-05-29/`, `backups/` - retained historical snapshots and workbook backups.
 - `product/`, `dist_updates/` - GM product reference PDFs and distribution updates.
 - `visualizer/`, `src/` - 2D visualizer scripts, exterior/wheel image assets, and the local workbook review tool under `visualizer/workbook-editor/` (separate from the order-form runtime).
-- `scripts/workbook_editor_server.py` - localhost-only server for the workbook review/editing UI (`.venv/bin/python scripts/workbook_editor_server.py`, then open `http://127.0.0.1:8027/`). Edits queue client-side and apply only through a gated pipeline (validation, dry-run, `save_workbook_safely`, apply log). Its read-only Review tab (`/api/lints`, `/api/compare`) lints the current workbook state (duplicate keys, orphan refs, display-order collisions and cell typing, OVS coverage, group integrity, boolean-as-text) and diffs `*_options` copy/placement across Stingray/Grand Sport/Z06 with majority-vs-deviator labels; lints are informational and never gate applies.
+- `scripts/workbook_editor_server.py` - localhost-only server for the workbook review/editing UI. See [Workbook Editor Workflow](#workbook-editor-workflow) for start, review, edit/apply, exported ops, and post-apply regeneration steps.
 - `visualizer/workbook-editor/intentional-differences.json` - committed allowlist of intentional cross-model option differences consumed by the compare view (and, later, the cross-model copy-parity test). Entries carry a per-option reason and a status: `intentional` suppresses the divergence (still visible behind the "show intentional" toggle); `pending-review` annotates items awaiting a product decision (consistency-review §6 R-items).
 - `scripts/apply_workbook_ops.py` - applies an exported ops.json batch through the same gated pipeline (`--write` to actually apply; default is validate + dry-run).
 
@@ -204,6 +204,48 @@ python -m pip install -r requirements.txt
 
 Do not commit `.venv/`. Do not run workbook generators with bare system Python; use `.venv/bin/python` or activate `.venv` first.
 
+## Workbook Editor Workflow
+
+`scripts/workbook_editor_server.py` serves a localhost-only UI for reviewing and editing `stingray_master.xlsx`. It derives models, sheet registries, schemas, and reference domains from the live workbook (`model_master`, `model_workbook_sources`, `runtime_steps`, `section_master`, and `section_presentation`); the editor does not hardcode workbook-owned sheet relationships.
+
+Start the editor from the repo root:
+
+```sh
+cd <repo-root>
+.venv/bin/python scripts/workbook_editor_server.py
+```
+
+Open `http://127.0.0.1:8027/`. Optional flags:
+
+```sh
+.venv/bin/python scripts/workbook_editor_server.py --port 8030
+.venv/bin/python scripts/workbook_editor_server.py --workbook /path/to/stingray_master.xlsx
+```
+
+Review tab:
+
+- `/api/lints` runs informational structural lints over the current workbook state: duplicate keys, orphan references, display-order collisions and cell typing, OVS coverage, group integrity, and boolean-as-text. Lints do not gate editor applies; the batch validator remains the write authority.
+- `/api/compare` compares `stingray_options`, `grandSport_options`, and `z06_options` by option ID, diffs copy/section/relative display order, and labels majority vs. deviator rows. ZR1/ZR1X scaffold sheets are excluded.
+- Intentional cross-model differences live in `visualizer/workbook-editor/intentional-differences.json`. `status: intentional` suppresses a matched divergence by default; `status: pending-review` annotates items waiting for a product decision. Editing this allowlist is a normal reviewed file change, not a workbook write.
+
+Editing and Apply behavior:
+
+- Edits queue client-side as typed operations. Nothing touches `stingray_master.xlsx` until Apply.
+- Only the model-scoped sheet families registered in `model_workbook_sources` are editable. Generated `form_*` sheets and workbook metadata sheets are read-only in the editor.
+- Schema-constrained fields use pickers, enums, or typed inputs. Adding an option must include OVS coverage for every active variant of that model; the Add Option wizard and server both check this.
+- Apply runs the full workbook gate internally: batch validation, dry-run on a temp copy, `validate_workbook_package`, `validate_workbook_schema`, `save_workbook_safely()` lock/mtime checks, backup, atomic replace, Excel-table ref maintenance, and an entry in `form-output/workbook-edit-log.jsonl`.
+- Warnings such as display-order collisions or deleting still-referenced keys block until explicitly confirmed.
+
+For review-then-apply workflows, export the ops batch and use the CLI wrapper. The default is validate + dry-run only:
+
+```sh
+.venv/bin/python scripts/apply_workbook_ops.py ops.json
+.venv/bin/python scripts/apply_workbook_ops.py ops.json --write
+.venv/bin/python scripts/apply_workbook_ops.py ops.json --write --confirm-warnings warning_id_1,warning_id_2
+```
+
+An editor Apply is only the workbook-write step. After any successful apply, regenerate the affected model artifacts, run the relevant gates below, and review diffs before treating the change as complete.
+
 ## Workbook And Generator Workflows
 
 Stingray production refresh:
@@ -218,7 +260,7 @@ node --test tests/stingray-generator-stability.test.mjs
 
 The Stingray generator reads `stingray_master.xlsx`, rewrites generated `form_*` sheets, writes `form-output/stingray-form-data.json`, writes `form-output/stingray-form-data.csv`, and updates `form-app/data.js`. Stingray is currently the only production-pathway model in `scripts/generate_form.py`.
 
-Grand Sport inspection and draft refresh:
+Grand Sport source/runtime-contract refresh:
 
 ```sh
 cd <repo-root>
@@ -226,9 +268,10 @@ cd <repo-root>
 node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
 node --test tests/grand-sport-rule-audit.test.mjs
+node --test tests/audit-parser-metadata-loaders.test.mjs
 ```
 
-Z06 inspection and draft refresh:
+Z06 source/runtime-contract refresh:
 
 ```sh
 cd <repo-root>
@@ -240,20 +283,21 @@ node --test tests/z06-performance-package-interactions.test.mjs
 node --test tests/z06-runtime-rule-corrections.test.mjs
 ```
 
-The Grand Sport and Z06 generators write inspection, contract preview, draft, rule-audit (Grand Sport), and `*-runtime-contract.json` artifacts under `form-output/inspection/`. Registry promotion embeds the `*-runtime-contract.json` artifacts verbatim; draft-only provenance never reaches `form-app/data.js`. By design, those generator runs do not directly mutate `form-app/data.js`.
+The Grand Sport and Z06 generators write inspection, contract preview, draft, rule-audit (Grand Sport), and clean `*-runtime-contract.json` artifacts under `form-output/inspection/`. Registry promotion embeds the `*-runtime-contract.json` artifacts verbatim; draft-only provenance never reaches `form-app/data.js`. By design, those generator runs do not directly mutate `form-app/data.js`.
 
-Runtime promotion (workbook-owned):
+Runtime promotion verification / reapply (workbook-owned):
 
 ```sh
 cd <repo-root>
 .venv/bin/python scripts/promote_model.py --model z06 --write
 .venv/bin/python scripts/generate_form.py --model z06
 .venv/bin/python scripts/generate_form.py --model stingray
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
 node --test tests/z06-runtime-promotion.test.mjs
 node --test tests/multi-model-runtime-switching.test.mjs
 ```
 
-Do not promote ZR1 or ZR1X as part of another model's pass unless that scope is explicitly approved.
+Z06 is already promoted in the current workbook/runtime state. Use this sequence only when promotion rows need to be verified or deliberately reapplied after workbook promotion metadata changes. Do not promote ZR1 or ZR1X as part of another model's pass unless that scope is explicitly approved.
 
 Full model/runtime validation:
 
