@@ -42,7 +42,7 @@ nav.tabs button {
 nav.tabs button.on { background: var(--amber); color: #0f172a; }
 nav.tabs button:not(.on):hover { background: #33415588; }
 
-main { max-width: 1180px; margin: 0 auto; padding: 24px; }
+main { width: 100%; max-width: none; margin: 0; padding: 24px; }
 h2.sec {
   font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
   color: var(--amber); margin: 0 0 12px;
@@ -117,8 +117,10 @@ td {
   color: #cbd5e1;
 }
 tr.row { cursor: pointer; }
+tr.row.editing { background: #111827; }
 tr.row:hover { background: var(--panel-2); }
 tr.detail td { white-space: normal; background: #0b1222; }
+.inline-edit td { max-width: none; white-space: normal; background: #0b1222; }
 .detail dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 6px 0; }
 .detail dt { color: var(--dim); font-size: 12px; }
 .detail dd { margin: 0; font-size: 13px; word-break: break-word; }

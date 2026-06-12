@@ -254,7 +254,7 @@ function SheetTable({ data, name, onQueue, initialQuery }) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(null);
-  const [editing, setEditing] = useState(null); // {mode, initial}
+  const [editing, setEditing] = useState(null); // {mode, initial, index}
 
   useEffect(() => {
     setSheet(null); setError(null); setQuery(initialQuery || ""); setPage(0); setOpen(null); setEditing(null);
@@ -302,7 +302,7 @@ function SheetTable({ data, name, onQueue, initialQuery }) {
     </div>
     ${error && html`<div class="error">${error}</div>`}
     ${!sheet && !error && html`<div class="loading">Loading ${name}…</div>`}
-    ${editing && html`<${RowForm} data=${data} sheetName=${name} mode=${editing.mode}
+    ${editing?.mode === "add" && html`<${RowForm} data=${data} sheetName=${name} mode=${editing.mode}
         initial=${editing.initial} onQueue=${onQueue} onCancel=${() => setEditing(null)} />`}
     ${sheet && html`<div class="tablewrap"><table>
       <thead><tr>
@@ -314,14 +314,18 @@ function SheetTable({ data, name, onQueue, initialQuery }) {
         ${rows.map((r, i) => {
           const idx = safePage * PAGE_SIZE + i;
           return html`
-            <tr class="row" key=${idx} onClick=${() => setOpen(open === idx ? null : idx)}>
+            <tr class=${"row" + (editing?.mode === "edit" && editing.index === idx ? " editing" : "")} key=${idx} onClick=${() => setOpen(open === idx ? null : idx)}>
               ${cols.map((c) => html`<td key=${c} title=${String(r[c] ?? "")}>${fmt(r[c])}</td>`)}
               ${editable && html`<td class="actions-col" onClick=${(e) => e.stopPropagation()}>
                 <button class="btn tiny" title="Edit"
-                  onClick=${() => setEditing({ mode: "edit", initial: r })}>✎</button>
+                  onClick=${() => setEditing({ mode: "edit", initial: r, index: idx })}>✎</button>
                 <button class="btn tiny danger" title="Delete" onClick=${() => queueDelete(r)}>🗑</button>
               </td>`}
             </tr>
+            ${editing?.mode === "edit" && editing.index === idx && html`<tr class="inline-edit"><td colSpan=${cols.length + 1}>
+              <${RowForm} data=${data} sheetName=${name} mode=${editing.mode}
+                initial=${editing.initial} onQueue=${onQueue} onCancel=${() => setEditing(null)} />
+            </td></tr>`}
             ${open === idx && html`<tr class="detail"><td colSpan=${cols.length + 1}>
               <dl>${sheet.headers.map((hcol) => html`
                 <dt key=${"t" + hcol}>${hcol}</dt><dd key=${"d" + hcol}>${fmt(r[hcol])}</dd>`)}
