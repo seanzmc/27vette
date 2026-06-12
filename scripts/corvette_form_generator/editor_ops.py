@@ -656,7 +656,9 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
     if lock.exists():
         return {"ok": False, "status": "locked",
                 "errors": [f"Excel lock file present: {lock}. Close Excel first."], "warnings": []}
-    if not allow_stale and batch.get("workbookMtimeNs") != path.stat().st_mtime_ns:
+    # mtime compares as strings: st_mtime_ns exceeds JS Number.MAX_SAFE_INTEGER,
+    # so the browser must round-trip it as a string to keep full precision.
+    if not allow_stale and str(batch.get("workbookMtimeNs")) != str(path.stat().st_mtime_ns):
         return {"ok": False, "status": "stale",
                 "errors": ["workbook changed since this batch was prepared; reload and re-verify"],
                 "warnings": []}

@@ -343,9 +343,11 @@ class ApplyBatchTest(unittest.TestCase):
         self.assertTrue(any(backups.iterdir()))
 
     def test_update_and_delete(self):
+        # mtime passed as a string, as the browser must send it (JS precision)
         result = self.run_batch(
             op("update", "stingray_options", {"option_id": "opt_thr_001"}, {"price": 777, "description": "x"}),
             op("delete", "stingray_ovs", {"option_id": "opt_one_001", "variant_id": "2lt"}),
+            mtime=str(self.path.stat().st_mtime_ns),
         )
         self.assertTrue(result["ok"], result)
         wb = load_workbook(self.path)

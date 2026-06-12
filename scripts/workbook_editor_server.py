@@ -190,7 +190,8 @@ def build_payload(extract: dict) -> dict:
     return {
         "workbook": {
             "path": extract["path"],
-            "mtimeNs": extract["mtime_ns"],
+            # string: st_mtime_ns overflows JS Number.MAX_SAFE_INTEGER
+            "mtimeNs": str(extract["mtime_ns"]),
             "sheetCount": len(extract["sheets"]),
         },
         "models": models,
