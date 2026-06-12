@@ -56,7 +56,8 @@ The runtime should render and evaluate the generated contract. It should not inf
 - `archive-2026-05-29/`, `backups/` - retained historical snapshots and workbook backups.
 - `product/`, `dist_updates/` - GM product reference PDFs and distribution updates.
 - `visualizer/`, `src/` - 2D visualizer scripts, exterior/wheel image assets, and the local workbook review tool under `visualizer/workbook-editor/` (separate from the order-form runtime).
-- `scripts/workbook_editor_server.py` - localhost-only, read-only server for the workbook review UI (`.venv/bin/python scripts/workbook_editor_server.py`, then open `http://127.0.0.1:8027/`).
+- `scripts/workbook_editor_server.py` - localhost-only server for the workbook review/editing UI (`.venv/bin/python scripts/workbook_editor_server.py`, then open `http://127.0.0.1:8027/`). Edits queue client-side and apply only through a gated pipeline (validation, dry-run, `save_workbook_safely`, apply log).
+- `scripts/apply_workbook_ops.py` - applies an exported ops.json batch through the same gated pipeline (`--write` to actually apply; default is validate + dry-run).
 
 ## Workbook Source Surfaces
 

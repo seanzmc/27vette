@@ -220,16 +220,27 @@ To compare generated JSON contracts while ignoring timestamp fields, run:
 node scripts/compare-generated-contracts.mjs before.json after.json
 ```
 
-## Workbook Review Tool (dev only)
+## Workbook Review & Edit Tool (dev only)
 
-`scripts/workbook_editor_server.py` serves a localhost read-only UI for reviewing `stingray_master.xlsx`:
+`scripts/workbook_editor_server.py` serves a localhost UI for reviewing and editing `stingray_master.xlsx`:
 
 ```sh
 .venv/bin/python scripts/workbook_editor_server.py
 # open http://127.0.0.1:8027/
 ```
 
-It derives models, sheet registries, schemas, and reference domains live from the workbook (`model_master`, `model_workbook_sources`, `runtime_steps`, `section_master`/`section_presentation`); nothing is hardcoded that a workbook sheet owns. Phase 1 has no write surface — it never modifies the workbook. See `workbook-editor-integration-spec.md` for the phased plan (Phase 2 adds a gated, non-breaking write path).
+It derives models, sheet registries, schemas, and reference domains live from the workbook (`model_master`, `model_workbook_sources`, `runtime_steps`, `section_master`/`section_presentation`); nothing is hardcoded that a workbook sheet owns.
+
+Write path (Phase 2, see `workbook-editor-phase2-spec.md`):
+
+- Edits queue client-side as typed ops; nothing touches the workbook until Apply.
+- Only the 11 model-scoped sheet families registered in `model_workbook_sources` are editable. Generated `form_*` sheets and metadata sheets are read-only.
+- Schema-constrained fields are pickers/enums/typed inputs, never free text. Adding an option requires an OVS status for every active variant of the model (the Add Option wizard enforces this; the server re-checks).
+- Every apply runs the full gate internally: batch validation (refs, coverage, group integrity, duplicate keys), a dry-run on a temp copy that must pass `validate_workbook_package` + `validate_workbook_schema`, then `save_workbook_safely()` (lock/mtime checks, backup, atomic replace), Excel-table ref maintenance, and a line in the committed `form-output/workbook-edit-log.jsonl`.
+- Warnings (display-order collisions, deleting still-referenced keys) block until explicitly confirmed.
+- `scripts/apply_workbook_ops.py ops.json [--write] [--confirm-warnings ids] [--allow-stale]` applies an exported batch through the identical pipeline for review-then-apply workflows.
+
+An editor apply is steps 4–5 of the Workbook Update Workflow above, nothing more: regenerate affected artifacts and run the model's gates afterward exactly as for a hand edit. The UI prints the gate commands after each apply.
 
 ## Stingray Generator Workflow
 
