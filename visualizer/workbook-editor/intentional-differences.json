@@ -1,0 +1,131 @@
+{
+  "description": "Intentional cross-model option differences for the workbook editor's Review tab compare view (Phase 3) and, later, the cross-model copy-parity test (consistency review 2026-06-11 rec 7). Each entry names an option (option_id, or rpo where option_id is not a reliable join key), the diverging field ('*' = all compared fields), the model(s) whose divergence is vouched for, a business reason, and a status. status=intentional suppresses the divergence in the compare view (still visible behind the 'show intentional' toggle) once every deviating model is covered by 'models'; status=pending-review only annotates — the row stays flagged until a product decision lands (review §6 R-items).",
+  "entries": [
+    {
+      "option_id": "opt_zz3_001",
+      "field": "description",
+      "models": ["z06"],
+      "status": "intentional",
+      "reason": "ZZ3 includes-list drops '(BC7) Black LS6 engine cover' on Z06 — BC7 does not exist on Z06 (different engine). Review §5."
+    },
+    {
+      "option_id": "opt_wub_001",
+      "field": "*",
+      "models": ["z06"],
+      "status": "intentional",
+      "reason": "WUB is Z06 standard equipment (sec_stan_001) vs a selectable exhaust option on Stingray/Grand Sport (sec_exha_001). Review §5."
+    },
+    {
+      "option_id": "opt_sfz_001",
+      "field": "description",
+      "models": ["stingray"],
+      "status": "intentional",
+      "reason": "GS/Z06 copy is applicability-accurate ('Front and rear on Grand Sport, Z06, ZR1 and ZR1X models'); Stingray keeps generic copy. Review §5."
+    },
+    {
+      "option_id": "opt_vyw_001",
+      "field": "description",
+      "models": ["z06"],
+      "status": "intentional",
+      "reason": "Z06 gets its own logo floor mat ('Z06 logo') vs car-silhouette copy on other models — GM applicability split. Suppresses only once Stingray's separate style drift (C-2/C-4) converges. Review §5."
+    },
+    {
+      "option_id": "opt_eyt_001",
+      "field": "description",
+      "models": ["z06"],
+      "status": "intentional",
+      "reason": "Z06 EYT description referencing 'Z06 on side quarter' is model-specific emblem content. Does not cover the truncated GS description (C-1 blocker) — the row stays flagged until C-1 is fixed. Review §5."
+    },
+    {
+      "option_id": "opt_uv6_001",
+      "field": "section_id",
+      "models": ["z06"],
+      "status": "pending-review",
+      "reason": "R-1: UV6 Head-Up Display sits in sec_1lte_001 on Z06 vs sec_2lte_001 on SR/GS — could be genuine (HUD standard from 1LZ) or a mis-sectioned row. Verify against the Z06 order guide."
+    },
+    {
+      "option_id": "opt_sc7_001",
+      "field": "section_id",
+      "models": ["stingray"],
+      "status": "pending-review",
+      "reason": "R-2: SC7 roof panel storage pouch is LPO interior (sec_lpoi_001) on Stingray vs LPO exterior (sec_lpoe_001) on GS/Z06 — intended catalog placement unknown."
+    },
+    {
+      "option_id": "opt_drz_001",
+      "field": "*",
+      "models": ["stingray"],
+      "status": "pending-review",
+      "reason": "R-3: DRZ name/description content is swapped between Stingray and GS/Z06, not just restyled — pick one canonical pair before the C-2 copy-convergence pass."
+    },
+    {
+      "option_id": "opt_efr_001",
+      "field": "description",
+      "models": ["stingray"],
+      "status": "pending-review",
+      "reason": "R-4: GS/Z06 long EFR copy references CFV/CFZ ground effects that don't exist on Stingray — SR's short copy may be intentionally model-correct; not a simple majority-wins overwrite."
+    },
+    {
+      "option_id": "opt_edu_001",
+      "field": "description",
+      "models": ["stingray"],
+      "status": "pending-review",
+      "reason": "R-4: GS/Z06 long EDU copy references CFV/CFZ ground effects that don't exist on Stingray — SR's short copy may be intentionally model-correct; not a simple majority-wins overwrite."
+    },
+    {
+      "option_id": "opt_nga_001",
+      "field": "description",
+      "models": ["z06"],
+      "status": "pending-review",
+      "reason": "R-5: Z06 NGA is quad-center exit, so dropping 'Corner Exit' looks deliberate — but each model's description should state its exit style explicitly; currently Z06 says nothing."
+    },
+    {
+      "option_id": "opt_ah2_001",
+      "field": "section_id",
+      "models": ["stingray"],
+      "status": "pending-review",
+      "reason": "R-6: per-trim seat rows — whether trim grouping (Stingray's sec_*lte sections) or seat grouping (sec_seat_002) wins is a presentation decision."
+    },
+    {
+      "option_id": "opt_aq9_001",
+      "field": "section_id",
+      "models": ["stingray"],
+      "status": "pending-review",
+      "reason": "R-6 / §5 taxonomy: per-trim seat rows in GS-era sec_seat_002 vs Stingray's trim sections — direction of convergence is a product decision."
+    },
+    {
+      "option_id": "opt_e60_001",
+      "field": "section_id",
+      "models": ["stingray"],
+      "status": "pending-review",
+      "reason": "§5/§6 taxonomy: GS-era section model (sec_perf_support_001) vs Stingray's older sec_perf_001 — direction of convergence is a product decision."
+    },
+    {
+      "option_id": "opt_eri_001",
+      "field": "section_id",
+      "models": ["stingray"],
+      "status": "pending-review",
+      "reason": "§5/§6 taxonomy: GS-era section model (sec_perf_support_001) vs Stingray's older sec_perf_001 — direction of convergence is a product decision."
+    },
+    {
+      "option_id": "opt_b4z_001",
+      "field": "section_id",
+      "models": ["stingray"],
+      "status": "pending-review",
+      "reason": "§5/§6 taxonomy: trim-standard rows live in sec_stan_001 on GS/Z06 vs sec_incl_001 on Stingray — direction of convergence is a product decision."
+    },
+    {
+      "option_id": "opt_g0k_001",
+      "field": "section_id",
+      "models": ["stingray"],
+      "status": "pending-review",
+      "reason": "§5/§6 taxonomy: trim-standard rows live in sec_stan_001 on GS/Z06 vs sec_incl_001 on Stingray — direction of convergence is a product decision."
+    },
+    {
+      "option_id": "opt_uqt_001",
+      "field": "section_id",
+      "models": ["stingray"],
+      "status": "pending-review",
+      "reason": "§5/§6 taxonomy: UQT in sec_inte_001 on GS/Z06 vs Stingray's trim section sec_2lte_001 — direction of convergence is a product decision."
+    }
+  ]
+}

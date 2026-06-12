@@ -242,6 +242,13 @@ Write path (Phase 2, see `workbook-editor-phase2-spec.md`):
 
 An editor apply is steps 4–5 of the Workbook Update Workflow above, nothing more: regenerate affected artifacts and run the model's gates afterward exactly as for a hand edit. The UI prints the gate commands after each apply.
 
+Review tab (Phase 3, see `workbook-editor-phase3-spec.md`) — read-only:
+
+- `GET /api/lints` runs structural lints over the *current* workbook state (duplicate keys, orphan refs, display-order collisions, display-order cell typing, OVS coverage, group integrity, boolean-as-text). Lints are informational and never gate applies; the Phase 2 batch validator remains the write authority. Lint logic lives in `scripts/corvette_form_generator/editor_lints.py` and is generic over `EDITOR_SHEET_META` — no model/RPO-specific exceptions in code.
+- `GET /api/compare` joins `stingray_options`/`grandSport_options`/`z06_options` by `option_id` (RPO fallback for the known Z06 `_002` keys), diffs name/description/section/relative display order, and labels majority vs deviator. Scaffold models (ZR1/ZR1X) are excluded.
+- Intentional model differences live in the committed `visualizer/workbook-editor/intentional-differences.json` with per-entry reasons. `status: intentional` suppresses a matched divergence (visible behind the "show intentional" toggle); `status: pending-review` annotates consistency-review §6 items awaiting a product decision. Entries that no longer match any divergence surface as stale. Editing the allowlist is a normal code-reviewed file change, not a workbook write.
+- Tests: `tests/test_editor_lints.py` pins the lints/compare to named findings of `workbook-consistency-review-2026-06-11.md` and must stay green against the real workbook.
+
 ## Stingray Generator Workflow
 
 Current default command from the repo root:

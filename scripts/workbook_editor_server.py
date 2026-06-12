@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""Read-only local server for reviewing stingray_master.xlsx (Phase 1).
+"""Local dev server for reviewing and editing stingray_master.xlsx.
 
 Derives models, per-model sheet registries, schemas, and reference domains
 live from the workbook — nothing is hardcoded that a workbook sheet owns.
-See workbook-editor-integration-spec.md. Phase 1 has no write surface.
+See workbook-editor-integration-spec.md (Phase 1 read surface),
+workbook-editor-phase2-spec.md (gated write API), and
+workbook-editor-phase3-spec.md (read-only Review endpoints:
+``/api/lints`` and ``/api/compare``).
 """
 
 from __future__ import annotations
@@ -20,6 +23,12 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+from corvette_form_generator.editor_lints import (  # noqa: E402
+    compare_options,
+    lint_summary,
+    load_allowlist,
+    run_lints,
+)
 from corvette_form_generator.editor_ops import (  # noqa: E402
     EDITOR_SHEET_META,
     apply_batch,
@@ -32,6 +41,7 @@ from corvette_form_generator.workbook import workbook_truthy  # noqa: E402
 
 UI_DIR = ROOT / "visualizer" / "workbook-editor"
 DEFAULT_WORKBOOK = ROOT / "stingray_master.xlsx"
+DEFAULT_ALLOWLIST = UI_DIR / "intentional-differences.json"
 
 _rows_of = rows_of
 
@@ -222,6 +232,34 @@ def sheet_payload(extract: dict, name: str) -> dict | None:
     return {"name": name, "headers": data["headers"], "rows": data["rows"]}
 
 
+def _workbook_stamp(extract: dict) -> dict:
+    return {"path": extract["path"], "mtimeNs": str(extract["mtime_ns"])}
+
+
+def lints_payload(extract: dict) -> dict:
+    """Read-only structural lints over the current workbook state (Phase 3).
+    Informational — the Phase 2 batch validator remains the write authority."""
+    lints = run_lints(extract)
+    return {
+        "workbook": _workbook_stamp(extract),
+        "summary": lint_summary(lints),
+        "lints": lints,
+    }
+
+
+def compare_payload(extract: dict, allowlist_path: Path) -> dict:
+    """Cross-model *_options comparison filtered through the committed
+    intentional-differences allowlist (Phase 3)."""
+    allowlist = load_allowlist(allowlist_path)
+    payload = compare_options(extract, allowlist)
+    payload["workbook"] = _workbook_stamp(extract)
+    payload["allowlist"] = {
+        "path": str(allowlist_path),
+        "entryCount": len(allowlist),
+    }
+    return payload
+
+
 CONTENT_TYPES = {
     ".html": "text/html; charset=utf-8",
     ".js": "text/javascript; charset=utf-8",
@@ -233,17 +271,42 @@ CONTENT_TYPES = {
 
 
 class WorkbookCache:
-    """Re-extract the workbook only when its mtime changes."""
+    """Re-extract the workbook only when its mtime changes; derived Review
+    payloads (lints/compare) are memoized on the same key plus, for compare,
+    the allowlist file's mtime."""
 
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, allowlist_path: Path = DEFAULT_ALLOWLIST):
         self.path = Path(path)
+        self.allowlist_path = Path(allowlist_path)
         self._extract: dict | None = None
+        self._computed: dict[str, tuple] = {}
 
     def extract(self) -> dict:
         mtime_ns = self.path.stat().st_mtime_ns
         if self._extract is None or self._extract["mtime_ns"] != mtime_ns:
             self._extract = extract_workbook(self.path)
+            self._computed.clear()
         return self._extract
+
+    def _memo(self, key: str, stamp, build):
+        cached = self._computed.get(key)
+        if cached is not None and cached[0] == stamp:
+            return cached[1]
+        value = build()
+        self._computed[key] = (stamp, value)
+        return value
+
+    def lints(self) -> dict:
+        extract = self.extract()
+        return self._memo("lints", extract["mtime_ns"],
+                          lambda: lints_payload(extract))
+
+    def compare(self) -> dict:
+        extract = self.extract()
+        allowlist_mtime = (self.allowlist_path.stat().st_mtime_ns
+                           if self.allowlist_path.exists() else None)
+        return self._memo("compare", (extract["mtime_ns"], allowlist_mtime),
+                          lambda: compare_payload(extract, self.allowlist_path))
 
 
 class EditorHandler(BaseHTTPRequestHandler):
@@ -301,6 +364,10 @@ class EditorHandler(BaseHTTPRequestHandler):
         try:
             if path == "/api/workbook":
                 self._send_json(build_payload(self.cache.extract()))
+            elif path == "/api/lints":
+                self._send_json(self.cache.lints())
+            elif path == "/api/compare":
+                self._send_json(self.cache.compare())
             elif path.startswith("/api/sheet/"):
                 name = unquote(path[len("/api/sheet/"):])
                 payload = sheet_payload(self.cache.extract(), name)

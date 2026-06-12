@@ -248,7 +248,7 @@ function StructureTab({ data, modelKey, setModelKey }) {
 
 /* ── Sheet Browser tab ────────────────────────────────────── */
 
-function SheetTable({ data, name, onQueue }) {
+function SheetTable({ data, name, onQueue, initialQuery }) {
   const [sheet, setSheet] = useState(null);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState("");
@@ -257,9 +257,9 @@ function SheetTable({ data, name, onQueue }) {
   const [editing, setEditing] = useState(null); // {mode, initial}
 
   useEffect(() => {
-    setSheet(null); setError(null); setQuery(""); setPage(0); setOpen(null); setEditing(null);
+    setSheet(null); setError(null); setQuery(initialQuery || ""); setPage(0); setOpen(null); setEditing(null);
     fetchJson(`/api/sheet/${encodeURIComponent(name)}`).then(setSheet).catch((e) => setError(e.message));
-  }, [name]);
+  }, [name, initialQuery]);
 
   const meta = data.sheets.find((s) => s.name === name) || {};
   const editable = meta.readOnly === false;
@@ -555,16 +555,20 @@ function GroupWizard({ data, modelKey, kind, onQueue, onClose }) {
 
 /* ── Browser tab shell ────────────────────────────────────── */
 
-function BrowserTab({ data, modelKey, setModelKey, onQueue }) {
+function BrowserTab({ data, modelKey, setModelKey, onQueue, focus }) {
   const modelEntries = data.modelSheets[modelKey] || [];
-  const [sheetName, setSheetName] = useState(modelEntries[0]?.sheet || null);
+  const [sheetName, setSheetName] = useState(focus?.sheet || modelEntries[0]?.sheet || null);
   const [wizard, setWizard] = useState(null); // "option" | "rule" | "exclusive"
 
   useEffect(() => {
     const entries = data.modelSheets[modelKey] || [];
-    setSheetName(entries[0]?.sheet || null);
+    setSheetName(focus?.sheet || entries[0]?.sheet || null);
     setWizard(null);
   }, [modelKey]);
+
+  useEffect(() => {
+    if (focus?.sheet) setSheetName(focus.sheet);
+  }, [focus]);
 
   const modelSheetNames = new Set(modelEntries.map((e) => e.sheet));
   const otherSheets = data.sheets.map((s) => s.name).filter((n) => !modelSheetNames.has(n)).sort();
@@ -598,8 +602,203 @@ function BrowserTab({ data, modelKey, setModelKey, onQueue }) {
     ${(wizard === "rule" || wizard === "exclusive") && html`<${GroupWizard} data=${data}
         modelKey=${modelKey} kind=${wizard} onQueue=${onQueue} onClose=${() => setWizard(null)} />`}
     ${sheetName
-      ? html`<${SheetTable} data=${data} name=${sheetName} key=${sheetName} onQueue=${onQueue} />`
+      ? html`<${SheetTable} data=${data} name=${sheetName} key=${sheetName} onQueue=${onQueue}
+          initialQuery=${focus && focus.sheet === sheetName ? focus.query : ""} />`
       : html`<p class="note">No registered source sheets for this model — pick one from “other sheets…”.</p>`}`;
+}
+
+/* ── Review tab (Phase 3, read-only) ──────────────────────── */
+
+const SEVERITIES = ["error", "warning", "info"];
+
+function LintsPanel({ onOpenRow }) {
+  const [payload, setPayload] = useState(null);
+  const [error, setError] = useState(null);
+  const [severities, setSeverities] = useState(() => new Set(SEVERITIES));
+  const [sheetFilter, setSheetFilter] = useState("");
+  const [modelFilter, setModelFilter] = useState("");
+  const [idFilter, setIdFilter] = useState("");
+
+  useEffect(() => {
+    fetchJson("/api/lints").then(setPayload).catch((e) => setError(e.message));
+  }, []);
+
+  if (error) return html`<div class="error">${error}</div>`;
+  if (!payload) return html`<div class="loading">Running lints…</div>`;
+
+  const lints = payload.lints;
+  const sheets = [...new Set(lints.map((l) => l.sheet))].sort();
+  const models = [...new Set(lints.map((l) => l.model).filter(Boolean))].sort();
+  const ids = [...new Set(lints.map((l) => l.id))].sort();
+  const filtered = lints.filter((l) =>
+    severities.has(l.severity)
+    && (!sheetFilter || l.sheet === sheetFilter)
+    && (!modelFilter || l.model === modelFilter)
+    && (!idFilter || l.id === idFilter));
+  const shown = filtered.slice(0, 300);
+  const toggleSeverity = (s) => setSeverities((prev) => {
+    const next = new Set(prev);
+    if (next.has(s)) next.delete(s); else next.add(s);
+    return next;
+  });
+
+  return html`<div class="panel">
+    <div class="bar">
+      <span class="title">Lints</span>
+      ${SEVERITIES.map((s) => html`
+        <button key=${s} class=${"sumchip sev-" + s + (severities.has(s) ? " on" : "")}
+          onClick=${() => toggleSeverity(s)}>${payload.summary[s] ?? 0} ${s}</button>`)}
+      <span class="meta">structural checks on current workbook state — informational, never gates applies</span>
+      <span class="spacer"></span>
+      <select value=${idFilter} onChange=${(e) => setIdFilter(e.target.value)}>
+        <option value="">all lints</option>
+        ${ids.map((i) => html`<option value=${i} key=${i}>${i}</option>`)}
+      </select>
+      <select value=${modelFilter} onChange=${(e) => setModelFilter(e.target.value)}>
+        <option value="">all models</option>
+        ${models.map((m) => html`<option value=${m} key=${m}>${m}</option>`)}
+      </select>
+      <select value=${sheetFilter} onChange=${(e) => setSheetFilter(e.target.value)}>
+        <option value="">all sheets</option>
+        ${sheets.map((s) => html`<option value=${s} key=${s}>${s}</option>`)}
+      </select>
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>severity</th><th>lint</th><th>sheet</th><th>model</th><th>key</th><th>message</th></tr></thead>
+      <tbody>
+        ${shown.length === 0 && html`<tr><td colSpan="6" class="dim">No lints match the filters.</td></tr>`}
+        ${shown.map((l, i) => html`<tr class="row" key=${i} title="open in Sheet Browser"
+            onClick=${() => onOpenRow(l)}>
+          <td><span class=${"badge sev-" + l.severity}>${l.severity}</span></td>
+          <td class="mono small">${l.id}</td>
+          <td class="mono small">${l.sheet}</td>
+          <td class="small">${l.model || html`<span class="dim">—</span>`}</td>
+          <td class="mono small">${l.key}</td>
+          <td class="lintmsg" title=${l.message}>${l.message}</td>
+        </tr>`)}
+      </tbody>
+    </table></div>
+    ${filtered.length > shown.length && html`
+      <p class="note pad">Showing first ${shown.length} of ${filtered.length} — narrow with the filters above.</p>`}
+  </div>`;
+}
+
+function diffStatusBadge(d) {
+  if (d.status === "intentional")
+    return html`<span class="badge st-intentional" title=${d.reason || ""}>intentional</span>`;
+  if (d.status === "pending-review")
+    return html`<span class="badge st-pending" title=${d.reason || ""}>pending review</span>`;
+  return null;
+}
+
+function ComparePanel() {
+  const [payload, setPayload] = useState(null);
+  const [error, setError] = useState(null);
+  const [fieldFilter, setFieldFilter] = useState("");
+  const [modelFilter, setModelFilter] = useState("");
+  const [showIntentional, setShowIntentional] = useState(false);
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    fetchJson("/api/compare").then(setPayload).catch((e) => setError(e.message));
+  }, []);
+
+  if (error) return html`<div class="error">${error}</div>`;
+  if (!payload) return html`<div class="loading">Comparing models…</div>`;
+
+  const fields = [...new Set(payload.rows.flatMap((r) => r.diffs.map((d) => d.field)))].sort();
+  const q = query.trim().toLowerCase();
+  const visible = payload.rows
+    .map((r) => ({
+      ...r,
+      diffs: r.diffs.filter((d) =>
+        (showIntentional || d.status !== "intentional")
+        && (!fieldFilter || d.field === fieldFilter)
+        && (!modelFilter || (d.deviators || []).includes(modelFilter))),
+    }))
+    .filter((r) => r.diffs.length > 0
+      && (!q || `${r.rpo || ""} ${r.name || ""} ${r.joinKey}`.toLowerCase().includes(q)));
+  const intentionalCount = payload.rows.reduce(
+    (n, r) => n + r.diffs.filter((d) => d.status === "intentional").length, 0);
+  const modelOnlyCounts = Object.entries(payload.modelOnly || {})
+    .map(([m, list]) => `${m}: ${list.length}`).join(" · ");
+
+  return html`<div class="space">
+    <div class="panel">
+      <div class="bar">
+        <span class="title">Cross-Model Compare</span>
+        <span class="meta">${payload.sharedCount} options shared across ${payload.models.join(" / ")}
+          · ${visible.length} divergent shown · model-only (expected): ${modelOnlyCounts}</span>
+        <span class="spacer"></span>
+        <label class="toggle">
+          <input type="checkbox" checked=${showIntentional}
+            onChange=${(e) => setShowIntentional(e.target.checked)} />
+          show intentional (${intentionalCount})
+        </label>
+        <select value=${fieldFilter} onChange=${(e) => setFieldFilter(e.target.value)}>
+          <option value="">all fields</option>
+          ${fields.map((f) => html`<option value=${f} key=${f}>${f}</option>`)}
+        </select>
+        <select value=${modelFilter} onChange=${(e) => setModelFilter(e.target.value)}>
+          <option value="">any deviator</option>
+          ${payload.models.map((m) => html`<option value=${m} key=${m}>${m} deviates</option>`)}
+        </select>
+        <input type="search" placeholder="Filter by RPO / name…" value=${query}
+          onInput=${(e) => setQuery(e.target.value)} />
+      </div>
+      ${visible.length === 0 && html`<p class="note pad">No divergences match the filters.</p>`}
+      ${visible.map((r) => html`<div class="cmprow" key=${r.joinKey}>
+        <div class="cmphead">
+          <span class="rpo mono">${r.rpo || "—"}</span>
+          <span class="cmpname">${r.name || r.joinKey}</span>
+          <span class="mono small dim">${r.joinKey}</span>
+          ${r.joinedVia === "rpo" && html`<span class="badge amber"
+            title=${"option_id differs across models: " + Object.entries(r.optionIds).map(([m, v]) => `${m}=${v}`).join(", ")}>joined via RPO</span>`}
+          ${r.models.length < payload.models.length && html`
+            <span class="badge" title="not present on every compared model">${r.models.join(" + ")} only</span>`}
+        </div>
+        ${r.diffs.map((d) => html`<div class=${"cmpdiff" + (d.status === "intentional" ? " muted" : "")} key=${d.field}>
+          <span class="badge field">${d.field}</span>
+          ${diffStatusBadge(d)}
+          <div class="cmpvals">
+            ${payload.models.filter((m) => d.values[m] !== undefined).map((m) => html`
+              <div class=${"cmpval" + ((d.deviators || []).includes(m) ? " deviator" : "")} key=${m}>
+                <span class="cmpmodel">${m}
+                  ${(d.deviators || []).includes(m) && html`<span class="badge dev">deviator</span>`}
+                  ${d.majority !== null && d.values[m] === d.majority
+                    && html`<span class="badge maj">majority</span>`}
+                </span>
+                <span class="cmptext">${d.values[m] === "" ? html`<span class="dim">(blank)</span>` : d.values[m]}</span>
+              </div>`)}
+          </div>
+          ${d.reason && html`<p class="note reason">${d.reason}</p>`}
+        </div>`)}
+      </div>`)}
+    </div>
+    ${(payload.staleAllowlist || []).length > 0 && html`<div class="panel">
+      <div class="bar"><span class="title">Stale allowlist entries</span>
+        <span class="meta">intentional entries that no longer match any divergence — candidates for removal from intentional-differences.json</span></div>
+      <ul class="errlist stale">
+        ${payload.staleAllowlist.map((e, i) => html`<li key=${i} class="mono small">
+          ${e.option_id || e.rpo} · ${e.field || "*"} — ${e.reason}</li>`)}
+      </ul>
+    </div>`}
+  </div>`;
+}
+
+function ReviewTab({ onOpenRow }) {
+  const [panel, setPanel] = useState("lints");
+  return html`
+    <div class="pills">
+      <button class=${"pill" + (panel === "lints" ? " on" : "")}
+        onClick=${() => setPanel("lints")}>Lints</button>
+      <button class=${"pill" + (panel === "compare" ? " on" : "")}
+        onClick=${() => setPanel("compare")}>Cross-Model Compare</button>
+      <span class="meta">read-only review surfaces — nothing here queues or applies changes</span>
+    </div>
+    ${panel === "lints"
+      ? html`<${LintsPanel} onOpenRow=${onOpenRow} />`
+      : html`<${ComparePanel} />`}`;
 }
 
 /* ── Pending Changes tab ──────────────────────────────────── */
@@ -737,6 +936,7 @@ function App() {
   const [modelKey, setModelKey] = useState(null);
   const [queue, setQueue] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [browserFocus, setBrowserFocus] = useState(null);
 
   const loadPayload = () => fetchJson("/api/workbook")
     .then((d) => {
@@ -752,6 +952,15 @@ function App() {
   const clearQueue = () => setQueue([]);
   const onApplied = () => { loadPayload().then(() => setRefreshKey((k) => k + 1)); };
 
+  // Review-tab click-through: land on the lint's row in the Sheet Browser.
+  const openLintRow = (lint) => {
+    const model = (lint.model || "").split("+")[0];
+    if (model && data && data.modelSheets[model]) setModelKey(model);
+    const query = lint.key && !lint.key.startsWith("row ") ? lint.key.split("+")[0] : "";
+    setBrowserFocus({ sheet: lint.sheet, query, ts: Date.now() });
+    setTab("browser");
+  };
+
   return html`
     <header class="app">
       <div>
@@ -763,6 +972,7 @@ function App() {
       <nav class="tabs">
         <button class=${tab === "structure" ? "on" : ""} onClick=${() => setTab("structure")}>Form Structure</button>
         <button class=${tab === "browser" ? "on" : ""} onClick=${() => setTab("browser")}>Sheet Browser</button>
+        <button class=${tab === "review" ? "on" : ""} onClick=${() => setTab("review")}>Review</button>
         <button class=${tab === "pending" ? "on" : ""} onClick=${() => setTab("pending")}>
           Pending Changes${queue.length ? ` (${queue.length})` : ""}</button>
       </nav>
@@ -774,7 +984,9 @@ function App() {
         html`<${StructureTab} data=${data} modelKey=${modelKey} setModelKey=${setModelKey} />`}
       ${data && modelKey && tab === "browser" &&
         html`<${BrowserTab} data=${data} modelKey=${modelKey} setModelKey=${setModelKey}
-               onQueue=${onQueue} key=${refreshKey} />`}
+               onQueue=${onQueue} focus=${browserFocus} key=${refreshKey} />`}
+      ${data && tab === "review" &&
+        html`<${ReviewTab} onOpenRow=${openLintRow} key=${"review" + refreshKey} />`}
       ${data && tab === "pending" &&
         html`<${PendingTab} data=${data} queue=${queue} removeItem=${removeItem}
                clearQueue=${clearQueue} onApplied=${onApplied} />`}

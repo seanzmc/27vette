@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
-"""Tests for the workbook-editor server payload derivation (Phase 1)."""
+"""Tests for the workbook-editor server payload derivation (Phases 1 & 3)."""
 
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
+import threading
 import unittest
+import urllib.error
+import urllib.request
+from http.server import ThreadingHTTPServer
 from pathlib import Path
 
 from openpyxl import Workbook
@@ -15,6 +20,7 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+import workbook_editor_server as srv  # noqa: E402
 from workbook_editor_server import (  # noqa: E402
     build_payload,
     extract_workbook,
@@ -313,6 +319,69 @@ class RealWorkbookIntegrationTest(unittest.TestCase):
         dom = self.payload["referenceDomains"]
         self.assertTrue(any(g["id"] for g in dom["exclusiveGroupsByModel"]["z06"]))
         self.assertTrue(any(i["id"] for i in dom["interiorsByModel"]["stingray"]))
+
+
+@unittest.skipUnless(REAL_WORKBOOK.exists(), "canonical workbook not present")
+class ReviewEndpointsTest(unittest.TestCase):
+    """Phase 3: GET /api/lints and /api/compare are read-only and well-formed,
+    and /api/workbook is unchanged."""
+
+    @classmethod
+    def setUpClass(cls):
+        srv.EditorHandler.cache = srv.WorkbookCache(REAL_WORKBOOK)
+        cls.server = ThreadingHTTPServer(("127.0.0.1", 0), srv.EditorHandler)
+        cls.port = cls.server.server_address[1]
+        threading.Thread(target=cls.server.serve_forever, daemon=True).start()
+        cls.mtime_before = REAL_WORKBOOK.stat().st_mtime_ns
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.shutdown()
+
+    def get(self, route):
+        try:
+            with urllib.request.urlopen(f"http://127.0.0.1:{self.port}{route}") as resp:
+                return resp.status, json.loads(resp.read())
+        except urllib.error.HTTPError as err:
+            return err.code, json.loads(err.read() or b"{}")
+
+    def test_lints_payload_well_formed(self):
+        status, body = self.get("/api/lints")
+        self.assertEqual(status, 200)
+        self.assertEqual(set(body), {"workbook", "summary", "lints"})
+        self.assertEqual(set(body["summary"]), {"error", "warning", "info"})
+        self.assertEqual(sum(body["summary"].values()), len(body["lints"]))
+        for lint in body["lints"][:25]:
+            self.assertEqual(
+                set(lint),
+                {"id", "severity", "sheet", "model", "key", "message", "cells"})
+            self.assertIn(lint["severity"], ("error", "warning", "info"))
+
+    def test_compare_payload_well_formed(self):
+        status, body = self.get("/api/compare")
+        self.assertEqual(status, 200)
+        for key in ("models", "sharedCount", "rows", "modelOnly",
+                    "staleAllowlist", "workbook", "allowlist"):
+            self.assertIn(key, body)
+        self.assertEqual(body["models"], ["grand_sport", "stingray", "z06"])
+        for row in body["rows"][:25]:
+            for key in ("joinKey", "joinedVia", "rpo", "optionIds", "models", "diffs"):
+                self.assertIn(key, row)
+            for diff in row["diffs"]:
+                self.assertIn(diff["status"],
+                              ("flagged", "intentional", "pending-review"))
+
+    def test_workbook_payload_unchanged_and_read_only(self):
+        status, body = self.get("/api/workbook")
+        self.assertEqual(status, 200)
+        self.assertEqual(
+            set(body),
+            {"workbook", "models", "modelSheets", "steps", "contextSections",
+             "sections", "sectionPresentation", "sheets", "referenceDomains"})
+        # read-only proof: serving lints + compare must not touch the workbook
+        self.get("/api/lints")
+        self.get("/api/compare")
+        self.assertEqual(REAL_WORKBOOK.stat().st_mtime_ns, self.mtime_before)
 
 
 if __name__ == "__main__":
