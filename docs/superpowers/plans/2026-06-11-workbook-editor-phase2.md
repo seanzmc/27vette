@@ -20,7 +20,7 @@
 
 Add `ruleGroupsByModel`, `exclusiveGroupsByModel`, `interiorsByModel` to `referenceDomains`, built the same way as `optionsByModel` (per model, from the registry's family sheet): groups → `{"id": group_id}`, interiors → `{"id": interior_id, "name": row["Interior Name"]}`.
 
-- [ ] **Step 1: Extend the fixture and add failing assertions.** In `build_fixture_workbook()` add to `model_workbook_sources` two active stingray rows: `rule_groups_sheet`→`rule_groups`, `rule_group_members_sheet`→`rule_group_members`; and append the sheets:
+- [x] **Step 1: Extend the fixture and add failing assertions.** In `build_fixture_workbook()` add to `model_workbook_sources` two active stingray rows: `rule_groups_sheet`→`rule_groups`, `rule_group_members_sheet`→`rule_group_members`; and append the sheets:
 
 ```python
     append_sheet(
@@ -55,8 +55,8 @@ And in `RealWorkbookIntegrationTest`:
         self.assertTrue(any(i["id"] for i in dom["interiorsByModel"]["stingray"]))
 ```
 
-- [ ] **Step 2: Run to verify failure** — `.venv/bin/python -m unittest tests.test_editor_server_payload -v` → FAIL (KeyError ruleGroupsByModel).
-- [ ] **Step 3: Implement** in `build_payload` (next to `options_by_model`):
+- [x] **Step 2: Run to verify failure** — `.venv/bin/python -m unittest tests.test_editor_server_payload -v` → FAIL (KeyError ruleGroupsByModel).
+- [x] **Step 3: Implement** in `build_payload` (next to `options_by_model`):
 
 ```python
     def _ids_by_model(family: str, id_col: str, name_col: str | None = None) -> dict:
@@ -78,7 +78,7 @@ And in `RealWorkbookIntegrationTest`:
 
 and in `referenceDomains`: `"ruleGroupsByModel": _ids_by_model("rule_groups", "group_id")`, `"exclusiveGroupsByModel": _ids_by_model("exclusive_groups", "group_id")`, `"interiorsByModel": _ids_by_model("interiors", "interior_id", "Interior Name")`.
 
-- [ ] **Step 4: Tests pass**, then commit: `feat: serve group and interior reference domains for guided editing`.
+- [x] **Step 4: Tests pass**, then commit: `feat: serve group and interior reference domains for guided editing`.
 
 ---
 
@@ -89,7 +89,7 @@ and in `referenceDomains`: `"ruleGroupsByModel": _ids_by_model("rule_groups", "g
 - Modify: `scripts/workbook_editor_server.py` (import the moved helpers)
 - Test: `tests/test_editor_ops_apply.py` (new)
 
-- [ ] **Step 1: Move helpers.** Cut `jsonable`, `extract_workbook` from the server; cut `_rows_of`/`_model_sheets` and re-home them in `editor_ops.py` as `rows_of(extract, name)` and `model_sheet_registry(extract)` (same bodies; `model_sheet_registry` returns `(registry, sheet_family)`). `editor_ops.py` gains imports:
+- [x] **Step 1: Move helpers.** Cut `jsonable`, `extract_workbook` from the server; cut `_rows_of`/`_model_sheets` and re-home them in `editor_ops.py` as `rows_of(extract, name)` and `model_sheet_registry(extract)` (same bodies; `model_sheet_registry` returns `(registry, sheet_family)`). `editor_ops.py` gains imports:
 
 ```python
 import json
@@ -115,7 +115,7 @@ DEFAULT_LOG_PATH = ROOT / "form-output" / "workbook-edit-log.jsonl"
 
 (`jsonable` + `extract_workbook` move verbatim, with `datetime, date` import adjusted.) The server replaces its definitions with `from corvette_form_generator.editor_ops import extract_workbook, jsonable, model_sheet_registry, rows_of` and keeps `_rows_of = rows_of`, `_model_sheets = model_sheet_registry` aliases so `build_payload` is untouched and the Phase 1 payload tests (which import `extract_workbook` from the server module) still pass.
 
-- [ ] **Step 2: Failing tests for flatten/coalesce/coerce** — create `tests/test_editor_ops_apply.py` with the standard sys.path header (as in `tests/test_editor_ops_meta.py`) and:
+- [x] **Step 2: Failing tests for flatten/coalesce/coerce** — create `tests/test_editor_ops_apply.py` with the standard sys.path header (as in `tests/test_editor_ops_meta.py`) and:
 
 ```python
 from corvette_form_generator.editor_ops import (  # noqa: E402
@@ -214,7 +214,7 @@ class CoerceTest(unittest.TestCase):
         self.assertIsNone(coerce_value("options", "description", ""))
 ```
 
-- [ ] **Step 3: Verify failure** (ImportError), then implement in `editor_ops.py`:
+- [x] **Step 3: Verify failure** (ImportError), then implement in `editor_ops.py`:
 
 ```python
 def flatten_items(items) -> list[dict]:
@@ -299,7 +299,7 @@ def coerce_value(family: str, column: str, value):
     return str(value).strip() or None
 ```
 
-- [ ] **Step 4: All editor + payload tests pass**, commit: `feat: op flattening, coalescing, and typed coercion for workbook edits`.
+- [x] **Step 4: All editor + payload tests pass**, commit: `feat: op flattening, coalescing, and typed coercion for workbook edits`.
 
 ---
 
@@ -307,7 +307,7 @@ def coerce_value(family: str, column: str, value):
 
 **Files:** modify `editor_ops.py`; extend `tests/test_editor_ops_apply.py`.
 
-- [ ] **Step 1: Fixture + failing tests.** Add a fixture builder to the test file (richer than the payload one — stingray fully wired, zr1 scaffold):
+- [x] **Step 1: Fixture + failing tests.** Add a fixture builder to the test file (richer than the payload one — stingray fully wired, zr1 scaffold):
 
 ```python
 import tempfile
@@ -505,7 +505,7 @@ class ValidateBatchTest(OpsFixtureBase):
         self.assertTrue(any(w["id"] == "scaffold:zr1_options" for w in warnings))
 ```
 
-- [ ] **Step 2: Verify failure**, then implement `_prepare_batch` + `validate_batch` in `editor_ops.py`:
+- [x] **Step 2: Verify failure**, then implement `_prepare_batch` + `validate_batch` in `editor_ops.py`:
 
 ```python
 CHILD_REFS_BY_FAMILY = {
@@ -766,7 +766,7 @@ def validate_batch(extract, batch):
 
 Note the deleted-keys comparison builds the same `_key_id` shape used by `coalesce_ops` — keep them consistent.
 
-- [ ] **Step 3: All tests pass**, commit: `feat: server-side non-breaking batch validation for workbook edits`.
+- [x] **Step 3: All tests pass**, commit: `feat: server-side non-breaking batch validation for workbook edits`.
 
 ---
 
@@ -774,7 +774,7 @@ Note the deleted-keys comparison builds the same `_key_id` shape used by `coales
 
 **Files:** modify `editor_ops.py`; extend `tests/test_editor_ops_apply.py`.
 
-- [ ] **Step 1: Failing tests:**
+- [x] **Step 1: Failing tests:**
 
 ```python
 from corvette_form_generator.editor_ops import apply_batch  # noqa: E402
@@ -908,7 +908,7 @@ class RealWorkbookApplyTest(unittest.TestCase):
         self.assertEqual(result["status"], "invalid")
 ```
 
-- [ ] **Step 2: Verify failure**, then implement in `editor_ops.py`:
+- [x] **Step 2: Verify failure**, then implement in `editor_ops.py`:
 
 ```python
 GATE_COMMANDS = {
@@ -1051,7 +1051,7 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
             "backupPath": str(backup_path), "logPath": str(log_file), **base}
 ```
 
-- [ ] **Step 3: All editor + payload tests pass** (`tests.test_editor_ops_apply`, `tests.test_editor_ops_meta`, `tests.test_editor_server_payload`), commit: `feat: atomic typed apply pipeline with dry-run, table healing, and apply log`.
+- [x] **Step 3: All editor + payload tests pass** (`tests.test_editor_ops_apply`, `tests.test_editor_ops_meta`, `tests.test_editor_server_payload`), commit: `feat: atomic typed apply pipeline with dry-run, table healing, and apply log`.
 
 ---
 
@@ -1059,7 +1059,7 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
 
 **Files:** modify `scripts/workbook_editor_server.py`; new `tests/test_editor_server_write_api.py`.
 
-- [ ] **Step 1: Failing tests** — temp copy of the real workbook, real HTTP server on an ephemeral port:
+- [x] **Step 1: Failing tests** — temp copy of the real workbook, real HTTP server on an ephemeral port:
 
 ```python
 #!/usr/bin/env python3
@@ -1162,7 +1162,7 @@ if __name__ == "__main__":
     unittest.main()
 ```
 
-- [ ] **Step 2: Verify failure** (501 unsupported method POST), then implement in the server. Add to `EditorHandler`:
+- [x] **Step 2: Verify failure** (501 unsupported method POST), then implement in the server. Add to `EditorHandler`:
 
 ```python
     log_path: Path | None = None  # test override; None -> editor_ops default
@@ -1216,13 +1216,13 @@ if __name__ == "__main__":
 
 with `from corvette_form_generator.editor_ops import apply_batch` added to imports.
 
-- [ ] **Step 3: Tests pass** (this suite runs schema validation twice on a real-workbook copy — expect ~10-20s), commit: `feat: workbook write API — validate and apply endpoints with origin guard`.
+- [x] **Step 3: Tests pass** (this suite runs schema validation twice on a real-workbook copy — expect ~10-20s), commit: `feat: workbook write API — validate and apply endpoints with origin guard`.
 
 ---
 
 ### Task 6: CLI — `scripts/apply_workbook_ops.py`
 
-- [ ] **Step 1: Write it** (thin shell, mirrors `promote_model.py`'s `--write` convention):
+- [x] **Step 1: Write it** (thin shell, mirrors `promote_model.py`'s `--write` convention):
 
 ```python
 #!/usr/bin/env python3
@@ -1268,7 +1268,7 @@ if __name__ == "__main__":
     sys.exit(main())
 ```
 
-- [ ] **Step 2: Smoke it** against a temp copy: export a tiny ops.json by hand, run default (validated, exit 0), run `--write` (applied), re-run same file (stale, exit 1), re-run with `--allow-stale` (applied). Commit: `feat: apply_workbook_ops CLI for review-then-apply workflow`.
+- [x] **Step 2: Smoke it** against a temp copy: export a tiny ops.json by hand, run default (validated, exit 0), run `--write` (applied), re-run same file (stale, exit 1), re-run with `--allow-stale` (applied). Commit: `feat: apply_workbook_ops CLI for review-then-apply workflow`.
 
 ---
 
@@ -1288,16 +1288,16 @@ Component inventory (full code is authored at execution time as the file itself;
 - `PendingTab({data, queue, removeItem, clearQueue, onApplied})` — items with action badges, key, per-column old→new for updates; composite grouping by label; Validate → renders errors (red) and warnings (amber with confirm checkboxes); Apply → posts confirmed warning ids, on success shows backup path, schema status, `gateReminders`, clears the queue, calls `onApplied`; Export downloads `workbook-ops-<ISO date>.json` with the batch envelope `{version: 1, workbook, workbookMtimeNs, createdAt, items}`.
 - `App` — queue state, third tab `Pending Changes (n)`, `onApplied` refetches `/api/workbook` and bumps a `refreshKey` used to remount the browser tab.
 
-- [ ] **Step 1: Write the UI code** per the contracts above.
-- [ ] **Step 2: Browser verification on a scratch copy** — `cp stingray_master.xlsx /tmp/editor-scratch.xlsx`, run server with `--workbook /tmp/editor-scratch.xlsx`, then with Playwright: edit a row (typed field), see it in Pending Changes with old→new, Validate (clean), Apply, confirm the table refreshes with the new value and the result panel shows backup + gate reminders; open the Add Option wizard and verify the OVS grid blocks advance until every variant has a status; verify read-only sheets show no edit affordances; zero console errors.
-- [ ] **Step 3: Commit**: `feat: guided workbook editing UI — structured forms, wizards, pending-changes apply flow`.
+- [x] **Step 1: Write the UI code** per the contracts above.
+- [x] **Step 2: Browser verification on a scratch copy** — `cp stingray_master.xlsx /tmp/editor-scratch.xlsx`, run server with `--workbook /tmp/editor-scratch.xlsx`, then with Playwright: edit a row (typed field), see it in Pending Changes with old→new, Validate (clean), Apply, confirm the table refreshes with the new value and the result panel shows backup + gate reminders; open the Add Option wizard and verify the OVS grid blocks advance until every variant has a status; verify read-only sheets show no edit affordances; zero console errors.
+- [x] **Step 3: Commit**: `feat: guided workbook editing UI — structured forms, wizards, pending-changes apply flow`.
 
 ---
 
 ### Task 8: Docs + final gates
 
-- [ ] **Step 1:** Update README (`workbook_editor_server.py` bullet: read-only → "review and gated editing") and the AGENTS.md "Workbook Review Tool" section: write path summary, CLI usage, the apply log, and the explicit rule that an editor apply is step 4-5 of the Workbook Update Workflow — regeneration and gates still follow.
-- [ ] **Step 2:** Full gates: `unittest discover` (all python suites), `git status stingray_master.xlsx` clean, `validate_workbook_schema.py` green, one node suite as regression. Commit: `docs: document workbook editor write path and CLI`.
+- [x] **Step 1:** Update README (`workbook_editor_server.py` bullet: read-only → "review and gated editing") and the AGENTS.md "Workbook Review Tool" section: write path summary, CLI usage, the apply log, and the explicit rule that an editor apply is step 4-5 of the Workbook Update Workflow — regeneration and gates still follow.
+- [x] **Step 2:** Full gates: `unittest discover` (all python suites), `git status stingray_master.xlsx` clean, `validate_workbook_schema.py` green, one node suite as regression. Commit: `docs: document workbook editor write path and CLI`.
 
 ## Self-Review Notes
 
