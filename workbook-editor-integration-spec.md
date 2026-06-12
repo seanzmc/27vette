@@ -142,7 +142,7 @@ The overall three-tab shape, the queue-then-apply mental model, key-field requir
 
 **Phase 1 — Read-only review tool.** Server with `GET /api/workbook` only; UI port (Preact/htm/CSS) with browse, full-column view (expandable row detail instead of the current 6-column truncation), text search/filter per sheet, and pagination or windowing for the 1,600-row OVS sheets. No write surface at all. *This already replaces ad-hoc scripting for review work and carries zero workbook risk.*
 
-**Phase 2 — Edit queue + safe apply.** `editor_ops.py` op logic, typed editing, coalescing, the guided forms and composite flows from §4.4 (Add Option with full OVS coverage, group + members), server-side non-breaking validation, dry-run validate, apply endpoint, `apply_workbook_ops.py` CLI, ops-JSON export, apply log, delete-reference warnings.
+**Phase 2 — Edit queue + safe apply.** `editor_ops.py` op logic, typed editing, coalescing, the guided forms and composite flows from §4.4 (Add Option with full OVS coverage, group + members), server-side non-breaking validation, dry-run validate, apply endpoint, `apply_workbook_ops.py` CLI, ops-JSON export, apply log, delete-reference warnings. Detailed design: `workbook-editor-phase2-spec.md`.
 
 **Phase 3 — Review enhancements (each independently shippable).**
 - **Lint panel:** display-order collisions, duplicate keys, orphan `option_id`/`section_id`/group references — surfaced per sheet and as a summary.
