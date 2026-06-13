@@ -32,7 +32,6 @@ from corvette_form_generator.rules import (
 from corvette_form_generator.runtime_metadata import (
     load_context_sections,
     load_default_selection_rules,
-    load_rule_review_rpos,
     load_runtime_steps,
     load_section_presentation,
     load_variant_option_overrides,
@@ -428,7 +427,11 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
     section_presentation_rows = load_section_presentation(wb, config.model_key)
     section_presentation = {row["section_id"]: row for row in section_presentation_rows}
-    special_review_rpos = load_rule_review_rpos(wb, config.model_key, config.special_rule_review_rpos)
+    special_review_rpos = {
+        clean(rpo)
+        for rpo in (config.special_rule_review_rpos or tuple(SPECIAL_REVIEW_RPOS))
+        if clean(rpo)
+    }
     rows = [normalized_option_row(row, config) for row in raw_rows]
     status_lookup = status_lookup_from_sheet(wb, config)
     apply_status_lookup(rows, status_lookup, config)
@@ -656,7 +659,11 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     apply_status_lookup(rows, status_lookup_from_sheet(wb, config), config)
     variant_option_overrides = keyed_variant_option_overrides(wb, config)
     context_copy_rows = context_choice_copy_rows(wb, config.model_key)
-    special_review_rpos = load_rule_review_rpos(wb, config.model_key, config.special_rule_review_rpos)
+    special_review_rpos = {
+        clean(rpo)
+        for rpo in (config.special_rule_review_rpos or tuple(SPECIAL_REVIEW_RPOS))
+        if clean(rpo)
+    }
 
     variant_source_rows = {row["variant_id"]: row for row in variants_raw if row.get("variant_id", "") in config.variant_ids}
     variants: list[dict[str, Any]] = []

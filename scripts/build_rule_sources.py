@@ -18,10 +18,8 @@ from openpyxl import load_workbook
 
 from corvette_form_generator.model_configs import base_model_config
 from corvette_form_generator.runtime_metadata import (
-    load_audit_group_members,
     load_model_config_overrides,
     load_rule_phrase_map,
-    load_rule_review_rpos,
 )
 from corvette_form_generator.workbook import clean, rows_from_sheet
 
@@ -66,6 +64,7 @@ RULE_PHRASES = (
     "included and only available with",
 )
 ENGINE_COVER_RPOS = {"BC7", "BCP", "BCS", "BC4", "B6P", "ZZ3", "D3V", "SL9"}
+SPECIAL_REVIEW_RPOS = {"EL9", "Z25", "FEY", "Z15"}
 
 
 def active_source_row(row: dict[str, str]) -> bool:
@@ -959,8 +958,12 @@ def main() -> None:
     _, all_option_ids_by_rpo = option_indexes(all_grand_sport_options)
     interior_codes = interior_combination_codes(wb, config)
     rule_phrase_rows = load_rule_phrase_map(wb, RULE_PHRASES)
-    engine_cover_group_members = load_audit_group_members(wb, "engine_cover", ENGINE_COVER_RPOS)
-    special_review_rpos = load_rule_review_rpos(wb, config.model_key, config.special_rule_review_rpos)
+    engine_cover_group_members = {"rpos": set(ENGINE_COVER_RPOS), "option_ids": set()}
+    special_review_rpos = {
+        clean(rpo)
+        for rpo in (config.special_rule_review_rpos or tuple(SPECIAL_REVIEW_RPOS))
+        if clean(rpo)
+    }
     candidate_keys, review_rows, unresolved_mentions = candidate_rule_keys(
         grand_sport_options,
         all_option_ids_by_rpo,

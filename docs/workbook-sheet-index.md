@@ -92,9 +92,6 @@ Important ownership notes:
 | `zr1x_exclusive_members` | 11 | ZR1X exclusive-group option members scaffold. | None currently. | Future model source sheet. |
 | `zr1x_variant_overrides` | 1 | ZR1X option/variant override scaffold. | None currently. | Header-only/no data rows at inspection time. |
 | `rule_phrase_map` | 7 | Parser metadata mapping source text phrases to rule types/directions/review defaults. | Grand Sport and Z-family parsing/audit paths; indirect runtime source. | Metadata used by generator/parser workflows, not browser runtime directly. |
-| `option_audit_groups` | 2 | Audit grouping definitions for option parser/review reports. | Grand Sport/Z-family audit paths; indirect runtime source. | Parent table for `option_audit_group_members`. |
-| `option_audit_group_members` | 9 | Audit-group member RPO/option rows. | Grand Sport/Z-family audit paths; indirect runtime source. | Child/member table for `option_audit_groups`. |
-| `rule_review_groups` | 5 | Model-scoped special rule review/audit metadata. | Grand Sport audit path; indirect runtime source. | Active rows are Grand Sport-scoped. |
 | `form_steps` | 15 | Generated runtime step output for the current workbook generation. | Stingray generated output. | Generated sheet; do not hand-edit. Grand Sport/Z06 runtime entries come from promoted runtime-contract JSON artifacts, not these workbook `form_*` sheets. |
 | `form_context_choices` | 9 | Generated body-style/trim/context choice output for the current workbook generation. | Stingray generated output. | Generated sheet; do not hand-edit. |
 | `form_choices` | 1,465 | Generated choice rows for the current workbook generation: option/variant availability, labels, prices, selection metadata, media fields. | Stingray generated output. | Generated sheet; do not hand-edit. |

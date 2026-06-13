@@ -38,6 +38,22 @@ function workbookRows(sheetName) {
   return JSON.parse(output);
 }
 
+function workbookSheetExists(sheetName) {
+  const output = execFileSync(
+    ".venv/bin/python",
+    [
+      "-c",
+      [
+        "from openpyxl import load_workbook",
+        "wb = load_workbook('stingray_master.xlsx', read_only=True, data_only=True)",
+        `print('${sheetName}' in wb.sheetnames)`,
+      ].join("; "),
+    ],
+    { encoding: "utf8" }
+  );
+  return output.trim() === "True";
+}
+
 const buildOutput = JSON.parse(
   execFileSync(".venv/bin/python", ["scripts/build_rule_sources.py", "--model", "grand_sport"], {
     encoding: "utf8",
@@ -58,28 +74,16 @@ test("Grand Sport rule audit reads interior suppression codes from model metadat
   assert.doesNotMatch(ruleSource, /rows_from_sheet\(wb, ["']lt_interiors["']\)/);
 });
 
-test("Grand Sport audit metadata is workbook-owned", () => {
+test("Grand Sport parser metadata remains workbook-owned while historical audit sheets are retired", () => {
   const phraseRows = workbookRows("rule_phrase_map");
-  const auditGroupRows = workbookRows("option_audit_groups");
-  const auditGroupMemberRows = workbookRows("option_audit_group_members");
-  const reviewRows = workbookRows("rule_review_groups");
 
   assert.ok(
     phraseRows.some((row) => row.phrase === "not available with" && normalizedBool(row.active) === "true"),
     "rule phrase metadata should be populated from workbook rows"
   );
-  assert.ok(
-    auditGroupRows.some((row) => row.group_id === "engine_cover" && normalizedBool(row.active) === "true"),
-    "engine-cover audit group should be workbook-authored"
-  );
-  assert.ok(
-    auditGroupMemberRows.some((row) => row.group_id === "engine_cover" && row.rpo === "B6P" && normalizedBool(row.active) === "true"),
-    "engine-cover RPO members should be workbook-authored"
-  );
-  assert.ok(
-    reviewRows.some((row) => row.model_key === "grand_sport" && row.rpo === "Z25" && normalizedBool(row.active) === "true"),
-    "special-review RPOs should be workbook-authored"
-  );
+  assert.equal(workbookSheetExists("option_audit_groups"), false);
+  assert.equal(workbookSheetExists("option_audit_group_members"), false);
+  assert.equal(workbookSheetExists("rule_review_groups"), false);
 });
 
 test("Grand Sport rule audit artifacts are generated and linked", () => {

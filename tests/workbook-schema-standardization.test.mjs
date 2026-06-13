@@ -78,12 +78,9 @@ payload = {
     'boolean_columns': {
         'asset_map.active': column_values('asset_map', 'active'),
         'default_selection_rules.active': column_values('default_selection_rules', 'active'),
-        'option_audit_group_members.active': column_values('option_audit_group_members', 'active'),
-        'option_audit_groups.active': column_values('option_audit_groups', 'active'),
         'order_summary_sections.active': column_values('order_summary_sections', 'active'),
         'rule_phrase_map.active': column_values('rule_phrase_map', 'active'),
         'rule_phrase_map.review_flag_default': column_values('rule_phrase_map', 'review_flag_default'),
-        'rule_review_groups.active': column_values('rule_review_groups', 'active'),
         'runtime_rule_exceptions.active': column_values('runtime_rule_exceptions', 'active'),
         'section_master.is_required': column_values('section_master', 'is_required'),
         'step_order_summary_map.active': column_values('step_order_summary_map', 'active'),

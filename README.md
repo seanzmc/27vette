@@ -100,9 +100,6 @@ Workbook-owned runtime metadata and audit sheets:
 - `runtime_rule_exceptions`
 - `variant_option_overrides`
 - `rule_phrase_map`
-- `option_audit_groups`
-- `option_audit_group_members`
-- `rule_review_groups`
 
 Model-scoped source sheets exist for Grand Sport (`grandSport_*`), Z06 (`z06_*`), ZR1 (`zr1_*`), and ZR1X (`zr1x_*`), each with the same nine-sheet shape:
 

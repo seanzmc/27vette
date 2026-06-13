@@ -112,9 +112,6 @@ Current workbook-owned runtime metadata and audit sheets include:
 - `model_interior_scope`
 - `interior_components`
 - `rule_phrase_map`
-- `option_audit_groups`
-- `option_audit_group_members`
-- `rule_review_groups`
 
 Current Grand Sport model-scoped sheets include:
 

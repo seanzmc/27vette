@@ -22,9 +22,7 @@ import sys
 from openpyxl import Workbook
 sys.path.insert(0, "scripts")
 from corvette_form_generator.runtime_metadata import (
-    load_audit_group_members,
     load_rule_phrase_map,
-    load_rule_review_rpos,
 )
 from build_rule_sources import RULE_PHRASES, candidate_rule_keys
 
@@ -120,62 +118,4 @@ print(json.dumps({"phrase_rows": phrase_rows}))
   assert.deepEqual(result.phrase_rows, []);
 });
 
-test("audit group fallback applies only when workbook group metadata is absent", () => {
-  const absentResult = runPythonJson(`${pythonPrefix}
-wb = empty_workbook()
-print(json.dumps(load_audit_group_members(wb, "engine_cover", ["BC7", "B6P"]), default=sorted))
-`);
-  assert.deepEqual(absentResult, { rpos: ["B6P", "BC7"], option_ids: [] });
 
-  const inactiveResult = runPythonJson(`${pythonPrefix}
-wb = Workbook()
-ws = wb.active
-ws.title = "option_audit_groups"
-ws.append(["group_id", "group_label", "active", "notes"])
-ws.append(["engine_cover", "Engine cover options", "FALSE", "test disabled"])
-ws_members = wb.create_sheet("option_audit_group_members")
-ws_members.append(["group_id", "rpo", "option_id", "active", "notes"])
-ws_members.append(["engine_cover", "BC7", "opt_bc7_001", "TRUE", "would be active if group were active"])
-print(json.dumps(load_audit_group_members(wb, "engine_cover", ["B6P"]), default=sorted))
-`);
-  assert.deepEqual(inactiveResult, { rpos: [], option_ids: [] });
-});
-
-test("rule review RPOs are workbook-owned when metadata rows exist", () => {
-  const workbookOwned = runPythonJson(`${pythonPrefix}
-wb = workbook_with_sheet(
-    "rule_review_groups",
-    ["model_key", "group_id", "rpo", "review_reason", "active", "notes"],
-    [{
-        "model_key": "grand_sport",
-        "group_id": "special_package_review",
-        "rpo": "ABC",
-        "review_reason": "test",
-        "active": "TRUE",
-    }],
-)
-print(json.dumps(sorted(load_rule_review_rpos(wb, "grand_sport", ["EL9", "Z25"]))))
-`);
-  assert.deepEqual(workbookOwned, ["ABC"]);
-
-  const disabled = runPythonJson(`${pythonPrefix}
-wb = workbook_with_sheet(
-    "rule_review_groups",
-    ["model_key", "group_id", "rpo", "review_reason", "active", "notes"],
-    [{
-        "model_key": "grand_sport",
-        "group_id": "special_package_review",
-        "rpo": "ABC",
-        "active": "FALSE",
-    }],
-)
-print(json.dumps(sorted(load_rule_review_rpos(wb, "grand_sport", ["EL9", "Z25"]))))
-`);
-  assert.deepEqual(disabled, []);
-
-  const absent = runPythonJson(`${pythonPrefix}
-wb = empty_workbook()
-print(json.dumps(sorted(load_rule_review_rpos(wb, "grand_sport", ["EL9", "Z25"]))))
-`);
-  assert.deepEqual(absent, ["EL9", "Z25"]);
-});

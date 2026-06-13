@@ -474,68 +474,6 @@ def load_rule_phrase_map(wb: Any, fallback_phrases: Iterable[Any] = ()) -> list[
     return [row for row in (_fallback_rule_phrase_row(phrase) for phrase in fallback_phrases) if row]
 
 
-def load_audit_group_members(
-    wb: Any,
-    group_id: str,
-    fallback_rpos: Iterable[str] = (),
-) -> dict[str, set[str]]:
-    """Load workbook-authored audit group members for a group_id.
-
-    Group rows, when present, own whether the group is active.  Fallback RPOs
-    are used only when no workbook group/member metadata exists for the group.
-    """
-
-    target_group = clean(group_id)
-    group_rows = [row for row in optional_rows(wb, "option_audit_groups") if clean(row.get("group_id")) == target_group]
-    member_rows = [row for row in optional_rows(wb, "option_audit_group_members") if clean(row.get("group_id")) == target_group]
-
-    if group_rows:
-        active_group_rows = [row for row in group_rows if truthy(row.get("active", "True"), default=True)]
-        if not active_group_rows:
-            return {"rpos": set(), "option_ids": set()}
-
-    rpos: set[str] = set()
-    option_ids: set[str] = set()
-    for row in member_rows:
-        if not truthy(row.get("active", "True"), default=True):
-            continue
-        rpo = clean(row.get("rpo"))
-        option_id = clean(row.get("option_id"))
-        if rpo:
-            rpos.add(rpo)
-        if option_id:
-            option_ids.add(option_id)
-
-    if not group_rows and not member_rows and not rpos and not option_ids:
-        rpos = {clean(rpo) for rpo in fallback_rpos if clean(rpo)}
-
-    return {"rpos": rpos, "option_ids": option_ids}
-
-
-def load_rule_review_rpos(wb: Any, model_key: str, fallback_rpos: Iterable[str] = ()) -> set[str]:
-    """Load workbook-authored special-review RPOs scoped by model.
-
-    If model-scoped rows exist in the workbook, they are authoritative even
-    when inactive.  Fallback RPOs are used only when the sheet has no rows for
-    the requested model.
-    """
-
-    model = clean(model_key).lower()
-    allowed_model_keys = _GLOBAL_MODEL_KEYS | {model}
-    scoped_rows = [
-        row
-        for row in optional_rows(wb, "rule_review_groups")
-        if clean(row.get("model_key", "")).lower() in allowed_model_keys
-    ]
-    if scoped_rows:
-        return {
-            clean(row.get("rpo"))
-            for row in scoped_rows
-            if truthy(row.get("active", "True"), default=True) and clean(row.get("rpo"))
-        }
-    return {clean(rpo) for rpo in fallback_rpos if clean(rpo)}
-
-
 def load_model_metadata(wb: Any, model_key: str) -> dict[str, Any]:
     """Load model registry/source/variant metadata from optional model sheets."""
 
