@@ -115,8 +115,10 @@ def active_interior_flags(config: ModelConfig) -> dict[str, bool]:
     return flags
 
 
-def build_model_interiors(config: ModelConfig) -> list[dict[str, Any]]:
-    wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
+def build_model_interiors(config: ModelConfig, wb: Any | None = None) -> list[dict[str, Any]]:
+    close_workbook = wb is None
+    if wb is None:
+        wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
     try:
         interior_rows = rows_from_sheet(wb, config.interior_source_sheet)
         price_ref_rows = rows_from_sheet(wb, "PriceRef")
@@ -133,7 +135,8 @@ def build_model_interiors(config: ModelConfig) -> list[dict[str, Any]]:
         workbook_components_by_interior_id = load_interior_components(wb, config.model_key)
         model_interior_scope = load_model_interior_scope_map(wb, config.model_key)
     finally:
-        wb.close()
+        if close_workbook:
+            wb.close()
 
     if not model_interior_scope:
         raise ValueError(

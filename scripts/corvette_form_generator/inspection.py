@@ -945,14 +945,20 @@ def write_contract_preview_artifacts(preview: dict[str, Any], output_dir: Path, 
     return {"json": str(json_path), "markdown": str(md_path)}
 
 
-def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
-    preview = build_contract_preview(config)
+def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None = None) -> dict[str, Any]:
+    if preview is None:
+        preview = build_contract_preview(config)
     variants_by_id = {row["variant_id"]: row for row in preview["variants"]}
     sections_by_id = {row["section_id"]: row for row in preview["sections"]}
-    interiors = build_model_interiors(config)
     wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
-    asset_map = load_asset_map(wb, config.model_key)
-    wb.close()
+    try:
+        interiors = build_model_interiors(config, wb=wb)
+        asset_map = load_asset_map(wb, config.model_key)
+        rule_groups = load_rule_groups(wb, config)
+        exclusive_groups = load_exclusive_groups(wb, config)
+        default_selection_rules = load_default_selection_rules(wb, config.model_key)
+    finally:
+        wb.close()
     option_rows: dict[str, dict[str, Any]] = {}
     statuses_by_option: defaultdict[str, dict[str, str]] = defaultdict(dict)
     order_by_option: dict[str, int] = {}
@@ -1059,25 +1065,25 @@ def build_form_data_draft(config: ModelConfig) -> dict[str, Any]:
     ]
 
     wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
-    rule_groups = load_rule_groups(wb, config)
-    exclusive_groups = load_exclusive_groups(wb, config)
-    color_overrides = build_color_overrides(wb, config, interiors, option_rows)
-    rules = build_draft_rules(
-        wb,
-        config,
-        option_rows,
-        sections_by_id,
-        interiors,
-        grouped_requirement_pairs(rule_groups),
-        grouped_exclusion_pairs(rule_groups) | exclusive_group_pairs(exclusive_groups),
-    )
-    default_selection_rules = load_default_selection_rules(wb, config.model_key)
-    price_rules, price_rule_validation, price_rule_source_rows = build_draft_price_rules(
-        wb,
-        config,
-        option_rows,
-        interiors,
-    )
+    try:
+        color_overrides = build_color_overrides(wb, config, interiors, option_rows)
+        rules = build_draft_rules(
+            wb,
+            config,
+            option_rows,
+            sections_by_id,
+            interiors,
+            grouped_requirement_pairs(rule_groups),
+            grouped_exclusion_pairs(rule_groups) | exclusive_group_pairs(exclusive_groups),
+        )
+        price_rules, price_rule_validation, price_rule_source_rows = build_draft_price_rules(
+            wb,
+            config,
+            option_rows,
+            interiors,
+        )
+    finally:
+        wb.close()
 
     validation = [
         {

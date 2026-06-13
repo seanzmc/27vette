@@ -74,7 +74,7 @@ def run_draft(base_config: ModelConfig) -> None:
         config.output_dir / "inspection",
         config.preview_artifact_prefix,
     )
-    draft = build_form_data_draft(config)
+    draft = build_form_data_draft(config, preview=preview)
     draft_artifact_paths = write_form_data_draft_artifacts(
         draft,
         config.output_dir / "inspection",
