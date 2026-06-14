@@ -1,6 +1,6 @@
 # Audit cleanup overview
 
-Clean up audit-related workbook sheets, skipped source rows, and default gate policy that are no longer needed for runtime form generation or customer-facing behavior. This is a multi-pass process: audit-only sheets and dead-end rows have been retired, default readiness gates now exclude optional audit/report tooling, and runtime metadata consolidation remains a later pass.
+Clean up audit-related workbook sheets, skipped source rows, and default gate policy that are no longer needed for runtime form generation or customer-facing behavior. This is a multi-pass process: audit-only sheets and dead-end rows have been retired, default readiness gates now exclude optional audit/report tooling, and promoted-model runtime metadata is now consolidated for the completed Pass E metadata set.
 
 Current approach: keep live form/workbook-contract gates separate from optional audit/dev historical tooling. Do not add audit/report checks back to default readiness without proving a current runtime-contract failure they uniquely catch.
 
@@ -134,6 +134,11 @@ Current result: `AGENTS.md` and `README.md` now split default readiness from opt
 
 ### Pass E — “Runtime metadata consolidation”
 
+Status: Completed for option (a). See:
+
+- `docs/audit-cleanup/pass-e-runtime-metadata-consolidation-spec.md`
+- `docs/audit-cleanup/pass-e-runtime-metadata-inventory.md`
+
 Goal: address the real architectural frustration: each model taking a different path.
 
 This is where we decide what to do with:
@@ -146,9 +151,7 @@ This is where we decide what to do with:
 - runtime_rule_exceptions
 - variant_option_overrides
 
-But do not mix this with audit-junk deletion. Some of these are actually useful attempts to move hardcoded behavior out of Python/JS. The problem is partial adoption and inconsistent model coverage, not necessarily that every sheet is junk.
+Current result: promoted models now have workbook-owned rows for `runtime_steps`, `context_section_master`, `order_summary_sections`, and `step_order_summary_map`. Grand Sport/Z06 runtime contracts now emit generated `orderSummary` metadata instead of relying silently on browser fallback constants. `section_presentation`, `context_choice_copy`, `runtime_rule_exceptions`, and variant override topology were classified and left in place.
 
 My recommendation:
-Pass A, Pass B, Pass C, and Pass D are complete. The next safe pass is Pass E: runtime metadata consolidation.
-
-That keeps runtime metadata consolidation separate from rule-row cleanup and avoids deleting useful read-only diagnostics before proving whether they still have signal.
+Pass A, Pass B, Pass C, Pass D, and Pass E option (a) are complete. The next safe follow-up, if needed, is a separate fallback-retirement pass that removes Python/JavaScript fallback constants only after proving every promoted model has workbook-owned replacements.

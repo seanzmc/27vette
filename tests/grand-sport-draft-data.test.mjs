@@ -135,6 +135,7 @@ test("Grand Sport draft preserves the live generated-data top-level contract", (
     "contextChoices",
     "choices",
     "standardEquipment",
+    "orderSummary",
     "ruleGroups",
     "exclusiveGroups",
     "rules",
@@ -158,6 +159,9 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
   assert.equal(draft.variants.length, 6);
   assert.equal(draft.contextChoices.length, 8);
   assert.equal(draft.steps.length, 14);
+  assert.equal(draft.orderSummary.sections.length, 11);
+  assert.equal(Object.keys(draft.orderSummary.stepMap).length, 13);
+  assert.equal(draft.orderSummary.stepMap.packages_performance, "performance_mechanical");
   assert.deepEqual(
     JSON.parse(JSON.stringify(draft.steps.map((step) => [step.step_key, step.step_label]))),
     [

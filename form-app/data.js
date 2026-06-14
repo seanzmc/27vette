@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-13T23:00:23+00:00"
+          "generated_at": "2026-06-14T21:05:12+00:00"
         },
         "variants": [
           {
@@ -55134,7 +55134,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-13T23:00:21+00:00",
+          "generated_at": "2026-06-14T21:05:09+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -55916,6 +55916,91 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 12
           }
         ],
+        "orderSummary": {
+          "sections": [
+            {
+              "section_key": "vehicle",
+              "section_label": "Model",
+              "display_order": 1,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "exterior_paint",
+              "section_label": "Exterior Paint",
+              "display_order": 2,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "exterior_appearance",
+              "section_label": "Exterior Appearance",
+              "display_order": 3,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "wheels_brakes",
+              "section_label": "Wheels & Brakes",
+              "display_order": 4,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "performance_mechanical",
+              "section_label": "Performance & Mechanical",
+              "display_order": 5,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "stripes",
+              "section_label": "Stripes",
+              "display_order": 6,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "seats_interior",
+              "section_label": "Seats & Interior",
+              "display_order": 7,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "accessories",
+              "section_label": "Accessories",
+              "display_order": 8,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "delivery",
+              "section_label": "Delivery",
+              "display_order": 9,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "auto_added_required",
+              "section_label": "Auto-Added / Required",
+              "display_order": 10,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "pricing_summary",
+              "section_label": "Pricing Summary",
+              "display_order": 11,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            }
+          ],
+          "stepMap": {
+            "body_style": "vehicle",
+            "trim_level": "vehicle",
+            "paint": "exterior_paint",
+            "exterior_appearance": "exterior_appearance",
+            "wheels": "wheels_brakes",
+            "packages_performance": "performance_mechanical",
+            "aero_exhaust_stripes_accessories": "stripes",
+            "seat": "seats_interior",
+            "base_interior": "seats_interior",
+            "seat_belt": "seats_interior",
+            "interior_trim": "seats_interior",
+            "accessories": "accessories",
+            "delivery": "delivery"
+          }
+        },
         "choices": [
           {
             "choice_id": "1lt_e07__opt_uvb_001",
@@ -110586,7 +110671,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-13T22:56:24+00:00",
+          "generated_at": "2026-06-14T21:05:10+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -110668,125 +110753,127 @@ window.CORVETTE_FORM_DATA = {
             "step_key": "body_style",
             "step_label": "Body Style",
             "runtime_order": 1,
-            "source": "fallback_config",
+            "source": "pass_e_runtime_metadata_consolidation",
             "section_ids": "sec_context_body_style"
           },
           {
             "step_key": "trim_level",
             "step_label": "Trim Level",
             "runtime_order": 2,
-            "source": "fallback_config",
+            "source": "pass_e_runtime_metadata_consolidation",
             "section_ids": "sec_context_trim_level"
           },
           {
             "step_key": "paint",
             "step_label": "Exterior Paint",
             "runtime_order": 3,
-            "source": "fallback_config",
+            "source": "pass_e_runtime_metadata_consolidation",
             "section_ids": "sec_pain_001"
           },
           {
             "step_key": "exterior_appearance",
             "step_label": "Exterior Appearance",
             "runtime_order": 4,
-            "source": "fallback_config",
+            "source": "pass_e_runtime_metadata_consolidation",
             "section_ids": "sec_badg_001|sec_engi_001|sec_exte_001|sec_roof_001"
           },
           {
             "step_key": "wheels",
             "step_label": "Wheels & Brake Calipers",
             "runtime_order": 5,
-            "source": "fallback_config",
+            "source": "pass_e_runtime_metadata_consolidation",
             "section_ids": "sec_cali_001|sec_perf_support_001|sec_whee_001|sec_whee_002|sec_z06_pkg_001"
           },
           {
             "step_key": "packages_performance",
             "step_label": "Performance & Aero",
             "runtime_order": 6,
-            "source": "fallback_config",
+            "source": "pass_e_runtime_metadata_consolidation",
             "section_ids": "sec_exha_001|sec_perf_aero_001|sec_perf_brake_001|sec_perf_ground_001|sec_perf_z52_001"
           },
           {
             "step_key": "aero_exhaust_stripes_accessories",
             "step_label": "Stripes",
             "runtime_order": 7,
-            "source": "fallback_config",
+            "source": "pass_e_runtime_metadata_consolidation",
             "section_ids": "sec_hash_001|sec_jake_001|sec_stri_001"
           },
           {
             "step_key": "seat",
             "step_label": "Seats",
             "runtime_order": 8,
-            "source": "fallback_config",
+            "source": "pass_e_runtime_metadata_consolidation",
             "section_ids": "sec_seat_002"
           },
           {
             "step_key": "base_interior",
             "step_label": "Interior Color",
             "runtime_order": 9,
-            "source": "fallback_config",
+            "source": "pass_e_runtime_metadata_consolidation",
             "section_ids": ""
           },
           {
             "step_key": "seat_belt",
             "step_label": "Seat Belt",
             "runtime_order": 10,
-            "source": "fallback_config",
+            "source": "pass_e_runtime_metadata_consolidation",
             "section_ids": "sec_seat_001"
           },
           {
             "step_key": "interior_trim",
             "step_label": "Interior Trim",
             "runtime_order": 11,
-            "source": "fallback_config",
+            "source": "pass_e_runtime_metadata_consolidation",
             "section_ids": "sec_colo_001|sec_inte_001"
           },
           {
             "step_key": "accessories",
             "step_label": "Accessories",
             "runtime_order": 12,
-            "source": "fallback_config",
+            "source": "pass_e_runtime_metadata_consolidation",
             "section_ids": "sec_lpoe_001|sec_lpoi_001|sec_lpow_001"
           },
           {
             "step_key": "delivery",
             "step_label": "Custom Delivery",
             "runtime_order": 13,
-            "source": "fallback_config",
+            "source": "pass_e_runtime_metadata_consolidation",
             "section_ids": "sec_cust_001"
           },
           {
             "step_key": "summary",
             "step_label": "Summary",
             "runtime_order": 14,
-            "source": "fallback_config",
+            "source": "pass_e_runtime_metadata_consolidation",
             "section_ids": ""
           }
         ],
         "sections": [
           {
+            "context_type": "body_style",
             "section_id": "sec_context_body_style",
             "section_name": "Body Style",
             "selection_mode": "single_select_req",
-            "selection_mode_label": "Required single choice",
             "choice_mode": "single",
             "is_required": "True",
             "standard_behavior": "user_selected",
             "section_display_order": 1,
             "step_key": "body_style",
-            "step_label": "Body Style"
+            "step_label": "Body Style",
+            "selection_mode_label": "Required single choice"
           },
           {
+            "context_type": "trim_level",
             "section_id": "sec_context_trim_level",
             "section_name": "Trim Level",
             "selection_mode": "single_select_req",
-            "selection_mode_label": "Required single choice",
             "choice_mode": "single",
             "is_required": "True",
             "standard_behavior": "user_selected",
             "section_display_order": 2,
             "step_key": "trim_level",
-            "step_label": "Trim Level"
+            "step_label": "Trim Level",
+            "selection_mode_label": "Required single choice"
           },
           {
             "section_id": "sec_pain_001",
@@ -111353,6 +111440,91 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 24
           }
         ],
+        "orderSummary": {
+          "sections": [
+            {
+              "section_key": "vehicle",
+              "section_label": "Model",
+              "display_order": 1,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "exterior_paint",
+              "section_label": "Exterior Paint",
+              "display_order": 2,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "exterior_appearance",
+              "section_label": "Exterior Appearance",
+              "display_order": 3,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "wheels_brakes",
+              "section_label": "Wheels & Brakes",
+              "display_order": 4,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "performance_mechanical",
+              "section_label": "Performance & Mechanical",
+              "display_order": 5,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "stripes",
+              "section_label": "Stripes",
+              "display_order": 6,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "seats_interior",
+              "section_label": "Seats & Interior",
+              "display_order": 7,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "accessories",
+              "section_label": "Accessories",
+              "display_order": 8,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "delivery",
+              "section_label": "Delivery",
+              "display_order": 9,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "auto_added_required",
+              "section_label": "Auto-Added / Required",
+              "display_order": 10,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            },
+            {
+              "section_key": "pricing_summary",
+              "section_label": "Pricing Summary",
+              "display_order": 11,
+              "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+            }
+          ],
+          "stepMap": {
+            "body_style": "vehicle",
+            "trim_level": "vehicle",
+            "paint": "exterior_paint",
+            "exterior_appearance": "exterior_appearance",
+            "wheels": "wheels_brakes",
+            "packages_performance": "performance_mechanical",
+            "aero_exhaust_stripes_accessories": "stripes",
+            "seat": "seats_interior",
+            "base_interior": "seats_interior",
+            "seat_belt": "seats_interior",
+            "interior_trim": "seats_interior",
+            "accessories": "accessories",
+            "delivery": "delivery"
+          }
+        },
         "choices": [
           {
             "choice_id": "1lz_h07__opt_dwk_001",

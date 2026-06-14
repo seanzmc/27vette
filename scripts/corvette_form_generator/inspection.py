@@ -32,6 +32,7 @@ from corvette_form_generator.rules import (
 from corvette_form_generator.runtime_metadata import (
     load_context_sections,
     load_default_selection_rules,
+    load_order_summary_metadata,
     load_runtime_steps,
     load_section_presentation,
     load_variant_option_overrides,
@@ -648,6 +649,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     section_presentation_rows = load_section_presentation(wb, config.model_key)
     section_presentation = {row["section_id"]: row for row in section_presentation_rows}
     runtime_steps = load_runtime_steps(wb, config.model_key, config.step_order, config.step_labels)
+    order_summary_metadata = load_order_summary_metadata(wb, config.model_key)
     context_sections = [
         {
             **row,
@@ -931,6 +933,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
         "steps": step_rows,
         "sections": section_rows,
         "contextChoices": context_choices,
+        "orderSummary": order_summary_metadata,
         "choices": choices,
         "candidateStandardEquipment": candidate_standard_equipment,
         "ruleDetailHotSpots": rule_hot_spots,
@@ -1175,6 +1178,7 @@ def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None
         "steps": preview["steps"],
         "sections": preview["sections"],
         "contextChoices": preview["contextChoices"],
+        "orderSummary": preview.get("orderSummary", {"sections": [], "stepMap": {}}),
         "choices": draft_choices,
         "standardEquipment": standard_equipment,
         "ruleGroups": rule_groups,

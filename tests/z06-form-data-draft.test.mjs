@@ -46,6 +46,7 @@ test("Z06 draft preserves the live generated-data top-level contract", () => {
     "contextChoices",
     "choices",
     "standardEquipment",
+    "orderSummary",
     "ruleGroups",
     "exclusiveGroups",
     "rules",
@@ -64,6 +65,10 @@ test("Z06 draft preserves the live generated-data top-level contract", () => {
     draft.variants.map((variant) => variant.variant_id),
     expectedVariantIds
   );
+  assert.equal(draft.steps.every((step) => step.source !== "fallback_config"), true);
+  assert.equal(draft.orderSummary.sections.length, 11);
+  assert.equal(Object.keys(draft.orderSummary.stepMap).length, 13);
+  assert.equal(draft.orderSummary.stepMap.packages_performance, "performance_mechanical");
   assert.ok(draft.choices.length > 0, "Z06 draft should include choices");
   assert.ok(draft.standardEquipment.length > 0, "Z06 draft should include standard equipment rows");
 });

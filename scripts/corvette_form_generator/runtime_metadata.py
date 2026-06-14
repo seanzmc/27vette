@@ -81,6 +81,24 @@ def active_rows(wb: Any, sheet_name: str, model_key: str | None = None) -> list[
     return [row for row in rows if truthy(row.get("active", "True"), default=True)]
 
 
+def promoted_runtime_model(wb: Any, model_key: str) -> bool:
+    """Return whether model_key is promoted to the live runtime registry."""
+
+    model = clean(model_key).lower()
+    for row in active_rows(wb, "model_registry_promotion", model):
+        if clean(row.get("model_key")).lower() == model and truthy(row.get("promoted_to_runtime"), default=False):
+            return True
+    return False
+
+
+def _require_workbook_metadata(wb: Any, model_key: str, sheet_name: str) -> None:
+    if promoted_runtime_model(wb, model_key):
+        raise ValueError(
+            f"Promoted runtime model {model_key!r} requires workbook-owned {sheet_name} rows; "
+            "fallback metadata is only allowed for unpromoted compatibility paths."
+        )
+
+
 def _copy_mapping_rows(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
     return [dict(deepcopy(row)) for row in rows]
 
@@ -95,6 +113,7 @@ def load_runtime_steps(
 
     rows = active_rows(wb, "runtime_steps", model_key)
     if not rows:
+        _require_workbook_metadata(wb, model_key, "runtime_steps")
         return [
             {
                 "step_key": clean(step_key),
@@ -107,6 +126,7 @@ def load_runtime_steps(
         ]
 
     steps: list[dict[str, Any]] = []
+    expected_step_keys = [clean(step_key) for step_key in fallback_order if clean(step_key)]
     for row in rows:
         step_key = clean(row.get("step_key"))
         if not step_key:
@@ -119,6 +139,14 @@ def load_runtime_steps(
                 "source": clean(row.get("source")) or "workbook",
             }
         )
+    if promoted_runtime_model(wb, model_key):
+        actual_step_keys = {row["step_key"] for row in steps}
+        missing_step_keys = [step_key for step_key in expected_step_keys if step_key not in actual_step_keys]
+        if missing_step_keys:
+            raise ValueError(
+                f"Promoted runtime model {model_key!r} has incomplete workbook-owned runtime_steps rows; "
+                f"missing step_key values: {', '.join(missing_step_keys)}"
+            )
     return sorted(steps, key=lambda row: (row["runtime_order"], row["step_key"]))
 
 
@@ -131,6 +159,7 @@ def load_context_sections(
 
     rows = active_rows(wb, "context_section_master", model_key)
     if not rows:
+        _require_workbook_metadata(wb, model_key, "context_section_master")
         return _copy_mapping_rows(fallback_sections)
 
     sections: list[dict[str, Any]] = []
@@ -281,6 +310,17 @@ def load_order_summary_metadata(wb: Any, model_key: str) -> dict[str, Any]:
         section_key = clean(row.get("section_key"))
         if step_key and section_key:
             step_map[step_key] = section_key
+
+    if promoted_runtime_model(wb, model_key) and (not sections or not step_map):
+        missing = []
+        if not sections:
+            missing.append("order_summary_sections")
+        if not step_map:
+            missing.append("step_order_summary_map")
+        raise ValueError(
+            f"Promoted runtime model {model_key!r} requires workbook-owned {' and '.join(missing)} rows; "
+            "browser order-summary fallback is only allowed for unpromoted compatibility paths."
+        )
 
     return {
         "sections": sorted(sections, key=lambda row: (row["display_order"], row["section_key"])),

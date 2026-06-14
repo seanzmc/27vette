@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-06-13T23:08:08+00:00",
+    "generated_at": "2026-06-14T21:05:13+00:00",
     "status": "read_only_preview"
   },
   "variants": [
@@ -787,6 +787,91 @@
       "display_order": 12
     }
   ],
+  "orderSummary": {
+    "sections": [
+      {
+        "section_key": "vehicle",
+        "section_label": "Model",
+        "display_order": 1,
+        "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+      },
+      {
+        "section_key": "exterior_paint",
+        "section_label": "Exterior Paint",
+        "display_order": 2,
+        "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+      },
+      {
+        "section_key": "exterior_appearance",
+        "section_label": "Exterior Appearance",
+        "display_order": 3,
+        "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+      },
+      {
+        "section_key": "wheels_brakes",
+        "section_label": "Wheels & Brakes",
+        "display_order": 4,
+        "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+      },
+      {
+        "section_key": "performance_mechanical",
+        "section_label": "Performance & Mechanical",
+        "display_order": 5,
+        "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+      },
+      {
+        "section_key": "stripes",
+        "section_label": "Stripes",
+        "display_order": 6,
+        "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+      },
+      {
+        "section_key": "seats_interior",
+        "section_label": "Seats & Interior",
+        "display_order": 7,
+        "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+      },
+      {
+        "section_key": "accessories",
+        "section_label": "Accessories",
+        "display_order": 8,
+        "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+      },
+      {
+        "section_key": "delivery",
+        "section_label": "Delivery",
+        "display_order": 9,
+        "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+      },
+      {
+        "section_key": "auto_added_required",
+        "section_label": "Auto-Added / Required",
+        "display_order": 10,
+        "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+      },
+      {
+        "section_key": "pricing_summary",
+        "section_label": "Pricing Summary",
+        "display_order": 11,
+        "notes": "Pass E: workbook-owned order summary grouping matching previous runtime fallback."
+      }
+    ],
+    "stepMap": {
+      "body_style": "vehicle",
+      "trim_level": "vehicle",
+      "paint": "exterior_paint",
+      "exterior_appearance": "exterior_appearance",
+      "wheels": "wheels_brakes",
+      "packages_performance": "performance_mechanical",
+      "aero_exhaust_stripes_accessories": "stripes",
+      "seat": "seats_interior",
+      "base_interior": "seats_interior",
+      "seat_belt": "seats_interior",
+      "interior_trim": "seats_interior",
+      "accessories": "accessories",
+      "delivery": "delivery"
+    }
+  },
   "choices": [
     {
       "option_id": "opt_uvb_001",

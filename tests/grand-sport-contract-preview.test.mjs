@@ -33,6 +33,9 @@ test("Grand Sport contract preview has the expected read-only contract shape", (
   assert.equal(preview.variants.every((variant) => variant.source_active === "False"), true);
   assert.equal(preview.contextChoices.length, 8);
   assert.equal(preview.steps.length, 14);
+  assert.equal(preview.orderSummary.sections.length, 11);
+  assert.equal(Object.keys(preview.orderSummary.stepMap).length, 13);
+  assert.equal(preview.orderSummary.stepMap.packages_performance, "performance_mechanical");
   assert.equal(preview.choices.length, 1284);
   assert.equal(preview.candidateStandardEquipment.length, 455);
 });

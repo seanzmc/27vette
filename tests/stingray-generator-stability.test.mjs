@@ -180,6 +180,34 @@ const expectedStandardSectionIds = [
   "sec_stan_002",
   "sec_tech_001",
 ];
+const expectedOrderSummarySections = [
+  ["vehicle", "Model", 1],
+  ["exterior_paint", "Exterior Paint", 2],
+  ["exterior_appearance", "Exterior Appearance", 3],
+  ["wheels_brakes", "Wheels & Brakes", 4],
+  ["performance_mechanical", "Performance & Mechanical", 5],
+  ["stripes", "Stripes", 6],
+  ["seats_interior", "Seats & Interior", 7],
+  ["accessories", "Accessories", 8],
+  ["delivery", "Delivery", 9],
+  ["auto_added_required", "Auto-Added / Required", 10],
+  ["pricing_summary", "Pricing Summary", 11],
+];
+const expectedStepOrderSummaryMap = [
+  ["body_style", "vehicle"],
+  ["trim_level", "vehicle"],
+  ["paint", "exterior_paint"],
+  ["exterior_appearance", "exterior_appearance"],
+  ["wheels", "wheels_brakes"],
+  ["packages_performance", "performance_mechanical"],
+  ["aero_exhaust_stripes_accessories", "stripes"],
+  ["seat", "seats_interior"],
+  ["base_interior", "seats_interior"],
+  ["seat_belt", "seats_interior"],
+  ["interior_trim", "seats_interior"],
+  ["accessories", "accessories"],
+  ["delivery", "delivery"],
+];
 const requiredGrandSportPriceRuleIds = [
   "gs_pr_fey_j57_001",
   "gs_pr_fey_t0f_001",
@@ -233,6 +261,13 @@ function workbookRows(sheetName) {
     { encoding: "utf8" }
   );
   return JSON.parse(output);
+}
+
+function promotedRuntimeModelKeys() {
+  return workbookRows("model_registry_promotion")
+    .filter((row) => row.active === "True" && row.promoted_to_runtime === "True")
+    .map((row) => row.model_key)
+    .sort();
 }
 
 function assertOptionVariantStatusCoverage(optionSheetName, statusSheetName, variantIds) {
@@ -438,7 +473,10 @@ test("Phase 6 step and presentation metadata are workbook-owned", () => {
   assert.deepEqual(workbookHeaders("context_section_master"), contextSectionHeaders);
   assert.deepEqual(workbookHeaders("section_presentation"), sectionPresentationHeaders);
 
-  for (const modelKey of ["stingray", "grand_sport"]) {
+  const promotedModels = promotedRuntimeModelKeys();
+  assert.deepEqual(promotedModels, ["grand_sport", "stingray", "z06"]);
+
+  for (const modelKey of promotedModels) {
     const runtimeRows = workbookRows("runtime_steps")
       .filter((row) => row.model_key === modelKey && row.active === "True")
       .sort((a, b) => Number(a.runtime_order) - Number(b.runtime_order));
@@ -449,6 +487,24 @@ test("Phase 6 step and presentation metadata are workbook-owned", () => {
       contextRows.map((row) => row.section_id).sort(),
       ["sec_context_body_style", "sec_context_trim_level"],
       `${modelKey} context sections should be workbook-owned`
+    );
+
+    const summaryRows = workbookRows("order_summary_sections")
+      .filter((row) => row.model_key === modelKey && row.active === "True")
+      .sort((a, b) => Number(a.display_order) - Number(b.display_order));
+    assert.deepEqual(
+      summaryRows.map((row) => [row.section_key, row.section_label, Number(row.display_order)]),
+      expectedOrderSummarySections,
+      `${modelKey} order summary sections should be workbook-owned`
+    );
+
+    const stepSummaryRows = workbookRows("step_order_summary_map")
+      .filter((row) => row.model_key === modelKey && row.active === "True")
+      .sort((a, b) => expectedStepOrderSummaryMap.findIndex(([stepKey]) => stepKey === a.step_key) - expectedStepOrderSummaryMap.findIndex(([stepKey]) => stepKey === b.step_key));
+    assert.deepEqual(
+      stepSummaryRows.map((row) => [row.step_key, row.section_key]),
+      expectedStepOrderSummaryMap,
+      `${modelKey} step-to-summary map should be workbook-owned`
     );
 
     const standardRows = workbookRows("section_presentation").filter(
