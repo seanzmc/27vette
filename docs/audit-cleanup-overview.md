@@ -1,8 +1,8 @@
 # Audit cleanup overview
 
-Clean up audit-related workbook sheets and scripts that are no longer needed for runtime form generation or customer-facing behavior. This is a multi-pass process that should start with retiring audit-only metadata from required gates, then deleting the workbook sheets, and finally consolidating runtime metadata.
+Clean up audit-related workbook sheets, skipped source rows, and default gate policy that are no longer needed for runtime form generation or customer-facing behavior. This is a multi-pass process: audit-only sheets and dead-end rows have been retired, default readiness gates now exclude optional audit/report tooling, and runtime metadata consolidation remains a later pass.
 
-Best approach: gate-first retirement, then workbook cleanup. Do not start by deleting sheets.
+Current approach: keep live form/workbook-contract gates separate from optional audit/dev historical tooling. Do not add audit/report checks back to default readiness without proving a current runtime-contract failure they uniquely catch.
 
 ## Recommended cleanup strategy:
 
@@ -12,8 +12,8 @@ Best approach: gate-first retirement, then workbook cleanup. Do not start by del
 
    Anything in the second bucket should not be required by normal form gates.
 
-2. First pass should be narrow: retire audit-only metadata from required gates.
-   Start with the cleanest junk:
+2. The first cleanup target was narrow: retire audit-only metadata from required gates.
+   It started with the cleanest junk:
    - option_audit_groups
    - option_audit_group_members
    - rule_review_groups
@@ -120,6 +120,8 @@ Current result: 288 runtime-skipped rows were deleted (`rule_mapping`: 88, `gran
 
 ### Pass D — “Required gate split”
 
+Status: Completed. See `docs/audit-cleanup/pass-d-required-gate-split-spec.md`.
+
 Goal: stop optional audit/report tooling from blocking normal form work after dead-end workbook rows are removed.
 
 Create/clarify:
@@ -127,6 +129,8 @@ Create/clarify:
 - default/live gate: app generation + runtime regressions
 - workbook schema gate: only canonical active workbook contracts
 - optional historical/audit gate: not part of normal readiness unless explicitly running old audit tooling
+
+Current result: `AGENTS.md` and `README.md` now split default readiness from opt-in Grand Sport audit/report gates. `scripts/build_rule_sources.py`, `tests/grand-sport-rule-audit.test.mjs`, and `tests/audit-parser-metadata-loaders.test.mjs` were demoted from default readiness; no proof exception was found.
 
 ### Pass E — “Runtime metadata consolidation”
 
@@ -145,6 +149,6 @@ This is where we decide what to do with:
 But do not mix this with audit-junk deletion. Some of these are actually useful attempts to move hardcoded behavior out of Python/JS. The problem is partial adoption and inconsistent model coverage, not necessarily that every sheet is junk.
 
 My recommendation:
-Pass A, Pass B, and Pass C are complete. The next safe pass is Pass D: split required gates so optional audit/report tooling no longer blocks normal form work now that dead-end workbook rule rows have been removed.
+Pass A, Pass B, Pass C, and Pass D are complete. The next safe pass is Pass E: runtime metadata consolidation.
 
 That keeps runtime metadata consolidation separate from rule-row cleanup and avoids deleting useful read-only diagnostics before proving whether they still have signal.

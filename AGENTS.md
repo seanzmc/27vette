@@ -296,9 +296,10 @@ Then run:
 ```sh
 node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
-node --test tests/grand-sport-rule-audit.test.mjs
 node --test tests/multi-model-runtime-switching.test.mjs
 ```
+
+Grand Sport rule-audit/report checks are optional diagnostics, not default readiness gates. Run the optional audit/report block in the Validation Gates section only when maintaining `scripts/build_rule_sources.py`, refreshing the Grand Sport rule-audit report, or investigating rule provenance.
 
 Some Grand Sport artifact names and metadata still reflect the inspection/draft migration path. Do not infer production status from naming alone; inspect the active registry, tests, and deployment intent.
 
@@ -388,7 +389,7 @@ Do not change endpoint, payload shape, or Turnstile behavior without explicit ap
 
 ## Validation Gates
 
-Use these as current default gates. If the relevant scripts, tests, or artifacts have changed, identify the replacement gates in the spec and explain why they supersede the commands below.
+Use these as current default readiness gates. Existing tests/docs are not proof that a gate is required: classify a gate as default only when failure indicates live runtime risk, generated runtime-contract risk, workbook schema/source-contract risk, model promotion risk, or dealer payload risk. Report/audit drift belongs in the optional audit/report block unless a spec documents the exact runtime-contract failure it uniquely catches.
 
 Docs-only changes:
 
@@ -412,9 +413,17 @@ Grand Sport source/draft refresh:
 .venv/bin/python scripts/generate_form.py --model grand_sport
 node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
+```
+
+Optional Grand Sport audit/report refresh:
+
+```sh
+.venv/bin/python scripts/build_rule_sources.py --model grand_sport
 node --test tests/grand-sport-rule-audit.test.mjs
 node --test tests/audit-parser-metadata-loaders.test.mjs
 ```
+
+Use the optional block only when maintaining audit/report tooling, refreshing `form-output/inspection/grand-sport-rule-audit.json` / `.md`, or investigating parser/rule provenance. It is not part of default model readiness.
 
 Z06 source/draft refresh:
 
@@ -445,7 +454,7 @@ node --test tests/stingray-form-regression.test.mjs
 node --test tests/multi-model-runtime-switching.test.mjs
 ```
 
-Full current suite:
+Full current default suite:
 
 ```sh
 .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
@@ -453,8 +462,6 @@ node --test tests/stingray-form-regression.test.mjs
 node --test tests/stingray-generator-stability.test.mjs
 node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
-node --test tests/grand-sport-rule-audit.test.mjs
-node --test tests/audit-parser-metadata-loaders.test.mjs
 node --test tests/workbook-schema-standardization.test.mjs
 node --test tests/workbook-visual-copy-standardization.test.mjs
 node --test tests/z06-contract-preview.test.mjs

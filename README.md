@@ -45,7 +45,7 @@ The runtime should render and evaluate the generated contract. It should not inf
 - `form-output/` - generated Stingray JSON/CSV outputs plus Grand Sport and Z06 inspection, contract preview, draft, rule-audit, and clean runtime-contract artifacts under `form-output/inspection/`.
 - `scripts/generate_form.py` - single generator entry point for every model. `--model stingray` runs the production pathway (form sheets, output artifacts, app data registry); `--model grand_sport` and `--model z06` emit inspection/preview/draft artifacts plus clean `*-runtime-contract.json` artifacts and do not directly mutate `form-app/data.js`.
 - `scripts/promote_model.py` - workbook-driven runtime promotion (`--model <key> --write`).
-- `scripts/build_rule_sources.py` - workbook rule-source audit helper.
+- `scripts/build_rule_sources.py` - opt-in workbook rule-source audit/report helper; not part of default model readiness.
 - `scripts/validate_workbook_schema.py` - workbook schema and live-contract validation.
 - `scripts/validate_workbook_package.py` / `scripts/repair_workbook_tables.py` - workbook package integrity checks and table repair.
 - `scripts/compare-generated-contracts.mjs` - compares generated JSON contracts while ignoring timestamp fields.
@@ -264,8 +264,6 @@ cd <repo-root>
 .venv/bin/python scripts/generate_form.py --model grand_sport
 node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
-node --test tests/grand-sport-rule-audit.test.mjs
-node --test tests/audit-parser-metadata-loaders.test.mjs
 ```
 
 Z06 source/runtime-contract refresh:
@@ -280,7 +278,18 @@ node --test tests/z06-performance-package-interactions.test.mjs
 node --test tests/z06-runtime-rule-corrections.test.mjs
 ```
 
-The Grand Sport and Z06 generators write inspection, contract preview, draft, rule-audit (Grand Sport), and clean `*-runtime-contract.json` artifacts under `form-output/inspection/`. Registry promotion embeds the `*-runtime-contract.json` artifacts verbatim; draft-only provenance never reaches `form-app/data.js`. By design, those generator runs do not directly mutate `form-app/data.js`.
+The Grand Sport and Z06 generators write inspection, contract preview, draft, and clean `*-runtime-contract.json` artifacts under `form-output/inspection/`. Registry promotion embeds the `*-runtime-contract.json` artifacts verbatim; draft-only provenance never reaches `form-app/data.js`. By design, those generator runs do not directly mutate `form-app/data.js`.
+
+Optional Grand Sport audit/report refresh:
+
+```sh
+cd <repo-root>
+.venv/bin/python scripts/build_rule_sources.py --model grand_sport
+node --test tests/grand-sport-rule-audit.test.mjs
+node --test tests/audit-parser-metadata-loaders.test.mjs
+```
+
+Use the optional audit/report refresh only when maintaining parser/report tooling, refreshing `form-output/inspection/grand-sport-rule-audit.json` / `.md`, or investigating rule provenance. It is not part of default model readiness.
 
 Runtime promotion verification / reapply (workbook-owned):
 
@@ -296,7 +305,7 @@ node --test tests/multi-model-runtime-switching.test.mjs
 
 Z06 is already promoted in the current workbook/runtime state. Use this sequence only when promotion rows need to be verified or deliberately reapplied after workbook promotion metadata changes. Do not promote ZR1 or ZR1X as part of another model's pass unless that scope is explicitly approved.
 
-Full model/runtime validation:
+Full default model/runtime validation:
 
 ```sh
 cd <repo-root>
@@ -305,8 +314,6 @@ node --test tests/stingray-form-regression.test.mjs
 node --test tests/stingray-generator-stability.test.mjs
 node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
-node --test tests/grand-sport-rule-audit.test.mjs
-node --test tests/audit-parser-metadata-loaders.test.mjs
 node --test tests/workbook-schema-standardization.test.mjs
 node --test tests/workbook-visual-copy-standardization.test.mjs
 node --test tests/z06-contract-preview.test.mjs
