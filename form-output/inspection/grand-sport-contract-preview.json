@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-06-11T01:14:56+00:00",
+    "generated_at": "2026-06-13T23:08:08+00:00",
     "status": "read_only_preview"
   },
   "variants": [
@@ -255,7 +255,7 @@
       "selection_mode": "single_select_opt",
       "selection_mode_label": "Optional single choice",
       "choice_mode": "single",
-      "is_required": "FALSE",
+      "is_required": "False",
       "standard_behavior": "user_selected",
       "section_display_order": 10,
       "step_key": "packages_performance",
@@ -359,7 +359,7 @@
       "selection_mode": "single_select_req",
       "selection_mode_label": "Required single choice",
       "choice_mode": "single",
-      "is_required": "TRUE",
+      "is_required": "True",
       "standard_behavior": "user_selected",
       "section_display_order": 20,
       "step_key": "packages_performance",
@@ -554,7 +554,7 @@
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "choice_mode": "multi",
-      "is_required": "FALSE",
+      "is_required": "False",
       "standard_behavior": "user_selected",
       "section_display_order": 40,
       "step_key": "wheels",
@@ -580,7 +580,7 @@
       "selection_mode": "single_select_req",
       "selection_mode_label": "Required single choice",
       "choice_mode": "single",
-      "is_required": "TRUE",
+      "is_required": "True",
       "standard_behavior": "user_selected",
       "section_display_order": 40,
       "step_key": "packages_performance",
@@ -619,7 +619,7 @@
       "selection_mode": "single_select_opt",
       "selection_mode_label": "Optional single choice",
       "choice_mode": "single",
-      "is_required": "FALSE",
+      "is_required": "False",
       "standard_behavior": "user_selected",
       "section_display_order": 50,
       "step_key": "packages_performance",
@@ -3168,9 +3168,9 @@
       "option_id": "opt_eyt_001",
       "rpo": "EYT",
       "label": "Carbon Flash Exterior Badge Package",
-      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_option_name": "Carbon Flash Exterior Badge Package",
-      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_detail_raw": "",
       "source_section_id": "sec_badg_001",
       "active": "True",
@@ -3189,15 +3189,15 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
       "rpo": "EYT",
       "label": "Carbon Flash Exterior Badge Package",
-      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_option_name": "Carbon Flash Exterior Badge Package",
-      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_detail_raw": "",
       "source_section_id": "sec_badg_001",
       "active": "True",
@@ -3216,15 +3216,15 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
       "rpo": "EYT",
       "label": "Carbon Flash Exterior Badge Package",
-      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_option_name": "Carbon Flash Exterior Badge Package",
-      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_detail_raw": "",
       "source_section_id": "sec_badg_001",
       "active": "True",
@@ -3243,15 +3243,15 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
       "rpo": "EYT",
       "label": "Carbon Flash Exterior Badge Package",
-      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_option_name": "Carbon Flash Exterior Badge Package",
-      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_detail_raw": "",
       "source_section_id": "sec_badg_001",
       "active": "True",
@@ -3270,15 +3270,15 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
       "rpo": "EYT",
       "label": "Carbon Flash Exterior Badge Package",
-      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_option_name": "Carbon Flash Exterior Badge Package",
-      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_detail_raw": "",
       "source_section_id": "sec_badg_001",
       "active": "True",
@@ -3297,15 +3297,15 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
       "rpo": "EYT",
       "label": "Carbon Flash Exterior Badge Package",
-      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_option_name": "Carbon Flash Exterior Badge Package",
-      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_detail_raw": "",
       "source_section_id": "sec_badg_001",
       "active": "True",
@@ -3324,7 +3324,7 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyk_001",
@@ -37838,9 +37838,9 @@
       "option_id": "opt_eyt_001",
       "rpo": "EYT",
       "label": "Carbon Flash Exterior Badge Package",
-      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_option_name": "Carbon Flash Exterior Badge Package",
-      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_detail_raw": "",
       "source_section_id": "sec_badg_001",
       "active": "True",
@@ -37859,15 +37859,15 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
       "rpo": "EYT",
       "label": "Carbon Flash Exterior Badge Package",
-      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_option_name": "Carbon Flash Exterior Badge Package",
-      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_detail_raw": "",
       "source_section_id": "sec_badg_001",
       "active": "True",
@@ -37886,15 +37886,15 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
       "rpo": "EYT",
       "label": "Carbon Flash Exterior Badge Package",
-      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_option_name": "Carbon Flash Exterior Badge Package",
-      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_detail_raw": "",
       "source_section_id": "sec_badg_001",
       "active": "True",
@@ -37913,15 +37913,15 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
       "rpo": "EYT",
       "label": "Carbon Flash Exterior Badge Package",
-      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_option_name": "Carbon Flash Exterior Badge Package",
-      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_detail_raw": "",
       "source_section_id": "sec_badg_001",
       "active": "True",
@@ -37940,15 +37940,15 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
       "rpo": "EYT",
       "label": "Carbon Flash Exterior Badge Package",
-      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_option_name": "Carbon Flash Exterior Badge Package",
-      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_detail_raw": "",
       "source_section_id": "sec_badg_001",
       "active": "True",
@@ -37967,15 +37967,15 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_eyt_001",
       "rpo": "EYT",
       "label": "Carbon Flash Exterior Badge Package",
-      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_option_name": "Carbon Flash Exterior Badge Package",
-      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and",
+      "source_description": "Crossed flags on the nose and rear decklid, Corvette lettering on rear fascia, and GS badge on rear quarter",
       "source_detail_raw": "",
       "source_section_id": "sec_badg_001",
       "active": "True",
@@ -37994,7 +37994,7 @@
       "status": "standard",
       "status_label": "Standard",
       "selectable": "True",
-      "display_behavior": ""
+      "display_behavior": "default_selected"
     },
     {
       "option_id": "opt_j6a_001",
