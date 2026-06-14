@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-06-14T21:05:12+00:00"
+    "generated_at": "2026-06-14T23:19:44+00:00"
   },
   "variants": [
     {
@@ -43569,7 +43569,7 @@
       "variant_scope": "",
       "disabled_reason": "PCX blocks the associated stripe, badge, delivery, wheel, and accessory choices.",
       "active": "True",
-      "notes": "Pass 2 grouped-excludes normalization: replaces repeated direct excludes with one workbook-owned excludes_any group."
+      "notes": "Workbook-owned grouped exclusion metadata."
     },
     {
       "group_id": "grp_pdv_excludes_full_length_stripes",
@@ -43598,7 +43598,7 @@
       "variant_scope": "",
       "disabled_reason": "PDV blocks full-length dual racing stripe choices.",
       "active": "True",
-      "notes": "Pass 2 grouped-excludes normalization: replaces repeated direct excludes with one workbook-owned excludes_any group."
+      "notes": "Workbook-owned grouped exclusion metadata."
     },
     {
       "group_id": "grp_r88_excludes_badge_and_stripe_choices",
@@ -43626,7 +43626,7 @@
       "variant_scope": "",
       "disabled_reason": "R88 blocks conflicting badge and stripe choices.",
       "active": "True",
-      "notes": "Pass 2 grouped-excludes normalization: replaces repeated direct excludes with one workbook-owned excludes_any group."
+      "notes": "Workbook-owned grouped exclusion metadata."
     },
     {
       "group_id": "grp_sfz_excludes_badge_and_stripe_choices",
@@ -43653,7 +43653,7 @@
       "variant_scope": "",
       "disabled_reason": "SFZ blocks conflicting badge and stripe choices.",
       "active": "True",
-      "notes": "Pass 2 grouped-excludes normalization: replaces repeated direct excludes with one workbook-owned excludes_any group."
+      "notes": "Workbook-owned grouped exclusion metadata."
     },
     {
       "group_id": "grp_cf8_excludes_full_length_stripes",
@@ -43679,7 +43679,7 @@
       "variant_scope": "",
       "disabled_reason": "CF8 blocks full-length dual racing stripe choices.",
       "active": "True",
-      "notes": "Pass 2 grouped-excludes normalization: replaces repeated direct excludes with one workbook-owned excludes_any group."
+      "notes": "Workbook-owned grouped exclusion metadata."
     },
     {
       "group_id": "grp_sb7_excludes_dual_racing_and_sht",
