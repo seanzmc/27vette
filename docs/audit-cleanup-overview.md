@@ -55,6 +55,8 @@ Best approach: gate-first retirement, then workbook cleanup. Do not start by del
 
 ### Pass A — “Audit scaffolding retirement”
 
+Status: Completed. See `docs/audit-cleanup/pass-a-audit-scaffolding-retirement-spec.md`.
+
 Goal: remove audit-only workbook sheets and their required-gate expectations without changing form runtime behavior.
 
 Scope:
@@ -76,7 +78,14 @@ Validation:
 
 ### Pass B — “One-pass writer/script retirement”
 
+Status: Completed. See:
+
+- `docs/audit-cleanup/pass-b-one-pass-script-retirement-spec.md`
+- `docs/audit-cleanup/pass-b-script-retirement-inventory.md`
+
 Goal: remove stale apply*, repair*, populate*, audit* scripts that are no longer workflow entrypoints.
+
+Current result: no active tracked stale one-pass workbook writer was found. The active tree already lacks the obvious old one-off script names (`populate*.py`, `generate_*_form.py`, `promote_*runtime*.py`, `*future*review*.py`, extra `apply*.py`, extra `repair*.py`). The current `apply_workbook_ops.py`, `repair_workbook_tables.py`, `promote_model.py`, generator, validators, workbook editor server, and comparison helper are guarded workflow entrypoints and were kept. `build_rule_sources.py` remains a reusable read-only report/audit helper; whether it belongs in normal readiness gates is a Pass C question.
 
 Method:
 
@@ -87,9 +96,31 @@ Method:
 - historical context: move lesson to docs/skill, delete executable
 - Update tests/docs that reference deleted scripts.
 
-### Pass C — “Required gate split”
+### Pass C — “Workbook dead-end rule row retirement”
 
-Goal: stop one-off audit tooling from blocking normal form work.
+Status: Completed. See:
+
+- `docs/audit-cleanup/pass-c-dead-end-rule-row-retirement-spec.md`
+- `docs/audit-cleanup/pass-c-rule-row-retirement-inventory.md`
+
+Goal: delete all workbook `rule_mapping` / `grandSport_rule_mapping` rows that current runtime generation skips, then update tests so skipped-row counts are no longer treated as protected infrastructure.
+
+Method:
+
+- Build an inventory for rollback/evidence, not for preserving ambiguous skipped rows.
+- Delete all rows where `runtime_authored_rule(row)` is false.
+- Delete any remaining runtime-authored direct rule rows skipped by grouped-rule dedupe.
+- Restore only a specific deleted row whose removal changes generated runtime contracts, then document why the generator still consumed it.
+- Update/remove audit tests that assert omitted-row accounting.
+- Update the workbook editor referenced-delete warning so it no longer says rule convention is `normalization_status`, not deletion.
+- Regenerate affected artifacts and compare runtime contracts while allowing audit artifact drift.
+- Decide whether `build_rule_sources.py` still has unique read-only diagnostic value after workbook dead-end rows are retired.
+
+Current result: 288 runtime-skipped rows were deleted (`rule_mapping`: 88, `grandSport_rule_mapping`: 200). `z06_rule_mapping` had no runtime-skipped control rows. Stingray, Grand Sport, and Z06 generated runtime contracts matched their pre-deletion snapshots, so no deleted row was restored.
+
+### Pass D — “Required gate split”
+
+Goal: stop optional audit/report tooling from blocking normal form work after dead-end workbook rows are removed.
 
 Create/clarify:
 
@@ -97,9 +128,7 @@ Create/clarify:
 - workbook schema gate: only canonical active workbook contracts
 - optional historical/audit gate: not part of normal readiness unless explicitly running old audit tooling
 
-This is the step that prevents the problem from coming back.
-
-### Pass D — “Runtime metadata consolidation”
+### Pass E — “Runtime metadata consolidation”
 
 Goal: address the real architectural frustration: each model taking a different path.
 
@@ -116,9 +145,6 @@ This is where we decide what to do with:
 But do not mix this with audit-junk deletion. Some of these are actually useful attempts to move hardcoded behavior out of Python/JS. The problem is partial adoption and inconsistent model coverage, not necessarily that every sheet is junk.
 
 My recommendation:
-Start with Pass A only.
+Pass A, Pass B, and Pass C are complete. The next safe pass is Pass D: split required gates so optional audit/report tooling no longer blocks normal form work now that dead-end workbook rule rows have been removed.
 
-It gives you an immediate reduction in workbook/test clutter without risking customer runtime behavior. It also breaks the bad pattern where historical audit scaffolding is treated as required app infrastructure.
-
-If you approve, I would write the spec for Pass A as:
-“Retire audit-only workbook metadata sheets and required-gate expectations: option_audit_groups, option_audit_group_members, rule_review_groups; no runtime behavior changes.”
+That keeps runtime metadata consolidation separate from rule-row cleanup and avoids deleting useful read-only diagnostics before proving whether they still have signal.

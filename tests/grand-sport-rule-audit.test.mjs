@@ -118,7 +118,7 @@ test("Grand Sport rule audit reconciles builder, workbook, and draft rule counts
   assert.equal(audit.summary.rawDetailRuleCandidates, buildOutput.raw_detail_rule_candidates);
 });
 
-test("Grand Sport rule audit separates copied, parsed, omitted, and review-needed rows", () => {
+test("Grand Sport rule audit separates copied, parsed, and review-needed rows", () => {
   assert.ok(
     audit.copiedFromStingray.some(
       (row) =>
@@ -140,12 +140,7 @@ test("Grand Sport rule audit separates copied, parsed, omitted, and review-neede
     ),
     "CFL/CFZ should be listed as a workbook rule matching detail_raw"
   );
-  assert.ok(
-    audit.omittedDuplicateExclusiveGroup.some(
-      (row) => row.source_id === "opt_rik_001" && row.rule_type === "excludes" && row.target_id === "opt_rin_001"
-    ),
-    "exclusive-group duplicate excludes should be visible in the audit"
-  );
+
   assert.ok(
     audit.skippedRequiresReview.every((row) => !["R6X", "D30", "PIN", "EDU", "EFR", "36S", "37S", "38S", "379", "3A9", "3F9", "3M9", "3N9"].includes(row.rpo)),
     "reviewed/deferred interior and color-override rows should not remain review-only"
@@ -274,7 +269,7 @@ test("Grand Sport rule audit highlights risky duplicate RPO and special package 
   assert.match(markdown, /## Engine Cover Rule Focus/);
 });
 
-test("Grand Sport rule audit flags inactive workbook rule references without mutating source rows", () => {
+test("Grand Sport rule audit confirms runtime-skipped inactive rule references were deleted", () => {
   const focused = audit.focusedReview;
 
   assert.equal(audit.summary.duplicateSemanticRuleKeys, focused.duplicateSemanticRuleKeys.length);
@@ -284,10 +279,7 @@ test("Grand Sport rule audit flags inactive workbook rule references without mut
   assert.equal(audit.summary.engineCoverInactiveReferences, focused.engineCoverRules.inactiveReferences.length);
 
   assert.equal(focused.missingOptionReferences.length, 0);
-  assert.ok(
-    focused.inactiveOptionReferences.length > 0,
-    "inactive source/target references should be visible for workbook cleanup"
-  );
+  assert.equal(focused.inactiveOptionReferences.length, 0, "inactive source/target references should not remain after Pass C deletion");
   assert.equal(
     focused.engineCoverRules.inactiveReferences.length,
     0,
@@ -334,8 +326,7 @@ test("Grand Sport rule audit classifies scoped duplicate cleanup separately", ()
   assert.equal(audit.summary.overlappingScopedRuleRows, focused.overlappingScopedRuleRows.length);
   assert.equal(audit.summary.redundantScopedRuleRows, focused.redundantScopedRuleRows.length);
   assert.equal(audit.summary.duplicateSemanticRuleKeys, audit.summary.exactDuplicateRuleRows);
-  assert.ok(copiedB6pRow, "copied B6P/D3V scoped row should remain in the workbook for traceability");
-  assert.equal(copiedB6pRow.generation_action, "omit_redundant_scoped_duplicate");
+  assert.equal(copiedB6pRow, undefined, "runtime-skipped copied B6P/D3V scoped row should be deleted, not retained for traceability");
   assert.equal(
     focused.redundantScopedRuleRows.some((row) => row.redundant_rule_id === copiedB6pRuleId),
     false,

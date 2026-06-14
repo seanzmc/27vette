@@ -564,7 +564,8 @@ def _prepare_batch(extract, batch):
         if referencing:
             warnings.append({"id": f"refdel:{sheet}:{'+'.join(o['_kt'])}",
                              "message": f"delete {target_id}: still referenced by {sorted(set(referencing))} "
-                                        f"(repo convention for rules is normalization_status, not deletion)"})
+                                        f"(rule deletes are allowed for runtime-skipped rows after contract comparison; "
+                                        f"active references still require review)"})
     return errors, warnings, prepared
 
 

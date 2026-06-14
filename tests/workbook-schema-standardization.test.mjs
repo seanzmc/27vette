@@ -261,7 +261,7 @@ test("future Corvette model metadata is scaffolded against shared LZ interiors",
 // The future-staging scaffold (scripts + ingest modules) was removed in the
 // pre-merge cleanup, so this stale-count guard is retired with it.
 
-test("rule lifecycle metadata keeps retained source rows auditable", () => {
+test("rule source sheets do not retain runtime-skipped lifecycle rows", () => {
   for (const [sheetName, rows] of [
     ["rule_mapping", snapshot.rule_mapping_rows],
     ["grandSport_rule_mapping", snapshot.grand_sport_rule_mapping_rows],
@@ -269,9 +269,16 @@ test("rule lifecycle metadata keeps retained source rows auditable", () => {
     assert.ok(rows.length > 0, `${sheetName} should have rule rows`);
     for (const row of rows) {
       assert.ok("normalization_status" in row, `${sheetName}.${row.rule_id} missing normalization_status`);
-      if (String(row.generation_action || "").startsWith("omit")) {
-        assert.ok(["omitted", "replaced"].includes(row.normalization_status), `${sheetName}.${row.rule_id} bad status`);
-      }
+      assert.equal(
+        String(row.generation_action || "").startsWith("omit"),
+        false,
+        `${sheetName}.${row.rule_id} should be deleted instead of retained with generation_action=${row.generation_action}`,
+      );
+      assert.equal(
+        ["omitted", "replaced"].includes(String(row.normalization_status || "").toLowerCase()),
+        false,
+        `${sheetName}.${row.rule_id} should be deleted instead of retained with normalization_status=${row.normalization_status}`,
+      );
     }
   }
 });
