@@ -83,18 +83,29 @@ test("source sheets use concise removable-roof labels with consistent order", ()
   }
 });
 
-test("Grand Sport engine cover order and customer descriptions match reviewed source copy", () => {
-  const expectedEngineRows = {
-    opt_bc7_001: [10, null],
-    opt_bcp_002: [20, "Includes engine lighting"],
-    opt_bcs_002: [30, "Includes engine lighting"],
-    opt_bc4_002: [40, "New for 2027. Includes engine lighting"],
-  };
+test("Stingray and Grand Sport engine appearance orders match reviewed Grand Sport source copy", () => {
+  const expectedEngineRows = [
+    ["B6P", 1, "opt_b6p_001", "opt_b6p_001", "Includes carbon fiber trim, (D3V) engine lighting and (SL9) engine specification plaque, LPO"],
+    ["ZZ3", 5, "opt_zz3_001", "opt_zz3_001", "Includes window under tonneau cover, (BC7) Black LS6 engine cover and (SL9) engine specification plaque, LPO"],
+    ["D3V", 10, "opt_d3v_001", "opt_d3v_001", null],
+    ["SL9", 11, "opt_sl9_001", "opt_sl9_001", "LPO. Genuine Corvette Accessory"],
+    ["BC7", 19, "opt_bc7_001", "opt_bc7_001", null],
+    ["BCP", 20, "opt_bcp_001", "opt_bcp_002", "Includes engine lighting"],
+    ["BCS", 30, "opt_bcs_001", "opt_bcs_002", "Includes engine lighting"],
+    ["BC4", 40, "opt_bc4_001", "opt_bc4_002", "New for 2027. Includes engine lighting"],
+    ["SLK", 50, "opt_slk_001", "opt_slk_001", "LPO. Genuine Corvette Accessory"],
+    ["SLN", 60, "opt_sln_001", "opt_sln_001", "LPO. Features Jake Logo. Genuine Corvette Accessory"],
+    ["VUP", 70, "opt_vup_001", "opt_vup_001", "LPO. Genuine Corvette Accessory"],
+  ];
 
-  for (const [optionId, [expectedOrder, expectedDescription]] of Object.entries(expectedEngineRows)) {
-    const row = rowFor("grandSport_options", optionId);
-    assert.equal(Number(row.display_order), expectedOrder, `grandSport_options ${optionId} display order`);
-    assert.equal(row.description ?? null, expectedDescription, `grandSport_options ${optionId} description`);
+  for (const [rpo, expectedOrder, stingrayOptionId, grandSportOptionId, expectedGrandSportDescription] of expectedEngineRows) {
+    const stingrayRow = rowFor("stingray_options", stingrayOptionId);
+    const grandSportRow = rowFor("grandSport_options", grandSportOptionId);
+    assert.equal(stingrayRow.section_id, "sec_engi_001", `stingray_options ${rpo} section`);
+    assert.equal(grandSportRow.section_id, "sec_engi_001", `grandSport_options ${rpo} section`);
+    assert.equal(Number(stingrayRow.display_order), expectedOrder, `stingray_options ${rpo} display order`);
+    assert.equal(Number(grandSportRow.display_order), expectedOrder, `grandSport_options ${rpo} display order`);
+    assert.equal(grandSportRow.description ?? null, expectedGrandSportDescription, `grandSport_options ${rpo} description`);
   }
 });
 

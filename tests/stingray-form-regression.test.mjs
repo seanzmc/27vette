@@ -2137,7 +2137,7 @@ test("exterior appearance, engine appearance, and wheel sections use QA-4 orderi
     .filter((choice) => choice.section_id === "sec_engi_001" && choice.variant_id === "1lt_c07" && choice.active === "True")
     .sort((a, b) => Number(a.display_order) - Number(b.display_order))
     .map((choice) => choice.rpo);
-  assert.deepEqual(JSON.parse(JSON.stringify(engineOrder)), ["BC7", "BCP", "BCS", "BC4", "B6P", "ZZ3", "D3V", "SL9", "SLK", "SLN", "VUP"]);
+  assert.deepEqual(JSON.parse(JSON.stringify(engineOrder)), ["B6P", "ZZ3", "D3V", "SL9", "BC7", "BCP", "BCS", "BC4", "SLK", "SLN", "VUP"]);
 
   const activeSectionIds = new Set(data.choices.filter((choice) => choice.active === "True").map((choice) => choice.section_id));
   const wheelSections = data.sections
