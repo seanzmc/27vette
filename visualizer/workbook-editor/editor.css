@@ -134,6 +134,16 @@ th {
   text-align: left; font-size: 11px; text-transform: uppercase; color: var(--muted);
   padding: 8px 12px; border-bottom: 1px solid var(--border); white-space: nowrap;
 }
+.sort-head {
+  display: inline-flex; align-items: center; gap: 6px;
+  max-width: 100%; padding: 0; border: 0; background: transparent;
+  color: inherit; font: inherit; text-transform: inherit; cursor: pointer;
+}
+.sort-head:hover, .sort-head.on { color: var(--amber); }
+.sort-mark {
+  border: 1px solid var(--amber-dark); border-radius: 999px; padding: 1px 5px;
+  color: #fcd34d; font-size: 9px; line-height: 1.2;
+}
 td {
   padding: 7px 12px; border-bottom: 1px solid var(--border);
   max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;

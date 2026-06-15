@@ -6,6 +6,7 @@ const html = htm.bind(h);
 const PAGE_SIZE = 100;
 const DEFAULT_VISIBLE_COLUMN_COUNT = 8;
 const VISIBLE_COLUMNS_STORAGE_KEY = "corvetteWorkbookEditor.visibleColumns.v1";
+const COLLATOR = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
 
 function defaultVisibleColumns(headers) {
   return headers.slice(0, Math.min(DEFAULT_VISIBLE_COLUMN_COUNT, headers.length));
@@ -59,6 +60,24 @@ function fmt(v) {
 }
 
 const isBlank = (v) => v === null || v === undefined || v === "";
+
+function rowIdentity(row, workbookIndex, keyCols) {
+  if (keyCols.length && keyCols.every((col) => !isBlank(row[col]))) {
+    return `key:${keyCols.map((col) => `${col}=${String(row[col])}`).join("|")}`;
+  }
+  return `row:${workbookIndex ?? ""}`;
+}
+
+function compareCellValues(a, b) {
+  const aBlank = isBlank(a);
+  const bBlank = isBlank(b);
+  if (aBlank && bBlank) return 0;
+  if (aBlank) return 1;
+  if (bBlank) return -1;
+  if (typeof a === "number" && typeof b === "number") return a - b;
+  if (typeof a === "boolean" && typeof b === "boolean") return Number(a) - Number(b);
+  return COLLATOR.compare(String(a), String(b));
+}
 
 /* ── domain helpers ───────────────────────────────────────── */
 
@@ -282,12 +301,14 @@ function SheetTable({ data, name, onQueue, initialQuery, focusTs, onFocusConsume
   const [error, setError] = useState(null);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
-  const [open, setOpen] = useState(null);
-  const [editing, setEditing] = useState(null); // {mode, initial, index}
+  const [openRowId, setOpenRowId] = useState(null);
+  const [editing, setEditing] = useState(null); // {mode, initial, rowId}
   const [visibleCols, setVisibleCols] = useState([]);
+  const [sort, setSort] = useState({ col: null, dir: null });
 
   useEffect(() => {
-    setSheet(null); setError(null); setQuery(""); setPage(0); setOpen(null); setEditing(null); setVisibleCols([]);
+    setSheet(null); setError(null); setQuery(""); setPage(0); setOpenRowId(null); setEditing(null);
+    setVisibleCols([]); setSort({ col: null, dir: null });
     fetchJson(`/api/sheet/${encodeURIComponent(name)}`)
       .then((payload) => {
         setSheet(payload);
@@ -300,7 +321,7 @@ function SheetTable({ data, name, onQueue, initialQuery, focusTs, onFocusConsume
     if (!focusTs || !initialQuery) return;
     setQuery(initialQuery);
     setPage(0);
-    setOpen(null);
+    setOpenRowId(null);
     if (onFocusConsumed) onFocusConsumed();
   }, [focusTs]);
 
@@ -310,8 +331,15 @@ function SheetTable({ data, name, onQueue, initialQuery, focusTs, onFocusConsume
   }, [name, sheet, visibleCols]);
 
   const meta = data.sheets.find((s) => s.name === name) || {};
+  const keyCols = meta.keyCols || [];
   const editable = meta.readOnly === false;
   const isOptionsFamily = meta.family === "options";
+  const rowOrder = useMemo(() => {
+    const order = new Map();
+    if (sheet) sheet.rows.forEach((row, index) => order.set(row, index));
+    return order;
+  }, [sheet]);
+  const rowIdFor = (row) => rowIdentity(row, rowOrder.get(row), keyCols);
   const filtered = useMemo(() => {
     if (!sheet) return [];
     const q = query.trim().toLowerCase();
@@ -320,10 +348,21 @@ function SheetTable({ data, name, onQueue, initialQuery, focusTs, onFocusConsume
       Object.values(r).some((v) => String(v ?? "").toLowerCase().includes(q)),
     );
   }, [sheet, query]);
+  const sortedRows = useMemo(() => {
+    if (!sort.col || !sort.dir) return filtered;
+    return filtered
+      .map((row) => ({ row, originalIndex: rowOrder.get(row) ?? 0 }))
+      .sort((a, b) => {
+        const cmp = compareCellValues(a.row[sort.col], b.row[sort.col]);
+        if (cmp !== 0) return sort.dir === "asc" ? cmp : -cmp;
+        return a.originalIndex - b.originalIndex;
+      })
+      .map((item) => item.row);
+  }, [filtered, rowOrder, sort.col, sort.dir]);
 
-  const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pages = Math.max(1, Math.ceil(sortedRows.length / PAGE_SIZE));
   const safePage = Math.min(page, pages - 1);
-  const rows = filtered.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
+  const rows = sortedRows.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
   const cols = sheet ? visibleCols.filter((c) => sheet.headers.includes(c)) : [];
   const extra = sheet ? sheet.headers.length - cols.length : 0;
   const setColumns = (cols) => {
@@ -342,9 +381,18 @@ function SheetTable({ data, name, onQueue, initialQuery, focusTs, onFocusConsume
     }
     setColumns(sheet.headers.filter((hcol) => selected.has(hcol)));
   };
+  const cycleSort = (col) => {
+    setSort((current) => {
+      if (current.col !== col) return { col, dir: "asc" };
+      if (current.dir === "asc") return { col, dir: "desc" };
+      return { col: null, dir: null };
+    });
+    setPage(0);
+    setOpenRowId(null);
+    setEditing(null);
+  };
 
   const queueDelete = (row) => {
-    const keyCols = meta.keyCols || [];
     const label = keyCols.map((k) => row[k]).join(" / ");
     if (!window.confirm(`Queue delete of ${label} from ${name}?`)) return;
     onQueue({ action: "delete", sheet: name,
@@ -378,7 +426,7 @@ function SheetTable({ data, name, onQueue, initialQuery, focusTs, onFocusConsume
         </div>
       </details>`}
       <input type="search" placeholder="Filter rows…" value=${query}
-        onInput=${(e) => { setQuery(e.target.value); setPage(0); setOpen(null); }} />
+        onInput=${(e) => { setQuery(e.target.value); setPage(0); setOpenRowId(null); }} />
     </div>
     ${error && html`<div class="error">${error}</div>`}
     ${!sheet && !error && html`<div class="loading">Loading ${name}…</div>`}
@@ -386,27 +434,35 @@ function SheetTable({ data, name, onQueue, initialQuery, focusTs, onFocusConsume
         initial=${editing.initial} onQueue=${onQueue} onCancel=${() => setEditing(null)} />`}
     ${sheet && html`<div class="tablewrap"><table>
       <thead><tr>
-        ${cols.map((c) => html`<th key=${c}>${c}</th>`)}
+        ${cols.map((c) => html`<th key=${c}>
+          <button class=${"sort-head" + (sort.col === c ? " on" : "")}
+            title=${sort.col === c ? `Sorted ${sort.dir}; click to change` : "Sort by this column"}
+            onClick=${() => cycleSort(c)}>
+            <span>${c}</span>
+            ${sort.col === c && html`<span class="sort-mark">${sort.dir}</span>`}
+          </button>
+        </th>`)}
         ${editable && html`<th class="actions-col">actions</th>`}
       </tr></thead>
       <tbody>
         ${rows.length === 0 && html`<tr><td colSpan=${cols.length + 1} class="dim">No rows match.</td></tr>`}
-        ${rows.map((r, i) => {
-          const idx = safePage * PAGE_SIZE + i;
+        ${rows.map((r) => {
+          const rowId = rowIdFor(r);
           return html`
-            <tr class=${"row" + (editing?.mode === "edit" && editing.index === idx ? " editing" : "")} key=${idx} onClick=${() => setOpen(open === idx ? null : idx)}>
+            <tr class=${"row" + (editing?.mode === "edit" && editing.rowId === rowId ? " editing" : "")}
+              key=${rowId} onClick=${() => setOpenRowId(openRowId === rowId ? null : rowId)}>
               ${cols.map((c) => html`<td key=${c} title=${String(r[c] ?? "")}>${fmt(r[c])}</td>`)}
               ${editable && html`<td class="actions-col" onClick=${(e) => e.stopPropagation()}>
                 <button class="btn tiny" title="Edit"
-                  onClick=${() => setEditing({ mode: "edit", initial: r, index: idx })}>✎</button>
+                  onClick=${() => setEditing({ mode: "edit", initial: r, rowId })}>✎</button>
                 <button class="btn tiny danger" title="Delete" onClick=${() => queueDelete(r)}>🗑</button>
               </td>`}
             </tr>
-            ${editing?.mode === "edit" && editing.index === idx && html`<tr class="inline-edit"><td colSpan=${cols.length + 1}>
+            ${editing?.mode === "edit" && editing.rowId === rowId && html`<tr class="inline-edit"><td colSpan=${cols.length + 1}>
               <${RowForm} data=${data} sheetName=${name} mode=${editing.mode}
                 initial=${editing.initial} onQueue=${onQueue} onCancel=${() => setEditing(null)} />
             </td></tr>`}
-            ${open === idx && html`<tr class="detail"><td colSpan=${cols.length + 1}>
+            ${openRowId === rowId && html`<tr class="detail"><td colSpan=${cols.length + 1}>
               <dl>${sheet.headers.map((hcol) => html`
                 <dt key=${"t" + hcol}>${hcol}</dt><dd key=${"d" + hcol}>${fmt(r[hcol])}</dd>`)}
               </dl>
@@ -415,9 +471,9 @@ function SheetTable({ data, name, onQueue, initialQuery, focusTs, onFocusConsume
       </tbody>
     </table></div>
     <div class="pager">
-      <button disabled=${safePage === 0} onClick=${() => { setPage(safePage - 1); setOpen(null); }}>‹ Prev</button>
+      <button disabled=${safePage === 0} onClick=${() => { setPage(safePage - 1); setOpenRowId(null); }}>‹ Prev</button>
       <span>page ${safePage + 1} / ${pages}</span>
-      <button disabled=${safePage >= pages - 1} onClick=${() => { setPage(safePage + 1); setOpen(null); }}>Next ›</button>
+      <button disabled=${safePage >= pages - 1} onClick=${() => { setPage(safePage + 1); setOpenRowId(null); }}>Next ›</button>
     </div>`}
   </div>`;
 }
