@@ -111,6 +111,15 @@ Current workbook-owned runtime metadata and audit sheets include:
 - `model_variants`
 - `model_interior_scope`
 - `interior_components`
+- `runtime_steps`
+- `context_section_master`
+- `context_choice_copy`
+- `section_presentation`
+- `order_summary_sections`
+- `step_order_summary_map`
+- `default_selection_rules`
+- `runtime_rule_exceptions`
+- `variant_option_overrides`
 - `rule_phrase_map`
 
 Current Grand Sport model-scoped sheets include:
@@ -136,6 +145,8 @@ Current Z06 model-scoped sheets include:
 - `z06_exclusive_groups`
 - `z06_exclusive_members`
 - `z06_variant_overrides`
+
+ZR1 and ZR1X also have model-scoped source sheets following the same nine-sheet shape with `zr1_` and `zr1x_` prefixes. They are unpromoted future-model source data only; do not promote them or include them in another model's pass unless that scope is explicitly approved.
 
 Current generated sheets are written by the generator and should not be edited manually:
 
@@ -260,7 +271,8 @@ Current expected outputs:
 - generated `form_*` sheets in `stingray_master.xlsx`
 - `form-output/stingray-form-data.json`
 - `form-output/stingray-form-data.csv`
-- `form-app/data.js`
+
+This script does not publish the browser app registry. Run `scripts/generate_registry.py` after model generation when promoted runtime data should be refreshed in `form-app/data.js`.
 
 Then run:
 
@@ -288,8 +300,9 @@ Current expected outputs under `form-output/inspection/`:
 - `grand-sport-contract-preview.md`
 - `grand-sport-form-data-draft.json`
 - `grand-sport-form-data-draft.md`
+- `grand-sport-runtime-contract.json` (clean contract embedded verbatim by registry promotion)
 
-This script is currently intentionally non-mutating for `form-app/data.js`. When a change is intended to update live app data, inspect the current production app-data generation path and verify the registry in `form-app/data.js`.
+This script is currently intentionally non-mutating for `form-app/data.js`. Run `scripts/generate_registry.py` after model generation when promoted runtime data should be refreshed in `form-app/data.js`, then verify the registry.
 
 Then run:
 
@@ -322,7 +335,7 @@ Current expected outputs under `form-output/inspection/`:
 - `z06-form-data-draft.md`
 - `z06-runtime-contract.json` (clean contract embedded verbatim by registry promotion)
 
-This script must not mutate `form-app/data.js` or write `stingray_master.xlsx`.
+This script must not mutate `form-app/data.js` or write `stingray_master.xlsx`. Run `scripts/generate_registry.py` after model generation when promoted runtime data should be refreshed in `form-app/data.js`.
 
 Then run:
 
