@@ -482,6 +482,76 @@ class SchemaValidationMetadataTests(unittest.TestCase):
 
         self.assertTrue(any(issue.check_id == "app_registry_stale" for issue in issues), issues)
 
+    def test_live_app_registry_freshness_ignores_generated_timestamps(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True}],
+            extra_sheets={
+                "model_registry_promotion": (
+                    [
+                        "model_key",
+                        "registry_key",
+                        "promoted_to_runtime",
+                        "default_model",
+                        "artifact_path",
+                        "artifact_type",
+                        "legacy_alias",
+                        "active",
+                        "display_order",
+                        "notes",
+                    ],
+                    [
+                        {
+                            "model_key": "stingray",
+                            "registry_key": "stingray",
+                            "promoted_to_runtime": True,
+                            "default_model": True,
+                            "artifact_type": "current_generation",
+                            "legacy_alias": "STINGRAY_FORM_DATA",
+                            "active": True,
+                            "display_order": 1,
+                        }
+                    ],
+                )
+            },
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            workbook_path = root / "stingray_master.xlsx"
+            app_dir = root / "form-app"
+            output_dir = root / "form-output"
+            app_dir.mkdir()
+            output_dir.mkdir()
+            fresh_data = {
+                "dataset": {"source_sheet": "stingray_options", "generated_at": "2026-06-15T20:31:02+00:00"},
+                "choices": [{"choice_id": "same"}],
+            }
+            timestamp_only_registry = {
+                "defaultModelKey": "stingray",
+                "models": {
+                    "stingray": {
+                        "key": "stingray",
+                        "label": "Stingray",
+                        "modelName": "Corvette Stingray",
+                        "exportSlug": "stingray",
+                        "data": {
+                            "dataset": {"source_sheet": "stingray_options", "generated_at": "2026-06-15T19:00:28+00:00"},
+                            "choices": [{"choice_id": "same"}],
+                        },
+                    }
+                },
+            }
+            wb.save(workbook_path)
+            (output_dir / "stingray-form-data.json").write_text(json.dumps(fresh_data), encoding="utf-8")
+            (app_dir / "data.js").write_text(
+                f"window.CORVETTE_FORM_DATA = {json.dumps(timestamp_only_registry)};\n"
+                "window.STINGRAY_FORM_DATA = window.CORVETTE_FORM_DATA.models.stingray.data;\n",
+                encoding="utf-8",
+            )
+
+            issues = validate_workbook_schema(workbook_path, check_live_contract=True)
+
+        self.assertFalse(any(issue.check_id == "app_registry_stale" for issue in issues), issues)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -192,6 +192,7 @@ RUNTIME_CHOICE_ROW_TRIM_FIELDS: set[str] = {
 }
 RUNTIME_STANDARD_EQUIPMENT_ROW_TRIM_FIELDS: set[str] = {"source_detail_raw"}
 FORBIDDEN_LIVE_LINEAGE_VALUE_TOKENS: tuple[str, ...] = ("grand_sport:",)
+GENERATED_TIMESTAMP_KEYS: frozenset[str] = frozenset(("generated_at", "sourceGeneratedAt", "generatedAt"))
 
 MODEL_REGISTRY_PROMOTION_HEADERS: tuple[str, ...] = (
     "model_key",
@@ -306,6 +307,18 @@ def live_contract_provenance_leaks(value: Any, path: str = "$") -> Iterable[tupl
                 break
 
 
+def without_generated_timestamps(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {
+            key: without_generated_timestamps(child)
+            for key, child in value.items()
+            if key not in GENERATED_TIMESTAMP_KEYS
+        }
+    if isinstance(value, list):
+        return [without_generated_timestamps(item) for item in value]
+    return value
+
+
 def validate_app_registry_freshness(wb, workbook: Path, issues: list[SchemaIssue]) -> None:
     app_data_path = workbook.parent / "form-app" / "data.js"
     if not app_data_path.exists():
@@ -327,10 +340,12 @@ def validate_app_registry_freshness(wb, workbook: Path, issues: list[SchemaIssue
             message=f"Could not validate app registry freshness: {exc}",
         )
         return
-    if actual_registry != expected_registry:
+    actual_registry_for_compare = without_generated_timestamps(actual_registry)
+    expected_registry_for_compare = without_generated_timestamps(expected_registry)
+    if actual_registry_for_compare != expected_registry_for_compare:
         stale_models: list[str] = []
-        actual_models = actual_registry.get("models", {}) if isinstance(actual_registry, dict) else {}
-        expected_models = expected_registry.get("models", {}) if isinstance(expected_registry, dict) else {}
+        actual_models = actual_registry_for_compare.get("models", {}) if isinstance(actual_registry_for_compare, dict) else {}
+        expected_models = expected_registry_for_compare.get("models", {}) if isinstance(expected_registry_for_compare, dict) else {}
         for model_key in sorted(set(actual_models) | set(expected_models)):
             if actual_models.get(model_key) != expected_models.get(model_key):
                 stale_models.append(model_key)
