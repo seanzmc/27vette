@@ -20,6 +20,7 @@ from corvette_form_generator.registry_promotion import (  # noqa: E402
     MODEL_REGISTRY_PROMOTION_HEADERS,
     build_registry_from_artifacts,
     build_registry_from_promotions,
+    live_contract_data,
     load_registry_promotions,
 )
 
@@ -141,7 +142,6 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
                         "choices": [
                             {
                                 "choice_id": "gs-choice",
-                                "source_detail_raw": "runtime tooltip source detail",
                             }
                         ],
                         "rules": [
@@ -189,8 +189,42 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
         self.assertEqual(registry["models"]["grandSport"]["exportSlug"], "grand-sport")
         self.assertEqual(registry["models"]["grandSport"]["data"]["dataset"]["source_sheet"], "grandSport_options")
         choice = registry["models"]["grandSport"]["data"]["choices"][0]
-        self.assertEqual(choice["source_detail_raw"], "runtime tooltip source detail")
+        self.assertEqual(choice["choice_id"], "gs-choice")
         self.assertEqual(registry["legacyAliases"], {"STINGRAY_FORM_DATA": "stingray"})
+
+    def test_live_contract_data_trims_choice_rows_without_stripping_section_or_group_modes(self) -> None:
+        cleaned = live_contract_data(
+            {
+                "dataset": {"status": "draft_not_runtime_active", "name": "Grand Sport form data draft"},
+                "sections": [
+                    {
+                        "section_id": "sec_wheels",
+                        "choice_mode": "single",
+                        "selection_mode": "single_select_req",
+                        "selection_mode_label": "Required single selection",
+                    }
+                ],
+                "choices": [
+                    {
+                        "choice_id": "choice-1",
+                        "source_detail_raw": "raw note",
+                        "choice_mode": "single",
+                        "selection_mode": "single_select_req",
+                        "selection_mode_label": "Required single selection",
+                    }
+                ],
+                "standardEquipment": [{"equipment_id": "std-1", "source_detail_raw": "raw note"}],
+                "exclusiveGroups": [{"group_id": "excl-1", "selection_mode": "required_single_within_group"}],
+            }
+        )
+
+        self.assertEqual(cleaned["dataset"]["status"], "runtime_active")
+        self.assertEqual(cleaned["sections"][0]["choice_mode"], "single")
+        self.assertEqual(cleaned["sections"][0]["selection_mode"], "single_select_req")
+        self.assertEqual(cleaned["sections"][0]["selection_mode_label"], "Required single selection")
+        self.assertEqual(cleaned["exclusiveGroups"][0]["selection_mode"], "required_single_within_group")
+        self.assertEqual(cleaned["choices"], [{"choice_id": "choice-1"}])
+        self.assertEqual(cleaned["standardEquipment"], [{"equipment_id": "std-1"}])
 
     def test_file_backed_registry_loads_current_generation_and_runtime_contract_artifacts(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

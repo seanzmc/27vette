@@ -334,10 +334,27 @@ test("selection modes have friendly display labels", () => {
     assert.ok(section.selection_mode_label, `${section.section_id} is missing a display label`);
     assert.equal(section.selection_mode_label.includes("_"), false, section.selection_mode_label);
   }
+});
+
+test("runtime payload trims choice-row duplicates while preserving consumed metadata", () => {
+  const strippedChoiceFields = ["source_detail_raw", "choice_mode", "selection_mode", "selection_mode_label"];
   for (const choice of data.choices) {
-    if (!choice.selection_mode) continue;
-    assert.ok(choice.selection_mode_label, `${choice.choice_id} is missing a display label`);
+    for (const field of strippedChoiceFields) {
+      assert.equal(Object.hasOwn(choice, field), false, `${choice.choice_id} leaked ${field}`);
+    }
   }
+  for (const row of data.standardEquipment) {
+    assert.equal(Object.hasOwn(row, "source_detail_raw"), false, `${row.equipment_id} leaked source_detail_raw`);
+  }
+
+  assert.ok(data.choices.some((choice) => Object.hasOwn(choice, "status_label")), "runtime keeps choice status_label");
+  assert.ok(Array.isArray(data.validation), "runtime keeps validation rows");
+  assert.ok(data.interiors.some((interior) => Object.hasOwn(interior, "source_note")), "runtime keeps interior source_note");
+  assert.ok(data.ruleGroups.some((group) => Object.hasOwn(group, "notes")), "runtime keeps group notes");
+  assert.ok(data.sections.some((section) => section.choice_mode), "runtime keeps section choice_mode");
+  assert.ok(data.sections.some((section) => section.selection_mode), "runtime keeps section selection_mode");
+  assert.ok(data.sections.some((section) => section.selection_mode_label), "runtime keeps section selection_mode_label");
+  assert.ok(data.exclusiveGroups.some((group) => group.selection_mode), "runtime keeps exclusive group selection_mode");
 });
 
 test("engine cover variants are consolidated with scoped B6P and ZZ3 price overrides", () => {

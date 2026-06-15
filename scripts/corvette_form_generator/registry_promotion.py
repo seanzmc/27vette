@@ -36,6 +36,10 @@ DRAFT_ONLY_PROVENANCE_FIELDS = (
 DRAFT_ONLY_LIVE_CONTRACT_FIELDS = frozenset(
     (*DRAFT_ONLY_TOP_LEVEL_FIELDS, *DRAFT_ONLY_CHOICE_FIELDS, *DRAFT_ONLY_PROVENANCE_FIELDS)
 )
+RUNTIME_CHOICE_ROW_TRIM_FIELDS = frozenset(
+    ("source_detail_raw", "choice_mode", "selection_mode", "selection_mode_label")
+)
+RUNTIME_STANDARD_EQUIPMENT_ROW_TRIM_FIELDS = frozenset(("source_detail_raw",))
 VALID_ARTIFACT_TYPES = {"current_generation", "draft_artifact"}
 
 
@@ -61,26 +65,37 @@ def export_slug(model_key: str) -> str:
     return model_key.replace("_", "-")
 
 
-def _strip_live_contract_provenance(value: Any) -> Any:
+def _runtime_payload_trim_fields(path: tuple[str, ...]) -> frozenset[str]:
+    if path == ("choices", "[]"):
+        return RUNTIME_CHOICE_ROW_TRIM_FIELDS
+    if path == ("standardEquipment", "[]"):
+        return RUNTIME_STANDARD_EQUIPMENT_ROW_TRIM_FIELDS
+    return frozenset()
+
+
+def _strip_live_contract_provenance(value: Any, path: tuple[str, ...] = ()) -> Any:
     if isinstance(value, dict):
+        runtime_payload_fields = _runtime_payload_trim_fields(path)
         return {
-            key: _strip_live_contract_provenance(child)
+            key: _strip_live_contract_provenance(child, (*path, key))
             for key, child in value.items()
-            if key not in DRAFT_ONLY_LIVE_CONTRACT_FIELDS
+            if key not in DRAFT_ONLY_LIVE_CONTRACT_FIELDS and key not in runtime_payload_fields
         }
     if isinstance(value, list):
-        return [_strip_live_contract_provenance(item) for item in value]
+        return [_strip_live_contract_provenance(item, (*path, "[]")) for item in value]
     return value
 
 
 def find_draft_only_fields(value: Any, path: str = "$") -> list[str]:
-    """Return JSON paths of draft-only fields present in a runtime contract."""
+    """Return JSON paths of fields that must not ship in a runtime contract."""
 
     leaks: list[str] = []
+    path_parts = _json_path_parts(path)
     if isinstance(value, dict):
+        runtime_payload_fields = _runtime_payload_trim_fields(path_parts)
         for key, child in value.items():
             child_path = f"{path}.{key}"
-            if key in DRAFT_ONLY_LIVE_CONTRACT_FIELDS:
+            if key in DRAFT_ONLY_LIVE_CONTRACT_FIELDS or key in runtime_payload_fields:
                 leaks.append(child_path)
             else:
                 leaks.extend(find_draft_only_fields(child, child_path))
@@ -88,6 +103,21 @@ def find_draft_only_fields(value: Any, path: str = "$") -> list[str]:
         for index, child in enumerate(value):
             leaks.extend(find_draft_only_fields(child, f"{path}[{index}]"))
     return leaks
+
+
+def _json_path_parts(path: str) -> tuple[str, ...]:
+    if path == "$":
+        return ()
+    parts: list[str] = []
+    for part in path.removeprefix("$.").split("."):
+        if "[" in part and part.endswith("]"):
+            name = part.split("[", 1)[0]
+            if name:
+                parts.append(name)
+            parts.append("[]")
+        else:
+            parts.append(part)
+    return tuple(parts)
 
 
 def assert_runtime_contract(data: dict[str, Any], *, source: str) -> None:

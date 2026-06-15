@@ -184,6 +184,13 @@ DRAFT_ONLY_PROVENANCE_FIELDS: set[str] = {
     "review_flags",
 }
 DRAFT_ONLY_LIVE_CONTRACT_FIELDS: set[str] = DRAFT_ONLY_CHOICE_FIELDS | DRAFT_ONLY_PROVENANCE_FIELDS
+RUNTIME_CHOICE_ROW_TRIM_FIELDS: set[str] = {
+    "source_detail_raw",
+    "choice_mode",
+    "selection_mode",
+    "selection_mode_label",
+}
+RUNTIME_STANDARD_EQUIPMENT_ROW_TRIM_FIELDS: set[str] = {"source_detail_raw"}
 FORBIDDEN_LIVE_LINEAGE_VALUE_TOKENS: tuple[str, ...] = ("grand_sport:",)
 
 MODEL_REGISTRY_PROMOTION_HEADERS: tuple[str, ...] = (
@@ -256,11 +263,35 @@ def add_issue(
     )
 
 
+def runtime_payload_trim_fields(path: tuple[str, ...]) -> set[str]:
+    if path == ("choices", "[]"):
+        return RUNTIME_CHOICE_ROW_TRIM_FIELDS
+    if path == ("standardEquipment", "[]"):
+        return RUNTIME_STANDARD_EQUIPMENT_ROW_TRIM_FIELDS
+    return set()
+
+
+def json_path_parts(path: str) -> tuple[str, ...]:
+    if path == "$":
+        return ()
+    parts: list[str] = []
+    for part in path.removeprefix("$.").split("."):
+        if "[" in part and part.endswith("]"):
+            name = part.split("[", 1)[0]
+            if name:
+                parts.append(name)
+            parts.append("[]")
+        else:
+            parts.append(part)
+    return tuple(parts)
+
+
 def live_contract_provenance_leaks(value: Any, path: str = "$") -> Iterable[tuple[str, str, Any]]:
     if isinstance(value, dict):
+        runtime_payload_fields = runtime_payload_trim_fields(json_path_parts(path))
         for key, child in value.items():
             child_path = f"{path}.{key}"
-            if key in DRAFT_ONLY_LIVE_CONTRACT_FIELDS:
+            if key in DRAFT_ONLY_LIVE_CONTRACT_FIELDS or key in runtime_payload_fields:
                 yield (child_path, "field", child)
                 continue
             yield from live_contract_provenance_leaks(child, child_path)
@@ -870,7 +901,7 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                                     "leak_type": leak_type,
                                     "value": leaked_value,
                                 },
-                                message="Draft/review provenance must not leak into live app data.",
+                                message="Draft/review provenance and runtime-trim payload fields must not leak into live app data.",
                             )
                 except (ValueError, json.JSONDecodeError) as exc:
                     add_issue(

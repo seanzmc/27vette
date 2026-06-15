@@ -100,9 +100,22 @@ class SchemaValidationMetadataTests(unittest.TestCase):
                 {
                     "choice_id": "choice-1",
                     "source_detail_raw": "customer-facing source detail",
+                    "choice_mode": "single",
+                    "selection_mode": "single_select_req",
+                    "selection_mode_label": "Required single selection",
                     "suggested_copy_from": "grand_sport:opt_abc_001",
                 }
             ],
+            "standardEquipment": [{"equipment_id": "std-1", "source_detail_raw": "standard source detail"}],
+            "sections": [
+                {
+                    "section_id": "sec_wheels",
+                    "choice_mode": "single",
+                    "selection_mode": "single_select_req",
+                    "selection_mode_label": "Required single selection",
+                }
+            ],
+            "exclusiveGroups": [{"group_id": "excl-1", "selection_mode": "required_single_within_group"}],
             "rules": [
                 {
                     "source_id": "opt_abc_001",
@@ -114,9 +127,22 @@ class SchemaValidationMetadataTests(unittest.TestCase):
 
         leaks = list(live_contract_provenance_leaks(data))
 
-        self.assertEqual({path for path, _, _ in leaks}, {"$.choices[0].suggested_copy_from", "$.rules[0].copy_from_model_key"})
+        self.assertEqual(
+            {path for path, _, _ in leaks},
+            {
+                "$.choices[0].source_detail_raw",
+                "$.choices[0].choice_mode",
+                "$.choices[0].selection_mode",
+                "$.choices[0].selection_mode_label",
+                "$.choices[0].suggested_copy_from",
+                "$.standardEquipment[0].source_detail_raw",
+                "$.rules[0].copy_from_model_key",
+            },
+        )
         self.assertFalse(any(path == "$.dataset.source_sheet" for path, _, _ in leaks))
         self.assertFalse(any(path == "$.label" for path, _, _ in leaks))
+        self.assertFalse(any(path.startswith("$.sections[0].") for path, _, _ in leaks))
+        self.assertFalse(any(path == "$.exclusiveGroups[0].selection_mode" for path, _, _ in leaks))
 
     def test_metadata_discovered_ovs_sheet_validates_option_ids(self) -> None:
         wb = minimal_schema_workbook(

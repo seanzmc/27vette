@@ -32,6 +32,7 @@ from corvette_form_generator.mapping import (
 )
 from corvette_form_generator.model_configs import STINGRAY_MODEL
 from corvette_form_generator.output import write_json_output
+from corvette_form_generator.registry_promotion import live_contract_data
 from corvette_form_generator.rules import (
     exclusive_group_pairs,
     grouped_exclusion_pairs,
@@ -823,7 +824,8 @@ def main() -> None:
     OUTPUT_DIR.mkdir(exist_ok=True)
     APP_DIR.mkdir(exist_ok=True)
     json_path = OUTPUT_DIR / "stingray-form-data.json"
-    write_json_output(json_path, data)
+    runtime_data = live_contract_data(data)
+    write_json_output(json_path, runtime_data)
     csv_path = OUTPUT_DIR / "stingray-form-data.csv"
     with csv_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(

@@ -172,6 +172,18 @@ test("promoted Z06 runtime data strips draft-only provenance and protects source
   assert.equal(Object.hasOwn(z06Data, "draftMetadata"), false);
   assert.equal(z06Data.choices.some((choice) => Object.hasOwn(choice, "source_option_name")), false);
   assert.equal(z06Data.choices.some((choice) => Object.hasOwn(choice, "review_flags")), false);
+  for (const field of ["source_detail_raw", "choice_mode", "selection_mode", "selection_mode_label"]) {
+    assert.equal(z06Data.choices.some((choice) => Object.hasOwn(choice, field)), false, `Z06 choices leaked ${field}`);
+  }
+  assert.equal(
+    z06Data.standardEquipment.some((row) => Object.hasOwn(row, "source_detail_raw")),
+    false,
+    "Z06 standard equipment leaked source_detail_raw"
+  );
+  assert.ok(z06Data.sections.some((section) => section.selection_mode), "Z06 keeps section selection_mode");
+  assert.ok(z06Data.sections.some((section) => section.choice_mode), "Z06 keeps section choice_mode");
+  assert.ok(z06Data.sections.some((section) => section.selection_mode_label), "Z06 keeps section selection_mode_label");
+  assert.ok(z06Data.exclusiveGroups.some((group) => group.selection_mode), "Z06 keeps exclusive group selection_mode");
 
   const pricedStandardChoices = z06Data.choices.filter(
     (choice) => standardSections.has(choice.section_id) && Number(choice.base_price || 0) > 0

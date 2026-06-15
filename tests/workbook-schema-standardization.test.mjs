@@ -579,6 +579,17 @@ test("category_master is retired from the active source graph and draft provenan
       assert.equal("source_option_name" in choice, false, `${modelKey} ${choice.choice_id} leaked source_option_name`);
       assert.equal("source_description" in choice, false, `${modelKey} ${choice.choice_id} leaked source_description`);
       assert.equal("text_cleanup_notes" in choice, false, `${modelKey} ${choice.choice_id} leaked text_cleanup_notes`);
+      assert.equal("source_detail_raw" in choice, false, `${modelKey} ${choice.choice_id} leaked source_detail_raw`);
+      assert.equal("choice_mode" in choice, false, `${modelKey} ${choice.choice_id} leaked choice_mode`);
+      assert.equal("selection_mode" in choice, false, `${modelKey} ${choice.choice_id} leaked selection_mode`);
+      assert.equal("selection_mode_label" in choice, false, `${modelKey} ${choice.choice_id} leaked selection_mode_label`);
     }
+    for (const row of entry.data.standardEquipment) {
+      assert.equal("source_detail_raw" in row, false, `${modelKey} ${row.equipment_id} leaked source_detail_raw`);
+    }
+    assert.ok(entry.data.sections.some((section) => section.selection_mode), `${modelKey} keeps section selection_mode`);
+    assert.ok(entry.data.sections.some((section) => section.choice_mode), `${modelKey} keeps section choice_mode`);
+    assert.ok(entry.data.sections.some((section) => section.selection_mode_label), `${modelKey} keeps section selection_mode_label`);
+    assert.ok(entry.data.exclusiveGroups.some((group) => group.selection_mode), `${modelKey} keeps group selection_mode`);
   }
 });
