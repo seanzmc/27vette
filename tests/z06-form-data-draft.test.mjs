@@ -105,6 +105,18 @@ test("Z06 standard equipment marks trim-equipment sections with LZ labels", () =
   assert.equal(trimRows.some((row) => /^\dLT Equipment$/.test(row.section_name)), false);
 });
 
+test("Z06 trim context choices use workbook-owned LZ tooltip copy", () => {
+  const tooltipsByTrim = new Map(
+    draft.contextChoices
+      .filter((choice) => choice.context_type === "trim_level")
+      .map((choice) => [choice.value, choice.info_tooltip])
+  );
+  assert.match(tooltipsByTrim.get("1LZ") || "", /Head-Up Display comes standard/);
+  assert.match(tooltipsByTrim.get("2LZ") || "", /comfort and convenience features/);
+  assert.match(tooltipsByTrim.get("3LZ") || "", /carbon fiber steering wheel/);
+  assert.equal([...tooltipsByTrim.values()].every(Boolean), true);
+});
+
 test("Z06 rear hash graphics draft outside the stripe radio section", () => {
   const sectionsByRpo = new Map();
   for (const choice of draft.choices) {
@@ -172,6 +184,13 @@ test("Z06 draft emits approved package/wheel, Z07, and engine-lighting price rul
     assert.equal(rule.price_rule_type, "override");
     assert.equal(rule.price_value, priceValue);
   }
+});
+
+test("Z06 indoor car cover exclusive group includes WKS", () => {
+  const group = draft.exclusiveGroups.find((item) => item.group_id === "z06_excl_indoor_car_covers");
+  assert.ok(group, "Z06 indoor car cover exclusive group should be emitted");
+  assert.equal(group.selection_mode, "single_within_group");
+  assert.deepEqual(group.option_ids, ["opt_rwh_001", "opt_wkr_001", "opt_wks_001"]);
 });
 
 test("Z06 draft emits forced Z07 aero and package wheel defaults", () => {
