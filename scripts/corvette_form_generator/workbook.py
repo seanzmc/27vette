@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import shutil
 import tempfile
-from typing import Any
+from typing import Any, Iterable
 from pathlib import Path
 from datetime import datetime
 
@@ -12,6 +12,7 @@ from openpyxl import load_workbook
 from openpyxl.styles import Font, PatternFill
 from openpyxl.utils import get_column_letter
 
+from corvette_form_generator.workbook_bool_hygiene import compare_bool_like_workbooks, format_issues
 from corvette_form_generator.workbook_package import assert_valid_workbook_package
 
 
@@ -108,7 +109,13 @@ def remove_table_sheet_auto_filters(wb) -> None:
             ws.auto_filter.ref = None
 
 
-def save_workbook_safely(wb, path: Path, *, loaded_mtime_ns: int | None = None) -> Path:
+def save_workbook_safely(
+    wb,
+    path: Path,
+    *,
+    loaded_mtime_ns: int | None = None,
+    approved_bool_type_migrations: Iterable[str | tuple[str, str]] | None = None,
+) -> Path:
     path = Path(path)
     lock_path = excel_lock_path(path)
     if lock_path.exists():
@@ -124,6 +131,17 @@ def save_workbook_safely(wb, path: Path, *, loaded_mtime_ns: int | None = None) 
         assert_valid_workbook_package(tmp_path)
         check_wb = load_workbook(tmp_path, read_only=True, data_only=True)
         check_wb.close()
+        bool_issues = compare_bool_like_workbooks(
+            path,
+            tmp_path,
+            approved_bool_type_migrations=approved_bool_type_migrations,
+        )
+        if any(issue.severity == "error" for issue in bool_issues):
+            detail = format_issues(bool_issues)
+            raise RuntimeError(
+                "Refusing to save workbook; bool-like cell storage changed without an approved "
+                f"sheet/column migration.\n{detail}"
+            )
         backup_path = backup_workbook(path)
         shutil.move(tmp_path, path)
         return backup_path
