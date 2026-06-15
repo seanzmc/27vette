@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-06-14T23:21:31+00:00",
+    "generated_at": "2026-06-15T02:27:36+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -9282,7 +9282,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "display_only",
-      "display_order": 10,
+      "display_order": 11,
       "source_detail_raw": ""
     },
     {
@@ -9307,7 +9307,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "display_only",
-      "display_order": 10,
+      "display_order": 11,
       "source_detail_raw": ""
     },
     {
@@ -9332,7 +9332,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "display_only",
-      "display_order": 10,
+      "display_order": 11,
       "source_detail_raw": ""
     },
     {
@@ -9357,7 +9357,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "display_only",
-      "display_order": 10,
+      "display_order": 11,
       "source_detail_raw": ""
     },
     {
@@ -9382,7 +9382,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "display_only",
-      "display_order": 10,
+      "display_order": 11,
       "source_detail_raw": ""
     },
     {
@@ -9407,7 +9407,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "display_only",
-      "display_order": 10,
+      "display_order": 11,
       "source_detail_raw": ""
     },
     {
@@ -10182,7 +10182,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": "Included and only available with (E60) front lift adjustable height."
     },
     {
@@ -10207,7 +10207,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": "Included and only available with (E60) front lift adjustable height."
     },
     {
@@ -10232,7 +10232,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": "Included and only available with (E60) front lift adjustable height."
     },
     {
@@ -10257,7 +10257,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": "Included and only available with (E60) front lift adjustable height."
     },
     {
@@ -10282,7 +10282,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": "Included and only available with (E60) front lift adjustable height."
     },
     {
@@ -10307,7 +10307,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": "Included and only available with (E60) front lift adjustable height."
     },
     {
@@ -14082,7 +14082,7 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 495,
       "display_behavior": "",
-      "display_order": 72,
+      "display_order": 73,
       "source_detail_raw": ""
     },
     {
@@ -14107,7 +14107,7 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 495,
       "display_behavior": "",
-      "display_order": 72,
+      "display_order": 73,
       "source_detail_raw": ""
     },
     {
@@ -14132,7 +14132,7 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 495,
       "display_behavior": "",
-      "display_order": 72,
+      "display_order": 73,
       "source_detail_raw": ""
     },
     {
@@ -14157,7 +14157,7 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 495,
       "display_behavior": "",
-      "display_order": 72,
+      "display_order": 73,
       "source_detail_raw": ""
     },
     {
@@ -14182,7 +14182,7 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 495,
       "display_behavior": "",
-      "display_order": 72,
+      "display_order": 73,
       "source_detail_raw": ""
     },
     {
@@ -14207,7 +14207,7 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 495,
       "display_behavior": "",
-      "display_order": 72,
+      "display_order": 73,
       "source_detail_raw": ""
     },
     {
@@ -28020,7 +28020,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 120,
+      "display_order": 124,
       "source_detail_raw": ""
     },
     {
@@ -28045,7 +28045,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 120,
+      "display_order": 124,
       "source_detail_raw": ""
     },
     {
@@ -28070,7 +28070,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 120,
+      "display_order": 124,
       "source_detail_raw": ""
     },
     {
@@ -28095,7 +28095,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 120,
+      "display_order": 124,
       "source_detail_raw": ""
     },
     {
@@ -28120,7 +28120,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 120,
+      "display_order": 124,
       "source_detail_raw": ""
     },
     {
@@ -28145,7 +28145,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 120,
+      "display_order": 124,
       "source_detail_raw": ""
     },
     {
@@ -29220,7 +29220,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": ""
     },
     {
@@ -29245,7 +29245,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": ""
     },
     {
@@ -29270,7 +29270,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": ""
     },
     {
@@ -29295,7 +29295,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": ""
     },
     {
@@ -29320,7 +29320,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": ""
     },
     {
@@ -29345,7 +29345,7 @@
       "selection_mode_label": "Display only",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": ""
     },
     {
@@ -38860,7 +38860,7 @@
       "section_id": "sec_incl_001",
       "section_name": "Included",
       "standard_equipment_group_type": "",
-      "display_order": 10,
+      "display_order": 11,
       "source_detail_raw": ""
     },
     {
@@ -38875,7 +38875,7 @@
       "section_id": "sec_incl_001",
       "section_name": "Included",
       "standard_equipment_group_type": "",
-      "display_order": 10,
+      "display_order": 11,
       "source_detail_raw": ""
     },
     {
@@ -38890,7 +38890,7 @@
       "section_id": "sec_incl_001",
       "section_name": "Included",
       "standard_equipment_group_type": "",
-      "display_order": 10,
+      "display_order": 11,
       "source_detail_raw": ""
     },
     {
@@ -38905,7 +38905,7 @@
       "section_id": "sec_incl_001",
       "section_name": "Included",
       "standard_equipment_group_type": "",
-      "display_order": 10,
+      "display_order": 11,
       "source_detail_raw": ""
     },
     {
@@ -38920,7 +38920,7 @@
       "section_id": "sec_incl_001",
       "section_name": "Included",
       "standard_equipment_group_type": "",
-      "display_order": 10,
+      "display_order": 11,
       "source_detail_raw": ""
     },
     {
@@ -38935,7 +38935,7 @@
       "section_id": "sec_incl_001",
       "section_name": "Included",
       "standard_equipment_group_type": "",
-      "display_order": 10,
+      "display_order": 11,
       "source_detail_raw": ""
     },
     {
@@ -42880,7 +42880,7 @@
       "section_id": "sec_stan_001",
       "section_name": "Standard Equipment",
       "standard_equipment_group_type": "",
-      "display_order": 120,
+      "display_order": 124,
       "source_detail_raw": ""
     },
     {
@@ -42895,7 +42895,7 @@
       "section_id": "sec_stan_001",
       "section_name": "Standard Equipment",
       "standard_equipment_group_type": "",
-      "display_order": 120,
+      "display_order": 124,
       "source_detail_raw": ""
     },
     {
@@ -42910,7 +42910,7 @@
       "section_id": "sec_stan_001",
       "section_name": "Standard Equipment",
       "standard_equipment_group_type": "",
-      "display_order": 120,
+      "display_order": 124,
       "source_detail_raw": ""
     },
     {
@@ -42925,7 +42925,7 @@
       "section_id": "sec_stan_001",
       "section_name": "Standard Equipment",
       "standard_equipment_group_type": "",
-      "display_order": 120,
+      "display_order": 124,
       "source_detail_raw": ""
     },
     {
@@ -42940,7 +42940,7 @@
       "section_id": "sec_stan_001",
       "section_name": "Standard Equipment",
       "standard_equipment_group_type": "",
-      "display_order": 120,
+      "display_order": 124,
       "source_detail_raw": ""
     },
     {
@@ -42955,7 +42955,7 @@
       "section_id": "sec_stan_001",
       "section_name": "Standard Equipment",
       "standard_equipment_group_type": "",
-      "display_order": 120,
+      "display_order": 124,
       "source_detail_raw": ""
     },
     {
@@ -43600,7 +43600,7 @@
       "section_id": "sec_stan_001",
       "section_name": "Standard Equipment",
       "standard_equipment_group_type": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": ""
     },
     {
@@ -43615,7 +43615,7 @@
       "section_id": "sec_stan_001",
       "section_name": "Standard Equipment",
       "standard_equipment_group_type": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": ""
     },
     {
@@ -43630,7 +43630,7 @@
       "section_id": "sec_stan_001",
       "section_name": "Standard Equipment",
       "standard_equipment_group_type": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": ""
     },
     {
@@ -43645,7 +43645,7 @@
       "section_id": "sec_stan_001",
       "section_name": "Standard Equipment",
       "standard_equipment_group_type": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": ""
     },
     {
@@ -43660,7 +43660,7 @@
       "section_id": "sec_stan_001",
       "section_name": "Standard Equipment",
       "standard_equipment_group_type": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": ""
     },
     {
@@ -43675,7 +43675,7 @@
       "section_id": "sec_stan_001",
       "section_name": "Standard Equipment",
       "standard_equipment_group_type": "",
-      "display_order": 20,
+      "display_order": 21,
       "source_detail_raw": ""
     },
     {

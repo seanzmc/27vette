@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-14T23:19:44+00:00"
+          "generated_at": "2026-06-15T03:06:19+00:00"
         },
         "variants": [
           {
@@ -2230,7 +2230,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1695,
-            "display_order": 10,
+            "display_order": 15,
             "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
           },
           {
@@ -2254,7 +2254,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1695,
-            "display_order": 10,
+            "display_order": 15,
             "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
           },
           {
@@ -2278,7 +2278,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1695,
-            "display_order": 10,
+            "display_order": 15,
             "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
           },
           {
@@ -2302,7 +2302,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1695,
-            "display_order": 10,
+            "display_order": 15,
             "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
           },
           {
@@ -2326,7 +2326,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1695,
-            "display_order": 10,
+            "display_order": 15,
             "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
           },
           {
@@ -2350,7 +2350,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 1695,
-            "display_order": 10,
+            "display_order": 15,
             "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
           },
           {
@@ -5839,7 +5839,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 40,
-            "display_order": 30,
+            "display_order": 35,
             "source_detail_raw": "1. Will be forced on orders with ship-to states that require a front license plate."
           },
           {
@@ -5863,7 +5863,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 40,
-            "display_order": 30,
+            "display_order": 35,
             "source_detail_raw": "1. Will be forced on orders with ship-to states that require a front license plate."
           },
           {
@@ -5887,7 +5887,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 40,
-            "display_order": 30,
+            "display_order": 35,
             "source_detail_raw": "1. Will be forced on orders with ship-to states that require a front license plate."
           },
           {
@@ -5911,7 +5911,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 40,
-            "display_order": 30,
+            "display_order": 35,
             "source_detail_raw": "1. Will be forced on orders with ship-to states that require a front license plate."
           },
           {
@@ -5935,7 +5935,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 40,
-            "display_order": 30,
+            "display_order": 35,
             "source_detail_raw": "1. Will be forced on orders with ship-to states that require a front license plate."
           },
           {
@@ -5959,7 +5959,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "multi_select_opt",
             "selection_mode_label": "Optional multiple choice",
             "base_price": 40,
-            "display_order": 30,
+            "display_order": 35,
             "source_detail_raw": "1. Will be forced on orders with ship-to states that require a front license plate."
           },
           {
@@ -55134,7 +55134,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-14T23:19:41+00:00",
+          "generated_at": "2026-06-15T03:05:52+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -62642,7 +62642,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
             "display_behavior": "default_selected",
-            "display_order": 10,
+            "display_order": 19,
             "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
           },
           {
@@ -62667,7 +62667,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
             "display_behavior": "default_selected",
-            "display_order": 10,
+            "display_order": 19,
             "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
           },
           {
@@ -62692,7 +62692,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
             "display_behavior": "default_selected",
-            "display_order": 10,
+            "display_order": 19,
             "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
           },
           {
@@ -62717,7 +62717,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 10,
+            "display_order": 19,
             "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
           },
           {
@@ -62742,7 +62742,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 10,
+            "display_order": 19,
             "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
           },
           {
@@ -62767,7 +62767,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Optional multiple choice",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 10,
+            "display_order": 19,
             "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
           },
           {
@@ -93882,7 +93882,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_engi_001",
             "section_name": "Engine Appearance",
             "standard_equipment_group_type": "",
-            "display_order": 10,
+            "display_order": 19,
             "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
           },
           {
@@ -93897,7 +93897,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_engi_001",
             "section_name": "Engine Appearance",
             "standard_equipment_group_type": "",
-            "display_order": 10,
+            "display_order": 19,
             "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
           },
           {
@@ -93912,7 +93912,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_engi_001",
             "section_name": "Engine Appearance",
             "standard_equipment_group_type": "",
-            "display_order": 10,
+            "display_order": 19,
             "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
           },
           {
@@ -110671,7 +110671,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-14T23:19:42+00:00",
+          "generated_at": "2026-06-15T02:27:36+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -119948,7 +119948,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "display_only",
-            "display_order": 10,
+            "display_order": 11,
             "source_detail_raw": ""
           },
           {
@@ -119973,7 +119973,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "display_only",
-            "display_order": 10,
+            "display_order": 11,
             "source_detail_raw": ""
           },
           {
@@ -119998,7 +119998,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "display_only",
-            "display_order": 10,
+            "display_order": 11,
             "source_detail_raw": ""
           },
           {
@@ -120023,7 +120023,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "display_only",
-            "display_order": 10,
+            "display_order": 11,
             "source_detail_raw": ""
           },
           {
@@ -120048,7 +120048,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "display_only",
-            "display_order": 10,
+            "display_order": 11,
             "source_detail_raw": ""
           },
           {
@@ -120073,7 +120073,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "display_only",
-            "display_order": 10,
+            "display_order": 11,
             "source_detail_raw": ""
           },
           {
@@ -120848,7 +120848,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": "Included and only available with (E60) front lift adjustable height."
           },
           {
@@ -120873,7 +120873,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": "Included and only available with (E60) front lift adjustable height."
           },
           {
@@ -120898,7 +120898,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": "Included and only available with (E60) front lift adjustable height."
           },
           {
@@ -120923,7 +120923,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": "Included and only available with (E60) front lift adjustable height."
           },
           {
@@ -120948,7 +120948,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": "Included and only available with (E60) front lift adjustable height."
           },
           {
@@ -120973,7 +120973,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": "Included and only available with (E60) front lift adjustable height."
           },
           {
@@ -124748,7 +124748,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Optional multiple choice",
             "base_price": 495,
             "display_behavior": "",
-            "display_order": 72,
+            "display_order": 73,
             "source_detail_raw": ""
           },
           {
@@ -124773,7 +124773,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Optional multiple choice",
             "base_price": 495,
             "display_behavior": "",
-            "display_order": 72,
+            "display_order": 73,
             "source_detail_raw": ""
           },
           {
@@ -124798,7 +124798,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Optional multiple choice",
             "base_price": 495,
             "display_behavior": "",
-            "display_order": 72,
+            "display_order": 73,
             "source_detail_raw": ""
           },
           {
@@ -124823,7 +124823,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Optional multiple choice",
             "base_price": 495,
             "display_behavior": "",
-            "display_order": 72,
+            "display_order": 73,
             "source_detail_raw": ""
           },
           {
@@ -124848,7 +124848,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Optional multiple choice",
             "base_price": 495,
             "display_behavior": "",
-            "display_order": 72,
+            "display_order": 73,
             "source_detail_raw": ""
           },
           {
@@ -124873,7 +124873,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Optional multiple choice",
             "base_price": 495,
             "display_behavior": "",
-            "display_order": 72,
+            "display_order": 73,
             "source_detail_raw": ""
           },
           {
@@ -138686,7 +138686,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 120,
+            "display_order": 124,
             "source_detail_raw": ""
           },
           {
@@ -138711,7 +138711,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 120,
+            "display_order": 124,
             "source_detail_raw": ""
           },
           {
@@ -138736,7 +138736,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 120,
+            "display_order": 124,
             "source_detail_raw": ""
           },
           {
@@ -138761,7 +138761,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 120,
+            "display_order": 124,
             "source_detail_raw": ""
           },
           {
@@ -138786,7 +138786,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 120,
+            "display_order": 124,
             "source_detail_raw": ""
           },
           {
@@ -138811,7 +138811,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 120,
+            "display_order": 124,
             "source_detail_raw": ""
           },
           {
@@ -139886,7 +139886,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": ""
           },
           {
@@ -139911,7 +139911,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": ""
           },
           {
@@ -139936,7 +139936,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": ""
           },
           {
@@ -139961,7 +139961,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": ""
           },
           {
@@ -139986,7 +139986,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": ""
           },
           {
@@ -140011,7 +140011,7 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode_label": "Display only",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": ""
           },
           {
@@ -149526,7 +149526,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_incl_001",
             "section_name": "Included",
             "standard_equipment_group_type": "",
-            "display_order": 10,
+            "display_order": 11,
             "source_detail_raw": ""
           },
           {
@@ -149541,7 +149541,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_incl_001",
             "section_name": "Included",
             "standard_equipment_group_type": "",
-            "display_order": 10,
+            "display_order": 11,
             "source_detail_raw": ""
           },
           {
@@ -149556,7 +149556,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_incl_001",
             "section_name": "Included",
             "standard_equipment_group_type": "",
-            "display_order": 10,
+            "display_order": 11,
             "source_detail_raw": ""
           },
           {
@@ -149571,7 +149571,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_incl_001",
             "section_name": "Included",
             "standard_equipment_group_type": "",
-            "display_order": 10,
+            "display_order": 11,
             "source_detail_raw": ""
           },
           {
@@ -149586,7 +149586,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_incl_001",
             "section_name": "Included",
             "standard_equipment_group_type": "",
-            "display_order": 10,
+            "display_order": 11,
             "source_detail_raw": ""
           },
           {
@@ -149601,7 +149601,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_incl_001",
             "section_name": "Included",
             "standard_equipment_group_type": "",
-            "display_order": 10,
+            "display_order": 11,
             "source_detail_raw": ""
           },
           {
@@ -153546,7 +153546,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_stan_001",
             "section_name": "Standard Equipment",
             "standard_equipment_group_type": "",
-            "display_order": 120,
+            "display_order": 124,
             "source_detail_raw": ""
           },
           {
@@ -153561,7 +153561,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_stan_001",
             "section_name": "Standard Equipment",
             "standard_equipment_group_type": "",
-            "display_order": 120,
+            "display_order": 124,
             "source_detail_raw": ""
           },
           {
@@ -153576,7 +153576,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_stan_001",
             "section_name": "Standard Equipment",
             "standard_equipment_group_type": "",
-            "display_order": 120,
+            "display_order": 124,
             "source_detail_raw": ""
           },
           {
@@ -153591,7 +153591,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_stan_001",
             "section_name": "Standard Equipment",
             "standard_equipment_group_type": "",
-            "display_order": 120,
+            "display_order": 124,
             "source_detail_raw": ""
           },
           {
@@ -153606,7 +153606,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_stan_001",
             "section_name": "Standard Equipment",
             "standard_equipment_group_type": "",
-            "display_order": 120,
+            "display_order": 124,
             "source_detail_raw": ""
           },
           {
@@ -153621,7 +153621,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_stan_001",
             "section_name": "Standard Equipment",
             "standard_equipment_group_type": "",
-            "display_order": 120,
+            "display_order": 124,
             "source_detail_raw": ""
           },
           {
@@ -154266,7 +154266,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_stan_001",
             "section_name": "Standard Equipment",
             "standard_equipment_group_type": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": ""
           },
           {
@@ -154281,7 +154281,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_stan_001",
             "section_name": "Standard Equipment",
             "standard_equipment_group_type": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": ""
           },
           {
@@ -154296,7 +154296,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_stan_001",
             "section_name": "Standard Equipment",
             "standard_equipment_group_type": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": ""
           },
           {
@@ -154311,7 +154311,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_stan_001",
             "section_name": "Standard Equipment",
             "standard_equipment_group_type": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": ""
           },
           {
@@ -154326,7 +154326,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_stan_001",
             "section_name": "Standard Equipment",
             "standard_equipment_group_type": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": ""
           },
           {
@@ -154341,7 +154341,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_stan_001",
             "section_name": "Standard Equipment",
             "standard_equipment_group_type": "",
-            "display_order": 20,
+            "display_order": 21,
             "source_detail_raw": ""
           },
           {

@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-06-14T23:21:28+00:00",
+    "generated_at": "2026-06-15T03:06:39+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -7513,7 +7513,7 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 0,
       "display_behavior": "default_selected",
-      "display_order": 10,
+      "display_order": 19,
       "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
     },
     {
@@ -7538,7 +7538,7 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 0,
       "display_behavior": "default_selected",
-      "display_order": 10,
+      "display_order": 19,
       "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
     },
     {
@@ -7563,7 +7563,7 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 0,
       "display_behavior": "default_selected",
-      "display_order": 10,
+      "display_order": 19,
       "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
     },
     {
@@ -7588,7 +7588,7 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 10,
+      "display_order": 19,
       "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
     },
     {
@@ -7613,7 +7613,7 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 10,
+      "display_order": 19,
       "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
     },
     {
@@ -7638,7 +7638,7 @@
       "selection_mode_label": "Optional multiple choice",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 10,
+      "display_order": 19,
       "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
     },
     {
@@ -38753,7 +38753,7 @@
       "section_id": "sec_engi_001",
       "section_name": "Engine Appearance",
       "standard_equipment_group_type": "",
-      "display_order": 10,
+      "display_order": 19,
       "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
     },
     {
@@ -38768,7 +38768,7 @@
       "section_id": "sec_engi_001",
       "section_name": "Engine Appearance",
       "standard_equipment_group_type": "",
-      "display_order": 10,
+      "display_order": 19,
       "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
     },
     {
@@ -38783,7 +38783,7 @@
       "section_id": "sec_engi_001",
       "section_name": "Engine Appearance",
       "standard_equipment_group_type": "",
-      "display_order": 10,
+      "display_order": 19,
       "source_detail_raw": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
     },
     {

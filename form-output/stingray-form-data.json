@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-06-14T23:19:44+00:00"
+    "generated_at": "2026-06-15T03:06:19+00:00"
   },
   "variants": [
     {
@@ -2222,7 +2222,7 @@
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1695,
-      "display_order": 10,
+      "display_order": 15,
       "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
     },
     {
@@ -2246,7 +2246,7 @@
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1695,
-      "display_order": 10,
+      "display_order": 15,
       "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
     },
     {
@@ -2270,7 +2270,7 @@
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1695,
-      "display_order": 10,
+      "display_order": 15,
       "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
     },
     {
@@ -2294,7 +2294,7 @@
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1695,
-      "display_order": 10,
+      "display_order": 15,
       "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
     },
     {
@@ -2318,7 +2318,7 @@
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1695,
-      "display_order": 10,
+      "display_order": 15,
       "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
     },
     {
@@ -2342,7 +2342,7 @@
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 1695,
-      "display_order": 10,
+      "display_order": 15,
       "source_detail_raw": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
     },
     {
@@ -5831,7 +5831,7 @@
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 40,
-      "display_order": 30,
+      "display_order": 35,
       "source_detail_raw": "1. Will be forced on orders with ship-to states that require a front license plate."
     },
     {
@@ -5855,7 +5855,7 @@
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 40,
-      "display_order": 30,
+      "display_order": 35,
       "source_detail_raw": "1. Will be forced on orders with ship-to states that require a front license plate."
     },
     {
@@ -5879,7 +5879,7 @@
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 40,
-      "display_order": 30,
+      "display_order": 35,
       "source_detail_raw": "1. Will be forced on orders with ship-to states that require a front license plate."
     },
     {
@@ -5903,7 +5903,7 @@
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 40,
-      "display_order": 30,
+      "display_order": 35,
       "source_detail_raw": "1. Will be forced on orders with ship-to states that require a front license plate."
     },
     {
@@ -5927,7 +5927,7 @@
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 40,
-      "display_order": 30,
+      "display_order": 35,
       "source_detail_raw": "1. Will be forced on orders with ship-to states that require a front license plate."
     },
     {
@@ -5951,7 +5951,7 @@
       "selection_mode": "multi_select_opt",
       "selection_mode_label": "Optional multiple choice",
       "base_price": 40,
-      "display_order": 30,
+      "display_order": 35,
       "source_detail_raw": "1. Will be forced on orders with ship-to states that require a front license plate."
     },
     {

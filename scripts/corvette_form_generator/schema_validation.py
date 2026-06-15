@@ -284,6 +284,21 @@ def clean_text(value: Any) -> str:
     return str(value).strip()
 
 
+def display_order_key(value: Any) -> str:
+    text = clean_text(value)
+    if not text:
+        return ""
+    if isinstance(value, bool):
+        return text
+    if isinstance(value, (int, float)):
+        return str(int(value)) if float(value).is_integer() else str(value)
+    try:
+        numeric = float(text)
+    except ValueError:
+        return text
+    return str(int(numeric)) if numeric.is_integer() else text
+
+
 def truthy(value: Any, default: bool = True) -> bool:
     if value is None:
         return default
@@ -496,6 +511,46 @@ def validate_registry_promotion_metadata(wb, issues: list[SchemaIssue]) -> None:
         )
 
 
+def validate_option_display_order_uniqueness(wb, option_sheets: Iterable[str], issues: list[SchemaIssue]) -> None:
+    for sheet in dict.fromkeys(option_sheets):
+        if sheet not in wb.sheetnames:
+            continue
+        ws = wb[sheet]
+        headers = header_index(ws)
+        if not all(column in headers for column in ("option_id", "section_id", "display_order")):
+            continue
+        buckets: dict[tuple[str, str], list[tuple[int, str]]] = {}
+        for row_number, row in records(ws):
+            if "active" in headers and not truthy(row.get("active"), default=True):
+                continue
+            section_id = clean_text(row.get("section_id"))
+            display_order = display_order_key(row.get("display_order"))
+            option_id = clean_text(row.get("option_id"))
+            if not section_id or not display_order or not option_id:
+                continue
+            buckets.setdefault((section_id, display_order), []).append((row_number, option_id))
+        for (section_id, display_order), matches in sorted(buckets.items()):
+            if len(matches) < 2:
+                continue
+            add_issue(
+                issues,
+                "error",
+                "duplicate_option_display_order",
+                sheet=sheet,
+                row=matches[0][0],
+                column="display_order",
+                value={
+                    "section_id": section_id,
+                    "display_order": display_order,
+                    "matches": [{"row": row_number, "option_id": option_id} for row_number, option_id in matches],
+                },
+                message=(
+                    f"{sheet} section {section_id!r} has duplicate option display_order {display_order!r}; "
+                    "use deterministic unique ordering, including standard/included sections."
+                ),
+            )
+
+
 def merge_sheet_columns(
     base: dict[str, tuple[str, ...]],
     by_role: dict[str, list[str]],
@@ -584,6 +639,7 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
         boolean_columns = merge_sheet_columns(BOOLEAN_COLUMNS, source_sheets_by_role, ROLE_BOOLEAN_COLUMNS)
         rpo_columns = merge_sheet_columns(RPO_COLUMNS, source_sheets_by_role, ROLE_RPO_COLUMNS)
         price_columns = merge_sheet_columns(PRICE_COLUMNS, source_sheets_by_role, ROLE_PRICE_COLUMNS)
+        validate_option_display_order_uniqueness(wb, source_sheets_by_role.get("source_option_sheet", []), issues)
 
         for sheet, columns in boolean_columns.items():
             if sheet not in wb.sheetnames:
