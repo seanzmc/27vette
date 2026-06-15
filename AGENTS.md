@@ -339,7 +339,7 @@ Use the workbook-owned promotion path when Z06 runtime activation needs to be ap
 cd <repo-root>
 .venv/bin/python scripts/promote_model.py --model z06 --write
 .venv/bin/python scripts/generate_form.py --model z06
-.venv/bin/python scripts/generate_form.py --model stingray
+.venv/bin/python scripts/generate_registry.py
 ```
 
 `scripts/promote_model.py --model z06` updates only Z06 rows in `model_master`, `model_registry_promotion`, and the six Z06 rows in `variant_master`. It must use `save_workbook_safely()`, refuse to run while an Excel lock file exists, and verify the saved workbook rows on disk.
@@ -402,6 +402,7 @@ Stingray data refresh:
 
 ```sh
 .venv/bin/python scripts/generate_form.py --model stingray
+.venv/bin/python scripts/generate_registry.py
 .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
 node --test tests/stingray-form-regression.test.mjs
 node --test tests/stingray-generator-stability.test.mjs
@@ -411,6 +412,7 @@ Grand Sport source/draft refresh:
 
 ```sh
 .venv/bin/python scripts/generate_form.py --model grand_sport
+.venv/bin/python scripts/generate_registry.py
 node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
 ```
@@ -429,6 +431,7 @@ Z06 source/draft refresh:
 
 ```sh
 .venv/bin/python scripts/generate_form.py --model z06
+.venv/bin/python scripts/generate_registry.py
 node --test tests/z06-contract-preview.test.mjs
 node --test tests/z06-form-data-draft.test.mjs
 node --test tests/z06-interior-accessory-cleanup.test.mjs
@@ -441,7 +444,7 @@ Z06 runtime promotion:
 ```sh
 .venv/bin/python scripts/promote_model.py --model z06 --write
 .venv/bin/python scripts/generate_form.py --model z06
-.venv/bin/python scripts/generate_form.py --model stingray
+.venv/bin/python scripts/generate_registry.py
 .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
 node --test tests/z06-runtime-promotion.test.mjs
 node --test tests/multi-model-runtime-switching.test.mjs

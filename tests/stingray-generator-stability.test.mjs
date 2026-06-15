@@ -349,6 +349,7 @@ test("Stingray generator uses the hardened workbook save path", () => {
   assert.match(generatorSource, /save_workbook_safely/);
   assert.match(fs.readFileSync("scripts/corvette_form_generator/workbook.py", "utf8"), /remove_table_sheet_auto_filters/);
   assert.doesNotMatch(generatorSource, /\bwb\.save\(WORKBOOK_PATH\)/);
+  assert.doesNotMatch(generatorSource, /write_app_data_registry/);
 });
 
 test("generated JSON and static app data stay synchronized apart from timestamp", () => {

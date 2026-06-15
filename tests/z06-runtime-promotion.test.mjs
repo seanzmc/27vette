@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
@@ -150,6 +151,19 @@ test("generated app registry promotes Z06 without changing default model", () =>
     JSON.parse(JSON.stringify(registry.models.z06.data.variants.map((variant) => variant.variant_id))),
     expectedZ06VariantIds
   );
+});
+
+test("dedicated registry generator publishes promoted runtime artifacts", () => {
+  const output = execFileSync(".venv/bin/python", ["scripts/generate_registry.py"], { encoding: "utf8" });
+  const result = JSON.parse(output);
+  assert.equal(result.status, "registry_generated");
+  assert.ok(result.output.endsWith("form-app/data.js"));
+  assert.deepEqual(result.models, ["stingray", "grandSport", "z06"]);
+
+  const registry = loadDataWindow().CORVETTE_FORM_DATA;
+  assert.equal(registry.defaultModelKey, "stingray");
+  assert.equal(registry.models.z06.data.dataset.status, "runtime_active");
+  assert.equal(registry.models.grandSport.data.dataset.status, "runtime_active");
 });
 
 test("promoted Z06 runtime data strips draft-only provenance and protects source-data cleanup", () => {

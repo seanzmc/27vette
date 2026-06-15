@@ -1,4 +1,4 @@
-"""Production form-data generation: workbook form_* sheets, output artifacts, app registry.
+"""Production form-data generation: workbook form_* sheets and Stingray output artifacts.
 
 Currently parameterized for the active current-generation model (Stingray).
 Invoked through ``scripts/generate_form.py``.
@@ -19,7 +19,6 @@ from corvette_form_generator.contract import (
     build_trim_context_choices,
     context_choice_copy_rows,
     label_for,
-    load_model_asset_map,
     option_asset_map,
 )
 from corvette_form_generator.inspection import section_step_resolution_source
@@ -32,8 +31,7 @@ from corvette_form_generator.mapping import (
     step_for_section as shared_step_for_section,
 )
 from corvette_form_generator.model_configs import STINGRAY_MODEL
-from corvette_form_generator.output import write_app_data_registry, write_json_output
-from corvette_form_generator.registry_promotion import build_registry_from_promotions, registry_model_key
+from corvette_form_generator.output import write_json_output
 from corvette_form_generator.rules import (
     exclusive_group_pairs,
     grouped_exclusion_pairs,
@@ -71,28 +69,6 @@ SECTION_STEP_OVERRIDES = dict(MODEL_CONFIG.section_step_overrides)
 BODY_STYLE_DISPLAY_ORDER = dict(MODEL_CONFIG.body_style_display_order)
 SELECTION_MODE_LABELS = dict(MODEL_CONFIG.selection_mode_labels)
 STANDARD_SECTIONS = set(MODEL_CONFIG.standard_sections)
-
-
-def build_app_data_registry(stingray_data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, str]]:
-    wb = load_workbook(WORKBOOK_PATH, read_only=True, data_only=True)
-    try:
-        model_assets = load_model_asset_map(wb, registry_model_key)
-        promoted_registry = build_registry_from_promotions(
-            wb,
-            current_model_key=MODEL_CONFIG.model_key,
-            current_data=stingray_data,
-            model_assets=model_assets,
-            root=ROOT,
-        )
-    finally:
-        wb.close()
-    if promoted_registry is None:
-        raise RuntimeError(
-            "model_registry_promotion has no promoted rows; refusing to guess the app registry. "
-            "Author the promotion rows in the workbook before regenerating app data."
-        )
-    legacy_aliases = promoted_registry.pop("legacyAliases", {})
-    return promoted_registry, legacy_aliases
 
 
 def step_for_section(
@@ -848,12 +824,6 @@ def main() -> None:
     APP_DIR.mkdir(exist_ok=True)
     json_path = OUTPUT_DIR / "stingray-form-data.json"
     write_json_output(json_path, data)
-    app_registry, legacy_aliases = build_app_data_registry(data)
-    write_app_data_registry(
-        APP_DIR / "data.js",
-        app_registry,
-        legacy_aliases=legacy_aliases,
-    )
     csv_path = OUTPUT_DIR / "stingray-form-data.csv"
     with csv_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(

@@ -230,6 +230,18 @@ def resolve_artifact_path(root: Path, artifact_path: str) -> Path:
     return root / path
 
 
+def current_generation_artifact_path(root: Path, promotion: RegistryPromotion) -> Path:
+    if promotion.artifact_path:
+        return resolve_artifact_path(root, promotion.artifact_path)
+    return root / "form-output" / f"{promotion.export_slug}-form-data.json"
+
+
+def artifact_path_for_promotion(root: Path, promotion: RegistryPromotion) -> Path:
+    if promotion.artifact_type == "current_generation":
+        return current_generation_artifact_path(root, promotion)
+    return resolve_artifact_path(root, promotion.artifact_path)
+
+
 def load_promotion_data(
     promotion: RegistryPromotion,
     *,
@@ -249,6 +261,16 @@ def load_promotion_data(
         raise FileNotFoundError(f"Promoted model artifact does not exist for {promotion.model_key}: {artifact}")
     data = json.loads(artifact.read_text(encoding="utf-8"))
     assert_runtime_contract(data, source=str(artifact))
+    return data
+
+
+def load_promotion_artifact_data(promotion: RegistryPromotion, *, root: Path) -> dict[str, Any]:
+    artifact = artifact_path_for_promotion(root, promotion)
+    if not artifact.exists():
+        raise FileNotFoundError(f"Promoted model artifact does not exist for {promotion.model_key}: {artifact}")
+    data = json.loads(artifact.read_text(encoding="utf-8"))
+    if promotion.artifact_type != "current_generation":
+        assert_runtime_contract(data, source=str(artifact))
     return data
 
 
@@ -296,3 +318,45 @@ def build_registry_from_promotions(
         "models": models,
         "legacyAliases": legacy_aliases,
     }
+
+
+def build_registry_from_artifacts(
+    wb: Any,
+    *,
+    model_assets: dict[str, dict[str, str]],
+    root: Path,
+) -> dict[str, Any]:
+    promotions = load_registry_promotions(wb)
+    if not promotions:
+        raise RuntimeError(
+            "model_registry_promotion has no promoted rows; refusing to guess the app registry. "
+            "Author the promotion rows in the workbook before regenerating app data."
+        )
+
+    models: dict[str, dict[str, Any]] = {}
+    legacy_aliases: dict[str, str] = {}
+    default_model_key = ""
+    for promotion in promotions:
+        data = load_promotion_artifact_data(promotion, root=root)
+        models[promotion.registry_key] = model_registry_entry(promotion, data, model_assets.get(promotion.registry_key))
+        if promotion.default_model:
+            default_model_key = promotion.registry_key
+        if promotion.legacy_alias:
+            legacy_aliases[promotion.legacy_alias] = promotion.registry_key
+    return {
+        "defaultModelKey": default_model_key,
+        "models": models,
+        "legacyAliases": legacy_aliases,
+    }
+
+
+def parse_app_data_registry(path: Path) -> dict[str, Any]:
+    text = path.read_text(encoding="utf-8")
+    try:
+        registry_json = text.split("window.CORVETTE_FORM_DATA = ", 1)[1].split(
+            ";\nwindow.STINGRAY_FORM_DATA",
+            1,
+        )[0]
+    except IndexError as exc:
+        raise ValueError(f"Could not locate window.CORVETTE_FORM_DATA in {path}") from exc
+    return json.loads(registry_json)

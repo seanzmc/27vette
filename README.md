@@ -43,7 +43,8 @@ The runtime should render and evaluate the generated contract. It should not inf
 - `stingray_master.xlsx` - canonical workbook, source/metadata sheets, and generated `form_*` sheets.
 - `form-app/` - static app shell, styles, runtime behavior, and generated data bundle.
 - `form-output/` - generated Stingray JSON/CSV outputs plus Grand Sport and Z06 inspection, contract preview, draft, rule-audit, and clean runtime-contract artifacts under `form-output/inspection/`.
-- `scripts/generate_form.py` - single generator entry point for every model. `--model stingray` runs the production pathway (form sheets, output artifacts, app data registry); `--model grand_sport` and `--model z06` emit inspection/preview/draft artifacts plus clean `*-runtime-contract.json` artifacts and do not directly mutate `form-app/data.js`.
+- `scripts/generate_form.py` - single model-artifact generator entry point. `--model stingray` writes form sheets plus Stingray JSON/CSV outputs; `--model grand_sport` and `--model z06` emit inspection/preview/draft artifacts plus clean `*-runtime-contract.json` artifacts.
+- `scripts/generate_registry.py` - publishes promoted runtime artifacts from `model_registry_promotion` into `form-app/data.js`.
 - `scripts/promote_model.py` - workbook-driven runtime promotion (`--model <key> --write`).
 - `scripts/build_rule_sources.py` - opt-in workbook rule-source audit/report helper; not part of default model readiness.
 - `scripts/validate_workbook_schema.py` - workbook schema and live-contract validation.
@@ -250,18 +251,20 @@ Stingray production refresh:
 ```sh
 cd <repo-root>
 .venv/bin/python scripts/generate_form.py --model stingray
+.venv/bin/python scripts/generate_registry.py
 .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
 node --test tests/stingray-form-regression.test.mjs
 node --test tests/stingray-generator-stability.test.mjs
 ```
 
-The Stingray generator reads `stingray_master.xlsx`, rewrites generated `form_*` sheets, writes `form-output/stingray-form-data.json`, writes `form-output/stingray-form-data.csv`, and updates `form-app/data.js`. Stingray is currently the only production-pathway model in `scripts/generate_form.py`.
+The Stingray generator reads `stingray_master.xlsx`, rewrites generated `form_*` sheets, writes `form-output/stingray-form-data.json`, and writes `form-output/stingray-form-data.csv`. `scripts/generate_registry.py` publishes the current promoted model registry to `form-app/data.js`.
 
 Grand Sport source/runtime-contract refresh:
 
 ```sh
 cd <repo-root>
 .venv/bin/python scripts/generate_form.py --model grand_sport
+.venv/bin/python scripts/generate_registry.py
 node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
 ```
@@ -271,6 +274,7 @@ Z06 source/runtime-contract refresh:
 ```sh
 cd <repo-root>
 .venv/bin/python scripts/generate_form.py --model z06
+.venv/bin/python scripts/generate_registry.py
 node --test tests/z06-contract-preview.test.mjs
 node --test tests/z06-form-data-draft.test.mjs
 node --test tests/z06-interior-accessory-cleanup.test.mjs
@@ -278,7 +282,7 @@ node --test tests/z06-performance-package-interactions.test.mjs
 node --test tests/z06-runtime-rule-corrections.test.mjs
 ```
 
-The Grand Sport and Z06 generators write inspection, contract preview, draft, and clean `*-runtime-contract.json` artifacts under `form-output/inspection/`. Registry promotion embeds the `*-runtime-contract.json` artifacts verbatim; draft-only provenance never reaches `form-app/data.js`. By design, those generator runs do not directly mutate `form-app/data.js`.
+The Grand Sport and Z06 generators write inspection, contract preview, draft, and clean `*-runtime-contract.json` artifacts under `form-output/inspection/`. `scripts/generate_registry.py` embeds the promoted `*-runtime-contract.json` artifacts verbatim; draft-only provenance never reaches `form-app/data.js`. By design, model generator runs do not directly mutate `form-app/data.js`.
 
 Optional Grand Sport audit/report refresh:
 
@@ -297,7 +301,7 @@ Runtime promotion verification / reapply (workbook-owned):
 cd <repo-root>
 .venv/bin/python scripts/promote_model.py --model z06 --write
 .venv/bin/python scripts/generate_form.py --model z06
-.venv/bin/python scripts/generate_form.py --model stingray
+.venv/bin/python scripts/generate_registry.py
 .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
 node --test tests/z06-runtime-promotion.test.mjs
 node --test tests/multi-model-runtime-switching.test.mjs

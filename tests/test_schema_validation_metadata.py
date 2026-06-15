@@ -6,6 +6,7 @@ from __future__ import annotations
 import sys
 import tempfile
 import unittest
+import json
 from pathlib import Path
 
 from openpyxl import Workbook
@@ -390,6 +391,70 @@ class SchemaValidationMetadataTests(unittest.TestCase):
         issues = validate_temp_workbook(wb)
 
         self.assertTrue(any(issue.check_id == "registry_promotion_registry_key_mismatch" for issue in issues), issues)
+
+    def test_live_app_registry_must_match_promoted_artifacts(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True}],
+            extra_sheets={
+                "model_registry_promotion": (
+                    [
+                        "model_key",
+                        "registry_key",
+                        "promoted_to_runtime",
+                        "default_model",
+                        "artifact_path",
+                        "artifact_type",
+                        "legacy_alias",
+                        "active",
+                        "display_order",
+                        "notes",
+                    ],
+                    [
+                        {
+                            "model_key": "stingray",
+                            "registry_key": "stingray",
+                            "promoted_to_runtime": True,
+                            "default_model": True,
+                            "artifact_type": "current_generation",
+                            "legacy_alias": "STINGRAY_FORM_DATA",
+                            "active": True,
+                            "display_order": 1,
+                        }
+                    ],
+                )
+            },
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            workbook_path = root / "stingray_master.xlsx"
+            app_dir = root / "form-app"
+            output_dir = root / "form-output"
+            app_dir.mkdir()
+            output_dir.mkdir()
+            fresh_data = {"dataset": {"source_sheet": "stingray_options"}, "choices": [{"choice_id": "fresh"}]}
+            stale_registry = {
+                "defaultModelKey": "stingray",
+                "models": {
+                    "stingray": {
+                        "key": "stingray",
+                        "label": "Stingray",
+                        "modelName": "Corvette Stingray",
+                        "exportSlug": "stingray",
+                        "data": {"dataset": {"source_sheet": "stingray_options"}, "choices": [{"choice_id": "stale"}]},
+                    }
+                },
+            }
+            wb.save(workbook_path)
+            (output_dir / "stingray-form-data.json").write_text(json.dumps(fresh_data), encoding="utf-8")
+            (app_dir / "data.js").write_text(
+                f"window.CORVETTE_FORM_DATA = {json.dumps(stale_registry)};\n"
+                "window.STINGRAY_FORM_DATA = window.CORVETTE_FORM_DATA.models.stingray.data;\n",
+                encoding="utf-8",
+            )
+
+            issues = validate_workbook_schema(workbook_path, check_live_contract=True)
+
+        self.assertTrue(any(issue.check_id == "app_registry_stale" for issue in issues), issues)
 
 
 if __name__ == "__main__":

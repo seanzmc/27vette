@@ -9,6 +9,13 @@ from typing import Any, Iterable
 
 from openpyxl import load_workbook
 
+from corvette_form_generator.contract import load_model_asset_map
+from corvette_form_generator.registry_promotion import (
+    build_registry_from_artifacts,
+    parse_app_data_registry,
+    registry_model_key,
+)
+
 
 BOOLEAN_COLUMNS: dict[str, tuple[str, ...]] = {
     "stingray_options": ("selectable", "active"),
@@ -266,6 +273,44 @@ def live_contract_provenance_leaks(value: Any, path: str = "$") -> Iterable[tupl
             if token in normalized:
                 yield (path, "value", value)
                 break
+
+
+def validate_app_registry_freshness(wb, workbook: Path, issues: list[SchemaIssue]) -> None:
+    app_data_path = workbook.parent / "form-app" / "data.js"
+    if not app_data_path.exists():
+        return
+    try:
+        actual_registry = parse_app_data_registry(app_data_path)
+        expected_registry = build_registry_from_artifacts(
+            wb,
+            model_assets=load_model_asset_map(wb, registry_model_key),
+            root=workbook.parent,
+        )
+        expected_registry.pop("legacyAliases", None)
+    except (FileNotFoundError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
+        add_issue(
+            issues,
+            "error",
+            "app_registry_freshness_check_failed",
+            sheet="form-app/data.js",
+            message=f"Could not validate app registry freshness: {exc}",
+        )
+        return
+    if actual_registry != expected_registry:
+        stale_models: list[str] = []
+        actual_models = actual_registry.get("models", {}) if isinstance(actual_registry, dict) else {}
+        expected_models = expected_registry.get("models", {}) if isinstance(expected_registry, dict) else {}
+        for model_key in sorted(set(actual_models) | set(expected_models)):
+            if actual_models.get(model_key) != expected_models.get(model_key):
+                stale_models.append(model_key)
+        add_issue(
+            issues,
+            "error",
+            "app_registry_stale",
+            sheet="form-app/data.js",
+            value={"stale_models": stale_models, "expected_default_model": expected_registry.get("defaultModelKey")},
+            message="form-app/data.js is stale relative to promoted runtime artifacts; run scripts/generate_registry.py.",
+        )
 
 
 def is_number(value: Any) -> bool:
@@ -809,12 +854,8 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
         if check_live_contract:
             app_data_path = workbook.parent / "form-app" / "data.js"
             if app_data_path.exists():
-                text = app_data_path.read_text(encoding="utf-8")
                 try:
-                    registry_json = text.split("window.CORVETTE_FORM_DATA = ", 1)[1].split(
-                        ";\nwindow.STINGRAY_FORM_DATA", 1
-                    )[0]
-                    registry = json.loads(registry_json)
+                    registry = parse_app_data_registry(app_data_path)
                     for model_key, entry in registry.get("models", {}).items():
                         data = entry.get("data", {})
                         for path, leak_type, leaked_value in live_contract_provenance_leaks(data):
@@ -831,7 +872,7 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                                 },
                                 message="Draft/review provenance must not leak into live app data.",
                             )
-                except (IndexError, json.JSONDecodeError) as exc:
+                except (ValueError, json.JSONDecodeError) as exc:
                     add_issue(
                         issues,
                         "error",
@@ -839,6 +880,7 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                         sheet="form-app/data.js",
                         message=f"Could not parse window.CORVETTE_FORM_DATA: {exc}",
                     )
+                validate_app_registry_freshness(wb, workbook, issues)
 
         return issues
     finally:

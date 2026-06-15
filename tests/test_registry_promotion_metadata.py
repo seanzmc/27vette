@@ -18,6 +18,7 @@ if str(SCRIPTS_DIR) not in sys.path:
 
 from corvette_form_generator.registry_promotion import (  # noqa: E402
     MODEL_REGISTRY_PROMOTION_HEADERS,
+    build_registry_from_artifacts,
     build_registry_from_promotions,
     load_registry_promotions,
 )
@@ -189,6 +190,34 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
         self.assertEqual(registry["models"]["grandSport"]["data"]["dataset"]["source_sheet"], "grandSport_options")
         choice = registry["models"]["grandSport"]["data"]["choices"][0]
         self.assertEqual(choice["source_detail_raw"], "runtime tooltip source detail")
+        self.assertEqual(registry["legacyAliases"], {"STINGRAY_FORM_DATA": "stingray"})
+
+    def test_file_backed_registry_loads_current_generation_and_runtime_contract_artifacts(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            stingray_path = root / "form-output" / "stingray-form-data.json"
+            gs_path = root / "form-output" / "inspection" / "grand-sport-runtime-contract.json"
+            gs_path.parent.mkdir(parents=True)
+            stingray_path.write_text(
+                json.dumps({"dataset": {"source_sheet": "stingray_options"}, "choices": []}),
+                encoding="utf-8",
+            )
+            gs_path.write_text(
+                json.dumps({"dataset": {"source_sheet": "grandSport_options", "status": "runtime_active"}, "choices": []}),
+                encoding="utf-8",
+            )
+            wb = workbook_with_promotions([promoted_grand_sport_row(display_order=2), promoted_stingray_row(display_order=1)])
+
+            registry = build_registry_from_artifacts(
+                wb,
+                model_assets={"stingray": {"image_url": "stingray.png"}, "grandSport": {"image_url": "gs.png"}},
+                root=root,
+            )
+
+        self.assertEqual(registry["defaultModelKey"], "stingray")
+        self.assertEqual(list(registry["models"].keys()), ["stingray", "grandSport"])
+        self.assertEqual(registry["models"]["stingray"]["data"]["dataset"]["source_sheet"], "stingray_options")
+        self.assertEqual(registry["models"]["grandSport"]["data"]["dataset"]["status"], "runtime_active")
         self.assertEqual(registry["legacyAliases"], {"STINGRAY_FORM_DATA": "stingray"})
 
     def test_promoted_artifact_with_draft_fields_fails_fast(self) -> None:

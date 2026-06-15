@@ -2,14 +2,14 @@
 """Single entry point for Corvette form-data generation.
 
 Usage:
-    python scripts/generate_form.py --model stingray      # production: form_* sheets, JSON/CSV, app registry
-    python scripts/generate_form.py --model grand_sport   # draft: inspection/preview/draft artifacts only
-    python scripts/generate_form.py --model z06           # draft: inspection/preview/draft artifacts only
+    python scripts/generate_form.py --model stingray      # production: form_* sheets and Stingray JSON/CSV
+    python scripts/generate_form.py --model grand_sport   # inspection/preview/draft/runtime-contract artifacts
+    python scripts/generate_form.py --model z06           # inspection/preview/draft/runtime-contract artifacts
+    python scripts/generate_registry.py                   # app registry from promoted runtime artifacts
 
-The production pathway runs for the current-generation model (Stingray) and is
-the only pathway that writes the workbook, form-output root artifacts, and
-form-app/data.js. All other models run the read-only draft pathway, which
-writes artifacts under form-output/inspection/ and never mutates app data.
+This command is scoped to one model's generated artifacts. It does not publish
+the browser app registry; run ``scripts/generate_registry.py`` after model
+generation when promoted runtime data should be refreshed in ``form-app/data.js``.
 """
 
 from __future__ import annotations
