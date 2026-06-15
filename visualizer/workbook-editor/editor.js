@@ -4,6 +4,35 @@ import htm from "htm";
 
 const html = htm.bind(h);
 const PAGE_SIZE = 100;
+const DEFAULT_VISIBLE_COLUMN_COUNT = 8;
+const VISIBLE_COLUMNS_STORAGE_KEY = "corvetteWorkbookEditor.visibleColumns.v1";
+
+function defaultVisibleColumns(headers) {
+  return headers.slice(0, Math.min(DEFAULT_VISIBLE_COLUMN_COUNT, headers.length));
+}
+
+function readVisibleColumns(sheetName, headers) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(VISIBLE_COLUMNS_STORAGE_KEY) || "{}");
+    const stored = parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+    const cols = Array.isArray(stored[sheetName]) ? stored[sheetName] : [];
+    const valid = cols.filter((c) => headers.includes(c));
+    return valid.length ? valid : defaultVisibleColumns(headers);
+  } catch {
+    return defaultVisibleColumns(headers);
+  }
+}
+
+function writeVisibleColumns(sheetName, cols) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(VISIBLE_COLUMNS_STORAGE_KEY) || "{}");
+    const stored = parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+    stored[sheetName] = cols;
+    localStorage.setItem(VISIBLE_COLUMNS_STORAGE_KEY, JSON.stringify(stored));
+  } catch {
+    // Column preferences are local convenience state; ignore storage failures.
+  }
+}
 
 async function fetchJson(url) {
   const res = await fetch(url);
@@ -248,18 +277,37 @@ function StructureTab({ data, modelKey, setModelKey }) {
 
 /* ── Sheet Browser tab ────────────────────────────────────── */
 
-function SheetTable({ data, name, onQueue, initialQuery }) {
+function SheetTable({ data, name, onQueue, initialQuery, focusTs, onFocusConsumed }) {
   const [sheet, setSheet] = useState(null);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(null);
   const [editing, setEditing] = useState(null); // {mode, initial, index}
+  const [visibleCols, setVisibleCols] = useState([]);
 
   useEffect(() => {
-    setSheet(null); setError(null); setQuery(initialQuery || ""); setPage(0); setOpen(null); setEditing(null);
-    fetchJson(`/api/sheet/${encodeURIComponent(name)}`).then(setSheet).catch((e) => setError(e.message));
-  }, [name, initialQuery]);
+    setSheet(null); setError(null); setQuery(""); setPage(0); setOpen(null); setEditing(null); setVisibleCols([]);
+    fetchJson(`/api/sheet/${encodeURIComponent(name)}`)
+      .then((payload) => {
+        setSheet(payload);
+        setVisibleCols(readVisibleColumns(name, payload.headers));
+      })
+      .catch((e) => setError(e.message));
+  }, [name]);
+
+  useEffect(() => {
+    if (!focusTs || !initialQuery) return;
+    setQuery(initialQuery);
+    setPage(0);
+    setOpen(null);
+    if (onFocusConsumed) onFocusConsumed();
+  }, [focusTs]);
+
+  useEffect(() => {
+    if (!sheet || visibleCols.length === 0) return;
+    writeVisibleColumns(name, visibleCols);
+  }, [name, sheet, visibleCols]);
 
   const meta = data.sheets.find((s) => s.name === name) || {};
   const editable = meta.readOnly === false;
@@ -276,8 +324,24 @@ function SheetTable({ data, name, onQueue, initialQuery }) {
   const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, pages - 1);
   const rows = filtered.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
-  const cols = sheet ? sheet.headers.slice(0, 8) : [];
+  const cols = sheet ? visibleCols.filter((c) => sheet.headers.includes(c)) : [];
   const extra = sheet ? sheet.headers.length - cols.length : 0;
+  const setColumns = (cols) => {
+    if (!sheet) return;
+    const valid = cols.filter((c) => sheet.headers.includes(c));
+    setVisibleCols(valid.length ? valid : defaultVisibleColumns(sheet.headers));
+  };
+  const toggleColumn = (col) => {
+    if (!sheet) return;
+    const selected = new Set(cols);
+    if (selected.has(col)) {
+      if (selected.size === 1) return;
+      selected.delete(col);
+    } else {
+      selected.add(col);
+    }
+    setColumns(sheet.headers.filter((hcol) => selected.has(hcol)));
+  };
 
   const queueDelete = (row) => {
     const keyCols = meta.keyCols || [];
@@ -297,6 +361,22 @@ function SheetTable({ data, name, onQueue, initialQuery }) {
         <button class="btn green" onClick=${() => setEditing({ mode: "add", initial: {} })}>+ Add Row</button>`}
       ${editable && isOptionsFamily && html`
         <span class="meta hint">options rows are added via the Add Option wizard (full OVS coverage)</span>`}
+      ${sheet && html`<details class="column-picker">
+        <summary class="btn">Columns (${cols.length}/${sheet.headers.length})</summary>
+        <div class="column-menu">
+          <div class="column-actions">
+            <button class="btn tiny" onClick=${() => setColumns(defaultVisibleColumns(sheet.headers))}>First 8</button>
+            <button class="btn tiny" onClick=${() => setColumns(sheet.headers)}>All</button>
+          </div>
+          <div class="column-options">
+            ${sheet.headers.map((col) => html`<label key=${col}>
+              <input type="checkbox" checked=${cols.includes(col)}
+                onChange=${() => toggleColumn(col)} />
+              <span>${col}</span>
+            </label>`)}
+          </div>
+        </div>
+      </details>`}
       <input type="search" placeholder="Filter rows…" value=${query}
         onInput=${(e) => { setQuery(e.target.value); setPage(0); setOpen(null); }} />
     </div>
@@ -559,7 +639,7 @@ function GroupWizard({ data, modelKey, kind, onQueue, onClose }) {
 
 /* ── Browser tab shell ────────────────────────────────────── */
 
-function BrowserTab({ data, modelKey, setModelKey, onQueue, focus }) {
+function BrowserTab({ data, modelKey, setModelKey, onQueue, focus, onFocusConsumed }) {
   const modelEntries = data.modelSheets[modelKey] || [];
   const [sheetName, setSheetName] = useState(focus?.sheet || modelEntries[0]?.sheet || null);
   const [wizard, setWizard] = useState(null); // "option" | "rule" | "exclusive"
@@ -607,7 +687,9 @@ function BrowserTab({ data, modelKey, setModelKey, onQueue, focus }) {
         modelKey=${modelKey} kind=${wizard} onQueue=${onQueue} onClose=${() => setWizard(null)} />`}
     ${sheetName
       ? html`<${SheetTable} data=${data} name=${sheetName} key=${sheetName} onQueue=${onQueue}
-          initialQuery=${focus && focus.sheet === sheetName ? focus.query : ""} />`
+          initialQuery=${focus && focus.sheet === sheetName ? focus.query : ""}
+          focusTs=${focus && focus.sheet === sheetName ? focus.ts : null}
+          onFocusConsumed=${onFocusConsumed} />`
       : html`<p class="note">No registered source sheets for this model — pick one from “other sheets…”.</p>`}`;
 }
 
@@ -988,7 +1070,8 @@ function App() {
         html`<${StructureTab} data=${data} modelKey=${modelKey} setModelKey=${setModelKey} />`}
       ${data && modelKey && tab === "browser" &&
         html`<${BrowserTab} data=${data} modelKey=${modelKey} setModelKey=${setModelKey}
-               onQueue=${onQueue} focus=${browserFocus} key=${refreshKey} />`}
+               onQueue=${onQueue} focus=${browserFocus} onFocusConsumed=${() => setBrowserFocus(null)}
+               key=${refreshKey} />`}
       ${data && tab === "review" &&
         html`<${ReviewTab} onOpenRow=${openLintRow} key=${"review" + refreshKey} />`}
       ${data && tab === "pending" &&
