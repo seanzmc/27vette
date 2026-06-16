@@ -6,7 +6,7 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-06-14T17:15:13+00:00",
+    "generated_at": "2026-06-16T04:23:57+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
@@ -1129,8 +1129,7 @@
           "target_rpo": "D3V",
           "target_active": true,
           "body_style_scope": "coupe",
-          "runtime_action": "",
-          "generation_action": ""
+          "runtime_action": ""
         },
         {
           "rule_id": "gs_copy_rule_opt_b6p_001_includes_opt_sl9_001_opt_b6p_001_includes_opt_sl9_001",
@@ -1142,8 +1141,7 @@
           "target_rpo": "SL9",
           "target_active": true,
           "body_style_scope": "",
-          "runtime_action": "",
-          "generation_action": ""
+          "runtime_action": ""
         },
         {
           "rule_id": "gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_002_requires_opt_zz3_001_convertible",
@@ -1155,8 +1153,7 @@
           "target_rpo": "ZZ3",
           "target_active": true,
           "body_style_scope": "convertible",
-          "runtime_action": "",
-          "generation_action": ""
+          "runtime_action": ""
         },
         {
           "rule_id": "gs_rule_opt_bc4_002_includes_opt_d3v_001",
@@ -1168,8 +1165,7 @@
           "target_rpo": "D3V",
           "target_active": true,
           "body_style_scope": "coupe",
-          "runtime_action": "",
-          "generation_action": ""
+          "runtime_action": ""
         },
         {
           "rule_id": "gs_copy_rule_opt_bc7_001_requires_opt_zz3_001_convertible_opt_bc7_001_requires_opt_zz3_001_convertible",
@@ -1181,8 +1177,7 @@
           "target_rpo": "ZZ3",
           "target_active": true,
           "body_style_scope": "convertible",
-          "runtime_action": "",
-          "generation_action": ""
+          "runtime_action": ""
         },
         {
           "rule_id": "gs_copy_rule_opt_bcp_002_requires_opt_zz3_001_opt_bcp_002_requires_opt_zz3_001_convertible",
@@ -1194,8 +1189,7 @@
           "target_rpo": "ZZ3",
           "target_active": true,
           "body_style_scope": "convertible",
-          "runtime_action": "",
-          "generation_action": ""
+          "runtime_action": ""
         },
         {
           "rule_id": "gs_rule_opt_bcp_002_includes_opt_d3v_001",
@@ -1207,8 +1201,7 @@
           "target_rpo": "D3V",
           "target_active": true,
           "body_style_scope": "coupe",
-          "runtime_action": "",
-          "generation_action": ""
+          "runtime_action": ""
         },
         {
           "rule_id": "gs_copy_rule_opt_bcs_002_requires_opt_zz3_001_opt_bcs_002_requires_opt_zz3_001_convertible",
@@ -1220,8 +1213,7 @@
           "target_rpo": "ZZ3",
           "target_active": true,
           "body_style_scope": "convertible",
-          "runtime_action": "",
-          "generation_action": ""
+          "runtime_action": ""
         },
         {
           "rule_id": "gs_rule_opt_bcs_002_includes_opt_d3v_001",
@@ -1233,8 +1225,7 @@
           "target_rpo": "D3V",
           "target_active": true,
           "body_style_scope": "coupe",
-          "runtime_action": "",
-          "generation_action": ""
+          "runtime_action": ""
         },
         {
           "rule_id": "gs_copy_rule_opt_zz3_001_includes_opt_bc7_002_opt_zz3_001_includes_opt_bc7_001",
@@ -1246,8 +1237,7 @@
           "target_rpo": "BC7",
           "target_active": true,
           "body_style_scope": "",
-          "runtime_action": "",
-          "generation_action": ""
+          "runtime_action": ""
         },
         {
           "rule_id": "gs_copy_rule_opt_zz3_001_includes_opt_sl9_001_opt_zz3_001_includes_opt_sl9_001",
@@ -1259,8 +1249,7 @@
           "target_rpo": "SL9",
           "target_active": true,
           "body_style_scope": "",
-          "runtime_action": "",
-          "generation_action": ""
+          "runtime_action": ""
         },
         {
           "rule_id": "gs_rule_opt_bc4_002_requires_opt_zz3_001_convertible",
@@ -1272,8 +1261,7 @@
           "target_rpo": "ZZ3",
           "target_active": true,
           "body_style_scope": "convertible",
-          "runtime_action": "",
-          "generation_action": ""
+          "runtime_action": ""
         }
       ],
       "inactiveReferences": []

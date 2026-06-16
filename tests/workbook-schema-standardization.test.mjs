@@ -54,9 +54,9 @@ canonical_source_sheets = {
 future_source_sheets = [
     'z06_options', 'z06_ovs', 'z06_rule_mapping', 'z06_price_rules', 'z06_rule_groups',
     'z06_rule_group_members', 'z06_exclusive_groups', 'z06_exclusive_members', 'z06_variant_overrides',
-    'zr1_options', 'zr1_ovs', 'zr1_rule_mapping', 'zr1_price_rules', 'zr1_rule_groups',
+    'zr1_options', 'zr1_ovs', 'zr1_price_rules', 'zr1_rule_groups',
     'zr1_rule_group_members', 'zr1_exclusive_groups', 'zr1_exclusive_members', 'zr1_variant_overrides',
-    'zr1x_options', 'zr1x_ovs', 'zr1x_rule_mapping', 'zr1x_price_rules', 'zr1x_rule_groups',
+    'zr1x_options', 'zr1x_ovs', 'zr1x_price_rules', 'zr1x_rule_groups',
     'zr1x_rule_group_members', 'zr1x_exclusive_groups', 'zr1x_exclusive_members', 'zr1x_variant_overrides',
 ]
 
@@ -191,7 +191,6 @@ test("future Corvette model metadata is scaffolded against shared LZ interiors",
     zr1: {
       source_option_sheet: "zr1_options",
       status_sheet: "zr1_ovs",
-      rule_mapping_sheet: "zr1_rule_mapping",
       price_rules_sheet: "zr1_price_rules",
       rule_groups_sheet: "zr1_rule_groups",
       rule_group_members_sheet: "zr1_rule_group_members",
@@ -204,7 +203,6 @@ test("future Corvette model metadata is scaffolded against shared LZ interiors",
     zr1x: {
       source_option_sheet: "zr1x_options",
       status_sheet: "zr1x_ovs",
-      rule_mapping_sheet: "zr1x_rule_mapping",
       price_rules_sheet: "zr1x_price_rules",
       rule_groups_sheet: "zr1x_rule_groups",
       rule_group_members_sheet: "zr1x_rule_group_members",
@@ -261,24 +259,15 @@ test("future Corvette model metadata is scaffolded against shared LZ interiors",
 // The future-staging scaffold (scripts + ingest modules) was removed in the
 // pre-merge cleanup, so this stale-count guard is retired with it.
 
-test("rule source sheets do not retain runtime-skipped lifecycle rows", () => {
+test("rule source sheets do not retain lifecycle-only columns", () => {
   for (const [sheetName, rows] of [
     ["rule_mapping", snapshot.rule_mapping_rows],
     ["grandSport_rule_mapping", snapshot.grand_sport_rule_mapping_rows],
   ]) {
     assert.ok(rows.length > 0, `${sheetName} should have rule rows`);
     for (const row of rows) {
-      assert.ok("normalization_status" in row, `${sheetName}.${row.rule_id} missing normalization_status`);
-      assert.equal(
-        String(row.generation_action || "").startsWith("omit"),
-        false,
-        `${sheetName}.${row.rule_id} should be deleted instead of retained with generation_action=${row.generation_action}`,
-      );
-      assert.equal(
-        ["omitted", "replaced"].includes(String(row.normalization_status || "").toLowerCase()),
-        false,
-        `${sheetName}.${row.rule_id} should be deleted instead of retained with normalization_status=${row.normalization_status}`,
-      );
+      assert.equal("generation_action" in row, false, `${sheetName}.${row.rule_id} should not keep generation_action`);
+      assert.equal("normalization_status" in row, false, `${sheetName}.${row.rule_id} should not keep normalization_status`);
     }
   }
 });
@@ -311,19 +300,12 @@ def active(row):
     return value.lower() not in {'false', '0', 'no', 'inactive'}
 
 def runtime_authored_rule(row):
-    status = clean(row.get('normalization_status')).lower()
-    if status in {'omitted', 'replaced'}:
-        return False
-    if status == 'preserved':
-        return True
-    return not clean(row.get('generation_action')).lower().startswith('omit')
+    return True
 
 models = {
     'stingray': ('rule_mapping', 'exclusive_groups', 'exclusive_group_members'),
     'grandSport': ('grandSport_rule_mapping', 'grandSport_exclusive_groups', 'grandSport_exclusive_members'),
     'z06': ('z06_rule_mapping', 'z06_exclusive_groups', 'z06_exclusive_members'),
-    'zr1': ('zr1_rule_mapping', 'zr1_exclusive_groups', 'zr1_exclusive_members'),
-    'zr1x': ('zr1x_rule_mapping', 'zr1x_exclusive_groups', 'zr1x_exclusive_members'),
 }
 
 duplicates = []
@@ -346,8 +328,6 @@ for model_key, (rule_sheet, group_sheet, member_sheet) in models.items():
         if not source_group or source_group != group_by_option.get(target_id):
             continue
         if clean(row.get('runtime_action')) == 'replace':
-            continue
-        if clean(row.get('generation_action')) == 'preserve_runtime_exclude':
             continue
         duplicates.append({
             'model': model_key,
@@ -392,12 +372,7 @@ def active(row):
     return value.lower() not in {'false', '0', 'no', 'inactive'}
 
 def runtime_authored_rule(row):
-    status = clean(row.get('normalization_status')).lower()
-    if status in {'omitted', 'replaced'}:
-        return False
-    if status == 'preserved':
-        return True
-    return not clean(row.get('generation_action')).lower().startswith('omit')
+    return True
 
 options = {clean(row.get('option_id')): row for row in rows('z06_options')}
 active_group_ids = {clean(row.get('group_id')) for row in rows('z06_exclusive_groups') if active(row)}
@@ -467,12 +442,7 @@ def active(row):
     return value.lower() not in {'false', '0', 'no', 'inactive'}
 
 def runtime_authored_rule(row):
-    status = clean(row.get('normalization_status')).lower()
-    if status in {'omitted', 'replaced'}:
-        return False
-    if status == 'preserved':
-        return True
-    return not clean(row.get('generation_action')).lower().startswith('omit')
+    return True
 
 models = {
     'stingray': {
@@ -495,20 +465,6 @@ models = {
         'member_sheet': 'z06_rule_group_members',
         'option_sheet': 'z06_options',
         'source_rpos': ['R88', 'SFZ', 'CF8', 'SHT', 'GBA'],
-    },
-    'zr1': {
-        'rule_sheet': 'zr1_rule_mapping',
-        'group_sheet': 'zr1_rule_groups',
-        'member_sheet': 'zr1_rule_group_members',
-        'option_sheet': 'zr1_options',
-        'source_rpos': ['R88', 'SFZ'],
-    },
-    'zr1x': {
-        'rule_sheet': 'zr1x_rule_mapping',
-        'group_sheet': 'zr1x_rule_groups',
-        'member_sheet': 'zr1x_rule_group_members',
-        'option_sheet': 'zr1x_options',
-        'source_rpos': ['R88', 'SFZ'],
     },
 }
 
@@ -534,8 +490,6 @@ for model_key, config in models.items():
             if clean(rule.get('rule_type')) != 'excludes':
                 continue
             if clean(rule.get('runtime_action')) == 'replace':
-                continue
-            if clean(rule.get('generation_action')) == 'preserve_runtime_exclude':
                 continue
             source_id = clean(rule.get('source_id'))
             target_id = clean(rule.get('target_id'))

@@ -16,12 +16,27 @@ def active_source_row(row: dict[str, str]) -> bool:
 
 
 def runtime_authored_rule(row: dict[str, str]) -> bool:
-    status = clean(row.get("normalization_status", "")).lower()
-    if status in {"omitted", "replaced"}:
-        return False
-    if status == "preserved":
-        return True
-    return not clean(row.get("generation_action", "")).lower().startswith("omit")
+    return True
+
+
+def entity_type(entity_id: str, option_rows: dict[str, dict[str, Any]], interiors_by_id: dict[str, dict[str, Any]]) -> str:
+    if entity_id in interiors_by_id:
+        return "interior"
+    if entity_id in option_rows:
+        return "option"
+    return ""
+
+
+def entity_section(entity_id: str, option_rows: dict[str, dict[str, Any]], interiors_by_id: dict[str, dict[str, Any]]) -> str:
+    if entity_id in option_rows:
+        return clean(option_rows[entity_id].get("section_id", ""))
+    if entity_id in interiors_by_id:
+        return clean(interiors_by_id[entity_id].get("section_id", ""))
+    return ""
+
+
+def section_selection_mode(section_id: str, sections_by_id: dict[str, dict[str, Any]]) -> str:
+    return clean(sections_by_id.get(section_id, {}).get("selection_mode", ""))
 
 
 def load_rule_groups(wb, config: ModelConfig) -> list[dict[str, Any]]:
@@ -138,19 +153,10 @@ def build_draft_rules(
             continue
         if rule_type == "requires" and (source_id, target_id) in grouped_requires:
             continue
-        if (
-            rule_type == "excludes"
-            and (source_id, target_id) in grouped_excludes
-            and rule.get("generation_action", "") != "preserve_runtime_exclude"
-            # Replace rules carry default-removal semantics that exclusive
-            # groups do not express; they must survive group-based dedupe.
-            and rule.get("runtime_action", "") != "replace"
-        ):
-            continue
-        source_section = rule.get("source_section", "")
-        target_section = rule.get("target_section", "")
-        source_mode = sections_by_id.get(source_section, {}).get("selection_mode") or rule.get("source_selection_mode", "")
-        target_mode = sections_by_id.get(target_section, {}).get("selection_mode") or rule.get("target_selection_mode", "")
+        source_section = entity_section(source_id, option_rows, interiors_by_id)
+        target_section = entity_section(target_id, option_rows, interiors_by_id)
+        source_mode = section_selection_mode(source_section, sections_by_id)
+        target_mode = section_selection_mode(target_section, sections_by_id)
         replaces_default = rule.get("runtime_action", "") == "replace"
         redundant = (
             rule_type == "excludes"
@@ -181,8 +187,8 @@ def build_draft_rules(
                 "source_id": source_id,
                 "rule_type": rule_type,
                 "target_id": target_id,
-                "target_type": rule.get("target_type", ""),
-                "source_type": rule.get("source_type", ""),
+                "target_type": entity_type(target_id, option_rows, interiors_by_id),
+                "source_type": entity_type(source_id, option_rows, interiors_by_id),
                 "source_section": source_section,
                 "target_section": target_section,
                 "source_selection_mode": source_mode,

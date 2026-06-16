@@ -777,8 +777,8 @@ test("Grand Sport and Z06 workbook place rear hash graphics outside the stripe r
     for (const ruleId of ruleIds) {
       const row = rowsByRuleId.get(ruleId);
       assert.equal(row?.rule_type, "includes", `${ruleId} should remain an include rule`);
-      assert.notEqual(row?.generation_action, "omit", `${ruleId} should not be omitted`);
-      assert.notEqual(row?.normalization_status, "omitted", `${ruleId} should not be normalized out`);
+      assert.equal("generation_action" in row, false, `${ruleId} should not rely on generation_action lifecycle metadata`);
+      assert.equal("normalization_status" in row, false, `${ruleId} should not rely on normalization_status lifecycle metadata`);
     }
   }
 });

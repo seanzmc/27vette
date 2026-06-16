@@ -29,14 +29,7 @@ RULE_MAPPING_HEADERS = [
     "source_id",
     "rule_type",
     "target_id",
-    "target_type",
     "original_detail_raw",
-    "source_type",
-    "target_selection_mode",
-    "source_selection_mode",
-    "target_section",
-    "source_section",
-    "generation_action",
     "body_style_scope",
     "runtime_action",
     "disabled_reason",
@@ -111,17 +104,9 @@ def runtime_rule_rows(
             continue
         source_id = row.get("source_id", "")
         target_id = row.get("target_id", "")
-        source_type = row.get("source_type", "option") or "option"
-        target_type = row.get("target_type", "option") or "option"
-        if source_type == "option" and source_id not in runtime_option_ids:
+        if source_id.startswith("opt_") and source_id not in runtime_option_ids:
             continue
-        if target_type == "option" and target_id not in runtime_option_ids:
-            continue
-        if (
-            row.get("rule_type", "").lower() == "excludes"
-            and (source_id, target_id) in grouped_excludes
-            and row.get("generation_action", "") != "preserve_runtime_exclude"
-        ):
+        if target_id.startswith("opt_") and target_id not in runtime_option_ids:
             continue
         if row.get("rule_type", "").lower() == "requires" and (source_id, target_id) in grouped_requires:
             continue
@@ -309,12 +294,7 @@ def grand_sport_rule_exact_key(row: dict[str, Any]) -> tuple[str, str, str, str]
 
 
 def runtime_authored_rule(row: dict[str, Any]) -> bool:
-    status = clean(row.get("normalization_status", "")).lower()
-    if status in {"omitted", "replaced"}:
-        return False
-    if status == "preserved":
-        return True
-    return not clean(row.get("generation_action", "")).lower().startswith("omit")
+    return True
 
 
 def canonical_rule_row(rows: list[dict[str, str]]) -> dict[str, str]:
@@ -462,10 +442,9 @@ def rule_reference_issues(
         if not runtime_authored_rule(row):
             continue
         for field in ("source_id", "target_id"):
-            type_field = "source_type" if field == "source_id" else "target_type"
-            if (row.get(type_field, "option") or "option") != "option":
-                continue
             option_id = row.get(field, "")
+            if option_id and not option_id.startswith("opt_"):
+                continue
             if not option_id:
                 missing_references.append(
                     {
@@ -537,7 +516,6 @@ def engine_cover_rule_audit(
                 "target_active": active_source_row(options_by_id.get(target_id, {})) if target_id in options_by_id else False,
                 "body_style_scope": row.get("body_style_scope", ""),
                 "runtime_action": row.get("runtime_action", ""),
-                "generation_action": row.get("generation_action", ""),
             }
         )
     inactive_engine_cover_refs = [
@@ -837,18 +815,19 @@ def write_rule_audit(
         options_by_id,
         body_styles_by_option,
     )
+    def rule_section(option_id: str) -> str:
+        return clean(options_by_id.get(option_id, {}).get("section_id", ""))
+
     annotated_rules = [
-        {**row, "_audit_origin": workbook_rule_origin(row, candidate_keys)}
+        {
+            **row,
+            "source_section": row.get("source_section", "") or rule_section(row.get("source_id", "")),
+            "target_section": row.get("target_section", "") or rule_section(row.get("target_id", "")),
+            "_audit_origin": workbook_rule_origin(row, candidate_keys),
+        }
         for row in workbook_rules
     ]
-    omitted_exclusive = [
-        row
-        for row in annotated_rules
-        if row.get("rule_type", "").lower() == "excludes"
-        and row.get("generation_action", "") != "preserve_runtime_exclude"
-        and (row.get("source_id", ""), row.get("target_id", "")) in grouped_excludes
-        and (runtime_authored_rule(row) or row.get("generation_action", "") == "omit_grouped_exclusion")
-    ]
+    omitted_exclusive: list[dict[str, Any]] = []
     omitted_exclusive_rule_ids = {row.get("rule_id", "") for row in omitted_exclusive}
     runtime_ids = runtime_available_option_ids(options, status_rows, tuple(config.variant_ids))
     runtime_rows = runtime_rule_rows(workbook_rules, runtime_ids, grouped_excludes, rule_group_requires)
@@ -858,8 +837,8 @@ def write_rule_audit(
         if row.get("rule_id", "") not in omitted_exclusive_rule_ids
         and (
             not runtime_authored_rule(row)
-            or ((row.get("source_type", "option") or "option") == "option" and row.get("source_id", "") not in runtime_ids)
-            or ((row.get("target_type", "option") or "option") == "option" and row.get("target_id", "") not in runtime_ids)
+            or (row.get("source_id", "").startswith("opt_") and row.get("source_id", "") not in runtime_ids)
+            or (row.get("target_id", "").startswith("opt_") and row.get("target_id", "") not in runtime_ids)
             or (row.get("rule_type", "").lower() == "requires" and (row.get("source_id", ""), row.get("target_id", "")) in rule_group_requires)
         )
     ]

@@ -34,12 +34,15 @@ from corvette_form_generator.model_configs import STINGRAY_MODEL
 from corvette_form_generator.output import write_json_output
 from corvette_form_generator.registry_promotion import live_contract_data
 from corvette_form_generator.rules import (
+    entity_section,
+    entity_type,
     exclusive_group_pairs,
     grouped_exclusion_pairs,
     grouped_requirement_pairs,
     load_exclusive_groups,
     load_rule_groups,
     runtime_authored_rule,
+    section_selection_mode,
     truncate_reason,
 )
 from corvette_form_generator.runtime_metadata import (
@@ -405,21 +408,12 @@ def main() -> None:
             continue
         if rule_type == "requires" and (source_id, target_id) in grouped_requires:
             continue
-        if (
-            rule_type == "excludes"
-            and (source_id, target_id) in grouped_excludes
-            and rule.get("generation_action", "") != "preserve_runtime_exclude"
-            # Replace rules carry default-removal semantics that exclusive
-            # groups do not express; they must survive group-based dedupe.
-            and rule.get("runtime_action", "") != "replace"
-        ):
-            continue
         if source_id in hidden_option_ids or target_id in hidden_option_ids:
             continue
-        source_section = rule.get("source_section", "")
-        target_section = rule.get("target_section", "")
-        source_mode = sections.get(source_section, {}).get("selection_mode") or rule.get("source_selection_mode", "")
-        target_mode = sections.get(target_section, {}).get("selection_mode") or rule.get("target_selection_mode", "")
+        source_section = entity_section(source_id, options_by_id, interiors_by_id)
+        target_section = entity_section(target_id, options_by_id, interiors_by_id)
+        source_mode = section_selection_mode(source_section, sections)
+        target_mode = section_selection_mode(target_section, sections)
         body_style_scope = rule.get("body_style_scope", "")
         replaces_t0a = rule.get("runtime_action", "") == "replace"
         redundant = (
@@ -462,8 +456,8 @@ def main() -> None:
                 "source_id": source_id,
                 "rule_type": rule_type,
                 "target_id": target_id,
-                "target_type": rule.get("target_type", ""),
-                "source_type": rule.get("source_type", ""),
+                "target_type": entity_type(target_id, options_by_id, interiors_by_id),
+                "source_type": entity_type(source_id, options_by_id, interiors_by_id),
                 "source_section": source_section,
                 "target_section": target_section,
                 "source_selection_mode": source_mode,

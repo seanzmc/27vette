@@ -77,13 +77,10 @@ EDITOR_SHEET_META: dict[str, dict] = {
             "rule_type": ("includes", "excludes", "requires"),
             "body_style_scope": ("", "coupe", "convertible"),
             "runtime_action": ("", "replace"),
-            "normalization_status": ("active", "omitted", "replaced", "preserved"),
         },
         "refs": {
             "source_id": "options",
             "target_id": "options",
-            "source_section": "sections",
-            "target_section": "sections",
         },
     },
     "rule_groups": {

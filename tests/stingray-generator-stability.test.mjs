@@ -70,18 +70,10 @@ const ruleMappingHeaders = [
   "source_id",
   "rule_type",
   "target_id",
-  "target_type",
   "original_detail_raw",
-  "source_type",
-  "target_selection_mode",
-  "source_selection_mode",
-  "target_section",
-  "source_section",
-  "generation_action",
   "body_style_scope",
   "runtime_action",
   "disabled_reason",
-  "normalization_status",
 ];
 const priceRuleHeaders = [
   "price_rule_id",

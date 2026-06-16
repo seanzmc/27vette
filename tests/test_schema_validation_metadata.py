@@ -26,8 +26,6 @@ RULE_MAPPING_HEADERS = [
     "source_id",
     "target_id",
     "rule_type",
-    "generation_action",
-    "normalization_status",
 ]
 PRICE_RULE_HEADERS = ["rule_id", "target_id", "price_rule_type", "price_value"]
 ACTIVE_GROUP_HEADERS = ["group_id", "active"]

@@ -156,23 +156,6 @@ REQUIRED_SHEETS: tuple[str, ...] = (
     "PriceRef",
 )
 
-LIFECYCLE_COLUMNS: tuple[str, ...] = (
-    "normalization_status",
-)
-
-ALLOWED_GENERATION_ACTIONS: set[str] = {
-    "",
-    "omit_grouped_requirement",
-    "omit_grouped_exclusion",
-    "omit_replaced_by_d3v_include",
-    "omit_soft_defaulted_caliper",
-    "omit_redundant_scoped_duplicate",
-    "preserve_runtime_exclude",
-    "omit_replaced_by_brake_exclusive_group",
-}
-
-ALLOWED_NORMALIZATION_STATUSES: set[str] = {"", "active", "omitted", "replaced", "preserved", "review"}
-
 DRAFT_ONLY_CHOICE_FIELDS: set[str] = {"source_option_name", "source_description", "text_cleanup_notes"}
 DRAFT_ONLY_PROVENANCE_FIELDS: set[str] = {
     "draftMetadata",
@@ -803,75 +786,6 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                             value=value,
                             message=f"{sheet}.{column} must be numeric or blank; blank means null/not-priced and 0 means explicit zero-price.",
                         )
-
-        rule_mapping_sheets = tuple(source_sheets_by_role.get("rule_mapping_sheet", [])) or (
-            "rule_mapping",
-            "grandSport_rule_mapping",
-        )
-        for sheet in rule_mapping_sheets:
-            if sheet not in wb.sheetnames:
-                continue
-            ws = wb[sheet]
-            headers = header_index(ws)
-            for column in LIFECYCLE_COLUMNS:
-                if column not in headers:
-                    add_issue(
-                        issues,
-                        "error",
-                        "missing_lifecycle_column",
-                        sheet=sheet,
-                        column=column,
-                        message=f"{sheet} must include lifecycle column {column}.",
-                    )
-            if not all(column in headers for column in ("generation_action", "normalization_status")):
-                continue
-            for row_number, row in records(ws):
-                action = str(row.get("generation_action") or "").strip()
-                status = str(row.get("normalization_status") or "").strip()
-                if action not in ALLOWED_GENERATION_ACTIONS:
-                    add_issue(
-                        issues,
-                        "error",
-                        "unknown_generation_action",
-                        sheet=sheet,
-                        row=row_number,
-                        column="generation_action",
-                        value=action,
-                        message=f"Unknown generation_action {action!r}.",
-                    )
-                if status not in ALLOWED_NORMALIZATION_STATUSES:
-                    add_issue(
-                        issues,
-                        "error",
-                        "unknown_normalization_status",
-                        sheet=sheet,
-                        row=row_number,
-                        column="normalization_status",
-                        value=status,
-                        message=f"Unknown normalization_status {status!r}.",
-                    )
-                if action.startswith("omit") and status not in {"omitted", "replaced"}:
-                    add_issue(
-                        issues,
-                        "error",
-                        "omitted_action_missing_status",
-                        sheet=sheet,
-                        row=row_number,
-                        column="normalization_status",
-                        value=status,
-                        message="Omitted/replaced generation_action rows must have omitted or replaced normalization_status.",
-                    )
-                if action == "preserve_runtime_exclude" and status != "preserved":
-                    add_issue(
-                        issues,
-                        "error",
-                        "preserved_action_status",
-                        sheet=sheet,
-                        row=row_number,
-                        column="normalization_status",
-                        value=status,
-                        message="preserve_runtime_exclude rows must have normalization_status preserved.",
-                    )
 
         validated_ovs_pairs: set[tuple[str, str]] = set()
         for model_key, sources in source_graph.items():

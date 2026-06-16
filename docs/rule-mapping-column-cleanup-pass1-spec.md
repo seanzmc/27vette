@@ -94,7 +94,7 @@ Also remove any trailing blank header/table columns left behind in `rule_mapping
 
 For unpromoted future models:
 
-- Delete or archive `zr1_rule_mapping` and `zr1x_rule_mapping` in the same workbook-safe pass.
+- Delete `zr1_rule_mapping` and `zr1x_rule_mapping` in the same workbook-safe pass.
 - Remove or deactivate their `model_workbook_sources` rows for `source_role=rule_mapping_sheet`.
 - Keep ZR1/ZR1X out of generation, registry promotion, and runtime scope.
 - Do not touch other ZR1/ZR1X option, OVS, price-rule, rule-group, exclusive-group, or variant-override sheets unless required only to remove stale references to the deleted rule-mapping sheets.
@@ -221,11 +221,11 @@ This decision must be backed by before/after generated contract comparison and a
 Use a safe-save workbook migration path, not manual Excel editing:
 
 - Remove the eight retired columns from `rule_mapping`, `grandSport_rule_mapping`, and `z06_rule_mapping`.
-- Delete or archive `zr1_rule_mapping` and `zr1x_rule_mapping`.
+- Delete `zr1_rule_mapping` and `zr1x_rule_mapping`.
 - Remove or deactivate the `model_workbook_sources` rows that register `zr1_rule_mapping` / `zr1x_rule_mapping` as `rule_mapping_sheet` sources.
 - Refresh Excel table refs to the reduced dimensions.
 - Save through `save_workbook_safely()`.
-- Reopen the workbook from disk and assert exact promoted rule-mapping headers, row counts, future-model rule-mapping sheet absence/archive state, and `model_workbook_sources` state.
+- Reopen the workbook from disk and assert exact promoted rule-mapping headers, row counts, future-model rule-mapping sheet absence, and `model_workbook_sources` state.
 
 The migration helper should be temporary or deleted after verification; do not leave a stale one-pass workbook writer as executable documentation.
 
@@ -301,9 +301,9 @@ Manual/browser verification:
 - Do not remodel replacement/default semantics.
 - Do not normalize or delete body-scoped ZZ3/engine-cover rules in this pass.
 - Do not change rule-group or exclusive-group schemas except where code needs to derive source/target metadata.
-- Do not promote ZR1/ZR1X or touch future-model scaffold rows beyond deleting/archiving `zr1_rule_mapping` / `zr1x_rule_mapping` and removing/deactivating stale references to those sheets.
+- Do not promote ZR1/ZR1X or touch future-model scaffold rows beyond deleting `zr1_rule_mapping` / `zr1x_rule_mapping` and removing/deactivating stale references to those sheets.
 - Do not redesign optional audit/report output beyond what is required to survive the source-schema cleanup.
 
 ## Approval Question
 
-Approve Pass 1 as scoped above: retire duplicate/lifecycle rule-mapping columns for the three runtime models, delete/archive unpromoted ZR1/ZR1X rule-mapping sheets and their workbook-source registrations, derive section/type/mode metadata from canonical source sheets while preserving generated rule payload shape by default, resolve the one Grand Sport `generation_action` row directly, regenerate/compare runtime contracts, and explicitly leave `body_style_scope` and `runtime_action` untouched?
+Approve Pass 1 as scoped above: retire duplicate/lifecycle rule-mapping columns for the three runtime models, delete unpromoted ZR1/ZR1X rule-mapping sheets and their workbook-source registrations, derive section/type/mode metadata from canonical source sheets while preserving generated rule payload shape by default, resolve the one Grand Sport `generation_action` row directly, regenerate/compare runtime contracts, and explicitly leave `body_style_scope` and `runtime_action` untouched?
