@@ -10,14 +10,14 @@ Implementation result:
 
 - Created `docs/copy-convergence-review-2026-06-17.md` from a read-only workbook probe.
 - Applied safe GS/Z06-majority copy convergence to Stingray source rows, excluding reviewed/deferred allowlist fields.
-- Applied user decisions R-1 through R-5:
+- Applied user decisions R-1 through R-6:
   - R-1 UV6 Z06 section drift remains intentional.
   - R-2 SC7 moved to Stingray `sec_lpoe_001`, punctuation normalized, and display order set to `71` to preserve active `(section_id, display_order)` uniqueness.
   - R-3 DRZ copy normalized to `Auto-Dimming Rear Camera Mirror` / `Inside rearview with full camera display`.
   - R-4 EFR/EDU copy updated per model-specific decision.
   - R-5 NGA copy updated per model-specific exhaust-exit decision.
-  - R-6 seat presentation/order remains deferred to a separate pass.
-- Extended `tests/workbook-visual-copy-standardization.test.mjs` to load `z06_options`, enforce shared-copy parity with an allowlist, reject trailing-period-only drift, and assert R-1 through R-5 decisions.
+  - R-6 AUP copy/order normalized in `docs/seat-presentation-order-spec.md`: `Asymmetrical Seats` / `Competition Driver Seat, GT2 Passenger Seat`, with active seat order AQ9/AH2/AE4/AUP at 10/20/30/40.
+- Extended `tests/workbook-visual-copy-standardization.test.mjs` to load `z06_options`, enforce shared-copy parity with an allowlist, reject trailing-period-only drift, and assert R-1 through R-6 decisions.
 - Regenerated Stingray, Grand Sport, Z06, and registry artifacts.
 - Updated `tests/stingray-generator-stability.test.mjs` for the already-current Stingray generated rule count of `144`, matching the previously completed rear-script pairwise-exclude retirement.
 
@@ -51,7 +51,7 @@ Current workbook facts from read-only probe:
 - Representative name drift still present: AJ7, AP9, AUP, BAZ, BV4, CJ2, CM9, D84, D86, DPB, DPC, DPG.
 - Representative description drift still present: 5JR, 5ZC, 5ZD, AJ7, AP9, AUP, BAZ, BV4, CAV, CFX, CJ2, CM9.
 
-Current product-review rows still needing explicit decisions:
+Historical product-review rows that required explicit decisions:
 
 | ID | Current evidence | Decision needed before workbook edit |
 |---|---|---|

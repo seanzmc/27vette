@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-06-17T21:02:41+00:00"
+    "generated_at": "2026-06-17T22:28:13+00:00"
   },
   "variants": [
     {
@@ -12746,7 +12746,7 @@
       "selectable": "True",
       "active": "True",
       "base_price": 2095,
-      "display_order": 40
+      "display_order": 30
     },
     {
       "choice_id": "2lt_c07__opt_ae4_002",
@@ -12766,7 +12766,7 @@
       "selectable": "True",
       "active": "True",
       "base_price": 2095,
-      "display_order": 40
+      "display_order": 30
     },
     {
       "choice_id": "3lt_c07__opt_ae4_002",
@@ -12786,7 +12786,7 @@
       "selectable": "True",
       "active": "True",
       "base_price": 2095,
-      "display_order": 40
+      "display_order": 30
     },
     {
       "choice_id": "1lt_c67__opt_ae4_002",
@@ -12806,7 +12806,7 @@
       "selectable": "True",
       "active": "True",
       "base_price": 2095,
-      "display_order": 40
+      "display_order": 30
     },
     {
       "choice_id": "2lt_c67__opt_ae4_002",
@@ -12826,7 +12826,7 @@
       "selectable": "True",
       "active": "True",
       "base_price": 2095,
-      "display_order": 40
+      "display_order": 30
     },
     {
       "choice_id": "3lt_c67__opt_ae4_002",
@@ -12846,14 +12846,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 2095,
-      "display_order": 40
+      "display_order": 30
     },
     {
       "choice_id": "1lt_c07__opt_aup_001",
       "option_id": "opt_aup_001",
       "rpo": "AUP",
-      "label": "Competition Sport Driver and GT2 Passenger Bucket Seats",
-      "description": "",
+      "label": "Asymmetrical Seats",
+      "description": "Competition Driver Seat, GT2 Passenger Seat",
       "section_id": "sec_seat_002",
       "section_name": "Seats",
       "standard_equipment_group_type": "",
@@ -12866,14 +12866,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 350,
-      "display_order": 80
+      "display_order": 40
     },
     {
       "choice_id": "2lt_c07__opt_aup_001",
       "option_id": "opt_aup_001",
       "rpo": "AUP",
-      "label": "Competition Sport Driver and GT2 Passenger Bucket Seats",
-      "description": "",
+      "label": "Asymmetrical Seats",
+      "description": "Competition Driver Seat, GT2 Passenger Seat",
       "section_id": "sec_seat_002",
       "section_name": "Seats",
       "standard_equipment_group_type": "",
@@ -12886,14 +12886,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 350,
-      "display_order": 80
+      "display_order": 40
     },
     {
       "choice_id": "3lt_c07__opt_aup_001",
       "option_id": "opt_aup_001",
       "rpo": "AUP",
-      "label": "Competition Sport Driver and GT2 Passenger Bucket Seats",
-      "description": "",
+      "label": "Asymmetrical Seats",
+      "description": "Competition Driver Seat, GT2 Passenger Seat",
       "section_id": "sec_seat_002",
       "section_name": "Seats",
       "standard_equipment_group_type": "",
@@ -12906,14 +12906,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 350,
-      "display_order": 80
+      "display_order": 40
     },
     {
       "choice_id": "1lt_c67__opt_aup_001",
       "option_id": "opt_aup_001",
       "rpo": "AUP",
-      "label": "Competition Sport Driver and GT2 Passenger Bucket Seats",
-      "description": "",
+      "label": "Asymmetrical Seats",
+      "description": "Competition Driver Seat, GT2 Passenger Seat",
       "section_id": "sec_seat_002",
       "section_name": "Seats",
       "standard_equipment_group_type": "",
@@ -12926,14 +12926,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 350,
-      "display_order": 80
+      "display_order": 40
     },
     {
       "choice_id": "2lt_c67__opt_aup_001",
       "option_id": "opt_aup_001",
       "rpo": "AUP",
-      "label": "Competition Sport Driver and GT2 Passenger Bucket Seats",
-      "description": "",
+      "label": "Asymmetrical Seats",
+      "description": "Competition Driver Seat, GT2 Passenger Seat",
       "section_id": "sec_seat_002",
       "section_name": "Seats",
       "standard_equipment_group_type": "",
@@ -12946,14 +12946,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 350,
-      "display_order": 80
+      "display_order": 40
     },
     {
       "choice_id": "3lt_c67__opt_aup_001",
       "option_id": "opt_aup_001",
       "rpo": "AUP",
-      "label": "Competition Sport Driver and GT2 Passenger Bucket Seats",
-      "description": "",
+      "label": "Asymmetrical Seats",
+      "description": "Competition Driver Seat, GT2 Passenger Seat",
       "section_id": "sec_seat_002",
       "section_name": "Seats",
       "standard_equipment_group_type": "",
@@ -12966,7 +12966,7 @@
       "selectable": "True",
       "active": "True",
       "base_price": 350,
-      "display_order": 80
+      "display_order": 40
     },
     {
       "choice_id": "1lt_c07__opt_zf1_001",
@@ -21530,7 +21530,7 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1695,
-      "display_order": 25
+      "display_order": 20
     },
     {
       "choice_id": "2lt_c07__opt_ah2_001",
@@ -21550,7 +21550,7 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1695,
-      "display_order": 25
+      "display_order": 20
     },
     {
       "choice_id": "3lt_c07__opt_ah2_001",
@@ -21570,7 +21570,7 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1695,
-      "display_order": 25
+      "display_order": 20
     },
     {
       "choice_id": "1lt_c67__opt_ah2_001",
@@ -21590,7 +21590,7 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1695,
-      "display_order": 25
+      "display_order": 20
     },
     {
       "choice_id": "2lt_c67__opt_ah2_001",
@@ -21610,7 +21610,7 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1695,
-      "display_order": 25
+      "display_order": 20
     },
     {
       "choice_id": "3lt_c67__opt_ah2_001",
@@ -21630,7 +21630,7 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1695,
-      "display_order": 25
+      "display_order": 20
     },
     {
       "choice_id": "1lt_c07__opt_001",
@@ -31814,7 +31814,7 @@
       "section_id": "sec_seat_002",
       "section_name": "Seats",
       "standard_equipment_group_type": "",
-      "display_order": 25
+      "display_order": 20
     },
     {
       "equipment_id": "std_3lt_c67__opt_ah2_001",
@@ -31828,7 +31828,7 @@
       "section_id": "sec_seat_002",
       "section_name": "Seats",
       "standard_equipment_group_type": "",
-      "display_order": 25
+      "display_order": 20
     },
     {
       "equipment_id": "std_3lt_c07__opt_001",

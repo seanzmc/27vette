@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-17T21:02:41+00:00"
+          "generated_at": "2026-06-17T22:28:13+00:00"
         },
         "variants": [
           {
@@ -12754,7 +12754,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 2095,
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "2lt_c07__opt_ae4_002",
@@ -12774,7 +12774,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 2095,
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "3lt_c07__opt_ae4_002",
@@ -12794,7 +12794,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 2095,
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "1lt_c67__opt_ae4_002",
@@ -12814,7 +12814,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 2095,
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "2lt_c67__opt_ae4_002",
@@ -12834,7 +12834,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 2095,
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "3lt_c67__opt_ae4_002",
@@ -12854,14 +12854,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 2095,
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "1lt_c07__opt_aup_001",
             "option_id": "opt_aup_001",
             "rpo": "AUP",
-            "label": "Competition Sport Driver and GT2 Passenger Bucket Seats",
-            "description": "",
+            "label": "Asymmetrical Seats",
+            "description": "Competition Driver Seat, GT2 Passenger Seat",
             "section_id": "sec_seat_002",
             "section_name": "Seats",
             "standard_equipment_group_type": "",
@@ -12874,14 +12874,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 350,
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "2lt_c07__opt_aup_001",
             "option_id": "opt_aup_001",
             "rpo": "AUP",
-            "label": "Competition Sport Driver and GT2 Passenger Bucket Seats",
-            "description": "",
+            "label": "Asymmetrical Seats",
+            "description": "Competition Driver Seat, GT2 Passenger Seat",
             "section_id": "sec_seat_002",
             "section_name": "Seats",
             "standard_equipment_group_type": "",
@@ -12894,14 +12894,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 350,
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "3lt_c07__opt_aup_001",
             "option_id": "opt_aup_001",
             "rpo": "AUP",
-            "label": "Competition Sport Driver and GT2 Passenger Bucket Seats",
-            "description": "",
+            "label": "Asymmetrical Seats",
+            "description": "Competition Driver Seat, GT2 Passenger Seat",
             "section_id": "sec_seat_002",
             "section_name": "Seats",
             "standard_equipment_group_type": "",
@@ -12914,14 +12914,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 350,
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "1lt_c67__opt_aup_001",
             "option_id": "opt_aup_001",
             "rpo": "AUP",
-            "label": "Competition Sport Driver and GT2 Passenger Bucket Seats",
-            "description": "",
+            "label": "Asymmetrical Seats",
+            "description": "Competition Driver Seat, GT2 Passenger Seat",
             "section_id": "sec_seat_002",
             "section_name": "Seats",
             "standard_equipment_group_type": "",
@@ -12934,14 +12934,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 350,
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "2lt_c67__opt_aup_001",
             "option_id": "opt_aup_001",
             "rpo": "AUP",
-            "label": "Competition Sport Driver and GT2 Passenger Bucket Seats",
-            "description": "",
+            "label": "Asymmetrical Seats",
+            "description": "Competition Driver Seat, GT2 Passenger Seat",
             "section_id": "sec_seat_002",
             "section_name": "Seats",
             "standard_equipment_group_type": "",
@@ -12954,14 +12954,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 350,
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "3lt_c67__opt_aup_001",
             "option_id": "opt_aup_001",
             "rpo": "AUP",
-            "label": "Competition Sport Driver and GT2 Passenger Bucket Seats",
-            "description": "",
+            "label": "Asymmetrical Seats",
+            "description": "Competition Driver Seat, GT2 Passenger Seat",
             "section_id": "sec_seat_002",
             "section_name": "Seats",
             "standard_equipment_group_type": "",
@@ -12974,7 +12974,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 350,
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "1lt_c07__opt_zf1_001",
@@ -21538,7 +21538,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1695,
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "2lt_c07__opt_ah2_001",
@@ -21558,7 +21558,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1695,
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "3lt_c07__opt_ah2_001",
@@ -21578,7 +21578,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1695,
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "1lt_c67__opt_ah2_001",
@@ -21598,7 +21598,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1695,
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "2lt_c67__opt_ah2_001",
@@ -21618,7 +21618,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1695,
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "3lt_c67__opt_ah2_001",
@@ -21638,7 +21638,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1695,
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "1lt_c07__opt_001",
@@ -31822,7 +31822,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_seat_002",
             "section_name": "Seats",
             "standard_equipment_group_type": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "equipment_id": "std_3lt_c67__opt_ah2_001",
@@ -31836,7 +31836,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_seat_002",
             "section_name": "Seats",
             "standard_equipment_group_type": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "equipment_id": "std_3lt_c07__opt_001",
@@ -47935,7 +47935,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-17T21:02:42+00:00",
+          "generated_at": "2026-06-17T22:28:14+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -68904,7 +68904,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "2lt_e07__opt_ah2_001",
@@ -68925,7 +68925,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "3lt_e07__opt_ah2_001",
@@ -68946,7 +68946,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "1lt_e67__opt_ah2_001",
@@ -68967,7 +68967,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "2lt_e67__opt_ah2_001",
@@ -68988,7 +68988,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "3lt_e67__opt_ah2_001",
@@ -69009,7 +69009,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "1lt_e07__opt_ae4_002",
@@ -69030,7 +69030,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1095,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "2lt_e07__opt_ae4_002",
@@ -69051,7 +69051,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1095,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "3lt_e07__opt_ae4_002",
@@ -69072,7 +69072,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1095,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "1lt_e67__opt_ae4_002",
@@ -69093,7 +69093,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1095,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "2lt_e67__opt_ae4_002",
@@ -69114,7 +69114,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1095,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "3lt_e67__opt_ae4_002",
@@ -69135,7 +69135,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1095,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "1lt_e07__opt_aup_001",
@@ -69156,7 +69156,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 350,
             "display_behavior": "",
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "2lt_e07__opt_aup_001",
@@ -69177,7 +69177,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 350,
             "display_behavior": "",
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "3lt_e07__opt_aup_001",
@@ -69198,7 +69198,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 350,
             "display_behavior": "",
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "1lt_e67__opt_aup_001",
@@ -69219,7 +69219,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 350,
             "display_behavior": "",
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "2lt_e67__opt_aup_001",
@@ -69240,7 +69240,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 350,
             "display_behavior": "",
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "3lt_e67__opt_aup_001",
@@ -69261,7 +69261,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 350,
             "display_behavior": "",
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "1lt_e07__opt_z25_001",
@@ -82645,7 +82645,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_seat_002",
             "section_name": "Seats",
             "standard_equipment_group_type": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "equipment_id": "std_3lt_e67__opt_ah2_001",
@@ -82659,7 +82659,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_seat_002",
             "section_name": "Seats",
             "standard_equipment_group_type": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "equipment_id": "std_1lt_e07__opt_cj2_001",
@@ -97339,7 +97339,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-17T21:02:42+00:00",
+          "generated_at": "2026-06-17T22:28:15+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -117275,7 +117275,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1095,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "2lz_h07__opt_ae4_002",
@@ -117296,7 +117296,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1095,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "3lz_h07__opt_ae4_002",
@@ -117317,7 +117317,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1095,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "1lz_h67__opt_ae4_002",
@@ -117338,7 +117338,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1095,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "2lz_h67__opt_ae4_002",
@@ -117359,7 +117359,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1095,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "3lz_h67__opt_ae4_002",
@@ -117380,7 +117380,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1095,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 30
           },
           {
             "choice_id": "1lz_h07__opt_ah2_001",
@@ -117401,7 +117401,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1695,
             "display_behavior": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "2lz_h07__opt_ah2_001",
@@ -117422,7 +117422,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1695,
             "display_behavior": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "3lz_h07__opt_ah2_001",
@@ -117443,7 +117443,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1695,
             "display_behavior": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "1lz_h67__opt_ah2_001",
@@ -117464,7 +117464,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1695,
             "display_behavior": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "2lz_h67__opt_ah2_001",
@@ -117485,7 +117485,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1695,
             "display_behavior": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "3lz_h67__opt_ah2_001",
@@ -117506,7 +117506,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 1695,
             "display_behavior": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "choice_id": "1lz_h07__opt_aq9_001",
@@ -117653,7 +117653,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 350,
             "display_behavior": "",
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "2lz_h07__opt_aup_001",
@@ -117674,7 +117674,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 350,
             "display_behavior": "",
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "3lz_h07__opt_aup_001",
@@ -117695,7 +117695,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 350,
             "display_behavior": "",
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "1lz_h67__opt_aup_001",
@@ -117716,7 +117716,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 350,
             "display_behavior": "",
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "2lz_h67__opt_aup_001",
@@ -117737,7 +117737,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 350,
             "display_behavior": "",
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "3lz_h67__opt_aup_001",
@@ -117758,7 +117758,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 350,
             "display_behavior": "",
-            "display_order": 80
+            "display_order": 40
           },
           {
             "choice_id": "1lz_h07__opt_085",
@@ -131936,7 +131936,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_seat_002",
             "section_name": "Seats",
             "standard_equipment_group_type": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "equipment_id": "std_3lz_h67__opt_ah2_001",
@@ -131950,7 +131950,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_seat_002",
             "section_name": "Seats",
             "standard_equipment_group_type": "",
-            "display_order": 25
+            "display_order": 20
           },
           {
             "equipment_id": "std_1lz_h07__opt_aq9_001",

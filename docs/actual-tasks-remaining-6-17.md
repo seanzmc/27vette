@@ -27,11 +27,11 @@ From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 
 - Copy-convergence / product-decision pass:
   - `docs/copy-convergence-review-2026-06-17.md` records the strict shared-option drift review.
   - Safe GS/Z06-majority copy was applied to Stingray source rows, excluding reviewed/deferred allowlist fields.
-  - `tests/workbook-visual-copy-standardization.test.mjs` now loads `z06_options`, enforces shared-copy parity with an allowlist, rejects trailing-period-only drift, and guards R-1 through R-5 product decisions.
+  - `tests/workbook-visual-copy-standardization.test.mjs` now loads `z06_options`, enforces shared-copy parity with an allowlist, rejects trailing-period-only drift, and guards R-1 through R-6 product decisions.
   - R-1 UV6 Z06 section drift remains intentional.
   - R-2 SC7 moved to Stingray `sec_lpoe_001`, punctuation was normalized, and display order was set to `71` to avoid a promoted active duplicate.
   - R-3 DRZ, R-4 EFR/EDU, and R-5 NGA copy decisions are applied.
-  - R-6 seat presentation/order remains deferred to a separate pass.
+  - R-6 AUP seat presentation/order is applied: all promoted sheets use `Asymmetrical Seats` / `Competition Driver Seat, GT2 Passenger Seat`, with active seat order AQ9/AH2/AE4/AUP at 10/20/30/40.
 
 - Earlier source-cleanup passes:
   - Active-model nonruntime option-row purge complete.
@@ -43,8 +43,7 @@ From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 
 ## Still to do
 
 - Residual copy/product follow-up:
-  - R-6 `sec_seat_002` seat presentation/order remains separate by user decision.
-  - Deferred copy allowlist rows remain for later review where automatic convergence could delete detail or product meaning: AP9 description, AUP name/description, D3V description, EYK/EYT badge copy, SFZ applicability, VYW logo applicability, ZZ3 Z06 includes-list difference, NWI description, and PIN restrictions.
+  - Deferred copy allowlist rows remain for later review where automatic convergence could delete detail or product meaning: AP9 description, D3V description, EYK/EYT badge copy, SFZ applicability, VYW logo applicability, ZZ3 Z06 includes-list difference, NWI description, and PIN restrictions.
 
 - Active standard-tech / connected-service ownership:
   - `sec_tech_001` rows still active emitted standard equipment.
@@ -79,6 +78,6 @@ From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 
 
 ## Recommended next passes
 
-1. R-6 seat presentation/order and residual copy allowlist decision pass, if desired.
+1. Residual copy allowlist decision pass, if desired.
 2. Interior stale-surface cleanup.
 3. Future-model scaffold display-order decision.

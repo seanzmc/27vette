@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-06-17T21:13:23+00:00",
+    "generated_at": "2026-06-17T22:29:22+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -20974,7 +20974,7 @@
       "active": "True",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 25
+      "display_order": 20
     },
     {
       "choice_id": "2lt_e07__opt_ah2_001",
@@ -20995,7 +20995,7 @@
       "active": "True",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 25
+      "display_order": 20
     },
     {
       "choice_id": "3lt_e07__opt_ah2_001",
@@ -21016,7 +21016,7 @@
       "active": "True",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 25
+      "display_order": 20
     },
     {
       "choice_id": "1lt_e67__opt_ah2_001",
@@ -21037,7 +21037,7 @@
       "active": "True",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 25
+      "display_order": 20
     },
     {
       "choice_id": "2lt_e67__opt_ah2_001",
@@ -21058,7 +21058,7 @@
       "active": "True",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 25
+      "display_order": 20
     },
     {
       "choice_id": "3lt_e67__opt_ah2_001",
@@ -21079,7 +21079,7 @@
       "active": "True",
       "base_price": 0,
       "display_behavior": "",
-      "display_order": 25
+      "display_order": 20
     },
     {
       "choice_id": "1lt_e07__opt_ae4_002",
@@ -21100,7 +21100,7 @@
       "active": "True",
       "base_price": 1095,
       "display_behavior": "",
-      "display_order": 40
+      "display_order": 30
     },
     {
       "choice_id": "2lt_e07__opt_ae4_002",
@@ -21121,7 +21121,7 @@
       "active": "True",
       "base_price": 1095,
       "display_behavior": "",
-      "display_order": 40
+      "display_order": 30
     },
     {
       "choice_id": "3lt_e07__opt_ae4_002",
@@ -21142,7 +21142,7 @@
       "active": "True",
       "base_price": 1095,
       "display_behavior": "",
-      "display_order": 40
+      "display_order": 30
     },
     {
       "choice_id": "1lt_e67__opt_ae4_002",
@@ -21163,7 +21163,7 @@
       "active": "True",
       "base_price": 1095,
       "display_behavior": "",
-      "display_order": 40
+      "display_order": 30
     },
     {
       "choice_id": "2lt_e67__opt_ae4_002",
@@ -21184,7 +21184,7 @@
       "active": "True",
       "base_price": 1095,
       "display_behavior": "",
-      "display_order": 40
+      "display_order": 30
     },
     {
       "choice_id": "3lt_e67__opt_ae4_002",
@@ -21205,7 +21205,7 @@
       "active": "True",
       "base_price": 1095,
       "display_behavior": "",
-      "display_order": 40
+      "display_order": 30
     },
     {
       "choice_id": "1lt_e07__opt_aup_001",
@@ -21226,7 +21226,7 @@
       "active": "True",
       "base_price": 350,
       "display_behavior": "",
-      "display_order": 80
+      "display_order": 40
     },
     {
       "choice_id": "2lt_e07__opt_aup_001",
@@ -21247,7 +21247,7 @@
       "active": "True",
       "base_price": 350,
       "display_behavior": "",
-      "display_order": 80
+      "display_order": 40
     },
     {
       "choice_id": "3lt_e07__opt_aup_001",
@@ -21268,7 +21268,7 @@
       "active": "True",
       "base_price": 350,
       "display_behavior": "",
-      "display_order": 80
+      "display_order": 40
     },
     {
       "choice_id": "1lt_e67__opt_aup_001",
@@ -21289,7 +21289,7 @@
       "active": "True",
       "base_price": 350,
       "display_behavior": "",
-      "display_order": 80
+      "display_order": 40
     },
     {
       "choice_id": "2lt_e67__opt_aup_001",
@@ -21310,7 +21310,7 @@
       "active": "True",
       "base_price": 350,
       "display_behavior": "",
-      "display_order": 80
+      "display_order": 40
     },
     {
       "choice_id": "3lt_e67__opt_aup_001",
@@ -21331,7 +21331,7 @@
       "active": "True",
       "base_price": 350,
       "display_behavior": "",
-      "display_order": 80
+      "display_order": 40
     },
     {
       "choice_id": "1lt_e07__opt_z25_001",
@@ -34715,7 +34715,7 @@
       "section_id": "sec_seat_002",
       "section_name": "Seats",
       "standard_equipment_group_type": "",
-      "display_order": 25
+      "display_order": 20
     },
     {
       "equipment_id": "std_3lt_e67__opt_ah2_001",
@@ -34729,7 +34729,7 @@
       "section_id": "sec_seat_002",
       "section_name": "Seats",
       "standard_equipment_group_type": "",
-      "display_order": 25
+      "display_order": 20
     },
     {
       "equipment_id": "std_1lt_e07__opt_cj2_001",

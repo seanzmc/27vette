@@ -65,8 +65,6 @@ function strictSharedOptionIds() {
 
 const COPY_FIELD_ALLOWLIST = new Map([
   ["opt_ap9_001:description", "GS/Z06 target is blank; keep Stingray detail for later product review."],
-  ["opt_aup_001:option_name", "R-6 seat presentation/copy stays deferred."],
-  ["opt_aup_001:description", "R-6 seat presentation/copy stays deferred."],
   ["opt_d3v_001:description", "GS/Z06 target is blank; keep Stingray engine-lighting copy for later review."],
   ["opt_edu_001:description", "R-4 keeps Stingray-specific EDU description while GS/Z06 use approved shared copy."],
   ["opt_efr_001:description", "R-4 keeps model-specific Stingray EFR description."],
@@ -155,6 +153,28 @@ test("approved product decisions R-1 through R-5 are workbook-owned", () => {
   );
   assert.equal(rowFor("grandSport_options", "opt_nga_001").description, "Standard, Corner Exit", "Grand Sport NGA description");
   assert.equal(rowFor("z06_options", "opt_nga_001").description, "Standard, Quad Center Exit", "Z06 NGA description");
+});
+
+test("approved R-6 seat presentation and order are workbook-owned across promoted models", () => {
+  const expectedSeats = [
+    ["opt_aq9_001", "AQ9", "GT1 Bucket Seats", "", 10],
+    ["opt_ah2_001", "AH2", "GT2 Bucket Seats", "", 20],
+    ["opt_ae4_002", "AE4", "Competition Sport Bucket Seats", "", 30],
+    ["opt_aup_001", "AUP", "Asymmetrical Seats", "Competition Driver Seat, GT2 Passenger Seat", 40],
+  ];
+
+  for (const sheetName of OPTION_SHEETS) {
+    const activeSeatRows = rowsBySheet
+      .get(sheetName)
+      .filter((row) => row.section_id === "sec_seat_002" && isActive(row))
+      .sort((left, right) => Number(left.display_order) - Number(right.display_order));
+
+    assert.deepEqual(
+      activeSeatRows.map((row) => [row.option_id, row.rpo, row.option_name, row.description ?? "", Number(row.display_order)]),
+      expectedSeats,
+      `${sheetName} active seat presentation/order`
+    );
+  }
 });
 
 test("source sheets use concise section-aware brake caliper labels", () => {

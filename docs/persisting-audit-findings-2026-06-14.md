@@ -44,8 +44,8 @@ Resolved or no longer current:
 Still persisting and needing an action plan:
 
 1. Optional audit/report tooling remains as opt-in historical tooling.
-2. Residual copy allowlist rows remain explicit product-review follow-ups after the safe convergence cohort.
-3. R-6 seat presentation/order remains deferred after R-1 through R-5 were completed or intentionally classified.
+2. Residual copy allowlist rows remain explicit product-review follow-ups after the safe convergence cohort and R-6 seat presentation/order pass.
+3. R-1 through R-6 product-review decisions are completed or intentionally classified.
 4. Z06 option-id suffix drift remains for U2K/U5G/UE1/VV4/CFV and no-RPO Z06 row IDs remain sparse.
 5. Stingray exclusive-group ID prefix/style drift remains cosmetic.
 6. Interior CSV/config remnants remain even though active interior grouping now comes from workbook metadata.
@@ -225,8 +225,8 @@ Evidence:
 
 - `docs/copy-convergence-review-2026-06-17.md` records the pre-edit strict shared-option review: 155 strict shared active option IDs and 136 drift fields reviewed.
 - Safe GS/Z06-majority copy convergence was applied to Stingray source rows, excluding reviewed/deferred allowlist fields.
-- `tests/workbook-visual-copy-standardization.test.mjs` now loads `z06_options`, enforces shared active option name/description parity with an allowlist, rejects trailing-period-only description drift, and guards the approved R-1 through R-5 decisions.
-- The remaining copy allowlist is intentional/deferred rather than unreviewed majority drift: AP9 description, AUP name/description, D3V description, EYK/EYT badge copy, SFZ applicability, VYW logo applicability, ZZ3 Z06 includes-list difference, NWI description, and PIN restrictions.
+- `tests/workbook-visual-copy-standardization.test.mjs` now loads `z06_options`, enforces shared active option name/description parity with an allowlist, rejects trailing-period-only description drift, and guards the approved R-1 through R-6 decisions.
+- The remaining copy allowlist is intentional/deferred rather than unreviewed majority drift: AP9 description, D3V description, EYK/EYT badge copy, SFZ applicability, VYW logo applicability, ZZ3 Z06 includes-list difference, NWI description, and PIN restrictions.
 
 Status: completed for safe copy convergence and punctuation drift. Residual allowlist rows remain for explicit product review only.
 
@@ -238,7 +238,7 @@ Action plan:
 
 ---
 
-### 9. Product-review section/copy decisions — R-1 through R-5 completed, R-6 deferred
+### 9. Product-review section/copy decisions — R-1 through R-6 completed or classified
 
 Evidence: the following workbook differences are still present:
 
@@ -247,15 +247,14 @@ Evidence: the following workbook differences are still present:
 - `opt_drz_001` copy now uses `Auto-Dimming Rear Camera Mirror` / `Inside rearview with full camera display` across active models.
 - `opt_efr_001`/`opt_edu_001` accent copy was updated per user decision: EFR keeps model-specific Stingray copy; EDU uses shared name, Stingray keeps its semicolon description, and GS/Z06 use the approved shorter description.
 - `opt_nga_001` copy now uses per-model exhaust-exit descriptions: Stingray `Standard, Corner Exit. NPP Performance exhaust is standard on all 2027's`, Grand Sport `Standard, Corner Exit`, Z06 `Standard, Quad Center Exit`.
-- `sec_seat_002` seat-row ordering/multiplicity remains a presentation decision.
+- `sec_seat_002` seat presentation/order now uses active promoted seat order AQ9/AH2/AE4/AUP at 10/20/30/40; `opt_aup_001` uses `Asymmetrical Seats` / `Competition Driver Seat, GT2 Passenger Seat` across promoted sheets.
 
-Status: R-1 through R-5 completed or intentionally classified; R-6 remains deferred by user decision.
+Status: R-1 through R-6 completed or intentionally classified.
 
 Action plan:
 
-1. No open action for R-1 through R-5.
-2. Keep R-6 seat presentation/order as a separate scoped pass.
-3. If continuing residual copy cleanup, use `docs/copy-convergence-review-2026-06-17.md` plus the `COPY_FIELD_ALLOWLIST` in `tests/workbook-visual-copy-standardization.test.mjs` as the current decision ledger.
+1. No open action for R-1 through R-6.
+2. If continuing residual copy cleanup, use `docs/copy-convergence-review-2026-06-17.md` plus the `COPY_FIELD_ALLOWLIST` in `tests/workbook-visual-copy-standardization.test.mjs` as the current decision ledger.
 
 ---
 
@@ -322,7 +321,7 @@ Action plan:
 
 ## Recommended next passes
 
-1. **R-6 seat presentation/order and residual copy allowlist pass, if desired**: resolve the explicitly deferred seat presentation/order item plus the remaining copy allowlist rows from `tests/workbook-visual-copy-standardization.test.mjs`.
+1. **Residual copy allowlist pass, if desired**: resolve the remaining copy allowlist rows from `tests/workbook-visual-copy-standardization.test.mjs`.
 2. **Interior stale-surface cleanup**: remove unused CSV/config remnants after consumer audit and contract-parity proof.
 3. **Future-model scaffold display-order decision**: decide whether ZR1/ZR1X standard-equipment duplicate display-order buckets should be cleaned now or only during their promotion/readiness pass.
 
@@ -369,7 +368,13 @@ Original audit gates:
 
 2026-06-17 copy-convergence/product-decision implementation evidence:
 
-- Workbook source edit — safe GS/Z06-majority copy convergence was applied to Stingray option source rows; R-1 through R-5 decisions were applied; R-6 remains deferred.
-- Review artifact — `docs/copy-convergence-review-2026-06-17.md` records the 155 strict shared IDs, 136 reviewed drift fields, 116 mechanical copy fields, 8 user-decision fields, and 12 deferred allowlist fields.
+- Workbook source edit — safe GS/Z06-majority copy convergence was applied to Stingray option source rows; R-1 through R-6 decisions were applied or intentionally classified.
+- Review artifact — `docs/copy-convergence-review-2026-06-17.md` records the 155 strict shared IDs, 136 reviewed drift fields, 116 mechanical copy fields, 10 user-decision fields, and 10 deferred allowlist fields.
 - Guardrail behavior — moving SC7 to `sec_lpoe_001` triggered the active promoted display-order validator; the workbook was corrected with `stingray_options.opt_sc7_001.display_order=71` and schema validation returned valid.
 - Targeted gates — workbook package/schema validation, Stingray/Grand Sport/Z06 generation, registry publication, visual-copy standardization, Stingray regression/stability, Grand Sport preview/draft, Z06 preview/draft, and multi-model runtime switching passed.
+
+2026-06-17 R-6 seat presentation/order implementation evidence:
+
+- Workbook source edit — active `sec_seat_002` rows in `stingray_options`, `grandSport_options`, and `z06_options` now use order AQ9/AH2/AE4/AUP at 10/20/30/40; `opt_aup_001` uses `Asymmetrical Seats` / `Competition Driver Seat, GT2 Passenger Seat` across promoted sheets.
+- Guardrail test — `tests/workbook-visual-copy-standardization.test.mjs` removes AUP from the copy allowlist and asserts the R-6 copy/order contract.
+- Targeted gates — workbook package/schema validation, Stingray/Grand Sport/Z06 generation, registry publication, visual-copy standardization, Stingray regression/stability, Grand Sport draft, Z06 draft, and multi-model runtime switching passed.

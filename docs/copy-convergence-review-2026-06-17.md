@@ -9,9 +9,9 @@ Generated from read-only `stingray_master.xlsx` probe before workbook edits.
 - `z06_options` active rows: 238
 - Strict shared active option IDs with one row per promoted sheet: 155
 - Copy drift fields reviewed: 136
-- `allowlist_defer`: 12
+- `allowlist_defer`: 10
 - `mechanical_copy_gs_z06_to_stingray`: 116
-- `user_decision`: 8
+- `user_decision`: 10
 
 ## Approved Product Decisions
 
@@ -21,7 +21,7 @@ Generated from read-only `stingray_master.xlsx` probe before workbook edits.
 - `opt_efr_001`: R-4: model-specific Stingray EFR copy; do not copy GS/Z06 long CFV/CFZ text.
 - `opt_edu_001`: R-4: shared EDU name; Stingray keeps current desc; GS/Z06 get approved shorter desc.
 - `opt_nga_001`: R-5: per-model exhaust-exit descriptions.
-- `sec_seat_002` / R-6: separate pass; seat presentation/order not changed here.
+- `sec_seat_002` / R-6: implemented in `docs/seat-presentation-order-spec.md`; AUP uses `Asymmetrical Seats` / `Competition Driver Seat, GT2 Passenger Seat`, with seat order AQ9/AH2/AE4/AUP.
 
 ## Field-Level Review
 
@@ -34,8 +34,8 @@ Generated from read-only `stingray_master.xlsx` probe before workbook edits.
 | mechanical_copy_gs_z06_to_stingray | `opt_aj7_001` | AJ7 | `description` | With Passenger Sensing System. | Driver and passenger with Passenger Sensing System | Driver and passenger with Passenger Sensing System | GS/Z06 majority copy; safe style/density/punctuation convergence. |
 | mechanical_copy_gs_z06_to_stingray | `opt_ap9_001` | AP9 | `option_name` | Front and Rear Trunk Cargo Nets | Two Cargo Nets | Two Cargo Nets | GS/Z06 majority copy; safe style/density/punctuation convergence. |
 | allowlist_defer | `opt_ap9_001` | AP9 | `description` | Set of 2. |  |  | deferred: GS/Z06 target is blank; avoid deleting Stingray detail without review. |
-| allowlist_defer | `opt_aup_001` | AUP | `option_name` | Competition Sport Driver and GT2 Passenger Bucket Seats | Asymmetrical Seats | Asymmetrical Seats | R-6 seat presentation deferred; keep seat copy out of mechanical cohort. |
-| allowlist_defer | `opt_aup_001` | AUP | `description` |  | Competition Driver Seat, GT2 Passenger Seat | Competition Driver Seat, GT2 Passenger Seat | R-6 seat presentation deferred; keep seat copy out of mechanical cohort. |
+| user_decision | `opt_aup_001` | AUP | `option_name` | Competition Sport Driver and GT2 Passenger Bucket Seats | Asymmetrical Seats | Asymmetrical Seats | R-6: use `Asymmetrical Seats` across promoted models. |
+| user_decision | `opt_aup_001` | AUP | `description` |  | Competition Driver Seat, GT2 Passenger Seat | Competition Driver Seat, GT2 Passenger Seat | R-6: use `Competition Driver Seat, GT2 Passenger Seat` across promoted models. |
 | mechanical_copy_gs_z06_to_stingray | `opt_baz_001` | BAZ | `option_name` | Stealth Interior Trim Package | Stealth Interior | Stealth Interior | GS/Z06 majority copy; safe style/density/punctuation convergence. |
 | mechanical_copy_gs_z06_to_stingray | `opt_baz_001` | BAZ | `description` | Dark finish aluminum trim | Dark Finish Aluminum Trim Package | Dark Finish Aluminum Trim Package | GS/Z06 majority copy; safe style/density/punctuation convergence. |
 | mechanical_copy_gs_z06_to_stingray | `opt_bv4_001` | BV4 | `option_name` | Custom Personalized Plaque | Personalized Specification Plaque | Personalized Specification Plaque | GS/Z06 majority copy; safe style/density/punctuation convergence. |
