@@ -255,6 +255,10 @@ const expectedStingrayExclusiveGroups = [
     optionIds: ["opt_rnx_001", "opt_rwj_001"],
   },
   {
+    groupId: "excl_rear_script_badges",
+    optionIds: ["opt_rik_001", "opt_rin_001", "opt_sl8_001"],
+  },
+  {
     groupId: "excl_suede_trunk_liner",
     optionIds: ["opt_sxb_001", "opt_sxr_001", "opt_sxt_001"],
   },
@@ -774,7 +778,7 @@ test("runtime renders selected RPO summary as sectioned rows matching export sec
   assert.match(autoHtml, /info-tooltip/);
 });
 
-test("Grand Sport exclusive groups are model-scoped and Stingray groups are unchanged", () => {
+test("Grand Sport exclusive groups are model-scoped and Stingray groups match workbook output", () => {
   const dataWindow = loadDataWindow();
   const registry = dataWindow.CORVETTE_FORM_DATA;
   const grandSportGroups = registry.models.grandSport.data.exclusiveGroups;

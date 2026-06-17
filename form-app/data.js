@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-17T05:38:15+00:00"
+          "generated_at": "2026-06-17T19:11:24+00:00"
         },
         "variants": [
           {
@@ -36936,6 +36936,17 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "single_within_group",
             "active": "True",
             "notes": "Stingray seatbelt colors are mutually exclusive; included 3LT interior seatbelts lock peers."
+          },
+          {
+            "group_id": "excl_rear_script_badges",
+            "option_ids": [
+              "opt_rik_001",
+              "opt_rin_001",
+              "opt_sl8_001"
+            ],
+            "selection_mode": "single_within_group",
+            "active": "True",
+            "notes": "Rear Corvette script badge color choices are mutually exclusive within the LPO Exterior section."
           }
         ],
         "rules": [
@@ -38776,78 +38787,6 @@ window.CORVETTE_FORM_DATA = {
             "source_note": "1. Must also add Ship To BAC 184590 (Dealer code 31-728). Available on SOLD orders only. Not available with LPO wheels. acknowledgement form required, includes (CFX) Corvette Museum logo plaque personalized with your name and VIN"
           },
           {
-            "rule_id": "rule_opt_rik_001_excludes_opt_rin_001",
-            "source_id": "opt_rik_001",
-            "rule_type": "excludes",
-            "target_id": "opt_rin_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_lpoe_001",
-            "target_section": "sec_lpoe_001",
-            "source_selection_mode": "multi_select_opt",
-            "target_selection_mode": "multi_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by RIK Torch Red Rear Corvette Script Badge.",
-            "auto_add": "False",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": "1. Not available with RIN, SL8."
-          },
-          {
-            "rule_id": "rule_opt_rik_001_excludes_opt_sl8_001",
-            "source_id": "opt_rik_001",
-            "rule_type": "excludes",
-            "target_id": "opt_sl8_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_lpoe_001",
-            "target_section": "sec_lpoe_001",
-            "source_selection_mode": "multi_select_opt",
-            "target_selection_mode": "multi_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by RIK Torch Red Rear Corvette Script Badge.",
-            "auto_add": "False",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": "1. Not available with RIN, SL8."
-          },
-          {
-            "rule_id": "rule_opt_rin_001_excludes_opt_rik_001",
-            "source_id": "opt_rin_001",
-            "rule_type": "excludes",
-            "target_id": "opt_rik_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_lpoe_001",
-            "target_section": "sec_lpoe_001",
-            "source_selection_mode": "multi_select_opt",
-            "target_selection_mode": "multi_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by RIN Arctic White Rear Corvette Script Badge.",
-            "auto_add": "False",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": "1. Not available with RIK, SL8."
-          },
-          {
-            "rule_id": "rule_opt_rin_001_excludes_opt_sl8_001",
-            "source_id": "opt_rin_001",
-            "rule_type": "excludes",
-            "target_id": "opt_sl8_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_lpoe_001",
-            "target_section": "sec_lpoe_001",
-            "source_selection_mode": "multi_select_opt",
-            "target_selection_mode": "multi_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by RIN Arctic White Rear Corvette Script Badge.",
-            "auto_add": "False",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": "1. Not available with RIK, SL8."
-          },
-          {
             "rule_id": "rule_opt_rnx_001_excludes_opt_5zu_001",
             "source_id": "opt_rnx_001",
             "rule_type": "excludes",
@@ -39062,42 +39001,6 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "runtime_action": "active",
             "source_note": "1. Not available with PDV, SB7 or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCX) Tech Bronze Accent Package, LPO."
-          },
-          {
-            "rule_id": "rule_opt_sl8_001_excludes_opt_rik_001",
-            "source_id": "opt_sl8_001",
-            "rule_type": "excludes",
-            "target_id": "opt_rik_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_lpoe_001",
-            "target_section": "sec_lpoe_001",
-            "source_selection_mode": "multi_select_opt",
-            "target_selection_mode": "multi_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by SL8 Edge Red Rear Corvette Script Badge.",
-            "auto_add": "False",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": "1. Not available with RIK, RIN."
-          },
-          {
-            "rule_id": "rule_opt_sl8_001_excludes_opt_rin_001",
-            "source_id": "opt_sl8_001",
-            "rule_type": "excludes",
-            "target_id": "opt_rin_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_lpoe_001",
-            "target_section": "sec_lpoe_001",
-            "source_selection_mode": "multi_select_opt",
-            "target_selection_mode": "multi_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by SL8 Edge Red Rear Corvette Script Badge.",
-            "auto_add": "False",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": "1. Not available with RIK, RIN."
           },
           {
             "rule_id": "rule_opt_spy_001_excludes_opt_s47_001",
@@ -48011,7 +47914,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "150 active compatibility rules exported from 150 source rules."
+            "message": "144 active compatibility rules exported from 144 source rules."
           }
         ]
       },
@@ -48032,7 +47935,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-17T05:38:16+00:00",
+          "generated_at": "2026-06-17T05:38:28+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -97436,7 +97339,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-17T05:19:42+00:00",
+          "generated_at": "2026-06-17T05:39:49+00:00",
           "status": "runtime_active"
         },
         "variants": [

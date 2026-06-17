@@ -264,6 +264,11 @@ const expectedAccessoryExclusiveGroups = [
     optionIds: ["opt_rnx_001", "opt_rwj_001"],
   },
   {
+    groupId: "excl_rear_script_badges",
+    rpos: ["RIK", "RIN", "SL8"],
+    optionIds: ["opt_rik_001", "opt_rin_001", "opt_sl8_001"],
+  },
+  {
     groupId: "excl_suede_trunk_liner",
     rpos: ["SXB", "SXR", "SXT"],
     optionIds: ["opt_sxb_001", "opt_sxr_001", "opt_sxt_001"],
@@ -485,6 +490,15 @@ test("accessory exclusive groups are generated from the expected active RPOs", (
       `${expectedGroup.groupId} should not silently miss listed RPOs`
     );
   }
+});
+
+test("Stingray rear script badge replacement is owned by an exclusive group, not pairwise rules", () => {
+  const scriptOptionIds = ["opt_rik_001", "opt_rin_001", "opt_sl8_001"];
+  const pairwiseScriptRules = data.rules.filter(
+    (rule) => scriptOptionIds.includes(rule.source_id) || scriptOptionIds.includes(rule.target_id)
+  );
+
+  assert.equal(pairwiseScriptRules.length, 0);
 });
 
 test("accessory exclusive groups remove other selected options in the same group", () => {

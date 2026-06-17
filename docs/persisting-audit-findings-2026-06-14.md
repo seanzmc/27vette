@@ -38,17 +38,17 @@ Resolved or no longer current:
 - Stingray active seat canonicalization is complete: active seat source rows are now the four canonical `sec_seat_002` rows `opt_aq9_001`, `opt_ah2_001`, `opt_ae4_002`, and `opt_aup_001`, with the three required Stingray trim-scoped seat price rules present.
 - Rule-mapping column cleanup Pass 1 is complete: promoted rule-mapping sheets now use the reduced runtime-source header set, retired duplicate/lifecycle columns are absent, and unpromoted ZR1/ZR1X rule-mapping sheets/source registrations are absent.
 - Browser order-summary fallback retirement / boundary narrowing is complete: promoted runtime models carry generated workbook-owned `orderSummary` metadata, browser `orderSectionDefinitions` / `stepOrderSectionKeys` fallback constants are removed, and Python step/context constants are documented as unpromoted compatibility / completeness-check inputs.
+- Stingray rear script badge cleanup is complete: `exclusive_groups.excl_rear_script_badges` and its three members now own RIK/RIN/SL8 replacement behavior, and the six redundant pairwise Stingray `rule_mapping` excludes are gone.
 
 Still persisting and needing an action plan:
 
 1. Optional audit/report tooling remains as opt-in historical tooling.
-2. Stingray rear script badges still use pairwise excludes instead of an exclusive group.
-3. Cross-model relative order drift still exists for wheels/roof and one Grand Sport exclusive-member ordering surface.
-4. Cross-model customer copy drift remains, including trailing-period drift pinned by tests.
-5. Several section/copy decisions remain product-review items.
-6. Z06 option-id suffix drift remains for U2K/U5G/UE1/VV4/CFV and no-RPO Z06 row IDs remain sparse.
-7. Stingray exclusive-group ID prefix/style drift remains cosmetic.
-8. Interior CSV/config remnants remain even though active interior grouping now comes from workbook metadata.
+2. Cross-model relative order drift still exists for wheels/roof and one Grand Sport exclusive-member ordering surface.
+3. Cross-model customer copy drift remains, including trailing-period drift pinned by tests.
+4. Several section/copy decisions remain product-review items.
+5. Z06 option-id suffix drift remains for U2K/U5G/UE1/VV4/CFV and no-RPO Z06 row IDs remain sparse.
+6. Stingray exclusive-group ID prefix/style drift remains cosmetic.
+7. Interior CSV/config remnants remain even though active interior grouping now comes from workbook metadata.
 
 Intentionally deferred, not part of the completed source-row purge: active emitted `sec_tech_001` / connected-service standard-equipment rows remain active workbook option rows until a separate standard-equipment ownership model is designed and proven.
 
@@ -151,24 +151,25 @@ Action plan:
 
 ---
 
-### 5. Stingray rear script badges still use pairwise excludes instead of an exclusive group
+### 5. Stingray rear script badges use a workbook-owned exclusive group — completed
 
 Evidence:
 
-- `rule_mapping` still has 6 active pairwise `excludes` rows among RIK/RIN/SL8.
-- No Stingray `exclusive_groups` + `exclusive_group_members` group contains all three rear-script badge options.
+- `exclusive_groups` now has active `excl_rear_script_badges` with `selection_mode=single_within_group`.
+- `exclusive_group_members` now has active members `opt_rik_001`, `opt_rin_001`, and `opt_sl8_001` at display orders 10/20/30.
+- `rule_mapping` no longer has the six redundant pairwise `excludes` rows among RIK/RIN/SL8.
 - Grand Sport and Z06 have equivalent model-scoped exclusive groups.
+- The three Stingray option rows still preserve their raw GM source incompatibility details in `stingray_options.detail_raw`.
+- `form-output/stingray-form-data.json` now emits the Stingray rear-script exclusive group and no pairwise rear-script rules.
+- `tests/stingray-form-regression.test.mjs` asserts the generated group, absence of pairwise rear-script rules, and replacement behavior through the accessory exclusive-group runtime path.
 
-Status: persists from S-3.
+Status: completed 2026-06-17.
 
 Action plan:
 
-1. Write a workbook-source spec for migrating Stingray rear-script badge behavior to an exclusive group.
-2. Add a RED runtime test proving current Stingray interaction blocks instead of radio-replacing, if that is still observable.
-3. Add a Stingray exclusive group and members for RIK/RIN/SL8.
-4. Delete or retire the six pairwise excludes only if generated contract comparison proves the exclusive group owns the behavior; do not keep redundant skipped rows long-term.
-5. Regenerate Stingray and compare contracts; if behavior intentionally changes from disabled-blocking to radio replacement, cover it in runtime tests.
-6. Run `tests/stingray-form-regression.test.mjs` and `tests/multi-model-runtime-switching.test.mjs`.
+1. No remaining implementation action for Stingray rear-script badges.
+2. Keep `docs/stingray-rear-script-exclusive-group-spec.md` as the historical implementation spec.
+3. Treat the intentional UX change as complete: selecting a rear-script badge now replaces the prior badge peer instead of disabling the alternatives through pairwise excludes.
 
 ---
 
@@ -332,11 +333,10 @@ Action plan:
 
 ## Recommended next passes
 
-1. **Display-order guard pass**: add a durable validator/test for promoted option-sheet `(section_id, display_order)` uniqueness now that promoted sheets are clean; decide separately whether to include ZR1/ZR1X scaffold rows.
-2. **Stingray rear-script exclusive-group pass**: migrate RIK/RIN/SL8 from pairwise excludes to a workbook-owned exclusive group if the intended UX is radio replacement.
-3. **Cross-model ordering pass**: settle wheels/roof order drift and the Grand Sport LS6 exclusive-member order mismatch.
-4. **Copy-convergence/product-decision pass**: larger workbook copy pass with explicit allowlist, RPO fallback for known Z06 suffix drift, and product review for section/copy decisions.
-5. **Interior stale-surface cleanup**: remove unused CSV/config remnants after consumer audit and contract-parity proof.
+1. **Cross-model ordering pass**: settle wheels/roof order drift and the Grand Sport LS6 exclusive-member order mismatch.
+2. **Copy-convergence/product-decision pass**: larger workbook copy pass with explicit allowlist, RPO fallback for known Z06 suffix drift, and product review for section/copy decisions.
+3. **Interior stale-surface cleanup**: remove unused CSV/config remnants after consumer audit and contract-parity proof.
+4. **Future-model scaffold display-order decision**: decide whether ZR1/ZR1X standard-equipment duplicate display-order buckets should be cleaned now or only during their promotion/readiness pass.
 
 ---
 
@@ -366,4 +366,8 @@ Original audit gates:
 - Active registry data tests — Stingray, Grand Sport, and Z06 all emit generated `orderSummary.sections` and `orderSummary.stepMap` metadata.
 - Runtime/generator boundary docs — Python step/context constants remain documented as unpromoted compatibility / promoted completeness-check inputs, not browser runtime fallbacks.
 
-No generators were run and no workbook or generated artifacts were modified for this refresh.
+2026-06-17 Stingray rear-script exclusive-group implementation evidence:
+
+- Workbook source edit — `exclusive_groups.excl_rear_script_badges` plus three `exclusive_group_members` rows were added; the six pairwise RIK/RIN/SL8 Stingray `rule_mapping` rows were removed; the three option `detail_raw` source notes were preserved.
+- Generated contract comparison — after ignoring timestamps and the rule-count validation message, the only payload drift was one added Stingray exclusive group and six removed rear-script pairwise rules; choices, prices, interiors, color overrides, standard equipment, dealer payload fields, and non-Stingray model contracts were unchanged.
+- Targeted gates — Stingray generation, registry publication, workbook package/schema validation, allowed-drift contract comparison, Stingray runtime regression, multi-model runtime switching, and `git diff --check` passed for this pass.
