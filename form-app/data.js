@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-17T03:40:13+00:00"
+          "generated_at": "2026-06-17T05:17:29+00:00"
         },
         "variants": [
           {
@@ -36825,6 +36825,20 @@ window.CORVETTE_FORM_DATA = {
             "disabled_reason": "DZX blocks Stingray Jake graphics.",
             "active": "True",
             "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+          },
+          {
+            "group_id": "grp_gba_excludes_edu",
+            "group_type": "excludes_any",
+            "source_id": "opt_gba_001",
+            "target_ids": [
+              "opt_edu_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "GBA black paint blocks EDU exterior accent choice.",
+            "active": "True",
+            "notes": "Workbook-owned grouped exclusion metadata."
           }
         ],
         "exclusiveGroups": [
@@ -48004,7 +48018,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-17T01:08:18+00:00",
+          "generated_at": "2026-06-17T05:18:21+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -86450,6 +86464,20 @@ window.CORVETTE_FORM_DATA = {
             "disabled_reason": "Requires FEB Z52 Sport Performance Package or FEY Z52 Track Performance Package.",
             "active": "True",
             "notes": "J57 is selectable with FEB, or included by FEY."
+          },
+          {
+            "group_id": "gs_group_gba_excludes_edu",
+            "group_type": "excludes_any",
+            "source_id": "opt_gba_001",
+            "target_ids": [
+              "opt_edu_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "GBA black paint blocks EDU exterior accent choice.",
+            "active": "True",
+            "notes": "Workbook-owned grouped exclusion metadata."
           }
         ],
         "exclusiveGroups": [
@@ -97380,7 +97408,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-17T04:12:08+00:00",
+          "generated_at": "2026-06-17T05:19:42+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -135819,12 +135847,12 @@ window.CORVETTE_FORM_DATA = {
               "opt_zyc_001",
               "opt_d84_001",
               "opt_d86_001",
-              "opt_cfl_001"
+              "opt_edu_001"
             ],
             "body_style_scope": "",
             "trim_level_scope": "",
             "variant_scope": "",
-            "disabled_reason": "GBA black paint blocks CFL, EFY, ZYC, D84, and D86 accent/roof choices.",
+            "disabled_reason": "GBA black paint blocks EDU, EFY, ZYC, D84, and D86 accent/roof choices.",
             "active": "True",
             "notes": "Workbook-owned grouped exclusion metadata."
           },

@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-06-17T04:12:08+00:00",
+    "generated_at": "2026-06-17T05:19:42+00:00",
     "status": "draft_not_runtime_active"
   },
   "variants": [
@@ -48928,12 +48928,12 @@
         "opt_zyc_001",
         "opt_d84_001",
         "opt_d86_001",
-        "opt_cfl_001"
+        "opt_edu_001"
       ],
       "body_style_scope": "",
       "trim_level_scope": "",
       "variant_scope": "",
-      "disabled_reason": "GBA black paint blocks CFL, EFY, ZYC, D84, and D86 accent/roof choices.",
+      "disabled_reason": "GBA black paint blocks EDU, EFY, ZYC, D84, and D86 accent/roof choices.",
       "active": "True",
       "notes": "Workbook-owned grouped exclusion metadata."
     },

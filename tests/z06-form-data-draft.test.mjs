@@ -192,12 +192,13 @@ test("Z06 3LZ interiors include locked zero-price seatbelt colors", () => {
   }
 });
 
-test("Z06 GBA excludes CFL through workbook group metadata", () => {
+test("Z06 GBA excludes EDU, not CFL, through workbook group metadata", () => {
   const group = draft.ruleGroups.find((row) => row.group_id === "z06_group_gba_excludes_accent_and_roof_choices");
   assert.ok(group, "GBA blocker group should exist");
   assert.equal(group.source_id, "opt_gba_001");
   assert.equal(group.group_type, "excludes_any");
-  assert.ok(group.target_ids.includes("opt_cfl_001"), "GBA should block CFL");
+  assert.ok(group.target_ids.includes("opt_edu_001"), "GBA should block EDU");
+  assert.equal(group.target_ids.includes("opt_cfl_001"), false, "GBA should not block CFL");
 });
 
 test("Z06 seatbelt colors are exclusive peers for interior-included locks", () => {

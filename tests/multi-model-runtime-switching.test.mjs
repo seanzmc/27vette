@@ -791,6 +791,37 @@ test("Grand Sport exclusive group selections remove peer options without runtime
   }
 });
 
+test("GBA paint blocks EDU but not CFL across active models", () => {
+  for (const [modelKey, hasCfl] of [["stingray", false], ["grandSport", true], ["z06", true]]) {
+    const runtime = loadRuntime();
+    runtime.activateModel(modelKey);
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+
+    const choiceByRpo = (rpo) => runtime.activeChoiceRows().find((choice) => choice.rpo === rpo);
+    const gba = choiceByRpo("GBA");
+    const edu = choiceByRpo("EDU");
+    assert.ok(gba, `${modelKey} should expose GBA`);
+    assert.ok(edu, `${modelKey} should expose EDU`);
+
+    runtime.handleChoice(gba);
+    runtime.reconcileSelections();
+
+    assert.match(runtime.disableReasonForChoice(edu), /GBA|black paint|EDU/i, `${modelKey} GBA should block EDU`);
+    runtime.handleChoice(edu);
+    runtime.reconcileSelections();
+    assert.equal(runtime.state.selected.has(edu.option_id), false, `${modelKey} EDU should not stick with GBA selected`);
+
+    const cfl = choiceByRpo("CFL");
+    if (hasCfl) {
+      assert.ok(cfl, `${modelKey} should expose CFL`);
+      assert.equal(runtime.disableReasonForChoice(cfl), "", `${modelKey} GBA should not block CFL`);
+    } else {
+      assert.equal(cfl, undefined, `${modelKey} has no CFL choice to block`);
+    }
+  }
+});
+
 test("Grand Sport required exclusive groups cannot be left empty", () => {
   const runtime = loadRuntime();
   runtime.activateModel("grandSport");

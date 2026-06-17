@@ -181,15 +181,18 @@ test("Z06 3LZ interiors include locked zero-price seatbelt colors", () => {
   }
 });
 
-test("Z06 GBA paint blocks CFL ground effect", () => {
+test("Z06 GBA paint blocks EDU exterior accent but not CFL ground effect", () => {
   const runtime = z06Runtime();
   runtime.handleChoice(choice(runtime, "GBA"));
   runtime.reconcileSelections();
-  const cfl = choice(runtime, "CFL");
-  assert.match(runtime.disableReasonForChoice(cfl), /GBA|black paint|CFL/i);
-  runtime.handleChoice(cfl);
+  const edu = choice(runtime, "EDU");
+  assert.match(runtime.disableReasonForChoice(edu), /GBA|black paint|EDU/i);
+  runtime.handleChoice(edu);
   runtime.reconcileSelections();
-  assert.equal(runtime.state.selected.has(cfl.option_id), false, "CFL should not stick with GBA selected");
+  assert.equal(runtime.state.selected.has(edu.option_id), false, "EDU should not stick with GBA selected");
+
+  const cfl = choice(runtime, "CFL");
+  assert.equal(runtime.disableReasonForChoice(cfl), "", "CFL should remain selectable with GBA selected");
 });
 
 test("Z06 Z07 defaults T0F, allows T0G switching, and keeps J57 included at zero", () => {

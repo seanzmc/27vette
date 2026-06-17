@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-06-17T03:40:13+00:00"
+    "generated_at": "2026-06-17T05:17:29+00:00"
   },
   "variants": [
     {
@@ -36817,6 +36817,20 @@
       "disabled_reason": "DZX blocks Stingray Jake graphics.",
       "active": "True",
       "notes": "Stripe cleanup: selected dual racing stripes conflict with Jake graphics."
+    },
+    {
+      "group_id": "grp_gba_excludes_edu",
+      "group_type": "excludes_any",
+      "source_id": "opt_gba_001",
+      "target_ids": [
+        "opt_edu_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "GBA black paint blocks EDU exterior accent choice.",
+      "active": "True",
+      "notes": "Workbook-owned grouped exclusion metadata."
     }
   ],
   "exclusiveGroups": [

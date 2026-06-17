@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-06-17T01:08:18+00:00",
+    "generated_at": "2026-06-17T05:18:21+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -38451,6 +38451,20 @@
       "disabled_reason": "Requires FEB Z52 Sport Performance Package or FEY Z52 Track Performance Package.",
       "active": "True",
       "notes": "J57 is selectable with FEB, or included by FEY."
+    },
+    {
+      "group_id": "gs_group_gba_excludes_edu",
+      "group_type": "excludes_any",
+      "source_id": "opt_gba_001",
+      "target_ids": [
+        "opt_edu_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "GBA black paint blocks EDU exterior accent choice.",
+      "active": "True",
+      "notes": "Workbook-owned grouped exclusion metadata."
     }
   ],
   "exclusiveGroups": [
