@@ -1219,7 +1219,8 @@ test("Grand Sport Pass 1 workbook rules drive engine, brake, ground-effect, and 
   runtime.handleChoice(t0f);
   assert.equal(runtime.currentOrder().auto_added_options.some((item) => item.rpo === "CFZ" && item.price === 0), true, "T0F should auto-add CFZ at $0");
   runtime.handleChoice(cfl);
-  assert.equal(runtime.state.selected.has("opt_cfl_001"), false, "CFL should remain blocked when T0F auto-adds CFZ");
+  assert.equal(runtime.state.selected.has("opt_cfl_001"), true, "CFL should switch through the ground-effects exclusive group");
+  assert.equal(runtime.currentOrder().auto_added_options.some((item) => item.rpo === "CFZ"), false, "CFL should suppress the exclusive CFZ auto-add");
 
   runtime.state.trimLevel = "3LT";
   runtime.resetDefaults();

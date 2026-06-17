@@ -129,16 +129,10 @@ test("Grand Sport rule audit separates copied, parsed, and review-needed rows", 
     ),
     "5JR/DRG should be listed as copied from Stingray"
   );
-  assert.ok(
-    audit.parsedFromDetailRaw.some(
-      (row) =>
-        row.rule_id === "gs_rule_opt_cfl_001_excludes_opt_cfz_001" &&
-        row.matched_phrase === "workbook_matches_detail_raw" &&
-        row.source_id === "opt_cfl_001" &&
-        row.rule_type === "excludes" &&
-        row.target_id === "opt_cfz_001"
-    ),
-    "CFL/CFZ should be listed as a workbook rule matching detail_raw"
+  assert.equal(
+    audit.parsedFromDetailRaw.some((row) => row.rule_id === "gs_rule_opt_cfl_001_excludes_opt_cfz_001"),
+    false,
+    "CFL/CFZ should rely on the ground-effects exclusive group, not a duplicate direct excludes rule"
   );
 
   assert.ok(
@@ -181,7 +175,7 @@ test("Grand Sport rule audit captures the approved cleanup decisions", () => {
   assert.equal(optionByRpo.get("R6X").display_behavior, "auto_only");
   assert.equal(Number(optionByRpo.get("Z25").price), 0);
   for (const rpo of ["R6P", "R9V", "R9W", "R9Y", "U2K"]) {
-    assert.equal(normalizedBool(optionByRpo.get(rpo).active), "false", `${rpo} should be inactive in workbook source`);
+    assert.equal(optionByRpo.has(rpo), false, `${rpo} inactive service-plan source row should be purged`);
   }
 
   assert.equal(

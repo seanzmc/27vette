@@ -48811,7 +48811,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-17T00:42:25+00:00",
+          "generated_at": "2026-06-17T01:08:18+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -88439,24 +88439,6 @@ window.CORVETTE_FORM_DATA = {
             "source_note": "1. Requires (J57) carbon ceramic brakes."
           },
           {
-            "rule_id": "gs_rule_opt_cfl_001_excludes_opt_cfz_001",
-            "source_id": "opt_cfl_001",
-            "rule_type": "excludes",
-            "target_id": "opt_cfz_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_perf_ground_001",
-            "target_section": "sec_perf_ground_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "single_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Not available with CFZ ground effects.",
-            "auto_add": "False",
-            "active": "False",
-            "runtime_action": "omit_redundant_same_section_exclude",
-            "source_note": "1. Not available with (CFV/CFZ) ground effects."
-          },
-          {
             "rule_id": "gs_rule_opt_fey_001_includes_opt_j57_001",
             "source_id": "opt_fey_001",
             "rule_type": "includes",
@@ -98163,7 +98145,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "123 active compatibility rules exported from grandSport_rule_mapping."
+            "message": "122 active compatibility rules exported from grandSport_rule_mapping."
           },
           {
             "check_id": "interior_contract",
@@ -98205,7 +98187,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-17T00:42:26+00:00",
+          "generated_at": "2026-06-17T01:10:26+00:00",
           "status": "runtime_active"
         },
         "variants": [

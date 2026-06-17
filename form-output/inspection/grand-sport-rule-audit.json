@@ -6,7 +6,7 @@
     "source_workbook": "stingray_master.xlsx",
     "source_option_sheet": "grandSport_options",
     "source_rule_sheet": "grandSport_rule_mapping",
-    "generated_at": "2026-06-16T04:23:57+00:00",
+    "generated_at": "2026-06-17T01:08:17+00:00",
     "status": "rule_audit_generated"
   },
   "summary": {
@@ -14,8 +14,8 @@
     "rawDetailRuleCandidates": 262,
     "rawDetailCandidateKeys": 262,
     "dedupedOrSelfReferenceCandidates": 1,
-    "finalWorkbookRuleRows": 123,
-    "expectedDraftRuntimeRules": 123,
+    "finalWorkbookRuleRows": 122,
+    "expectedDraftRuntimeRules": 122,
     "omittedDuplicateExclusiveGroup": 0,
     "omittedInactiveOrUnemitted": 0,
     "skippedRequiresReview": 4,
@@ -34,7 +34,7 @@
     "inactiveOptionReferences": 0,
     "engineCoverRuleRows": 12,
     "engineCoverInactiveReferences": 0,
-    "workbookRulesMatchingDetailRaw": 47,
+    "workbookRulesMatchingDetailRaw": 46,
     "workbookManualOrApprovedRules": 76
   },
   "sourceSheets": {
@@ -565,14 +565,6 @@
       "source_id": "opt_j6l_001",
       "rule_type": "requires",
       "target_id": "opt_j57_001",
-      "body_style_scope": "",
-      "matched_phrase": "workbook_matches_detail_raw"
-    },
-    {
-      "rule_id": "gs_rule_opt_cfl_001_excludes_opt_cfz_001",
-      "source_id": "opt_cfl_001",
-      "rule_type": "excludes",
-      "target_id": "opt_cfz_001",
       "body_style_scope": "",
       "matched_phrase": "workbook_matches_detail_raw"
     },

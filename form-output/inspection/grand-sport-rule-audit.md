@@ -1,15 +1,15 @@
 # Grand Sport Rule Audit
 
-Generated: `2026-06-16T04:23:57+00:00`
+Generated: `2026-06-17T01:08:17+00:00`
 Status: `rule_audit_generated`
 
 ## Summary
 
-- Workbook rule rows: 123
-- Expected draft runtime rules: 123
+- Workbook rule rows: 122
+- Expected draft runtime rules: 122
 - Omitted duplicate exclusive-group rules: 0
 - Raw detail candidate keys: 262
-- Workbook rules matching detail raw: 47
+- Workbook rules matching detail raw: 46
 - Workbook manual/approved/copied rules: 76
 - Skipped/review rows: 4
 - Unresolved non-interior RPO mentions: 6
@@ -75,7 +75,6 @@ Status: `rule_audit_generated`
 - `gs_rule_opt_dx4_001_excludes_opt_gkz_001`: opt_dx4_001 excludes opt_gkz_001
 - `gs_rule_opt_dx4_001_excludes_opt_gph_001`: opt_dx4_001 excludes opt_gph_001
 - `gs_rule_opt_j6l_001_requires_opt_j57_001`: opt_j6l_001 requires opt_j57_001
-- `gs_rule_opt_cfl_001_excludes_opt_cfz_001`: opt_cfl_001 excludes opt_cfz_001
 - `gs_rule_opt_fey_001_includes_opt_j57_001`: opt_fey_001 includes opt_j57_001
 - `gs_rule_opt_fey_001_includes_opt_t0f_001`: opt_fey_001 includes opt_t0f_001
 - `gs_rule_opt_t0f_001_includes_opt_cfz_001`: opt_t0f_001 includes opt_cfz_001
@@ -87,7 +86,8 @@ Status: `rule_audit_generated`
 - `gs_rule_opt_stz_001_requires_opt_j57_001`: opt_stz_001 requires opt_j57_001
 - `gs_rule_opt_sig_001_requires_opt_t0e_001`: opt_sig_001 requires opt_t0e_001
 - `gs_rule_opt_dmu_001_requires_opt_z15_001`: opt_dmu_001 requires opt_z15_001
-- ... 12 more
+- `gs_rule_opt_dmv_001_requires_opt_z15_001`: opt_dmv_001 requires opt_z15_001
+- ... 11 more
 
 ## Omitted Duplicate Exclusive Group Rules
 
