@@ -42,24 +42,14 @@ const approvedDeletes = {
     ],
     componentRpos: ["36S", "37S", "38S", "N26", "TU7"],
     deferredOptionIds: [
-      "opt_aq9_003",
-      "opt_ae4_001",
-      "opt_aq9_004",
-      "opt_ah2_003",
-      "opt_ae4_002",
-      "opt_ah2_002",
-      "opt_ae4_003",
-      "opt_aup_001",
-      "opt_aq9_002",
-      "opt_aq9_001",
-      "opt_ah2_001",
       "opt_u5g_001",
+      "opt_004",
       "opt_ive_001",
       "opt_008",
       "opt_ue1_001",
       "opt_u2k_001",
       "opt_vv4_001",
-      "opt_iwe_001",
+      "opt_ppw_001",
     ],
   },
   grand_sport: {
@@ -193,7 +183,46 @@ test("obsolete custom-stitch presentation suppressors are gone after source-row 
   }
 });
 
-test("deferred active emitted seat and standard-equipment rows remain in source sheets", () => {
+test("Stingray active seats collapse to the canonical Grand Sport/Z06 source shape", () => {
+  const seatRows = optionRowsBySheet
+    .get("stingray_options")
+    .filter((row) => row.section_id === "sec_seat_002" && row.active === "True")
+    .sort((a, b) => Number(a.display_order) - Number(b.display_order));
+  assert.deepEqual(
+    seatRows.map((row) => [row.option_id, row.rpo, row.selectable, row.active, row.display_order]),
+    [
+      ["opt_aq9_001", "AQ9", "True", "True", "10"],
+      ["opt_ah2_001", "AH2", "True", "True", "25"],
+      ["opt_ae4_002", "AE4", "True", "True", "40"],
+      ["opt_aup_001", "AUP", "True", "True", "80"],
+    ]
+  );
+
+  const retiredSeatIds = [
+    "opt_aq9_002",
+    "opt_aq9_003",
+    "opt_aq9_004",
+    "opt_ah2_002",
+    "opt_ah2_003",
+    "opt_ae4_001",
+    "opt_ae4_003",
+  ];
+  const optionIds = new Set(optionRowsBySheet.get("stingray_options").map((row) => row.option_id));
+  const ovsOptionIds = new Set(ovsRowsBySheet.get("stingray_ovs").map((row) => row.option_id));
+  for (const optionId of retiredSeatIds) {
+    assert.equal(optionIds.has(optionId), false, `stingray_options should not retain retired seat row ${optionId}`);
+    assert.equal(ovsOptionIds.has(optionId), false, `stingray_ovs should not retain retired seat row ${optionId}`);
+  }
+
+  const standardTechRows = optionRowsBySheet
+    .get("stingray_options")
+    .filter((row) => row.section_id === "sec_tech_001" && row.active === "True")
+    .map((row) => row.option_id)
+    .sort();
+  assert.deepEqual(standardTechRows, ["opt_004", "opt_008", "opt_ive_001", "opt_ppw_001", "opt_u2k_001", "opt_u5g_001", "opt_ue1_001", "opt_vv4_001"]);
+});
+
+test("deferred active emitted standard-equipment rows remain in source sheets", () => {
   for (const [modelKey, config] of Object.entries(approvedDeletes)) {
     const optionRows = optionRowsBySheet.get(config.optionSheet);
     const optionIds = new Set(optionRows.map((row) => row.option_id));
