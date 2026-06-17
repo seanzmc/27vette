@@ -34,6 +34,9 @@ Resolved or no longer current:
 - Z06 trim-card tooltip copy is now workbook-owned and emitted in `form-app/data.js`; `tests/z06-form-data-draft.test.mjs` asserts the 1LZ/2LZ/3LZ tooltip copy.
 - Z06 WKS is now a member of `z06_excl_indoor_car_covers`, ordered after RWH/WKR, and `z06_options.opt_wks_001` now has `display_order=73`; `tests/z06-form-data-draft.test.mjs` asserts the group membership.
 - Active promoted-model option sheets no longer have duplicate active `(section_id, display_order)` buckets. The only current duplicate buckets found by the refreshed audit are future-model scaffold rows in `zr1_options.sec_stan_001` and `zr1x_options.sec_stan_001` for U80/WUB at order `20`.
+- Active-model non-runtime option-row purge is complete: the approved purge-list rows are absent from the matching active option sheets and OVS sheets, and active-model `section_presentation.sec_cust_002` rows are absent.
+- Stingray active seat canonicalization is complete: active seat source rows are now the four canonical `sec_seat_002` rows `opt_aq9_001`, `opt_ah2_001`, `opt_ae4_002`, and `opt_aup_001`, with the three required Stingray trim-scoped seat price rules present.
+- Rule-mapping column cleanup Pass 1 is complete: promoted rule-mapping sheets now use the reduced runtime-source header set, retired duplicate/lifecycle columns are absent, and unpromoted ZR1/ZR1X rule-mapping sheets/source registrations are absent.
 
 Still persisting and needing an action plan:
 
@@ -47,9 +50,32 @@ Still persisting and needing an action plan:
 8. Stingray exclusive-group ID prefix/style drift remains cosmetic.
 9. Interior CSV/config remnants remain even though active interior grouping now comes from workbook metadata.
 
+Intentionally deferred, not part of the completed source-row purge: active emitted `sec_tech_001` / connected-service standard-equipment rows remain active workbook option rows until a separate standard-equipment ownership model is designed and proven.
+
 ---
 
 ## Remaining issues and action plans
+
+### Completed source-cleanup passes refreshed 2026-06-17
+
+Evidence:
+
+- `docs/active-model-nonruntime-option-row-purge-spec.md` is now historical: current workbook probes found none of the approved purge-list option IDs in their active-model option sheets or OVS sheets, and no active-model `section_presentation.sec_cust_002` rows remain.
+- `docs/active-seat-standard-equipment-ownership-spec.md` is now historical: current workbook probes found exactly four active Stingray seat source rows in `sec_seat_002` and found the three required Stingray seat price rules.
+- `docs/rule-mapping-column-cleanup-pass1-spec.md` is now historical: current workbook probes found the reduced promoted rule-mapping headers, no retired duplicate/lifecycle columns, no `zr1_rule_mapping` / `zr1x_rule_mapping` sheets, and no future-model rule-mapping registrations.
+
+Status: completed. These are not current recommended next passes.
+
+Action plan:
+
+1. No open implementation action for the completed non-runtime option-row purge, Stingray seat canonicalization, or rule-mapping column cleanup Pass 1.
+2. Keep their docs as historical specs with top-level completed status.
+3. Keep their deferred follow-ons separate:
+   - active `sec_tech_001` / connected-service ownership requires a future standard-equipment source model,
+   - `body_style_scope` / `runtime_action` cleanup requires future parity-proven rule modeling,
+   - fallback retirement remains a separate runtime/generator boundary pass.
+
+---
 
 ### 1. Runtime/order-summary fallback constants remain after Pass E option (a)
 
@@ -313,8 +339,8 @@ Action plan:
 
 ## Recommended next passes
 
-1. **Display-order guard pass**: add a durable validator/test for promoted option-sheet `(section_id, display_order)` uniqueness now that promoted sheets are clean; decide separately whether to include ZR1/ZR1X scaffold rows.
-2. **Fallback-removal pass**: remove or narrow runtime/order-summary fallback constants and update README/AGENTS wording now that promoted models have workbook-owned rows and generated-data tests.
+1. **Fallback-retirement / boundary-narrowing pass**: remove or narrow runtime/order-summary fallback constants and update README/AGENTS wording now that promoted models have workbook-owned rows and generated-data tests. This is the recommended first implementation pass after the docs status refresh.
+2. **Display-order guard pass**: add a durable validator/test for promoted option-sheet `(section_id, display_order)` uniqueness now that promoted sheets are clean; decide separately whether to include ZR1/ZR1X scaffold rows.
 3. **Stingray rear-script exclusive-group pass**: migrate RIK/RIN/SL8 from pairwise excludes to a workbook-owned exclusive group if the intended UX is radio replacement.
 4. **Cross-model ordering pass**: settle wheels/roof order drift and the Grand Sport LS6 exclusive-member order mismatch.
 5. **Copy-convergence/product-decision pass**: larger workbook copy pass with explicit allowlist, RPO fallback for known Z06 suffix drift, and product review for section/copy decisions.
@@ -335,5 +361,11 @@ Original audit gates:
 - `node` probe against `form-app/data.js` — confirmed Stingray, Grand Sport, and Z06 all emit 11 `orderSummary.sections` rows and 13 `stepMap` entries; confirmed Z06 1LZ/2LZ/3LZ trim choices now have non-empty `info_tooltip` copy.
 - `search_files` / `read_file` probes — confirmed current runtime/config fallback symbols, tests covering Z06 tooltip/WKS/orderSummary and interior fallback-symbol guards, and copy test scope.
 - `git diff -- docs/persisting-audit-findings-2026-06-14.md` — docs-only diff review.
+
+2026-06-17 documentation refresh evidence:
+
+- `openpyxl` read-only probes against `stingray_master.xlsx` — confirmed active-model nonruntime purge-list rows and matching OVS rows are absent; active-model `section_presentation.sec_cust_002` rows are absent; Stingray active seats are canonicalized to four `sec_seat_002` rows; the three Stingray seat price rules are present; promoted rule-mapping sheets use the reduced header set; retired rule-mapping columns and ZR1/ZR1X rule-mapping registrations are absent; promoted runtime metadata row counts remain complete.
+- `rg` probe against `form-app`, `scripts`, and this document — confirmed `orderSectionDefinitions`, `stepOrderSectionKeys`, `STEP_ORDER`, `STEP_LABELS`, `CONTEXT_SECTIONS`, and `interior_reference_path` still exist where the remaining action plans say they persist.
+- Docs-only status refresh — updated completed status in the three historical specs and this persistence handoff; no workbook, generated artifact, runtime, or test changes were made.
 
 No generators were run and no workbook or generated artifacts were modified for this report update.

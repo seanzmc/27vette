@@ -4,7 +4,11 @@ Recommended reasoning level: high.
 
 ## Status
 
-Spec only. Do not implement until approved.
+Completed.
+
+Implementation result verified 2026-06-17: the approved active-model non-runtime source rows are absent from the matching option and OVS sheets for Stingray, Grand Sport, and Z06, and the active-model `section_presentation` rows for `sec_cust_002` are gone. This document remains as the historical approved scope and validation record.
+
+Still deferred: active emitted `sec_tech_001` / connected-service standard-equipment rows remain active and need a separate ownership model before deletion.
 
 ## Diagnosis
 
@@ -338,8 +342,8 @@ Manual/browser verification:
 - No active seat-row canonicalization unless separately approved after this purge.
 - No removal of shared `section_master` taxonomy rows.
 
-## Approval Question
+## Historical Approval Prompt
 
-Approve this pass as a source-row purge limited to the exact safe-delete lists above?
+Pre-implementation prompt: approve this pass as a source-row purge limited to the exact safe-delete lists above.
 
 Recommended answer: approve this limited pass first. It removes rows that are already non-runtime or owned by `interior_components` while protecting currently emitted seat and standard-equipment behavior. After it is green, write a separate seat/standard-equipment modeling spec for any active emitted rows you still want removed from option sheets.

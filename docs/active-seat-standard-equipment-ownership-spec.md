@@ -4,7 +4,11 @@ Recommended reasoning level: high.
 
 ## Status
 
-Spec only. Do not implement until approved.
+Completed.
+
+Implementation result verified 2026-06-17: Stingray active seat source rows are canonicalized to four active `sec_seat_002` rows (`opt_aq9_001`, `opt_ah2_001`, `opt_ae4_002`, `opt_aup_001`), and the three required Stingray seat price rules are present (`sr_pr_1lt_ae4_seat_001`, `sr_pr_3lt_ae4_seat_001`, `sr_pr_3lt_ah2_seat_001`). This document remains as the historical approved scope and validation record.
+
+Still deferred: active emitted `sec_tech_001` / connected-service standard-equipment rows remain active and need a separate ownership model before deletion.
 
 ## Diagnosis
 
@@ -281,8 +285,8 @@ Manual/browser verification:
 - No broad standard-equipment redesign.
 - No generated artifact hand edits.
 
-## Approval Question
+## Historical Approval Prompt
 
-Approve a Stingray-first active seat canonicalization pass scoped above, with active connected-service / standard-tech rows explicitly deferred?
+Pre-implementation prompt: approve a Stingray-first active seat canonicalization pass scoped above, with active connected-service / standard-tech rows explicitly deferred.
 
 Recommended answer: approve this limited Stingray seat pass first. It aligns Stingray with the Grand Sport/Z06 canonical seat shape while avoiding a broader standard-equipment owner redesign.

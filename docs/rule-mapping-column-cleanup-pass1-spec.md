@@ -4,7 +4,11 @@ Recommended reasoning level: high.
 
 ## Status
 
-Spec only. Do not implement until approved.
+Completed.
+
+Implementation result verified 2026-06-17: promoted rule-mapping sheets now keep only `rule_id`, `source_id`, `rule_type`, `target_id`, `original_detail_raw`, `body_style_scope`, `runtime_action`, and `disabled_reason`; retired duplicate/lifecycle columns are absent from `rule_mapping`, `grandSport_rule_mapping`, and `z06_rule_mapping`. `zr1_rule_mapping` / `zr1x_rule_mapping` and their future-model source registrations are absent. This document remains as the historical approved scope and validation record.
+
+Still deferred: `body_style_scope` and `runtime_action` remain intentionally retained behavior-carrying or parity-sensitive fields for later cleanup passes.
 
 ## Diagnosis
 
@@ -304,6 +308,6 @@ Manual/browser verification:
 - Do not promote ZR1/ZR1X or touch future-model scaffold rows beyond deleting `zr1_rule_mapping` / `zr1x_rule_mapping` and removing/deactivating stale references to those sheets.
 - Do not redesign optional audit/report output beyond what is required to survive the source-schema cleanup.
 
-## Approval Question
+## Historical Approval Prompt
 
-Approve Pass 1 as scoped above: retire duplicate/lifecycle rule-mapping columns for the three runtime models, delete unpromoted ZR1/ZR1X rule-mapping sheets and their workbook-source registrations, derive section/type/mode metadata from canonical source sheets while preserving generated rule payload shape by default, resolve the one Grand Sport `generation_action` row directly, regenerate/compare runtime contracts, and explicitly leave `body_style_scope` and `runtime_action` untouched?
+Pre-implementation prompt: approve Pass 1 as scoped above — retire duplicate/lifecycle rule-mapping columns for the three runtime models, delete unpromoted ZR1/ZR1X rule-mapping sheets and their workbook-source registrations, derive section/type/mode metadata from canonical source sheets while preserving generated rule payload shape by default, resolve the one Grand Sport `generation_action` row directly, regenerate/compare runtime contracts, and explicitly leave `body_style_scope` and `runtime_action` untouched.
