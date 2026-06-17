@@ -135,6 +135,63 @@ function autoAddedRpos(runtime) {
   return [...runtime.computeAutoAdded().keys()].map((id) => choices.find((choice) => choice.option_id === id)?.rpo || id).sort();
 }
 
+const z06InteriorSeatbeltIncludes = [
+  ["3LZ_AE4_H8T", "opt_3a9_001", "3A9"],
+  ["3LZ_AE4_HAG", "opt_3a9_001", "3A9"],
+  ["3LZ_AE4_HNK", "opt_3f9_001", "3F9"],
+  ["3LZ_AE4_HUF_N2Z", "opt_3n9_001", "3N9"],
+  ["3LZ_AE4_HUW", "opt_379_001", "379"],
+  ["3LZ_AE4_HUX_N2Z", "opt_379_001", "379"],
+  ["3LZ_AE4_HZN", "opt_3n9_001", "3N9"],
+  ["3LZ_AH2_H8T", "opt_3a9_001", "3A9"],
+  ["3LZ_AH2_HAG", "opt_3a9_001", "3A9"],
+  ["3LZ_AH2_HNK", "opt_3f9_001", "3F9"],
+  ["3LZ_AH2_HUF_N2Z", "opt_3n9_001", "3N9"],
+  ["3LZ_AH2_HUW", "opt_379_001", "379"],
+  ["3LZ_AH2_HUX_N2Z", "opt_379_001", "379"],
+  ["3LZ_AH2_HZN", "opt_3n9_001", "3N9"],
+  ["3LZ_AUP_HAG", "opt_3a9_001", "3A9"],
+  ["3LZ_AH2_HVZ", "opt_3f9_001", "3F9"],
+  ["3LZ_AE4_HVZ", "opt_3f9_001", "3F9"],
+  ["3LZ_AUP_HVZ", "opt_3f9_001", "3F9"],
+];
+
+test("Z06 3LZ interiors include locked zero-price seatbelt colors", () => {
+  for (const [interiorId, seatbeltOptionId, seatbeltRpo] of z06InteriorSeatbeltIncludes) {
+    const runtime = z06Runtime({ trimLevel: "3LZ" });
+    const seatRpo = interiorId.includes("_AE4_") ? "AE4" : interiorId.includes("_AUP_") ? "AUP" : "AH2";
+    runtime.handleChoice(choice(runtime, seatRpo));
+    runtime.state.selectedInterior = interiorId;
+    runtime.reconcileSelections();
+    assert.equal(autoAddedRpos(runtime).includes(seatbeltRpo), true, `${interiorId} should auto-add ${seatbeltRpo}`);
+    assert.equal(runtime.optionPrice(seatbeltOptionId), 0, `${interiorId} ${seatbeltRpo} should price at zero`);
+
+    const otherSeatbelt = runtime.activeChoiceRows().find(
+      (item) => item.section_id === "sec_seat_001" && item.option_id !== seatbeltOptionId && item.selectable === "True"
+    );
+    assert.ok(otherSeatbelt, "expected another selectable seatbelt for lock test");
+    runtime.handleChoice(otherSeatbelt);
+    runtime.reconcileSelections();
+    assert.equal(runtime.state.selected.has(otherSeatbelt.option_id), false, `${interiorId} should block other seatbelts`);
+
+    runtime.state.selected.add("opt_d30_001");
+    runtime.handleChoice(otherSeatbelt);
+    runtime.reconcileSelections();
+    assert.equal(runtime.state.selected.has(otherSeatbelt.option_id), false, `${interiorId} should block other seatbelts even with D30`);
+  }
+});
+
+test("Z06 GBA paint blocks CFL ground effect", () => {
+  const runtime = z06Runtime();
+  runtime.handleChoice(choice(runtime, "GBA"));
+  runtime.reconcileSelections();
+  const cfl = choice(runtime, "CFL");
+  assert.match(runtime.disableReasonForChoice(cfl), /GBA|black paint|CFL/i);
+  runtime.handleChoice(cfl);
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has(cfl.option_id), false, "CFL should not stick with GBA selected");
+});
+
 test("Z06 Z07 defaults T0F, allows T0G switching, and keeps J57 included at zero", () => {
   const runtime = z06Runtime();
   const z07 = choice(runtime, "Z07");

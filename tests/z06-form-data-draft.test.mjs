@@ -17,6 +17,26 @@ const standardSections = new Set([
   "sec_stan_002",
   "sec_tech_001",
 ]);
+const z06InteriorSeatbeltIncludes = [
+  ["3LZ_AE4_H8T", "opt_3a9_001"],
+  ["3LZ_AE4_HAG", "opt_3a9_001"],
+  ["3LZ_AE4_HNK", "opt_3f9_001"],
+  ["3LZ_AE4_HUF_N2Z", "opt_3n9_001"],
+  ["3LZ_AE4_HUW", "opt_379_001"],
+  ["3LZ_AE4_HUX_N2Z", "opt_379_001"],
+  ["3LZ_AE4_HZN", "opt_3n9_001"],
+  ["3LZ_AH2_H8T", "opt_3a9_001"],
+  ["3LZ_AH2_HAG", "opt_3a9_001"],
+  ["3LZ_AH2_HNK", "opt_3f9_001"],
+  ["3LZ_AH2_HUF_N2Z", "opt_3n9_001"],
+  ["3LZ_AH2_HUW", "opt_379_001"],
+  ["3LZ_AH2_HUX_N2Z", "opt_379_001"],
+  ["3LZ_AH2_HZN", "opt_3n9_001"],
+  ["3LZ_AUP_HAG", "opt_3a9_001"],
+  ["3LZ_AH2_HVZ", "opt_3f9_001"],
+  ["3LZ_AE4_HVZ", "opt_3f9_001"],
+  ["3LZ_AUP_HVZ", "opt_3f9_001"],
+];
 const fullLengthStripeOptionIds = [
   "opt_dpb_001", "opt_dpc_001", "opt_dpg_001", "opt_dpl_001", "opt_dpt_001", "opt_dsy_001", "opt_dsz_001", "opt_dt0_001",
   "opt_dth_001", "opt_dub_001", "opt_due_001", "opt_duk_001", "opt_duw_001", "opt_dzu_001", "opt_dzv_001", "opt_dzx_001",
@@ -161,6 +181,30 @@ test("Z06 draft keeps default-selected options selectable", () => {
       assert.equal(choice.selectable, "True", `${choice.choice_id} should remain selectable`);
     }
   }
+});
+
+test("Z06 3LZ interiors include locked zero-price seatbelt colors", () => {
+  const ruleKeys = new Set(draft.rules.map((rule) => `${rule.source_id}::${rule.rule_type}::${rule.target_id}`));
+  const priceKeys = new Set(draft.priceRules.map((rule) => `${rule.condition_option_id}::${rule.target_option_id}::${rule.price_rule_type}::${rule.price_value}`));
+  for (const [interiorId, seatbeltOptionId] of z06InteriorSeatbeltIncludes) {
+    assert.ok(ruleKeys.has(`${interiorId}::includes::${seatbeltOptionId}`), `${interiorId} should include ${seatbeltOptionId}`);
+    assert.ok(priceKeys.has(`${interiorId}::${seatbeltOptionId}::override::0`), `${interiorId} should zero-price ${seatbeltOptionId}`);
+  }
+});
+
+test("Z06 GBA excludes CFL through workbook group metadata", () => {
+  const group = draft.ruleGroups.find((row) => row.group_id === "z06_group_gba_excludes_accent_and_roof_choices");
+  assert.ok(group, "GBA blocker group should exist");
+  assert.equal(group.source_id, "opt_gba_001");
+  assert.equal(group.group_type, "excludes_any");
+  assert.ok(group.target_ids.includes("opt_cfl_001"), "GBA should block CFL");
+});
+
+test("Z06 seatbelt colors are exclusive peers for interior-included locks", () => {
+  const group = draft.exclusiveGroups.find((row) => row.group_id === "z06_excl_seat_belts");
+  assert.ok(group, "Z06 seatbelt exclusive group should exist");
+  assert.equal(group.selection_mode, "single_within_group");
+  assert.deepEqual(group.option_ids, ["opt_719_001", "opt_3n9_001", "opt_379_001", "opt_3a9_001", "opt_3f9_001", "opt_3m9_001"]);
 });
 
 

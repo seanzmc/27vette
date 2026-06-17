@@ -784,7 +784,9 @@ function userSelectedExclusiveGroupPeer(optionId, selectedIds) {
 function includedRuleLocksExclusivePeer(rule) {
   const sourceGroup = optionExclusiveGroup(rule.source_id);
   const targetGroup = optionExclusiveGroup(rule.target_id);
-  return exclusiveGroupAllowsSingleSelection(sourceGroup) && targetGroup?.selection_mode === "single_within_group";
+  if (targetGroup?.selection_mode !== "single_within_group") return false;
+  if (exclusiveGroupAllowsSingleSelection(sourceGroup)) return true;
+  return Boolean(data.interiors?.some((interior) => interior.interior_id === rule.source_id));
 }
 
 function includedRuleAllowedReplacementPeers(rule) {
