@@ -37,18 +37,18 @@ Resolved or no longer current:
 - Active-model non-runtime option-row purge is complete: the approved purge-list rows are absent from the matching active option sheets and OVS sheets, and active-model `section_presentation.sec_cust_002` rows are absent.
 - Stingray active seat canonicalization is complete: active seat source rows are now the four canonical `sec_seat_002` rows `opt_aq9_001`, `opt_ah2_001`, `opt_ae4_002`, and `opt_aup_001`, with the three required Stingray trim-scoped seat price rules present.
 - Rule-mapping column cleanup Pass 1 is complete: promoted rule-mapping sheets now use the reduced runtime-source header set, retired duplicate/lifecycle columns are absent, and unpromoted ZR1/ZR1X rule-mapping sheets/source registrations are absent.
+- Browser order-summary fallback retirement / boundary narrowing is complete: promoted runtime models carry generated workbook-owned `orderSummary` metadata, browser `orderSectionDefinitions` / `stepOrderSectionKeys` fallback constants are removed, and Python step/context constants are documented as unpromoted compatibility / completeness-check inputs.
 
 Still persisting and needing an action plan:
 
-1. Runtime/order-summary fallback constants remain after Pass E option (a).
-2. Optional audit/report tooling remains as opt-in historical tooling.
-3. Stingray rear script badges still use pairwise excludes instead of an exclusive group.
-4. Cross-model relative order drift still exists for wheels/roof and one Grand Sport exclusive-member ordering surface.
-5. Cross-model customer copy drift remains, including trailing-period drift pinned by tests.
-6. Several section/copy decisions remain product-review items.
-7. Z06 option-id suffix drift remains for U2K/U5G/UE1/VV4/CFV and no-RPO Z06 row IDs remain sparse.
-8. Stingray exclusive-group ID prefix/style drift remains cosmetic.
-9. Interior CSV/config remnants remain even though active interior grouping now comes from workbook metadata.
+1. Optional audit/report tooling remains as opt-in historical tooling.
+2. Stingray rear script badges still use pairwise excludes instead of an exclusive group.
+3. Cross-model relative order drift still exists for wheels/roof and one Grand Sport exclusive-member ordering surface.
+4. Cross-model customer copy drift remains, including trailing-period drift pinned by tests.
+5. Several section/copy decisions remain product-review items.
+6. Z06 option-id suffix drift remains for U2K/U5G/UE1/VV4/CFV and no-RPO Z06 row IDs remain sparse.
+7. Stingray exclusive-group ID prefix/style drift remains cosmetic.
+8. Interior CSV/config remnants remain even though active interior grouping now comes from workbook metadata.
 
 Intentionally deferred, not part of the completed source-row purge: active emitted `sec_tech_001` / connected-service standard-equipment rows remain active workbook option rows until a separate standard-equipment ownership model is designed and proven.
 
@@ -77,29 +77,22 @@ Action plan:
 
 ---
 
-### 1. Runtime/order-summary fallback constants remain after Pass E option (a)
+### 1. Runtime/order-summary fallback constants after Pass E option (a) — completed
 
 Evidence:
 
-- `form-app/app.js` still has fallback behavior in `orderSummarySections()` and `orderSummaryStepMap()`:
-  - `data.orderSummary?.sections` else `orderSectionDefinitions`
-  - `data.orderSummary?.stepMap || Object.fromEntries(stepOrderSectionKeys)`
-- `scripts/corvette_form_generator/model_configs.py` still carries fallback `STEP_ORDER`, `STEP_LABELS`, and `CONTEXT_SECTIONS` constants used as base config/fallback inputs.
-- `README.md` still says promoted runtime-contract models may omit `orderSummary`, although the current workbook has rows for Stingray, Grand Sport, and Z06.
-- `tests/grand-sport-draft-data.test.mjs` and `tests/z06-form-data-draft.test.mjs` now assert 11 generated `orderSummary.sections` rows and 13 `stepMap` entries for Grand Sport and Z06. `form-app/data.js` currently emits the same counts for Stingray, Grand Sport, and Z06.
+- `form-app/app.js` no longer carries browser order-summary fallback constants `orderSectionDefinitions`, `orderSectionLabels`, `orderSectionOrder`, or `stepOrderSectionKeys`.
+- `orderSummarySections()` and `orderSummaryStepMap()` now require generated `data.orderSummary` metadata and raise a clearly named missing-generated-data error instead of returning an empty/malformed fallback.
+- `tests/multi-model-runtime-switching.test.mjs` guards against reintroducing the retired browser fallback symbols and verifies every active registry model emits generated `orderSummary.sections` and `orderSummary.stepMap`.
+- `scripts/corvette_form_generator/model_configs.py` and `runtime_metadata.py` now document Python step/context constants as unpromoted compatibility defaults and promoted completeness-check inputs, not active promoted runtime metadata ownership.
+- `README.md` now documents that all promoted runtime models carry workbook-owned `orderSummary` metadata.
 
-Status: partly progressed. The promoted-model data gap is closed and covered by tests; the remaining work is code/docs fallback retirement or boundary narrowing.
+Status: completed.
 
 Action plan:
 
-1. Write a spec for a fallback-retirement pass, scoped only to promoted-model runtime metadata fallback behavior and README/AGENTS wording.
-2. Keep the existing Grand Sport/Z06 generated-data tests; add a Stingray-specific assertion only if the runtime test suite does not already prove its generated `orderSummary` contract.
-3. Decide fallback semantics explicitly before editing runtime code:
-   - fail generation if promoted models lack workbook-owned rows, or
-   - keep fallback only for non-promoted/future models and document that boundary.
-4. Remove or narrow `orderSectionDefinitions` / `stepOrderSectionKeys` fallback usage only after the boundary is decided.
-5. Update `README.md` / `AGENTS.md` text that still implies promoted models may omit `orderSummary` if that is no longer true.
-6. Run runtime/multi-model gates: `tests/stingray-form-regression.test.mjs`, `tests/multi-model-runtime-switching.test.mjs`, plus the model draft/contract tests if generators are touched.
+1. No open action for browser order-summary fallback retirement.
+2. Keep Python `STEP_ORDER`, `STEP_LABELS`, and `CONTEXT_SECTIONS` only as unpromoted compatibility / completeness-check inputs unless a later future-model workflow pass approves removing that fallback boundary.
 
 ---
 
@@ -339,12 +332,11 @@ Action plan:
 
 ## Recommended next passes
 
-1. **Fallback-retirement / boundary-narrowing pass**: remove or narrow runtime/order-summary fallback constants and update README/AGENTS wording now that promoted models have workbook-owned rows and generated-data tests. This is the recommended first implementation pass after the docs status refresh.
-2. **Display-order guard pass**: add a durable validator/test for promoted option-sheet `(section_id, display_order)` uniqueness now that promoted sheets are clean; decide separately whether to include ZR1/ZR1X scaffold rows.
-3. **Stingray rear-script exclusive-group pass**: migrate RIK/RIN/SL8 from pairwise excludes to a workbook-owned exclusive group if the intended UX is radio replacement.
-4. **Cross-model ordering pass**: settle wheels/roof order drift and the Grand Sport LS6 exclusive-member order mismatch.
-5. **Copy-convergence/product-decision pass**: larger workbook copy pass with explicit allowlist, RPO fallback for known Z06 suffix drift, and product review for section/copy decisions.
-6. **Interior stale-surface cleanup**: remove unused CSV/config remnants after consumer audit and contract-parity proof.
+1. **Display-order guard pass**: add a durable validator/test for promoted option-sheet `(section_id, display_order)` uniqueness now that promoted sheets are clean; decide separately whether to include ZR1/ZR1X scaffold rows.
+2. **Stingray rear-script exclusive-group pass**: migrate RIK/RIN/SL8 from pairwise excludes to a workbook-owned exclusive group if the intended UX is radio replacement.
+3. **Cross-model ordering pass**: settle wheels/roof order drift and the Grand Sport LS6 exclusive-member order mismatch.
+4. **Copy-convergence/product-decision pass**: larger workbook copy pass with explicit allowlist, RPO fallback for known Z06 suffix drift, and product review for section/copy decisions.
+5. **Interior stale-surface cleanup**: remove unused CSV/config remnants after consumer audit and contract-parity proof.
 
 ---
 
@@ -368,4 +360,10 @@ Original audit gates:
 - `rg` probe against `form-app`, `scripts`, and this document — confirmed `orderSectionDefinitions`, `stepOrderSectionKeys`, `STEP_ORDER`, `STEP_LABELS`, `CONTEXT_SECTIONS`, and `interior_reference_path` still exist where the remaining action plans say they persist.
 - Docs-only status refresh — updated completed status in the three historical specs and this persistence handoff; no workbook, generated artifact, runtime, or test changes were made.
 
-No generators were run and no workbook or generated artifacts were modified for this report update.
+2026-06-17 fallback-retirement implementation evidence:
+
+- `form-app/app.js` source guard — retired browser order-summary fallback symbols and fallback expressions are absent.
+- Active registry data tests — Stingray, Grand Sport, and Z06 all emit generated `orderSummary.sections` and `orderSummary.stepMap` metadata.
+- Runtime/generator boundary docs — Python step/context constants remain documented as unpromoted compatibility / promoted completeness-check inputs, not browser runtime fallbacks.
+
+No generators were run and no workbook or generated artifacts were modified for this refresh.

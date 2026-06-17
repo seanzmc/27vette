@@ -152,7 +152,7 @@ Each model dataset exposes a shared top-level contract:
 - `defaultSelectionRules`
 - `validation`
 
-The Stingray dataset additionally carries `runtimeRuleExceptions` and `orderSummary`; promoted runtime-contract models may omit keys their contract does not use. Verify the embedded contract rather than assuming key parity across models.
+The Stingray dataset additionally carries `runtimeRuleExceptions`. All promoted runtime models carry workbook-owned `orderSummary` metadata (`sections` and `stepMap`); browser runtime code reads that generated metadata instead of synthesizing order-summary grouping from hardcoded fallback constants. Verify the embedded contract rather than assuming non-promoted draft artifacts have the same key parity.
 
 The app registry wraps those datasets by runtime model key and includes model-level presentation assets:
 

@@ -3,9 +3,10 @@
 The workbook owns model-specific metadata through ``model_master``,
 ``model_workbook_sources``, ``model_variants``, and
 ``model_registry_promotion``; resolve a base config against it with
-``runtime_metadata.load_model_config_overrides``. Python keeps only what the
-workbook cannot express: filesystem paths, cross-model presentation
-constants, and the small per-model extras below.
+``runtime_metadata.load_model_config_overrides``. Python keeps filesystem
+paths, unpromoted-model compatibility defaults, and promoted-model
+completeness expectations. Promoted runtime metadata such as steps, context
+sections, and order-summary grouping must come from workbook rows.
 """
 
 from __future__ import annotations

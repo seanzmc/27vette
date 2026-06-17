@@ -138,36 +138,6 @@ const rulesByTarget = new Map();
 const priceRulesByTarget = new Map();
 const ruleGroupsBySource = new Map();
 const exclusiveGroupByOption = new Map();
-const orderSectionDefinitions = [
-  ["vehicle", "Vehicle"],
-  ["exterior_paint", "Exterior Paint"],
-  ["exterior_appearance", "Exterior Appearance"],
-  ["wheels_brakes", "Wheels & Brakes"],
-  ["performance_mechanical", "Performance & Mechanical"],
-  ["stripes", "Stripes"],
-  ["seats_interior", "Seats & Interior"],
-  ["accessories", "Accessories"],
-  ["delivery", "Delivery"],
-  ["auto_added_required", "Auto-Added / Required"],
-  ["pricing_summary", "Pricing Summary"],
-];
-const orderSectionLabels = new Map(orderSectionDefinitions);
-const orderSectionOrder = new Map(orderSectionDefinitions.map(([key], index) => [key, index]));
-const stepOrderSectionKeys = new Map([
-  ["body_style", "vehicle"],
-  ["trim_level", "vehicle"],
-  ["paint", "exterior_paint"],
-  ["exterior_appearance", "exterior_appearance"],
-  ["wheels", "wheels_brakes"],
-  ["packages_performance", "performance_mechanical"],
-  ["aero_exhaust_stripes_accessories", "stripes"],
-  ["seat", "seats_interior"],
-  ["base_interior", "seats_interior"],
-  ["seat_belt", "seats_interior"],
-  ["interior_trim", "seats_interior"],
-  ["accessories", "accessories"],
-  ["delivery", "delivery"],
-]);
 
 function rebuildDataIndexes() {
   runtimeSteps = [modelStep, ...(data.steps || []).filter((step) => step.step_key !== "summary")];
@@ -1067,18 +1037,23 @@ function choiceDisplayPrice(choice) {
   return optionPrice(choice.option_id, [choice.option_id]);
 }
 
+function missingGeneratedOrderSummaryMetadata(field) {
+  const modelKey = activeModel?.key || activeModelKey || data?.dataset?.model_key || data?.dataset?.model || "unknown";
+  throw new Error(
+    `Missing generated orderSummary.${field} metadata for active model ${modelKey}. Regenerate the model artifact and registry before loading the runtime.`
+  );
+}
+
 function orderSummarySections() {
   const generated = data.orderSummary?.sections;
   if (Array.isArray(generated) && generated.length) return generated;
-  return orderSectionDefinitions.map(([section_key, section_label], display_order) => ({
-    section_key,
-    section_label,
-    display_order,
-  }));
+  return missingGeneratedOrderSummaryMetadata("sections");
 }
 
 function orderSummaryStepMap() {
-  return data.orderSummary?.stepMap || Object.fromEntries(stepOrderSectionKeys);
+  const generated = data.orderSummary?.stepMap;
+  if (generated && typeof generated === "object" && Object.keys(generated).length) return generated;
+  return missingGeneratedOrderSummaryMetadata("stepMap");
 }
 
 function orderSummarySectionOrder() {

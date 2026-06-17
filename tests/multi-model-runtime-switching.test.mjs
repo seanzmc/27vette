@@ -3,6 +3,8 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
+const appSource = fs.readFileSync("form-app/app.js", "utf8");
+
 function makeElement() {
   return {
     textContent: "",
@@ -329,6 +331,44 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
   assert.deepEqual(
     JSON.parse(JSON.stringify(registry.models.z06.data.variants.map((variant) => variant.variant_id))),
     ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"]
+  );
+});
+
+test("active registry models carry generated order-summary metadata without browser fallbacks", () => {
+  for (const forbiddenSymbol of ["orderSectionDefinitions", "orderSectionLabels", "orderSectionOrder", "stepOrderSectionKeys"]) {
+    assert.doesNotMatch(appSource, new RegExp(`\\b${forbiddenSymbol}\\b`), `${forbiddenSymbol} should not remain in app.js`);
+  }
+  assert.doesNotMatch(appSource, /Object\.fromEntries\(stepOrderSectionKeys\)/);
+  assert.doesNotMatch(appSource, /orderSectionDefinitions\.map/);
+
+  const registry = loadDataWindow().CORVETTE_FORM_DATA;
+  for (const [modelKey, entry] of Object.entries(registry.models)) {
+    assert.equal(entry.data.steps.length, 14, `${modelKey} should emit generated runtime steps`);
+    assert.equal(entry.data.orderSummary.sections.length, 11, `${modelKey} should emit order-summary sections`);
+    assert.equal(Object.keys(entry.data.orderSummary.stepMap).length, 13, `${modelKey} should emit order-summary step map`);
+    assert.equal(entry.data.orderSummary.stepMap.base_interior, "seats_interior", `${modelKey} should map interiors from generated metadata`);
+  }
+});
+
+test("runtime fails loudly when generated order-summary metadata is missing", () => {
+  const missingSectionsRuntime = loadRuntime();
+  missingSectionsRuntime.state.bodyStyle = "coupe";
+  missingSectionsRuntime.state.trimLevel = "1LT";
+  missingSectionsRuntime.resetDefaults();
+  delete missingSectionsRuntime.data.orderSummary.sections;
+  assert.throws(
+    () => missingSectionsRuntime.currentOrder(),
+    /Missing generated orderSummary\.sections metadata for active model stingray/
+  );
+
+  const missingStepMapRuntime = loadRuntime();
+  missingStepMapRuntime.state.bodyStyle = "coupe";
+  missingStepMapRuntime.state.trimLevel = "1LT";
+  missingStepMapRuntime.resetDefaults();
+  missingStepMapRuntime.data.orderSummary.stepMap = {};
+  assert.throws(
+    () => missingStepMapRuntime.currentOrder(),
+    /Missing generated orderSummary\.stepMap metadata for active model stingray/
   );
 });
 

@@ -109,7 +109,12 @@ def load_runtime_steps(
     fallback_order: Iterable[str],
     fallback_labels: Mapping[str, Any],
 ) -> list[dict[str, Any]]:
-    """Load runtime step metadata or synthesize it from fallback order/labels."""
+    """Load runtime step metadata.
+
+    Promoted runtime models must have workbook-owned rows. Fallback
+    order/labels are compatibility defaults for unpromoted models and the
+    expected-key set for promoted completeness checks.
+    """
 
     rows = active_rows(wb, "runtime_steps", model_key)
     if not rows:
@@ -155,7 +160,11 @@ def load_context_sections(
     model_key: str,
     fallback_sections: Iterable[Mapping[str, Any]],
 ) -> list[dict[str, Any]]:
-    """Load context section metadata or return caller-provided fallback sections."""
+    """Load context section metadata.
+
+    Promoted runtime models must have workbook-owned rows. Caller-provided
+    fallback sections are compatibility defaults for unpromoted models only.
+    """
 
     rows = active_rows(wb, "context_section_master", model_key)
     if not rows:
