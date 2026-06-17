@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-06-17T05:38:28+00:00",
+    "generated_at": "2026-06-17T19:49:10+00:00",
     "status": "draft_not_runtime_active"
   },
   "variants": [
@@ -48881,9 +48881,9 @@
       "group_id": "gs_excl_ls6_engine_covers",
       "option_ids": [
         "opt_bc7_001",
-        "opt_bc4_002",
         "opt_bcp_002",
-        "opt_bcs_002"
+        "opt_bcs_002",
+        "opt_bc4_002"
       ],
       "selection_mode": "single_within_group",
       "active": "True",

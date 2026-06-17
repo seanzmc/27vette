@@ -39,16 +39,16 @@ Resolved or no longer current:
 - Rule-mapping column cleanup Pass 1 is complete: promoted rule-mapping sheets now use the reduced runtime-source header set, retired duplicate/lifecycle columns are absent, and unpromoted ZR1/ZR1X rule-mapping sheets/source registrations are absent.
 - Browser order-summary fallback retirement / boundary narrowing is complete: promoted runtime models carry generated workbook-owned `orderSummary` metadata, browser `orderSectionDefinitions` / `stepOrderSectionKeys` fallback constants are removed, and Python step/context constants are documented as unpromoted compatibility / completeness-check inputs.
 - Stingray rear script badge cleanup is complete: `exclusive_groups.excl_rear_script_badges` and its three members now own RIK/RIN/SL8 replacement behavior, and the six redundant pairwise Stingray `rule_mapping` excludes are gone.
+- Cross-model ordering cleanup is complete for the confirmed active surfaces: Z06 `SOM`/`ROX` order now matches the Grand Sport shared wheel sequence, Grand Sport LS6 exclusive-member order now matches its option-sheet order, and active shared roof order is guarded without a workbook edit.
 
 Still persisting and needing an action plan:
 
 1. Optional audit/report tooling remains as opt-in historical tooling.
-2. Cross-model relative order drift still exists for wheels/roof and one Grand Sport exclusive-member ordering surface.
-3. Cross-model customer copy drift remains, including trailing-period drift pinned by tests.
-4. Several section/copy decisions remain product-review items.
-5. Z06 option-id suffix drift remains for U2K/U5G/UE1/VV4/CFV and no-RPO Z06 row IDs remain sparse.
-6. Stingray exclusive-group ID prefix/style drift remains cosmetic.
-7. Interior CSV/config remnants remain even though active interior grouping now comes from workbook metadata.
+2. Cross-model customer copy drift remains, including trailing-period drift pinned by tests.
+3. Several section/copy decisions remain product-review items.
+4. Z06 option-id suffix drift remains for U2K/U5G/UE1/VV4/CFV and no-RPO Z06 row IDs remain sparse.
+5. Stingray exclusive-group ID prefix/style drift remains cosmetic.
+6. Interior CSV/config remnants remain even though active interior grouping now comes from workbook metadata.
 
 Intentionally deferred, not part of the completed source-row purge: active emitted `sec_tech_001` / connected-service standard-equipment rows remain active workbook option rows until a separate standard-equipment ownership model is designed and proven.
 
@@ -194,30 +194,28 @@ Action plan:
 
 ---
 
-### 7. Cross-model relative order and exclusive-member order drift remains
+### 7. Cross-model relative order and exclusive-member order drift — completed for confirmed active surfaces
 
 Evidence:
 
-- GS/Z06 wheels `SOM`/`ROX` relative order still differs:
+- GS/Z06 shared wheels now agree on the confirmed shared forged/carbon-wheel sequence `ROU`, `SON`, `SOM`, `ROX`, `ROY`, `ROZ`, `STZ`:
   - Grand Sport: `SOM=43`, `ROX=44`
-  - Z06: `ROX=23`, `SOM=30`
-- Roof `CF8`/`CM9` order still differs:
-  - Stingray: `CF8=13`, `CM9=20`
-  - Grand Sport/Z06: `CM9=20`, `CF8=50`
-- Grand Sport engine appearance option-sheet order has been normalized for the LS6 cover rows, but `gs_excl_ls6_engine_covers` exclusive-member order still disagrees with that source order:
+  - Z06: `SOM=23`, `ROX=30`
+- The older roof `CF8`/`CM9` finding is not active emitted cross-model drift:
+  - `CF8` is currently active only in Grand Sport.
+  - Active shared roof order is guarded as `CF7`, `C2Z`, `CC3`, `CM9`, `D84`, `D86` across promoted models.
+- Grand Sport engine appearance option-sheet order is normalized for the LS6 cover rows, and `gs_excl_ls6_engine_covers` exclusive-member order now agrees with that source order:
   - option sheet: BC7=19, BCP=20, BCS=30, BC4=40
-  - exclusive members: BC7=10, BC4=30, BCP=50, BCS=70
+  - exclusive members: BC7=10, BCP=20, BCS=30, BC4=40
+- `tests/grand-sport-draft-data.test.mjs`, `tests/z06-form-data-draft.test.mjs`, and `tests/multi-model-runtime-switching.test.mjs` cover these order surfaces.
 
-Status: partially progressed; wheels/roof drift persists and the Grand Sport LS6 exclusive-member surface remains stale relative to the option sheet.
+Status: completed 2026-06-17 for the confirmed active ordering surfaces.
 
 Action plan:
 
-1. Decide canonical section order per section, preferring the later reviewed GS/Z06 order only when product/visual intent agrees.
-2. For Grand Sport LS6 engine covers, update `grandSport_exclusive_members.gs_excl_ls6_engine_covers` to match the intended radio order, or document why the exclusive-member order intentionally differs from `grandSport_options.sec_engi_001`.
-3. Update workbook source display orders and exclusive-member display orders together for future sections/groups whose UI can read both surfaces.
-4. Add parity tests scoped to the specific shared sections instead of broad all-model ordering equality.
-5. Regenerate and compare generated contracts for order-only diffs.
-6. Browser-smoke the affected option sections.
+1. No remaining implementation action for the scoped cross-model ordering pass.
+2. Keep `docs/cross-model-ordering-pass-spec.md` as the historical implementation spec.
+3. If a future source update makes `CF8` active in multiple promoted models, revisit roof ordering with a new product-order decision rather than assuming the old inactive-row finding is current.
 
 ---
 
@@ -333,10 +331,9 @@ Action plan:
 
 ## Recommended next passes
 
-1. **Cross-model ordering pass**: settle wheels/roof order drift and the Grand Sport LS6 exclusive-member order mismatch.
-2. **Copy-convergence/product-decision pass**: larger workbook copy pass with explicit allowlist, RPO fallback for known Z06 suffix drift, and product review for section/copy decisions.
-3. **Interior stale-surface cleanup**: remove unused CSV/config remnants after consumer audit and contract-parity proof.
-4. **Future-model scaffold display-order decision**: decide whether ZR1/ZR1X standard-equipment duplicate display-order buckets should be cleaned now or only during their promotion/readiness pass.
+1. **Copy-convergence/product-decision pass**: larger workbook copy pass with explicit allowlist, RPO fallback for known Z06 suffix drift, and product review for section/copy decisions.
+2. **Interior stale-surface cleanup**: remove unused CSV/config remnants after consumer audit and contract-parity proof.
+3. **Future-model scaffold display-order decision**: decide whether ZR1/ZR1X standard-equipment duplicate display-order buckets should be cleaned now or only during their promotion/readiness pass.
 
 ---
 
@@ -371,3 +368,10 @@ Original audit gates:
 - Workbook source edit — `exclusive_groups.excl_rear_script_badges` plus three `exclusive_group_members` rows were added; the six pairwise RIK/RIN/SL8 Stingray `rule_mapping` rows were removed; the three option `detail_raw` source notes were preserved.
 - Generated contract comparison — after ignoring timestamps and the rule-count validation message, the only payload drift was one added Stingray exclusive group and six removed rear-script pairwise rules; choices, prices, interiors, color overrides, standard equipment, dealer payload fields, and non-Stingray model contracts were unchanged.
 - Targeted gates — Stingray generation, registry publication, workbook package/schema validation, allowed-drift contract comparison, Stingray runtime regression, multi-model runtime switching, and `git diff --check` passed for this pass.
+
+2026-06-17 cross-model ordering implementation evidence:
+
+- Workbook source edit — `z06_options` swapped the `SOM`/`ROX` display-order values to align the shared wheel subset, and `grandSport_exclusive_members.gs_excl_ls6_engine_covers` was reordered to match `grandSport_options.sec_engi_001`.
+- Roof finding resolution — active shared roof order is now covered by a characterization guard; no roof workbook rows changed because `CF8` is active only for Grand Sport in current promoted data.
+- Generated contract review — an order-aware allowlist probe against `/tmp/before-*` snapshots confirmed only the approved Grand Sport LS6 group order and Z06 wheel order drift in draft/runtime artifacts.
+- Targeted gates — Grand Sport/Z06 generation, registry publication, workbook package/schema validation, order-aware generated-contract probe, Grand Sport draft, Z06 draft, multi-model runtime switching, and `git diff --check` passed for this pass.

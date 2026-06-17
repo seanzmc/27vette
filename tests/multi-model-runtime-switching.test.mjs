@@ -190,7 +190,7 @@ init();
 const expectedGrandSportExclusiveGroups = [
   {
     groupId: "gs_excl_ls6_engine_covers",
-    optionIds: ["opt_bc7_001", "opt_bc4_002", "opt_bcp_002", "opt_bcs_002"],
+    optionIds: ["opt_bc7_001", "opt_bcp_002", "opt_bcs_002", "opt_bc4_002"],
     selectionMode: "single_within_group",
   },
   {
@@ -292,6 +292,23 @@ const expectedPaintImages = {
   GTR: ["opt_gtr_001", "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_14_gtr.png", "Admiral Blue Metallic"],
 };
 
+function sectionRpoOrder(data, sectionId) {
+  const orderByRpo = new Map();
+  for (const choice of data.choices.filter((item) => item.section_id === sectionId && item.active === "True")) {
+    const order = Number(choice.display_order);
+    if (!orderByRpo.has(choice.rpo) || order < orderByRpo.get(choice.rpo)) {
+      orderByRpo.set(choice.rpo, order);
+    }
+  }
+  return [...orderByRpo]
+    .sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]))
+    .map(([rpo]) => rpo);
+}
+
+function relativeOrder(order, expectedRpos) {
+  return order.filter((rpo) => expectedRpos.includes(rpo));
+}
+
 test("generated app data exposes a multi-model registry with Stingray compatibility alias", () => {
   const dataWindow = loadDataWindow();
   const registry = dataWindow.CORVETTE_FORM_DATA;
@@ -335,6 +352,30 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
   assert.deepEqual(
     JSON.parse(JSON.stringify(registry.models.z06.data.variants.map((variant) => variant.variant_id))),
     ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"]
+  );
+});
+
+test("active roof option relative order is consistent across promoted models", () => {
+  const registry = loadDataWindow().CORVETTE_FORM_DATA;
+  const sharedActiveRoofOrder = ["CF7", "C2Z", "CC3", "CM9", "D84", "D86"];
+  const roofOrders = Object.fromEntries(
+    Object.entries(registry.models).map(([modelKey, entry]) => [modelKey, sectionRpoOrder(entry.data, "sec_roof_001")])
+  );
+
+  for (const [modelKey, order] of Object.entries(roofOrders)) {
+    assert.deepEqual(
+      relativeOrder(order, sharedActiveRoofOrder),
+      sharedActiveRoofOrder,
+      `${modelKey} should preserve the active shared roof option order`
+    );
+  }
+
+  assert.deepEqual(
+    Object.entries(roofOrders)
+      .filter(([, order]) => order.includes("CF8"))
+      .map(([modelKey]) => modelKey),
+    ["grandSport"],
+    "CF8 is currently active only in Grand Sport, so the older CF8/CM9 audit item is not active cross-model drift"
   );
 });
 

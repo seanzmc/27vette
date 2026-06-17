@@ -93,6 +93,28 @@ test("Z06 draft preserves the live generated-data top-level contract", () => {
   assert.ok(draft.standardEquipment.length > 0, "Z06 draft should include standard equipment rows");
 });
 
+test("Z06 shared forged and carbon wheel choices follow the cross-model order", () => {
+  const wheels = draft.choices
+    .filter((choice) => choice.variant_id === "1lz_h07" && choice.section_id === "sec_whee_002")
+    .sort((a, b) => Number(a.display_order) - Number(b.display_order))
+    .map((choice) => [choice.rpo, choice.base_price, choice.display_order, choice.label]);
+
+  assert.deepEqual(JSON.parse(JSON.stringify(wheels)), [
+    ["SOE", 0, 10, "Titanium Satin Spider Wheels"],
+    ["SRK", 995, 11, "10-Spoke Pearl Nickel Wheels"],
+    ["ROU", 995, 12, "Pearl Nickel Wheels"],
+    ["SOA", 1095, 20, "Black Spider Wheels"],
+    ["SRN", 1095, 21, "10-Spoke Gloss Black Wheels"],
+    ["SON", 1095, 22, "Gloss Black Wheels"],
+    ["SOM", 1495, 23, "Bright Polished Wheels"],
+    ["ROX", 995, 30, "Carbon Flash Machined-Edge Wheels"],
+    ["STX", 1995, 31, "10-Spoke Bright Polished Wheels"],
+    ["ROY", 11995, 40, "Carbon Flash-Painted Carbon Fiber Wheels"],
+    ["ROZ", 13995, 41, "Visible Carbon Fiber Wheels"],
+    ["STZ", 15500, 42, "Visible Carbon Fiber Red Stripe Wheels"],
+  ]);
+});
+
 test("Z06 standard equipment marks trim-equipment sections with LZ labels", () => {
   const trimRows = draft.standardEquipment.filter(
     (row) => row.standard_equipment_group_type === "trim_equipment"
