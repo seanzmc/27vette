@@ -384,10 +384,9 @@ test("Stingray Phase 4 availability rules are workbook-owned", () => {
   assert.equal(uqtOverrides.every((row) => row.status === "unavailable" && row.selectable === "False" && row.active === "False"), true);
 
   const stitchPresentation = workbookRows("section_presentation").find(
-    (row) => row.model_key === "stingray" && row.section_id === "sec_cust_002"
+    (row) => row.model_key === "stingray" && row.section_id === "sec_cust_002" && row.active === "True"
   );
-  assert.equal(stitchPresentation?.display_behavior, "hidden");
-  assert.equal(stitchPresentation?.step_key, "interior_trim");
+  assert.equal(stitchPresentation, undefined, "Stingray custom-stitch suppression should no longer require source option rows");
 
   const r6xInteriors = workbookRows("lt_interiors").filter(
     (row) => row.active_for_stingray === "True" && row.requires_r6x === "True"

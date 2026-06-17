@@ -1,6 +1,6 @@
 # Grand Sport Form Data Draft
 
-Generated: `2026-06-16T04:23:58+00:00`
+Generated: `2026-06-17T00:46:13+00:00`
 Status: `draft_not_runtime_active`
 Source sheet: `grandSport_options`
 
@@ -23,7 +23,7 @@ Source sheet: `grandSport_options`
 
 - Candidate available/standard choices from preview: 1284
 - Full variant-matrix draft choices: 1422
-- Rule/detail hot spot rows preserved: 129
+- Rule/detail hot spot rows preserved: 113
 - Unresolved normalization issues: 0
 
 ## Validation Warnings

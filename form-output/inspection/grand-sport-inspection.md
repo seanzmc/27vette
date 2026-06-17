@@ -1,6 +1,6 @@
 # Grand Sport Inspection
 
-Generated: `2026-06-16T04:23:58+00:00`
+Generated: `2026-06-17T00:46:12+00:00`
 Source sheet: `grandSport_options`
 Status: `inspection_generated`
 
@@ -13,16 +13,16 @@ Status: `inspection_generated`
 
 ## Counts
 
-- Option rows: 273
-- Unique RPOs: 230
-- Variant status cells: 1638
+- Option rows: 242
+- Unique RPOs: 215
+- Variant status cells: 1452
 - Candidate choice rows with available/standard status: 1422
 - Candidate standard equipment cells: 455
 - Candidate standard option rows: 90
 - Active option rows with available/standard status: 234
-- Inactive option rows all unavailable/blank: 39
-- Selectable counts: `{"False": 107, "True": 166}`
-- Status counts: `{"available": 903, "standard": 547, "unavailable": 188}`
+- Inactive option rows all unavailable/blank: 8
+- Selectable counts: `{"False": 88, "True": 154}`
+- Status counts: `{"available": 837, "standard": 465, "unavailable": 150}`
 - Missing status cells: 0
 - Unknown status cells: 0
 
@@ -36,8 +36,8 @@ Status: `inspection_generated`
 
 ## Rule/Detail Hot Spots
 
-- Hot spot counts: `{"except": 2, "included_with": 19, "includes": 44, "not_available": 51, "not_recommended": 4, "only": 26, "requires": 33}`
-- Rows requiring later rule review: 129
+- Hot spot counts: `{"included_with": 19, "includes": 40, "not_available": 47, "not_recommended": 4, "only": 22, "requires": 22}`
+- Rows requiring later rule review: 113
 
 | RPO | Option | Section | Matched Terms | Special Mentions |
 | --- | --- | --- | --- | --- |
@@ -51,9 +51,6 @@ Status: `inspection_generated`
 | `R8C` | Corvette Museum Delivery | `sec_cust_001` | not_available, includes, only |  |
 | `PIN` | Customer VIN Ending Reservation | `sec_cust_001` | not_available, only |  |
 | `BV4` | Personalized Specification Plaque | `sec_cust_001` | only |  |
-| `38S` | Adrenaline Red Custom Leather Stitching | `sec_cust_002` | requires |  |
-| `36S` | Competition Yellow Custom Leather Stitching | `sec_cust_002` | requires |  |
-| `37S` | Santorini Blue Custom Leather Stitching | `sec_cust_002` | requires |  |
 | `B6P` | Coupe Engine Appearance Package | `sec_engi_001` | includes |  |
 | `ZZ3` | Convertible Engine Appearance Package | `sec_engi_001` | includes |  |
 | `D3V` | Engine Lighting | `sec_engi_001` | included_with |  |
@@ -81,7 +78,10 @@ Status: `inspection_generated`
 | `TR7` | Automatic Leveling Headlamp Control | `sec_incl_001` | only |  |
 | `CFX` | Personalized Corvette Museum Plaque | `sec_incl_001` | includes, only |  |
 | `XFR` | High Performance Tires | `sec_incl_001` | only |  |
-| ... | 89 additional rows in JSON artifact |  |  |  |
+| `XFS` | Michelin Pilot Sport Cup 2 R Tires | `sec_incl_001` | only | FEY |
+| `SFZ` | Dark Stealth Crossed Flags Emblems | `sec_lpoe_001` | not_available |  |
+| `R88` | Front Illuminated Crossed Flags Emblem | `sec_lpoe_001` | not_available |  |
+| ... | 73 additional rows in JSON artifact |  |  |  |
 
 ## Warnings
 

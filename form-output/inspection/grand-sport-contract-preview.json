@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-06-16T04:23:58+00:00",
+    "generated_at": "2026-06-17T00:46:13+00:00",
     "status": "read_only_preview"
   },
   "variants": [
@@ -47831,14 +47831,13 @@
   ],
   "ruleDetailHotSpots": {
     "counts": {
-      "except": 2,
       "included_with": 19,
-      "includes": 44,
-      "not_available": 51,
+      "includes": 40,
+      "not_available": 47,
       "not_recommended": 4,
-      "only": 26,
-      "requires": 33,
-      "special_package_review": 28
+      "only": 22,
+      "requires": 22,
+      "special_package_review": 27
     },
     "rows": [
       {
@@ -47954,39 +47953,6 @@
         ],
         "special_mentions": [],
         "detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
-      },
-      {
-        "option_id": "opt_38s_001",
-        "rpo": "38S",
-        "option_name": "Adrenaline Red Custom Leather Stitching",
-        "section_id": "sec_cust_002",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior or (HU0/HXO) Adrenaline Red/Jet Black interior."
-      },
-      {
-        "option_id": "opt_36s_001",
-        "rpo": "36S",
-        "option_name": "Competition Yellow Custom Leather Stitching",
-        "section_id": "sec_cust_002",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior."
-      },
-      {
-        "option_id": "opt_37s_001",
-        "rpo": "37S",
-        "option_name": "Santorini Blue Custom Leather Stitching",
-        "section_id": "sec_cust_002",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior."
       },
       {
         "option_id": "opt_b6p_001",
@@ -48357,28 +48323,6 @@
         "detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package."
       },
       {
-        "option_id": "opt_n26_001",
-        "rpo": "N26",
-        "option_name": "Sueded Microfiber-Wrapped Steering Wheel",
-        "section_id": "sec_inte_001",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (HTJ) Jet Black interior.\n2. Requires leather seating surfaces with perforated sueded microfiber inserts interior: HTP, HU6, HU7, HTQ.\n3. Requires leather seating surfaces with perforated sueded microfiber inserts interiors: HTT, HU9, HUA, HTG, HUF, HMO, HVT, HXO, HZP, HUX, EPX, HUB."
-      },
-      {
-        "option_id": "opt_tu7_001",
-        "rpo": "TU7",
-        "option_name": "Two-Tone Seats",
-        "section_id": "sec_inte_001",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (AH2) GT2 seats. Available with (HUK/HU6) Sky Cool Gray, (HUL/HU7) Adrenaline Red, (HTN/HTQ) Natural interiors.\n2. Requires (AH2) GT2 seats. Available with (HU1/HU9) Sky Cool Gray, (HU2/HUA) Adrenaline Red, (HUE/HTG) Natural, (HMO/HVV) Jet Black/Sky Cool Gray, (HU0/HXO) Jet Black/Adrenaline Red interiors."
-      },
-      {
         "option_id": "opt_sfz_001",
         "rpo": "SFZ",
         "option_name": "Dark Stealth Crossed Flags Emblems",
@@ -48598,103 +48542,6 @@
         ],
         "special_mentions": [],
         "detail_raw": "1. Not available at this time."
-      },
-      {
-        "option_id": "opt_r9w_001",
-        "rpo": "R9W",
-        "option_name": "Deleted Mobile Service Plus",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires a dealer with a BFU of 284. Requires TRE, SRE or Fleet order types."
-      },
-      {
-        "option_id": "opt_r6p_001",
-        "rpo": "R6P",
-        "option_name": "Three-Year SiriusXM Subscription",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "requires",
-          "not_available",
-          "includes"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires SiriusXM. Not available with a FGO order type. SiriusXM Extended Service subscription will stop at the end of the applicable subscription period unless you decide to continue service. Plan is non-transferable and non-refundable. Service subject to the SiriusXM Customer Agreement and Privacy Policy, visit siriusxm.com/terms to see complete terms and how to cancel which includes online methods or calling 1-866-635-2349. Some services, content and features are subject to device capabilities, an active data connection enabled in the vehicle and location availability. All fees, content and features are subject to change. Content varies by subscription plan. SiriusXM and related logos are trademarks of Sirius XM Radio Inc. and its respective subsidiaries."
-      },
-      {
-        "option_id": "opt_prb_001",
-        "rpo": "PRB",
-        "option_name": "Three-Year OnStar One Standalone Plan",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "requires",
-          "not_available"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (UE1) OnStar and a Retail order type. Not available on vehicles being shipped to Puerto Rico, the Virgin Islands, or Guam. OnStar plan, working electrical system, cell reception and GPS signal required. OnStar links to emergency services. Not all vehicles may transmit all crash data. Service coverage varies with conditions and location. Service availability, features and functionality vary by device and software version. Subject to user terms. See onstar.com for details and limitations."
-      },
-      {
-        "option_id": "opt_r9y_001",
-        "rpo": "R9Y",
-        "option_name": "One-Year Mobile Service Plus",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "requires",
-          "not_available",
-          "only",
-          "except"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Required and only available for dealers who have a BFU of 284, except for orders with (R9W) Deleted Mobile Service Plus. Requires TRE, SRE, FBC, FNR or Fleet order types. Not available with (R9V) Mobile Service Plus for 3 years."
-      },
-      {
-        "option_id": "opt_r9v_001",
-        "rpo": "R9V",
-        "option_name": "Three-Year Mobile Service Plus",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "requires",
-          "not_available",
-          "only",
-          "except"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Required and only available for dealers who have a BFU of 284, except for orders with (R9W) Deleted Mobile Service Plus. Requires TRE, SRE or Fleet order types. Not available with (R9Y) Mobile Service Plus for 1 year."
-      },
-      {
-        "option_id": "opt_r9l_001",
-        "rpo": "R9L",
-        "option_name": "Removes OnStar Basics (OnStar Fleet Basics for Fleet)",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "only"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Included and only available on vehicles being shipped to Puerto Rico, the Virgin Islands, or Guam. Will delete OnStar Services and OnStar standard equipment (OnStar Basics / Connected Access / EV Access / R9M Services i.e. OnStar One and OnStar One Super Cruise as equipped) for vehicles shipping to these territories."
-      },
-      {
-        "option_id": "opt_u2k_001",
-        "rpo": "U2K",
-        "option_name": "SiriusXM Trial Subscription",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "includes"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. IMPORTANT: The SiriusXM trial subscription is not provided on vehicles that are ordered for Fleet Daily Rental (\"FDR\") use. Trial subscription is subject to the SiriusXM Customer Agreement and privacy policy, visit siriusxm.com which includes full terms and how to cancel. All fees, content, features, and availability are subject to change."
-      },
-      {
-        "option_id": "opt_009",
-        "rpo": "",
-        "option_name": "OnStar Basics (OnStar Fleet Basics for Fleet)",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (UE1) OnStar. OnStar Basics is standard for 8 years; working electrical system, cell reception and GPS signal required. OnStar links to emergency services. Service coverage varies with conditions and location. Service availability, features and functionality vary by device and software version. Subject to user terms. See onstar.com for details and limitations. Removed with a ship-to of Guam, Puerto Rico or the Virgin Islands."
       },
       {
         "option_id": "opt_t0e_001",
@@ -49053,42 +48900,6 @@
         "detail_raw": ""
       },
       {
-        "option_id": "opt_cm9_002",
-        "rpo": "CM9",
-        "option_name": "Body-Color Power Convertible Hardtop",
-        "section_id": "sec_stan_002",
-        "matched_terms": [
-          "includes",
-          "only"
-        ],
-        "special_mentions": [],
-        "detail_raw": ""
-      },
-      {
-        "option_id": "opt_efr_002",
-        "rpo": "EFR",
-        "option_name": "Carbon Flash Exterior Accents",
-        "section_id": "sec_stan_002",
-        "matched_terms": [
-          "includes"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered."
-      },
-      {
-        "option_id": "opt_719_002",
-        "rpo": "719",
-        "option_name": "Black Seat Belt Color",
-        "section_id": "sec_stan_002",
-        "matched_terms": [
-          "special_package_review"
-        ],
-        "special_mentions": [
-          "EL9"
-        ],
-        "detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color."
-      },
-      {
         "option_id": "opt_z15_001",
         "rpo": "Z15",
         "option_name": "Grand Sport Heritage Graphics",
@@ -49420,11 +49231,6 @@
           "option_id": "opt_z25_001",
           "rpo": "Z25",
           "option_name": "Grand Sport Launch Edition"
-        },
-        {
-          "option_id": "opt_719_002",
-          "rpo": "719",
-          "option_name": "Black Seat Belt Color"
         }
       ],
       "FEY": [

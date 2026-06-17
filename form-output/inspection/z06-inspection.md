@@ -1,6 +1,6 @@
 # Z06 Inspection
 
-Generated: `2026-06-16T04:23:07+00:00`
+Generated: `2026-06-17T00:46:15+00:00`
 Source sheet: `z06_options`
 Status: `inspection_generated`
 
@@ -13,16 +13,16 @@ Status: `inspection_generated`
 
 ## Counts
 
-- Option rows: 249
-- Unique RPOs: 223
-- Variant status cells: 1494
+- Option rows: 243
+- Unique RPOs: 217
+- Variant status cells: 1458
 - Candidate choice rows with available/standard status: 1428
 - Candidate standard equipment cells: 488
 - Candidate standard option rows: 95
 - Active option rows with available/standard status: 236
-- Inactive option rows all unavailable/blank: 13
-- Selectable counts: `{"False": 90, "True": 159}`
-- Status counts: `{"available": 821, "standard": 490, "unavailable": 183}`
+- Inactive option rows all unavailable/blank: 7
+- Selectable counts: `{"False": 86, "True": 157}`
+- Status counts: `{"available": 799, "standard": 490, "unavailable": 169}`
 - Missing status cells: 0
 - Unknown status cells: 0
 
@@ -36,8 +36,8 @@ Status: `inspection_generated`
 
 ## Rule/Detail Hot Spots
 
-- Hot spot counts: `{"included_with": 25, "includes": 37, "not_available": 42, "not_recommended": 4, "only": 13, "requires": 18}`
-- Rows requiring later rule review: 110
+- Hot spot counts: `{"included_with": 25, "includes": 37, "not_available": 42, "not_recommended": 4, "only": 13, "requires": 12}`
+- Rows requiring later rule review: 104
 
 | RPO | Option | Section | Matched Terms | Special Mentions |
 | --- | --- | --- | --- | --- |
@@ -52,9 +52,6 @@ Status: `inspection_generated`
 | `PIN` | Customer VIN Ending Reservation | `sec_cust_001` | not_available, only |  |
 | `R8C` | Corvette Museum Delivery | `sec_cust_001` | not_available, includes, only |  |
 | `VK3` | Front License Plate Bracket | `sec_cust_001` | requires |  |
-| `36S` | Competition Yellow Custom Leather Stitching | `sec_cust_002` | requires |  |
-| `37S` | Santorini Blue Custom Leather Stitching | `sec_cust_002` | requires |  |
-| `38S` | Adrenaline Red Custom Leather Stitching | `sec_cust_002` | requires |  |
 | `B6P` | Coupe Engine Appearance Package | `sec_engi_001` | includes |  |
 | `BCW` | Red Engine Intake | `sec_engi_001` | requires, includes |  |
 | `D3V` | Engine Lighting | `sec_engi_001` | included_with |  |
@@ -70,10 +67,7 @@ Status: `inspection_generated`
 | `DRG` | Carbon Flash Outside Mirrors | `sec_incl_001` | only |  |
 | `TR7` | Automatic Leveling Headlamp Control | `sec_incl_001` | only |  |
 | `XFS` | Michelin Pilot Sport Cup 2 R Tires | `sec_incl_001` | only |  |
-| `N26` | Sueded Microfiber-Wrapped Steering Wheel | `sec_inte_001` | requires |  |
 | `FA6` | Level 2 Carbon Fiber Interior Trim | `sec_inte_001` | not_available |  |
-| `N2Z` | Carbon Fiber and Suede Steering Wheel | `sec_inte_001` | requires |  |
-| `TU7` | Two-Tone Seats | `sec_inte_001` | requires |  |
 | `RYQ` | Visible Carbon Fiber Door Intake Trim | `sec_lpoe_001` | not_available |  |
 | `5JR` | Visible Carbon Fiber Outside Mirror Covers | `sec_lpoe_001` | includes |  |
 | `PCQ` | Grille Screen Protection Package | `sec_lpoe_001` | includes |  |
@@ -81,7 +75,13 @@ Status: `inspection_generated`
 | `R88` | Front Illuminated Crossed Flags Emblem | `sec_lpoe_001` | not_available |  |
 | `RIK` | Torch Red Rear Corvette Script Badge | `sec_lpoe_001` | not_available |  |
 | `RIN` | Arctic White Rear Corvette Script Badge | `sec_lpoe_001` | not_available |  |
-| ... | 70 additional rows in JSON artifact |  |  |  |
+| `SBT` | Dual Roof Package | `sec_lpoe_001` | not_available, includes |  |
+| `SC7` | Roof Panel Storage Pouch | `sec_lpoe_001` | included_with |  |
+| `SFZ` | Dark Stealth Crossed Flags Emblems | `sec_lpoe_001` | not_available, included_with |  |
+| `SIG` | Clear Smoked Spoiler Extension | `sec_lpoe_001` | requires |  |
+| `SL8` | Edge Red Rear Corvette Script Badge | `sec_lpoe_001` | not_available |  |
+| `VWE` | Front Radiator Grille Screens | `sec_lpoe_001` | included_with |  |
+| ... | 64 additional rows in JSON artifact |  |  |  |
 
 ## Warnings
 

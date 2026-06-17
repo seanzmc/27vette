@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-16T04:23:07+00:00",
+  "generated_at": "2026-06-17T00:46:15+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "z06",
@@ -91,64 +91,61 @@
     "inactive_configured": []
   },
   "counts": {
-    "option_rows": 249,
-    "unique_rpos": 223,
-    "variant_status_cells": 1494,
-    "status_source_rows": 1494,
+    "option_rows": 243,
+    "unique_rpos": 217,
+    "variant_status_cells": 1458,
+    "status_source_rows": 1458,
     "candidate_choice_rows_available_or_standard": 1428,
     "candidate_standard_equipment_cells": 488,
     "candidate_standard_option_rows": 95,
     "selectable_counts": {
-      "False": 90,
-      "True": 159
+      "False": 86,
+      "True": 157
     },
     "active_option_rows_available_or_standard": 236,
-    "inactive_option_rows_all_unavailable_or_blank": 13,
+    "inactive_option_rows_all_unavailable_or_blank": 7,
     "status_counts": {
-      "available": 821,
+      "available": 799,
       "standard": 490,
-      "unavailable": 183
+      "unavailable": 169
     },
     "status_counts_by_variant": {
       "1lz_h07": {
-        "available": 133,
+        "available": 132,
         "standard": 71,
-        "unavailable": 45
+        "unavailable": 40
       },
       "2lz_h07": {
-        "available": 141,
+        "available": 136,
         "standard": 86,
-        "unavailable": 22
+        "unavailable": 21
       },
       "3lz_h07": {
-        "available": 148,
+        "available": 143,
         "standard": 88,
-        "unavailable": 13
+        "unavailable": 12
       },
       "1lz_h67": {
-        "available": 126,
+        "available": 125,
         "standard": 71,
-        "unavailable": 52
+        "unavailable": 47
       },
       "2lz_h67": {
-        "available": 133,
+        "available": 128,
         "standard": 86,
-        "unavailable": 30
+        "unavailable": 29
       },
       "3lz_h67": {
-        "available": 140,
+        "available": 135,
         "standard": 88,
-        "unavailable": 21
+        "unavailable": 20
       }
     },
     "missing_status_cells": 0,
     "unknown_status_cells": 0
   },
   "unique_rpos": [
-    "36S",
     "379",
-    "37S",
-    "38S",
     "3A9",
     "3F9",
     "3M9",
@@ -254,8 +251,6 @@
     "KQV",
     "LT6",
     "M1M",
-    "N26",
-    "N2Z",
     "N38",
     "N3W",
     "NGA",
@@ -326,7 +321,6 @@
     "TDM",
     "TQ5",
     "TR7",
-    "TU7",
     "U2K",
     "U5G",
     "U80",
@@ -945,48 +939,6 @@
       }
     },
     {
-      "option_id": "opt_36s_001",
-      "rpo": "36S",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lz_h07": "unavailable",
-        "2lz_h07": "available",
-        "3lz_h07": "available",
-        "1lz_h67": "unavailable",
-        "2lz_h67": "available",
-        "3lz_h67": "available"
-      }
-    },
-    {
-      "option_id": "opt_37s_001",
-      "rpo": "37S",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lz_h07": "unavailable",
-        "2lz_h07": "available",
-        "3lz_h07": "available",
-        "1lz_h67": "unavailable",
-        "2lz_h67": "available",
-        "3lz_h67": "available"
-      }
-    },
-    {
-      "option_id": "opt_38s_001",
-      "rpo": "38S",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lz_h07": "unavailable",
-        "2lz_h07": "available",
-        "3lz_h07": "available",
-        "1lz_h67": "unavailable",
-        "2lz_h67": "available",
-        "3lz_h67": "available"
-      }
-    },
-    {
       "option_id": "opt_b6p_001",
       "rpo": "B6P",
       "effective_status": "available",
@@ -1323,20 +1275,6 @@
       }
     },
     {
-      "option_id": "opt_n26_001",
-      "rpo": "N26",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lz_h07": "available",
-        "2lz_h07": "available",
-        "3lz_h07": "unavailable",
-        "1lz_h67": "available",
-        "2lz_h67": "available",
-        "3lz_h67": "unavailable"
-      }
-    },
-    {
       "option_id": "opt_baz_001",
       "rpo": "BAZ",
       "effective_status": "available",
@@ -1389,34 +1327,6 @@
         "3lz_h07": "available",
         "1lz_h67": "unavailable",
         "2lz_h67": "unavailable",
-        "3lz_h67": "available"
-      }
-    },
-    {
-      "option_id": "opt_n2z_001",
-      "rpo": "N2Z",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lz_h07": "unavailable",
-        "2lz_h07": "unavailable",
-        "3lz_h07": "available",
-        "1lz_h67": "unavailable",
-        "2lz_h67": "unavailable",
-        "3lz_h67": "available"
-      }
-    },
-    {
-      "option_id": "opt_tu7_001",
-      "rpo": "TU7",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lz_h07": "unavailable",
-        "2lz_h07": "available",
-        "3lz_h07": "available",
-        "1lz_h67": "unavailable",
-        "2lz_h67": "available",
         "3lz_h67": "available"
       }
     },
@@ -10195,7 +10105,7 @@
       "not_available": 42,
       "not_recommended": 4,
       "only": 13,
-      "requires": 18
+      "requires": 12
     },
     "rows": [
       {
@@ -10322,39 +10232,6 @@
         ],
         "special_mentions": [],
         "detail_raw": "Will be forced on orders with ship-to states that require a front license plate."
-      },
-      {
-        "option_id": "opt_36s_001",
-        "rpo": "36S",
-        "option_name": "Competition Yellow Custom Leather Stitching",
-        "section_id": "sec_cust_002",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
-      },
-      {
-        "option_id": "opt_37s_001",
-        "rpo": "37S",
-        "option_name": "Santorini Blue Custom Leather Stitching",
-        "section_id": "sec_cust_002",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
-      },
-      {
-        "option_id": "opt_38s_001",
-        "rpo": "38S",
-        "option_name": "Adrenaline Red Custom Leather Stitching",
-        "section_id": "sec_cust_002",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior or (HU0/HXO) Adrenaline Red/Jet Black interior."
       },
       {
         "option_id": "opt_b6p_001",
@@ -10527,17 +10404,6 @@
         "detail_raw": "Included and only available with (Z07) Z07 Performance Package."
       },
       {
-        "option_id": "opt_n26_001",
-        "rpo": "N26",
-        "option_name": "Sueded Microfiber-Wrapped Steering Wheel",
-        "section_id": "sec_inte_001",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "Requires (HTJ) Jet Black interior.\nRequires leather seating surfaces with perforated sueded microfiber inserts interior: HTP, HU6, HU7, HTQ."
-      },
-      {
         "option_id": "opt_fa6_001",
         "rpo": "FA6",
         "option_name": "Level 2 Carbon Fiber Interior Trim",
@@ -10547,28 +10413,6 @@
         ],
         "special_mentions": [],
         "detail_raw": "Not available with (FA5) carbon fiber interior trim."
-      },
-      {
-        "option_id": "opt_n2z_001",
-        "rpo": "N2Z",
-        "option_name": "Carbon Fiber and Suede Steering Wheel",
-        "section_id": "sec_inte_001",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "Requires leather seating surfaces with perforated sueded microfiber inserts interiors: HTT, HU9, HUA, HTG, HUF, HMO, HVT, HXO, HZP, HUX, EPX, HUB."
-      },
-      {
-        "option_id": "opt_tu7_001",
-        "rpo": "TU7",
-        "option_name": "Two-Tone Seats",
-        "section_id": "sec_inte_001",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "Requires (AH2) GT2 seats. Available with (HUK/HU6) Sky Cool Gray, (HUL/HU7) Adrenaline Red, (HTN/HTQ) Natural interiors.\nRequires (AH2) GT2 seats. Available with (HU1/HU9) Sky Cool Gray, (HU2/HUA) Adrenaline Red, (HUE/HTG) Natural, (HMO/HVV) Jet Black/Sky Cool Gray, (HU0/HXO) Jet Black/Adrenaline Red interiors."
       },
       {
         "option_id": "opt_ryq_001",

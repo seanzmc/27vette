@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-16T04:23:58+00:00",
+  "generated_at": "2026-06-17T00:46:12+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "grand_sport",
@@ -98,54 +98,54 @@
     ]
   },
   "counts": {
-    "option_rows": 273,
-    "unique_rpos": 230,
-    "variant_status_cells": 1638,
-    "status_source_rows": 1638,
+    "option_rows": 242,
+    "unique_rpos": 215,
+    "variant_status_cells": 1452,
+    "status_source_rows": 1452,
     "candidate_choice_rows_available_or_standard": 1422,
     "candidate_standard_equipment_cells": 455,
     "candidate_standard_option_rows": 90,
     "selectable_counts": {
-      "False": 107,
-      "True": 166
+      "False": 88,
+      "True": 154
     },
     "active_option_rows_available_or_standard": 234,
-    "inactive_option_rows_all_unavailable_or_blank": 39,
+    "inactive_option_rows_all_unavailable_or_blank": 8,
     "status_counts": {
-      "available": 903,
-      "standard": 547,
-      "unavailable": 188
+      "available": 837,
+      "standard": 465,
+      "unavailable": 150
     },
     "status_counts_by_variant": {
       "1lt_e07": {
-        "available": 146,
-        "standard": 79,
-        "unavailable": 48
+        "available": 139,
+        "standard": 66,
+        "unavailable": 37
       },
       "2lt_e07": {
-        "available": 156,
-        "standard": 98,
-        "unavailable": 19
-      },
-      "3lt_e07": {
-        "available": 158,
-        "standard": 98,
+        "available": 142,
+        "standard": 83,
         "unavailable": 17
       },
+      "3lt_e07": {
+        "available": 146,
+        "standard": 85,
+        "unavailable": 11
+      },
       "1lt_e67": {
-        "available": 141,
-        "standard": 78,
-        "unavailable": 54
+        "available": 134,
+        "standard": 65,
+        "unavailable": 43
       },
       "2lt_e67": {
-        "available": 150,
-        "standard": 97,
-        "unavailable": 26
+        "available": 136,
+        "standard": 82,
+        "unavailable": 24
       },
       "3lt_e67": {
-        "available": 152,
-        "standard": 97,
-        "unavailable": 24
+        "available": 140,
+        "standard": 84,
+        "unavailable": 18
       }
     },
     "missing_status_cells": 0,
@@ -154,10 +154,7 @@
   "unique_rpos": [
     "17A",
     "20A",
-    "36S",
     "379",
-    "37S",
-    "38S",
     "3A9",
     "3F9",
     "3M9",
@@ -272,7 +269,6 @@
     "KQV",
     "LS6",
     "M1N",
-    "N26",
     "N38",
     "NGA",
     "NK4",
@@ -284,15 +280,9 @@
     "PEF",
     "PIN",
     "PPW",
-    "PRB",
-    "R6P",
     "R6X",
     "R88",
     "R8C",
-    "R9L",
-    "R9V",
-    "R9W",
-    "R9Y",
     "RIA",
     "RIK",
     "RIN",
@@ -339,12 +329,8 @@
     "TDM",
     "TQ5",
     "TR7",
-    "TU7",
-    "U2K",
-    "U5G",
     "U80",
     "UD7",
-    "UE1",
     "UEU",
     "UFG",
     "UFT",
@@ -368,7 +354,6 @@
     "VPW",
     "VTB",
     "VUP",
-    "VV4",
     "VWE",
     "VWT",
     "VYW",
@@ -384,20 +369,6 @@
     "ZZ3"
   ],
   "status_matrix": [
-    {
-      "option_id": "opt_aq9_004",
-      "rpo": "AQ9",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "unavailable",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "unavailable"
-      }
-    },
     {
       "option_id": "opt_uvb_001",
       "rpo": "UVB",
@@ -567,20 +538,6 @@
       }
     },
     {
-      "option_id": "opt_aq9_003",
-      "rpo": "AQ9",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "unavailable",
-        "2lt_e07": "standard",
-        "3lt_e07": "unavailable",
-        "1lt_e67": "unavailable",
-        "2lt_e67": "standard",
-        "3lt_e67": "unavailable"
-      }
-    },
-    {
       "option_id": "opt_kqv_001",
       "rpo": "KQV",
       "effective_status": "standard",
@@ -745,20 +702,6 @@
         "3lt_e07": "standard",
         "1lt_e67": "unavailable",
         "2lt_e67": "standard",
-        "3lt_e67": "standard"
-      }
-    },
-    {
-      "option_id": "opt_ah2_003",
-      "rpo": "AH2",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "unavailable",
-        "2lt_e07": "available",
-        "3lt_e07": "standard",
-        "1lt_e67": "unavailable",
-        "2lt_e67": "available",
         "3lt_e67": "standard"
       }
     },
@@ -982,48 +925,6 @@
         "2lt_e07": "available",
         "3lt_e07": "available",
         "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_38s_001",
-      "rpo": "38S",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "unavailable",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "unavailable",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_36s_001",
-      "rpo": "36S",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "unavailable",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "unavailable",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_37s_001",
-      "rpo": "37S",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "unavailable",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "unavailable",
         "2lt_e67": "available",
         "3lt_e67": "available"
       }
@@ -1500,34 +1401,6 @@
         "2lt_e07": "available",
         "3lt_e07": "available",
         "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_n26_001",
-      "rpo": "N26",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_tu7_001",
-      "rpo": "TU7",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "unavailable",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "unavailable",
         "2lt_e67": "available",
         "3lt_e67": "available"
       }
@@ -2034,160 +1907,6 @@
         "1lt_e67": "unavailable",
         "2lt_e67": "unavailable",
         "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_r9w_001",
-      "rpo": "R9W",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_r6p_001",
-      "rpo": "R6P",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_prb_001",
-      "rpo": "PRB",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_r9y_001",
-      "rpo": "R9Y",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_r9v_001",
-      "rpo": "R9V",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_r9l_001",
-      "rpo": "R9L",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "available",
-        "2lt_e07": "available",
-        "3lt_e07": "available",
-        "1lt_e67": "available",
-        "2lt_e67": "available",
-        "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_u5g_001",
-      "rpo": "U5G",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "standard",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "standard"
-      }
-    },
-    {
-      "option_id": "opt_ue1_001",
-      "rpo": "UE1",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "standard",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "standard"
-      }
-    },
-    {
-      "option_id": "opt_u2k_001",
-      "rpo": "U2K",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "standard",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "standard"
-      }
-    },
-    {
-      "option_id": "opt_vv4_001",
-      "rpo": "VV4",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "standard",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "standard"
-      }
-    },
-    {
-      "option_id": "opt_009",
-      "rpo": "",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "standard",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "standard"
       }
     },
     {
@@ -2891,20 +2610,6 @@
       }
     },
     {
-      "option_id": "opt_aq9_002",
-      "rpo": "AQ9",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "unavailable",
-        "2lt_e07": "standard",
-        "3lt_e07": "unavailable",
-        "1lt_e67": "unavailable",
-        "2lt_e67": "standard",
-        "3lt_e67": "unavailable"
-      }
-    },
-    {
       "option_id": "opt_ah2_001",
       "rpo": "AH2",
       "effective_status": "standard",
@@ -2919,20 +2624,6 @@
       }
     },
     {
-      "option_id": "opt_ae4_001",
-      "rpo": "AE4",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "unavailable",
-        "2lt_e07": "unavailable",
-        "3lt_e07": "available",
-        "1lt_e67": "unavailable",
-        "2lt_e67": "unavailable",
-        "3lt_e67": "available"
-      }
-    },
-    {
       "option_id": "opt_ae4_002",
       "rpo": "AE4",
       "effective_status": "available",
@@ -2944,34 +2635,6 @@
         "1lt_e67": "available",
         "2lt_e67": "available",
         "3lt_e67": "available"
-      }
-    },
-    {
-      "option_id": "opt_ae4_003",
-      "rpo": "AE4",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "unavailable",
-        "2lt_e07": "available",
-        "3lt_e07": "unavailable",
-        "1lt_e67": "unavailable",
-        "2lt_e67": "available",
-        "3lt_e67": "unavailable"
-      }
-    },
-    {
-      "option_id": "opt_ah2_002",
-      "rpo": "AH2",
-      "effective_status": "available",
-      "effective_status_label": "Available",
-      "statuses": {
-        "1lt_e07": "unavailable",
-        "2lt_e07": "available",
-        "3lt_e07": "unavailable",
-        "1lt_e67": "unavailable",
-        "2lt_e67": "available",
-        "3lt_e67": "unavailable"
       }
     },
     {
@@ -3465,104 +3128,6 @@
       }
     },
     {
-      "option_id": "opt_j6a_002",
-      "rpo": "J6A",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "standard",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "standard"
-      }
-    },
-    {
-      "option_id": "opt_eyt_002",
-      "rpo": "EYT",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "standard",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "standard"
-      }
-    },
-    {
-      "option_id": "opt_cm9_002",
-      "rpo": "CM9",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "unavailable",
-        "2lt_e07": "unavailable",
-        "3lt_e07": "unavailable",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "standard"
-      }
-    },
-    {
-      "option_id": "opt_nga_002",
-      "rpo": "NGA",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "standard",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "standard"
-      }
-    },
-    {
-      "option_id": "opt_efr_002",
-      "rpo": "EFR",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "standard",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "standard"
-      }
-    },
-    {
-      "option_id": "opt_cf7_002",
-      "rpo": "CF7",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "standard",
-        "1lt_e67": "unavailable",
-        "2lt_e67": "unavailable",
-        "3lt_e67": "unavailable"
-      }
-    },
-    {
-      "option_id": "opt_719_002",
-      "rpo": "719",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "standard",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "standard"
-      }
-    },
-    {
       "option_id": "opt_nk4_001",
       "rpo": "NK4",
       "effective_status": "standard",
@@ -3579,20 +3144,6 @@
     {
       "option_id": "opt_fea_001",
       "rpo": "FEA",
-      "effective_status": "standard",
-      "effective_status_label": "Standard",
-      "statuses": {
-        "1lt_e07": "standard",
-        "2lt_e07": "standard",
-        "3lt_e07": "standard",
-        "1lt_e67": "standard",
-        "2lt_e67": "standard",
-        "3lt_e67": "standard"
-      }
-    },
-    {
-      "option_id": "opt_swm_002",
-      "rpo": "SWM",
       "effective_status": "standard",
       "effective_status_label": "Standard",
       "statuses": {
@@ -10301,13 +9852,12 @@
   ],
   "rule_detail_hot_spots": {
     "counts": {
-      "except": 2,
       "included_with": 19,
-      "includes": 44,
-      "not_available": 51,
+      "includes": 40,
+      "not_available": 47,
       "not_recommended": 4,
-      "only": 26,
-      "requires": 33
+      "only": 22,
+      "requires": 22
     },
     "rows": [
       {
@@ -10423,39 +9973,6 @@
         ],
         "special_mentions": [],
         "detail_raw": "1. Available on SOLD orders only. (CFX) Personalized plaque is already included in (R8C) Corvette Museum Delivery."
-      },
-      {
-        "option_id": "opt_38s_001",
-        "rpo": "38S",
-        "option_name": "Adrenaline Red Custom Leather Stitching",
-        "section_id": "sec_cust_002",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior or (HU0/HXO) Adrenaline Red/Jet Black interior."
-      },
-      {
-        "option_id": "opt_36s_001",
-        "rpo": "36S",
-        "option_name": "Competition Yellow Custom Leather Stitching",
-        "section_id": "sec_cust_002",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior."
-      },
-      {
-        "option_id": "opt_37s_001",
-        "rpo": "37S",
-        "option_name": "Santorini Blue Custom Leather Stitching",
-        "section_id": "sec_cust_002",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (H1Y/HTM/HTP) Jet Black interior.\n2. Requires (HTE/HTT/HUB/HUC) Jet Black interior."
       },
       {
         "option_id": "opt_b6p_001",
@@ -10813,28 +10330,6 @@
         "detail_raw": "1. Included and only available with (FEY) Z52 Track Performance Package."
       },
       {
-        "option_id": "opt_n26_001",
-        "rpo": "N26",
-        "option_name": "Sueded Microfiber-Wrapped Steering Wheel",
-        "section_id": "sec_inte_001",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (HTJ) Jet Black interior.\n2. Requires leather seating surfaces with perforated sueded microfiber inserts interior: HTP, HU6, HU7, HTQ.\n3. Requires leather seating surfaces with perforated sueded microfiber inserts interiors: HTT, HU9, HUA, HTG, HUF, HMO, HVT, HXO, HZP, HUX, EPX, HUB."
-      },
-      {
-        "option_id": "opt_tu7_001",
-        "rpo": "TU7",
-        "option_name": "Two-Tone Seats",
-        "section_id": "sec_inte_001",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (AH2) GT2 seats. Available with (HUK/HU6) Sky Cool Gray, (HUL/HU7) Adrenaline Red, (HTN/HTQ) Natural interiors.\n2. Requires (AH2) GT2 seats. Available with (HU1/HU9) Sky Cool Gray, (HU2/HUA) Adrenaline Red, (HUE/HTG) Natural, (HMO/HVV) Jet Black/Sky Cool Gray, (HU0/HXO) Jet Black/Adrenaline Red interiors."
-      },
-      {
         "option_id": "opt_sfz_001",
         "rpo": "SFZ",
         "option_name": "Dark Stealth Crossed Flags Emblems",
@@ -11054,103 +10549,6 @@
         ],
         "special_mentions": [],
         "detail_raw": "1. Not available at this time."
-      },
-      {
-        "option_id": "opt_r9w_001",
-        "rpo": "R9W",
-        "option_name": "Deleted Mobile Service Plus",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires a dealer with a BFU of 284. Requires TRE, SRE or Fleet order types."
-      },
-      {
-        "option_id": "opt_r6p_001",
-        "rpo": "R6P",
-        "option_name": "Three-Year SiriusXM Subscription",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "requires",
-          "not_available",
-          "includes"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires SiriusXM. Not available with a FGO order type. SiriusXM Extended Service subscription will stop at the end of the applicable subscription period unless you decide to continue service. Plan is non-transferable and non-refundable. Service subject to the SiriusXM Customer Agreement and Privacy Policy, visit siriusxm.com/terms to see complete terms and how to cancel which includes online methods or calling 1-866-635-2349. Some services, content and features are subject to device capabilities, an active data connection enabled in the vehicle and location availability. All fees, content and features are subject to change. Content varies by subscription plan. SiriusXM and related logos are trademarks of Sirius XM Radio Inc. and its respective subsidiaries."
-      },
-      {
-        "option_id": "opt_prb_001",
-        "rpo": "PRB",
-        "option_name": "Three-Year OnStar One Standalone Plan",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "requires",
-          "not_available"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (UE1) OnStar and a Retail order type. Not available on vehicles being shipped to Puerto Rico, the Virgin Islands, or Guam. OnStar plan, working electrical system, cell reception and GPS signal required. OnStar links to emergency services. Not all vehicles may transmit all crash data. Service coverage varies with conditions and location. Service availability, features and functionality vary by device and software version. Subject to user terms. See onstar.com for details and limitations."
-      },
-      {
-        "option_id": "opt_r9y_001",
-        "rpo": "R9Y",
-        "option_name": "One-Year Mobile Service Plus",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "requires",
-          "not_available",
-          "only",
-          "except"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Required and only available for dealers who have a BFU of 284, except for orders with (R9W) Deleted Mobile Service Plus. Requires TRE, SRE, FBC, FNR or Fleet order types. Not available with (R9V) Mobile Service Plus for 3 years."
-      },
-      {
-        "option_id": "opt_r9v_001",
-        "rpo": "R9V",
-        "option_name": "Three-Year Mobile Service Plus",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "requires",
-          "not_available",
-          "only",
-          "except"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Required and only available for dealers who have a BFU of 284, except for orders with (R9W) Deleted Mobile Service Plus. Requires TRE, SRE or Fleet order types. Not available with (R9Y) Mobile Service Plus for 1 year."
-      },
-      {
-        "option_id": "opt_r9l_001",
-        "rpo": "R9L",
-        "option_name": "Removes OnStar Basics (OnStar Fleet Basics for Fleet)",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "only"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Included and only available on vehicles being shipped to Puerto Rico, the Virgin Islands, or Guam. Will delete OnStar Services and OnStar standard equipment (OnStar Basics / Connected Access / EV Access / R9M Services i.e. OnStar One and OnStar One Super Cruise as equipped) for vehicles shipping to these territories."
-      },
-      {
-        "option_id": "opt_u2k_001",
-        "rpo": "U2K",
-        "option_name": "SiriusXM Trial Subscription",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "includes"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. IMPORTANT: The SiriusXM trial subscription is not provided on vehicles that are ordered for Fleet Daily Rental (\"FDR\") use. Trial subscription is subject to the SiriusXM Customer Agreement and privacy policy, visit siriusxm.com which includes full terms and how to cancel. All fees, content, features, and availability are subject to change."
-      },
-      {
-        "option_id": "opt_009",
-        "rpo": "",
-        "option_name": "OnStar Basics (OnStar Fleet Basics for Fleet)",
-        "section_id": "sec_onst_001",
-        "matched_terms": [
-          "requires"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Requires (UE1) OnStar. OnStar Basics is standard for 8 years; working electrical system, cell reception and GPS signal required. OnStar links to emergency services. Service coverage varies with conditions and location. Service availability, features and functionality vary by device and software version. Subject to user terms. See onstar.com for details and limitations. Removed with a ship-to of Guam, Puerto Rico or the Virgin Islands."
       },
       {
         "option_id": "opt_t0e_001",
@@ -11499,40 +10897,6 @@
         "detail_raw": ""
       },
       {
-        "option_id": "opt_cm9_002",
-        "rpo": "CM9",
-        "option_name": "Body-Color Power Convertible Hardtop",
-        "section_id": "sec_stan_002",
-        "matched_terms": [
-          "includes",
-          "only"
-        ],
-        "special_mentions": [],
-        "detail_raw": ""
-      },
-      {
-        "option_id": "opt_efr_002",
-        "rpo": "EFR",
-        "option_name": "Carbon Flash Exterior Accents",
-        "section_id": "sec_stan_002",
-        "matched_terms": [
-          "includes"
-        ],
-        "special_mentions": [],
-        "detail_raw": "1. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered.\n2. Also includes tonneau grille. Rockers and splitters are not Carbon Flash when (CFV) visible carbon fiber ground effects is also ordered."
-      },
-      {
-        "option_id": "opt_719_002",
-        "rpo": "719",
-        "option_name": "Black Seat Belt Color",
-        "section_id": "sec_stan_002",
-        "matched_terms": [],
-        "special_mentions": [
-          "EL9"
-        ],
-        "detail_raw": "1. (HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior and (EL9) Santorini Blue Dipped with Torch Red accents interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color."
-      },
-      {
         "option_id": "opt_z15_001",
         "rpo": "Z15",
         "option_name": "Grand Sport Heritage Graphics",
@@ -11859,11 +11223,6 @@
           "option_id": "opt_z25_001",
           "rpo": "Z25",
           "option_name": "Grand Sport Launch Edition"
-        },
-        {
-          "option_id": "opt_719_002",
-          "rpo": "719",
-          "option_name": "Black Seat Belt Color"
         }
       ],
       "FEY": [

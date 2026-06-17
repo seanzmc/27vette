@@ -829,8 +829,8 @@ test("Grand Sport Jake graphics are selectable choices with rear hash graphics i
 test("Grand Sport draft preserves rule hot spots and normalization metadata for later phases", () => {
   assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1284);
   assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1422);
-  assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 129);
-  assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 28);
+  assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 113);
+  assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 27);
   assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);
   assert.equal(draft.draftMetadata.priceRuleSourceRows, draft.priceRules.length);
   assert.deepEqual(draft.draftMetadata.deferredSurfaces, []);

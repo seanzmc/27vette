@@ -1,6 +1,6 @@
 # Z06 Contract Preview
 
-Generated: `2026-06-16T04:23:07+00:00`
+Generated: `2026-06-17T00:46:16+00:00`
 Status: `read_only_preview`
 Source sheet: `z06_options`
 
@@ -12,7 +12,7 @@ Source sheet: `z06_options`
 - Sections: 36
 - Choices: 1283
 - Candidate standard equipment cells: 488
-- Rule/detail hot spot rows: 110
+- Rule/detail hot spot rows: 104
 - Unresolved normalization issues: 0
 
 ## Variants
@@ -40,8 +40,8 @@ Source sheet: `z06_options`
 
 ## Rule/Detail Hot Spots
 
-- Counts: `{"included_with": 25, "includes": 37, "not_available": 42, "not_recommended": 4, "only": 13, "requires": 18}`
-- Rows: 110
+- Counts: `{"included_with": 25, "includes": 37, "not_available": 42, "not_recommended": 4, "only": 13, "requires": 12}`
+- Rows: 104
 
 ## Unresolved Normalization Issues
 

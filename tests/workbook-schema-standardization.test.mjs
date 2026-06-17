@@ -121,8 +121,8 @@ test("schema validation CLI accepts the standardized workbook and live app contr
 
 test("workbook primitive cells use canonical raw Excel types", () => {
   const numericLookingRpos = new Set(["379", "719"]);
-  assert.equal(snapshot.stingray_rpos.filter((value) => numericLookingRpos.has(value)).length >= 3, true);
-  assert.equal(snapshot.grand_sport_rpos.filter((value) => numericLookingRpos.has(value)).length >= 3, true);
+  assert.equal(snapshot.stingray_rpos.filter((value) => numericLookingRpos.has(value)).length >= 2, true);
+  assert.equal(snapshot.grand_sport_rpos.filter((value) => numericLookingRpos.has(value)).length >= 2, true);
   assert.equal(snapshot.stingray_rpos.every((value) => typeof value === "string"), true);
   assert.equal(snapshot.grand_sport_rpos.every((value) => typeof value === "string"), true);
 

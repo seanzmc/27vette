@@ -244,7 +244,7 @@ Expected generated-data behavior:
    - `form-output/inspection/grand-sport-runtime-contract.json`
    - `form-output/inspection/z06-form-data-draft.json`
    - `form-output/inspection/z06-runtime-contract.json`
-   - `form-app/data.js` parsed structurally by model.
+   - `form-app/data.js` parsed with a Node `vm` shim and exported as JSON from `window.CORVETTE_FORM_DATA`; `scripts/compare-generated-contracts.mjs` compares JSON files, not raw `.js` bundles.
 2. Re-run a read-only workbook inventory immediately before writing:
    - Confirm exact option IDs still exist where expected.
    - Confirm matching OVS row counts.
@@ -277,9 +277,10 @@ Behavior-equivalence checks:
 node scripts/compare-generated-contracts.mjs /tmp/before-stingray-form-data.json form-output/stingray-form-data.json
 node scripts/compare-generated-contracts.mjs /tmp/before-grand-sport-runtime-contract.json form-output/inspection/grand-sport-runtime-contract.json
 node scripts/compare-generated-contracts.mjs /tmp/before-z06-runtime-contract.json form-output/inspection/z06-runtime-contract.json
+node scripts/compare-generated-contracts.mjs /tmp/before-corvette-form-data.json /tmp/after-corvette-form-data.json
 ```
 
-The comparison should be clean for runtime behavior surfaces, ignoring timestamps. If only inspection/source-count artifacts change, report that as expected non-runtime drift. If choices, standard equipment, rules, interiors, prices, or dealer-relevant payload fields change unexpectedly, stop and restore or split the pass.
+Export `/tmp/after-corvette-form-data.json` from regenerated `form-app/data.js` with the same Node `vm` parse used for the before snapshot. The comparison should be clean for runtime behavior surfaces, ignoring timestamps. If only inspection/source-count artifacts change, report that as expected non-runtime drift. If choices, standard equipment, rules, interiors, prices, or dealer-relevant payload fields change unexpectedly, stop and restore or split the pass.
 
 Targeted tests:
 
@@ -308,6 +309,10 @@ Add or update a test that asserts all approved option IDs are absent from their 
 
 The guard must not fail on explicitly deferred active emitted rows.
 
+Do not rely on runtime non-render tests alone for deleted rows. Tests such as the Z06 component/custom-stitch non-render assertion can pass vacuously after source rows are deleted because `choices.every(...)` is true for an empty array. Keep a workbook-source purge guard that proves the approved source rows and matching OVS rows are absent, and separately keep runtime tests that prove component line items and customer-facing behavior still work.
+
+Expect hardcoded generated-count assertions, especially in `tests/stingray-generator-stability.test.mjs`, to be reviewed after regeneration. If counts move only because approved non-runtime source rows disappeared from generated source/inspection surfaces while customer-facing runtime contracts remain equivalent, update the count assertions with the pass.
+
 Manual/browser verification:
 
 - Stingray: Interior Trim step still has no Custom Stitch or OnStar selectable cards; selected interior line items still show stitch/N26/TU7 component RPOs when applicable.
@@ -319,7 +324,7 @@ Manual/browser verification:
 
 - Active standard connected-service rows in `sec_tech_001` are currently emitted standard equipment. Deleting them would change visible trim standard-equipment data unless a separate standard-equipment ownership decision is made.
 - Active Stingray duplicate seat rows currently emit choices/standard equipment and encode variant/trim price/status behavior. They are not safe to delete in this pass without a seat-normalization model that preserves generated contracts.
-- Removing `section_presentation` hidden rows is safe only after the source option rows are gone and generated contracts compare clean.
+- Removing `section_presentation` hidden rows is safe only after the source option rows are gone and generated contracts compare clean. Keep this gate strict: do not remove the Stingray/Z06 `sec_cust_002` presentation suppressors before proving the source-row purge itself is behavior-equivalent.
 - Deleting source rows without matching OVS cleanup can break coverage/stability gates.
 - Deleting rows that still have rule/price/group references can create orphan references or silently remove behavior.
 

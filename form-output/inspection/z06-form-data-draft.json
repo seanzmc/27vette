@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-06-16T04:23:08+00:00",
+    "generated_at": "2026-06-17T00:46:16+00:00",
     "status": "draft_not_runtime_active"
   },
   "variants": [
@@ -58208,7 +58208,7 @@
         "not_available": 42,
         "not_recommended": 4,
         "only": 13,
-        "requires": 18
+        "requires": 12
       },
       "rows": [
         {
@@ -58335,39 +58335,6 @@
           ],
           "special_mentions": [],
           "detail_raw": "Will be forced on orders with ship-to states that require a front license plate."
-        },
-        {
-          "option_id": "opt_36s_001",
-          "rpo": "36S",
-          "option_name": "Competition Yellow Custom Leather Stitching",
-          "section_id": "sec_cust_002",
-          "matched_terms": [
-            "requires"
-          ],
-          "special_mentions": [],
-          "detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
-        },
-        {
-          "option_id": "opt_37s_001",
-          "rpo": "37S",
-          "option_name": "Santorini Blue Custom Leather Stitching",
-          "section_id": "sec_cust_002",
-          "matched_terms": [
-            "requires"
-          ],
-          "special_mentions": [],
-          "detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior."
-        },
-        {
-          "option_id": "opt_38s_001",
-          "rpo": "38S",
-          "option_name": "Adrenaline Red Custom Leather Stitching",
-          "section_id": "sec_cust_002",
-          "matched_terms": [
-            "requires"
-          ],
-          "special_mentions": [],
-          "detail_raw": "Requires (H1Y/HTM/HTP) Jet Black interior.\nRequires (HTE/HTT/HUB/HUC) Jet Black interior or (HU0/HXO) Adrenaline Red/Jet Black interior."
         },
         {
           "option_id": "opt_b6p_001",
@@ -58540,17 +58507,6 @@
           "detail_raw": "Included and only available with (Z07) Z07 Performance Package."
         },
         {
-          "option_id": "opt_n26_001",
-          "rpo": "N26",
-          "option_name": "Sueded Microfiber-Wrapped Steering Wheel",
-          "section_id": "sec_inte_001",
-          "matched_terms": [
-            "requires"
-          ],
-          "special_mentions": [],
-          "detail_raw": "Requires (HTJ) Jet Black interior.\nRequires leather seating surfaces with perforated sueded microfiber inserts interior: HTP, HU6, HU7, HTQ."
-        },
-        {
           "option_id": "opt_fa6_001",
           "rpo": "FA6",
           "option_name": "Level 2 Carbon Fiber Interior Trim",
@@ -58560,28 +58516,6 @@
           ],
           "special_mentions": [],
           "detail_raw": "Not available with (FA5) carbon fiber interior trim."
-        },
-        {
-          "option_id": "opt_n2z_001",
-          "rpo": "N2Z",
-          "option_name": "Carbon Fiber and Suede Steering Wheel",
-          "section_id": "sec_inte_001",
-          "matched_terms": [
-            "requires"
-          ],
-          "special_mentions": [],
-          "detail_raw": "Requires leather seating surfaces with perforated sueded microfiber inserts interiors: HTT, HU9, HUA, HTG, HUF, HMO, HVT, HXO, HZP, HUX, EPX, HUB."
-        },
-        {
-          "option_id": "opt_tu7_001",
-          "rpo": "TU7",
-          "option_name": "Two-Tone Seats",
-          "section_id": "sec_inte_001",
-          "matched_terms": [
-            "requires"
-          ],
-          "special_mentions": [],
-          "detail_raw": "Requires (AH2) GT2 seats. Available with (HUK/HU6) Sky Cool Gray, (HUL/HU7) Adrenaline Red, (HTN/HTQ) Natural interiors.\nRequires (AH2) GT2 seats. Available with (HU1/HU9) Sky Cool Gray, (HU2/HUA) Adrenaline Red, (HUE/HTG) Natural, (HMO/HVV) Jet Black/Sky Cool Gray, (HU0/HXO) Jet Black/Adrenaline Red interiors."
         },
         {
           "option_id": "opt_ryq_001",

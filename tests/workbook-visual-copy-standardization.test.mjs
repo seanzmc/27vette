@@ -43,7 +43,6 @@ function rowFor(sheetName, optionId) {
 test("source sheets use concise section-aware brake caliper labels", () => {
   const expectedByOptionId = {
     opt_j6a_001: "Black Painted Calipers",
-    opt_j6a_002: "Black Painted Calipers",
     opt_j6f_001: "Bright Red-Painted Calipers",
     opt_j6e_001: "Velocity Yellow-Painted Calipers",
     opt_j6n_001: "Edge Red-Painted Calipers",
@@ -53,9 +52,7 @@ test("source sheets use concise section-aware brake caliper labels", () => {
   for (const sheetName of ["stingray_options", "grandSport_options"]) {
     for (const [optionId, expectedName] of Object.entries(expectedByOptionId)) {
       const matchingRows = rowsBySheet.get(sheetName).filter((row) => row.option_id === optionId);
-      if (sheetName === "grandSport_options" || optionId !== "opt_j6a_002") {
-        assert.equal(matchingRows.length, 1, `${sheetName} should contain ${optionId}`);
-      }
+      assert.equal(matchingRows.length, 1, `${sheetName} should contain ${optionId}`);
       for (const row of matchingRows) {
         assert.equal(row.option_name, expectedName, `${sheetName} ${optionId}`);
       }
@@ -78,8 +75,11 @@ test("source sheets use concise removable-roof labels with consistent order", ()
       assert.equal(Number(row.display_order), expectedOrder, `${sheetName} ${optionId} display order`);
     }
 
-    const standardMirror = rowFor(sheetName, "opt_cf7_002");
-    assert.equal(standardMirror.option_name, "Body-Color Roof Panel", `${sheetName} CF7 standard mirror name`);
+    assert.equal(
+      rowsBySheet.get(sheetName).some((row) => row.option_id === "opt_cf7_002"),
+      false,
+      `${sheetName} should not retain inactive CF7 standard mirror source row`
+    );
   }
 });
 

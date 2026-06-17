@@ -87,19 +87,19 @@ test("customer-facing text is cleaned while raw source fields stay intact", () =
 });
 
 test("rule/detail hot spot buckets are preserved for later phases", () => {
-  assert.equal(preview.ruleDetailHotSpots.rows.length, 129);
-  assert.equal(preview.ruleDetailHotSpots.counts.requires, 33);
-  assert.equal(preview.ruleDetailHotSpots.counts.not_available, 51);
+  assert.equal(preview.ruleDetailHotSpots.rows.length, 113);
+  assert.equal(preview.ruleDetailHotSpots.counts.requires, 22);
+  assert.equal(preview.ruleDetailHotSpots.counts.not_available, 47);
   assert.equal(preview.ruleDetailHotSpots.counts.included_with, 19);
-  assert.equal(preview.ruleDetailHotSpots.counts.includes, 44);
+  assert.equal(preview.ruleDetailHotSpots.counts.includes, 40);
   assert.equal(
     preview.ruleDetailHotSpots.rows.some(
       (row) => ["DMU", "DMV", "DMW", "DMX", "DMY"].includes(row.rpo) && /Requires \(D84\)/.test(row.detail_raw)
     ),
     false
   );
-  assert.equal(preview.ruleDetailHotSpots.counts.only, 26);
+  assert.equal(preview.ruleDetailHotSpots.counts.only, 22);
   assert.equal(preview.ruleDetailHotSpots.counts.not_recommended, 4);
-  assert.equal(preview.ruleDetailHotSpots.counts.except, 2);
-  assert.equal(preview.ruleDetailHotSpots.counts.special_package_review, 28);
+  assert.equal(preview.ruleDetailHotSpots.counts.except ?? 0, 0);
+  assert.equal(preview.ruleDetailHotSpots.counts.special_package_review, 27);
 });

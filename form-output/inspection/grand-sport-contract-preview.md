@@ -1,6 +1,6 @@
 # Grand Sport Contract Preview
 
-Generated: `2026-06-16T04:23:58+00:00`
+Generated: `2026-06-17T00:46:13+00:00`
 Status: `read_only_preview`
 Source sheet: `grandSport_options`
 
@@ -12,7 +12,7 @@ Source sheet: `grandSport_options`
 - Sections: 37
 - Choices: 1284
 - Candidate standard equipment cells: 455
-- Rule/detail hot spot rows: 129
+- Rule/detail hot spot rows: 113
 - Unresolved normalization issues: 0
 
 ## Variants
@@ -40,8 +40,8 @@ Source sheet: `grandSport_options`
 
 ## Rule/Detail Hot Spots
 
-- Counts: `{"except": 2, "included_with": 19, "includes": 44, "not_available": 51, "not_recommended": 4, "only": 26, "requires": 33, "special_package_review": 28}`
-- Rows: 129
+- Counts: `{"included_with": 19, "includes": 40, "not_available": 47, "not_recommended": 4, "only": 22, "requires": 22, "special_package_review": 27}`
+- Rows: 113
 
 ## Unresolved Normalization Issues
 

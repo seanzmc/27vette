@@ -1,6 +1,6 @@
 # Z06 Form Data Draft
 
-Generated: `2026-06-16T04:23:08+00:00`
+Generated: `2026-06-17T00:46:16+00:00`
 Status: `draft_not_runtime_active`
 Source sheet: `z06_options`
 
@@ -23,7 +23,7 @@ Source sheet: `z06_options`
 
 - Candidate available/standard choices from preview: 1283
 - Full variant-matrix draft choices: 1428
-- Rule/detail hot spot rows preserved: 110
+- Rule/detail hot spot rows preserved: 104
 - Unresolved normalization issues: 0
 
 ## Validation Warnings
