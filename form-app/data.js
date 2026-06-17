@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-17T05:17:29+00:00"
+          "generated_at": "2026-06-17T05:38:15+00:00"
         },
         "variants": [
           {
@@ -36922,6 +36922,20 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "required_single_within_group",
             "active": "True",
             "notes": "Exterior Accent options require one active accent selection; selected default cannot be cleared without choosing another accent package."
+          },
+          {
+            "group_id": "excl_seat_belts",
+            "option_ids": [
+              "opt_719_001",
+              "opt_3n9_001",
+              "opt_379_001",
+              "opt_3a9_001",
+              "opt_3f9_001",
+              "opt_3m9_001"
+            ],
+            "selection_mode": "single_within_group",
+            "active": "True",
+            "notes": "Stingray seatbelt colors are mutually exclusive; included 3LT interior seatbelts lock peers."
           }
         ],
         "rules": [
@@ -48018,7 +48032,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-17T05:18:21+00:00",
+          "generated_at": "2026-06-17T05:38:16+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -86576,6 +86590,20 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "required_single_within_group",
             "active": "True",
             "notes": "Grand Sport brake choices require one active brake selection; selected default cannot be cleared without choosing another brake package."
+          },
+          {
+            "group_id": "gs_excl_seat_belts",
+            "option_ids": [
+              "opt_719_001",
+              "opt_3n9_001",
+              "opt_379_001",
+              "opt_3a9_001",
+              "opt_3f9_001",
+              "opt_3m9_001"
+            ],
+            "selection_mode": "single_within_group",
+            "active": "True",
+            "notes": "Grand Sport seatbelt colors are mutually exclusive; included 3LT interior seatbelts lock peers."
           }
         ],
         "rules": [

@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-06-17T05:18:21+00:00",
+    "generated_at": "2026-06-17T05:38:28+00:00",
     "status": "draft_not_runtime_active"
   },
   "variants": [
@@ -48972,6 +48972,20 @@
       "selection_mode": "required_single_within_group",
       "active": "True",
       "notes": "Grand Sport brake choices require one active brake selection; selected default cannot be cleared without choosing another brake package."
+    },
+    {
+      "group_id": "gs_excl_seat_belts",
+      "option_ids": [
+        "opt_719_001",
+        "opt_3n9_001",
+        "opt_379_001",
+        "opt_3a9_001",
+        "opt_3f9_001",
+        "opt_3m9_001"
+      ],
+      "selection_mode": "single_within_group",
+      "active": "True",
+      "notes": "Grand Sport seatbelt colors are mutually exclusive; included 3LT interior seatbelts lock peers."
     }
   ],
   "rules": [

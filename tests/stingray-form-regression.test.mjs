@@ -2395,6 +2395,29 @@ test("single interior and included seatbelt defaults are handled in runtime", ()
   assert.equal(seatbeltDefault?.condition_id, "sec_seat_001");
 });
 
+test("Stingray 3LT interiors lock included color seatbelts against other seatbelt choices", () => {
+  const group = data.exclusiveGroups.find((item) => item.group_id === "excl_seat_belts");
+  assert.ok(group, "Stingray seatbelt exclusive group should be generated");
+  assert.equal(group.selection_mode, "single_within_group");
+  assert.deepEqual(JSON.parse(JSON.stringify(group.option_ids)), ["opt_719_001", "opt_3n9_001", "opt_379_001", "opt_3a9_001", "opt_3f9_001", "opt_3m9_001"]);
+
+  const runtime = configureInteriorOrder({ trimLevel: "3LT", seatRpo: "AE4", interiorId: "3LT_AE4_H8T" });
+  runtime.reconcileSelections();
+  assert.equal(runtime.computeAutoAdded().has("opt_3a9_001"), true, "3LT_AE4_H8T should auto-add 3A9");
+  assert.equal(runtime.optionPrice("opt_3a9_001"), 0, "included 3A9 should price at zero");
+
+  const redSeatbelt = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_3f9_001");
+  assert.ok(redSeatbelt, "red seatbelt should exist for lock test");
+  runtime.handleChoice(redSeatbelt);
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has("opt_3f9_001"), false, "included 3A9 should block other seatbelt choices");
+
+  runtime.state.selected.add("opt_d30_001");
+  runtime.handleChoice(redSeatbelt);
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has("opt_3f9_001"), false, "D30 should not unlock a 3LT included seatbelt peer");
+});
+
 test("sidebar keeps one Standard & Included surface inside Selected RPOs", () => {
   assert.match(htmlSource, /selectedStandardEquipmentList/);
   assert.doesNotMatch(htmlSource, /standardEquipmentList/);

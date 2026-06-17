@@ -221,6 +221,10 @@ const expectedGrandSportExclusiveGroups = [
     selectionMode: "required_single_within_group",
   },
   {
+    groupId: "gs_excl_seat_belts",
+    optionIds: ["opt_719_001", "opt_3n9_001", "opt_379_001", "opt_3a9_001", "opt_3f9_001", "opt_3m9_001"],
+  },
+  {
     groupId: "gs_excl_performance_brakes",
     optionIds: ["opt_jx6_001", "opt_j56_001", "opt_j57_001"],
     selectionMode: "required_single_within_group",
@@ -256,6 +260,10 @@ const expectedStingrayExclusiveGroups = [
     groupId: "excl_ext_accents",
     optionIds: ["opt_efr_001", "opt_efy_001", "opt_edu_001"],
     selectionMode: "required_single_within_group",
+  },
+  {
+    groupId: "excl_seat_belts",
+    optionIds: ["opt_719_001", "opt_3n9_001", "opt_379_001", "opt_3a9_001", "opt_3f9_001", "opt_3m9_001"],
   },
 ];
 
@@ -1488,17 +1496,31 @@ test("Grand Sport 3LT interiors auto-add included color seatbelts from workbook 
   const ah2Seat = runtime.activeChoiceRows().find((choice) => choice.rpo === "AH2" && choice.step_key === "seat");
   runtime.handleChoice(ah2Seat);
 
-  for (const [interiorId, rpo] of [
-    ["3LT_AH2_HZN", "3N9"],
-    ["3LT_AH2_HNK", "3F9"],
-    ["3LT_AH2_H8T", "3A9"],
-    ["3LT_AH2_HUW", "379"],
+  for (const [interiorId, rpo, optionId] of [
+    ["3LT_AH2_HZN", "3N9", "opt_3n9_001"],
+    ["3LT_AH2_HNK", "3F9", "opt_3f9_001"],
+    ["3LT_AH2_H8T", "3A9", "opt_3a9_001"],
+    ["3LT_AH2_HUW", "379", "opt_379_001"],
   ]) {
     runtime.state.selectedInterior = interiorId;
     runtime.reconcileSelections();
     const order = runtime.currentOrder();
     assert.equal(runtime.state.selected.has("opt_719_001"), false, `${interiorId} should replace default 719`);
     assert.equal(order.auto_added_options.some((item) => item.rpo === rpo && item.price === 0), true, `${interiorId} should auto-add ${rpo} at no charge`);
+
+    const otherSeatbelt = runtime.activeChoiceRows().find(
+      (item) => item.section_id === "sec_seat_001" && item.option_id !== optionId && item.selectable === "True"
+    );
+    assert.ok(otherSeatbelt, "expected another selectable seatbelt for lock test");
+    runtime.handleChoice(otherSeatbelt);
+    runtime.reconcileSelections();
+    assert.equal(runtime.state.selected.has(otherSeatbelt.option_id), false, `${interiorId} should block other seatbelts`);
+
+    runtime.state.selected.add("opt_d30_001");
+    runtime.handleChoice(otherSeatbelt);
+    runtime.reconcileSelections();
+    assert.equal(runtime.state.selected.has(otherSeatbelt.option_id), false, `${interiorId} should block other seatbelts even with D30`);
+    runtime.state.selected.delete("opt_d30_001");
   }
 
   runtime.state.selectedInterior = "3LT_AH2_HTE";

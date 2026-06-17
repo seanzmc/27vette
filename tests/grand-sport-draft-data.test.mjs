@@ -120,6 +120,10 @@ const expectedGrandSportExclusiveGroups = [
     selection_mode: "required_single_within_group",
   },
   {
+    group_id: "gs_excl_seat_belts",
+    option_ids: ["opt_719_001", "opt_3n9_001", "opt_379_001", "opt_3a9_001", "opt_3f9_001", "opt_3m9_001"],
+  },
+  {
     group_id: "gs_excl_performance_brakes",
     option_ids: ["opt_jx6_001", "opt_j56_001", "opt_j57_001"],
     selection_mode: "required_single_within_group",
