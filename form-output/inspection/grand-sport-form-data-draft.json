@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-06-17T19:49:10+00:00",
+    "generated_at": "2026-06-17T21:13:23+00:00",
     "status": "draft_not_runtime_active"
   },
   "variants": [
@@ -9446,7 +9446,7 @@
       "option_id": "opt_nga_001",
       "rpo": "NGA",
       "label": "Black Exhaust Tips",
-      "description": "Standard. Corner Exit",
+      "description": "Standard, Corner Exit",
       "section_id": "sec_exha_001",
       "section_name": "Exhaust",
       "standard_equipment_group_type": "",
@@ -9466,7 +9466,7 @@
       "display_order": 10,
       "source_detail_raw": "",
       "source_option_name": "Black Exhaust Tips",
-      "source_description": "Standard. Corner Exit",
+      "source_description": "Standard, Corner Exit",
       "text_cleanup_notes": []
     },
     {
@@ -9474,7 +9474,7 @@
       "option_id": "opt_nga_001",
       "rpo": "NGA",
       "label": "Black Exhaust Tips",
-      "description": "Standard. Corner Exit",
+      "description": "Standard, Corner Exit",
       "section_id": "sec_exha_001",
       "section_name": "Exhaust",
       "standard_equipment_group_type": "",
@@ -9494,7 +9494,7 @@
       "display_order": 10,
       "source_detail_raw": "",
       "source_option_name": "Black Exhaust Tips",
-      "source_description": "Standard. Corner Exit",
+      "source_description": "Standard, Corner Exit",
       "text_cleanup_notes": []
     },
     {
@@ -9502,7 +9502,7 @@
       "option_id": "opt_nga_001",
       "rpo": "NGA",
       "label": "Black Exhaust Tips",
-      "description": "Standard. Corner Exit",
+      "description": "Standard, Corner Exit",
       "section_id": "sec_exha_001",
       "section_name": "Exhaust",
       "standard_equipment_group_type": "",
@@ -9522,7 +9522,7 @@
       "display_order": 10,
       "source_detail_raw": "",
       "source_option_name": "Black Exhaust Tips",
-      "source_description": "Standard. Corner Exit",
+      "source_description": "Standard, Corner Exit",
       "text_cleanup_notes": []
     },
     {
@@ -9530,7 +9530,7 @@
       "option_id": "opt_nga_001",
       "rpo": "NGA",
       "label": "Black Exhaust Tips",
-      "description": "Standard. Corner Exit",
+      "description": "Standard, Corner Exit",
       "section_id": "sec_exha_001",
       "section_name": "Exhaust",
       "standard_equipment_group_type": "",
@@ -9550,7 +9550,7 @@
       "display_order": 10,
       "source_detail_raw": "",
       "source_option_name": "Black Exhaust Tips",
-      "source_description": "Standard. Corner Exit",
+      "source_description": "Standard, Corner Exit",
       "text_cleanup_notes": []
     },
     {
@@ -9558,7 +9558,7 @@
       "option_id": "opt_nga_001",
       "rpo": "NGA",
       "label": "Black Exhaust Tips",
-      "description": "Standard. Corner Exit",
+      "description": "Standard, Corner Exit",
       "section_id": "sec_exha_001",
       "section_name": "Exhaust",
       "standard_equipment_group_type": "",
@@ -9578,7 +9578,7 @@
       "display_order": 10,
       "source_detail_raw": "",
       "source_option_name": "Black Exhaust Tips",
-      "source_description": "Standard. Corner Exit",
+      "source_description": "Standard, Corner Exit",
       "text_cleanup_notes": []
     },
     {
@@ -9586,7 +9586,7 @@
       "option_id": "opt_nga_001",
       "rpo": "NGA",
       "label": "Black Exhaust Tips",
-      "description": "Standard. Corner Exit",
+      "description": "Standard, Corner Exit",
       "section_id": "sec_exha_001",
       "section_name": "Exhaust",
       "standard_equipment_group_type": "",
@@ -9606,7 +9606,7 @@
       "display_order": 10,
       "source_detail_raw": "",
       "source_option_name": "Black Exhaust Tips",
-      "source_description": "Standard. Corner Exit",
+      "source_description": "Standard, Corner Exit",
       "text_cleanup_notes": []
     },
     {
@@ -10118,7 +10118,7 @@
       "option_id": "opt_edu_001",
       "rpo": "EDU",
       "label": "Body-Color and Carbon Flash Accents",
-      "description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
+      "description": "Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",
       "section_id": "sec_exte_001",
       "section_name": "Exterior Accents",
       "standard_equipment_group_type": "",
@@ -10138,7 +10138,7 @@
       "display_order": 20,
       "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.",
       "source_option_name": "Body-Color and Carbon Flash Accents",
-      "source_description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
+      "source_description": "Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",
       "text_cleanup_notes": []
     },
     {
@@ -10146,7 +10146,7 @@
       "option_id": "opt_edu_001",
       "rpo": "EDU",
       "label": "Body-Color and Carbon Flash Accents",
-      "description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
+      "description": "Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",
       "section_id": "sec_exte_001",
       "section_name": "Exterior Accents",
       "standard_equipment_group_type": "",
@@ -10166,7 +10166,7 @@
       "display_order": 20,
       "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.",
       "source_option_name": "Body-Color and Carbon Flash Accents",
-      "source_description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
+      "source_description": "Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",
       "text_cleanup_notes": []
     },
     {
@@ -10174,7 +10174,7 @@
       "option_id": "opt_edu_001",
       "rpo": "EDU",
       "label": "Body-Color and Carbon Flash Accents",
-      "description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
+      "description": "Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",
       "section_id": "sec_exte_001",
       "section_name": "Exterior Accents",
       "standard_equipment_group_type": "",
@@ -10194,7 +10194,7 @@
       "display_order": 20,
       "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.",
       "source_option_name": "Body-Color and Carbon Flash Accents",
-      "source_description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
+      "source_description": "Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",
       "text_cleanup_notes": []
     },
     {
@@ -10202,7 +10202,7 @@
       "option_id": "opt_edu_001",
       "rpo": "EDU",
       "label": "Body-Color and Carbon Flash Accents",
-      "description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
+      "description": "Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",
       "section_id": "sec_exte_001",
       "section_name": "Exterior Accents",
       "standard_equipment_group_type": "",
@@ -10222,7 +10222,7 @@
       "display_order": 20,
       "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.",
       "source_option_name": "Body-Color and Carbon Flash Accents",
-      "source_description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
+      "source_description": "Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",
       "text_cleanup_notes": []
     },
     {
@@ -10230,7 +10230,7 @@
       "option_id": "opt_edu_001",
       "rpo": "EDU",
       "label": "Body-Color and Carbon Flash Accents",
-      "description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
+      "description": "Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",
       "section_id": "sec_exte_001",
       "section_name": "Exterior Accents",
       "standard_equipment_group_type": "",
@@ -10250,7 +10250,7 @@
       "display_order": 20,
       "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.",
       "source_option_name": "Body-Color and Carbon Flash Accents",
-      "source_description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
+      "source_description": "Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",
       "text_cleanup_notes": []
     },
     {
@@ -10258,7 +10258,7 @@
       "option_id": "opt_edu_001",
       "rpo": "EDU",
       "label": "Body-Color and Carbon Flash Accents",
-      "description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
+      "description": "Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",
       "section_id": "sec_exte_001",
       "section_name": "Exterior Accents",
       "standard_equipment_group_type": "",
@@ -10278,7 +10278,7 @@
       "display_order": 20,
       "source_detail_raw": "1. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered. \n2. Tonneau grille is Carbon Flash-painted. Front splitter is not body-color when (CFV/CFZ) ground effects is also ordered.",
       "source_option_name": "Body-Color and Carbon Flash Accents",
-      "source_description": "Front splitter is body-color; rockers and front/rear grille accents are Carbon Flash-painted. Front splitter is not body-color when CFV or CFZ ground effects is ordered. Tonneau grille is Carbon Flash-painted with convertible.",
+      "source_description": "Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",
       "text_cleanup_notes": []
     },
     {
@@ -43060,7 +43060,7 @@
       "option_id": "opt_nga_001",
       "rpo": "NGA",
       "label": "Black Exhaust Tips",
-      "description": "Standard. Corner Exit",
+      "description": "Standard, Corner Exit",
       "section_id": "sec_exha_001",
       "section_name": "Exhaust",
       "standard_equipment_group_type": "",
@@ -43075,7 +43075,7 @@
       "option_id": "opt_nga_001",
       "rpo": "NGA",
       "label": "Black Exhaust Tips",
-      "description": "Standard. Corner Exit",
+      "description": "Standard, Corner Exit",
       "section_id": "sec_exha_001",
       "section_name": "Exhaust",
       "standard_equipment_group_type": "",
@@ -43090,7 +43090,7 @@
       "option_id": "opt_nga_001",
       "rpo": "NGA",
       "label": "Black Exhaust Tips",
-      "description": "Standard. Corner Exit",
+      "description": "Standard, Corner Exit",
       "section_id": "sec_exha_001",
       "section_name": "Exhaust",
       "standard_equipment_group_type": "",
@@ -43105,7 +43105,7 @@
       "option_id": "opt_nga_001",
       "rpo": "NGA",
       "label": "Black Exhaust Tips",
-      "description": "Standard. Corner Exit",
+      "description": "Standard, Corner Exit",
       "section_id": "sec_exha_001",
       "section_name": "Exhaust",
       "standard_equipment_group_type": "",
@@ -43120,7 +43120,7 @@
       "option_id": "opt_nga_001",
       "rpo": "NGA",
       "label": "Black Exhaust Tips",
-      "description": "Standard. Corner Exit",
+      "description": "Standard, Corner Exit",
       "section_id": "sec_exha_001",
       "section_name": "Exhaust",
       "standard_equipment_group_type": "",
@@ -43135,7 +43135,7 @@
       "option_id": "opt_nga_001",
       "rpo": "NGA",
       "label": "Black Exhaust Tips",
-      "description": "Standard. Corner Exit",
+      "description": "Standard, Corner Exit",
       "section_id": "sec_exha_001",
       "section_name": "Exhaust",
       "standard_equipment_group_type": "",

@@ -21,7 +21,17 @@ From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 
 
 - Display-order cleanup for promoted sheets:
   - Promoted `stingray_options`, `grandSport_options`, and `z06_options` have no active duplicate `(section_id, display_order)` buckets.
+  - `scripts/validate_workbook_schema.py` now enforces active promoted option-sheet `(section_id, display_order)` uniqueness; the SC7 section move tripped this guard and was corrected with `stingray_options.opt_sc7_001.display_order=71`.
   - Residual duplicates are future-model scaffold rows only: `zr1_options.sec_stan_001` and `zr1x_options.sec_stan_001` U80/WUB at order `20`.
+
+- Copy-convergence / product-decision pass:
+  - `docs/copy-convergence-review-2026-06-17.md` records the strict shared-option drift review.
+  - Safe GS/Z06-majority copy was applied to Stingray source rows, excluding reviewed/deferred allowlist fields.
+  - `tests/workbook-visual-copy-standardization.test.mjs` now loads `z06_options`, enforces shared-copy parity with an allowlist, rejects trailing-period-only drift, and guards R-1 through R-5 product decisions.
+  - R-1 UV6 Z06 section drift remains intentional.
+  - R-2 SC7 moved to Stingray `sec_lpoe_001`, punctuation was normalized, and display order was set to `71` to avoid a promoted active duplicate.
+  - R-3 DRZ, R-4 EFR/EDU, and R-5 NGA copy decisions are applied.
+  - R-6 seat presentation/order remains deferred to a separate pass.
 
 - Earlier source-cleanup passes:
   - Active-model nonruntime option-row purge complete.
@@ -32,10 +42,9 @@ From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 
 
 ## Still to do
 
-- Cross-model copy convergence / product decisions:
-  - Shared option name/description drift remains.
-  - Product-review items still need decision table; do not majority-overwrite without decisions.
-  - Extend copy tests to include `z06_options` and intentional-difference allowlist.
+- Residual copy/product follow-up:
+  - R-6 `sec_seat_002` seat presentation/order remains separate by user decision.
+  - Deferred copy allowlist rows remain for later review where automatic convergence could delete detail or product meaning: AP9 description, AUP name/description, D3V description, EYK/EYT badge copy, SFZ applicability, VYW logo applicability, ZZ3 Z06 includes-list difference, NWI description, and PIN restrictions.
 
 - Active standard-tech / connected-service ownership:
   - `sec_tech_001` rows still active emitted standard equipment.
@@ -46,9 +55,9 @@ From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 
   - `architectureAudit/stingray_interiors_refactor.csv` and `architectureAudit/grand_sport_interiors_refactor.csv` still exist.
   - Needs consumer audit + contract-parity proof before removal.
 
-- Durable display-order validator:
-  - Add validator/test for active promoted `(section_id, display_order)` uniqueness now that promoted sheets are clean.
-  - Decide separately whether to include future ZR1/ZR1X scaffold rows.
+- Future-model scaffold display-order decision:
+  - Active promoted `(section_id, display_order)` uniqueness is guarded by workbook schema validation.
+  - Decide separately whether to clean and include future ZR1/ZR1X scaffold rows.
 
 - Optional audit/report tooling:
   - `scripts/build_rule_sources.py`
@@ -70,6 +79,6 @@ From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 
 
 ## Recommended next passes
 
-1. Copy-convergence/product-decision pass.
+1. R-6 seat presentation/order and residual copy allowlist decision pass, if desired.
 2. Interior stale-surface cleanup.
-3. Future-model scaffold display-order decision / durable validator pass.
+3. Future-model scaffold display-order decision.

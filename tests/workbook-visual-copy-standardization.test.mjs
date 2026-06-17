@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import test from "node:test";
 
+const OPTION_SHEETS = ["stingray_options", "grandSport_options", "z06_options"];
+
 function workbookRows(sheetName) {
   const output = execFileSync(
     ".venv/bin/python",
@@ -29,16 +31,131 @@ function workbookRows(sheetName) {
   return JSON.parse(output);
 }
 
-const rowsBySheet = new Map([
-  ["stingray_options", workbookRows("stingray_options")],
-  ["grandSport_options", workbookRows("grandSport_options")],
-]);
+const rowsBySheet = new Map(OPTION_SHEETS.map((sheetName) => [sheetName, workbookRows(sheetName)]));
+
+function isActive(row) {
+  return row.active === true || String(row.active).toLowerCase() === "true";
+}
 
 function rowFor(sheetName, optionId) {
-  const row = rowsBySheet.get(sheetName).find((candidate) => candidate.option_id === optionId);
-  assert.ok(row, `${sheetName} is missing ${optionId}`);
+  const row = rowsBySheet.get(sheetName).find((candidate) => candidate.option_id === optionId && isActive(candidate));
+  assert.ok(row, `${sheetName} is missing active ${optionId}`);
   return row;
 }
+
+function activeRowsByOptionId(sheetName) {
+  const byOptionId = new Map();
+  for (const row of rowsBySheet.get(sheetName).filter(isActive)) {
+    const rows = byOptionId.get(row.option_id) ?? [];
+    rows.push(row);
+    byOptionId.set(row.option_id, rows);
+  }
+  return byOptionId;
+}
+
+function strictSharedOptionIds() {
+  const maps = new Map(OPTION_SHEETS.map((sheetName) => [sheetName, activeRowsByOptionId(sheetName)]));
+  const shared = [...maps.get("stingray_options").keys()].filter((optionId) =>
+    OPTION_SHEETS.every((sheetName) => maps.get(sheetName).has(optionId))
+  );
+  return shared
+    .filter((optionId) => OPTION_SHEETS.every((sheetName) => maps.get(sheetName).get(optionId).length === 1))
+    .sort();
+}
+
+const COPY_FIELD_ALLOWLIST = new Map([
+  ["opt_ap9_001:description", "GS/Z06 target is blank; keep Stingray detail for later product review."],
+  ["opt_aup_001:option_name", "R-6 seat presentation/copy stays deferred."],
+  ["opt_aup_001:description", "R-6 seat presentation/copy stays deferred."],
+  ["opt_d3v_001:description", "GS/Z06 target is blank; keep Stingray engine-lighting copy for later review."],
+  ["opt_edu_001:description", "R-4 keeps Stingray-specific EDU description while GS/Z06 use approved shared copy."],
+  ["opt_efr_001:description", "R-4 keeps model-specific Stingray EFR description."],
+  ["opt_eyk_001:description", "Model-specific emblem/badging copy."],
+  ["opt_eyt_001:description", "Model-specific emblem/badging copy."],
+  ["opt_nga_001:description", "R-5 uses per-model exhaust-exit wording."],
+  ["opt_nwi_001:description", "NWI exhaust-tip wording remains a separate copy decision."],
+  ["opt_pin_001:description", "GS/Z06 target is blank; keep Stingray restriction copy for later review."],
+  ["opt_sfz_001:option_name", "Model applicability differs: Stingray front-only vs GS/Z06 front+rear."],
+  ["opt_sfz_001:description", "Model applicability differs: Stingray front-only vs GS/Z06 front+rear."],
+  ["opt_vyw_001:description", "Model-specific floor-mat logo applicability, especially Z06."],
+  ["opt_zz3_001:description", "Z06 lacks the LS6 engine cover referenced by Stingray/Grand Sport copy."],
+]);
+
+test("shared active option names and descriptions match across promoted models except reviewed allowlist", () => {
+  for (const optionId of strictSharedOptionIds()) {
+    for (const field of ["option_name", "description"]) {
+      const allowlistKey = `${optionId}:${field}`;
+      if (COPY_FIELD_ALLOWLIST.has(allowlistKey)) continue;
+
+      const values = Object.fromEntries(OPTION_SHEETS.map((sheetName) => [sheetName, rowFor(sheetName, optionId)[field] ?? ""]));
+      assert.equal(
+        new Set(Object.values(values)).size,
+        1,
+        `${optionId} ${field} should match across promoted models: ${JSON.stringify(values)}`
+      );
+    }
+  }
+});
+
+test("shared active descriptions do not differ only by trailing period", () => {
+  for (const optionId of strictSharedOptionIds()) {
+    const values = OPTION_SHEETS.map((sheetName) => String(rowFor(sheetName, optionId).description ?? ""));
+    const normalized = values.map((value) => value.replace(/\.$/, ""));
+    assert.notEqual(
+      new Set(normalized).size === 1 && new Set(values).size > 1,
+      true,
+      `${optionId} description differs only by trailing period: ${JSON.stringify(values)}`
+    );
+  }
+});
+
+test("approved product decisions R-1 through R-5 are workbook-owned", () => {
+  assert.equal(rowFor("z06_options", "opt_uv6_001").section_id, "sec_1lte_001", "R-1 Z06 UV6 drift is intentional");
+  assert.equal(rowFor("stingray_options", "opt_uv6_001").section_id, "sec_2lte_001", "R-1 Stingray UV6 remains 2LT");
+  assert.equal(rowFor("grandSport_options", "opt_uv6_001").section_id, "sec_2lte_001", "R-1 Grand Sport UV6 remains 2LT");
+
+  for (const sheetName of OPTION_SHEETS) {
+    const sc7 = rowFor(sheetName, "opt_sc7_001");
+    assert.equal(sc7.section_id, "sec_lpoe_001", `${sheetName} SC7 section`);
+    assert.equal(sc7.description, "LPO. Genuine Corvette Accessory", `${sheetName} SC7 punctuation`);
+
+    const drz = rowFor(sheetName, "opt_drz_001");
+    assert.equal(drz.option_name, "Auto-Dimming Rear Camera Mirror", `${sheetName} DRZ name`);
+    assert.equal(drz.description, "Inside rearview with full camera display", `${sheetName} DRZ description`);
+  }
+
+  const stingrayEfr = rowFor("stingray_options", "opt_efr_001");
+  assert.equal(stingrayEfr.option_name, "Carbon Flash Painted Accents", "Stingray EFR name");
+  assert.equal(
+    stingrayEfr.description,
+    "Includes side vents and front/rear grille accents. Includes tonneau grille with convertible.",
+    "Stingray EFR description"
+  );
+
+  for (const sheetName of OPTION_SHEETS) {
+    assert.equal(rowFor(sheetName, "opt_edu_001").option_name, "Body-Color and Carbon Flash Accents", `${sheetName} EDU name`);
+  }
+  assert.equal(
+    rowFor("stingray_options", "opt_edu_001").description,
+    "Body-color side vents and front splitter; Carbon Flash-painted rockers and front/rear grille accents.",
+    "Stingray EDU keeps approved model copy"
+  );
+  for (const sheetName of ["grandSport_options", "z06_options"]) {
+    assert.equal(
+      rowFor(sheetName, "opt_edu_001").description,
+      "Body-color side vents and front splitter, Carbon Flash-painted rockers and front/rear grille accents",
+      `${sheetName} EDU description`
+    );
+  }
+
+  assert.equal(
+    rowFor("stingray_options", "opt_nga_001").description,
+    "Standard, Corner Exit. NPP Performance exhaust is standard on all 2027's",
+    "Stingray NGA description"
+  );
+  assert.equal(rowFor("grandSport_options", "opt_nga_001").description, "Standard, Corner Exit", "Grand Sport NGA description");
+  assert.equal(rowFor("z06_options", "opt_nga_001").description, "Standard, Quad Center Exit", "Z06 NGA description");
+});
 
 test("source sheets use concise section-aware brake caliper labels", () => {
   const expectedByOptionId = {
@@ -67,7 +184,7 @@ test("source sheets use concise removable-roof labels with consistent order", ()
     opt_cc3_001: ["Transparent Roof Panel", "Removable", 12],
   };
 
-  for (const sheetName of ["stingray_options", "grandSport_options"]) {
+  for (const sheetName of OPTION_SHEETS) {
     for (const [optionId, [expectedName, expectedDescription, expectedOrder]] of Object.entries(expectedRoofRows)) {
       const row = rowFor(sheetName, optionId);
       assert.equal(row.option_name, expectedName, `${sheetName} ${optionId} name`);
@@ -112,9 +229,9 @@ test("Stingray and Grand Sport engine appearance orders match reviewed Grand Spo
 test("source sheets keep accessory branding in descriptions when the base product remains identifiable", () => {
   const expectedRows = {
     stingray_options: {
-      opt_sln_001: ["Visible Carbon Fiber Engine Cross Brace", "LPO. Features Jake logo. Genuine Corvette Accessory."],
-      opt_vtb_001: ["Rear Fascia/Roof Storage Protector", "LPO. Black. Embroidered crossed flags logo. Genuine Corvette Accessory."],
-      opt_rwh_001: ["Black Premium Indoor Car Cover", "LPO. Crossed flags logo. Genuine Corvette Accessory."],
+      opt_sln_001: ["Visible Carbon Fiber Engine Cross Brace", "LPO. Features Jake Logo. Genuine Corvette Accessory"],
+      opt_vtb_001: ["Black Rear Fascia/Roof Protector", "LPO. Embroidered crossed flags logo. Genuine Corvette Accessory"],
+      opt_rwh_001: ["Black Premium Indoor Car Cover", "LPO. Crossed flags logo. Genuine Corvette Accessory"],
       opt_sl1_001: ["Red Premium Indoor Car Cover", "LPO. Stingray logo. Genuine Corvette Accessory."],
       opt_wkq_001: [
         "Black Premium Indoor Car Cover with Access Panels",
@@ -124,13 +241,13 @@ test("source sheets keep accessory branding in descriptions when the base produc
         "Gray Premium Outdoor Car Cover with Access Panels",
         "LPO. Includes access panels and Corvette silhouette within the Stingray logo. Genuine Corvette Accessory.",
       ],
-      opt_rwj_001: ["Gray Premium Outdoor Car Cover", "LPO. Crossed flags logo and Corvette silhouette. Genuine Corvette Accessory."],
+      opt_rwj_001: ["Gray Premium Outdoor Car Cover", "LPO. Crossed flags logo and Corvette silhouette. Genuine Corvette Accessory"],
       opt_pef_001: [
         "Contoured Liner Protection Package",
-        "LPO. Includes (CAV) Jake logo contoured cargo area liners and (RIA) Jake logo all-weather floor liners. Genuine Corvette Accessory.",
+        "LPO. Includes (CAV) Jake logo contoured cargo area liners and (RIA) Jake logo all-weather floor liners. Genuine Corvette Accessory",
       ],
-      opt_ria_001: ["All-Weather Floor Liners", "LPO. Jake logo. Genuine Corvette Accessory."],
-      opt_cav_001: ["Contoured Cargo Area Liners", "LPO. Jake logo. Genuine Corvette Accessory."],
+      opt_ria_001: ["All-Weather Floor Liners", "LPO. Jake logo. Genuine Corvette Accessory"],
+      opt_cav_001: ["Contoured Cargo Area Liners", "LPO. Jake logo. Genuine Corvette Accessory"],
       opt_vyw_001: [
         "Premium Carpeted Floor Mats",
         "LPO. Features car silhouette logo on Stingray, Grand Sport, ZR1 and ZR1X models. Genuine Corvette Accessory.",
@@ -143,6 +260,13 @@ test("source sheets keep accessory branding in descriptions when the base produc
       ],
       opt_cav_001: ["Contoured Cargo Area Liners", "LPO. Jake logo. Genuine Corvette Accessory"],
       opt_sig_001: ["Clear Smoked Spoiler Extension", "LPO. Jake logo. Genuine Corvette Accessory"],
+    },
+    z06_options: {
+      opt_pef_001: [
+        "Contoured Liner Protection Package",
+        "LPO. Includes (CAV) Jake logo contoured cargo area liners and (RIA) Jake logo all-weather floor liners. Genuine Corvette Accessory",
+      ],
+      opt_cav_001: ["Contoured Cargo Area Liners", "LPO. Jake logo. Genuine Corvette Accessory"],
     },
   };
 
