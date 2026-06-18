@@ -177,6 +177,19 @@ RUNTIME_STANDARD_EQUIPMENT_ROW_TRIM_FIELDS: set[str] = {"source_detail_raw"}
 FORBIDDEN_LIVE_LINEAGE_VALUE_TOKENS: tuple[str, ...] = ("grand_sport:",)
 GENERATED_TIMESTAMP_KEYS: frozenset[str] = frozenset(("generated_at", "sourceGeneratedAt", "generatedAt"))
 
+MODEL_MASTER_HEADERS: tuple[str, ...] = (
+    "model_key",
+    "registry_key",
+    "model_label",
+    "model_year",
+    "dataset_name",
+    "export_slug",
+    "expected_variant_count",
+    "default_model",
+    "active",
+    "notes",
+)
+
 MODEL_REGISTRY_PROMOTION_HEADERS: tuple[str, ...] = (
     "model_key",
     "registry_key",
@@ -472,8 +485,57 @@ def sheets_by_role(source_graph: dict[str, dict[str, str]]) -> dict[str, list[st
     return by_role
 
 
+def validate_model_master_metadata(wb, issues: list[SchemaIssue]) -> bool:
+    if "model_master" not in wb.sheetnames:
+        add_issue(
+            issues,
+            "error",
+            "missing_required_sheet",
+            sheet="model_master",
+            message="Missing required sheet model_master.",
+        )
+        return False
+
+    headers = nonblank_headers(wb["model_master"])
+    if headers != list(MODEL_MASTER_HEADERS):
+        add_issue(
+            issues,
+            "error",
+            "model_master_header_drift",
+            sheet="model_master",
+            value={"expected": list(MODEL_MASTER_HEADERS), "actual": headers},
+            message="model_master headers must match the workbook-owned model metadata contract.",
+        )
+        return False
+
+    seen_active_model_keys: dict[str, int] = {}
+    for row_number, row in records(wb["model_master"]):
+        if not truthy(row.get("active"), default=True):
+            continue
+        model_key = clean_text(row.get("model_key")).lower()
+        if not model_key:
+            continue
+        first_row = seen_active_model_keys.get(model_key)
+        if first_row is not None:
+            add_issue(
+                issues,
+                "error",
+                "duplicate_active_model_master_row",
+                sheet="model_master",
+                row=row_number,
+                column="model_key",
+                value={"model_key": model_key, "first_row": first_row, "duplicate_row": row_number},
+                message=f"Duplicate active model_master row for model_key {model_key!r}.",
+            )
+            continue
+        seen_active_model_keys[model_key] = row_number
+    return True
+
+
 def validate_registry_promotion_metadata(wb, issues: list[SchemaIssue]) -> None:
     if "model_registry_promotion" not in wb.sheetnames:
+        return
+    if "model_master" not in wb.sheetnames:
         return
 
     headers = nonblank_headers(wb["model_registry_promotion"])
@@ -680,9 +742,11 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                 message="category_master should not be an active source sheet; historical category evidence lives in archive/stingray_archive.xlsx.",
             )
 
+        model_master_valid = validate_model_master_metadata(wb, issues)
         source_graph = metadata_source_graph(wb, issues)
         source_sheets_by_role = sheets_by_role(source_graph)
-        validate_registry_promotion_metadata(wb, issues)
+        if model_master_valid:
+            validate_registry_promotion_metadata(wb, issues)
 
         for left, right in HEADER_PAIRS:
             if left not in wb.sheetnames or right not in wb.sheetnames:

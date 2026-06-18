@@ -25,6 +25,11 @@ From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 
   - Future-model scaffold duplicates are also closed: `zr1_options.sec_stan_001` and `zr1x_options.sec_stan_001` keep U80 at display order `20` and WUB at `21`.
   - `scripts/validate_workbook_schema.py` now also guards inactive future scaffold option sheets referenced by inactive `model_workbook_sources` rows with `duplicate_future_scaffold_option_display_order`.
 
+- Model metadata schema gate repair:
+  - `model_master` is restored as the workbook-owned model metadata table for Stingray, Grand Sport, Z06, ZR1, and ZR1X.
+  - `scripts/validate_workbook_schema.py` now reports direct `model_master_header_drift` and `duplicate_active_model_master_row` issues before indirect registry-promotion errors.
+  - The two inactive future `model_workbook_sources` rule-mapping rows for ZR1/ZR1X were not restored because `zr1_rule_mapping` and `zr1x_rule_mapping` do not currently exist.
+
 - Copy-convergence / product-decision pass:
   - `docs/copy-convergence-review-2026-06-17.md` records the strict shared-option drift review.
   - Safe GS/Z06-majority copy was applied to Stingray source rows, excluding reviewed/deferred allowlist fields.

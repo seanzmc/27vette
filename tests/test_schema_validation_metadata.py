@@ -52,7 +52,23 @@ def minimal_schema_workbook(
 
     append_sheet(wb, "variant_master", ["variant_id", "active"])
     append_sheet(wb, "section_master", ["section_id", "active"])
-    append_sheet(wb, "model_master", ["model_key", "registry_key", "active"], extra_model_rows or [])
+    append_sheet(
+        wb,
+        "model_master",
+        [
+            "model_key",
+            "registry_key",
+            "model_label",
+            "model_year",
+            "dataset_name",
+            "export_slug",
+            "expected_variant_count",
+            "default_model",
+            "active",
+            "notes",
+        ],
+        extra_model_rows or [],
+    )
     append_sheet(
         wb,
         "model_workbook_sources",
@@ -90,6 +106,50 @@ def validate_temp_workbook(wb: Workbook):
 
 
 class SchemaValidationMetadataTests(unittest.TestCase):
+    def test_model_master_asset_map_shaped_headers_are_rejected_directly(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_sheets={
+                "model_master": (
+                    [
+                        "model_key",
+                        "target_type",
+                        "target_id",
+                        "image_url",
+                        "image_alt",
+                        "image_fit",
+                        "image_position",
+                        "active",
+                        "notes",
+                        "notes",
+                    ],
+                    [
+                        {
+                            "model_key": "stingray",
+                            "target_type": "model",
+                            "target_id": "stingray",
+                            "active": True,
+                        }
+                    ],
+                )
+            }
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(any(issue.check_id == "model_master_header_drift" for issue in issues), issues)
+
+    def test_model_master_rejects_duplicate_active_model_keys(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[
+                {"model_key": "stingray", "registry_key": "stingray", "active": True},
+                {"model_key": "stingray", "registry_key": "stingray", "active": True},
+            ]
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(any(issue.check_id == "duplicate_active_model_master_row" for issue in issues), issues)
+
     def test_live_contract_provenance_leaks_flags_future_model_review_lineage_only(self) -> None:
         data = {
             "dataset": {"source_sheet": "grandSport_options"},
