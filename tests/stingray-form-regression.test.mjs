@@ -807,7 +807,8 @@ test("summary drawer redirects page wheel scrolling and lets standard equipment 
   assert.match(appSource, /dataset\?\.mobileDrawer !== "summary"/);
   assert.match(appSource, /summaryDrawer\.scrollTop \+= deltaY/);
   assert.match(appSource, /summaryDrawer\.scrollLeft \+= deltaX/);
-  assert.match(appSource, /floatsOverSummaryDrawer/);
+  assert.match(appSource, /function tooltipShouldFloat/);
+  assert.match(appSource, /tooltipShouldFloat\(trigger\)/);
   assert.match(appSource, /dataset\.floating = "viewport"/);
   assert.match(stylesSource, /\.tooltip-panel\[data-floating="viewport"\]\s*\{[\s\S]*position:\s*fixed;[\s\S]*z-index:\s*120/);
   assert.match(stylesSource, /\.app-shell\[data-mobile-drawer="summary"\] \.summary-panel\s*\{[\s\S]*transform:\s*none/);
@@ -1037,6 +1038,21 @@ test("choice cards reserve availability slot and move disabled reason into toolt
   assert.match(autoHtml, /<span class="choice-media" data-fit="cover">/);
   assert.doesNotMatch(autoHtml, /choice-media disabled/);
   assert.match(autoHtml, /<div class="choice-availability">[\s\S]*choice-state auto-reason info-tooltip/);
+});
+
+test("tooltips use mobile-safe touch handlers without selecting parent cards", () => {
+  assert.match(appSource, /function toggleTooltip\(trigger, event\)/);
+  assert.match(appSource, /trigger\.addEventListener\("pointerup"/);
+  assert.match(appSource, /trigger\.addEventListener\("touchend"/);
+  assert.match(appSource, /event\?\.stopPropagation\?\.\(\)/);
+  assert.match(appSource, /function tooltipShouldFloat\(trigger\)/);
+  assert.match(appSource, /isMobileViewport\(\)/);
+  assert.match(appSource, /function recentlyHandledAnyTooltipTouch\(\)/);
+  assert.match(appSource, /function stopEventAfterTooltipTouch\(event\)/);
+  assert.match(appSource, /document\.addEventListener\("click", \(event\) => \{\n\s*if \(stopEventAfterTooltipTouch\(event\)\) return;/);
+  assert.match(appSource, /button\.addEventListener\("click", \(event\) => \{\n\s*if \(stopEventAfterTooltipTouch\(event\)\) return;\n\s*const choice = activeChoiceRows/);
+  assert.match(stylesSource, /\.info-tooltip\s*\{[\s\S]*touch-action:\s*manipulation/);
+  assert.match(stylesSource, /\.tooltip-panel\[data-floating="viewport"\]/);
 });
 
 test("mobile drawers expose route and summary state without changing form logic", () => {
@@ -2443,6 +2459,19 @@ test("Stingray 3LT interiors lock included color seatbelts against other seatbel
   runtime.handleChoice(redSeatbelt);
   runtime.reconcileSelections();
   assert.equal(runtime.state.selected.has("opt_3f9_001"), false, "D30 should not unlock a 3LT included seatbelt peer");
+
+  const dippedRuntime = configureInteriorOrder({ trimLevel: "3LT", seatRpo: "AH2", interiorId: "3LT_AH2_HNK" });
+  dippedRuntime.reconcileSelections();
+  const autoAdded = dippedRuntime.computeAutoAdded();
+  assert.equal(autoAdded.get("opt_3f9_001"), "Included with Adrenaline Red Dipped.");
+  dippedRuntime.state.activeStep = "seat_belt";
+  const blackSeatbelt = dippedRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_719_001");
+  const blackSeatbeltHtml = dippedRuntime.renderChoiceCard(blackSeatbelt, autoAdded);
+  assert.match(
+    blackSeatbeltHtml,
+    /Torch Red Seat Belt Color is included with Adrenaline Red Dipped, so other seat belt colors are unavailable\./
+  );
+  assert.doesNotMatch(blackSeatbeltHtml, /3LT_AH2_HNK|3lt_ah2_hnk/);
 });
 
 test("sidebar keeps one Standard & Included surface inside Selected RPOs", () => {

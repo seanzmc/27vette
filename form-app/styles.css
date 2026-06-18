@@ -1537,6 +1537,7 @@ body:has(.app-shell[data-mobile-drawer]) {
   height: 20px;
   color: var(--accent-dark);
   line-height: 1;
+  touch-action: manipulation;
   vertical-align: middle;
   z-index: 1;
 }
@@ -1900,6 +1901,10 @@ body:has(.app-shell[data-mobile-drawer]) {
 
   .tooltip-panel {
     max-width: min(320px, calc(100vw - 28px));
+  }
+
+  .tooltip-panel[data-floating="viewport"] {
+    max-width: calc(100vw - 28px);
   }
 
   .mobile-summary-bar {

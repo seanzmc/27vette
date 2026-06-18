@@ -332,9 +332,15 @@ function tooltipPanelForTrigger(trigger) {
   return trigger?._floatingTooltipPanel || trigger?.querySelector?.(".tooltip-panel") || null;
 }
 
+let lastTooltipTouchHandledAt = 0;
+
 function hideTooltip(trigger) {
   const panel = tooltipPanelForTrigger(trigger);
   if (panel?.dataset?.floating === "viewport") delete panel.dataset.open;
+}
+
+function tooltipShouldFloat(trigger) {
+  return Boolean(trigger.closest?.("#summaryDrawer") || isMobileViewport());
 }
 
 function closeTooltips(exceptTrigger = null) {
@@ -354,18 +360,18 @@ function positionTooltip(trigger) {
   const panel = tooltipPanelForTrigger(trigger);
   if (!panel) return;
   const margin = 10;
-  const floatsOverSummaryDrawer = Boolean(trigger.closest?.("#summaryDrawer"));
-  if (floatsOverSummaryDrawer && panel.parentElement !== document.body) {
+  const floatsToViewport = tooltipShouldFloat(trigger);
+  if (floatsToViewport && document.body && panel.parentElement !== document.body) {
     trigger._floatingTooltipPanel = panel;
     panel.__tooltipTrigger = trigger;
-    document.body?.appendChild(panel);
+    document.body.appendChild(panel);
   }
   panel.style.left = "";
   panel.style.right = "";
   panel.style.top = "";
   panel.style.bottom = "";
   if (panel.dataset) {
-    if (floatsOverSummaryDrawer) {
+    if (floatsToViewport) {
       panel.dataset.floating = "viewport";
       panel.dataset.open = "true";
     } else {
@@ -373,10 +379,11 @@ function positionTooltip(trigger) {
       delete panel.dataset.open;
     }
   }
+  if (!trigger.getBoundingClientRect || !panel.getBoundingClientRect) return;
   const triggerRect = trigger.getBoundingClientRect();
   const panelRect = panel.getBoundingClientRect();
-  const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-  const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+  const viewportWidth = window.innerWidth || document.documentElement?.clientWidth || 360;
+  const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 640;
 
   let left = triggerRect.right - panelRect.width;
   left = Math.min(Math.max(left, margin), viewportWidth - panelRect.width - margin);
@@ -386,8 +393,38 @@ function positionTooltip(trigger) {
   }
   top = Math.min(Math.max(top, margin), viewportHeight - panelRect.height - margin);
 
-  panel.style.left = `${Math.round(floatsOverSummaryDrawer ? left : left - triggerRect.left)}px`;
-  panel.style.top = `${Math.round(floatsOverSummaryDrawer ? top : top - triggerRect.top)}px`;
+  panel.style.left = `${Math.round(floatsToViewport ? left : left - triggerRect.left)}px`;
+  panel.style.top = `${Math.round(floatsToViewport ? top : top - triggerRect.top)}px`;
+}
+
+function toggleTooltip(trigger, event) {
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+  const shouldOpen = !trigger.classList?.contains("is-open");
+  closeTooltips(trigger);
+  trigger.classList?.toggle("is-open", shouldOpen);
+  if (shouldOpen) positionTooltip(trigger);
+  else hideTooltip(trigger);
+}
+
+function markTooltipTouchHandled(trigger) {
+  lastTooltipTouchHandledAt = Date.now();
+  trigger._tooltipTouchHandledAt = lastTooltipTouchHandledAt;
+}
+
+function recentlyHandledTooltipTouch(trigger) {
+  return Date.now() - Number(trigger._tooltipTouchHandledAt || 0) < 500;
+}
+
+function recentlyHandledAnyTooltipTouch() {
+  return Date.now() - lastTooltipTouchHandledAt < 500;
+}
+
+function stopEventAfterTooltipTouch(event) {
+  if (!recentlyHandledAnyTooltipTouch()) return false;
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+  return true;
 }
 
 function bindTooltips(root = document) {
@@ -403,14 +440,23 @@ function bindTooltips(root = document) {
     trigger.addEventListener("blur", () => {
       if (!trigger.classList?.contains("is-open")) hideTooltip(trigger);
     });
+    trigger.addEventListener("pointerup", (event) => {
+      if (!event.pointerType || event.pointerType === "mouse") return;
+      markTooltipTouchHandled(trigger);
+      toggleTooltip(trigger, event);
+    });
+    trigger.addEventListener("touchend", (event) => {
+      if (recentlyHandledTooltipTouch(trigger)) return;
+      markTooltipTouchHandled(trigger);
+      toggleTooltip(trigger, event);
+    });
     trigger.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      const shouldOpen = !trigger.classList?.contains("is-open");
-      closeTooltips(trigger);
-      trigger.classList?.toggle("is-open", shouldOpen);
-      if (shouldOpen) positionTooltip(trigger);
-      else hideTooltip(trigger);
+      if (recentlyHandledTooltipTouch(trigger)) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+      toggleTooltip(trigger, event);
     });
     trigger.addEventListener("keydown", (event) => {
       if (event.key !== "Escape") return;
@@ -423,6 +469,7 @@ function bindTooltips(root = document) {
 
 if (document?.addEventListener) {
   document.addEventListener("click", (event) => {
+    if (stopEventAfterTooltipTouch(event)) return;
     if (!event.target?.closest?.(".info-tooltip")) closeTooltips();
   });
 }
@@ -681,10 +728,20 @@ function getOptionLabel(optionId) {
   return `${option.rpo || option.option_id} ${option.label || ""}`.trim();
 }
 
+function getOptionCustomerLabel(optionId) {
+  const option = optionsById.get(optionId);
+  if (!option) return optionId;
+  return String(option.label || option.rpo || option.option_id || "").trim();
+}
+
+function getInteriorCustomerLabel(interior) {
+  return String(interior?.interior_leaf_label || interior?.interior_name || interior?.interior_code || interior?.interior_id || "").trim();
+}
+
 function getEntityLabel(id) {
   if (optionsById.has(id)) return getOptionLabel(id);
   const interior = interiorsById.get(id);
-  if (interior) return `${interior.interior_id} ${interior.interior_name}`.trim();
+  if (interior) return getInteriorCustomerLabel(interior);
   return id;
 }
 
@@ -697,8 +754,21 @@ function removeDuplicatedEntityRpo(reason, entityId) {
 }
 
 function includedWithReason(rule) {
+  if (interiorsById.has(rule.source_id)) return `Included with ${getEntityLabel(rule.source_id)}.`;
   const reason = rule.disabled_reason || `Included with ${getEntityLabel(rule.source_id)}.`;
   return removeDuplicatedEntityRpo(reason, rule.source_id);
+}
+
+function includedWithSourceLabel(rule) {
+  const reason = includedWithReason(rule);
+  const match = String(reason || "").match(/^Included with\s+(.+?)\.?$/i);
+  return match ? match[1] : getEntityLabel(rule.source_id);
+}
+
+function peerUnavailableGroupLabel(optionId) {
+  const sectionName = sectionsById.get(optionSectionId(optionId))?.section_name || "related option";
+  if (/seat\s*belt/i.test(sectionName)) return "seat belt colors";
+  return `${sectionName.toLowerCase()} choices`;
 }
 
 function requiresReason(rule) {
@@ -795,7 +865,9 @@ function includedExclusiveGroupPeerReason(optionId, selectedIds = selectedContex
         selectedIds.has(rule.source_id) &&
         includedRuleLocksAgainstPeer(rule, optionId)
     );
-    if (includeRule) return `${getEntityLabel(peerId)} is locked because it is ${includedWithReason(includeRule).toLowerCase()}`;
+    if (includeRule) {
+      return `${getOptionCustomerLabel(peerId)} is included with ${includedWithSourceLabel(includeRule)}, so other ${peerUnavailableGroupLabel(peerId)} are unavailable.`;
+    }
   }
   return "";
 }
@@ -2420,25 +2492,29 @@ function renderStepContent({ resetScroll = false } = {}) {
   if (resetScroll) resetStepScroll();
   bindCustomerForm();
   els.stepContent.querySelectorAll("[data-option]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", (event) => {
+      if (stopEventAfterTooltipTouch(event)) return;
       const choice = activeChoiceRows().find((item) => item.option_id === button.dataset.option);
       if (choice) handleChoice(choice);
     });
   });
   els.stepContent.querySelectorAll("[data-interior]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", (event) => {
+      if (stopEventAfterTooltipTouch(event)) return;
       const interior = interiorsById.get(button.dataset.interior);
       if (interior) handleInterior(interior);
     });
   });
   els.stepContent.querySelectorAll("[data-context-choice]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", (event) => {
+      if (stopEventAfterTooltipTouch(event)) return;
       const choice = data.contextChoices.find((item) => item.context_choice_id === button.dataset.contextChoice);
       if (choice && !(choice.context_type === "trim_level" && choice.body_style !== state.bodyStyle)) handleContextChoice(choice);
     });
   });
   els.stepContent.querySelectorAll("[data-model-choice]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", (event) => {
+      if (stopEventAfterTooltipTouch(event)) return;
       requestModelChange(button.dataset.modelChoice);
     });
   });
