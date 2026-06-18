@@ -30,6 +30,12 @@ From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 
   - `scripts/validate_workbook_schema.py` now reports direct `model_master_header_drift` and `duplicate_active_model_master_row` issues before indirect registry-promotion errors.
   - The two inactive future `model_workbook_sources` rule-mapping rows for ZR1/ZR1X were not restored because `zr1_rule_mapping` and `zr1x_rule_mapping` do not currently exist.
 
+- Interior stale-surface cleanup:
+  - `ModelConfig.interior_reference_path` and the default `architectureAudit/*_interiors_refactor.csv` config assignment are retired.
+  - `architectureAudit/stingray_interiors_refactor.csv` and `architectureAudit/grand_sport_interiors_refactor.csv` are deleted.
+  - `tests/grand-sport-draft-data.test.mjs` now guards active interior pipeline sources against reintroducing `interior_reference_path` or the stale CSV file names.
+  - Active interior generation remains workbook-owned through `model_interior_scope`, `interior_components`, `lt_interiors`, `LZ_Interiors`, and `PriceRef`.
+
 - Copy-convergence / product-decision pass:
   - `docs/copy-convergence-review-2026-06-17.md` records the strict shared-option drift review.
   - Safe GS/Z06-majority copy was applied to Stingray source rows, excluding reviewed/deferred allowlist fields.
@@ -55,11 +61,6 @@ From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 
   - `sec_tech_001` rows still active emitted standard equipment.
   - Do not delete until workbook-owned replacement source model exists.
 
-- Interior stale-surface cleanup:
-  - `interior_reference_path` still exists in config/model config surfaces.
-  - `architectureAudit/stingray_interiors_refactor.csv` and `architectureAudit/grand_sport_interiors_refactor.csv` still exist.
-  - Needs consumer audit + contract-parity proof before removal.
-
 - Optional audit/report tooling:
   - `scripts/build_rule_sources.py`
   - `tests/grand-sport-rule-audit.test.mjs`
@@ -81,4 +82,5 @@ From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 
 ## Recommended next passes
 
 1. Residual copy allowlist decision pass, if desired.
-2. Interior stale-surface cleanup.
+2. Active standard-tech / connected-service ownership design.
+3. Optional audit/report tooling classification or later rule-mapping cleanup, if architecture cleanup continues.

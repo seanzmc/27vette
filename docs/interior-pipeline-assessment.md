@@ -4,6 +4,8 @@ Date: 2026-06-10
 Status: verified and corrected against the current `work/27vette-copy-2026-06-09` workspace.
 Scope: diagnosis/spec for the Z06 3LZ R6X build-summary overcharge and a workspace-guideline-compliant normalization path. This file is a planning artifact only; it does not approve implementation.
 
+2026-06-18 status note: the old CSV/reference fallback surfaces described below are historical. Current active generation no longer reads `interior_reference_path`; `ModelConfig.interior_reference_path`, the `base_model_config()` CSV assignment, and `architectureAudit/stingray_interiors_refactor.csv` / `architectureAudit/grand_sport_interiors_refactor.csv` were retired in `docs/interior-stale-surface-cleanup-spec.md`. Use current code/tests over the stale 2026-06-10 line references in this assessment.
+
 ## 1. Reported Symptom
 
 Z06, 3LZ, AH2 seat, custom interior `3LZ_R6X_AH2_HUU`:

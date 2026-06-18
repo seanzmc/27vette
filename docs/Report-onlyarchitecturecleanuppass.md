@@ -97,15 +97,16 @@ Recommended next pass:
   - Then remove only the hardcoded line if the generic workbook-driven path covers it.
 
 3. Interior stale edge routes: interior_reference_path and CSV files
-   Risk: Medium current risk, high cleanup/review value.
+   Status: Completed 2026-06-18.
+   Original risk: Medium current risk, high cleanup/review value.
 
 Evidence:
 
-- interior_reference_path still exists in config surfaces:
-  - scripts/corvette_form_generator/model_config.py:24
-  - scripts/corvette_form_generator/model_configs.py:207
+- interior_reference_path no longer exists in active config surfaces:
+  - `ModelConfig.interior_reference_path` was removed.
+  - the `base_model_config()` CSV-path assignment was removed.
 - Current active generator code no longer consumes config.interior_reference_path.
-  - Search in scripts/corvette_form_generator/\*.py found only the dataclass field and default assignment.
+  - A source guard now rejects reintroducing it in active interior pipeline sources.
 - Current shared interior builder is workbook-owned:
   - scripts/corvette_form_generator/interiors.py:118-185
   - It reads model_interior_scope, interior_components, lt_interiors / LZ_Interiors, and PriceRef.
@@ -118,10 +119,9 @@ Evidence:
     - ZR1 90
     - ZR1X 90
   - interior_components: 846 active rows
-- The CSV files still exist:
-  - architectureAudit/stingray_interiors_refactor.csv, size 13276
-  - architectureAudit/grand_sport_interiors_refactor.csv, size 13500
-  - no architectureAudit/z06_interiors_refactor.csv
+- The stale CSV files are deleted:
+  - architectureAudit/stingray_interiors_refactor.csv
+  - architectureAudit/grand_sport_interiors_refactor.csv
 - Current tests already guard workbook-owned grouping:
   - tests/grand-sport-draft-data.test.mjs:624-647
   - tests/stingray-form-regression.test.mjs:44-46 and later model_interior_scope coverage
@@ -129,22 +129,8 @@ Evidence:
 
 Assessment:
 
-- The original task doc is partly stale here. It correctly says the config field and CSVs still exist, but active code evidence indicates the CSV/reference fallback is already retired from current generation.
-- Remaining cleanup is likely:
-  - remove interior_reference_path from ModelConfig,
-  - remove the default assignment in base_model_config,
-  - delete the two CSVs,
-  - refresh stale docs that still describe CSV consumption.
-- This looks like a good low-behavior-risk cleanup, but still needs contract-parity proof because it deletes files/config fields.
-
-Recommended next pass:
-
-- Interior stale-surface retirement spec:
-  - Assert no active code references interior_reference_path except config definition/default.
-  - Delete config field/default and CSV files.
-  - Run Stingray, Grand Sport, Z06 generation plus registry.
-  - Compare generated contracts ignoring timestamps.
-  - Run interior-focused tests and multi-model runtime switching.
+- Completed cleanup removed the dead config/file surfaces rather than creating another parallel hierarchy source.
+- Keep the guard; do not reintroduce CSV/reference hierarchy paths for active interior generation.
 
 4. Optional audit/report tooling: build_rule_sources.py and audit tests
    Risk: Medium.

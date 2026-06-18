@@ -204,7 +204,6 @@ def base_model_config(model_key: str) -> ModelConfig:
         workbook_path=WORKBOOK_PATH,
         output_dir=OUTPUT_DIR,
         app_dir=APP_DIR,
-        interior_reference_path=ROOT / "architectureAudit" / f"{model_key}_interiors_refactor.csv",
         generated_sheets=GENERATED_SHEETS,
         step_order=STEP_ORDER,
         step_labels=STEP_LABELS,

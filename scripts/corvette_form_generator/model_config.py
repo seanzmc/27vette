@@ -21,7 +21,6 @@ class ModelConfig:
     workbook_path: Path
     output_dir: Path
     app_dir: Path
-    interior_reference_path: Path
     generated_sheets: tuple[str, ...]
     step_order: tuple[str, ...]
     step_labels: Mapping[str, str]

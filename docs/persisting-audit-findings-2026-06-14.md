@@ -297,33 +297,30 @@ Action plan:
 
 ---
 
-### 12. Interior CSV/config remnants remain after workbook-owned grouping migration
+### 12. Interior CSV/config remnants retired after workbook-owned grouping migration
 
 Evidence:
 
-- `architectureAudit/stingray_interiors_refactor.csv` and `architectureAudit/grand_sport_interiors_refactor.csv` still exist.
-- `scripts/corvette_form_generator/model_configs.py` still assigns `interior_reference_path=ROOT / "architectureAudit" / f"{model_key}_interiors_refactor.csv"`.
-- `scripts/corvette_form_generator/model_config.py` still carries `interior_reference_path` in `ModelConfig`.
+- `architectureAudit/stingray_interiors_refactor.csv` and `architectureAudit/grand_sport_interiors_refactor.csv` are deleted.
+- `scripts/corvette_form_generator/model_configs.py` no longer assigns an interior CSV reference path.
+- `scripts/corvette_form_generator/model_config.py` no longer carries `interior_reference_path` in `ModelConfig`.
 - Current active builder no longer uses those CSV fallbacks: `interiors.py` builds from `model_interior_scope`, raises when active scope rows are missing, and no longer contains the old `INTERIOR_COMPONENT_LABELS` / `broad_interior_color_family` heuristic surfaces.
-- `tests/grand-sport-draft-data.test.mjs` now asserts workbook-owned grouping metadata for active Stingray/Grand Sport/Z06 scope rows and guards against old `read_interior_reference`, `grouping_fields_for_interior`, `fallback_interior_trims`, and `interior_component_metadata` symbols.
+- `tests/grand-sport-draft-data.test.mjs` now asserts workbook-owned grouping metadata for active Stingray/Grand Sport/Z06 scope rows and guards against old `read_interior_reference`, `grouping_fields_for_interior`, `fallback_interior_trims`, `interior_component_metadata`, `interior_reference_path`, and stale interior CSV file-name surfaces.
 
-Status: the original interior runtime defect, workbook-owned grouping gap, and old fallback-symbol guards are fixed; stale CSV/config surfaces remain.
+Status: completed. The original interior runtime defect, workbook-owned grouping gap, old fallback-symbol guards, and remaining stale CSV/config surfaces are fixed/retired.
 
-Action plan:
+Follow-up guardrails:
 
-1. Run a consumer audit for `interior_reference_path` and the two CSVs.
-2. If no active code path consumes them, remove `interior_reference_path` from `ModelConfig` and `base_model_config()`.
-3. Delete or archive the two CSVs only after proving generated contracts remain stable without the config field.
-4. Keep the existing tests that fail if active promoted-model interiors lack workbook-owned grouping metadata or if old fallback symbols reappear.
-5. Snapshot current generated JSON, run Stingray, Grand Sport, and Z06 generators, compare generated contracts while ignoring timestamps, then run model/runtime gates after deletion.
+1. Keep the existing tests that fail if active promoted-model interiors lack workbook-owned grouping metadata or if old fallback/config symbols reappear.
+2. Do not add a replacement CSV/reference path; model/interior grouping metadata belongs in `model_interior_scope` and component membership belongs in `interior_components`.
 
 ---
 
 ## Recommended next passes
 
 1. **Residual copy allowlist pass, if desired**: resolve the remaining copy allowlist rows from `tests/workbook-visual-copy-standardization.test.mjs`.
-2. **Interior stale-surface cleanup**: remove unused CSV/config remnants after consumer audit and contract-parity proof.
-3. **Future-model scaffold display-order decision**: decide whether ZR1/ZR1X standard-equipment duplicate display-order buckets should be cleaned now or only during their promotion/readiness pass.
+2. **Active standard-tech / connected-service ownership**: design a workbook-owned replacement source before deleting active `sec_tech_001` emitted standard-equipment rows.
+3. **Optional audit/report tooling classification or later rule-mapping cleanup**: continue only with a scoped spec that distinguishes default readiness from opt-in provenance/report tooling.
 
 ---
 
@@ -352,6 +349,13 @@ Original audit gates:
 - `form-app/app.js` source guard — retired browser order-summary fallback symbols and fallback expressions are absent.
 - Active registry data tests — Stingray, Grand Sport, and Z06 all emit generated `orderSummary.sections` and `orderSummary.stepMap` metadata.
 - Runtime/generator boundary docs — Python step/context constants remain documented as unpromoted compatibility / promoted completeness-check inputs, not browser runtime fallbacks.
+
+2026-06-18 interior stale-surface cleanup evidence:
+
+- Active source guard — `tests/grand-sport-draft-data.test.mjs` fails when `interior_reference_path` remains in active config and passes after removal.
+- Config/file cleanup — `ModelConfig.interior_reference_path`, the `base_model_config()` CSV-path assignment, and the two `architectureAudit/*_interiors_refactor.csv` files are removed.
+- Controlled generation proof — regenerated Stingray, Grand Sport, and Z06 contracts matched between the removed-field implementation and a temporary control run with the unused field restored, proving the retired config surface did not affect generated payloads.
+- Targeted gates — workbook package/schema validation, interior-focused Node tests, multi-model runtime switching, Python compile, and model config metadata tests passed.
 
 2026-06-17 Stingray rear-script exclusive-group implementation evidence:
 

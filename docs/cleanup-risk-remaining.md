@@ -43,21 +43,13 @@ Risk ranking
      - Delete active sec_tech_001 rows without replacement ownership.
 
 3. Interior stale-surface cleanup: interior_reference_path + architectureAudit/\*\_interiors_refactor.csv
-   - Risk: High
-   - Current live risk: Medium, unknown until consumer audit
-   - Pass risk: High
-   - Why:
-     - Config paths and CSV refactor files are likely transitional/single-pass edge surfaces.
-     - If any active code still consumes them, they compete with workbook-owned interior metadata.
-   - Core-philosophy concern:
-     - Potential parallel source of truth beside model_interior_scope, interior_components, lt_interiors, LZ_Interiors, and PriceRef.
-   - Safe next shape:
-     - Consumer audit first.
-     - Prove before/after generated-contract parity.
-     - Remove only proven-dead surfaces.
-     - If still consumed, migrate consumer to workbook metadata before deletion.
-   - Flag for review:
-     - This is the clearest “single-pass edge route” cleanup candidate.
+   - Status: Completed 2026-06-18.
+   - Result:
+     - `ModelConfig.interior_reference_path` and the `base_model_config()` CSV-path assignment are retired.
+     - `architectureAudit/stingray_interiors_refactor.csv` and `architectureAudit/grand_sport_interiors_refactor.csv` are deleted.
+     - `tests/grand-sport-draft-data.test.mjs` guards active interior pipeline sources against reintroducing those stale config/file surfaces.
+   - Residual guidance:
+     - Do not add a replacement CSV/reference path; workbook-owned interior grouping stays in `model_interior_scope`, and component membership stays in `interior_components`.
 
 4. Future-model scaffold display-order decision: ZR1/ZR1X duplicate sec_stan_001 orders
    - Risk: Medium-high
@@ -180,4 +172,4 @@ Those three directly answer: workbook-owned data, one runtime path, and only rel
 What changed: nothing.
 What did not change: workbook, generated artifacts, runtime, tests, docs.
 Gates: not run; this was report-only ranking.
-Manual verification pending: actual current consumers for interior_reference_path, the interior CSVs, and audit tooling should be probed before any cleanup spec.
+Manual verification pending: audit tooling classification remains; the interior stale-surface consumer audit/cleanup completed on 2026-06-18.

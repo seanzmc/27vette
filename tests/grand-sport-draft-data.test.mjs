@@ -49,6 +49,14 @@ function workbookRows(sheetName) {
 const draft = generateDraftWithoutAppMutation();
 const inspectionSource = fs.readFileSync("scripts/corvette_form_generator/inspection.py", "utf8");
 const interiorsSource = fs.readFileSync("scripts/corvette_form_generator/interiors.py", "utf8");
+const activeInteriorPipelineSources = [
+  inspectionSource,
+  interiorsSource,
+  fs.readFileSync("scripts/corvette_form_generator/model_config.py", "utf8"),
+  fs.readFileSync("scripts/corvette_form_generator/model_configs.py", "utf8"),
+  fs.readFileSync("scripts/corvette_form_generator/production.py", "utf8"),
+  fs.readFileSync("scripts/generate_form.py", "utf8"),
+].join("\n");
 const heritageHashOptionIds = ["opt_17a_001", "opt_20a_001", "opt_55a_001", "opt_75a_001", "opt_97a_001", "opt_dx4_001"];
 const heritageCenterStripeOptionIds = ["opt_dmu_001", "opt_dmv_001", "opt_dmw_001", "opt_dmx_001", "opt_dmy_001"];
 const nonCenterStripeOptionIds = [
@@ -678,6 +686,11 @@ test("Grand Sport draft includes model-scoped LT interiors with EL9 launch editi
   assert.doesNotMatch(interiorsSource, /read_interior_reference|grouping_fields_for_interior|fallback_interior_trims|interior_component_metadata/);
   assert.doesNotMatch(inspectionSource, /rows_from_sheet\(wb, ["']lt_interiors["']\)/);
   assert.doesNotMatch(inspectionSource, /source_sheet["']?: ["']lt_interiors["']/);
+  assert.doesNotMatch(
+    activeInteriorPipelineSources,
+    /interior_reference_path|stingray_interiors_refactor\.csv|grand_sport_interiors_refactor\.csv/,
+    "active interior generation must not keep stale CSV reference config surfaces"
+  );
 
   assert.equal(draft.interiors.every((interior) => interior.source_sheet === "lt_interiors"), true);
   const byId = new Map(draft.interiors.map((interior) => [interior.interior_id, interior]));
