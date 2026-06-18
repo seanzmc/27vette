@@ -1014,17 +1014,28 @@ test("choice cards reserve availability slot and move disabled reason into toolt
   runtime.reconcileSelections();
   const paint = runtime.activeChoiceRows().find((choice) => choice.step_key === "paint" && choice.selectable === "True");
   assert.ok(paint, "paint choice should exist for availability-slot test");
+  const mediaPaint = {
+    ...paint,
+    image_url: "./assets/cards/availability-test.webp",
+    image_alt: "Availability test image",
+  };
 
-  const availableHtml = runtime.renderChoiceCard(paint, new Map());
+  const availableHtml = runtime.renderChoiceCard(mediaPaint, new Map());
   assert.match(availableHtml, /<div class="choice-availability"><\/div>/);
   assert.doesNotMatch(availableHtml, /choice-state disabled-reason/);
+  assert.match(availableHtml, /<span class="choice-media" data-fit="cover">/);
+  assert.doesNotMatch(availableHtml, /choice-media disabled/);
 
-  const unavailableHtml = runtime.renderChoiceCard({ ...paint, status: "unavailable" }, new Map());
+  const unavailableHtml = runtime.renderChoiceCard({ ...mediaPaint, status: "unavailable" }, new Map());
   assert.match(unavailableHtml, /<div class="choice-availability">[\s\S]*choice-state disabled-reason info-tooltip/);
   assert.match(unavailableHtml, /tooltip-panel" role="tooltip">Not available for this body and trim\./);
   assert.doesNotMatch(unavailableHtml, /<p class="disabled-reason"/);
+  assert.match(unavailableHtml, /choice-media disabled/);
 
-  const autoHtml = runtime.renderChoiceCard(paint, new Map([[paint.option_id, "Included with package."]]));
+  const autoHtml = runtime.renderChoiceCard(mediaPaint, new Map([[mediaPaint.option_id, "Included with package."]]));
+  assert.match(autoHtml, /aria-disabled="true"/);
+  assert.match(autoHtml, /<span class="choice-media" data-fit="cover">/);
+  assert.doesNotMatch(autoHtml, /choice-media disabled/);
   assert.match(autoHtml, /<div class="choice-availability">[\s\S]*choice-state auto-reason info-tooltip/);
 });
 
@@ -1100,6 +1111,8 @@ test("custom stitch choices are removed from the selectable runtime", () => {
 
 test("auto-added included options render as locked selections without duplicate manual selection", () => {
   assert.match(appSource, /const disabled = Boolean\(disabledReason \|\| autoReason\)/);
+  assert.match(appSource, /const mediaDisabled = Boolean\(disabledReason\)/);
+  assert.match(appSource, /renderCardMedia\(choice, choice\.label, \{ disabled: mediaDisabled \}\)/);
   assert.match(appSource, /aria-disabled=\\"true\\"/);
   assert.doesNotMatch(appSource, /data-option="\$\{choice\.option_id\}" \$\{disabled \? "aria-disabled=\\"true\\" disabled"/);
   assert.match(appSource, /if \(autoAdded\.has\(choice\.option_id\)\) return/);

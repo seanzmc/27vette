@@ -1717,6 +1717,7 @@ function renderChoiceCard(choice, autoAdded) {
   const autoReason = autoAdded.get(choice.option_id);
   const disabledReason = autoReason ? "" : disableReasonForChoice(choice);
   const disabled = Boolean(disabledReason || autoReason);
+  const mediaDisabled = Boolean(disabledReason);
   const detail = descriptiveTooltipText(choice.description) || descriptiveTooltipText(choice.status_label);
   const classes = ["choice-card"];
   if (cardHasMedia(choice)) classes.push("has-media");
@@ -1727,7 +1728,7 @@ function renderChoiceCard(choice, autoAdded) {
   const priceMarkup = displayPrice === null ? "" : `<span class=\"price\">${formatMoney(displayPrice)}</span>`;
   return `
     <button class="${classes.join(" ")}" type="button" data-option="${choice.option_id}" ${disabled ? "aria-disabled=\"true\"" : ""}>
-      ${renderCardMedia(choice, choice.label, { disabled })}
+      ${renderCardMedia(choice, choice.label, { disabled: mediaDisabled })}
       <span class="topline"><span class="rpo">${escapeHtml(choice.rpo || choice.option_id)}</span>${priceMarkup}</span>
       <span class="choice-name"><span>${escapeHtml(choice.label)}</span>${renderInfoTooltip(detail, "Option details", { focusable: false })}</span>
       ${renderChoiceRelationshipBadges(choice, { disabled })}
