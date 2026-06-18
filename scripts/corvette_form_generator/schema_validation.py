@@ -585,7 +585,13 @@ def validate_registry_promotion_metadata(wb, issues: list[SchemaIssue]) -> None:
         )
 
 
-def validate_option_display_order_uniqueness(wb, option_sheets: Iterable[str], issues: list[SchemaIssue]) -> None:
+def validate_option_display_order_uniqueness(
+    wb,
+    option_sheets: Iterable[str],
+    issues: list[SchemaIssue],
+    *,
+    check_id: str = "duplicate_option_display_order",
+) -> None:
     for sheet in dict.fromkeys(option_sheets):
         if sheet not in wb.sheetnames:
             continue
@@ -609,7 +615,7 @@ def validate_option_display_order_uniqueness(wb, option_sheets: Iterable[str], i
             add_issue(
                 issues,
                 "error",
-                "duplicate_option_display_order",
+                check_id,
                 sheet=sheet,
                 row=matches[0][0],
                 column="display_order",
@@ -623,6 +629,25 @@ def validate_option_display_order_uniqueness(wb, option_sheets: Iterable[str], i
                     "use deterministic unique ordering, including standard/included sections."
                 ),
             )
+
+
+def inactive_source_option_sheets(wb, active_option_sheets: Iterable[str]) -> list[str]:
+    if "model_workbook_sources" not in wb.sheetnames:
+        return []
+
+    active_sheets = set(active_option_sheets)
+    sheets: list[str] = []
+    for _, row in records(wb["model_workbook_sources"]):
+        if truthy(row.get("active"), default=True):
+            continue
+        if clean_text(row.get("source_role")) != "source_option_sheet":
+            continue
+        sheet_name = clean_text(row.get("sheet_name"))
+        if not sheet_name or sheet_name in active_sheets or sheet_name not in wb.sheetnames:
+            continue
+        if sheet_name not in sheets:
+            sheets.append(sheet_name)
+    return sheets
 
 
 def merge_sheet_columns(
@@ -713,7 +738,14 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
         boolean_columns = merge_sheet_columns(BOOLEAN_COLUMNS, source_sheets_by_role, ROLE_BOOLEAN_COLUMNS)
         rpo_columns = merge_sheet_columns(RPO_COLUMNS, source_sheets_by_role, ROLE_RPO_COLUMNS)
         price_columns = merge_sheet_columns(PRICE_COLUMNS, source_sheets_by_role, ROLE_PRICE_COLUMNS)
-        validate_option_display_order_uniqueness(wb, source_sheets_by_role.get("source_option_sheet", []), issues)
+        active_option_sheets = source_sheets_by_role.get("source_option_sheet", [])
+        validate_option_display_order_uniqueness(wb, active_option_sheets, issues)
+        validate_option_display_order_uniqueness(
+            wb,
+            inactive_source_option_sheets(wb, active_option_sheets),
+            issues,
+            check_id="duplicate_future_scaffold_option_display_order",
+        )
 
         for sheet, columns in boolean_columns.items():
             if sheet not in wb.sheetnames:

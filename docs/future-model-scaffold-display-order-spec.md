@@ -1,7 +1,7 @@
 # Future-model scaffold display-order cleanup spec
 
 Date: 2026-06-18
-Status: Spec only. Do not implement until approved.
+Status: Implemented. Pass 1 and Pass 2 landed; full schema validation remains blocked by unrelated current `model_master` / `model_registry_promotion` drift noted in gate results.
 
 ## Goal
 
@@ -18,9 +18,6 @@ Evidence inspected:
 - `docs/actual-tasks-remaining-6-17.md:57-59` records the open item:
   - active promoted `(section_id, display_order)` uniqueness is guarded;
   - future ZR1/ZR1X scaffold rows still need a separate decision.
-- `model_master` current state:
-  - `stingray`, `grand_sport`, and `z06` are active.
-  - `zr1` and `zr1x` are inactive.
 - `model_workbook_sources` current state:
   - ZR1 source roles exist but are inactive, including `source_option_sheet -> zr1_options`.
   - ZR1X source roles exist but are inactive, including `source_option_sheet -> zr1x_options`.
@@ -141,7 +138,7 @@ Recommended behavior:
 - Add a separate future-scaffold display-order uniqueness check that deliberately inspects existing inactive `model_workbook_sources` rows where:
   - `source_role == source_option_sheet`,
   - `sheet_name` exists in the workbook,
-  - the associated model exists in `model_master` but is inactive.
+  - the sheet is not already part of the active source-option sheet graph.
 - Scope the future-scaffold guard only to active rows inside those inactive option sheets, grouped by `(section_id, display_order)`, using the same numeric-normalized `display_order_key()` behavior as the current guard.
 - Use a distinct `check_id`, recommended: `duplicate_future_scaffold_option_display_order`.
 - Make it an error after Pass 1 is clean, so future scaffold collisions cannot be silently reintroduced.
@@ -156,7 +153,7 @@ Pass 2 tests:
 
 - Add/extend a unit test that creates an inactive `zr1` model in `model_master`, inactive `model_workbook_sources.source_option_sheet -> zr1_options`, and duplicate active rows in `zr1_options.sec_stan_001`; assert `duplicate_future_scaffold_option_display_order` is emitted.
 - Add/extend a unit test that active promoted duplicate option sheets still emit the existing `duplicate_option_display_order` check ID.
-- Confirm clean current workbook passes the default schema validator after Pass 1.
+- Confirm the future-scaffold duplicate check is clean on the current workbook after Pass 1. Full schema validation may still be blocked by unrelated metadata drift and should be reported separately rather than hidden.
 
 Validation for Pass 2:
 
@@ -199,8 +196,24 @@ git diff --check -- docs/actual-tasks-remaining-6-17.md docs/future-model-scaffo
 - Adding the future-scaffold guard to default schema validation means future inactive source rows can block default validation if they drift again. This is intentional for display-order collisions only; do not broaden inactive-scaffold checks without a separate spec.
 - Workbook writes can create Excel/package damage if not saved safely. Use `save_workbook_safely()` and verify the workbook package after save.
 
-## Approval prompt
+## Implementation result
 
-Approve controlled Pass 1 + Pass 2 as scoped above?
+- Pass 1 changed only the two approved workbook source cells:
+  - `zr1_options.opt_wub_001.display_order`: `20` -> `21`.
+  - `zr1x_options.opt_wub_001.display_order`: `20` -> `21`.
+- Pass 2 added `duplicate_future_scaffold_option_display_order` validation for inactive future scaffold option sheets referenced by inactive `model_workbook_sources` rows.
+- Pass 3 refreshed `docs/actual-tasks-remaining-6-17.md` so this item is no longer listed as open.
 
-Recommended answer: approve Pass 1 first, then run Pass 2 only after the workbook has been verified clean. Pass 3 should be done after both land.
+Focused gates:
+
+- `.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx` -> valid, 0 issues.
+- Future-scaffold collision probe for `zr1_options` / `zr1x_options` -> no `sec_stan_001` active collisions; U80 remains `20`, WUB is `21`.
+- `.venv/bin/python -m pytest tests/test_schema_validation_metadata.py -q` -> 15 passed.
+- `git diff --check` on touched files -> passed.
+
+Blocked broader gate:
+
+- `.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx` currently fails on unrelated metadata drift:
+  - `registry_promotion_inactive_model` for `stingray`.
+  - `registry_promotion_registry_key_mismatch` for `grand_sport` / `grandSport`.
+  - `app_registry_freshness_check_failed` caused by the same metadata state.

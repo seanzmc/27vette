@@ -22,7 +22,8 @@ From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 
 - Display-order cleanup for promoted sheets:
   - Promoted `stingray_options`, `grandSport_options`, and `z06_options` have no active duplicate `(section_id, display_order)` buckets.
   - `scripts/validate_workbook_schema.py` now enforces active promoted option-sheet `(section_id, display_order)` uniqueness; the SC7 section move tripped this guard and was corrected with `stingray_options.opt_sc7_001.display_order=71`.
-  - Residual duplicates are future-model scaffold rows only: `zr1_options.sec_stan_001` and `zr1x_options.sec_stan_001` U80/WUB at order `20`.
+  - Future-model scaffold duplicates are also closed: `zr1_options.sec_stan_001` and `zr1x_options.sec_stan_001` keep U80 at display order `20` and WUB at `21`.
+  - `scripts/validate_workbook_schema.py` now also guards inactive future scaffold option sheets referenced by inactive `model_workbook_sources` rows with `duplicate_future_scaffold_option_display_order`.
 
 - Copy-convergence / product-decision pass:
   - `docs/copy-convergence-review-2026-06-17.md` records the strict shared-option drift review.
@@ -54,10 +55,6 @@ From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 
   - `architectureAudit/stingray_interiors_refactor.csv` and `architectureAudit/grand_sport_interiors_refactor.csv` still exist.
   - Needs consumer audit + contract-parity proof before removal.
 
-- Future-model scaffold display-order decision:
-  - Active promoted `(section_id, display_order)` uniqueness is guarded by workbook schema validation.
-  - Decide separately whether to clean and include future ZR1/ZR1X scaffold rows.
-
 - Optional audit/report tooling:
   - `scripts/build_rule_sources.py`
   - `tests/grand-sport-rule-audit.test.mjs`
@@ -80,4 +77,3 @@ From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 
 
 1. Residual copy allowlist decision pass, if desired.
 2. Interior stale-surface cleanup.
-3. Future-model scaffold display-order decision.

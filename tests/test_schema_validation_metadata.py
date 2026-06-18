@@ -238,6 +238,55 @@ class SchemaValidationMetadataTests(unittest.TestCase):
             issues,
         )
 
+    def test_future_scaffold_option_display_order_duplicates_are_rejected(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "zr1", "registry_key": "zr1", "active": False}],
+            extra_source_rows=[
+                {
+                    "model_key": "zr1",
+                    "source_role": "source_option_sheet",
+                    "sheet_name": "zr1_options",
+                    "active": False,
+                },
+            ],
+            extra_sheets={
+                "zr1_options": (
+                    OPTION_HEADERS,
+                    [
+                        {
+                            "option_id": "opt_u80_001",
+                            "rpo": "U80",
+                            "selectable": False,
+                            "active": True,
+                            "price": 0,
+                            "section_id": "sec_stan_001",
+                            "display_order": "20",
+                        },
+                        {
+                            "option_id": "opt_wub_001",
+                            "rpo": "WUB",
+                            "selectable": False,
+                            "active": True,
+                            "price": 0,
+                            "section_id": "sec_stan_001",
+                            "display_order": 20,
+                        },
+                    ],
+                ),
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(
+            any(
+                issue.check_id == "duplicate_future_scaffold_option_display_order"
+                and issue.sheet == "zr1_options"
+                for issue in issues
+            ),
+            issues,
+        )
+
     def test_metadata_discovered_interior_source_sheet_role_is_known(self) -> None:
         wb = minimal_schema_workbook(
             extra_model_rows=[{"model_key": "z06", "registry_key": "z06", "active": True}],
