@@ -86,9 +86,10 @@ test("Z06 draft preserves the live generated-data top-level contract", () => {
     expectedVariantIds
   );
   assert.equal(draft.steps.every((step) => step.source !== "fallback_config"), true);
-  assert.equal(draft.orderSummary.sections.length, 11);
-  assert.equal(Object.keys(draft.orderSummary.stepMap).length, 13);
+  assert.equal(draft.orderSummary.sections.length, 12);
+  assert.equal(Object.keys(draft.orderSummary.stepMap).length, 14);
   assert.equal(draft.orderSummary.stepMap.packages_performance, "performance_mechanical");
+  assert.equal(draft.orderSummary.stepMap.standard_equipment, "required_charges");
   assert.ok(draft.choices.length > 0, "Z06 draft should include choices");
   assert.ok(draft.standardEquipment.length > 0, "Z06 draft should include standard equipment rows");
 });
@@ -205,6 +206,39 @@ test("Z06 draft keeps default-selected options selectable", () => {
   }
 });
 
+test("Z06 gas guzzler tax drafts as standard-equipment default charge with T0F/T0G price overrides", () => {
+  const r8eChoices = draft.choices.filter((choice) => choice.option_id === "opt_r8e_002");
+  assert.equal(r8eChoices.length, expectedVariantIds.length, "R8E should emit for every Z06 variant");
+  assert.deepEqual(r8eChoices.map((choice) => choice.variant_id).sort(), [...expectedVariantIds].sort());
+  for (const choice of r8eChoices) {
+    assert.equal(choice.rpo, "R8E");
+    assert.equal(choice.label, "Gas Guzzler Tax");
+    assert.equal(choice.base_price, 2600);
+    assert.equal(choice.status, "standard");
+    assert.equal(choice.selectable, "True");
+    assert.equal(choice.display_behavior, "");
+    assert.equal(choice.step_key, "standard_equipment");
+  }
+
+  const defaultRule = draft.defaultSelectionRules.find((rule) => rule.rule_id === "z06_default_r8e_tax");
+  assert.ok(defaultRule, "Z06 should emit a workbook-owned R8E default-selection rule");
+  assert.equal(defaultRule.target_option_id, "opt_r8e_002");
+  assert.equal(defaultRule.condition_type, "always");
+
+  const priceRulesById = new Map(draft.priceRules.map((rule) => [rule.price_rule_id, rule]));
+  for (const [ruleId, conditionOptionId] of [
+    ["z06_pr_t0f_r8e_tax_3000", "opt_t0f_001"],
+    ["z06_pr_t0g_r8e_tax_3000", "opt_t0g_001"],
+  ]) {
+    const rule = priceRulesById.get(ruleId);
+    assert.ok(rule, `${ruleId} should be emitted`);
+    assert.equal(rule.condition_option_id, conditionOptionId);
+    assert.equal(rule.target_option_id, "opt_r8e_002");
+    assert.equal(rule.price_rule_type, "override");
+    assert.equal(rule.price_value, 3000);
+  }
+});
+
 test("Z06 3LZ interiors include locked zero-price seatbelt colors", () => {
   const ruleKeys = new Set(draft.rules.map((rule) => `${rule.source_id}::${rule.rule_type}::${rule.target_id}`));
   const priceKeys = new Set(draft.priceRules.map((rule) => `${rule.condition_option_id}::${rule.target_option_id}::${rule.price_rule_type}::${rule.price_value}`));
@@ -241,6 +275,8 @@ test("Z06 draft emits approved package/wheel, Z07, and engine-lighting price rul
     ["z06_pr_stz_pdb_17500", "opt_stz_001", "opt_pdb_001", 17500],
     ["z06_pr_roy_pdd_25495", "opt_roy_001", "opt_pdd_001", 25495],
     ["z06_pr_roy_pdf_26495", "opt_roy_001", "opt_pdf_001", 26495],
+    ["z06_pr_t0f_r8e_tax_3000", "opt_t0f_001", "opt_r8e_002", 3000],
+    ["z06_pr_t0g_r8e_tax_3000", "opt_t0g_001", "opt_r8e_002", 3000],
     ["z06_pr_pda_sne_001", "opt_pda_001", "opt_sne_001", 0],
     ["z06_pr_pda_vpw_001", "opt_pda_001", "opt_vpw_001", 0],
   ]) {
@@ -469,7 +505,7 @@ test("Z06 N26, suede, two-tone, and custom stitch source rows do not render as s
 
 test("Z06 draft does not emit priced standard-equipment choices", () => {
   const pricedStandardChoices = draft.choices.filter(
-    (choice) => standardSections.has(choice.section_id) && Number(choice.base_price || 0) > 0
+    (choice) => choice.option_id !== "opt_r8e_002" && standardSections.has(choice.section_id) && Number(choice.base_price || 0) > 0
   );
   assert.deepEqual(
     pricedStandardChoices.map((choice) => `${choice.choice_id}:${choice.rpo}:${choice.section_id}:${choice.base_price}`),

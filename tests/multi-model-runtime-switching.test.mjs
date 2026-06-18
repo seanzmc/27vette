@@ -388,9 +388,11 @@ test("active registry models carry generated order-summary metadata without brow
 
   const registry = loadDataWindow().CORVETTE_FORM_DATA;
   for (const [modelKey, entry] of Object.entries(registry.models)) {
+    const expectedOrderSummarySections = modelKey === "z06" ? 12 : 11;
+    const expectedOrderSummaryStepMap = modelKey === "z06" ? 14 : 13;
     assert.equal(entry.data.steps.length, 14, `${modelKey} should emit generated runtime steps`);
-    assert.equal(entry.data.orderSummary.sections.length, 11, `${modelKey} should emit order-summary sections`);
-    assert.equal(Object.keys(entry.data.orderSummary.stepMap).length, 13, `${modelKey} should emit order-summary step map`);
+    assert.equal(entry.data.orderSummary.sections.length, expectedOrderSummarySections, `${modelKey} should emit order-summary sections`);
+    assert.equal(Object.keys(entry.data.orderSummary.stepMap).length, expectedOrderSummaryStepMap, `${modelKey} should emit order-summary step map`);
     assert.equal(entry.data.orderSummary.stepMap.base_interior, "seats_interior", `${modelKey} should map interiors from generated metadata`);
   }
 });

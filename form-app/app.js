@@ -1059,11 +1059,13 @@ function matchingPriceRuleApplies(rule) {
 }
 
 function packageComponentPriceRules(packageOptionId) {
-  return (priceRulesByTarget.get(packageOptionId) || []).filter((rule) => {
+  const rules = (priceRulesByTarget.get(packageOptionId) || []).filter((rule) => {
     if (rule.price_rule_type !== "override" || !matchingPriceRuleApplies(rule)) return false;
     const conditionGroup = optionExclusiveGroup(rule.condition_option_id);
     return exclusiveGroupAllowsSingleSelection(conditionGroup) && Number(rule.price_value || 0) > 0;
   });
+  const distinctPrices = new Set(rules.map((rule) => Number(rule.price_value || 0)));
+  return distinctPrices.size > 1 ? rules : [];
 }
 
 function hasPackageComponentPricing(packageOptionId) {

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-18T15:43:20+00:00",
+  "generated_at": "2026-06-18T22:07:05+00:00",
   "status": "inspection_generated",
   "config": {
     "model_key": "z06",
@@ -99,8 +99,8 @@
     "candidate_standard_equipment_cells": 488,
     "candidate_standard_option_rows": 95,
     "selectable_counts": {
-      "False": 86,
-      "True": 157
+      "False": 85,
+      "True": 158
     },
     "active_option_rows_available_or_standard": 236,
     "inactive_option_rows_all_unavailable_or_blank": 7,

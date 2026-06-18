@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-06-18T15:43:20+00:00",
+    "generated_at": "2026-06-18T22:07:05+00:00",
     "status": "read_only_preview"
   },
   "variants": [
@@ -841,6 +841,12 @@
         "section_label": "Pricing Summary",
         "display_order": 11,
         "notes": "Workbook-owned order summary grouping matching generated behavior."
+      },
+      {
+        "section_key": "required_charges",
+        "section_label": "Required Charges",
+        "display_order": 15,
+        "notes": "Workbook-owned order summary grouping for required Z06 charge lines such as gas guzzler tax."
       }
     ],
     "stepMap": {
@@ -856,7 +862,8 @@
       "seat_belt": "seats_interior",
       "interior_trim": "seats_interior",
       "accessories": "accessories",
-      "delivery": "delivery"
+      "delivery": "delivery",
+      "standard_equipment": "required_charges"
     }
   },
   "choices": [
@@ -8079,7 +8086,7 @@
       "source_detail_raw": "",
       "source_section_id": "sec_incl_001",
       "active": "True",
-      "base_price": 0,
+      "base_price": 2600,
       "display_order": 5,
       "text_cleanup_notes": [],
       "choice_id": "1lz_h07__opt_r8e_002",
@@ -8093,7 +8100,7 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "display_behavior": ""
     },
     {
@@ -8106,7 +8113,7 @@
       "source_detail_raw": "",
       "source_section_id": "sec_incl_001",
       "active": "True",
-      "base_price": 0,
+      "base_price": 2600,
       "display_order": 5,
       "text_cleanup_notes": [],
       "choice_id": "2lz_h07__opt_r8e_002",
@@ -8120,7 +8127,7 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "display_behavior": ""
     },
     {
@@ -8133,7 +8140,7 @@
       "source_detail_raw": "",
       "source_section_id": "sec_incl_001",
       "active": "True",
-      "base_price": 0,
+      "base_price": 2600,
       "display_order": 5,
       "text_cleanup_notes": [],
       "choice_id": "3lz_h07__opt_r8e_002",
@@ -8147,7 +8154,7 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "display_behavior": ""
     },
     {
@@ -8160,7 +8167,7 @@
       "source_detail_raw": "",
       "source_section_id": "sec_incl_001",
       "active": "True",
-      "base_price": 0,
+      "base_price": 2600,
       "display_order": 5,
       "text_cleanup_notes": [],
       "choice_id": "1lz_h67__opt_r8e_002",
@@ -8174,7 +8181,7 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "display_behavior": ""
     },
     {
@@ -8187,7 +8194,7 @@
       "source_detail_raw": "",
       "source_section_id": "sec_incl_001",
       "active": "True",
-      "base_price": 0,
+      "base_price": 2600,
       "display_order": 5,
       "text_cleanup_notes": [],
       "choice_id": "2lz_h67__opt_r8e_002",
@@ -8201,7 +8208,7 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "display_behavior": ""
     },
     {
@@ -8214,7 +8221,7 @@
       "source_detail_raw": "",
       "source_section_id": "sec_incl_001",
       "active": "True",
-      "base_price": 0,
+      "base_price": 2600,
       "display_order": 5,
       "text_cleanup_notes": [],
       "choice_id": "3lz_h67__opt_r8e_002",
@@ -8228,7 +8235,7 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "display_behavior": ""
     },
     {
@@ -38753,7 +38760,7 @@
       "source_detail_raw": "",
       "source_section_id": "sec_incl_001",
       "active": "True",
-      "base_price": 0,
+      "base_price": 2600,
       "display_order": 5,
       "text_cleanup_notes": [],
       "choice_id": "1lz_h07__opt_r8e_002",
@@ -38767,7 +38774,7 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "display_behavior": ""
     },
     {
@@ -38780,7 +38787,7 @@
       "source_detail_raw": "",
       "source_section_id": "sec_incl_001",
       "active": "True",
-      "base_price": 0,
+      "base_price": 2600,
       "display_order": 5,
       "text_cleanup_notes": [],
       "choice_id": "2lz_h07__opt_r8e_002",
@@ -38794,7 +38801,7 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "display_behavior": ""
     },
     {
@@ -38807,7 +38814,7 @@
       "source_detail_raw": "",
       "source_section_id": "sec_incl_001",
       "active": "True",
-      "base_price": 0,
+      "base_price": 2600,
       "display_order": 5,
       "text_cleanup_notes": [],
       "choice_id": "3lz_h07__opt_r8e_002",
@@ -38821,7 +38828,7 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "display_behavior": ""
     },
     {
@@ -38834,7 +38841,7 @@
       "source_detail_raw": "",
       "source_section_id": "sec_incl_001",
       "active": "True",
-      "base_price": 0,
+      "base_price": 2600,
       "display_order": 5,
       "text_cleanup_notes": [],
       "choice_id": "1lz_h67__opt_r8e_002",
@@ -38848,7 +38855,7 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "display_behavior": ""
     },
     {
@@ -38861,7 +38868,7 @@
       "source_detail_raw": "",
       "source_section_id": "sec_incl_001",
       "active": "True",
-      "base_price": 0,
+      "base_price": 2600,
       "display_order": 5,
       "text_cleanup_notes": [],
       "choice_id": "2lz_h67__opt_r8e_002",
@@ -38875,7 +38882,7 @@
       "trim_level": "2LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "display_behavior": ""
     },
     {
@@ -38888,7 +38895,7 @@
       "source_detail_raw": "",
       "source_section_id": "sec_incl_001",
       "active": "True",
-      "base_price": 0,
+      "base_price": 2600,
       "display_order": 5,
       "text_cleanup_notes": [],
       "choice_id": "3lz_h67__opt_r8e_002",
@@ -38902,7 +38909,7 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "display_behavior": ""
     },
     {

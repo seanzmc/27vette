@@ -156,6 +156,42 @@ const z06InteriorSeatbeltIncludes = [
   ["3LZ_AUP_HVZ", "opt_3f9_001", "3F9"],
 ];
 
+test("Z06 gas guzzler tax defaults into every build and prices up with T0F/T0G", () => {
+  const runtime = z06Runtime();
+  const r8e = choice(runtime, "R8E");
+  assert.equal(r8e.step_key, "standard_equipment", "R8E should stay outside customer option steps");
+  assert.equal(runtime.data.steps.some((step) => step.step_key === "standard_equipment"), false, "standard equipment is not a visible option step");
+  assert.equal(r8e.selectable, "True", "R8E should use default-selection plumbing");
+  assert.equal(runtime.state.selected.has(r8e.option_id), true, "R8E should default into the selected build state");
+  assert.equal(autoAddedRpos(runtime).includes("R8E"), false, "R8E should not be duplicated as an auto-added item");
+  assert.equal(runtime.optionPrice(r8e.option_id), 2600, "R8E should default to the base gas guzzler tax");
+
+  const initialOrderItem = runtime.currentOrder().selected_options.find((item) => item.rpo === "R8E");
+  assert.ok(initialOrderItem, "R8E should appear in selected order-summary output");
+  assert.equal(initialOrderItem.price, 2600);
+  assert.equal(initialOrderItem.section_key, "required_charges");
+
+  runtime.handleChoice(choice(runtime, "T0F"));
+  runtime.reconcileSelections();
+  assert.equal(runtime.optionPrice(r8e.option_id), 3000, "T0F should raise R8E to $3,000");
+
+  const t0gRuntime = z06Runtime();
+  t0gRuntime.handleChoice(choice(t0gRuntime, "T0G"));
+  t0gRuntime.reconcileSelections();
+  assert.equal(t0gRuntime.optionPrice(r8e.option_id), 3000, "T0G should raise R8E to $3,000");
+
+  for (const rpo of ["Z07", "PDD", "PDF"]) {
+    const packageRuntime = z06Runtime();
+    packageRuntime.handleChoice(choice(packageRuntime, rpo));
+    packageRuntime.reconcileSelections();
+    assert.equal(
+      packageRuntime.optionPrice(r8e.option_id),
+      3000,
+      `${rpo} should raise R8E to $3,000 when T0F/T0G is on the build through auto-adds`
+    );
+  }
+});
+
 test("Z06 3LZ interiors include locked zero-price seatbelt colors", () => {
   for (const [interiorId, seatbeltOptionId, seatbeltRpo] of z06InteriorSeatbeltIncludes) {
     const runtime = z06Runtime({ trimLevel: "3LZ" });

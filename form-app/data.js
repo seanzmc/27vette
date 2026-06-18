@@ -97483,7 +97483,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-18T15:43:21+00:00",
+          "generated_at": "2026-06-18T22:07:05+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -98319,6 +98319,12 @@ window.CORVETTE_FORM_DATA = {
               "section_label": "Pricing Summary",
               "display_order": 11,
               "notes": "Workbook-owned order summary grouping matching generated behavior."
+            },
+            {
+              "section_key": "required_charges",
+              "section_label": "Required Charges",
+              "display_order": 15,
+              "notes": "Workbook-owned order summary grouping for required Z06 charge lines such as gas guzzler tax."
             }
           ],
           "stepMap": {
@@ -98334,7 +98340,8 @@ window.CORVETTE_FORM_DATA = {
             "seat_belt": "seats_interior",
             "interior_trim": "seats_interior",
             "accessories": "accessories",
-            "delivery": "delivery"
+            "delivery": "delivery",
+            "standard_equipment": "required_charges"
           }
         },
         "choices": [
@@ -105829,9 +105836,9 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LZ",
             "status": "standard",
             "status_label": "Standard",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
-            "base_price": 0,
+            "base_price": 2600,
             "display_behavior": "",
             "display_order": 5
           },
@@ -105850,9 +105857,9 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "2LZ",
             "status": "standard",
             "status_label": "Standard",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
-            "base_price": 0,
+            "base_price": 2600,
             "display_behavior": "",
             "display_order": 5
           },
@@ -105871,9 +105878,9 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LZ",
             "status": "standard",
             "status_label": "Standard",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
-            "base_price": 0,
+            "base_price": 2600,
             "display_behavior": "",
             "display_order": 5
           },
@@ -105892,9 +105899,9 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LZ",
             "status": "standard",
             "status_label": "Standard",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
-            "base_price": 0,
+            "base_price": 2600,
             "display_behavior": "",
             "display_order": 5
           },
@@ -105913,9 +105920,9 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "2LZ",
             "status": "standard",
             "status_label": "Standard",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
-            "base_price": 0,
+            "base_price": 2600,
             "display_behavior": "",
             "display_order": 5
           },
@@ -105934,9 +105941,9 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LZ",
             "status": "standard",
             "status_label": "Standard",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
-            "base_price": 0,
+            "base_price": 2600,
             "display_behavior": "",
             "display_order": 5
           },
@@ -138879,6 +138886,28 @@ window.CORVETTE_FORM_DATA = {
             "trim_level_scope": "3LZ",
             "variant_scope": "",
             "notes": "3LZ_AUP_HVZ includes opt_3f9_001 seat belt at no charge."
+          },
+          {
+            "price_rule_id": "z06_pr_t0f_r8e_tax_3000",
+            "condition_option_id": "opt_t0f_001",
+            "target_option_id": "opt_r8e_002",
+            "price_rule_type": "override",
+            "price_value": 3000,
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "",
+            "notes": "T0F raises the Z06 gas guzzler tax to $3,000."
+          },
+          {
+            "price_rule_id": "z06_pr_t0g_r8e_tax_3000",
+            "condition_option_id": "opt_t0g_001",
+            "target_option_id": "opt_r8e_002",
+            "price_rule_type": "override",
+            "price_value": 3000,
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "",
+            "notes": "T0G raises the Z06 gas guzzler tax to $3,000."
           }
         ],
         "interiors": [
@@ -145956,6 +145985,17 @@ window.CORVETTE_FORM_DATA = {
         ],
         "defaultSelectionRules": [
           {
+            "rule_id": "z06_default_r8e_tax",
+            "target_option_id": "opt_r8e_002",
+            "condition_type": "always",
+            "condition_id": "",
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "priority": 5,
+            "notes": "Default required Z06 gas guzzler tax line for every build."
+          },
+          {
             "rule_id": "z06_default_719",
             "target_option_id": "opt_719_001",
             "condition_type": "unless_selected_section",
@@ -146023,7 +146063,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "price_rule",
             "entity_id": "",
-            "message": "66 active price rules exported from z06_price_rules."
+            "message": "68 active price rules exported from z06_price_rules."
           },
           {
             "check_id": "color_overrides",

@@ -186,7 +186,7 @@ test("promoted Z06 runtime data strips draft-only provenance and protects source
   assert.ok(z06Data.exclusiveGroups.some((group) => group.selection_mode), "Z06 keeps exclusive group selection_mode");
 
   const pricedStandardChoices = z06Data.choices.filter(
-    (choice) => standardSections.has(choice.section_id) && Number(choice.base_price || 0) > 0
+    (choice) => choice.option_id !== "opt_r8e_002" && standardSections.has(choice.section_id) && Number(choice.base_price || 0) > 0
   );
   assert.deepEqual(JSON.parse(JSON.stringify(pricedStandardChoices)), []);
 

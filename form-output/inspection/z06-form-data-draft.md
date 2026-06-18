@@ -1,6 +1,6 @@
 # Z06 Form Data Draft
 
-Generated: `2026-06-18T15:43:21+00:00`
+Generated: `2026-06-18T22:07:05+00:00`
 Status: `draft_not_runtime_active`
 Source sheet: `z06_options`
 
@@ -15,7 +15,7 @@ Source sheet: `z06_options`
 - Rule groups: 35 (workbook-backed)
 - Exclusive groups: 13 (workbook-backed)
 - Rules: 73 (workbook-backed)
-- Price rules: 66 (workbook-backed)
+- Price rules: 68 (workbook-backed)
 - Interiors: 130 (model-scoped)
 - Color overrides: 137
 
