@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-06-17T22:28:13+00:00"
+    "generated_at": "2026-06-18T15:38:14+00:00"
   },
   "variants": [
     {
@@ -12021,7 +12021,11 @@
       "active": "True",
       "base_price": 0,
       "display_order": 1,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+      "image_alt": "Black Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c07__opt_719_001",
@@ -12042,7 +12046,11 @@
       "active": "True",
       "base_price": 0,
       "display_order": 1,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+      "image_alt": "Black Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c07__opt_719_001",
@@ -12063,7 +12071,11 @@
       "active": "True",
       "base_price": 0,
       "display_order": 1,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+      "image_alt": "Black Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c67__opt_719_001",
@@ -12084,7 +12096,11 @@
       "active": "True",
       "base_price": 0,
       "display_order": 1,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+      "image_alt": "Black Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c67__opt_719_001",
@@ -12105,7 +12121,11 @@
       "active": "True",
       "base_price": 0,
       "display_order": 1,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+      "image_alt": "Black Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c67__opt_719_001",
@@ -12126,7 +12146,11 @@
       "active": "True",
       "base_price": 0,
       "display_order": 1,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+      "image_alt": "Black Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c07__opt_3n9_001",
@@ -12146,7 +12170,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 2
+      "display_order": 2,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+      "image_alt": "Natural Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c07__opt_3n9_001",
@@ -12166,7 +12194,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 2
+      "display_order": 2,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+      "image_alt": "Natural Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c07__opt_3n9_001",
@@ -12186,7 +12218,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 2
+      "display_order": 2,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+      "image_alt": "Natural Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c67__opt_3n9_001",
@@ -12206,7 +12242,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 2
+      "display_order": 2,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+      "image_alt": "Natural Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c67__opt_3n9_001",
@@ -12226,7 +12266,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 2
+      "display_order": 2,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+      "image_alt": "Natural Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c67__opt_3n9_001",
@@ -12246,7 +12290,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 2
+      "display_order": 2,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+      "image_alt": "Natural Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c07__opt_379_001",
@@ -12266,7 +12314,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 3
+      "display_order": 3,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+      "image_alt": "Orange Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c07__opt_379_001",
@@ -12286,7 +12338,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 3
+      "display_order": 3,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+      "image_alt": "Orange Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c07__opt_379_001",
@@ -12306,7 +12362,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 3
+      "display_order": 3,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+      "image_alt": "Orange Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c67__opt_379_001",
@@ -12326,7 +12386,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 3
+      "display_order": 3,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+      "image_alt": "Orange Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c67__opt_379_001",
@@ -12346,7 +12410,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 3
+      "display_order": 3,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+      "image_alt": "Orange Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c67__opt_379_001",
@@ -12366,7 +12434,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 3
+      "display_order": 3,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+      "image_alt": "Orange Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c07__opt_3a9_001",
@@ -12386,7 +12458,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 4
+      "display_order": 4,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+      "image_alt": "Santorini Blue Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c07__opt_3a9_001",
@@ -12406,7 +12482,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 4
+      "display_order": 4,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+      "image_alt": "Santorini Blue Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c07__opt_3a9_001",
@@ -12426,7 +12506,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 4
+      "display_order": 4,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+      "image_alt": "Santorini Blue Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c67__opt_3a9_001",
@@ -12446,7 +12530,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 4
+      "display_order": 4,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+      "image_alt": "Santorini Blue Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c67__opt_3a9_001",
@@ -12466,7 +12554,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 4
+      "display_order": 4,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+      "image_alt": "Santorini Blue Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c67__opt_3a9_001",
@@ -12486,7 +12578,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 4
+      "display_order": 4,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+      "image_alt": "Santorini Blue Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c07__opt_3f9_001",
@@ -12506,7 +12602,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 5
+      "display_order": 5,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+      "image_alt": "Torch Red Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c07__opt_3f9_001",
@@ -12526,7 +12626,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 5
+      "display_order": 5,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+      "image_alt": "Torch Red Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c07__opt_3f9_001",
@@ -12546,7 +12650,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 5
+      "display_order": 5,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+      "image_alt": "Torch Red Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c67__opt_3f9_001",
@@ -12566,7 +12674,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 5
+      "display_order": 5,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+      "image_alt": "Torch Red Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c67__opt_3f9_001",
@@ -12586,7 +12698,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 5
+      "display_order": 5,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+      "image_alt": "Torch Red Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c67__opt_3f9_001",
@@ -12606,7 +12722,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 5
+      "display_order": 5,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+      "image_alt": "Torch Red Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c07__opt_3m9_001",
@@ -12626,7 +12746,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 6
+      "display_order": 6,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+      "image_alt": "Yellow Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c07__opt_3m9_001",
@@ -12646,7 +12770,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 6
+      "display_order": 6,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+      "image_alt": "Yellow Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c07__opt_3m9_001",
@@ -12666,7 +12794,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 6
+      "display_order": 6,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+      "image_alt": "Yellow Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c67__opt_3m9_001",
@@ -12686,7 +12818,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 6
+      "display_order": 6,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+      "image_alt": "Yellow Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c67__opt_3m9_001",
@@ -12706,7 +12842,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 6
+      "display_order": 6,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+      "image_alt": "Yellow Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c67__opt_3m9_001",
@@ -12726,7 +12866,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 595,
-      "display_order": 6
+      "display_order": 6,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+      "image_alt": "Yellow Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c07__opt_ae4_002",
@@ -17955,7 +18099,7 @@
       "active": "True",
       "base_price": 1095,
       "display_order": 30,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png",
       "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
       "image_fit": "cover",
       "image_position": "center"
@@ -17979,7 +18123,7 @@
       "active": "True",
       "base_price": 1095,
       "display_order": 30,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png",
       "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
       "image_fit": "cover",
       "image_position": "center"
@@ -18003,7 +18147,7 @@
       "active": "True",
       "base_price": 1095,
       "display_order": 30,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png",
       "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
       "image_fit": "cover",
       "image_position": "center"
@@ -18027,7 +18171,7 @@
       "active": "True",
       "base_price": 1095,
       "display_order": 30,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png",
       "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
       "image_fit": "cover",
       "image_position": "center"
@@ -18051,7 +18195,7 @@
       "active": "True",
       "base_price": 1095,
       "display_order": 30,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png",
       "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
       "image_fit": "cover",
       "image_position": "center"
@@ -18075,7 +18219,7 @@
       "active": "True",
       "base_price": 1095,
       "display_order": 30,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png",
       "image_alt": "Gloss Black 10-Spoke Forged Aluminum Wheels",
       "image_fit": "cover",
       "image_position": "center"

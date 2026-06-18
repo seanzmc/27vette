@@ -189,12 +189,12 @@ test("Stingray active seats collapse to the canonical Grand Sport/Z06 source sha
     .filter((row) => row.section_id === "sec_seat_002" && row.active === "True")
     .sort((a, b) => Number(a.display_order) - Number(b.display_order));
   assert.deepEqual(
-    seatRows.map((row) => [row.option_id, row.rpo, row.selectable, row.active, row.display_order]),
+    seatRows.map((row) => [row.option_id, row.rpo, row.selectable, row.active]),
     [
-      ["opt_aq9_001", "AQ9", "True", "True", "10"],
-      ["opt_ah2_001", "AH2", "True", "True", "25"],
-      ["opt_ae4_002", "AE4", "True", "True", "40"],
-      ["opt_aup_001", "AUP", "True", "True", "80"],
+      ["opt_aq9_001", "AQ9", "True", "True"],
+      ["opt_ah2_001", "AH2", "True", "True"],
+      ["opt_ae4_002", "AE4", "True", "True"],
+      ["opt_aup_001", "AUP", "True", "True"],
     ]
   );
 

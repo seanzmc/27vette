@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-06-17T22:29:24+00:00",
+    "generated_at": "2026-06-18T15:43:21+00:00",
     "status": "draft_not_runtime_active"
   },
   "variants": [
@@ -5422,7 +5422,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png",
+      "image_alt": "Black Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_j6a_001",
@@ -5450,7 +5454,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png",
+      "image_alt": "Black Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_j6a_001",
@@ -5478,7 +5486,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png",
+      "image_alt": "Black Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_j6a_001",
@@ -5506,7 +5518,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png",
+      "image_alt": "Black Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_j6a_001",
@@ -5534,7 +5550,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png",
+      "image_alt": "Black Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_j6a_001",
@@ -5562,7 +5582,11 @@
       "source_detail_raw": "",
       "source_option_name": "Black Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png",
+      "image_alt": "Black Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_j6b_001",
@@ -5590,7 +5614,11 @@
       "source_detail_raw": "",
       "source_option_name": "Blue-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png",
+      "image_alt": "Blue-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_j6b_001",
@@ -5618,7 +5646,11 @@
       "source_detail_raw": "",
       "source_option_name": "Blue-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png",
+      "image_alt": "Blue-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_j6b_001",
@@ -5646,7 +5678,11 @@
       "source_detail_raw": "",
       "source_option_name": "Blue-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png",
+      "image_alt": "Blue-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_j6b_001",
@@ -5674,7 +5710,11 @@
       "source_detail_raw": "",
       "source_option_name": "Blue-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png",
+      "image_alt": "Blue-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_j6b_001",
@@ -5702,7 +5742,11 @@
       "source_detail_raw": "",
       "source_option_name": "Blue-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png",
+      "image_alt": "Blue-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_j6b_001",
@@ -5730,7 +5774,11 @@
       "source_detail_raw": "",
       "source_option_name": "Blue-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png",
+      "image_alt": "Blue-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_j6d_001",
@@ -5758,7 +5806,11 @@
       "source_detail_raw": "Included and only available with (J57) carbon ceramic brakes.",
       "source_option_name": "Dark Gray Metallic-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png",
+      "image_alt": "Dark Gray Metallic-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_j6d_001",
@@ -5786,7 +5838,11 @@
       "source_detail_raw": "Included and only available with (J57) carbon ceramic brakes.",
       "source_option_name": "Dark Gray Metallic-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png",
+      "image_alt": "Dark Gray Metallic-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_j6d_001",
@@ -5814,7 +5870,11 @@
       "source_detail_raw": "Included and only available with (J57) carbon ceramic brakes.",
       "source_option_name": "Dark Gray Metallic-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png",
+      "image_alt": "Dark Gray Metallic-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_j6d_001",
@@ -5842,7 +5902,11 @@
       "source_detail_raw": "Included and only available with (J57) carbon ceramic brakes.",
       "source_option_name": "Dark Gray Metallic-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png",
+      "image_alt": "Dark Gray Metallic-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_j6d_001",
@@ -5870,7 +5934,11 @@
       "source_detail_raw": "Included and only available with (J57) carbon ceramic brakes.",
       "source_option_name": "Dark Gray Metallic-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png",
+      "image_alt": "Dark Gray Metallic-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_j6d_001",
@@ -5898,7 +5966,11 @@
       "source_detail_raw": "Included and only available with (J57) carbon ceramic brakes.",
       "source_option_name": "Dark Gray Metallic-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png",
+      "image_alt": "Dark Gray Metallic-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_j6e_001",
@@ -5926,7 +5998,11 @@
       "source_detail_raw": "",
       "source_option_name": "Velocity Yellow-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png",
+      "image_alt": "Velocity Yellow-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_j6e_001",
@@ -5954,7 +6030,11 @@
       "source_detail_raw": "",
       "source_option_name": "Velocity Yellow-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png",
+      "image_alt": "Velocity Yellow-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_j6e_001",
@@ -5982,7 +6062,11 @@
       "source_detail_raw": "",
       "source_option_name": "Velocity Yellow-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png",
+      "image_alt": "Velocity Yellow-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_j6e_001",
@@ -6010,7 +6094,11 @@
       "source_detail_raw": "",
       "source_option_name": "Velocity Yellow-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png",
+      "image_alt": "Velocity Yellow-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_j6e_001",
@@ -6038,7 +6126,11 @@
       "source_detail_raw": "",
       "source_option_name": "Velocity Yellow-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png",
+      "image_alt": "Velocity Yellow-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_j6e_001",
@@ -6066,7 +6158,11 @@
       "source_detail_raw": "",
       "source_option_name": "Velocity Yellow-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png",
+      "image_alt": "Velocity Yellow-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_j6f_001",
@@ -6094,7 +6190,11 @@
       "source_detail_raw": "",
       "source_option_name": "Bright Red-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png",
+      "image_alt": "Bright Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_j6f_001",
@@ -6122,7 +6222,11 @@
       "source_detail_raw": "",
       "source_option_name": "Bright Red-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png",
+      "image_alt": "Bright Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_j6f_001",
@@ -6150,7 +6254,11 @@
       "source_detail_raw": "",
       "source_option_name": "Bright Red-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png",
+      "image_alt": "Bright Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_j6f_001",
@@ -6178,7 +6286,11 @@
       "source_detail_raw": "",
       "source_option_name": "Bright Red-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png",
+      "image_alt": "Bright Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_j6f_001",
@@ -6206,7 +6318,11 @@
       "source_detail_raw": "",
       "source_option_name": "Bright Red-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png",
+      "image_alt": "Bright Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_j6f_001",
@@ -6234,7 +6350,11 @@
       "source_detail_raw": "",
       "source_option_name": "Bright Red-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png",
+      "image_alt": "Bright Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_j6l_001",
@@ -6262,7 +6382,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Orange-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png",
+      "image_alt": "Orange-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_j6l_001",
@@ -6290,7 +6414,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Orange-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png",
+      "image_alt": "Orange-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_j6l_001",
@@ -6318,7 +6446,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Orange-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png",
+      "image_alt": "Orange-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_j6l_001",
@@ -6346,7 +6478,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Orange-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png",
+      "image_alt": "Orange-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_j6l_001",
@@ -6374,7 +6510,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Orange-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png",
+      "image_alt": "Orange-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_j6l_001",
@@ -6402,7 +6542,11 @@
       "source_detail_raw": "Requires (J57) carbon ceramic brakes.",
       "source_option_name": "Orange-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png",
+      "image_alt": "Orange-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_j6n_001",
@@ -6430,7 +6574,11 @@
       "source_detail_raw": "",
       "source_option_name": "Edge Red-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png",
+      "image_alt": "Edge Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_j6n_001",
@@ -6458,7 +6606,11 @@
       "source_detail_raw": "",
       "source_option_name": "Edge Red-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png",
+      "image_alt": "Edge Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_j6n_001",
@@ -6486,7 +6638,11 @@
       "source_detail_raw": "",
       "source_option_name": "Edge Red-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png",
+      "image_alt": "Edge Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_j6n_001",
@@ -6514,7 +6670,11 @@
       "source_detail_raw": "",
       "source_option_name": "Edge Red-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png",
+      "image_alt": "Edge Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_j6n_001",
@@ -6542,7 +6702,11 @@
       "source_detail_raw": "",
       "source_option_name": "Edge Red-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png",
+      "image_alt": "Edge Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_j6n_001",
@@ -6570,7 +6734,11 @@
       "source_detail_raw": "",
       "source_option_name": "Edge Red-Painted Calipers",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png",
+      "image_alt": "Edge Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_d30_001",
@@ -25198,7 +25366,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors.",
       "source_option_name": "Orange Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+      "image_alt": "Orange Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_379_001",
@@ -25226,7 +25398,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors.",
       "source_option_name": "Orange Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+      "image_alt": "Orange Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_379_001",
@@ -25254,7 +25430,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors.",
       "source_option_name": "Orange Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+      "image_alt": "Orange Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_379_001",
@@ -25282,7 +25462,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors.",
       "source_option_name": "Orange Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+      "image_alt": "Orange Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_379_001",
@@ -25310,7 +25494,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors.",
       "source_option_name": "Orange Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+      "image_alt": "Orange Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_379_001",
@@ -25338,7 +25526,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EJH, EPX) Very Dark Atmosphere interiors or (HAG) Asymmetrical Santorini Blue/Jet Black interior. Included with (HUW, HUX) Habanero interiors.",
       "source_option_name": "Orange Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png",
+      "image_alt": "Orange Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_3a9_001",
@@ -25366,7 +25558,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
       "source_option_name": "Santorini Blue Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+      "image_alt": "Santorini Blue Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_3a9_001",
@@ -25394,7 +25590,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
       "source_option_name": "Santorini Blue Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+      "image_alt": "Santorini Blue Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_3a9_001",
@@ -25422,7 +25622,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
       "source_option_name": "Santorini Blue Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+      "image_alt": "Santorini Blue Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_3a9_001",
@@ -25450,7 +25654,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
       "source_option_name": "Santorini Blue Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+      "image_alt": "Santorini Blue Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_3a9_001",
@@ -25478,7 +25686,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
       "source_option_name": "Santorini Blue Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+      "image_alt": "Santorini Blue Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_3a9_001",
@@ -25506,7 +25718,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (HVZ) Asymmetrical Adrenaline Red/Jet Black interior. Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
       "source_option_name": "Santorini Blue Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png",
+      "image_alt": "Santorini Blue Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_3f9_001",
@@ -25534,7 +25750,11 @@
       "source_detail_raw": "Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior.",
       "source_option_name": "Torch Red Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+      "image_alt": "Torch Red Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_3f9_001",
@@ -25562,7 +25782,11 @@
       "source_detail_raw": "Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior.",
       "source_option_name": "Torch Red Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+      "image_alt": "Torch Red Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_3f9_001",
@@ -25590,7 +25814,11 @@
       "source_detail_raw": "Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior.",
       "source_option_name": "Torch Red Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+      "image_alt": "Torch Red Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_3f9_001",
@@ -25618,7 +25846,11 @@
       "source_detail_raw": "Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior.",
       "source_option_name": "Torch Red Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+      "image_alt": "Torch Red Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_3f9_001",
@@ -25646,7 +25878,11 @@
       "source_detail_raw": "Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior.",
       "source_option_name": "Torch Red Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+      "image_alt": "Torch Red Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_3f9_001",
@@ -25674,7 +25910,11 @@
       "source_detail_raw": "Not recommended with (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HNK) Adrenaline Red Dipped interior.",
       "source_option_name": "Torch Red Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png",
+      "image_alt": "Torch Red Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_3m9_001",
@@ -25702,7 +25942,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
       "source_option_name": "Yellow Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+      "image_alt": "Yellow Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_3m9_001",
@@ -25730,7 +25974,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
       "source_option_name": "Yellow Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+      "image_alt": "Yellow Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_3m9_001",
@@ -25758,7 +26006,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
       "source_option_name": "Yellow Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+      "image_alt": "Yellow Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_3m9_001",
@@ -25786,7 +26038,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
       "source_option_name": "Yellow Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+      "image_alt": "Yellow Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_3m9_001",
@@ -25814,7 +26070,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
       "source_option_name": "Yellow Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+      "image_alt": "Yellow Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_3m9_001",
@@ -25842,7 +26102,11 @@
       "source_detail_raw": "Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.\nNot recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.",
       "source_option_name": "Yellow Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png",
+      "image_alt": "Yellow Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_3n9_001",
@@ -25870,7 +26134,11 @@
       "source_detail_raw": "Recommended with (HTA, HTJ) Jet Black interior.\nRecommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\nRecommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
       "source_option_name": "Natural Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+      "image_alt": "Natural Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_3n9_001",
@@ -25898,7 +26166,11 @@
       "source_detail_raw": "Recommended with (HTA, HTJ) Jet Black interior.\nRecommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\nRecommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
       "source_option_name": "Natural Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+      "image_alt": "Natural Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_3n9_001",
@@ -25926,7 +26198,11 @@
       "source_detail_raw": "Recommended with (HTA, HTJ) Jet Black interior.\nRecommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\nRecommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
       "source_option_name": "Natural Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+      "image_alt": "Natural Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_3n9_001",
@@ -25954,7 +26230,11 @@
       "source_detail_raw": "Recommended with (HTA, HTJ) Jet Black interior.\nRecommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\nRecommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
       "source_option_name": "Natural Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+      "image_alt": "Natural Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_3n9_001",
@@ -25982,7 +26262,11 @@
       "source_detail_raw": "Recommended with (HTA, HTJ) Jet Black interior.\nRecommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\nRecommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
       "source_option_name": "Natural Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+      "image_alt": "Natural Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_3n9_001",
@@ -26010,7 +26294,11 @@
       "source_detail_raw": "Recommended with (HTA, HTJ) Jet Black interior.\nRecommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior.\nRecommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HTG, HUE) Natural interiors or (EJH, EPX) Very Dark Atmosphere interiors. Included with (HUF, HZN) Natural Dipped interiors.",
       "source_option_name": "Natural Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png",
+      "image_alt": "Natural Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_719_001",
@@ -26038,7 +26326,11 @@
       "source_detail_raw": "(HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
       "source_option_name": "Black Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+      "image_alt": "Black Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h07__opt_719_001",
@@ -26066,7 +26358,11 @@
       "source_detail_raw": "(HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
       "source_option_name": "Black Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+      "image_alt": "Black Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h07__opt_719_001",
@@ -26094,7 +26390,11 @@
       "source_detail_raw": "(HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
       "source_option_name": "Black Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+      "image_alt": "Black Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h67__opt_719_001",
@@ -26122,7 +26422,11 @@
       "source_detail_raw": "(HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
       "source_option_name": "Black Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+      "image_alt": "Black Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lz_h67__opt_719_001",
@@ -26150,7 +26454,11 @@
       "source_detail_raw": "(HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
       "source_option_name": "Black Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+      "image_alt": "Black Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lz_h67__opt_719_001",
@@ -26178,7 +26486,11 @@
       "source_detail_raw": "(HZN, HUF) Natural Dipped interior comes with (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior comes with (3A9) Santorini Blue seat belt color; (HNK) Adrenaline Red Dipped interior comes with (3F9) Torch Red seat belt color; (HUW, HUX) Habanero interior comes with (379) Orange seat belt color.",
       "source_option_name": "Black Seat Belt Color",
       "source_description": "",
-      "text_cleanup_notes": []
+      "text_cleanup_notes": [],
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png",
+      "image_alt": "Black Seat Belt Color",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lz_h07__opt_ae4_002",

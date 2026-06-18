@@ -1,0 +1,973 @@
+artifact,model_key,choice_id,option_id,rpo,section_id,field,before_value,after_value,asset_map_value,classification
+stingray-json,stingray,1lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+stingray-json,stingray,1lt_c07__opt_qe6_001,opt_qe6_001,QE6,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,intentional_asset_map_replacement
+stingray-json,stingray,1lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+stingray-json,stingray,1lt_c67__opt_qe6_001,opt_qe6_001,QE6,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,intentional_asset_map_replacement
+stingray-json,stingray,2lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+stingray-json,stingray,2lt_c07__opt_qe6_001,opt_qe6_001,QE6,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,intentional_asset_map_replacement
+stingray-json,stingray,2lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+stingray-json,stingray,2lt_c67__opt_qe6_001,opt_qe6_001,QE6,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,intentional_asset_map_replacement
+stingray-json,stingray,3lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+stingray-json,stingray,3lt_c07__opt_qe6_001,opt_qe6_001,QE6,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,intentional_asset_map_replacement
+stingray-json,stingray,3lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+stingray-json,stingray,3lt_c67__opt_qe6_001,opt_qe6_001,QE6,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,1lt_e07__opt_swm_001,opt_swm_001,SWM,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,1lt_e07__opt_swn_001,opt_swn_001,SWN,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,1lt_e07__opt_swo_001,opt_swo_001,SWO,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,1lt_e07__opt_swp_001,opt_swp_001,SWP,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,1lt_e67__opt_swm_001,opt_swm_001,SWM,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,1lt_e67__opt_swn_001,opt_swn_001,SWN,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,1lt_e67__opt_swo_001,opt_swo_001,SWO,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,1lt_e67__opt_swp_001,opt_swp_001,SWP,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,2lt_e07__opt_swm_001,opt_swm_001,SWM,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,2lt_e07__opt_swn_001,opt_swn_001,SWN,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,2lt_e07__opt_swo_001,opt_swo_001,SWO,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,2lt_e07__opt_swp_001,opt_swp_001,SWP,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,2lt_e67__opt_swm_001,opt_swm_001,SWM,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,2lt_e67__opt_swn_001,opt_swn_001,SWN,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,2lt_e67__opt_swo_001,opt_swo_001,SWO,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,2lt_e67__opt_swp_001,opt_swp_001,SWP,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,3lt_e07__opt_swm_001,opt_swm_001,SWM,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,3lt_e07__opt_swn_001,opt_swn_001,SWN,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,3lt_e07__opt_swo_001,opt_swo_001,SWO,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,3lt_e07__opt_swp_001,opt_swp_001,SWP,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,3lt_e67__opt_swm_001,opt_swm_001,SWM,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,3lt_e67__opt_swn_001,opt_swn_001,SWN,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,3lt_e67__opt_swo_001,opt_swo_001,SWO,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,intentional_asset_map_replacement
+grand-sport-runtime-json,grand_sport,3lt_e67__opt_swp_001,opt_swp_001,SWP,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,intentional_asset_map_replacement
+z06-runtime-json,z06,1lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_alt,,Black Painted Calipers,Black Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_alt,,Blue-Painted Calipers,Blue-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_alt,,Dark Gray Metallic-Painted Calipers,Dark Gray Metallic-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_alt,,Velocity Yellow-Painted Calipers,Velocity Yellow-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_alt,,Bright Red-Painted Calipers,Bright Red-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_alt,,Orange-Painted Calipers,Orange-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_alt,,Edge Red-Painted Calipers,Edge Red-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_alt,,Black Painted Calipers,Black Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_alt,,Blue-Painted Calipers,Blue-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_alt,,Dark Gray Metallic-Painted Calipers,Dark Gray Metallic-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_alt,,Velocity Yellow-Painted Calipers,Velocity Yellow-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_alt,,Bright Red-Painted Calipers,Bright Red-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_alt,,Orange-Painted Calipers,Orange-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_alt,,Edge Red-Painted Calipers,Edge Red-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,1lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_alt,,Black Painted Calipers,Black Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_alt,,Blue-Painted Calipers,Blue-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_alt,,Dark Gray Metallic-Painted Calipers,Dark Gray Metallic-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_alt,,Velocity Yellow-Painted Calipers,Velocity Yellow-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_alt,,Bright Red-Painted Calipers,Bright Red-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_alt,,Orange-Painted Calipers,Orange-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_alt,,Edge Red-Painted Calipers,Edge Red-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_alt,,Black Painted Calipers,Black Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_alt,,Blue-Painted Calipers,Blue-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_alt,,Dark Gray Metallic-Painted Calipers,Dark Gray Metallic-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_alt,,Velocity Yellow-Painted Calipers,Velocity Yellow-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_alt,,Bright Red-Painted Calipers,Bright Red-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_alt,,Orange-Painted Calipers,Orange-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_alt,,Edge Red-Painted Calipers,Edge Red-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,2lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_alt,,Black Painted Calipers,Black Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_alt,,Blue-Painted Calipers,Blue-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_alt,,Dark Gray Metallic-Painted Calipers,Dark Gray Metallic-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_alt,,Velocity Yellow-Painted Calipers,Velocity Yellow-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_alt,,Bright Red-Painted Calipers,Bright Red-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_alt,,Orange-Painted Calipers,Orange-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_alt,,Edge Red-Painted Calipers,Edge Red-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_alt,,Black Painted Calipers,Black Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_alt,,Blue-Painted Calipers,Blue-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_alt,,Dark Gray Metallic-Painted Calipers,Dark Gray Metallic-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_alt,,Velocity Yellow-Painted Calipers,Velocity Yellow-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_alt,,Bright Red-Painted Calipers,Bright Red-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_alt,,Orange-Painted Calipers,Orange-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_alt,,Edge Red-Painted Calipers,Edge Red-Painted Calipers,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+z06-runtime-json,z06,3lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c07__opt_qe6_001,opt_qe6_001,QE6,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,intentional_asset_map_replacement
+data-js-stingray,stingray,1lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+data-js-stingray,stingray,1lt_c67__opt_qe6_001,opt_qe6_001,QE6,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,intentional_asset_map_replacement
+data-js-stingray,stingray,2lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c07__opt_qe6_001,opt_qe6_001,QE6,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,intentional_asset_map_replacement
+data-js-stingray,stingray,2lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+data-js-stingray,stingray,2lt_c67__opt_qe6_001,opt_qe6_001,QE6,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,intentional_asset_map_replacement
+data-js-stingray,stingray,3lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c07__opt_qe6_001,opt_qe6_001,QE6,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,intentional_asset_map_replacement
+data-js-stingray,stingray,3lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+data-js-stingray,stingray,3lt_c67__opt_qe6_001,opt_qe6_001,QE6,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-qe6_v1.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/qe6.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,1lt_e07__opt_swm_001,opt_swm_001,SWM,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,1lt_e07__opt_swn_001,opt_swn_001,SWN,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,1lt_e07__opt_swo_001,opt_swo_001,SWO,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,1lt_e07__opt_swp_001,opt_swp_001,SWP,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,1lt_e67__opt_swm_001,opt_swm_001,SWM,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,1lt_e67__opt_swn_001,opt_swn_001,SWN,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,1lt_e67__opt_swo_001,opt_swo_001,SWO,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,1lt_e67__opt_swp_001,opt_swp_001,SWP,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,2lt_e07__opt_swm_001,opt_swm_001,SWM,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,2lt_e07__opt_swn_001,opt_swn_001,SWN,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,2lt_e07__opt_swo_001,opt_swo_001,SWO,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,2lt_e07__opt_swp_001,opt_swp_001,SWP,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,2lt_e67__opt_swm_001,opt_swm_001,SWM,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,2lt_e67__opt_swn_001,opt_swn_001,SWN,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,2lt_e67__opt_swo_001,opt_swo_001,SWO,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,2lt_e67__opt_swp_001,opt_swp_001,SWP,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,3lt_e07__opt_swm_001,opt_swm_001,SWM,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,3lt_e07__opt_swn_001,opt_swn_001,SWN,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,3lt_e07__opt_swo_001,opt_swo_001,SWO,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,3lt_e07__opt_swp_001,opt_swp_001,SWP,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,3lt_e67__opt_swm_001,opt_swm_001,SWM,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_79_swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swm.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,3lt_e67__opt_swn_001,opt_swn_001,SWN,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_82_swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swn.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,3lt_e67__opt_swo_001,opt_swo_001,SWO,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_85_swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swo.png,intentional_asset_map_replacement
+data-js-grandSport,grand_sport,3lt_e67__opt_swp_001,opt_swp_001,SWP,sec_whee_002,image_url,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_87_swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/swp.png,intentional_asset_map_replacement
+data-js-z06,z06,1lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_alt,,Black Painted Calipers,Black Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_alt,,Blue-Painted Calipers,Blue-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_alt,,Dark Gray Metallic-Painted Calipers,Dark Gray Metallic-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_alt,,Velocity Yellow-Painted Calipers,Velocity Yellow-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_alt,,Bright Red-Painted Calipers,Bright Red-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_alt,,Orange-Painted Calipers,Orange-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_alt,,Edge Red-Painted Calipers,Edge Red-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_alt,,Black Painted Calipers,Black Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_alt,,Blue-Painted Calipers,Blue-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_alt,,Dark Gray Metallic-Painted Calipers,Dark Gray Metallic-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_alt,,Velocity Yellow-Painted Calipers,Velocity Yellow-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_alt,,Bright Red-Painted Calipers,Bright Red-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_alt,,Orange-Painted Calipers,Orange-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_alt,,Edge Red-Painted Calipers,Edge Red-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,1lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_alt,,Black Painted Calipers,Black Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_alt,,Blue-Painted Calipers,Blue-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_alt,,Dark Gray Metallic-Painted Calipers,Dark Gray Metallic-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_alt,,Velocity Yellow-Painted Calipers,Velocity Yellow-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_alt,,Bright Red-Painted Calipers,Bright Red-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_alt,,Orange-Painted Calipers,Orange-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_alt,,Edge Red-Painted Calipers,Edge Red-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_alt,,Black Painted Calipers,Black Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_alt,,Blue-Painted Calipers,Blue-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_alt,,Dark Gray Metallic-Painted Calipers,Dark Gray Metallic-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_alt,,Velocity Yellow-Painted Calipers,Velocity Yellow-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_alt,,Bright Red-Painted Calipers,Bright Red-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_alt,,Orange-Painted Calipers,Orange-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_alt,,Edge Red-Painted Calipers,Edge Red-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,2lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_alt,,Black Painted Calipers,Black Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_alt,,Blue-Painted Calipers,Blue-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_alt,,Dark Gray Metallic-Painted Calipers,Dark Gray Metallic-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_alt,,Velocity Yellow-Painted Calipers,Velocity Yellow-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_alt,,Bright Red-Painted Calipers,Bright Red-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_alt,,Orange-Painted Calipers,Orange-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_alt,,Edge Red-Painted Calipers,Edge Red-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h07__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_alt,,Orange Seat Belt Color,Orange Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_379_001,opt_379_001,379,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_379.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_alt,,Santorini Blue Seat Belt Color,Santorini Blue Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3a9_001,opt_3a9_001,3A9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3a9.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_alt,,Torch Red Seat Belt Color,Torch Red Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3f9_001,opt_3f9_001,3F9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3f9.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_alt,,Yellow Seat Belt Color,Yellow Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3m9_001,opt_3m9_001,3M9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3m9.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_alt,,Natural Seat Belt Color,Natural Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_3n9_001,opt_3n9_001,3N9,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_3n9.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_alt,,Black Seat Belt Color,Black Seat Belt Color,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_719_001,opt_719_001,719,sec_seat_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/imgi_47_719.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_alt,,Black Painted Calipers,Black Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6a_001,opt_j6a_001,J6A,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6a-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_alt,,Blue-Painted Calipers,Blue-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6b_001,opt_j6b_001,J6B,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6b-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_alt,,Dark Gray Metallic-Painted Calipers,Dark Gray Metallic-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6d_001,opt_j6d_001,J6D,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6d-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_alt,,Velocity Yellow-Painted Calipers,Velocity Yellow-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6e_001,opt_j6e_001,J6E,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6e-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_alt,,Bright Red-Painted Calipers,Bright Red-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6f_001,opt_j6f_001,J6F,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6f-23x13-cp.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_alt,,Orange-Painted Calipers,Orange-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6l_001,opt_j6l_001,J6L,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6l-23x10-cp.png,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_alt,,Edge Red-Painted Calipers,Edge Red-Painted Calipers,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_fit,,cover,cover,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_position,,center,center,intentional_asset_map_addition
+data-js-z06,z06,3lz_h67__opt_j6n_001,opt_j6n_001,J6N,sec_cali_001,image_url,,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h-j6n-23x10-cp.png,intentional_asset_map_addition
