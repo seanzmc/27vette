@@ -1134,9 +1134,17 @@ function orderSummarySectionOrder() {
   return new Map(orderSummarySections().map((section, index) => [section.section_key, Number(section.display_order || index)]));
 }
 
-function sectionKeyForStep(stepKey, type = "") {
-  if (type === "auto_added") return "auto_added_required";
+function sectionKeyForStep(stepKey) {
   return orderSummaryStepMap()[stepKey] || stepKey || "vehicle";
+}
+
+function autoAddedOptionUsesRequiredSummaryBucket(option) {
+  return option?.section_id === "sec_incl_001";
+}
+
+function sectionKeyForOption(option, type = "") {
+  if (type === "auto_added" && autoAddedOptionUsesRequiredSummaryBucket(option)) return "auto_added_required";
+  return sectionKeyForStep(option?.step_key || "");
 }
 
 function sectionLabelForKey(sectionKey) {
@@ -1145,7 +1153,7 @@ function sectionLabelForKey(sectionKey) {
 }
 
 function lineItemFromOption(option, type, price, extra = {}) {
-  const sectionKey = sectionKeyForStep(option.step_key, type);
+  const sectionKey = sectionKeyForOption(option, type);
   return {
     id: option.option_id,
     rpo: option.rpo || "",
@@ -2578,8 +2586,8 @@ function renderSummary() {
   els.summaryTotal.textContent = formatMoney(total);
   els.variantName.textContent = variant?.display_name || activeModel.label || "Stingray";
 
-  const selectedItems = items.filter((item) => item.type !== "auto_added");
-  const autoItems = items.filter((item) => item.type === "auto_added");
+  const selectedItems = items.filter((item) => item.type !== "auto_added" || item.section_key !== "auto_added_required");
+  const autoItems = items.filter((item) => item.type === "auto_added" && item.section_key === "auto_added_required");
   els.selectedList.innerHTML = renderSectionedSummaryItems(selectedItems, {
     base_price: base,
     total_msrp: total,

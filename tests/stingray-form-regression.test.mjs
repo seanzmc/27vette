@@ -1205,6 +1205,10 @@ test("current order option lines are complete, separated, and omit standard equi
   assert.equal(order.selected_options.some((item) => item.type === "auto_added"), false);
   assert.equal(order.auto_added_options.every((item) => item.type === "auto_added"), true);
   assert.equal(order.auto_added_options.some((item) => item.rpo === "FE3"), true, "Z51 should keep FE3 clearly auto-added");
+  const autoByRpo = new Map(order.auto_added_options.map((item) => [item.rpo, item]));
+  assert.equal(autoByRpo.get("FE3")?.section_key, "performance_mechanical", "non-included auto-added FE3 should recap in its normal section");
+  assert.equal(autoByRpo.get("T0A")?.section_key, "performance_mechanical", "non-included auto-added T0A should recap in its normal section");
+  assert.equal(autoByRpo.get("G0K")?.section_key, "auto_added_required", "sec_incl auto-added package rows should stay in Auto-Added / Required");
   assert.equal(order.selected_options.some((item) => item.step_key === "standard_equipment"), false);
   assert.equal(order.standard_equipment_summary.count > 0, true);
   assert.equal(Array.isArray(order.standard_equipment_summary.items), false, "summary should not dump standard equipment rows");
@@ -1328,11 +1332,14 @@ test("compact order sections omit empty/admin sections and use minimal item rows
   runtime.reconcileSelections();
 
   const z51 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_z51_001");
+  const pcx = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_pcx_001");
   const paint = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001");
   assert.ok(z51, "Z51 should exist for the current variant");
+  assert.ok(pcx, "PCX should exist for the current variant");
   assert.ok(paint, "Black paint should exist for the current variant");
   runtime.handleChoice(paint);
   runtime.handleChoice(z51);
+  runtime.handleChoice(pcx);
   runtime.state.selectedInterior = "1LT_AQ9_HTA";
 
   const compact = runtime.compactOrder();
@@ -1351,8 +1358,18 @@ test("compact order sections omit empty/admin sections and use minimal item rows
 
   const interiorRows = allItems.filter((item) => item.rpo === "HTA");
   assert.equal(interiorRows.length, 1, "selected interior should appear once");
+  const performanceSection = compact.sections.find((section) => section.section === "Performance & Mechanical");
+  assert.ok(performanceSection.items.some((item) => item.rpo === "FE3"), "auto-added FE3 should be grouped with performance content");
+  assert.ok(performanceSection.items.some((item) => item.rpo === "T0A"), "auto-added T0A should be grouped with performance content");
+  const accessoriesSection = compact.sections.find((section) => section.section === "Accessories");
+  assert.ok(accessoriesSection.items.some((item) => item.rpo === "5DG"), "PCX auto-added 5DG should be grouped with accessories");
+  assert.ok(accessoriesSection.items.some((item) => item.rpo === "SFZ"), "PCX auto-added SFZ should be grouped with accessories");
+  const stripesSection = compact.sections.find((section) => section.section === "Stripes");
+  assert.ok(stripesSection.items.some((item) => item.rpo === "SHT"), "PCX auto-added SHT should be grouped with stripes");
+  assert.ok(stripesSection.items.some((item) => item.rpo === "SNG"), "PCX auto-added SNG should be grouped with stripes");
   const autoSection = compact.sections.find((section) => section.section === "Auto-Added / Required");
-  assert.ok(autoSection.items.some((item) => item.rpo === "FE3"), "auto-added FE3 should be grouped as required");
+  assert.ok(autoSection.items.some((item) => item.rpo === "G0K"), "sec_incl auto-added package rows should remain grouped as required");
+  assert.equal(autoSection.items.some((item) => item.rpo === "FE3"), false, "non-included auto-added FE3 should not remain in Auto-Added / Required");
 });
 
 test("download build exports customer-facing Markdown", () => {
@@ -1655,7 +1672,8 @@ test("plain text order summary renders compact order data for emails and review"
   assert.doesNotMatch(summary, /Base MSRP/);
   assert.match(summary, /<p><strong><u>Exterior Paint<\/u><\/strong><\/p><ul><li>GBA Black: \$0<\/li>/);
   assert.match(summary, /<p><strong><u>Seats &amp; Interior<\/u><\/strong><\/p><ul>[\s\S]*<li>AQ9 GT1 Bucket Seats: \$0<\/li>[\s\S]*<li>HTA Jet Black: \$0<\/li>/);
-  assert.match(summary, /<p><strong><u>Auto-Added \/ Required<\/u><\/strong><\/p><ul>[\s\S]*<li>FE3 Z51 Performance Suspension: \$0<\/li>/);
+  assert.match(summary, /<p><strong><u>Performance &amp; Mechanical<\/u><\/strong><\/p><ul>[\s\S]*<li>FE3 Z51 Performance Suspension: \$0<\/li>/);
+  assert.match(summary, /<p><strong><u>Auto-Added \/ Required<\/u><\/strong><\/p><ul>[\s\S]*<li>G0K Rear Axle 5\.56 Ratio: \$0<\/li>/);
   assert.doesNotMatch(summary, /STANDARD & INCLUDED/);
   assert.match(summary, /<p><strong>Total MSRP: \$\d/);
   assert.doesNotMatch(summary, /(?:^|\n)(?:Vehicle|Exterior Paint|Seats & Interior|Auto-Added \/ Required)(?:\n|$)/);

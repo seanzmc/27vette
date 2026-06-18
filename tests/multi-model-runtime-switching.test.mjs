@@ -815,10 +815,12 @@ test("runtime renders selected RPO summary as sectioned rows matching export sec
   assert.match(selectedHtml, /summary-rpo-label/);
   assert.match(selectedHtml, /summary-rpo-price/);
   assert.match(selectedHtml, /GBA/);
+  assert.match(selectedHtml, /SB7/);
+  assert.match(selectedHtml, /VWD/);
 
   const autoHtml = runtime.elements.get("#autoList").innerHTML;
-  assert.match(autoHtml, /summary-rpo-row/);
-  assert.match(autoHtml, /info-tooltip/);
+  assert.match(autoHtml, /No auto-added RPOs/);
+  assert.doesNotMatch(autoHtml, /summary-rpo-row/);
 });
 
 test("Grand Sport exclusive groups are model-scoped and Stingray groups match workbook output", () => {
