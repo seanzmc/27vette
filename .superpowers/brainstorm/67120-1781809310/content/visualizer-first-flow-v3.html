@@ -1,0 +1,561 @@
+<style>
+  :root {
+    --paper: #f6f1e8;
+    --panel: #fffaf2;
+    --ink: #1f2933;
+    --muted: #6f665d;
+    --line: #d8cbb9;
+    --red: #b1182b;
+    --green: #22875a;
+    --gold: #d99019;
+    --blue: #2563eb;
+  }
+  .direction {
+    margin-top: 20px;
+  }
+  .mock-shell {
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f8f3ea;
+    box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
+  }
+  .mock-top {
+    display: grid;
+    grid-template-columns: minmax(230px, 1fr) auto auto;
+    gap: 18px;
+    align-items: center;
+    height: 66px;
+    padding: 0 22px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+  .eyebrow {
+    margin: 0 0 3px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .mock-top h3 {
+    margin: 0;
+    font-size: 22px;
+    letter-spacing: 0;
+  }
+  .next-chip {
+    display: inline-grid;
+    grid-template-columns: 18px auto;
+    gap: 8px;
+    align-items: center;
+    border: 1px solid #efc76f;
+    border-radius: 999px;
+    padding: 8px 12px;
+    background: #fff7df;
+    color: #6f4a09;
+    font-size: 13px;
+    font-weight: 900;
+  }
+  .next-chip span:first-child {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: white;
+    font-size: 12px;
+  }
+  .msrp {
+    text-align: right;
+  }
+  .msrp strong {
+    display: block;
+    font-size: 22px;
+  }
+  .visual-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 286px;
+    min-height: 610px;
+  }
+  .stage {
+    position: relative;
+    min-width: 0;
+    background:
+      linear-gradient(180deg, rgba(255,250,242,.9), rgba(246,241,232,.72)),
+      radial-gradient(circle at 42% 46%, rgba(255,255,255,.95), rgba(218,207,191,.45) 54%, rgba(198,184,164,.26) 75%);
+    overflow: hidden;
+  }
+  .stage-progress {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 5px;
+    background: #e1d5c5;
+  }
+  .stage-progress span {
+    display: block;
+    width: 42%;
+    height: 100%;
+    background: var(--green);
+  }
+  .stage-header {
+    position: absolute;
+    top: 26px;
+    left: 26px;
+    z-index: 2;
+  }
+  .stage-header h2 {
+    margin: 0;
+    font-size: 34px;
+    letter-spacing: 0;
+  }
+  .stage-header p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .car-wrap {
+    position: absolute;
+    inset: 92px 28px 150px;
+    display: grid;
+    place-items: center;
+  }
+  .car-shadow {
+    position: absolute;
+    bottom: 44px;
+    width: min(76%, 760px);
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(31, 41, 51, .16);
+    filter: blur(10px);
+  }
+  .car-image {
+    position: relative;
+    z-index: 1;
+    width: min(88%, 820px);
+    max-height: 360px;
+    object-fit: contain;
+    filter: drop-shadow(0 24px 26px rgba(31, 41, 51, .18));
+  }
+  .view-tabs {
+    position: absolute;
+    top: 30px;
+    right: 28px;
+    display: inline-flex;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(255,250,242,.9);
+  }
+  .view-tabs span {
+    padding: 8px 12px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .view-tabs span.active {
+    background: var(--ink);
+    color: white;
+  }
+  .option-strip {
+    position: absolute;
+    left: 26px;
+    right: 26px;
+    bottom: 24px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+  }
+  .strip-title h3 {
+    margin: 0;
+    font-size: 18px;
+  }
+  .strip-title p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .swatches {
+    display: flex;
+    gap: 10px;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .swatch {
+    display: grid;
+    grid-template-columns: 38px minmax(92px, 1fr);
+    gap: 9px;
+    align-items: center;
+    min-width: 152px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 8px;
+    background: rgba(255,250,242,.8);
+  }
+  .swatch.active {
+    border-color: var(--red);
+    background: white;
+  }
+  .paint {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(31,41,51,.18);
+  }
+  .swatch strong {
+    display: block;
+    font-size: 12px;
+  }
+  .swatch small {
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .next-button {
+    border-radius: 8px;
+    background: var(--red);
+    color: white;
+    padding: 11px 14px;
+    font-size: 13px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+  .flow-rail {
+    border-left: 1px solid var(--line);
+    background: var(--panel);
+    padding: 18px 14px;
+  }
+  .rail-title {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: end;
+    margin-bottom: 14px;
+  }
+  .rail-title h4 {
+    margin: 0;
+    font-size: 17px;
+  }
+  .rail-title span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .rail-step {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 9px;
+    align-items: start;
+    border-radius: 9px;
+    padding: 10px 8px;
+    margin-bottom: 7px;
+  }
+  .rail-step.active {
+    background: #f1e4d1;
+  }
+  .rail-icon {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #e3d7c7;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 900;
+  }
+  .rail-icon.done { background: var(--green); color: white; }
+  .rail-icon.warn { background: var(--gold); color: white; }
+  .rail-icon.lock { background: white; border: 1px solid var(--line); color: var(--muted); }
+  .rail-step strong {
+    display: block;
+    font-size: 14px;
+  }
+  .rail-step small {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.3;
+  }
+  .rail-footer {
+    margin-top: 18px;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  .plain-mode {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 286px;
+    border-top: 1px solid var(--line);
+    background: #fbf6ed;
+  }
+  .plain-main {
+    padding: 22px;
+  }
+  .plain-main h3 {
+    margin: 0 0 6px;
+    font-size: 24px;
+  }
+  .plain-main > p {
+    margin: 0 0 18px;
+    color: var(--muted);
+  }
+  .plain-list {
+    display: grid;
+    gap: 8px;
+  }
+  .plain-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 18px;
+    border-top: 1px solid var(--line);
+    padding: 12px 0;
+  }
+  .plain-row strong {
+    display: block;
+  }
+  .plain-row small {
+    color: var(--muted);
+  }
+  .select-pill {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 11px;
+    background: white;
+    font-weight: 900;
+    font-size: 12px;
+  }
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .principle {
+    border: 1px solid rgba(148, 163, 184, .5);
+    border-radius: 9px;
+    padding: 14px;
+    background: white;
+  }
+  .principle h4 {
+    margin: 0 0 6px;
+  }
+  .principle p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .choice-question {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .route-choice {
+    border: 1px solid rgba(148, 163, 184, .6);
+    border-radius: 10px;
+    padding: 14px;
+    background: white;
+    cursor: pointer;
+  }
+  .route-choice:hover,
+  .route-choice.selected {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .16);
+  }
+  .route-choice h3 {
+    margin: 0 0 6px;
+  }
+  .route-choice p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  @media (max-width: 1050px) {
+    .mock-top,
+    .visual-layout,
+    .plain-mode {
+      grid-template-columns: 1fr;
+    }
+    .flow-rail {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+    .principles,
+    .choice-question {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<h2>Cleaner Direction: Visualizer-First Flow</h2>
+<p class="subtitle">This backs away from stacked panels. The car becomes the main workspace. Progress moves to a single right-side flow rail. The active visual choice uses a bottom strip. Dense non-visual options move to a later list screen.</p>
+
+<div class="direction">
+  <div class="mock-shell">
+    <div class="mock-top">
+      <div>
+        <p class="eyebrow">2027 Corvette</p>
+        <h3>Stingray Coupe 2LT</h3>
+      </div>
+      <div class="next-chip"><span>!</span><span>Next required: Exterior color</span></div>
+      <div class="msrp">
+        <p class="eyebrow">Total MSRP</p>
+        <strong>$83,240</strong>
+      </div>
+    </div>
+
+    <div class="visual-layout">
+      <main class="stage">
+        <div class="stage-progress"><span></span></div>
+        <div class="stage-header">
+          <p class="eyebrow">Exterior</p>
+          <h2>Choose a color</h2>
+          <p>One required selection. Visual changes apply immediately.</p>
+        </div>
+        <div class="view-tabs">
+          <span class="active">Exterior</span>
+          <span>Interior</span>
+          <span>Detail</span>
+        </div>
+        <div class="car-wrap">
+          <div class="car-shadow"></div>
+          <img class="car-image" src="https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-5do.png" alt="Corvette visualizer preview">
+        </div>
+        <div class="option-strip">
+          <div class="strip-title">
+            <h3>Exterior color</h3>
+            <p>Required • 1 selected</p>
+          </div>
+          <div class="swatches">
+            <div class="swatch active">
+              <span class="paint" style="background:#dfe5e9;"></span>
+              <span><strong>Arctic White</strong><small>Included</small></span>
+            </div>
+            <div class="swatch">
+              <span class="paint" style="background:#0c0c0f;"></span>
+              <span><strong>Black</strong><small>Included</small></span>
+            </div>
+            <div class="swatch">
+              <span class="paint" style="background:#c71f31;"></span>
+              <span><strong>Torch Red</strong><small>Included</small></span>
+            </div>
+            <div class="swatch">
+              <span class="paint" style="background:#6e7178;"></span>
+              <span><strong>Sea Wolf Gray</strong><small>$995</small></span>
+            </div>
+          </div>
+          <span class="next-button">Next: Wheels</span>
+        </div>
+      </main>
+
+      <aside class="flow-rail">
+        <div class="rail-title">
+          <h4>Build Flow</h4>
+          <span>4 of 9</span>
+        </div>
+        <div class="rail-step">
+          <span class="rail-icon done">✓</span>
+          <span><strong>Vehicle</strong><small>Model, body, trim complete</small></span>
+        </div>
+        <div class="rail-step active">
+          <span class="rail-icon warn">!</span>
+          <span><strong>Exterior</strong><small>Color required, wheels next</small></span>
+        </div>
+        <div class="rail-step">
+          <span class="rail-icon lock">3</span>
+          <span><strong>Interior</strong><small>Seats, colors, belts</small></span>
+        </div>
+        <div class="rail-step">
+          <span class="rail-icon lock">4</span>
+          <span><strong>Performance</strong><small>Non-visual option group</small></span>
+        </div>
+        <div class="rail-step">
+          <span class="rail-icon lock">5</span>
+          <span><strong>Accessories</strong><small>Non-visual option group</small></span>
+        </div>
+        <div class="rail-step">
+          <span class="rail-icon lock">6</span>
+          <span><strong>Review</strong><small>Download or submit to dealer</small></span>
+        </div>
+        <div class="rail-footer">
+          Availability messages stay inline with the affected choice. The rail only tracks progress and what comes next.
+        </div>
+      </aside>
+    </div>
+
+    <div class="plain-mode">
+      <div class="plain-main">
+        <h3>Later step: Performance & Accessories</h3>
+        <p>No visualizer needed here. The layout switches to a clean decision list with the same right-side flow rail, because these choices are mostly mechanical or package rules.</p>
+        <div class="plain-list">
+          <div class="plain-row">
+            <span><strong>Z51 Performance Package</strong><small>Adds performance suspension, brakes, exhaust, and related requirements.</small></span>
+            <span class="select-pill">Selected</span>
+          </div>
+          <div class="plain-row">
+            <span><strong>Front Lift Adjustable Height</strong><small>Available with current body and trim.</small></span>
+            <span class="select-pill">Add $2,595</span>
+          </div>
+          <div class="plain-row">
+            <span><strong>Battery Protection Package</strong><small>Dealer accessory, no visual change.</small></span>
+            <span class="select-pill">Add $100</span>
+          </div>
+        </div>
+      </div>
+      <aside class="flow-rail">
+        <div class="rail-title">
+          <h4>Build Flow</h4>
+          <span>7 of 9</span>
+        </div>
+        <div class="rail-step"><span class="rail-icon done">✓</span><span><strong>Exterior</strong><small>Complete</small></span></div>
+        <div class="rail-step"><span class="rail-icon done">✓</span><span><strong>Interior</strong><small>Complete</small></span></div>
+        <div class="rail-step active"><span class="rail-icon warn">!</span><span><strong>Performance</strong><small>1 package requirement open</small></span></div>
+        <div class="rail-step"><span class="rail-icon lock">8</span><span><strong>Accessories</strong><small>Optional</small></span></div>
+        <div class="rail-step"><span class="rail-icon lock">9</span><span><strong>Review</strong><small>3 required left</small></span></div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<div class="principles">
+  <div class="principle">
+    <h4>One main canvas</h4>
+    <p>The visualizer owns the first impression. Controls sit around it, not inside stacked cards.</p>
+  </div>
+  <div class="principle">
+    <h4>One progress root</h4>
+    <p>The right rail carries colored status, requiredness, and sequence. No extra progress widgets competing with it.</p>
+  </div>
+  <div class="principle">
+    <h4>Mode changes by content</h4>
+    <p>Exterior and interior are visual. Performance and accessories can switch to a list because visual feedback adds less value there.</p>
+  </div>
+  <div class="principle">
+    <h4>Messages stay local</h4>
+    <p>Unavailable, auto-added, and newly available messages appear beside the affected choice, not in another summary box.</p>
+  </div>
+</div>
+
+<h2 style="margin-top:28px;">Core Direction Choice</h2>
+<p class="subtitle">This is the next decision I would lock before writing a spec.</p>
+
+<div class="choice-question">
+  <div class="route-choice" data-choice="chevy_like_visual_first" onclick="toggleSelect(this)">
+    <h3>Chevy-like visual-first flow</h3>
+    <p>Use the visualizer as the main surface for vehicle/exterior/interior steps, with right-side progression and a separate non-visual options phase.</p>
+  </div>
+  <div class="route-choice" data-choice="current_form_plus_visual_panel" onclick="toggleSelect(this)">
+    <h3>Current form plus visual panel</h3>
+    <p>Keep the current step layout more intact and add the visualizer as a prominent panel. Lower disruption, but more risk of crowding.</p>
+  </div>
+</div>

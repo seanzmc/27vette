@@ -1,0 +1,578 @@
+<style>
+  .sp-root,
+  .sp-root * {
+    box-sizing: border-box;
+  }
+  .sp-root {
+    --paper: #f6f1e8;
+    --panel: #fffaf2;
+    --ink: #172026;
+    --muted: #5f554b;
+    --line: #d8cbb9;
+    --red: #b1182b;
+    --green: #1f8a5b;
+    --gold: #d99019;
+    --blue: #2563eb;
+    color: var(--ink);
+  }
+  .sp-root h2,
+  .sp-root h3,
+  .sp-root h4,
+  .sp-root p,
+  .sp-root span,
+  .sp-root small,
+  .sp-root strong,
+  .sp-root li {
+    color: inherit;
+  }
+  .sp-root > h2 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-size: 28px;
+    letter-spacing: 0;
+  }
+  .sp-subtitle {
+    margin: 0 0 20px;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .screens {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 18px;
+  }
+  .screen-card {
+    border: 1px solid rgba(100, 116, 139, .45);
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 18px 48px rgba(15, 23, 42, .12);
+  }
+  .screen-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: #ffffff;
+  }
+  .screen-label h3 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 18px;
+  }
+  .screen-label span {
+    border-radius: 999px;
+    padding: 5px 9px;
+    background: #e8eef7;
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .mock {
+    min-height: 530px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  }
+  .topbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+    height: 64px;
+    padding: 0 18px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+  .eyebrow {
+    margin: 0 0 3px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .topbar h4 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 21px;
+    letter-spacing: 0;
+  }
+  .topbar strong {
+    color: var(--ink);
+    font-size: 20px;
+  }
+  .setup-workspace {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    min-height: 466px;
+  }
+  .setup-rail,
+  .flow-rail {
+    border-left: 1px solid var(--line);
+    background: var(--panel);
+    padding: 14px;
+  }
+  .setup-rail {
+    border-left: 0;
+    border-right: 1px solid var(--line);
+    background: #efe8dc;
+  }
+  .rail-step {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 9px;
+    align-items: start;
+    border-radius: 9px;
+    padding: 9px 7px;
+    margin-bottom: 7px;
+  }
+  .rail-step.active {
+    background: #fffaf2;
+  }
+  .dot {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #e3d7c7;
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .dot.done { background: var(--green); color: white; }
+  .dot.warn { background: var(--gold); color: white; }
+  .rail-step strong {
+    display: block;
+    color: var(--ink);
+    font-size: 13px;
+  }
+  .rail-step small {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.3;
+  }
+  .setup-main {
+    padding: 22px;
+  }
+  .setup-main h2,
+  .stage-title h2 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 30px;
+    letter-spacing: 0;
+  }
+  .setup-main > p,
+  .stage-title p {
+    margin: 7px 0 18px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .review-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .summary-box,
+  .next-box {
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 14px;
+    background: white;
+  }
+  .summary-box h3,
+  .next-box h3 {
+    margin: 0 0 10px;
+    color: var(--ink);
+    font-size: 17px;
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 8px 0;
+    border-top: 1px solid #efe4d3;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .summary-row strong {
+    color: var(--ink);
+  }
+  .next-box {
+    border-color: #efc76f;
+    background: #fff7df;
+  }
+  .next-box p {
+    margin: 0 0 14px;
+    color: #73530d;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .primary-action {
+    display: inline-flex;
+    border-radius: 8px;
+    background: var(--red);
+    color: white;
+    padding: 10px 13px;
+    font-size: 13px;
+    font-weight: 900;
+  }
+  .visual-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    min-height: 466px;
+  }
+  .stage {
+    position: relative;
+    min-width: 0;
+    background:
+      linear-gradient(180deg, rgba(255,250,242,.96), rgba(246,241,232,.72)),
+      radial-gradient(circle at 50% 54%, rgba(255,255,255,1), rgba(218,207,191,.48) 56%, rgba(198,184,164,.24) 76%);
+    overflow: hidden;
+  }
+  .stage-progress {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 5px;
+    background: #e1d5c5;
+  }
+  .stage-progress span {
+    display: block;
+    width: 34%;
+    height: 100%;
+    background: var(--green);
+  }
+  .stage-title {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    z-index: 2;
+  }
+  .car-wrap {
+    position: absolute;
+    inset: 92px 24px 126px;
+    display: grid;
+    place-items: center;
+  }
+  .car-shadow {
+    position: absolute;
+    bottom: 36px;
+    width: 78%;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(31, 41, 51, .16);
+    filter: blur(10px);
+  }
+  .car-image {
+    position: relative;
+    z-index: 1;
+    width: min(88%, 620px);
+    max-height: 270px;
+    object-fit: contain;
+    filter: drop-shadow(0 22px 24px rgba(31, 41, 51, .18));
+  }
+  .view-tabs {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    display: inline-flex;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255,250,242,.94);
+  }
+  .view-tabs span {
+    padding: 8px 11px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .view-tabs span.active {
+    background: var(--ink);
+    color: white;
+  }
+  .option-strip {
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    bottom: 20px;
+    display: grid;
+    grid-template-columns: minmax(120px, .38fr) minmax(0, 1fr);
+    gap: 14px;
+    align-items: center;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+  }
+  .strip-title h3 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 18px;
+  }
+  .strip-title p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .swatches {
+    display: flex;
+    gap: 9px;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .swatch {
+    display: grid;
+    grid-template-columns: 34px minmax(80px, 1fr);
+    gap: 8px;
+    align-items: center;
+    min-width: 144px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 8px;
+    background: rgba(255,250,242,.82);
+  }
+  .swatch.active {
+    border-color: var(--red);
+    background: white;
+  }
+  .paint {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(31, 41, 51, .18);
+  }
+  .swatch strong {
+    display: block;
+    color: var(--ink);
+    font-size: 12px;
+  }
+  .swatch small {
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .flow-rail h4 {
+    margin: 0 0 12px;
+    color: var(--ink);
+    font-size: 17px;
+  }
+  .rail-note {
+    margin-top: 14px;
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .principle {
+    border: 1px solid rgba(100, 116, 139, .45);
+    border-radius: 9px;
+    padding: 14px;
+    background: white;
+  }
+  .principle h3 {
+    margin: 0 0 6px;
+    color: var(--ink);
+    font-size: 16px;
+  }
+  .principle p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .choice-question {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .route-choice {
+    border: 1px solid rgba(100, 116, 139, .6);
+    border-radius: 10px;
+    padding: 14px;
+    background: white;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .route-choice:hover,
+  .route-choice.selected {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .16);
+  }
+  .route-choice h3 {
+    margin: 0 0 6px;
+    color: var(--ink);
+  }
+  .route-choice p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  @media (max-width: 1100px) {
+    .screens,
+    .principles,
+    .choice-question {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="sp-root">
+  <h2>Vehicle Setup → Visualizer Transition</h2>
+  <p class="sp-subtitle">This keeps the current vehicle setup mental model, then uses the setup review click as the handoff into the visualizer-first exterior flow. I also forced dark heading/body colors in this sample for readability.</p>
+
+  <div class="screens">
+    <section class="screen-card">
+      <div class="screen-label">
+        <h3>1. Vehicle Setup Review</h3>
+        <span>After trim is selected</span>
+      </div>
+      <div class="mock">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">2027 Corvette</p>
+            <h4>Vehicle Setup</h4>
+          </div>
+          <strong>$78,000</strong>
+        </div>
+        <div class="setup-workspace">
+          <nav class="setup-rail">
+            <div class="rail-step"><span class="dot done">✓</span><span><strong>Model</strong><small>Stingray</small></span></div>
+            <div class="rail-step"><span class="dot done">✓</span><span><strong>Body</strong><small>Coupe</small></span></div>
+            <div class="rail-step"><span class="dot done">✓</span><span><strong>Trim</strong><small>2LT</small></span></div>
+            <div class="rail-step active"><span class="dot warn">!</span><span><strong>Review</strong><small>Ready for visual setup</small></span></div>
+          </nav>
+          <main class="setup-main">
+            <p class="eyebrow">Review setup</p>
+            <h2>Confirm your vehicle</h2>
+            <p>This is the bridge between the setup wizard and the visualizer. The next click starts Exterior color with the car visible.</p>
+            <div class="review-panel">
+              <div class="summary-box">
+                <h3>Selected vehicle</h3>
+                <div class="summary-row"><span>Model</span><strong>Stingray</strong></div>
+                <div class="summary-row"><span>Body style</span><strong>Coupe</strong></div>
+                <div class="summary-row"><span>Trim level</span><strong>2LT</strong></div>
+                <div class="summary-row"><span>Base MSRP</span><strong>$78,000</strong></div>
+              </div>
+              <div class="next-box">
+                <h3>Next up</h3>
+                <p>Start the visual build with Exterior color. Paint is required and affects the main vehicle preview immediately.</p>
+                <span class="primary-action">Continue to Exterior</span>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen-card">
+      <div class="screen-label">
+        <h3>2. Exterior Color Visualizer</h3>
+        <span>First visualizer screen</span>
+      </div>
+      <div class="mock">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Stingray Coupe 2LT</p>
+            <h4>Exterior</h4>
+          </div>
+          <strong>$78,000</strong>
+        </div>
+        <div class="visual-workspace">
+          <main class="stage">
+            <div class="stage-progress"><span></span></div>
+            <div class="stage-title">
+              <p class="eyebrow">Exterior color</p>
+              <h2>Choose a paint color</h2>
+              <p>Required. Options list horizontally below the vehicle.</p>
+            </div>
+            <div class="view-tabs">
+              <span class="active">Exterior</span>
+              <span>Interior</span>
+            </div>
+            <div class="car-wrap">
+              <div class="car-shadow"></div>
+              <img class="car-image" src="https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-5do.png" alt="Corvette exterior preview">
+            </div>
+            <div class="option-strip">
+              <div class="strip-title">
+                <h3>Paint</h3>
+                <p>Required • 1 selected</p>
+              </div>
+              <div class="swatches">
+                <div class="swatch active">
+                  <span class="paint" style="background:#dfe5e9;"></span>
+                  <span><strong>Arctic White</strong><small>Included</small></span>
+                </div>
+                <div class="swatch">
+                  <span class="paint" style="background:#0c0c0f;"></span>
+                  <span><strong>Black</strong><small>Included</small></span>
+                </div>
+                <div class="swatch">
+                  <span class="paint" style="background:#c71f31;"></span>
+                  <span><strong>Torch Red</strong><small>Included</small></span>
+                </div>
+                <div class="swatch">
+                  <span class="paint" style="background:#6e7178;"></span>
+                  <span><strong>Sea Wolf Gray</strong><small>$995</small></span>
+                </div>
+              </div>
+            </div>
+          </main>
+          <aside class="flow-rail">
+            <h4>Build Flow</h4>
+            <div class="rail-step"><span class="dot done">✓</span><span><strong>Vehicle</strong><small>Model, body, trim complete</small></span></div>
+            <div class="rail-step active"><span class="dot warn">!</span><span><strong>Exterior</strong><small>Paint, roof, accents, wheels, brakes, stripes, spoiler</small></span></div>
+            <div class="rail-step"><span class="dot">3</span><span><strong>Interior</strong><small>Seats, color, belts, trim</small></span></div>
+            <div class="rail-step"><span class="dot">4</span><span><strong>Performance</strong><small>Mixed visual and mechanical</small></span></div>
+            <div class="rail-step"><span class="dot">5</span><span><strong>Accessories</strong><small>Image cards, no visualizer</small></span></div>
+            <div class="rail-note">The right rail is the only persistent progress root. No extra summary cards around the stage.</div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="principles">
+    <div class="principle">
+      <h3>Setup stays familiar</h3>
+      <p>Model, body, and trim can keep the current guided setup interaction instead of forcing the visualizer too early.</p>
+    </div>
+    <div class="principle">
+      <h3>Review is the handoff</h3>
+      <p>The first visualizer appearance happens after the user confirms the vehicle setup, then immediately starts Exterior color.</p>
+    </div>
+    <div class="principle">
+      <h3>Horizontal options first</h3>
+      <p>Paint and similar visual choices sit below the car image, keeping the vehicle stage front and center.</p>
+    </div>
+  </div>
+
+  <h2 style="margin-top:28px;color:var(--ink);">Transition Decision</h2>
+  <p class="sp-subtitle">This is the piece I would lock into the spec if it matches what you meant.</p>
+
+  <div class="choice-question">
+    <div class="route-choice" data-choice="setup_review_then_exterior_color" onclick="toggleSelect(this)">
+      <h3>Use setup review as the visualizer handoff</h3>
+      <p>After model/body/trim, show a review state. The Continue action opens Exterior color with the visualizer and horizontal options.</p>
+    </div>
+    <div class="route-choice" data-choice="skip_review_open_visualizer" onclick="toggleSelect(this)">
+      <h3>Skip setup review and open visualizer directly</h3>
+      <p>After trim selection, immediately enter Exterior color. Faster, but less explicit about the vehicle context the user just chose.</p>
+    </div>
+  </div>
+</div>

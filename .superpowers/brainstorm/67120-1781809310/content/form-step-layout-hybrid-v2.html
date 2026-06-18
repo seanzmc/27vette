@@ -1,0 +1,479 @@
+<style>
+  :root {
+    --paper: #f8f3ea;
+    --panel: #fffaf2;
+    --ink: #1f2933;
+    --muted: #6f665d;
+    --line: #d8cbb9;
+    --red: #b1182b;
+    --green: #1f8a5b;
+    --gold: #d99019;
+    --blue: #2563eb;
+  }
+  .prototype-wrap {
+    display: grid;
+    gap: 18px;
+    margin-top: 20px;
+  }
+  .prototype {
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
+  }
+  .screen {
+    min-height: 610px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  }
+  .topbar {
+    display: grid;
+    grid-template-columns: minmax(190px, 1fr) auto auto;
+    align-items: center;
+    gap: 18px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+  .eyebrow {
+    margin: 0 0 3px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .topbar h3 {
+    margin: 0;
+    font-size: 22px;
+    letter-spacing: 0;
+  }
+  .next-required {
+    display: grid;
+    gap: 2px;
+    min-width: 240px;
+    border: 1px solid #f0c56d;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #fff7df;
+    font-size: 13px;
+  }
+  .next-required strong {
+    color: #92400e;
+  }
+  .msrp {
+    text-align: right;
+  }
+  .msrp strong {
+    display: block;
+    font-size: 22px;
+  }
+  .workspace {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr) 292px;
+    min-height: 540px;
+  }
+  .rail {
+    border-right: 1px solid var(--line);
+    background: #efe8dc;
+    padding: 14px 10px;
+  }
+  .rail-header {
+    margin: 0 6px 12px;
+  }
+  .progress {
+    height: 8px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #ded2c2;
+  }
+  .progress span {
+    display: block;
+    height: 100%;
+    width: 58%;
+    background: var(--green);
+  }
+  .step {
+    display: grid;
+    grid-template-columns: 26px 1fr auto;
+    gap: 8px;
+    align-items: center;
+    margin: 6px 0;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 8px;
+    color: var(--ink);
+    font-size: 13px;
+  }
+  .step.active {
+    border-color: var(--line);
+    background: white;
+    color: var(--red);
+  }
+  .step small {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .dot {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ddd2c2;
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .dot.done { background: var(--green); color: white; }
+  .dot.warn { background: var(--gold); color: white; }
+  .dot.todo { background: white; border: 1px solid var(--line); }
+  .step-badge {
+    border-radius: 999px;
+    padding: 2px 7px;
+    background: #f4e8d5;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .main {
+    min-width: 0;
+    padding: 22px;
+  }
+  .step-title {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 16px;
+    align-items: end;
+    margin-bottom: 14px;
+  }
+  .step-title h2 {
+    margin: 0;
+    font-size: 30px;
+  }
+  .step-rule {
+    border-radius: 999px;
+    padding: 7px 10px;
+    background: #e8eef7;
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .change-strip {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    border: 1px solid #d9e4f6;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #f5f8fd;
+    font-size: 13px;
+  }
+  .change-strip strong {
+    color: #1d4ed8;
+  }
+  .linkish {
+    color: #1d4ed8;
+    font-weight: 900;
+  }
+  .choice-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .choice {
+    min-height: 118px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: white;
+    padding: 14px;
+    display: grid;
+    gap: 8px;
+    align-content: start;
+  }
+  .choice.selected {
+    border-color: var(--red);
+    box-shadow: inset 4px 0 0 var(--red);
+  }
+  .choice.disabled {
+    color: #8b8174;
+    background: #eee7dc;
+  }
+  .choice-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .choice h4 {
+    margin: 0;
+    font-size: 15px;
+  }
+  .choice p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  .state-pill {
+    width: fit-content;
+    border-radius: 999px;
+    padding: 4px 8px;
+    background: #f4e8d5;
+    color: #5c5147;
+    font-size: 11px;
+    font-weight: 900;
+  }
+  .state-pill.green { background: #dff4e9; color: #166040; }
+  .state-pill.gold { background: #fff1c9; color: #92400e; }
+  .state-pill.gray { background: #ddd8cf; color: #5c5147; }
+  .impact {
+    border-left: 1px solid var(--line);
+    background: var(--panel);
+    padding: 14px;
+  }
+  .impact-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 12px;
+    background: white;
+  }
+  .impact-card h4 {
+    margin: 0 0 9px;
+    font-size: 14px;
+  }
+  .impact-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+    border-top: 1px solid #efe4d3;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .impact-row strong {
+    color: var(--ink);
+  }
+  .guide-card {
+    border-color: #f0c56d;
+    background: #fff7df;
+  }
+  .guide-card p {
+    margin: 0 0 10px;
+    color: #73530d;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .mini-button {
+    display: inline-flex;
+    border-radius: 6px;
+    background: var(--red);
+    color: white;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .callout-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .callout {
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    border-radius: 8px;
+    padding: 14px;
+    background: white;
+  }
+  .callout h4 {
+    margin: 0 0 6px;
+  }
+  .callout p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .density-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .density {
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    border-radius: 10px;
+    padding: 14px;
+    background: white;
+    cursor: pointer;
+  }
+  .density:hover,
+  .density.selected {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
+  }
+  .density h3 {
+    margin: 0 0 6px;
+  }
+  .density p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  @media (max-width: 1050px) {
+    .workspace { grid-template-columns: 180px minmax(0, 1fr); }
+    .impact { display: none; }
+    .topbar { grid-template-columns: 1fr; align-items: stretch; }
+    .density-options, .callout-row { grid-template-columns: 1fr; }
+  }
+</style>
+
+<h2>Hybrid Direction: Guided Status Workspace</h2>
+<p class="subtitle">This version preserves the form as a focused step workflow, but adds persistent progress, “next required” guidance, and a quiet impact panel for availability changes. The guide is bounded so it does not become the whole interface.</p>
+
+<div class="prototype-wrap">
+  <div class="prototype">
+    <div class="screen">
+      <div class="topbar">
+        <div>
+          <p class="eyebrow">2027 Corvette</p>
+          <h3>Grand Sport Coupe 2LT</h3>
+        </div>
+        <div class="next-required">
+          <span class="eyebrow">Next Required</span>
+          <strong>Choose one wheel style</strong>
+          <span>Required before download or dealer submission.</span>
+        </div>
+        <div class="msrp">
+          <p class="eyebrow">Total MSRP</p>
+          <strong>$92,780</strong>
+        </div>
+      </div>
+
+      <div class="workspace">
+        <nav class="rail">
+          <div class="rail-header">
+            <p class="eyebrow">Build Progress</p>
+            <div class="progress"><span></span></div>
+          </div>
+          <div class="step"><span class="dot done">✓</span><span>Vehicle Setup<small>Complete</small></span><span class="step-badge">3/3</span></div>
+          <div class="step"><span class="dot done">✓</span><span>Exterior<small>Complete</small></span><span class="step-badge">2/2</span></div>
+          <div class="step active"><span class="dot warn">!</span><span>Wheels<small>Required</small></span><span class="step-badge">0/1</span></div>
+          <div class="step"><span class="dot todo">4</span><span>Seats<small>Optional</small></span><span class="step-badge">0</span></div>
+          <div class="step"><span class="dot todo">5</span><span>Interior Color<small>Required later</small></span><span class="step-badge">0/1</span></div>
+          <div class="step"><span class="dot todo">6</span><span>Review<small>Locked until complete</small></span><span class="step-badge">3 left</span></div>
+        </nav>
+
+        <main class="main">
+          <div class="step-title">
+            <div>
+              <p class="eyebrow">Step 3 of 12</p>
+              <h2>Wheels</h2>
+            </div>
+            <span class="step-rule">Required: choose 1</span>
+          </div>
+
+          <div class="change-strip">
+            <strong>Availability changed</strong>
+            <span>Z51 made 2 wheel options available and deactivated 1 incompatible option.</span>
+            <span class="linkish">View details</span>
+          </div>
+
+          <div class="choice-grid">
+            <div class="choice selected">
+              <div class="choice-top"><span>Q9I</span><span>$995</span></div>
+              <h4>Split Spoke Machined-Face Wheels</h4>
+              <p>Currently selected for this build.</p>
+              <span class="state-pill green">Selected</span>
+            </div>
+            <div class="choice">
+              <div class="choice-top"><span>Q8T</span><span>$1,495</span></div>
+              <h4>Carbon Flash-Painted Wheels</h4>
+              <p>Newly available with the selected performance package.</p>
+              <span class="state-pill gold">Newly available</span>
+            </div>
+            <div class="choice disabled">
+              <div class="choice-top"><span>Q9A</span><span>$0</span></div>
+              <h4>Bright Silver-Painted Wheels</h4>
+              <p>Unavailable because the selected package requires a compatible wheel.</p>
+              <span class="state-pill gray">Unavailable</span>
+            </div>
+            <div class="choice">
+              <div class="choice-top"><span>Q7E</span><span>$2,495</span></div>
+              <h4>Competition Gray Wheels</h4>
+              <p>Available for the current body, trim, and package combination.</p>
+              <span class="state-pill">Available</span>
+            </div>
+          </div>
+        </main>
+
+        <aside class="impact">
+          <div class="impact-card guide-card">
+            <h4>Guide</h4>
+            <p>You only need one wheel selection to complete this step. The current selection is valid, so you can continue or compare alternatives.</p>
+            <span class="mini-button">Next: Seats</span>
+          </div>
+          <div class="impact-card">
+            <h4>Build Status</h4>
+            <div class="impact-row"><span>Required left</span><strong>3</strong></div>
+            <div class="impact-row"><span>Current step</span><strong>Complete</strong></div>
+            <div class="impact-row"><span>Warnings</span><strong>1</strong></div>
+          </div>
+          <div class="impact-card">
+            <h4>Selection Impact</h4>
+            <div class="impact-row"><span>Newly available</span><strong>2</strong></div>
+            <div class="impact-row"><span>Deactivated</span><strong>1</strong></div>
+            <div class="impact-row"><span>Auto-added</span><strong>0</strong></div>
+          </div>
+          <div class="impact-card">
+            <h4>Summary</h4>
+            <div class="impact-row"><span>Base</span><strong>$78,000</strong></div>
+            <div class="impact-row"><span>Options</span><strong>$14,780</strong></div>
+            <div class="impact-row"><span>Total MSRP</span><strong>$92,780</strong></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout-row">
+    <div class="callout">
+      <h4>Progress is always visible</h4>
+      <p>The rail stops being only navigation. It tells the user which steps are complete, required, changed, or blocked.</p>
+    </div>
+    <div class="callout">
+      <h4>Guidance stays bounded</h4>
+      <p>The “Next Required” strip and compact guide panel answer what to do next without turning the page into a tutorial.</p>
+    </div>
+    <div class="callout">
+      <h4>State changes get surfaced</h4>
+      <p>Availability changes become an explicit, dismissible message instead of silently changing the option grid underneath the user.</p>
+    </div>
+  </div>
+</div>
+
+<h2 style="margin-top:28px;">Where should the density land?</h2>
+<p class="subtitle">This is the main design knob. Pick the one that feels closest.</p>
+
+<div class="density-options">
+  <div class="density" data-choice="lean_quieter" onclick="toggleSelect(this)">
+    <h3>Quieter</h3>
+    <p>Keep the rail progress and top “Next Required,” but hide most impact details behind a button or drawer.</p>
+  </div>
+  <div class="density" data-choice="balanced_hybrid" onclick="toggleSelect(this)">
+    <h3>Balanced</h3>
+    <p>Use this shown layout: visible progress, one change strip, compact right-side impact cards.</p>
+  </div>
+  <div class="density" data-choice="more_guided" onclick="toggleSelect(this)">
+    <h3>More Guided</h3>
+    <p>Make the guide more active: stronger next-step recommendations and more prominent unresolved requirements.</p>
+  </div>
+</div>

@@ -1,0 +1,389 @@
+<style>
+  :root {
+    --paper: #f6f1e8;
+    --panel: #fffaf2;
+    --ink: #1f2933;
+    --muted: #6f665d;
+    --line: #d8cbb9;
+    --red: #b1182b;
+    --green: #22875a;
+    --gold: #d99019;
+    --blue: #2563eb;
+  }
+  .flow-shell {
+    margin-top: 20px;
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--paper);
+    box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
+  }
+  .top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: center;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+  .eyebrow {
+    margin: 0 0 4px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .top h3 {
+    margin: 0;
+    font-size: 24px;
+  }
+  .summary-pill {
+    border: 1px solid #efc76f;
+    border-radius: 999px;
+    padding: 9px 13px;
+    background: #fff7df;
+    color: #6f4a09;
+    font-size: 13px;
+    font-weight: 900;
+  }
+  .flow-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    min-height: 560px;
+  }
+  .map {
+    padding: 24px;
+  }
+  .stage-note {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 14px;
+    align-items: end;
+    margin-bottom: 20px;
+  }
+  .stage-note h2 {
+    margin: 0;
+    font-size: 32px;
+  }
+  .stage-note p {
+    margin: 6px 0 0;
+    color: var(--muted);
+  }
+  .mini-stage {
+    position: relative;
+    height: 164px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 22px;
+    background:
+      radial-gradient(circle at 50% 62%, rgba(31, 41, 51, .14), transparent 26%),
+      linear-gradient(180deg, #fffaf2, #eee3d1);
+    overflow: hidden;
+  }
+  .car-line {
+    position: absolute;
+    left: 12%;
+    right: 12%;
+    top: 48%;
+    height: 36px;
+    border: 5px solid #bf1f32;
+    border-top-left-radius: 70px 38px;
+    border-top-right-radius: 92px 42px;
+    border-bottom: 0;
+  }
+  .car-line::before,
+  .car-line::after {
+    content: "";
+    position: absolute;
+    bottom: -26px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 6px solid #1f2933;
+    background: #f8f3ea;
+  }
+  .car-line::before { left: 14%; }
+  .car-line::after { right: 16%; }
+  .flow-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .phase {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: white;
+    overflow: hidden;
+  }
+  .phase.visual {
+    border-color: rgba(34, 135, 90, .42);
+  }
+  .phase.mixed {
+    border-color: rgba(217, 144, 25, .55);
+  }
+  .phase.static {
+    border-color: rgba(100, 116, 139, .42);
+  }
+  .phase-head {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 8px;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid var(--line);
+    background: #fbf5ec;
+  }
+  .phase-icon {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: white;
+    font-weight: 900;
+    font-size: 13px;
+  }
+  .visual .phase-icon { background: var(--green); }
+  .mixed .phase-icon { background: var(--gold); }
+  .static .phase-icon { background: #64748b; }
+  .phase h4 {
+    margin: 0;
+    font-size: 15px;
+  }
+  .phase small {
+    color: var(--muted);
+  }
+  .phase ul {
+    list-style: none;
+    padding: 12px;
+    margin: 0;
+    display: grid;
+    gap: 8px;
+    color: var(--ink);
+    font-size: 13px;
+  }
+  .phase li {
+    border-bottom: 1px solid #efe4d3;
+    padding-bottom: 7px;
+  }
+  .phase li:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .rail {
+    border-left: 1px solid var(--line);
+    background: var(--panel);
+    padding: 18px 14px;
+  }
+  .rail h4 {
+    margin: 0 0 12px;
+    font-size: 18px;
+  }
+  .rail-step {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 9px;
+    align-items: start;
+    padding: 9px 7px;
+    border-radius: 9px;
+    margin-bottom: 7px;
+  }
+  .rail-step.active {
+    background: #f1e4d1;
+  }
+  .dot {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #e3d7c7;
+    font-weight: 900;
+    font-size: 12px;
+  }
+  .dot.done { background: var(--green); color: white; }
+  .dot.warn { background: var(--gold); color: white; }
+  .rail-step strong {
+    display: block;
+    font-size: 14px;
+  }
+  .rail-step small {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.3;
+  }
+  .rail-note {
+    margin-top: 18px;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .approaches {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 20px;
+  }
+  .approach {
+    border: 1px solid rgba(148, 163, 184, .6);
+    border-radius: 10px;
+    padding: 14px;
+    background: white;
+    cursor: pointer;
+  }
+  .approach:hover,
+  .approach.selected {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .16);
+  }
+  .approach h3 {
+    margin: 0 0 6px;
+  }
+  .approach p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  @media (max-width: 1050px) {
+    .flow-body,
+    .top,
+    .approaches {
+      grid-template-columns: 1fr;
+    }
+    .flow-grid {
+      grid-template-columns: 1fr;
+    }
+    .rail {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+  }
+</style>
+
+<h2>Proposed High-Level Flow</h2>
+<p class="subtitle">This maps your category structure into the visualizer-first redesign. The big move is grouping by customer mental model rather than exposing every workbook step as its own top-level page.</p>
+
+<div class="flow-shell">
+  <div class="top">
+    <div>
+      <p class="eyebrow">Configurator Direction</p>
+      <h3>Vehicle → Exterior → Interior → Performance → Accessories → Review</h3>
+    </div>
+    <div class="summary-pill">Single progress rail, visual stage first</div>
+  </div>
+
+  <div class="flow-body">
+    <main class="map">
+      <div class="stage-note">
+        <div>
+          <p class="eyebrow">Main Workspace</p>
+          <h2>Visualizer owns the visual steps</h2>
+          <p>Exterior, Interior, and the visual part of Performance use the car stage as the dominant screen element.</p>
+        </div>
+      </div>
+
+      <div class="mini-stage">
+        <div class="car-line"></div>
+      </div>
+
+      <div class="flow-grid">
+        <section class="phase visual">
+          <div class="phase-head">
+            <span class="phase-icon">1</span>
+            <span><h4>Vehicle</h4><small>Setup</small></span>
+          </div>
+          <ul>
+            <li>Model</li>
+            <li>Body style</li>
+            <li>Trim level</li>
+          </ul>
+        </section>
+
+        <section class="phase visual">
+          <div class="phase-head">
+            <span class="phase-icon">2</span>
+            <span><h4>Exterior</h4><small>Visualizer</small></span>
+          </div>
+          <ul>
+            <li>Paint</li>
+            <li>Roof</li>
+            <li>Accents and badges</li>
+            <li>Wheels and brakes</li>
+            <li>Stripes and spoiler</li>
+          </ul>
+        </section>
+
+        <section class="phase visual">
+          <div class="phase-head">
+            <span class="phase-icon">3</span>
+            <span><h4>Interior</h4><small>Visualizer</small></span>
+          </div>
+          <ul>
+            <li>Seats</li>
+            <li>Interior color</li>
+            <li>Seatbelt</li>
+            <li>Interior trim</li>
+          </ul>
+        </section>
+
+        <section class="phase mixed">
+          <div class="phase-head">
+            <span class="phase-icon">4</span>
+            <span><h4>Performance</h4><small>Mixed</small></span>
+          </div>
+          <ul>
+            <li>Mechanical</li>
+            <li>Suspension</li>
+            <li>Spoiler</li>
+            <li>Exhaust</li>
+            <li>Engine appearance</li>
+          </ul>
+        </section>
+
+        <section class="phase static">
+          <div class="phase-head">
+            <span class="phase-icon">5</span>
+            <span><h4>Accessories</h4><small>Card list</small></span>
+          </div>
+          <ul>
+            <li>All accessory options</li>
+            <li>Image cards</li>
+            <li>No visualizer stage</li>
+          </ul>
+        </section>
+      </div>
+    </main>
+
+    <aside class="rail">
+      <h4>Right Rail Behavior</h4>
+      <div class="rail-step"><span class="dot done">✓</span><span><strong>Vehicle</strong><small>Complete when model/body/trim are selected.</small></span></div>
+      <div class="rail-step active"><span class="dot warn">!</span><span><strong>Exterior</strong><small>Shows required subgroups and changed availability.</small></span></div>
+      <div class="rail-step"><span class="dot">3</span><span><strong>Interior</strong><small>Unlocked after vehicle context is stable.</small></span></div>
+      <div class="rail-step"><span class="dot">4</span><span><strong>Performance</strong><small>Mixed visual/non-visual handling.</small></span></div>
+      <div class="rail-step"><span class="dot">5</span><span><strong>Accessories</strong><small>Final non-visual option set.</small></span></div>
+      <div class="rail-step"><span class="dot">6</span><span><strong>Review</strong><small>Submit/download once required choices are complete.</small></span></div>
+      <div class="rail-note">The rail is the only persistent navigation/progress root. Subgroups appear in the active workspace, not as more nested sidebars.</div>
+    </aside>
+  </div>
+</div>
+
+<h2 style="margin-top:28px;">Performance Handling</h2>
+<p class="subtitle">This is the one place where the flow needs a clear rule because it mixes visual and non-visual choices.</p>
+
+<div class="approaches">
+  <div class="approach" data-choice="performance_mixed_single_step" onclick="toggleSelect(this)">
+    <h3>Recommended: one Performance step, mixed controls</h3>
+    <p>Keep Performance as one step. Use the visualizer stage when the active subgroup affects appearance, then switch the same workspace to compact cards for purely mechanical choices. The rail stays simple.</p>
+  </div>
+  <div class="approach" data-choice="performance_split_visual_mechanical" onclick="toggleSelect(this)">
+    <h3>Split Performance into Visual and Mechanical</h3>
+    <p>Make spoiler/exhaust/engine appearance one visual phase, and mechanical/suspension a separate card-list phase. Clearer internally, but adds another top-level stop.</p>
+  </div>
+</div>
