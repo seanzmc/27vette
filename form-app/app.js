@@ -2514,6 +2514,39 @@ function renderInteriorCompositionSummary() {
   `;
 }
 
+function visualizerLayerFromRow(row, sourceType, key) {
+  const src = String(row?.layer_url || "").trim();
+  if (!src) return null;
+  const z = Number(row.layer_z);
+  return {
+    key,
+    source_type: sourceType,
+    src,
+    full_src: String(row.layer_url_full || src).trim(),
+    z: Number.isFinite(z) ? z : 25,
+    role: String(row.layer_role || row.step_key || sourceType).trim(),
+    alt: [row.rpo, row.label || row.interior_name || row.interior_code].filter(Boolean).join(" ").trim(),
+  };
+}
+
+function currentInteriorVisualizerLayers() {
+  const layers = [];
+  const autoAdded = computeAutoAdded();
+  const optionIds = new Set([...state.selected, ...autoAdded.keys()]);
+  for (const optionId of optionIds) {
+    const row = choiceForCurrentVariant(optionId) || optionsById.get(optionId);
+    if (!row || !interiorCompositionStepKeys.has(row.step_key)) continue;
+    const layer = visualizerLayerFromRow(row, "option", optionId);
+    if (layer) layers.push(layer);
+  }
+  if (state.selectedInterior) {
+    const interior = interiorsById.get(state.selectedInterior);
+    const layer = visualizerLayerFromRow(interior, "interior", state.selectedInterior);
+    if (layer) layers.push(layer);
+  }
+  return layers.sort((a, b) => a.z - b.z || a.key.localeCompare(b.key));
+}
+
 function renderStepContent({ resetScroll = false } = {}) {
   const step = runtimeSteps.find((item) => item.step_key === state.activeStep);
   const autoAdded = computeAutoAdded();

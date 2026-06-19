@@ -1,6 +1,6 @@
 # Spec: Priority C2 — Interior Visualizer Pane Spike
 
-Status: Follow-up spec. Priority C Interior Composition Summary has landed; start this only with explicit approval for mixed workbook/generator/runtime visualizer work.
+Status: C2a foundation implemented. Optional workbook-owned visualizer layer fields and a generic runtime layer resolver have landed; production pane mounting and real layer rows remain pending image-source approval.
 
 ## Diagnosis
 
@@ -239,3 +239,63 @@ Manual checks at `http://localhost:8000`:
 ## Approval Question
 
 After Priority C lands, approve Priority C2 as a mixed workbook/generator/runtime visualizer spike to prove a workbook-owned interior layer contract before production visualizer wiring?
+
+## C2a Completion Evidence
+
+Implemented foundation only:
+
+- `stingray_master.xlsx` / `asset_map`
+  - Added optional layer metadata columns: `layer_url`, `layer_url_full`, `layer_z`, and `layer_role`.
+  - No active production layer URLs were added in this pass.
+- `scripts/corvette_form_generator/contract.py`
+  - Added `ASSET_LAYER_FIELDS`.
+  - Allows active `asset_map` rows to be image-only, layer-only, or both.
+  - Keeps layer fields absent from runtime rows when workbook rows do not provide layer metadata.
+- `scripts/corvette_form_generator/production.py`
+  - Added optional layer fields to generated `form_choices` and `form_interiors` sheet headers.
+- `scripts/corvette_form_generator/interiors.py`
+  - Carries optional interior-code layer fields through generated interior rows when present.
+- `scripts/corvette_form_generator/inspection.py`
+  - Carries optional layer fields through draft model choice rows when present.
+- `form-app/app.js`
+  - Added `currentInteriorVisualizerLayers()` as a non-rendering resolver.
+  - Combines selected interior-step options, auto-added interior-step options, and `state.selectedInterior` into one ordered layer stack.
+  - Does not mount or display a visualizer pane yet.
+- `tests/test_asset_visualizer_contract.py`
+  - Covers image vs layer field separation, layer-only rows, and absence of blank layer fields.
+- `tests/stingray-form-regression.test.mjs`
+  - Covers selected option + selected interior layer resolution and no-layer graceful empty state.
+
+Validation run:
+
+```sh
+.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+.venv/bin/python scripts/generate_form.py --model stingray
+.venv/bin/python scripts/generate_form.py --model grand_sport
+.venv/bin/python scripts/generate_form.py --model z06
+.venv/bin/python scripts/generate_registry.py
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+.venv/bin/python -m unittest tests/test_asset_visualizer_contract.py
+node --test tests/stingray-form-regression.test.mjs
+node --test tests/multi-model-runtime-switching.test.mjs
+node --test tests/grand-sport-contract-preview.test.mjs
+node --test tests/grand-sport-draft-data.test.mjs
+node --test tests/z06-contract-preview.test.mjs
+node --test tests/z06-form-data-draft.test.mjs
+git diff --check
+```
+
+Generated JSON and `form-app/data.js` produced timestamp-only diffs because no active layer URLs exist yet; those timestamp-only generated diffs were restored after validation. On-disk workbook headers were verified for `asset_map`, `form_choices`, and `form_interiors`.
+
+Image-source timing:
+
+- Image sources were not required for C2a because this pass only established the optional metadata contract and runtime resolver.
+- Image sources are required before C2b can mount a meaningful visualizer pane or add active layer rows.
+- Minimum C2b sample set should cover one complete interior path with compositable, same-geometry assets:
+  - base/cockpit background
+  - one seat layer
+  - one interior color layer tied to `state.selectedInterior`
+  - one seat belt layer
+  - one interior trim layer if trim is included in the first pane
+  - approved `layer_z` ordering and `layer_role` labels
+- Production runtime layer URLs should be WordPress-hosted and workbook-authored, not local `src-img/` paths.

@@ -15,6 +15,7 @@ from typing import Any
 from openpyxl import load_workbook
 from corvette_form_generator.contract import (
     ASSET_IMAGE_FIELDS,
+    ASSET_LAYER_FIELDS,
     build_body_context_choices,
     build_trim_context_choices,
     context_choice_copy_rows,
@@ -653,6 +654,7 @@ def main() -> None:
             "display_order",
             "source_detail_raw",
             *ASSET_IMAGE_FIELDS,
+            *ASSET_LAYER_FIELDS,
         ],
         choices,
     )
@@ -774,6 +776,7 @@ def main() -> None:
             "interior_leaf_label",
             "interior_reference_order",
             *ASSET_IMAGE_FIELDS,
+            *ASSET_LAYER_FIELDS,
         ],
         interiors,
     )

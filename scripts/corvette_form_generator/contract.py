@@ -8,15 +8,25 @@ from corvette_form_generator.workbook import clean, rows_from_sheet, workbook_tr
 
 
 ASSET_IMAGE_FIELDS = ("image_url", "image_alt", "image_fit", "image_position")
+ASSET_LAYER_FIELDS = ("layer_url", "layer_url_full", "layer_z", "layer_role")
 
 
 def asset_fields(row: dict[str, Any]) -> dict[str, str]:
-    return {
+    fields = {
         "image_url": clean(row.get("image_url")),
         "image_alt": clean(row.get("image_alt")),
         "image_fit": clean(row.get("image_fit")),
         "image_position": clean(row.get("image_position")),
     }
+    for field in ASSET_LAYER_FIELDS:
+        value = clean(row.get(field))
+        if value:
+            fields[field] = value
+    return fields
+
+
+def asset_has_runtime_locator(fields: dict[str, str]) -> bool:
+    return bool(fields.get("image_url") or fields.get("layer_url"))
 
 
 def load_asset_map(wb, model_key: str) -> dict[tuple[str, str], dict[str, str]]:
@@ -34,7 +44,7 @@ def load_asset_map(wb, model_key: str) -> dict[tuple[str, str], dict[str, str]]:
         target_type = clean(row.get("target_type"))
         target_id = clean(row.get("target_id"))
         fields = asset_fields(row)
-        if not target_type or not target_id or not fields["image_url"]:
+        if not target_type or not target_id or not asset_has_runtime_locator(fields):
             continue
         assets[(target_type, target_id)] = fields
     return assets

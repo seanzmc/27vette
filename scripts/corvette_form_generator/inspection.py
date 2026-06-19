@@ -13,6 +13,7 @@ from openpyxl import load_workbook
 
 from corvette_form_generator.contract import (
     ASSET_IMAGE_FIELDS,
+    ASSET_LAYER_FIELDS,
     build_body_context_choices,
     build_trim_context_choices,
     context_choice_copy_rows,
@@ -1050,8 +1051,9 @@ def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None
                 "source_description": option["source_description"],
                 "text_cleanup_notes": option["text_cleanup_notes"],
             }
-            if option.get("image_url"):
-                draft_choice.update({field: option.get(field, "") for field in ASSET_IMAGE_FIELDS})
+            asset_fields = [*ASSET_IMAGE_FIELDS, *ASSET_LAYER_FIELDS]
+            if option.get("image_url") or option.get("layer_url"):
+                draft_choice.update({field: option.get(field, "") for field in asset_fields if option.get(field, "")})
             draft_choices.append(draft_choice)
 
     standard_equipment = [

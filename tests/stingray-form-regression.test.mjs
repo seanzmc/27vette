@@ -207,6 +207,7 @@ window.__testApi = {
   render,
   renderChoiceCard,
   renderInteriorGroups: typeof renderInteriorGroups === "function" ? renderInteriorGroups : undefined,
+  currentInteriorVisualizerLayers: typeof currentInteriorVisualizerLayers === "function" ? currentInteriorVisualizerLayers : undefined,
   activateStep: typeof activateStep === "function" ? activateStep : undefined,
   setMobileDrawer: typeof setMobileDrawer === "function" ? setMobileDrawer : undefined,
   closeMobileDrawers: typeof closeMobileDrawers === "function" ? closeMobileDrawers : undefined,
@@ -763,6 +764,63 @@ test("interior composition summary reflects selected interior composition and to
   assert.match(html, new RegExp(escapeRegExp(belt.rpo)));
   assert.match(html, /Interior delta/);
   assert.match(html, new RegExp(escapeRegExp(expectedTotal)));
+});
+
+test("interior visualizer layer resolver combines selected options and selected interior", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const seat = runtime.activeChoiceRows().find((choice) => choice.rpo === "AQ9" && choice.step_key === "seat");
+  assert.ok(seat, "expected AQ9 seat choice");
+  seat.layer_url = "https://example.test/seat-layer.webp";
+  seat.layer_url_full = "https://example.test/seat-layer-full.png";
+  seat.layer_z = "30";
+  seat.layer_role = "seat";
+  runtime.handleChoice(seat);
+
+  const interior = runtime.data.interiors.find((row) => row.trim_level === "1LT" && row.seat_code === "AQ9");
+  assert.ok(interior, "expected 1LT/AQ9 interior");
+  interior.layer_url = "https://example.test/interior-layer.webp";
+  interior.layer_z = "40";
+  interior.layer_role = "interior_color";
+  runtime.state.selectedInterior = interior.interior_id;
+
+  const layers = runtime.currentInteriorVisualizerLayers();
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(layers.map((layer) => [layer.source_type, layer.key, layer.src, layer.z, layer.role]))),
+    [
+      ["option", seat.option_id, "https://example.test/seat-layer.webp", 30, "seat"],
+      ["interior", interior.interior_id, "https://example.test/interior-layer.webp", 40, "interior_color"],
+    ]
+  );
+  assert.equal(layers[0].full_src, "https://example.test/seat-layer-full.png");
+  assert.equal(layers[1].full_src, "https://example.test/interior-layer.webp");
+});
+
+test("interior visualizer layer resolver is empty when workbook layer metadata is absent", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  for (const choice of runtime.activeChoiceRows()) {
+    delete choice.layer_url;
+    delete choice.layer_url_full;
+    delete choice.layer_z;
+    delete choice.layer_role;
+  }
+  for (const interior of runtime.data.interiors) {
+    delete interior.layer_url;
+    delete interior.layer_url_full;
+    delete interior.layer_z;
+    delete interior.layer_role;
+  }
+
+  assert.equal(runtime.currentInteriorVisualizerLayers().length, 0);
 });
 
 test("option selections preserve the current viewport instead of resetting to the page top", () => {

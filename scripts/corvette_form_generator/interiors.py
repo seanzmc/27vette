@@ -7,7 +7,7 @@ from typing import Any
 
 from openpyxl import load_workbook
 
-from corvette_form_generator.contract import ASSET_IMAGE_FIELDS, interior_asset_map
+from corvette_form_generator.contract import interior_asset_map
 from corvette_form_generator.model_config import ModelConfig
 from corvette_form_generator.pricing import (
     generated_interior_price,
@@ -183,7 +183,7 @@ def build_model_interiors(config: ModelConfig, wb: Any | None = None) -> list[di
         interior["interior_components_json"] = json.dumps(interior["interior_components"], separators=(",", ":"))
         interior.update(grouping_fields_from_scope(scope_row, interior))
         if asset := interior_assets.get(interior["interior_code"].upper()):
-            interior.update({field: asset.get(field, "") for field in ASSET_IMAGE_FIELDS})
+            interior.update(asset)
         interiors.append(interior)
 
     return interiors
