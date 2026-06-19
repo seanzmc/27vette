@@ -773,6 +773,7 @@ def main() -> None:
             "interior_parent_group_label",
             "interior_leaf_label",
             "interior_reference_order",
+            *ASSET_IMAGE_FIELDS,
         ],
         interiors,
     )

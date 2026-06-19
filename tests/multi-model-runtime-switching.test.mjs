@@ -1278,7 +1278,9 @@ test("Grand Sport 1LT interior color groups stay expanded when each group has on
   const html = runtime.renderInteriorGroups(interiors);
   assert.doesNotMatch(html, /<details class="interior-group"/, "single-option 1LT color groups should not be collapsed");
   assert.match(html, /<section class="interior-group"/);
-  assert.match(html, /<button class="choice-card"/);
+  assert.match(html, /<button class="choice-card has-media"/);
+  assert.match(html, /<span class="choice-media" data-fit="swatch">/);
+  assert.doesNotMatch(html, /1 choice/, "single-option interior groups should not expose internal count copy");
 });
 
 test("Grand Sport interior color groups render collapsed disclosure containers", () => {

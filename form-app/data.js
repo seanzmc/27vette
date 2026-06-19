@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-18T15:38:14+00:00"
+          "generated_at": "2026-06-19T05:54:15+00:00"
         },
         "variants": [
           {
@@ -40407,7 +40407,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "1LT > AE4 Competition Seats > HTJ Jet Black",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "HTJ Jet Black",
-            "interior_reference_order": 4
+            "interior_reference_order": 4,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htj.png",
+            "image_alt": "HTJ HTJ Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "1LT_AQ9_HTA",
@@ -40441,7 +40445,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "1LT > AQ9 GT1 Bucket Seats > HTA Jet Black",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "HTA Jet Black",
-            "interior_reference_order": 1
+            "interior_reference_order": 1,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hta.png",
+            "image_alt": "HTA HTA Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "1LT_AQ9_HUP",
@@ -40475,7 +40483,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "1LT > AQ9 GT1 Bucket Seats > HUP Sky Cool Gray",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "HUP Sky Cool Gray",
-            "interior_reference_order": 2
+            "interior_reference_order": 2,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hup.png",
+            "image_alt": "HUP HUP Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "1LT_AQ9_HUQ",
@@ -40509,7 +40521,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "1LT > AQ9 GT1 Bucket Seats > HUQ Adrenaline Red",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "HUQ Adrenaline Red",
-            "interior_reference_order": 3
+            "interior_reference_order": 3,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huq.png",
+            "image_alt": "HUQ HUQ Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTM",
@@ -40550,7 +40566,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 12
+            "interior_reference_order": 12,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTM_36S",
@@ -40597,7 +40617,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
-            "interior_reference_order": 13
+            "interior_reference_order": 13,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTM_37S",
@@ -40644,7 +40668,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Blue Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
-            "interior_reference_order": 14
+            "interior_reference_order": 14,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTM_38S",
@@ -40691,7 +40719,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Red Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
-            "interior_reference_order": 15
+            "interior_reference_order": 15,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTN",
@@ -40732,7 +40764,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural",
-            "interior_reference_order": 24
+            "interior_reference_order": 24,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htn.png",
+            "image_alt": "HTN Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTP_N26",
@@ -40779,7 +40815,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede",
-            "interior_reference_order": 16
+            "interior_reference_order": 16,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTP_N26_36S",
@@ -40832,7 +40872,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Yellow Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Yellow Stitching",
-            "interior_reference_order": 17
+            "interior_reference_order": 17,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTP_N26_37S",
@@ -40885,7 +40929,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Blue Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Blue Stitching",
-            "interior_reference_order": 18
+            "interior_reference_order": 18,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTP_N26_38S",
@@ -40938,7 +40986,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Red Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Red Stitching",
-            "interior_reference_order": 19
+            "interior_reference_order": 19,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTQ_N26",
@@ -40985,7 +41037,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural Suede",
-            "interior_reference_order": 25
+            "interior_reference_order": 25,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htq.png",
+            "image_alt": "HTQ Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HU6_N26",
@@ -41032,7 +41088,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
-            "interior_reference_order": 21
+            "interior_reference_order": 21,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu6.png",
+            "image_alt": "HU6 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HU7_N26",
@@ -41079,7 +41139,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Adrenaline Red > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red Suede",
-            "interior_reference_order": 23
+            "interior_reference_order": 23,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu7.png",
+            "image_alt": "HU7 Adrenaline Red Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HUK",
@@ -41120,7 +41184,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 20
+            "interior_reference_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huk.png",
+            "image_alt": "HUK Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HUL",
@@ -41161,7 +41229,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 22
+            "interior_reference_order": 22,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hul.png",
+            "image_alt": "HUL Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTM",
@@ -41202,7 +41274,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 26
+            "interior_reference_order": 26,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTM_36S",
@@ -41249,7 +41325,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
-            "interior_reference_order": 27
+            "interior_reference_order": 27,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTM_37S",
@@ -41296,7 +41376,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Blue Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
-            "interior_reference_order": 28
+            "interior_reference_order": 28,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTM_38S",
@@ -41343,7 +41427,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Red Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
-            "interior_reference_order": 29
+            "interior_reference_order": 29,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTN",
@@ -41384,7 +41472,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural",
-            "interior_reference_order": 41
+            "interior_reference_order": 41,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htn.png",
+            "image_alt": "HTN Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTN_TU7",
@@ -41431,7 +41523,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Two Tone",
-            "interior_reference_order": 42
+            "interior_reference_order": 42,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htn.png",
+            "image_alt": "HTN Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTP_N26",
@@ -41478,7 +41574,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede",
-            "interior_reference_order": 30
+            "interior_reference_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTP_N26_36S",
@@ -41531,7 +41631,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Yellow Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Yellow Stitching",
-            "interior_reference_order": 31
+            "interior_reference_order": 31,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTP_N26_37S",
@@ -41584,7 +41688,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Blue Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Blue Stitching",
-            "interior_reference_order": 32
+            "interior_reference_order": 32,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTP_N26_38S",
@@ -41637,7 +41745,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Red Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Red Stitching",
-            "interior_reference_order": 33
+            "interior_reference_order": 33,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTQ_N26",
@@ -41684,7 +41796,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Suede",
-            "interior_reference_order": 43
+            "interior_reference_order": 43,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htq.png",
+            "image_alt": "HTQ Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTQ_N26_TU7",
@@ -41737,7 +41853,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Suede Two Tone",
-            "interior_reference_order": 44
+            "interior_reference_order": 44,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htq.png",
+            "image_alt": "HTQ Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HU6_N26",
@@ -41784,7 +41904,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
-            "interior_reference_order": 36
+            "interior_reference_order": 36,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu6.png",
+            "image_alt": "HU6 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HU6_N26_TU7",
@@ -41837,7 +41961,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Suede Two Tone",
-            "interior_reference_order": 37
+            "interior_reference_order": 37,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu6.png",
+            "image_alt": "HU6 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HU7_N26_TU7",
@@ -41890,7 +42018,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Adrenaline Red > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red Suede Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red Suede Two Tone",
-            "interior_reference_order": 40
+            "interior_reference_order": 40,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu7.png",
+            "image_alt": "HU7 Adrenaline Red Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HUK",
@@ -41931,7 +42063,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 34
+            "interior_reference_order": 34,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huk.png",
+            "image_alt": "HUK Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HUK_TU7",
@@ -41978,7 +42114,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Two Tone",
-            "interior_reference_order": 35
+            "interior_reference_order": 35,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huk.png",
+            "image_alt": "HUK Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HUL",
@@ -42019,7 +42159,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 38
+            "interior_reference_order": 38,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hul.png",
+            "image_alt": "HUL Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HUL_TU7",
@@ -42066,7 +42210,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red Two Tone",
-            "interior_reference_order": 39
+            "interior_reference_order": 39,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hul.png",
+            "image_alt": "HUL Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AQ9_H1Y",
@@ -42100,7 +42248,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Jet Black > Jet Black",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 5
+            "interior_reference_order": 5,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h1y.png",
+            "image_alt": "H1Y Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AQ9_H1Y_36S",
@@ -42141,7 +42293,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Jet Black > Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
-            "interior_reference_order": 6
+            "interior_reference_order": 6,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h1y.png",
+            "image_alt": "H1Y Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AQ9_H1Y_37S",
@@ -42182,7 +42338,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Jet Black > Jet Black with Blue Stitching",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
-            "interior_reference_order": 7
+            "interior_reference_order": 7,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h1y.png",
+            "image_alt": "H1Y Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AQ9_H1Y_38S",
@@ -42223,7 +42383,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Jet Black > Jet Black with Red Stitching",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
-            "interior_reference_order": 8
+            "interior_reference_order": 8,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h1y.png",
+            "image_alt": "H1Y Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AQ9_HUN",
@@ -42257,7 +42421,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Sky Cool Gray",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 9
+            "interior_reference_order": 9,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hun.png",
+            "image_alt": "HUN Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AQ9_HUR",
@@ -42291,7 +42459,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Adrenaline Red",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 10
+            "interior_reference_order": 10,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hur.png",
+            "image_alt": "HUR Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AQ9_HUV",
@@ -42325,7 +42497,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Natural",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Natural",
-            "interior_reference_order": 11
+            "interior_reference_order": 11,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huv.png",
+            "image_alt": "HUV Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_EJH",
@@ -42366,7 +42542,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Very Dark Atmosphere > Napa leather seating surfaces with perforated inserts. > Very Dark Atmosphere",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Very Dark Atmosphere",
-            "interior_reference_order": 115
+            "interior_reference_order": 115,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ejh.png",
+            "image_alt": "EJH Very Dark Atmosphere interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_EPX_N26",
@@ -42413,7 +42593,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Very Dark Atmosphere > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Very Dark Atmosphere Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Very Dark Atmosphere Suede",
-            "interior_reference_order": 116
+            "interior_reference_order": 116,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/epx.png",
+            "image_alt": "EPX Very Dark Atmosphere Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_H8T",
@@ -42454,7 +42638,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Santorini Blue > Santorini Blue",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Santorini Blue",
-            "interior_reference_order": 112
+            "interior_reference_order": 112,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h8t.png",
+            "image_alt": "H8T Santorini Blue interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HAG",
@@ -42495,7 +42683,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Asymmetrical Santorini Blue / Jet Black > Asymmetrical Santorini Blue / Jet Black",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Asymmetrical Santorini Blue / Jet Black",
-            "interior_reference_order": 126
+            "interior_reference_order": 126,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hag.png",
+            "image_alt": "HAG Asymmetrical Santorini Blue / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HNK",
@@ -42536,7 +42728,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Adrenaline Red Dipped > Adrenaline Red Dipped",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red Dipped",
-            "interior_reference_order": 107
+            "interior_reference_order": 107,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hnk.png",
+            "image_alt": "HNK Adrenaline Red Dipped interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTE",
@@ -42577,7 +42773,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 95
+            "interior_reference_order": 95,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTE_36S",
@@ -42624,7 +42824,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
-            "interior_reference_order": 96
+            "interior_reference_order": 96,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTE_37S",
@@ -42671,7 +42875,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Blue Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
-            "interior_reference_order": 97
+            "interior_reference_order": 97,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTE_38S",
@@ -42718,7 +42926,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Red Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
-            "interior_reference_order": 98
+            "interior_reference_order": 98,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTG_N26",
@@ -42765,7 +42977,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural Suede",
-            "interior_reference_order": 109
+            "interior_reference_order": 109,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htg.png",
+            "image_alt": "HTG Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTT_N26",
@@ -42812,7 +43028,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede",
-            "interior_reference_order": 99
+            "interior_reference_order": 99,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTT_N26_36S",
@@ -42865,7 +43085,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Yellow Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Yellow Stitching",
-            "interior_reference_order": 100
+            "interior_reference_order": 100,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTT_N26_37S",
@@ -42918,7 +43142,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Blue Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Blue Stitching",
-            "interior_reference_order": 101
+            "interior_reference_order": 101,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTT_N26_38S",
@@ -42971,7 +43199,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Red Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Red Stitching",
-            "interior_reference_order": 102
+            "interior_reference_order": 102,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HU1",
@@ -43012,7 +43244,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 103
+            "interior_reference_order": 103,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu1.png",
+            "image_alt": "HU1 Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HU2",
@@ -43053,7 +43289,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 105
+            "interior_reference_order": 105,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu2.png",
+            "image_alt": "HU2 Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HU9_N26",
@@ -43100,7 +43340,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
-            "interior_reference_order": 104
+            "interior_reference_order": 104,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu9.png",
+            "image_alt": "HU9 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUA_N26",
@@ -43147,7 +43391,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Adrenaline Red > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red Suede",
-            "interior_reference_order": 106
+            "interior_reference_order": 106,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hua.png",
+            "image_alt": "HUA Adrenaline Red Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUB_N26",
@@ -43194,7 +43442,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black",
-            "interior_reference_order": 121
+            "interior_reference_order": 121,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUB_N26_36S",
@@ -43247,7 +43499,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Yellow Stitching",
-            "interior_reference_order": 122
+            "interior_reference_order": 122,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUB_N26_37S",
@@ -43300,7 +43556,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black with Blue Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Blue Stitching",
-            "interior_reference_order": 123
+            "interior_reference_order": 123,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUB_N26_38S",
@@ -43353,7 +43613,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black with Red Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Red Stitching",
-            "interior_reference_order": 124
+            "interior_reference_order": 124,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUC",
@@ -43394,7 +43658,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black",
-            "interior_reference_order": 117
+            "interior_reference_order": 117,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUC_36S",
@@ -43441,7 +43709,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Yellow Stitching",
-            "interior_reference_order": 118
+            "interior_reference_order": 118,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUC_37S",
@@ -43488,7 +43760,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Blue Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Blue Stitching",
-            "interior_reference_order": 119
+            "interior_reference_order": 119,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUC_38S",
@@ -43535,7 +43811,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Red Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Red Stitching",
-            "interior_reference_order": 120
+            "interior_reference_order": 120,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUE",
@@ -43576,7 +43856,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural",
-            "interior_reference_order": 108
+            "interior_reference_order": 108,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hue.png",
+            "image_alt": "HUE Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUF_N26",
@@ -43623,7 +43907,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Natural Dipped > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Dipped Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural Dipped Suede",
-            "interior_reference_order": 111
+            "interior_reference_order": 111,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huf.png",
+            "image_alt": "HUF Natural Dipped Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUW",
@@ -43664,7 +43952,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Habanero > Napa leather seating surfaces with perforated inserts. > Habanero",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Habanero",
-            "interior_reference_order": 113
+            "interior_reference_order": 113,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huw.png",
+            "image_alt": "HUW Habanero interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUX_N26",
@@ -43711,7 +44003,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Habanero > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Habanero Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Habanero Suede",
-            "interior_reference_order": 114
+            "interior_reference_order": 114,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hux.png",
+            "image_alt": "HUX Habanero Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HVZ",
@@ -43752,7 +44048,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Asymmetrical Adrenaline Red / Jet Black > Asymmetrical Adrenaline Red / Jet Black",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Asymmetrical Adrenaline Red / Jet Black",
-            "interior_reference_order": 125
+            "interior_reference_order": 125,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvz.png",
+            "image_alt": "HVZ Asymmetrical Adrenaline Red / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HZN",
@@ -43793,7 +44093,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Natural Dipped > Napa leather seating surfaces with perforated inserts. > Natural Dipped",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural Dipped",
-            "interior_reference_order": 110
+            "interior_reference_order": 110,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hzn.png",
+            "image_alt": "HZN Natural Dipped interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_EJH",
@@ -43827,7 +44131,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Very Dark Atmosphere > Napa leather seating surfaces with perforated inserts. > Very Dark Atmosphere",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Very Dark Atmosphere",
-            "interior_reference_order": 70
+            "interior_reference_order": 70,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ejh.png",
+            "image_alt": "EJH Very Dark Atmosphere interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_EPX_N26",
@@ -43868,7 +44176,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Very Dark Atmosphere > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Very Dark Atmosphere Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Very Dark Atmosphere Suede",
-            "interior_reference_order": 71
+            "interior_reference_order": 71,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/epx.png",
+            "image_alt": "EPX Very Dark Atmosphere Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_H8T",
@@ -43902,7 +44214,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Santorini Blue > Santorini Blue",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Santorini Blue",
-            "interior_reference_order": 67
+            "interior_reference_order": 67,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h8t.png",
+            "image_alt": "H8T Santorini Blue interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HAG",
@@ -43936,7 +44252,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Asymmetrical Santorini Blue / Jet Black > Asymmetrical Santorini Blue / Jet Black",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Asymmetrical Santorini Blue / Jet Black",
-            "interior_reference_order": 81
+            "interior_reference_order": 81,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hag.png",
+            "image_alt": "HAG Asymmetrical Santorini Blue / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HNK",
@@ -43970,7 +44290,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Adrenaline Red Dipped > Adrenaline Red Dipped",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red Dipped",
-            "interior_reference_order": 60
+            "interior_reference_order": 60,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hnk.png",
+            "image_alt": "HNK Adrenaline Red Dipped interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTE",
@@ -44004,7 +44328,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 45
+            "interior_reference_order": 45,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTE_36S",
@@ -44045,7 +44373,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
-            "interior_reference_order": 46
+            "interior_reference_order": 46,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTE_37S",
@@ -44086,7 +44418,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Blue Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
-            "interior_reference_order": 47
+            "interior_reference_order": 47,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTE_38S",
@@ -44127,7 +44463,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Red Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
-            "interior_reference_order": 48
+            "interior_reference_order": 48,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTG_N26",
@@ -44168,7 +44508,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Suede",
-            "interior_reference_order": 63
+            "interior_reference_order": 63,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htg.png",
+            "image_alt": "HTG Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTG_N26_TU7",
@@ -44215,7 +44559,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Suede Two Tone",
-            "interior_reference_order": 64
+            "interior_reference_order": 64,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htg.png",
+            "image_alt": "HTG Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTT_N26",
@@ -44256,7 +44604,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede",
-            "interior_reference_order": 49
+            "interior_reference_order": 49,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTT_N26_36S",
@@ -44303,7 +44655,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Yellow Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Yellow Stitching",
-            "interior_reference_order": 50
+            "interior_reference_order": 50,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTT_N26_37S",
@@ -44350,7 +44706,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Blue Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Blue Stitching",
-            "interior_reference_order": 51
+            "interior_reference_order": 51,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTT_N26_38S",
@@ -44397,7 +44757,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Red Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Red Stitching",
-            "interior_reference_order": 52
+            "interior_reference_order": 52,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HU1",
@@ -44431,7 +44795,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 53
+            "interior_reference_order": 53,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu1.png",
+            "image_alt": "HU1 Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HU1_TU7",
@@ -44472,7 +44840,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Two Tone",
-            "interior_reference_order": 54
+            "interior_reference_order": 54,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu1.png",
+            "image_alt": "HU1 Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HU2",
@@ -44506,7 +44878,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 57
+            "interior_reference_order": 57,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu2.png",
+            "image_alt": "HU2 Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HU2_TU7",
@@ -44547,7 +44923,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red Two Tone",
-            "interior_reference_order": 58
+            "interior_reference_order": 58,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu2.png",
+            "image_alt": "HU2 Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HU9_N26",
@@ -44588,7 +44968,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
-            "interior_reference_order": 55
+            "interior_reference_order": 55,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu9.png",
+            "image_alt": "HU9 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HU9_N26_TU7",
@@ -44635,7 +45019,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Suede Two Tone",
-            "interior_reference_order": 56
+            "interior_reference_order": 56,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu9.png",
+            "image_alt": "HU9 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUA_N26_TU7",
@@ -44682,7 +45070,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Adrenaline Red > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red Suede Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red Suede Two Tone",
-            "interior_reference_order": 59
+            "interior_reference_order": 59,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hua.png",
+            "image_alt": "HUA Adrenaline Red Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUB_N26",
@@ -44723,7 +45115,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black suede",
-            "interior_reference_order": 76
+            "interior_reference_order": 76,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUB_N26_36S",
@@ -44770,7 +45166,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black suede with Yellow Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black suede with Yellow Stitching",
-            "interior_reference_order": 77
+            "interior_reference_order": 77,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUB_N26_37S",
@@ -44817,7 +45217,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black suede with Blue Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black suede with Blue Stitching",
-            "interior_reference_order": 78
+            "interior_reference_order": 78,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUB_N26_38S",
@@ -44864,7 +45268,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black suede with Red Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black suede with Red Stitching",
-            "interior_reference_order": 79
+            "interior_reference_order": 79,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUC",
@@ -44898,7 +45306,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black",
-            "interior_reference_order": 72
+            "interior_reference_order": 72,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUC_36S",
@@ -44939,7 +45351,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Yellow Stitching",
-            "interior_reference_order": 73
+            "interior_reference_order": 73,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUC_37S",
@@ -44980,7 +45396,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Blue Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Blue Stitching",
-            "interior_reference_order": 74
+            "interior_reference_order": 74,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUC_38S",
@@ -45021,7 +45441,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Red Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Red Stitching",
-            "interior_reference_order": 75
+            "interior_reference_order": 75,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUE",
@@ -45055,7 +45479,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural",
-            "interior_reference_order": 61
+            "interior_reference_order": 61,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hue.png",
+            "image_alt": "HUE Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUE_TU7",
@@ -45096,7 +45524,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Two Tone",
-            "interior_reference_order": 62
+            "interior_reference_order": 62,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hue.png",
+            "image_alt": "HUE Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUF_N26",
@@ -45137,7 +45569,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural Dipped > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Dipped Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Dipped Suede",
-            "interior_reference_order": 66
+            "interior_reference_order": 66,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huf.png",
+            "image_alt": "HUF Natural Dipped Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUW",
@@ -45171,7 +45607,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Habanero > Napa leather seating surfaces with perforated inserts. > Habanero",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Habanero",
-            "interior_reference_order": 68
+            "interior_reference_order": 68,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huw.png",
+            "image_alt": "HUW Habanero interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUX_N26",
@@ -45212,7 +45652,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Habanero > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Habanero Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Habanero Suede",
-            "interior_reference_order": 69
+            "interior_reference_order": 69,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hux.png",
+            "image_alt": "HUX Habanero Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HVZ",
@@ -45246,7 +45690,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Asymmetrical Adrenaline Red / Jet Black > Asymmetrical Adrenaline Red / Jet Black",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Asymmetrical Adrenaline Red / Jet Black",
-            "interior_reference_order": 80
+            "interior_reference_order": 80,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvz.png",
+            "image_alt": "HVZ Asymmetrical Adrenaline Red / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HZN",
@@ -45280,7 +45728,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural Dipped > Napa leather seating surfaces with perforated inserts. > Natural Dipped",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Dipped",
-            "interior_reference_order": 65
+            "interior_reference_order": 65,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hzn.png",
+            "image_alt": "HZN Natural Dipped interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AUP_HAG",
@@ -45321,7 +45773,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AUP Assymetrical seats > Asymmetrical Santorini Blue / Jet Black",
             "interior_parent_group_label": "AUP Assymetrical seats",
             "interior_leaf_label": "Asymmetrical Santorini Blue / Jet Black",
-            "interior_reference_order": 93
+            "interior_reference_order": 93,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hag.png",
+            "image_alt": "HAG Asymmetrical Santorini Blue / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AUP_HVZ",
@@ -45362,7 +45818,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AUP Assymetrical seats > Asymmetrical Adrenaline Red / Jet Black",
             "interior_parent_group_label": "AUP Assymetrical seats",
             "interior_leaf_label": "Asymmetrical Adrenaline Red / Jet Black",
-            "interior_reference_order": 94
+            "interior_reference_order": 94,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvz.png",
+            "image_alt": "HVZ Asymmetrical Adrenaline Red / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AE4_HU0_38S",
@@ -45409,7 +45869,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Custom Interior trim and seat combinations > Jet Black interior / Adrenaline Red seats > Napa leather seating surfaces with perforated inserts. > Jet Black interior / Adrenaline Red seats",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_reference_order": 129
+            "interior_reference_order": 129,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu0.png",
+            "image_alt": "HU0 Jet Black interior / Adrenaline Red seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AE4_HUU",
@@ -45450,7 +45914,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Custom Interior trim and seat combinations > Adrenaline Red interior / Jet Black seats > Napa leather seating surfaces with perforated inserts. > Adrenaline Red interior / Jet Black seats",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats",
-            "interior_reference_order": 127
+            "interior_reference_order": 127,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huu.png",
+            "image_alt": "HUU Adrenaline Red interior / Jet Black seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AE4_HXO_N26_38S",
@@ -45503,7 +45971,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Custom Interior trim and seat combinations > Jet Black interior / Adrenaline Red seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black interior / Adrenaline Red seats Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats Suede",
-            "interior_reference_order": 130
+            "interior_reference_order": 130,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hxo.png",
+            "image_alt": "HXO Jet Black interior / Adrenaline Red seats Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AE4_HZP_N26",
@@ -45550,7 +46022,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Custom Interior trim and seat combinations > Adrenaline Red interior / Jet Black seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red interior / Jet Black seats Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats Suede",
-            "interior_reference_order": 128
+            "interior_reference_order": 128,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hzp.png",
+            "image_alt": "HZP Adrenaline Red interior / Jet Black seats Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HMO_N26",
@@ -45597,7 +46073,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Sky Cool Gray seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black interior / Sky Cool Gray seats Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats Suede",
-            "interior_reference_order": 86
+            "interior_reference_order": 86,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hmo.png",
+            "image_alt": "HMO Jet Black interior / Sky Cool Gray seats Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HMO_N26_TU7",
@@ -45650,7 +46130,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Sky Cool Gray seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black interior / Sky Cool Gray seats Suede Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats Suede Two Tone",
-            "interior_reference_order": 87
+            "interior_reference_order": 87,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hmo.png",
+            "image_alt": "HMO Jet Black interior / Sky Cool Gray seats Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HU0_38S",
@@ -45697,7 +46181,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Adrenaline Red seats > Napa leather seating surfaces with perforated inserts. > Jet Black interior / Adrenaline Red seats",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_reference_order": 90
+            "interior_reference_order": 90,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu0.png",
+            "image_alt": "HU0 Jet Black interior / Adrenaline Red seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HU0_38S_TU7",
@@ -45750,7 +46238,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Adrenaline Red seats > Napa leather seating surfaces with perforated inserts. > Jet Black interior / Adrenaline Red seats Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats Two Tone",
-            "interior_reference_order": 91
+            "interior_reference_order": 91,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu0.png",
+            "image_alt": "HU0 Jet Black interior / Adrenaline Red seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HUU",
@@ -45791,7 +46283,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Adrenaline Red interior / Jet Black seats > Napa leather seating surfaces with perforated inserts. > Adrenaline Red interior / Jet Black seats (HUU)",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats (HUU)",
-            "interior_reference_order": 88
+            "interior_reference_order": 88,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huu.png",
+            "image_alt": "HUU Adrenaline Red interior / Jet Black seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HVT_N26",
@@ -45838,7 +46334,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Sky Cool Gray interior / Jet Black seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray interior / Jet Black seats Suede (HVT)",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray interior / Jet Black seats Suede (HVT)",
-            "interior_reference_order": 83
+            "interior_reference_order": 83,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvt.png",
+            "image_alt": "HVT Sky Cool Gray interior / Jet Black seats Suede (HVT) interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HVV",
@@ -45879,7 +46379,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Sky Cool Gray seats > Napa leather seating surfaces with perforated inserts. > Jet Black interior / Sky Cool Gray seats (HVV)",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats (HVV)",
-            "interior_reference_order": 84
+            "interior_reference_order": 84,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvv.png",
+            "image_alt": "HVV Jet Black interior / Sky Cool Gray seats (HVV) interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HVV_TU7",
@@ -45926,7 +46430,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Sky Cool Gray seats > Napa leather seating surfaces with perforated inserts. > Jet Black interior / Sky Cool Gray seats Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats Two Tone",
-            "interior_reference_order": 85
+            "interior_reference_order": 85,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvv.png",
+            "image_alt": "HVV Jet Black interior / Sky Cool Gray seats (HVV) interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HXO_N26_38S_TU7",
@@ -45985,7 +46493,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Adrenaline Red seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black interior / Adrenaline Red seats Suede HXO",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats Suede HXO",
-            "interior_reference_order": 92
+            "interior_reference_order": 92,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hxo.png",
+            "image_alt": "HXO Jet Black interior / Adrenaline Red seats Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HZB",
@@ -46026,7 +46538,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Sky Cool Gray interior / Jet Black seats > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray interior / Jet Black seats (HZB)",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray interior / Jet Black seats (HZB)",
-            "interior_reference_order": 82
+            "interior_reference_order": 82,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hzb.png",
+            "image_alt": "HZB Sky Cool Gray interior / Jet Black seats (HZB) interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HZP_N26",
@@ -46073,7 +46589,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Adrenaline Red interior / Jet Black seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red interior / Jet Black seats Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats Suede",
-            "interior_reference_order": 89
+            "interior_reference_order": 89,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hzp.png",
+            "image_alt": "HZP Adrenaline Red interior / Jet Black seats Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           }
         ],
         "colorOverrides": [
@@ -48079,7 +48599,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-18T15:42:16+00:00",
+          "generated_at": "2026-06-19T06:04:30+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -89418,7 +89938,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "1LT > AE4 Competition Seats > HTJ Jet Black",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "HTJ Jet Black",
-            "interior_reference_order": 4
+            "interior_reference_order": 4,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htj.png",
+            "image_alt": "HTJ HTJ Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "1LT_AQ9_HTA",
@@ -89454,7 +89978,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "1LT > AQ9 GT1 Bucket Seats > HTA Jet Black",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "HTA Jet Black",
-            "interior_reference_order": 1
+            "interior_reference_order": 1,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hta.png",
+            "image_alt": "HTA HTA Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "1LT_AQ9_HUP",
@@ -89490,7 +90018,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "1LT > AQ9 GT1 Bucket Seats > HUP Sky Cool Gray",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "HUP Sky Cool Gray",
-            "interior_reference_order": 2
+            "interior_reference_order": 2,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hup.png",
+            "image_alt": "HUP HUP Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "1LT_AQ9_HUQ",
@@ -89526,7 +90058,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "1LT > AQ9 GT1 Bucket Seats > HUQ Adrenaline Red",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "HUQ Adrenaline Red",
-            "interior_reference_order": 3
+            "interior_reference_order": 3,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huq.png",
+            "image_alt": "HUQ HUQ Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTM",
@@ -89569,7 +90105,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 12
+            "interior_reference_order": 12,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTM_36S",
@@ -89618,7 +90158,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
-            "interior_reference_order": 13
+            "interior_reference_order": 13,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTM_37S",
@@ -89667,7 +90211,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Blue Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
-            "interior_reference_order": 14
+            "interior_reference_order": 14,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTM_38S",
@@ -89716,7 +90264,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Red Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
-            "interior_reference_order": 15
+            "interior_reference_order": 15,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTN",
@@ -89759,7 +90311,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural",
-            "interior_reference_order": 24
+            "interior_reference_order": 24,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htn.png",
+            "image_alt": "HTN Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTP_N26",
@@ -89808,7 +90364,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede",
-            "interior_reference_order": 16
+            "interior_reference_order": 16,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTP_N26_36S",
@@ -89863,7 +90423,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Yellow Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Yellow Stitching",
-            "interior_reference_order": 17
+            "interior_reference_order": 17,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTP_N26_37S",
@@ -89918,7 +90482,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Blue Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Blue Stitching",
-            "interior_reference_order": 18
+            "interior_reference_order": 18,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTP_N26_38S",
@@ -89973,7 +90541,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Red Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Red Stitching",
-            "interior_reference_order": 19
+            "interior_reference_order": 19,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HTQ_N26",
@@ -90022,7 +90594,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural Suede",
-            "interior_reference_order": 25
+            "interior_reference_order": 25,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htq.png",
+            "image_alt": "HTQ Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HU6_N26",
@@ -90071,7 +90647,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
-            "interior_reference_order": 21
+            "interior_reference_order": 21,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu6.png",
+            "image_alt": "HU6 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HU7_N26",
@@ -90120,7 +90700,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Adrenaline Red > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red Suede",
-            "interior_reference_order": 23
+            "interior_reference_order": 23,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu7.png",
+            "image_alt": "HU7 Adrenaline Red Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HUK",
@@ -90163,7 +90747,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 20
+            "interior_reference_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huk.png",
+            "image_alt": "HUK Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AE4_HUL",
@@ -90206,7 +90794,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AE4 Competition Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 22
+            "interior_reference_order": 22,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hul.png",
+            "image_alt": "HUL Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTM",
@@ -90249,7 +90841,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 26
+            "interior_reference_order": 26,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTM_36S",
@@ -90298,7 +90894,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
-            "interior_reference_order": 27
+            "interior_reference_order": 27,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTM_37S",
@@ -90347,7 +90947,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Blue Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
-            "interior_reference_order": 28
+            "interior_reference_order": 28,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTM_38S",
@@ -90396,7 +91000,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Red Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
-            "interior_reference_order": 29
+            "interior_reference_order": 29,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTN",
@@ -90439,7 +91047,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural",
-            "interior_reference_order": 41
+            "interior_reference_order": 41,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htn.png",
+            "image_alt": "HTN Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTN_TU7",
@@ -90488,7 +91100,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Two Tone",
-            "interior_reference_order": 42
+            "interior_reference_order": 42,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htn.png",
+            "image_alt": "HTN Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTP_N26",
@@ -90537,7 +91153,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede",
-            "interior_reference_order": 30
+            "interior_reference_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTP_N26_36S",
@@ -90592,7 +91212,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Yellow Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Yellow Stitching",
-            "interior_reference_order": 31
+            "interior_reference_order": 31,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTP_N26_37S",
@@ -90647,7 +91271,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Blue Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Blue Stitching",
-            "interior_reference_order": 32
+            "interior_reference_order": 32,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTP_N26_38S",
@@ -90702,7 +91330,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Red Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Red Stitching",
-            "interior_reference_order": 33
+            "interior_reference_order": 33,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTQ_N26",
@@ -90751,7 +91383,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Suede",
-            "interior_reference_order": 43
+            "interior_reference_order": 43,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htq.png",
+            "image_alt": "HTQ Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HTQ_N26_TU7",
@@ -90806,7 +91442,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Suede Two Tone",
-            "interior_reference_order": 44
+            "interior_reference_order": 44,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htq.png",
+            "image_alt": "HTQ Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HU6_N26",
@@ -90855,7 +91495,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
-            "interior_reference_order": 36
+            "interior_reference_order": 36,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu6.png",
+            "image_alt": "HU6 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HU6_N26_TU7",
@@ -90910,7 +91554,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Suede Two Tone",
-            "interior_reference_order": 37
+            "interior_reference_order": 37,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu6.png",
+            "image_alt": "HU6 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HU7_N26_TU7",
@@ -90965,7 +91613,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Adrenaline Red > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red Suede Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red Suede Two Tone",
-            "interior_reference_order": 40
+            "interior_reference_order": 40,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu7.png",
+            "image_alt": "HU7 Adrenaline Red Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HUK",
@@ -91008,7 +91660,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 34
+            "interior_reference_order": 34,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huk.png",
+            "image_alt": "HUK Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HUK_TU7",
@@ -91057,7 +91713,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Two Tone",
-            "interior_reference_order": 35
+            "interior_reference_order": 35,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huk.png",
+            "image_alt": "HUK Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HUL",
@@ -91100,7 +91760,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 38
+            "interior_reference_order": 38,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hul.png",
+            "image_alt": "HUL Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AH2_HUL_TU7",
@@ -91149,7 +91813,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AH2 GT2 Bucket Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red Two Tone",
-            "interior_reference_order": 39
+            "interior_reference_order": 39,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hul.png",
+            "image_alt": "HUL Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AQ9_H1Y",
@@ -91185,7 +91853,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Jet Black > Jet Black",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 5
+            "interior_reference_order": 5,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h1y.png",
+            "image_alt": "H1Y Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AQ9_H1Y_36S",
@@ -91228,7 +91900,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Jet Black > Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
-            "interior_reference_order": 6
+            "interior_reference_order": 6,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h1y.png",
+            "image_alt": "H1Y Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AQ9_H1Y_37S",
@@ -91271,7 +91947,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Jet Black > Jet Black with Blue Stitching",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
-            "interior_reference_order": 7
+            "interior_reference_order": 7,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h1y.png",
+            "image_alt": "H1Y Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AQ9_H1Y_38S",
@@ -91314,7 +91994,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Jet Black > Jet Black with Red Stitching",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
-            "interior_reference_order": 8
+            "interior_reference_order": 8,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h1y.png",
+            "image_alt": "H1Y Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AQ9_HUN",
@@ -91350,7 +92034,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Sky Cool Gray",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 9
+            "interior_reference_order": 9,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hun.png",
+            "image_alt": "HUN Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AQ9_HUR",
@@ -91386,7 +92074,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Adrenaline Red",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 10
+            "interior_reference_order": 10,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hur.png",
+            "image_alt": "HUR Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LT_AQ9_HUV",
@@ -91422,7 +92114,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LT > AQ9 GT1 Bucket Seats > Natural",
             "interior_parent_group_label": "AQ9 GT1 Bucket Seats",
             "interior_leaf_label": "Natural",
-            "interior_reference_order": 11
+            "interior_reference_order": 11,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huv.png",
+            "image_alt": "HUV Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_EJH",
@@ -91465,7 +92161,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Very Dark Atmosphere > Napa leather seating surfaces with perforated inserts. > Very Dark Atmosphere",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Very Dark Atmosphere",
-            "interior_reference_order": 117
+            "interior_reference_order": 117,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ejh.png",
+            "image_alt": "EJH Very Dark Atmosphere interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_EL9",
@@ -91508,7 +92208,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Santorini Blue Dipped with Torch Red accents > Santorini Blue Dipped with Torch Red accents",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Santorini Blue Dipped with Torch Red accents",
-            "interior_reference_order": 96
+            "interior_reference_order": 96,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/el9.png",
+            "image_alt": "EL9 Santorini Blue Dipped with Torch Red accents interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_EPX_N26",
@@ -91557,7 +92261,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Very Dark Atmosphere > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Very Dark Atmosphere Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Very Dark Atmosphere Suede",
-            "interior_reference_order": 118
+            "interior_reference_order": 118,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/epx.png",
+            "image_alt": "EPX Very Dark Atmosphere Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_H8T",
@@ -91600,7 +92308,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Santorini Blue > Santorini Blue",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Santorini Blue",
-            "interior_reference_order": 114
+            "interior_reference_order": 114,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h8t.png",
+            "image_alt": "H8T Santorini Blue interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HAG",
@@ -91643,7 +92355,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Asymmetrical Santorini Blue / Jet Black > Asymmetrical Santorini Blue / Jet Black",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Asymmetrical Santorini Blue / Jet Black",
-            "interior_reference_order": 128
+            "interior_reference_order": 128,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hag.png",
+            "image_alt": "HAG Asymmetrical Santorini Blue / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HNK",
@@ -91686,7 +92402,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Adrenaline Red Dipped > Adrenaline Red Dipped",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red Dipped",
-            "interior_reference_order": 109
+            "interior_reference_order": 109,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hnk.png",
+            "image_alt": "HNK Adrenaline Red Dipped interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTE",
@@ -91729,7 +92449,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 97
+            "interior_reference_order": 97,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTE_36S",
@@ -91778,7 +92502,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
-            "interior_reference_order": 98
+            "interior_reference_order": 98,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTE_37S",
@@ -91827,7 +92555,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Blue Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
-            "interior_reference_order": 99
+            "interior_reference_order": 99,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTE_38S",
@@ -91876,7 +92608,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Red Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
-            "interior_reference_order": 100
+            "interior_reference_order": 100,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTG_N26",
@@ -91925,7 +92661,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural Suede",
-            "interior_reference_order": 111
+            "interior_reference_order": 111,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htg.png",
+            "image_alt": "HTG Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTT_N26",
@@ -91974,7 +92714,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede",
-            "interior_reference_order": 101
+            "interior_reference_order": 101,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTT_N26_36S",
@@ -92029,7 +92773,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Yellow Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Yellow Stitching",
-            "interior_reference_order": 102
+            "interior_reference_order": 102,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTT_N26_37S",
@@ -92084,7 +92832,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Blue Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Blue Stitching",
-            "interior_reference_order": 103
+            "interior_reference_order": 103,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HTT_N26_38S",
@@ -92139,7 +92891,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Red Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black Suede with Red Stitching",
-            "interior_reference_order": 104
+            "interior_reference_order": 104,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HU1",
@@ -92182,7 +92938,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 105
+            "interior_reference_order": 105,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu1.png",
+            "image_alt": "HU1 Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HU2",
@@ -92225,7 +92985,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 107
+            "interior_reference_order": 107,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu2.png",
+            "image_alt": "HU2 Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HU9_N26",
@@ -92274,7 +93038,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
-            "interior_reference_order": 106
+            "interior_reference_order": 106,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu9.png",
+            "image_alt": "HU9 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUA_N26",
@@ -92323,7 +93091,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Adrenaline Red > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red Suede",
-            "interior_reference_order": 108
+            "interior_reference_order": 108,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hua.png",
+            "image_alt": "HUA Adrenaline Red Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUB_N26",
@@ -92372,7 +93144,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black",
-            "interior_reference_order": 123
+            "interior_reference_order": 123,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUB_N26_36S",
@@ -92427,7 +93203,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Yellow Stitching",
-            "interior_reference_order": 124
+            "interior_reference_order": 124,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUB_N26_37S",
@@ -92482,7 +93262,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black with Blue Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Blue Stitching",
-            "interior_reference_order": 125
+            "interior_reference_order": 125,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUB_N26_38S",
@@ -92537,7 +93321,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black with Red Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Red Stitching",
-            "interior_reference_order": 126
+            "interior_reference_order": 126,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUC",
@@ -92580,7 +93368,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black",
-            "interior_reference_order": 119
+            "interior_reference_order": 119,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUC_36S",
@@ -92629,7 +93421,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Yellow Stitching",
-            "interior_reference_order": 120
+            "interior_reference_order": 120,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUC_37S",
@@ -92678,7 +93474,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Blue Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Blue Stitching",
-            "interior_reference_order": 121
+            "interior_reference_order": 121,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUC_38S",
@@ -92727,7 +93527,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Red Stitching",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Red Stitching",
-            "interior_reference_order": 122
+            "interior_reference_order": 122,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUE",
@@ -92770,7 +93574,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural",
-            "interior_reference_order": 110
+            "interior_reference_order": 110,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hue.png",
+            "image_alt": "HUE Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUF_N26",
@@ -92819,7 +93627,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Natural Dipped > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Dipped Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural Dipped Suede",
-            "interior_reference_order": 113
+            "interior_reference_order": 113,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huf.png",
+            "image_alt": "HUF Natural Dipped Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUW",
@@ -92862,7 +93674,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Habanero > Napa leather seating surfaces with perforated inserts. > Habanero",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Habanero",
-            "interior_reference_order": 115
+            "interior_reference_order": 115,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huw.png",
+            "image_alt": "HUW Habanero interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HUX_N26",
@@ -92911,7 +93727,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Habanero > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Habanero Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Habanero Suede",
-            "interior_reference_order": 116
+            "interior_reference_order": 116,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hux.png",
+            "image_alt": "HUX Habanero Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HVZ",
@@ -92954,7 +93774,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Asymmetrical Adrenaline Red / Jet Black > Asymmetrical Adrenaline Red / Jet Black",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Asymmetrical Adrenaline Red / Jet Black",
-            "interior_reference_order": 127
+            "interior_reference_order": 127,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvz.png",
+            "image_alt": "HVZ Asymmetrical Adrenaline Red / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AE4_HZN",
@@ -92997,7 +93821,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Natural Dipped > Napa leather seating surfaces with perforated inserts. > Natural Dipped",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Natural Dipped",
-            "interior_reference_order": 112
+            "interior_reference_order": 112,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hzn.png",
+            "image_alt": "HZN Natural Dipped interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_EJH",
@@ -93033,7 +93861,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Very Dark Atmosphere > Napa leather seating surfaces with perforated inserts. > Very Dark Atmosphere",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Very Dark Atmosphere",
-            "interior_reference_order": 71
+            "interior_reference_order": 71,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ejh.png",
+            "image_alt": "EJH Very Dark Atmosphere interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_EL9",
@@ -93069,7 +93901,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Santorini Blue Dipped with Torch Red accents > Santorini Blue Dipped with Torch Red accents",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Santorini Blue Dipped with Torch Red accents",
-            "interior_reference_order": 45
+            "interior_reference_order": 45,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/el9.png",
+            "image_alt": "EL9 Santorini Blue Dipped with Torch Red accents interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_EPX_N26",
@@ -93112,7 +93948,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Very Dark Atmosphere > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Very Dark Atmosphere Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Very Dark Atmosphere Suede",
-            "interior_reference_order": 72
+            "interior_reference_order": 72,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/epx.png",
+            "image_alt": "EPX Very Dark Atmosphere Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_H8T",
@@ -93148,7 +93988,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Santorini Blue > Santorini Blue",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Santorini Blue",
-            "interior_reference_order": 68
+            "interior_reference_order": 68,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h8t.png",
+            "image_alt": "H8T Santorini Blue interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HAG",
@@ -93184,7 +94028,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Asymmetrical Santorini Blue / Jet Black > Asymmetrical Santorini Blue / Jet Black",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Asymmetrical Santorini Blue / Jet Black",
-            "interior_reference_order": 82
+            "interior_reference_order": 82,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hag.png",
+            "image_alt": "HAG Asymmetrical Santorini Blue / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HNK",
@@ -93220,7 +94068,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Adrenaline Red Dipped > Adrenaline Red Dipped",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red Dipped",
-            "interior_reference_order": 61
+            "interior_reference_order": 61,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hnk.png",
+            "image_alt": "HNK Adrenaline Red Dipped interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTE",
@@ -93256,7 +94108,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 46
+            "interior_reference_order": 46,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTE_36S",
@@ -93299,7 +94155,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
-            "interior_reference_order": 47
+            "interior_reference_order": 47,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTE_37S",
@@ -93342,7 +94202,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Blue Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
-            "interior_reference_order": 48
+            "interior_reference_order": 48,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTE_38S",
@@ -93385,7 +94249,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Napa leather seating surfaces with perforated inserts. > Jet Black with Red Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
-            "interior_reference_order": 49
+            "interior_reference_order": 49,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTG_N26",
@@ -93428,7 +94296,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Suede",
-            "interior_reference_order": 64
+            "interior_reference_order": 64,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htg.png",
+            "image_alt": "HTG Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTG_N26_TU7",
@@ -93477,7 +94349,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Suede Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Suede Two Tone",
-            "interior_reference_order": 65
+            "interior_reference_order": 65,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htg.png",
+            "image_alt": "HTG Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTT_N26",
@@ -93520,7 +94396,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede",
-            "interior_reference_order": 50
+            "interior_reference_order": 50,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTT_N26_36S",
@@ -93569,7 +94449,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Yellow Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Yellow Stitching",
-            "interior_reference_order": 51
+            "interior_reference_order": 51,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTT_N26_37S",
@@ -93618,7 +94502,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Blue Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Blue Stitching",
-            "interior_reference_order": 52
+            "interior_reference_order": 52,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HTT_N26_38S",
@@ -93667,7 +94555,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black Suede with Red Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black Suede with Red Stitching",
-            "interior_reference_order": 53
+            "interior_reference_order": 53,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HU1",
@@ -93703,7 +94595,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 54
+            "interior_reference_order": 54,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu1.png",
+            "image_alt": "HU1 Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HU1_TU7",
@@ -93746,7 +94642,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Two Tone",
-            "interior_reference_order": 55
+            "interior_reference_order": 55,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu1.png",
+            "image_alt": "HU1 Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HU2",
@@ -93782,7 +94682,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 58
+            "interior_reference_order": 58,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu2.png",
+            "image_alt": "HU2 Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HU2_TU7",
@@ -93825,7 +94729,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts. > Adrenaline Red Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red Two Tone",
-            "interior_reference_order": 59
+            "interior_reference_order": 59,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu2.png",
+            "image_alt": "HU2 Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HU9_N26",
@@ -93868,7 +94776,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
-            "interior_reference_order": 56
+            "interior_reference_order": 56,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu9.png",
+            "image_alt": "HU9 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HU9_N26_TU7",
@@ -93917,7 +94829,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Sky Cool Gray > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray Suede Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray Suede Two Tone",
-            "interior_reference_order": 57
+            "interior_reference_order": 57,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu9.png",
+            "image_alt": "HU9 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUA_N26_TU7",
@@ -93966,7 +94882,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Adrenaline Red > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red Suede Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red Suede Two Tone",
-            "interior_reference_order": 60
+            "interior_reference_order": 60,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hua.png",
+            "image_alt": "HUA Adrenaline Red Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUB_N26",
@@ -94009,7 +94929,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black suede",
-            "interior_reference_order": 77
+            "interior_reference_order": 77,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUB_N26_36S",
@@ -94058,7 +94982,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black suede with Yellow Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black suede with Yellow Stitching",
-            "interior_reference_order": 78
+            "interior_reference_order": 78,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUB_N26_37S",
@@ -94107,7 +95035,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black suede with Blue Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black suede with Blue Stitching",
-            "interior_reference_order": 79
+            "interior_reference_order": 79,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUB_N26_38S",
@@ -94156,7 +95088,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Ultimate Suede Jet Black suede with Red Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black suede with Red Stitching",
-            "interior_reference_order": 80
+            "interior_reference_order": 80,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUC",
@@ -94192,7 +95128,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black",
-            "interior_reference_order": 73
+            "interior_reference_order": 73,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUC_36S",
@@ -94235,7 +95175,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Yellow Stitching",
-            "interior_reference_order": 74
+            "interior_reference_order": 74,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUC_37S",
@@ -94278,7 +95222,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Blue Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Blue Stitching",
-            "interior_reference_order": 75
+            "interior_reference_order": 75,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUC_38S",
@@ -94321,7 +95269,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts. > Ultimate Suede Jet Black with Red Stitching",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Red Stitching",
-            "interior_reference_order": 76
+            "interior_reference_order": 76,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUE",
@@ -94357,7 +95309,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural",
-            "interior_reference_order": 62
+            "interior_reference_order": 62,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hue.png",
+            "image_alt": "HUE Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUE_TU7",
@@ -94400,7 +95356,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural > Napa leather seating surfaces with perforated inserts. > Natural Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Two Tone",
-            "interior_reference_order": 63
+            "interior_reference_order": 63,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hue.png",
+            "image_alt": "HUE Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUF_N26",
@@ -94443,7 +95403,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural Dipped > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Natural Dipped Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Dipped Suede",
-            "interior_reference_order": 67
+            "interior_reference_order": 67,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huf.png",
+            "image_alt": "HUF Natural Dipped Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUW",
@@ -94479,7 +95443,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Habanero > Napa leather seating surfaces with perforated inserts. > Habanero",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Habanero",
-            "interior_reference_order": 69
+            "interior_reference_order": 69,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huw.png",
+            "image_alt": "HUW Habanero interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HUX_N26",
@@ -94522,7 +95490,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Habanero > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Habanero Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Habanero Suede",
-            "interior_reference_order": 70
+            "interior_reference_order": 70,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hux.png",
+            "image_alt": "HUX Habanero Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HVZ",
@@ -94558,7 +95530,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Asymmetrical Adrenaline Red / Jet Black > Asymmetrical Adrenaline Red / Jet Black",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Asymmetrical Adrenaline Red / Jet Black",
-            "interior_reference_order": 81
+            "interior_reference_order": 81,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvz.png",
+            "image_alt": "HVZ Asymmetrical Adrenaline Red / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AH2_HZN",
@@ -94594,7 +95570,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Natural Dipped > Napa leather seating surfaces with perforated inserts. > Natural Dipped",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Natural Dipped",
-            "interior_reference_order": 66
+            "interior_reference_order": 66,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hzn.png",
+            "image_alt": "HZN Natural Dipped interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AUP_HAG",
@@ -94637,7 +95617,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AUP Assymetrical seats > Asymmetrical Santorini Blue / Jet Black",
             "interior_parent_group_label": "AUP Assymetrical seats",
             "interior_leaf_label": "Asymmetrical Santorini Blue / Jet Black",
-            "interior_reference_order": 94
+            "interior_reference_order": 94,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hag.png",
+            "image_alt": "HAG Asymmetrical Santorini Blue / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_AUP_HVZ",
@@ -94680,7 +95664,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AUP Assymetrical seats > Asymmetrical Adrenaline Red / Jet Black",
             "interior_parent_group_label": "AUP Assymetrical seats",
             "interior_leaf_label": "Asymmetrical Adrenaline Red / Jet Black",
-            "interior_reference_order": 95
+            "interior_reference_order": 95,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvz.png",
+            "image_alt": "HVZ Asymmetrical Adrenaline Red / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AE4_HU0_38S",
@@ -94729,7 +95717,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Custom Interior trim and seat combinations > Jet Black interior / Adrenaline Red seats > Napa leather seating surfaces with perforated inserts. > Jet Black interior / Adrenaline Red seats",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_reference_order": 131
+            "interior_reference_order": 131,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu0.png",
+            "image_alt": "HU0 Jet Black interior / Adrenaline Red seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AE4_HUU",
@@ -94772,7 +95764,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Custom Interior trim and seat combinations > Adrenaline Red interior / Jet Black seats > Napa leather seating surfaces with perforated inserts. > Adrenaline Red interior / Jet Black seats",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats",
-            "interior_reference_order": 129
+            "interior_reference_order": 129,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huu.png",
+            "image_alt": "HUU Adrenaline Red interior / Jet Black seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AE4_HXO_N26_38S",
@@ -94827,7 +95823,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Custom Interior trim and seat combinations > Jet Black interior / Adrenaline Red seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black interior / Adrenaline Red seats Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats Suede",
-            "interior_reference_order": 132
+            "interior_reference_order": 132,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hxo.png",
+            "image_alt": "HXO Jet Black interior / Adrenaline Red seats Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AE4_HZP_N26",
@@ -94876,7 +95876,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AE4 Competition Seats > Custom Interior trim and seat combinations > Adrenaline Red interior / Jet Black seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red interior / Jet Black seats Suede",
             "interior_parent_group_label": "AE4 Competition Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats Suede",
-            "interior_reference_order": 130
+            "interior_reference_order": 130,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hzp.png",
+            "image_alt": "HZP Adrenaline Red interior / Jet Black seats Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HMO_N26",
@@ -94925,7 +95929,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Sky Cool Gray seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black interior / Sky Cool Gray seats Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats Suede",
-            "interior_reference_order": 87
+            "interior_reference_order": 87,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hmo.png",
+            "image_alt": "HMO Jet Black interior / Sky Cool Gray seats Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HMO_N26_TU7",
@@ -94980,7 +95988,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Sky Cool Gray seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black interior / Sky Cool Gray seats Suede Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats Suede Two Tone",
-            "interior_reference_order": 88
+            "interior_reference_order": 88,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hmo.png",
+            "image_alt": "HMO Jet Black interior / Sky Cool Gray seats Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HU0_38S",
@@ -95029,7 +96041,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Adrenaline Red seats > Napa leather seating surfaces with perforated inserts. > Jet Black interior / Adrenaline Red seats",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_reference_order": 91
+            "interior_reference_order": 91,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu0.png",
+            "image_alt": "HU0 Jet Black interior / Adrenaline Red seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HU0_38S_TU7",
@@ -95084,7 +96100,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Adrenaline Red seats > Napa leather seating surfaces with perforated inserts. > Jet Black interior / Adrenaline Red seats Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats Two Tone",
-            "interior_reference_order": 92
+            "interior_reference_order": 92,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu0.png",
+            "image_alt": "HU0 Jet Black interior / Adrenaline Red seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HUU",
@@ -95127,7 +96147,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Adrenaline Red interior / Jet Black seats > Napa leather seating surfaces with perforated inserts. > Adrenaline Red interior / Jet Black seats (HUU)",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats (HUU)",
-            "interior_reference_order": 89
+            "interior_reference_order": 89,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huu.png",
+            "image_alt": "HUU Adrenaline Red interior / Jet Black seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HVT_N26",
@@ -95176,7 +96200,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Sky Cool Gray interior / Jet Black seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Sky Cool Gray interior / Jet Black seats Suede (HVT)",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray interior / Jet Black seats Suede (HVT)",
-            "interior_reference_order": 84
+            "interior_reference_order": 84,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvt.png",
+            "image_alt": "HVT Sky Cool Gray interior / Jet Black seats Suede (HVT) interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HVV",
@@ -95219,7 +96247,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Sky Cool Gray seats > Napa leather seating surfaces with perforated inserts. > Jet Black interior / Sky Cool Gray seats (HVV)",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats (HVV)",
-            "interior_reference_order": 85
+            "interior_reference_order": 85,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvv.png",
+            "image_alt": "HVV Jet Black interior / Sky Cool Gray seats (HVV) interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HVV_TU7",
@@ -95268,7 +96300,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Sky Cool Gray seats > Napa leather seating surfaces with perforated inserts. > Jet Black interior / Sky Cool Gray seats Two Tone",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats Two Tone",
-            "interior_reference_order": 86
+            "interior_reference_order": 86,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvv.png",
+            "image_alt": "HVV Jet Black interior / Sky Cool Gray seats (HVV) interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HXO_N26_38S_TU7",
@@ -95329,7 +96365,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Jet Black interior / Adrenaline Red seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Jet Black interior / Adrenaline Red seats Suede HXO",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats Suede HXO",
-            "interior_reference_order": 93
+            "interior_reference_order": 93,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hxo.png",
+            "image_alt": "HXO Jet Black interior / Adrenaline Red seats Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HZB",
@@ -95372,7 +96412,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Sky Cool Gray interior / Jet Black seats > Napa leather seating surfaces with perforated inserts. > Sky Cool Gray interior / Jet Black seats (HZB)",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Sky Cool Gray interior / Jet Black seats (HZB)",
-            "interior_reference_order": 83
+            "interior_reference_order": 83,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hzb.png",
+            "image_alt": "HZB Sky Cool Gray interior / Jet Black seats (HZB) interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LT_R6X_AH2_HZP_N26",
@@ -95421,7 +96465,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LT > AH2 GT2 Bucket Seats > Custom Interior trim and seat combinations > Adrenaline Red interior / Jet Black seats > Sueded microfiber seat inserts and sueded microfiber wrapped steering wheel. > Adrenaline Red interior / Jet Black seats Suede",
             "interior_parent_group_label": "AH2 GT2 Bucket Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats Suede",
-            "interior_reference_order": 90
+            "interior_reference_order": 90,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hzp.png",
+            "image_alt": "HZP Adrenaline Red interior / Jet Black seats Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           }
         ],
         "colorOverrides": [
@@ -97483,7 +98531,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-18T22:07:05+00:00",
+          "generated_at": "2026-06-19T06:05:32+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -138945,7 +139993,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "1LZ > AQ9 Seats > Jet Black > Mulan leather seating surfaces with perforated inserts > Jet Black",
             "interior_parent_group_label": "AQ9 Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 1
+            "interior_reference_order": 1,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hta.png",
+            "image_alt": "HTA Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "1LZ_AQ9_HUP",
@@ -138981,7 +140033,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "1LZ > AQ9 Seats > Sky Cool Gray > Mulan leather seating surfaces with perforated inserts > Sky Cool Gray",
             "interior_parent_group_label": "AQ9 Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 2
+            "interior_reference_order": 2,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hup.png",
+            "image_alt": "HUP Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "1LZ_AQ9_HUQ",
@@ -139017,7 +140073,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "1LZ > AQ9 Seats > Adrenaline Red > Mulan leather seating surfaces with perforated inserts > Adrenaline Red",
             "interior_parent_group_label": "AQ9 Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 3
+            "interior_reference_order": 3,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huq.png",
+            "image_alt": "HUQ Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "1LZ_AE4_HTJ_N26",
@@ -139066,7 +140126,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "1LZ > AE4 Seats > Jet Black > Performance Textile > Jet Black",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 4
+            "interior_reference_order": 4,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htj.png",
+            "image_alt": "HTJ Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AQ9_H1Y",
@@ -139102,7 +140166,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AQ9 Seats > Jet Black > Mulan leather seating surfaces with perforated inserts > Jet Black",
             "interior_parent_group_label": "AQ9 Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 5
+            "interior_reference_order": 5,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h1y.png",
+            "image_alt": "H1Y Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AQ9_H1Y_38S",
@@ -139145,7 +140213,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AQ9 Seats > Jet Black > Mulan leather seating surfaces with perforated inserts > Jet Black with Red Stitching",
             "interior_parent_group_label": "AQ9 Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
-            "interior_reference_order": 6
+            "interior_reference_order": 6,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h1y.png",
+            "image_alt": "H1Y Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AQ9_H1Y_36S",
@@ -139188,7 +140260,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AQ9 Seats > Jet Black > Mulan leather seating surfaces with perforated inserts > Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AQ9 Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
-            "interior_reference_order": 7
+            "interior_reference_order": 7,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h1y.png",
+            "image_alt": "H1Y Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AQ9_H1Y_37S",
@@ -139231,7 +140307,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AQ9 Seats > Jet Black > Mulan leather seating surfaces with perforated inserts > Jet Black with Blue Stitching",
             "interior_parent_group_label": "AQ9 Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
-            "interior_reference_order": 8
+            "interior_reference_order": 8,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h1y.png",
+            "image_alt": "H1Y Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AQ9_HUN",
@@ -139267,7 +140347,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AQ9 Seats > Sky Cool Gray > Mulan leather seating surfaces with perforated inserts > Sky Cool Gray",
             "interior_parent_group_label": "AQ9 Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 9
+            "interior_reference_order": 9,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hun.png",
+            "image_alt": "HUN Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AQ9_HUR",
@@ -139303,7 +140387,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AQ9 Seats > Adrenaline Red > Mulan leather seating surfaces with perforated inserts > Adrenaline Red",
             "interior_parent_group_label": "AQ9 Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 10
+            "interior_reference_order": 10,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hur.png",
+            "image_alt": "HUR Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AQ9_HUV",
@@ -139339,7 +140427,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AQ9 Seats > Natural > Mulan leather seating surfaces with perforated inserts > Natural",
             "interior_parent_group_label": "AQ9 Seats",
             "interior_leaf_label": "Natural",
-            "interior_reference_order": 11
+            "interior_reference_order": 11,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huv.png",
+            "image_alt": "HUV Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HTM",
@@ -139382,7 +140474,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 12
+            "interior_reference_order": 12,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HTM_38S",
@@ -139431,7 +140527,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black with Red Stitching",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
-            "interior_reference_order": 13
+            "interior_reference_order": 13,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HTM_36S",
@@ -139480,7 +140580,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
-            "interior_reference_order": 14
+            "interior_reference_order": 14,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HTM_37S",
@@ -139529,7 +140633,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black with Blue Stitching",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
-            "interior_reference_order": 15
+            "interior_reference_order": 15,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AE4_HTM",
@@ -139572,7 +140680,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Jet Black",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 16
+            "interior_reference_order": 16,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AE4_HTM_38S",
@@ -139621,7 +140733,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Jet Black with Red Stitching",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
-            "interior_reference_order": 17
+            "interior_reference_order": 17,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AE4_HTM_36S",
@@ -139670,7 +140786,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
-            "interior_reference_order": 18
+            "interior_reference_order": 18,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AE4_HTM_37S",
@@ -139719,7 +140839,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Jet Black with Blue Stitching",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
-            "interior_reference_order": 19
+            "interior_reference_order": 19,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htm.png",
+            "image_alt": "HTM Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HUK",
@@ -139762,7 +140886,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts > Sky Cool Gray",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 20
+            "interior_reference_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huk.png",
+            "image_alt": "HUK Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HUK_TU7",
@@ -139811,7 +140939,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts > Sky Cool Gray Two tone",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Sky Cool Gray Two tone",
-            "interior_reference_order": 21
+            "interior_reference_order": 21,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huk.png",
+            "image_alt": "HUK Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AE4_HUK",
@@ -139854,7 +140986,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AE4 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts and performance textile > Sky Cool Gray",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 22
+            "interior_reference_order": 22,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huk.png",
+            "image_alt": "HUK Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HUL",
@@ -139897,7 +141033,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts > Adrenaline Red",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 23
+            "interior_reference_order": 23,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hul.png",
+            "image_alt": "HUL Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HUL_TU7",
@@ -139946,7 +141086,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts > Adrenaline Red Two tone",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Adrenaline Red Two tone",
-            "interior_reference_order": 24
+            "interior_reference_order": 24,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hul.png",
+            "image_alt": "HUL Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AE4_HUL",
@@ -139989,7 +141133,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AE4 Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts and performance textile > Adrenaline Red",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 25
+            "interior_reference_order": 25,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hul.png",
+            "image_alt": "HUL Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HTN",
@@ -140032,7 +141180,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Natural > Napa leather seating surfaces with perforated inserts > Natural",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Natural",
-            "interior_reference_order": 26
+            "interior_reference_order": 26,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htn.png",
+            "image_alt": "HTN Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HTN_TU7",
@@ -140081,7 +141233,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Natural > Napa leather seating surfaces with perforated inserts > Natural Two tone",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Natural Two tone",
-            "interior_reference_order": 27
+            "interior_reference_order": 27,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htn.png",
+            "image_alt": "HTN Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AE4_HTN",
@@ -140124,7 +141280,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AE4 Seats > Natural > Napa leather seating surfaces with perforated inserts and performance textile > Natural",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Natural",
-            "interior_reference_order": 28
+            "interior_reference_order": 28,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htn.png",
+            "image_alt": "HTN Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HTP_N26",
@@ -140173,7 +141333,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Jet Black Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black Suede",
-            "interior_reference_order": 29
+            "interior_reference_order": 29,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HTP_N26_38S",
@@ -140228,7 +141392,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Jet Black with Red Stitching suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black with Red Stitching suede",
-            "interior_reference_order": 30
+            "interior_reference_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HTP_N26_36S",
@@ -140283,7 +141451,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Jet Black with Yellow Stitching Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching Suede",
-            "interior_reference_order": 31
+            "interior_reference_order": 31,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HTP_N26_37S",
@@ -140338,7 +141510,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Jet Black with Blue Stitching Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching Suede",
-            "interior_reference_order": 32
+            "interior_reference_order": 32,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AE4_HTP_N26",
@@ -140387,7 +141563,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Jet Black Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black Suede",
-            "interior_reference_order": 33
+            "interior_reference_order": 33,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AE4_HTP_N26_38S",
@@ -140442,7 +141622,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Jet Black with Red Stitching suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black with Red Stitching suede",
-            "interior_reference_order": 34
+            "interior_reference_order": 34,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AE4_HTP_N26_36S",
@@ -140497,7 +141681,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Jet Black with Yellow Stitching Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching Suede",
-            "interior_reference_order": 35
+            "interior_reference_order": 35,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AE4_HTP_N26_37S",
@@ -140552,7 +141740,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Jet Black with Blue Stitching Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching Suede",
-            "interior_reference_order": 36
+            "interior_reference_order": 36,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htp.png",
+            "image_alt": "HTP Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HU6_N26",
@@ -140601,7 +141793,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated sueded microfiber inserts > Sky Cool Gray Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
-            "interior_reference_order": 37
+            "interior_reference_order": 37,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu6.png",
+            "image_alt": "HU6 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HU6_N26_TU7",
@@ -140656,7 +141852,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated sueded microfiber inserts > Sky Cool Gray Suede Two tone",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Sky Cool Gray Suede Two tone",
-            "interior_reference_order": 38
+            "interior_reference_order": 38,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu6.png",
+            "image_alt": "HU6 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AE4_HU6_N26",
@@ -140705,7 +141905,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AE4 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Sky Cool Gray Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
-            "interior_reference_order": 39
+            "interior_reference_order": 39,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu6.png",
+            "image_alt": "HU6 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HU7_N26_TU7",
@@ -140760,7 +141964,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Adrenaline Red > Napa leather seating surfaces with perforated sueded microfiber inserts > Adrenaline Red Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Adrenaline Red Suede",
-            "interior_reference_order": 40
+            "interior_reference_order": 40,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu7.png",
+            "image_alt": "HU7 Adrenaline Red Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AE4_HU7_N26",
@@ -140809,7 +142017,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AE4 Seats > Adrenaline Red > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Adrenaline Red Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Adrenaline Red Suede",
-            "interior_reference_order": 41
+            "interior_reference_order": 41,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu7.png",
+            "image_alt": "HU7 Adrenaline Red Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HTQ_N26",
@@ -140858,7 +142070,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Natural > Napa leather seating surfaces with perforated sueded microfiber inserts > Natural Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Natural Suede",
-            "interior_reference_order": 42
+            "interior_reference_order": 42,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htq.png",
+            "image_alt": "HTQ Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AH2_HTQ_N26_TU7",
@@ -140913,7 +142129,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AH2 Seats > Natural > Napa leather seating surfaces with perforated sueded microfiber inserts > Natural Suede Two tone",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Natural Suede Two tone",
-            "interior_reference_order": 43
+            "interior_reference_order": 43,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htq.png",
+            "image_alt": "HTQ Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "2LZ_AE4_HTQ_N26",
@@ -140962,7 +142182,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "2LZ > AE4 Seats > Natural > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Natural Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Natural Suede",
-            "interior_reference_order": 44
+            "interior_reference_order": 44,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htq.png",
+            "image_alt": "HTQ Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HTE",
@@ -140998,7 +142222,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 45
+            "interior_reference_order": 45,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HTE_38S",
@@ -141041,7 +142269,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black with Red Stitching",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
-            "interior_reference_order": 46
+            "interior_reference_order": 46,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HTE_36S",
@@ -141084,7 +142316,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
-            "interior_reference_order": 47
+            "interior_reference_order": 47,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HTE_37S",
@@ -141127,7 +142363,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black with Blue Stitching",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
-            "interior_reference_order": 48
+            "interior_reference_order": 48,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HTE",
@@ -141170,7 +142410,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Jet Black",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black",
-            "interior_reference_order": 49
+            "interior_reference_order": 49,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HTE_38S",
@@ -141219,7 +142463,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Jet Black with Red Stitching",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black with Red Stitching",
-            "interior_reference_order": 50
+            "interior_reference_order": 50,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HTE_36S",
@@ -141268,7 +142516,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching",
-            "interior_reference_order": 51
+            "interior_reference_order": 51,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HTE_37S",
@@ -141317,7 +142569,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Jet Black with Blue Stitching",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching",
-            "interior_reference_order": 52
+            "interior_reference_order": 52,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hte.png",
+            "image_alt": "HTE Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HU1",
@@ -141353,7 +142609,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts > Sky Cool Gray",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 53
+            "interior_reference_order": 53,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu1.png",
+            "image_alt": "HU1 Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HU1_TU7",
@@ -141396,7 +142656,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts > Sky Cool Gray Two tone",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Sky Cool Gray Two tone",
-            "interior_reference_order": 54
+            "interior_reference_order": 54,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu1.png",
+            "image_alt": "HU1 Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HU1",
@@ -141439,7 +142703,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts and performance textile > Sky Cool Gray",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Sky Cool Gray",
-            "interior_reference_order": 55
+            "interior_reference_order": 55,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu1.png",
+            "image_alt": "HU1 Sky Cool Gray interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HU2",
@@ -141475,7 +142743,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts > Adrenaline Red",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 56
+            "interior_reference_order": 56,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu2.png",
+            "image_alt": "HU2 Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HU2_TU7",
@@ -141518,7 +142790,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts > Adrenaline Red Two tone",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Adrenaline Red Two tone",
-            "interior_reference_order": 57
+            "interior_reference_order": 57,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu2.png",
+            "image_alt": "HU2 Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HU2",
@@ -141561,7 +142837,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts and performance textile > Adrenaline Red",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Adrenaline Red",
-            "interior_reference_order": 58
+            "interior_reference_order": 58,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu2.png",
+            "image_alt": "HU2 Adrenaline Red interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HNK",
@@ -141597,7 +142877,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Adrenaline Red Dipped > Napa leather seating surfaces with perforated inserts > Adrenaline Red Dipped",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Adrenaline Red Dipped",
-            "interior_reference_order": 59
+            "interior_reference_order": 59,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hnk.png",
+            "image_alt": "HNK Adrenaline Red Dipped interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HNK",
@@ -141640,7 +142924,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Adrenaline Red Dipped > Napa leather seating surfaces with perforated inserts and performance textile > Adrenaline Red Dipped",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Adrenaline Red Dipped",
-            "interior_reference_order": 60
+            "interior_reference_order": 60,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hnk.png",
+            "image_alt": "HNK Adrenaline Red Dipped interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HUE",
@@ -141676,7 +142964,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Natural > Napa leather seating surfaces with perforated inserts > Natural",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Natural",
-            "interior_reference_order": 61
+            "interior_reference_order": 61,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hue.png",
+            "image_alt": "HUE Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HUE_TU7",
@@ -141719,7 +143011,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Natural > Napa leather seating surfaces with perforated inserts > Natural Two tone",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Natural Two tone",
-            "interior_reference_order": 62
+            "interior_reference_order": 62,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hue.png",
+            "image_alt": "HUE Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HUE",
@@ -141762,7 +143058,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Natural > Napa leather seating surfaces with perforated inserts and performance textile > Natural",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Natural",
-            "interior_reference_order": 63
+            "interior_reference_order": 63,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hue.png",
+            "image_alt": "HUE Natural interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HZN",
@@ -141798,7 +143098,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Natural Dipped > Napa leather seating surfaces with perforated inserts > Natural Dipped",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Natural Dipped",
-            "interior_reference_order": 64
+            "interior_reference_order": 64,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hzn.png",
+            "image_alt": "HZN Natural Dipped interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HZN",
@@ -141841,7 +143145,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Natural Dipped > Napa leather seating surfaces with perforated inserts and performance textile > Natural Dipped",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Natural Dipped",
-            "interior_reference_order": 65
+            "interior_reference_order": 65,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hzn.png",
+            "image_alt": "HZN Natural Dipped interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_H8T",
@@ -141877,7 +143185,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Santorini Blue > Napa leather seating surfaces with perforated inserts > Santorini Blue",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Santorini Blue",
-            "interior_reference_order": 66
+            "interior_reference_order": 66,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h8t.png",
+            "image_alt": "H8T Santorini Blue interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_H8T",
@@ -141920,7 +143232,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Santorini Blue > Napa leather seating surfaces with perforated inserts and performance textile > Santorini Blue",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Santorini Blue",
-            "interior_reference_order": 67
+            "interior_reference_order": 67,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/h8t.png",
+            "image_alt": "H8T Santorini Blue interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HUW",
@@ -141956,7 +143272,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Habanero > Napa leather seating surfaces with perforated inserts > Habanero",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Habanero",
-            "interior_reference_order": 68
+            "interior_reference_order": 68,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huw.png",
+            "image_alt": "HUW Habanero interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HUW",
@@ -141999,7 +143319,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Habanero > Napa leather seating surfaces with perforated inserts and performance textile > Habanero",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Habanero",
-            "interior_reference_order": 69
+            "interior_reference_order": 69,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huw.png",
+            "image_alt": "HUW Habanero interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_EJH",
@@ -142035,7 +143359,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Very Dark Atmosphere > Napa leather seating surfaces with perforated inserts > Very Dark Atmosphere",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Very Dark Atmosphere",
-            "interior_reference_order": 70
+            "interior_reference_order": 70,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ejh.png",
+            "image_alt": "EJH Very Dark Atmosphere interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_EJH",
@@ -142078,7 +143406,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Very Dark Atmosphere > Napa leather seating surfaces with perforated inserts and performance textile > Very Dark Atmosphere",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Very Dark Atmosphere",
-            "interior_reference_order": 71
+            "interior_reference_order": 71,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ejh.png",
+            "image_alt": "EJH Very Dark Atmosphere interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HUC",
@@ -142114,7 +143446,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts > Ultimate Suede Jet Black",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black",
-            "interior_reference_order": 72
+            "interior_reference_order": 72,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HUC_38S",
@@ -142157,7 +143493,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts > Ultimate Suede Jet Black with Red Stitching",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Red Stitching",
-            "interior_reference_order": 73
+            "interior_reference_order": 73,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HUC_37S",
@@ -142200,7 +143540,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts > Ultimate Suede Jet Black with Blue Stitching",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Blue Stitching",
-            "interior_reference_order": 74
+            "interior_reference_order": 74,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HUC_36S",
@@ -142243,7 +143587,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts > Ultimate Suede Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Yellow Stitching",
-            "interior_reference_order": 75
+            "interior_reference_order": 75,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HUC",
@@ -142286,7 +143634,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Ultimate Suede Jet Black",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black",
-            "interior_reference_order": 76
+            "interior_reference_order": 76,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HUC_38S",
@@ -142335,7 +143687,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Ultimate Suede Jet Black with Red Stitching",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Red Stitching",
-            "interior_reference_order": 77
+            "interior_reference_order": 77,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HUC_37S",
@@ -142384,7 +143740,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Ultimate Suede Jet Black with Blue Stitching",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Blue Stitching",
-            "interior_reference_order": 78
+            "interior_reference_order": 78,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HUC_36S",
@@ -142433,7 +143793,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Ultimate Suede Jet Black with Yellow Stitching",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black with Yellow Stitching",
-            "interior_reference_order": 79
+            "interior_reference_order": 79,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huc.png",
+            "image_alt": "HUC Ultimate Suede Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HVZ",
@@ -142469,7 +143833,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Asymmetrical Adrenaline Red / Jet Black > Napa leather seating surfaces with perforated inserts > Asymmetrical Adrenaline Red / Jet Black",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Asymmetrical Adrenaline Red / Jet Black",
-            "interior_reference_order": 80
+            "interior_reference_order": 80,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvz.png",
+            "image_alt": "HVZ Asymmetrical Adrenaline Red / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HVZ",
@@ -142512,7 +143880,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Asymmetrical Adrenaline Red / Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Asymmetrical Adrenaline Red / Jet Black",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Asymmetrical Adrenaline Red / Jet Black",
-            "interior_reference_order": 81
+            "interior_reference_order": 81,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvz.png",
+            "image_alt": "HVZ Asymmetrical Adrenaline Red / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HAG",
@@ -142548,7 +143920,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Asymmetrical Santorini Blue / Jet Black > Napa leather seating surfaces with perforated inserts > Asymmetrical Santorini Blue / Jet Black",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Asymmetrical Santorini Blue / Jet Black",
-            "interior_reference_order": 82
+            "interior_reference_order": 82,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hag.png",
+            "image_alt": "HAG Asymmetrical Santorini Blue / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HAG",
@@ -142591,7 +143967,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Asymmetrical Santorini Blue / Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Asymmetrical Santorini Blue / Jet Black",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Asymmetrical Santorini Blue / Jet Black",
-            "interior_reference_order": 83
+            "interior_reference_order": 83,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hag.png",
+            "image_alt": "HAG Asymmetrical Santorini Blue / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HTT_N2Z",
@@ -142634,7 +144014,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Jet Black Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black Suede",
-            "interior_reference_order": 84
+            "interior_reference_order": 84,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HTT_N2Z_38S",
@@ -142683,7 +144067,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Jet Black with Red Stitching suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black with Red Stitching suede",
-            "interior_reference_order": 85
+            "interior_reference_order": 85,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HTT_N2Z_36S",
@@ -142732,7 +144120,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Jet Black with Yellow Stitching Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching Suede",
-            "interior_reference_order": 86
+            "interior_reference_order": 86,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HTT_N2Z_37S",
@@ -142781,7 +144173,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Jet Black with Blue Stitching Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching Suede",
-            "interior_reference_order": 87
+            "interior_reference_order": 87,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HTT_N2Z",
@@ -142830,7 +144226,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Jet Black Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black Suede",
-            "interior_reference_order": 88
+            "interior_reference_order": 88,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HTT_N2Z_38S",
@@ -142885,7 +144285,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Jet Black with Red Stitching suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black with Red Stitching suede",
-            "interior_reference_order": 89
+            "interior_reference_order": 89,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HTT_N2Z_36S",
@@ -142940,7 +144344,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Jet Black with Yellow Stitching Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black with Yellow Stitching Suede",
-            "interior_reference_order": 90
+            "interior_reference_order": 90,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HTT_N2Z_37S",
@@ -142995,7 +144403,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Jet Black with Blue Stitching Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black with Blue Stitching Suede",
-            "interior_reference_order": 91
+            "interior_reference_order": 91,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htt.png",
+            "image_alt": "HTT Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HU9_N2Z",
@@ -143038,7 +144450,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated sueded microfiber inserts > Sky Cool Gray Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
-            "interior_reference_order": 92
+            "interior_reference_order": 92,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu9.png",
+            "image_alt": "HU9 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HU9_N2Z_TU7",
@@ -143087,7 +144503,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated sueded microfiber inserts > Sky Cool Gray Two tone Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Sky Cool Gray Two tone Suede",
-            "interior_reference_order": 93
+            "interior_reference_order": 93,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu9.png",
+            "image_alt": "HU9 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HU9_N2Z",
@@ -143136,7 +144556,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Sky Cool Gray Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Sky Cool Gray Suede",
-            "interior_reference_order": 94
+            "interior_reference_order": 94,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu9.png",
+            "image_alt": "HU9 Sky Cool Gray Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HUA_N2Z_TU7",
@@ -143185,7 +144609,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Adrenaline Red > Napa leather seating surfaces with perforated sueded microfiber inserts > Adrenaline Red Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Adrenaline Red Suede",
-            "interior_reference_order": 95
+            "interior_reference_order": 95,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hua.png",
+            "image_alt": "HUA Adrenaline Red Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HUA_N2Z",
@@ -143234,7 +144662,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Adrenaline Red > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Adrenaline Red Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Adrenaline Red Suede",
-            "interior_reference_order": 96
+            "interior_reference_order": 96,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hua.png",
+            "image_alt": "HUA Adrenaline Red Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HTG_N2Z",
@@ -143277,7 +144709,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Natural > Napa leather seating surfaces with perforated sueded microfiber inserts > Natural Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Natural Suede",
-            "interior_reference_order": 97
+            "interior_reference_order": 97,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htg.png",
+            "image_alt": "HTG Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HTG_N2Z_TU7",
@@ -143326,7 +144762,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Natural > Napa leather seating surfaces with perforated sueded microfiber inserts > Natural Suede Two tone",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Natural Suede Two tone",
-            "interior_reference_order": 98
+            "interior_reference_order": 98,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htg.png",
+            "image_alt": "HTG Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HTG_N2Z",
@@ -143375,7 +144815,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Natural > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Natural Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Natural Suede",
-            "interior_reference_order": 99
+            "interior_reference_order": 99,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/htg.png",
+            "image_alt": "HTG Natural Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HUF_N2Z",
@@ -143418,7 +144862,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Natural Dipped > Napa leather seating surfaces with perforated sueded microfiber inserts > Natural Dipped Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Natural Dipped Suede",
-            "interior_reference_order": 100
+            "interior_reference_order": 100,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huf.png",
+            "image_alt": "HUF Natural Dipped Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HUF_N2Z",
@@ -143467,7 +144915,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Natural Dipped > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Natural Dipped Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Natural Dipped Suede",
-            "interior_reference_order": 101
+            "interior_reference_order": 101,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huf.png",
+            "image_alt": "HUF Natural Dipped Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HUX_N2Z",
@@ -143510,7 +144962,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Habanero > Napa leather seating surfaces with perforated sueded microfiber inserts > Habanero Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Habanero Suede",
-            "interior_reference_order": 102
+            "interior_reference_order": 102,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hux.png",
+            "image_alt": "HUX Habanero Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HUX_N2Z",
@@ -143559,7 +145015,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Habanero > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Habanero Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Habanero Suede",
-            "interior_reference_order": 103
+            "interior_reference_order": 103,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hux.png",
+            "image_alt": "HUX Habanero Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_EPX_N2Z",
@@ -143602,7 +145062,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Very Dark Atmosphere > Napa leather seating surfaces with perforated sueded microfiber inserts > Very Dark Atmosphere Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Very Dark Atmosphere Suede",
-            "interior_reference_order": 104
+            "interior_reference_order": 104,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/epx.png",
+            "image_alt": "EPX Very Dark Atmosphere Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_EPX_N2Z",
@@ -143651,7 +145115,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Very Dark Atmosphere > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Very Dark Atmosphere Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Very Dark Atmosphere Suede",
-            "interior_reference_order": 105
+            "interior_reference_order": 105,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/epx.png",
+            "image_alt": "EPX Very Dark Atmosphere Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HUB_N2Z",
@@ -143694,7 +145162,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Ultimate Suede Jet Black Suede",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black Suede",
-            "interior_reference_order": 106
+            "interior_reference_order": 106,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HUB_N2Z_38S",
@@ -143743,7 +145215,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Ultimate Suede Jet Black Suede with Red Stitching",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black Suede with Red Stitching",
-            "interior_reference_order": 107
+            "interior_reference_order": 107,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HUB_N2Z_36S",
@@ -143792,7 +145268,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Ultimate Suede Jet Black Suede with Yellow Stitching",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black Suede with Yellow Stitching",
-            "interior_reference_order": 108
+            "interior_reference_order": 108,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AH2_HUB_N2Z_37S",
@@ -143841,7 +145321,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Ultimate Suede Jet Black Suede with Blue Stitching",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black Suede with Blue Stitching",
-            "interior_reference_order": 109
+            "interior_reference_order": 109,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HUB_N2Z",
@@ -143890,7 +145374,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Ultimate Suede Jet Black Suede",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black Suede",
-            "interior_reference_order": 110
+            "interior_reference_order": 110,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HUB_N2Z_38S",
@@ -143945,7 +145433,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Ultimate Suede Jet Black Suede with Red Stitching",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black Suede with Red Stitching",
-            "interior_reference_order": 111
+            "interior_reference_order": 111,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HUB_N2Z_36S",
@@ -144000,7 +145492,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Ultimate Suede Jet Black Suede with Yellow Stitching",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black Suede with Yellow Stitching",
-            "interior_reference_order": 112
+            "interior_reference_order": 112,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AE4_HUB_N2Z_37S",
@@ -144055,7 +145551,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Ultimate Suede Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Ultimate Suede Jet Black Suede with Blue Stitching",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Ultimate Suede Jet Black Suede with Blue Stitching",
-            "interior_reference_order": 113
+            "interior_reference_order": 113,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hub.png",
+            "image_alt": "HUB Ultimate Suede Jet Black Suede interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AUP_HVZ",
@@ -144098,7 +145598,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AUP Seats > Asymmetrical Adrenaline Red / Jet Black > Napa leather seating surfaces with perforated inserts > Asymmetrical Adrenaline Red / Jet Black",
             "interior_parent_group_label": "AUP Seats",
             "interior_leaf_label": "Asymmetrical Adrenaline Red / Jet Black",
-            "interior_reference_order": 114
+            "interior_reference_order": 114,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvz.png",
+            "image_alt": "HVZ Asymmetrical Adrenaline Red / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_AUP_HAG",
@@ -144141,7 +145645,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AUP Seats > Asymmetrical Santorini Blue / Jet Black > Napa leather seating surfaces with perforated inserts > Asymmetrical Santorini Blue / Jet Black",
             "interior_parent_group_label": "AUP Seats",
             "interior_leaf_label": "Asymmetrical Santorini Blue / Jet Black",
-            "interior_reference_order": 115
+            "interior_reference_order": 115,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hag.png",
+            "image_alt": "HAG Asymmetrical Santorini Blue / Jet Black interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_R6X_AH2_HZB",
@@ -144184,7 +145692,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated inserts > Sky Cool Gray interior / Jet Black seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Sky Cool Gray interior / Jet Black seats",
-            "interior_reference_order": 116
+            "interior_reference_order": 116,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hzb.png",
+            "image_alt": "HZB Sky Cool Gray interior / Jet Black seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_R6X_AH2_HVV",
@@ -144227,7 +145739,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black interior / Sky Cool Gray seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats",
-            "interior_reference_order": 117
+            "interior_reference_order": 117,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvv.png",
+            "image_alt": "HVV Jet Black interior / Sky Cool Gray seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_R6X_AH2_HVV_TU7",
@@ -144276,7 +145792,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black interior / Sky Cool Gray seats two tone",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats two tone",
-            "interior_reference_order": 118
+            "interior_reference_order": 118,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvv.png",
+            "image_alt": "HVV Jet Black interior / Sky Cool Gray seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_R6X_AH2_HUU",
@@ -144319,7 +145839,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts > Adrenaline Red interior / Jet Black seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats",
-            "interior_reference_order": 119
+            "interior_reference_order": 119,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huu.png",
+            "image_alt": "HUU Adrenaline Red interior / Jet Black seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_R6X_AE4_HUU",
@@ -144362,7 +145886,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Adrenaline Red > Napa leather seating surfaces with perforated inserts and performance textile > Adrenaline Red interior / Jet Black seats",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats",
-            "interior_reference_order": 120
+            "interior_reference_order": 120,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/huu.png",
+            "image_alt": "HUU Adrenaline Red interior / Jet Black seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_R6X_AH2_HU0_38S",
@@ -144411,7 +145939,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black interior / Adrenaline Red seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_reference_order": 121
+            "interior_reference_order": 121,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu0.png",
+            "image_alt": "HU0 Jet Black interior / Adrenaline Red seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_R6X_AH2_HU0_38S_TU7",
@@ -144466,7 +145998,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated inserts > Jet Black interior / Adrenaline Red seats two tone",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats two tone",
-            "interior_reference_order": 122
+            "interior_reference_order": 122,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu0.png",
+            "image_alt": "HU0 Jet Black interior / Adrenaline Red seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_R6X_AE4_HU0_38S",
@@ -144515,7 +146051,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated inserts and performance textile > Jet Black interior / Adrenaline Red seats",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_reference_order": 123
+            "interior_reference_order": 123,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hu0.png",
+            "image_alt": "HU0 Jet Black interior / Adrenaline Red seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_R6X_AH2_HVT_N2Z",
@@ -144564,7 +146104,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Sky Cool Gray > Napa leather seating surfaces with perforated sueded microfiber inserts > Sky Cool Gray interior / Jet Black seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Sky Cool Gray interior / Jet Black seats",
-            "interior_reference_order": 124
+            "interior_reference_order": 124,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hvt.png",
+            "image_alt": "HVT Sky Cool Gray interior / Jet Black seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_R6X_AH2_HMO_N2Z",
@@ -144613,7 +146157,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Jet Black interior / Sky Cool Gray seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats",
-            "interior_reference_order": 125
+            "interior_reference_order": 125,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hmo.png",
+            "image_alt": "HMO Jet Black interior / Sky Cool Gray seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_R6X_AH2_HMO_N2Z_TU7",
@@ -144668,7 +146216,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Jet Black interior / Sky Cool Gray seats two tone",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black interior / Sky Cool Gray seats two tone",
-            "interior_reference_order": 126
+            "interior_reference_order": 126,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hmo.png",
+            "image_alt": "HMO Jet Black interior / Sky Cool Gray seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
@@ -144717,7 +146269,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Adrenaline Red > Napa leather seating surfaces with perforated sueded microfiber inserts > Adrenaline Red interior / Jet Black seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats",
-            "interior_reference_order": 127
+            "interior_reference_order": 127,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hzp.png",
+            "image_alt": "HZP Adrenaline Red interior / Jet Black seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
@@ -144766,7 +146322,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Adrenaline Red > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Adrenaline Red interior / Jet Black seats",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Adrenaline Red interior / Jet Black seats",
-            "interior_reference_order": 128
+            "interior_reference_order": 128,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hzp.png",
+            "image_alt": "HZP Adrenaline Red interior / Jet Black seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_R6X_AH2_HXO_N2Z_38S_TU7",
@@ -144827,7 +146387,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AH2 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts > Jet Black interior / Adrenaline Red seats",
             "interior_parent_group_label": "AH2 Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_reference_order": 129
+            "interior_reference_order": 129,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hxo.png",
+            "image_alt": "HXO Jet Black interior / Adrenaline Red seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           },
           {
             "interior_id": "3LZ_R6X_AE4_HXO_N2Z_38S",
@@ -144882,7 +146446,11 @@ window.CORVETTE_FORM_DATA = {
             "interior_hierarchy_path": "3LZ > AE4 Seats > Jet Black > Napa leather seating surfaces with perforated sueded microfiber inserts and performance textile > Jet Black interior / Adrenaline Red seats",
             "interior_parent_group_label": "AE4 Seats",
             "interior_leaf_label": "Jet Black interior / Adrenaline Red seats",
-            "interior_reference_order": 130
+            "interior_reference_order": 130,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hxo.png",
+            "image_alt": "HXO Jet Black interior / Adrenaline Red seats interior swatch",
+            "image_fit": "swatch",
+            "image_position": "center"
           }
         ],
         "colorOverrides": [

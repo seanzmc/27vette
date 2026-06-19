@@ -634,11 +634,22 @@ test("1LT interior color groups stay expanded when each group has one option", (
   runtime.handleChoice(gt1);
   const interiors = runtime.data.interiors.filter((interior) => interior.trim_level === "1LT" && interior.seat_code === "AQ9");
   assert.equal(interiors.length > 1, true, "1LT should expose multiple color groups");
+  const jetBlack = interiors.find((interior) => interior.interior_code === "HTA");
+  assert.ok(jetBlack, "HTA interior should exist for 1LT/AQ9");
+  assert.equal(jetBlack.image_url, "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/hta.png");
+  assert.equal(jetBlack.image_fit, "swatch");
 
   const html = runtime.renderInteriorGroups(interiors);
   assert.doesNotMatch(html, /<details class="interior-group"/, "single-option 1LT color groups should not be collapsed");
   assert.match(html, /<section class="interior-group"/);
-  assert.match(html, /<button class="choice-card"/);
+  assert.match(html, /<button class="choice-card has-media"/);
+  assert.match(html, /<span class="choice-media" data-fit="swatch">/);
+  assert.doesNotMatch(html, /1 choice/, "single-option interior groups should not expose internal count copy");
+
+  runtime.state.selectedInterior = jetBlack.interior_id;
+  const selectedHtml = runtime.renderInteriorGroups(interiors);
+  assert.match(selectedHtml, /choice-state selected-reason/);
+  assert.match(selectedHtml, /✓ Selected/);
 });
 
 test("interior color groups render as collapsed disclosure containers without the rejected restyle", () => {
@@ -656,9 +667,27 @@ test("interior color groups render as collapsed disclosure containers without th
   const html = runtime.renderInteriorGroups(interiors);
   assert.match(html, /<details class="interior-group"/);
   assert.match(html, /<summary class="interior-group-header">/);
+  assert.match(html, /<span class="interior-group-count">\d+ choices<\/span>/);
   assert.doesNotMatch(html, /<details class="interior-group"[^>]*\sopen(?:\s|>)/, "groups should be collapsed by default without a selection");
   assert.doesNotMatch(stylesSource, /\.interior-color-section\s*\{[\s\S]*background:\s*linear-gradient/);
   assert.doesNotMatch(stylesSource, /\.interior-group\s*\{[\s\S]*background:\s*#fbfaf7/);
+});
+
+test("interior compatibility copy uses customer-facing change-seat action", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.activateStep("base_interior");
+  const html = runtime.elements.get("#stepContent").innerHTML;
+
+  assert.match(html, /Showing colors compatible with AQ9 GT1 Bucket Seats\./);
+  assert.match(html, /data-interior-change-seat>Change seats<\/button> to see additional interior colors\./);
+  assert.doesNotMatch(html, /1 choice/);
+  assert.match(appSource, /data-interior-change-seat/);
+  assert.match(appSource, /activateStep\("seat"\)/);
+  assert.match(stylesSource, /\.inline-link-button\s*\{/);
 });
 
 test("option selections preserve the current viewport instead of resetting to the page top", () => {
@@ -917,6 +946,7 @@ test("vehicle setup exposes paced readability hooks without changing option step
   assert.doesNotMatch(cssBlock(".choice-card.selected.auto"), /background-image|box-shadow|inset/);
   assert.match(cssBlock(".choice-card:focus-visible"), /outline-color:\s*transparent/);
   assert.match(cssBlock(".choice-card:focus-visible"), /box-shadow:\s*0 0 0 3px rgba\(178, 34, 52, 0\.35\)/);
+  assert.match(cssBlock(".selected-reason"), /color:\s*var\(--accent-dark\)/);
   assert.match(cssBlock(".choice-availability"), /min-height:\s*24px/);
   assert.match(stylesSource, /\.vehicle-setup-equipment-disclosure\s*\{/);
   assert.match(stylesSource, /\.vehicle-setup-next-action\s*\{[\s\S]*justify-content:\s*space-between/);

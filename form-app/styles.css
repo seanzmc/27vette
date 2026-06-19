@@ -1179,6 +1179,26 @@ textarea {
   color: var(--ok);
 }
 
+.selected-reason {
+  color: var(--accent-dark);
+}
+
+.inline-link-button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--accent-dark);
+  font: inherit;
+  font-weight: 850;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.inline-link-button:hover,
+.inline-link-button:focus-visible {
+  color: var(--accent);
+}
+
 .summary-panel {
   display: flex;
   flex-direction: column;

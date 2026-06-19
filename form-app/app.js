@@ -1860,7 +1860,13 @@ function renderInteriorCard(interior) {
       ${renderCardMedia(interior, label, { disabled: Boolean(disabledReason) })}
       <span class="topline"><span class="rpo">${interior.interior_code}</span><span class="price">${formatMoney(adjustedInteriorDisplayPrice(interior))}</span></span>
       <span class="choice-name"><span>${escapeHtml(label)}</span>${renderInfoTooltip(detail || interior.interior_id, "Interior details", { focusable: false })}</span>
-      ${renderChoiceAvailability(disabledReason ? renderStatePill("Unavailable", "disabled-reason", disabledReason) : "")}
+      ${renderChoiceAvailability(
+        disabledReason
+          ? renderStatePill("Unavailable", "disabled-reason", disabledReason)
+          : selected
+            ? renderStatePill("✓ Selected", "selected-reason")
+            : ""
+      )}
     </button>
   `;
 }
@@ -1895,12 +1901,13 @@ function renderInteriorGroups(interiors) {
           const materialGroups = groupInteriorsBy(group.rows, "interior_material_family");
           const materialSummary = [...new Set(group.rows.map((interior) => interior.interior_material_family).filter(Boolean))].join(" / ");
           const selectedInGroup = group.rows.some((interior) => interior.interior_id === state.selectedInterior);
+          const countLabel = group.rows.length > 1 ? `<span class="interior-group-count">${group.rows.length} choices</span>` : "";
           const groupHeader = `
                 <span class="interior-group-heading">
                   <span class="interior-group-title">${escapeHtml(group.label)}</span>
                   ${materialSummary ? `<span class="interior-group-summary">${escapeHtml(materialSummary)}</span>` : ""}
                 </span>
-                <span class="interior-group-count">${group.rows.length === 1 ? "1 choice" : `${group.rows.length} choices`}</span>`;
+                ${countLabel}`;
           const groupBody = `
               <div class="interior-group-body">
                 ${materialGroups
@@ -2441,7 +2448,11 @@ function renderStepContent({ resetScroll = false } = {}) {
     const selectedSeat = selectedSeatChoice();
     body = `
       <section class="section-block interior-color-section">
-        ${selectedSeat ? `<p class="selected-seat-context">Showing colors compatible with ${escapeHtml(selectedSeat.rpo)} ${escapeHtml(selectedSeat.label)}.</p>` : ""}
+        ${
+          selectedSeat
+            ? `<p class="selected-seat-context">Showing colors compatible with ${escapeHtml(selectedSeat.rpo)} ${escapeHtml(selectedSeat.label)}. <button type="button" class="inline-link-button" data-interior-change-seat>Change seats</button> to see additional interior colors.</p>`
+            : ""
+        }
         ${renderInteriorGroups(interiors)}
       </section>
     `;
@@ -2515,6 +2526,7 @@ function renderStepContent({ resetScroll = false } = {}) {
       if (interior) handleInterior(interior);
     });
   });
+  els.stepContent.querySelector("[data-interior-change-seat]")?.addEventListener("click", () => activateStep("seat"));
   els.stepContent.querySelectorAll("[data-context-choice]").forEach((button) => {
     button.addEventListener("click", (event) => {
       if (stopEventAfterTooltipTouch(event)) return;

@@ -50,6 +50,16 @@ def option_asset_map(wb, model_key: str) -> dict[str, dict[str, str]]:
     }
 
 
+def interior_asset_map(wb, model_key: str) -> dict[str, dict[str, str]]:
+    """Interior-code assets for one model, keyed by interior color code."""
+
+    return {
+        target_id.upper(): fields
+        for (target_type, target_id), fields in load_asset_map(wb, model_key).items()
+        if target_type == "interior_code"
+    }
+
+
 def load_model_asset_map(wb, registry_key_for_model) -> dict[str, dict[str, str]]:
     """Model-card assets across every model, keyed by registry target id."""
 

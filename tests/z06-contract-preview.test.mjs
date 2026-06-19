@@ -36,9 +36,10 @@ test("Z06 contract preview has the expected read-only contract shape", () => {
   assert.equal(preview.contextChoices.length, 8);
   assert.equal(preview.steps.length, 14);
   assert.equal(preview.steps.every((step) => step.source !== "fallback_config"), true);
-  assert.equal(preview.orderSummary.sections.length, 11);
-  assert.equal(Object.keys(preview.orderSummary.stepMap).length, 13);
+  assert.equal(preview.orderSummary.sections.length, 12);
+  assert.equal(Object.keys(preview.orderSummary.stepMap).length, 14);
   assert.equal(preview.orderSummary.stepMap.packages_performance, "performance_mechanical");
+  assert.equal(preview.orderSummary.stepMap.standard_equipment, "required_charges");
   assert.ok(preview.choices.length > 0, "Z06 preview should include choices");
   assert.ok(preview.candidateStandardEquipment.length > 0, "Z06 preview should include candidate standard equipment");
 });

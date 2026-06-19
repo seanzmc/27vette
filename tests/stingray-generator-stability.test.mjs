@@ -185,6 +185,10 @@ const expectedOrderSummarySections = [
   ["auto_added_required", "Auto-Added / Required", 10],
   ["pricing_summary", "Pricing Summary", 11],
 ];
+const expectedZ06OrderSummarySections = [
+  ...expectedOrderSummarySections,
+  ["required_charges", "Required Charges", 15],
+];
 const expectedStepOrderSummaryMap = [
   ["body_style", "vehicle"],
   ["trim_level", "vehicle"],
@@ -199,6 +203,10 @@ const expectedStepOrderSummaryMap = [
   ["interior_trim", "seats_interior"],
   ["accessories", "accessories"],
   ["delivery", "delivery"],
+];
+const expectedZ06StepOrderSummaryMap = [
+  ...expectedStepOrderSummaryMap,
+  ["standard_equipment", "required_charges"],
 ];
 const requiredGrandSportPriceRuleIds = [
   "gs_pr_fey_j57_001",
@@ -484,18 +492,20 @@ test("Phase 6 step and presentation metadata are workbook-owned", () => {
     const summaryRows = workbookRows("order_summary_sections")
       .filter((row) => row.model_key === modelKey && row.active === "True")
       .sort((a, b) => Number(a.display_order) - Number(b.display_order));
+    const expectedSummaryRows = modelKey === "z06" ? expectedZ06OrderSummarySections : expectedOrderSummarySections;
     assert.deepEqual(
       summaryRows.map((row) => [row.section_key, row.section_label, Number(row.display_order)]),
-      expectedOrderSummarySections,
+      expectedSummaryRows,
       `${modelKey} order summary sections should be workbook-owned`
     );
 
+    const expectedStepSummaryMap = modelKey === "z06" ? expectedZ06StepOrderSummaryMap : expectedStepOrderSummaryMap;
     const stepSummaryRows = workbookRows("step_order_summary_map")
       .filter((row) => row.model_key === modelKey && row.active === "True")
-      .sort((a, b) => expectedStepOrderSummaryMap.findIndex(([stepKey]) => stepKey === a.step_key) - expectedStepOrderSummaryMap.findIndex(([stepKey]) => stepKey === b.step_key));
+      .sort((a, b) => expectedStepSummaryMap.findIndex(([stepKey]) => stepKey === a.step_key) - expectedStepSummaryMap.findIndex(([stepKey]) => stepKey === b.step_key));
     assert.deepEqual(
       stepSummaryRows.map((row) => [row.step_key, row.section_key]),
-      expectedStepOrderSummaryMap,
+      expectedStepSummaryMap,
       `${modelKey} step-to-summary map should be workbook-owned`
     );
 
