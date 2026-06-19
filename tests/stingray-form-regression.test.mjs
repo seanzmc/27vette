@@ -690,6 +690,81 @@ test("interior compatibility copy uses customer-facing change-seat action", () =
   assert.match(stylesSource, /\.inline-link-button\s*\{/);
 });
 
+test("interior composition summary renders only on interior steps", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  for (const stepKey of ["seat", "base_interior", "seat_belt", "interior_trim"]) {
+    runtime.activateStep(stepKey);
+    assert.match(
+      runtime.elements.get("#stepContent").innerHTML,
+      /class="interior-composition-summary"/,
+      `${stepKey} should render the interior composition summary`
+    );
+  }
+
+  const nonInteriorStep = data.steps.find((step) => !["seat", "base_interior", "seat_belt", "interior_trim"].includes(step.step_key));
+  assert.ok(nonInteriorStep, "expected at least one non-interior runtime step");
+  runtime.activateStep(nonInteriorStep.step_key);
+  assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /class="interior-composition-summary"/);
+});
+
+test("interior composition summary shows placeholders before interior choices are made", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.state.selected.clear();
+  runtime.state.userSelected.clear();
+  runtime.state.selectedInterior = "";
+
+  runtime.activateStep("seat");
+  const html = runtime.elements.get("#stepContent").innerHTML;
+
+  assert.match(html, /Choose seats/);
+  assert.match(html, /Choose interior color/);
+  assert.match(html, /Choose seat belt/);
+  assert.match(html, /No interior trim selected/);
+  assert.match(html, /Interior color availability follows the selected seat\./);
+});
+
+test("interior composition summary reflects selected interior composition and total", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "2LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const seat = runtime.activeChoiceRows().find((choice) => choice.rpo === "AH2" && choice.step_key === "seat");
+  assert.ok(seat, "expected a 2LT AH2 seat choice");
+  runtime.handleChoice(seat);
+
+  const interior = runtime.data.interiors.find((row) => row.trim_level === "2LT" && row.seat_code === "AH2");
+  assert.ok(interior, "expected a 2LT/AH2 interior choice");
+  runtime.state.selectedInterior = interior.interior_id;
+
+  const belt = runtime.activeChoiceRows().find((choice) => choice.step_key === "seat_belt" && choice.selectable === "True");
+  assert.ok(belt, "expected a selectable seat belt choice");
+  runtime.handleChoice(belt);
+
+  runtime.activateStep("interior_trim");
+  const html = runtime.elements.get("#stepContent").innerHTML;
+  const seatsInteriorSection = runtime.currentOrder().sections.find((section) => section.section_key === "seats_interior");
+  const expectedTotal = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(
+    seatsInteriorSection.section_total
+  );
+  const escapeRegExp = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  assert.match(html, new RegExp(escapeRegExp(seat.rpo)));
+  assert.match(html, new RegExp(escapeRegExp(seat.label)));
+  assert.match(html, new RegExp(escapeRegExp(interior.interior_code)));
+  assert.match(html, new RegExp(escapeRegExp(belt.rpo)));
+  assert.match(html, /Interior delta/);
+  assert.match(html, new RegExp(escapeRegExp(expectedTotal)));
+});
+
 test("option selections preserve the current viewport instead of resetting to the page top", () => {
   assert.match(appSource, /function captureScrollPosition\(\)/);
   assert.match(appSource, /function restoreScrollPosition\(position\)/);

@@ -100,6 +100,7 @@ const modelStep = {
   step_label: "Vehicle Setup",
 };
 const vehicleSetupStepKeys = new Set(["model", "body_style", "trim_level"]);
+const interiorCompositionStepKeys = new Set(["seat", "base_interior", "seat_belt", "interior_trim"]);
 const vehicleSetupStages = ["model", "body_style", "trim_level", "ready"];
 const vehicleSetupHighlights = {
   stingray: {
@@ -2421,6 +2422,98 @@ function renderStepChoiceGroups(choices, autoAdded) {
   return rendered.join("");
 }
 
+function interiorCompositionOptionRows(stepKey, autoAdded) {
+  return activeChoiceRows()
+    .filter((choice) => choice.step_key === stepKey)
+    .filter((choice) => state.selected.has(choice.option_id) || autoAdded.has(choice.option_id))
+    .sort((a, b) => Number(a.display_order || 0) - Number(b.display_order || 0));
+}
+
+function interiorCompositionItemFromChoice(choice, autoAdded, placeholder) {
+  if (!choice) {
+    return { code: "", label: placeholder, meta: "Pending", pending: true };
+  }
+  const autoOnly = autoAdded.has(choice.option_id) && !state.selected.has(choice.option_id);
+  return {
+    code: choice.rpo || "",
+    label: choice.label || choice.option_id || placeholder,
+    meta: autoOnly ? "Included with selected interior" : "Selected",
+    pending: false,
+  };
+}
+
+function interiorCompositionState() {
+  const autoAdded = computeAutoAdded();
+  const seat = selectedSeatChoice();
+  const interior = state.selectedInterior ? interiorsById.get(state.selectedInterior) : null;
+  const seatBelt = interiorCompositionOptionRows("seat_belt", autoAdded)[0];
+  const trimRows = interiorCompositionOptionRows("interior_trim", autoAdded);
+  const order = currentOrder();
+  const seatsInteriorSection = order.sections.find((section) => section.section_key === "seats_interior");
+  return {
+    seat: interiorCompositionItemFromChoice(seat, autoAdded, "Choose seats"),
+    interior: interior
+      ? {
+          code: interior.interior_code || "",
+          label: getInteriorCustomerLabel(interior),
+          meta: "Selected",
+          pending: false,
+        }
+      : { code: "", label: "Choose interior color", meta: "Pending", pending: true },
+    seatBelt: interiorCompositionItemFromChoice(seatBelt, autoAdded, "Choose seat belt"),
+    trims: trimRows.length
+      ? trimRows.map((choice) => interiorCompositionItemFromChoice(choice, autoAdded, "No interior trim selected"))
+      : [{ code: "", label: "No interior trim selected", meta: "Optional", pending: true }],
+    total: Number(seatsInteriorSection?.section_total || 0),
+  };
+}
+
+function renderInteriorCompositionItem(title, item) {
+  const classes = ["interior-composition-item"];
+  if (item.pending) classes.push("pending");
+  return `
+    <div class="${classes.join(" ")}">
+      <dt>${escapeHtml(title)}</dt>
+      <dd>
+        ${item.code ? `<span class="interior-composition-code">${escapeHtml(item.code)}</span>` : ""}
+        <strong>${escapeHtml(item.label)}</strong>
+        <span>${escapeHtml(item.meta)}</span>
+      </dd>
+    </div>
+  `;
+}
+
+function renderInteriorCompositionSummary() {
+  const composition = interiorCompositionState();
+  const trimSummary = {
+    code: composition.trims.map((item) => item.code).filter(Boolean).join(", "),
+    label: composition.trims.map((item) => item.label).join(", "),
+    meta: composition.trims.some((item) => !item.pending) ? "Selected" : "Optional",
+    pending: composition.trims.every((item) => item.pending),
+  };
+  return `
+    <aside class="interior-composition-summary" aria-label="Interior composition summary">
+      <div class="interior-composition-heading">
+        <div>
+          <p class="eyebrow">Interior composition</p>
+          <h3>Your interior so far</h3>
+        </div>
+        <div class="interior-composition-total" aria-label="Interior delta ${escapeHtml(formatMoney(composition.total))}">
+          <span>Interior delta</span>
+          <strong>${escapeHtml(formatMoney(composition.total))}</strong>
+        </div>
+      </div>
+      <dl class="interior-composition-grid">
+        ${renderInteriorCompositionItem("Seat", composition.seat)}
+        ${renderInteriorCompositionItem("Interior Color", composition.interior)}
+        ${renderInteriorCompositionItem("Seat Belt", composition.seatBelt)}
+        ${renderInteriorCompositionItem("Interior Trim", trimSummary)}
+      </dl>
+      <p class="interior-composition-note">Interior color availability follows the selected seat.</p>
+    </aside>
+  `;
+}
+
 function renderStepContent({ resetScroll = false } = {}) {
   const step = runtimeSteps.find((item) => item.step_key === state.activeStep);
   const autoAdded = computeAutoAdded();
@@ -2490,6 +2583,7 @@ function renderStepContent({ resetScroll = false } = {}) {
 
   const next = nextStep();
   const isVehicleSetupStep = isModelStep;
+  const interiorCompositionSummary = interiorCompositionStepKeys.has(state.activeStep) ? renderInteriorCompositionSummary() : "";
   const nextButtonLabel = next ? `Next: ${next.step_label}` : "";
   els.stepContent.dataset.activeStep = state.activeStep;
   els.stepContent.dataset.stepKind = isModelStep ? "model" : isContextStep ? "context" : "option";
@@ -2501,6 +2595,7 @@ function renderStepContent({ resetScroll = false } = {}) {
       </div>
       <span class="step-meta">${currentVariant()?.display_name || ""}</span>
     </header>
+    ${interiorCompositionSummary}
     ${body}
     ${
       next && !isVehicleSetupStep

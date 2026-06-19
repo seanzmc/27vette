@@ -1,6 +1,6 @@
 # Spec: Priority C — Interior Composition Summary
 
-Status: Spec only. Do not implement until approved.
+Status: Implemented. Visualizer-pane work is split into the follow-up Priority C2 spike; the visualizer is not wired in this pass.
 
 ## Diagnosis
 
@@ -26,6 +26,10 @@ Current runtime evidence:
   - New Priority C tests should use the same harness rather than adding a new browser/runtime test framework.
 - `form-app/styles.css`
   - Existing card/summary/section styles can support a compact inline component without changing the shell or dealer flow.
+- Visualizer/media evidence:
+  - `visualizer/visualizer.js` exists as a prototype/drop-in, but it is not loaded by `form-app/index.html`.
+  - The prototype expects generated `layer_src`, `layer_z`, and `layer_src_full` fields on selected choice rows; the current shared asset contract emits `image_url`, `image_alt`, `image_fit`, and `image_position`.
+  - The prototype reads `state.selected` but Interior Color currently lives in `state.selectedInterior`, so a true live interior pane needs its own data-contract/runtime pass.
 
 Root cause:
 
@@ -33,7 +37,7 @@ The runtime has all data needed to summarize the selected interior composition, 
 
 Risk level: medium.
 
-Change type: runtime UI + CSS + tests. No workbook source-data edit is expected for this pass.
+Change type: runtime UI + CSS + tests. No workbook source-data edit is expected for this pass. True live visualizer integration is explicitly deferred to Priority C2.
 
 ## Exact Files To Change
 
@@ -51,6 +55,7 @@ Expected source changes:
 2. `form-app/styles.css`
    - Add compact panel styles.
    - Preserve current card layout and step shell behavior.
+   - Keep the panel layout compatible with a later adjacent/stacked visualizer preview block without reserving permanent empty space.
 
 3. `tests/stingray-form-regression.test.mjs`
    - Add runtime render tests for the composition panel.
@@ -61,6 +66,7 @@ Likely generated artifacts:
 
 - None expected.
 - If implementation unexpectedly requires generated data changes, stop and write an amended spec before editing workbook/generator paths.
+- Do not modify `visualizer/visualizer.js`, load it in `form-app/index.html`, or add layer fields to generated artifacts in this pass.
 
 ## Proposed Runtime Design
 
@@ -70,6 +76,7 @@ Render location:
 
 - Immediately below the step header or as the first block in the step body for interior steps.
 - Do not render on Vehicle Setup, Exterior Paint, Exterior Appearance, Wheels, Performance, Stripes, Accessories, Delivery, or Summary.
+- Structure the markup so a later Priority C2 visualizer pane can sit above or beside this summary without rewriting the summary state helper.
 
 Panel content:
 
@@ -110,6 +117,8 @@ Interaction behavior:
 - Keep this pass runtime-generic and data-driven.
 - No workbook source edits unless an implementation proof shows an existing generated field is insufficient; if that happens, stop and amend this spec.
 - No generated `form-output/*` or `form-app/data.js` hand edits.
+- No `visualizer/visualizer.js` wiring, no `form-app/index.html` script addition, and no generated layer metadata in Priority C.
+- Keep local `src-img/` files source/reference-only. Runtime image URLs remain WordPress-hosted and workbook-authored through generated asset metadata.
 - No new dependencies.
 - No dealer submission endpoint, payload shape, or Turnstile changes.
 - No D30/UQT ownership cleanup in this pass; that remains Priority D.
@@ -124,6 +133,7 @@ Interaction behavior:
 - Hiding, renaming, repricing, or moving Interior Trim options.
 - Adding new workbook metadata sheets.
 - Adding local `src-img/` runtime paths.
+- Adding a true layered visualizer pane or changing the generated media contract.
 - Changing order export, dealer submission, or Formidable-ready payload semantics.
 - Rebuilding the step rail.
 
@@ -144,6 +154,10 @@ Interaction behavior:
 4. Visual crowding
    - Risk: adding a panel to each interior step could make the screens feel heavier.
    - Mitigation: make it compact, low-height, and scannable; avoid duplicating the full Build Summary drawer.
+
+5. Accidental visualizer scope creep
+   - Risk: using Priority C to wire the existing visualizer prototype would require non-existent generated `layer_*` fields and would miss `state.selectedInterior`.
+   - Mitigation: keep Priority C to the summary panel; capture live-pane work in Priority C2 with workbook/generator/runtime ownership called out separately.
 
 ## Implementation Tasks After Approval
 
@@ -183,8 +197,18 @@ Interaction behavior:
    - Compact card/panel layout.
    - Responsive grid or wrap behavior.
    - No new selected-state layout shifts.
+   - Avoid broad shell/sidebar restyle; allow future visualizer placement through local panel layout only.
 
-9. Run focused tests and browser smoke.
+9. Do not wire the visualizer prototype in this pass.
+   - Leave `visualizer/visualizer.js` and `form-app/index.html` unchanged unless implementation proof contradicts this spec.
+
+10. Run focused tests and browser smoke.
+
+## Follow-Up Pass
+
+Priority C2 should be a separate Interior Visualizer Spike after this panel lands.
+
+See `docs/interior/thirdSpec_InteriorVisualizerSpike.md` for the proposed mixed workbook/generator/runtime spike. That pass should prove the live-pane data contract, including `state.selectedInterior`, before any production visualizer is wired into the customer runtime.
 
 ## Validation Plan
 
@@ -228,4 +252,18 @@ Recommended extra smoke if time permits:
 
 ## Approval Question
 
-Approve Priority C implementation: add a compact Interior Composition summary across Seats, Interior Color, Seat Belt, and Interior Trim, runtime-only unless implementation proves a missing generated-data field?
+Historical approval prompt: add a compact Interior Composition summary across Seats, Interior Color, Seat Belt, and Interior Trim, runtime-only unless implementation proves a missing generated-data field. The live visualizer pane remains deferred to Priority C2.
+
+## Completion Evidence
+
+Implemented in `form-app/app.js`, `form-app/styles.css`, and `tests/stingray-form-regression.test.mjs`.
+
+Validation run after implementation:
+
+```sh
+node --test tests/stingray-form-regression.test.mjs
+node --test tests/multi-model-runtime-switching.test.mjs
+git diff --check
+```
+
+Browser smoke run with `../.venv/bin/python -m http.server 8000` confirmed the Stingray interior panel renders on Seats and Interior Color, updates after a seat change, does not load `visualizer/visualizer.js`, and produced no console errors. Grand Sport/Z06 browser smoke remains pending; automated multi-model runtime switching passed.

@@ -759,6 +759,106 @@ textarea {
   font-weight: 750;
 }
 
+.interior-composition-summary {
+  display: grid;
+  gap: 12px;
+  margin: -4px 0 18px;
+  border: 1px solid rgba(178, 34, 52, 0.16);
+  border-radius: 10px;
+  padding: 14px;
+  background: linear-gradient(135deg, rgba(255, 252, 246, 0.94), rgba(248, 243, 234, 0.78));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.interior-composition-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.interior-composition-heading h3,
+.interior-composition-heading .eyebrow,
+.interior-composition-note {
+  margin: 0;
+}
+
+.interior-composition-heading h3 {
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.interior-composition-total {
+  display: grid;
+  gap: 2px;
+  min-width: 118px;
+  text-align: right;
+}
+
+.interior-composition-total span,
+.interior-composition-item dt,
+.interior-composition-item dd > span:last-child {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.interior-composition-total strong {
+  color: var(--accent-dark);
+  font-size: 18px;
+}
+
+.interior-composition-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.interior-composition-item {
+  min-width: 0;
+  border: 1px solid rgba(217, 209, 196, 0.74);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.interior-composition-item dd {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 0;
+  min-width: 0;
+}
+
+.interior-composition-item strong {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+}
+
+.interior-composition-code {
+  color: var(--accent-dark);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+}
+
+.interior-composition-item.pending strong {
+  color: #7f7466;
+}
+
+.interior-composition-note {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
 .choice-relation-group {
   display: grid;
   gap: 12px;
@@ -1912,6 +2012,19 @@ body:has(.app-shell[data-mobile-drawer]) {
   }
 
   .interior-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .interior-composition-heading {
+    display: grid;
+  }
+
+  .interior-composition-total {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .interior-composition-grid {
     grid-template-columns: 1fr;
   }
 
