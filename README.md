@@ -39,7 +39,7 @@ The runtime should render and evaluate the generated contract. It should not inf
 
 - `README.md` - project overview, architecture, local run, workflows, and roadmap.
 - `AGENTS.md` - granular developer workflows, source-of-truth rules, validation gates, and handoff requirements.
-- `docs/` - current planning, review, workbook editor, and workbook inventory docs, including `docs/workbook-sheet-index.md` and workbook editor phase specs.
+- `docs/` - current planning, review, workbook editor, and ingest/schema docs. The stale workbook sheet index was archived to `docs/archive/workbook-sheet-index-2026-06-12.md`.
 - `stingray_master.xlsx` - canonical workbook, source/metadata sheets, and generated `form_*` sheets.
 - `form-app/` - static app shell, styles, runtime behavior, and generated data bundle.
 - `form-output/` - generated Stingray JSON/CSV outputs plus Grand Sport and Z06 inspection, contract preview, draft, rule-audit, and clean runtime-contract artifacts under `form-output/inspection/`.
@@ -102,7 +102,9 @@ Workbook-owned runtime metadata and audit sheets:
 - `variant_option_overrides`
 - `rule_phrase_map`
 
-Model-scoped source sheets exist for Grand Sport (`grandSport_*`), Z06 (`z06_*`), ZR1 (`zr1_*`), and ZR1X (`zr1x_*`), each with the same nine-sheet shape:
+Model-scoped source sheets exist for Grand Sport (`grandSport_*`) and Z06 (`z06_*`) in the active normalized workflow. ZR1 (`zr1_*`) and ZR1X (`zr1x_*`) rows/sheets are inactive historical scaffolds that should be reprocessed before they are used as ingest truth.
+
+The active normalized model-scoped shape is:
 
 - `<model>_options`
 - `<model>_ovs`
@@ -114,7 +116,7 @@ Model-scoped source sheets exist for Grand Sport (`grandSport_*`), Z06 (`z06_*`)
 - `<model>_exclusive_members`
 - `<model>_variant_overrides`
 
-ZR1 and ZR1X sheets are source data for unpromoted future models only.
+Existing ZR1 and ZR1X scaffold rows remain unpromoted and should be treated as historical seed data until a clean reprocess/apply pass replaces or retires them.
 
 `category_master` is not an active source sheet. Historical evidence sheets (`archive_*` and `*_raw`) were extracted to `archive/stingray_archive.xlsx` and no longer live in `stingray_master.xlsx`.
 
