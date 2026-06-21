@@ -22,8 +22,7 @@ The current architecture is:
 stingray_master.xlsx
   -> workbook source and metadata sheets
   -> generator/inspection scripts
-  -> generated form_* workbook sheets
-  -> form-output JSON/CSV/inspection artifacts
+  -> form-output runtime-contract JSON / compatibility CSV / inspection artifacts
   -> form-app/data.js multi-model registry
   -> static browser runtime
   -> download build / submit to dealer
@@ -120,19 +119,7 @@ Existing ZR1 and ZR1X scaffold rows remain unpromoted and should be treated as h
 
 `category_master` is not an active source sheet. Historical evidence sheets (`archive_*` and `*_raw`) were extracted to `archive/stingray_archive.xlsx` and no longer live in `stingray_master.xlsx`.
 
-Generated sheets are output surfaces and should not be edited by hand:
-
-- `form_steps`
-- `form_context_choices`
-- `form_choices`
-- `form_standard_equipment`
-- `form_rule_groups`
-- `form_exclusive_groups`
-- `form_rules`
-- `form_price_rules`
-- `form_interiors`
-- `form_color_overrides`
-- `form_validation`
+Generated runtime contracts are output surfaces and should not be edited by hand. Active runtime payloads live under `form-output/runtime/` and are published to `form-app/data.js` by `scripts/generate_registry.py`. Historical workbook `form_*` generated sheets are retired from the routine workflow; use source workbook rows plus regeneration instead of recreating or editing workbook generated sheets.
 
 ## Generated Data Contract
 
@@ -231,7 +218,7 @@ Review tab:
 Editing and Apply behavior:
 
 - Edits queue client-side as typed operations. Nothing touches `stingray_master.xlsx` until Apply.
-- Only the model-scoped sheet families registered in `model_workbook_sources` are editable. Generated `form_*` sheets and workbook metadata sheets are read-only in the editor.
+- Only the model-scoped sheet families registered in `model_workbook_sources` are editable. Workbook metadata sheets and any unregistered/generated/debug sheets are read-only in the editor.
 - Schema-constrained fields use pickers, enums, or typed inputs. Adding an option must include OVS coverage for every active variant of that model; the Add Option wizard and server both check this.
 - Apply runs the full workbook gate internally: batch validation, dry-run on a temp copy, `validate_workbook_package`, `validate_workbook_schema`, `save_workbook_safely()` lock/mtime checks, backup, atomic replace, Excel-table ref maintenance, and an entry in `form-output/workbook-edit-log.jsonl`.
 - Warnings such as display-order collisions or deleting still-referenced keys block until explicitly confirmed.
@@ -259,7 +246,7 @@ node --test tests/stingray-form-regression.test.mjs
 node --test tests/stingray-generator-stability.test.mjs
 ```
 
-The Stingray generator reads `stingray_master.xlsx`, rewrites generated `form_*` sheets, writes compatibility outputs at `form-output/stingray-form-data.json` and `form-output/stingray-form-data.csv`, and writes `form-output/runtime/stingray-runtime-contract.json`. `scripts/generate_registry.py` publishes the current promoted model registry to `form-app/data.js`.
+The Stingray generator reads `stingray_master.xlsx`, writes compatibility outputs at `form-output/stingray-form-data.json` and `form-output/stingray-form-data.csv`, and writes `form-output/runtime/stingray-runtime-contract.json`. It does not routinely save workbook generated sheets. `scripts/generate_registry.py` publishes the current promoted model registry to `form-app/data.js`.
 
 Grand Sport source/runtime-contract refresh:
 

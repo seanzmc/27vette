@@ -469,7 +469,7 @@ Validation depends on target model and whether promoted runtime data changes.
 ## Explicit non-goals for the ingest/schema path
 
 - Do not promote ZR1/ZR1X to runtime as part of raw ingest.
-- Do not edit generated `form_*` sheets directly.
+- Do not recreate or edit retired workbook `form_*` generated sheets as ingest outputs.
 - Do not hand-edit `form-output/*` or `form-app/data.js`.
 - Do not create a permanent parallel review taxonomy when canonical workbook sheets already own the data.
 - Do not use archived ingest skills/scripts as current source of truth.

@@ -1,4 +1,4 @@
-"""Production form-data generation: workbook form_* sheets and Stingray output artifacts.
+"""Production form-data generation: Stingray compatibility and runtime artifacts.
 
 Currently parameterized for the active current-generation model (Stingray).
 Invoked through ``scripts/generate_form.py``.
@@ -58,7 +58,7 @@ from corvette_form_generator.runtime_metadata import (
     presentation_bool,
 )
 from corvette_form_generator.validation import validation_error_count
-from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet, save_workbook_safely, write_sheet
+from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet
 
 
 MODEL_CONFIG = STINGRAY_MODEL
@@ -66,7 +66,6 @@ ROOT = MODEL_CONFIG.root
 WORKBOOK_PATH = MODEL_CONFIG.workbook_path
 OUTPUT_DIR = MODEL_CONFIG.output_dir
 APP_DIR = MODEL_CONFIG.app_dir
-GENERATED_SHEETS = list(MODEL_CONFIG.generated_sheets)
 STEP_ORDER = list(MODEL_CONFIG.step_order)
 STEP_LABELS = dict(MODEL_CONFIG.step_labels)
 CONTEXT_SECTIONS = [dict(section) for section in MODEL_CONFIG.context_sections]
@@ -159,7 +158,6 @@ def build_standard_equipment(choices: list[dict[str, Any]]) -> list[dict[str, An
 def main() -> None:
     global MODEL_CONFIG
 
-    loaded_mtime_ns = WORKBOOK_PATH.stat().st_mtime_ns
     wb = load_workbook(WORKBOOK_PATH)
     MODEL_CONFIG = load_model_config_overrides(wb, STINGRAY_MODEL)
 
@@ -601,196 +599,6 @@ def main() -> None:
         ]
     )
 
-    write_sheet(
-        wb,
-        "form_steps",
-        ["step_key", "step_label", "runtime_order", "source", "section_ids"],
-        step_rows,
-    )
-    write_sheet(
-        wb,
-        "form_context_choices",
-        [
-            "context_choice_id",
-            "context_type",
-            "value",
-            "label",
-            "description",
-            "info_tooltip",
-            "section_id",
-            "step_key",
-            "body_style",
-            "trim_level",
-            "variant_id",
-            "base_price",
-            "display_order",
-        ],
-        context_choices,
-    )
-    write_sheet(
-        wb,
-        "form_choices",
-        [
-            "choice_id",
-            "option_id",
-            "rpo",
-            "label",
-            "description",
-            "section_id",
-            "section_name",
-            "step_key",
-            "variant_id",
-            "body_style",
-            "trim_level",
-            "status",
-            "status_label",
-            "selectable",
-            "active",
-            "choice_mode",
-            "selection_mode",
-            "selection_mode_label",
-            "base_price",
-            "display_behavior",
-            "display_order",
-            "source_detail_raw",
-            *ASSET_IMAGE_FIELDS,
-        ],
-        choices,
-    )
-    write_sheet(
-        wb,
-        "form_standard_equipment",
-        [
-            "equipment_id",
-            "variant_id",
-            "body_style",
-            "trim_level",
-            "option_id",
-            "rpo",
-            "label",
-            "description",
-            "section_id",
-            "section_name",
-            "standard_equipment_group_type",
-            "display_order",
-            "source_detail_raw",
-        ],
-        standard_equipment,
-    )
-    write_sheet(
-        wb,
-        "form_rule_groups",
-        [
-            "group_id",
-            "group_type",
-            "source_id",
-            "target_ids",
-            "body_style_scope",
-            "trim_level_scope",
-            "variant_scope",
-            "disabled_reason",
-            "active",
-            "notes",
-        ],
-        [{**row, "target_ids": "|".join(row["target_ids"])} for row in rule_groups],
-    )
-    write_sheet(
-        wb,
-        "form_exclusive_groups",
-        ["group_id", "option_ids", "selection_mode", "active", "notes"],
-        [{**row, "option_ids": "|".join(row["option_ids"])} for row in exclusive_groups],
-    )
-    write_sheet(
-        wb,
-        "form_rules",
-        [
-            "rule_id",
-            "source_id",
-            "rule_type",
-            "target_id",
-            "target_type",
-            "source_type",
-            "source_section",
-            "target_section",
-            "source_selection_mode",
-            "target_selection_mode",
-            "body_style_scope",
-            "disabled_reason",
-            "auto_add",
-            "active",
-            "runtime_action",
-            "source_note",
-        ],
-        raw_rules,
-    )
-    write_sheet(
-        wb,
-        "form_price_rules",
-        [
-            "price_rule_id",
-            "condition_option_id",
-            "target_option_id",
-            "price_rule_type",
-            "price_value",
-            "body_style_scope",
-            "trim_level_scope",
-            "variant_scope",
-            "notes",
-        ],
-        price_rules,
-    )
-    write_sheet(
-        wb,
-        "form_interiors",
-        [
-            "interior_id",
-            "source_sheet",
-            "active_for_stingray",
-            "trim_level",
-            "requires_r6x",
-            "seat_code",
-            "interior_code",
-            "interior_name",
-            "material",
-            "price",
-            "suede",
-            "stitch",
-            "two_tone",
-            "section_id",
-            "color_overrides_raw",
-            "source_note",
-            "interior_components_json",
-            "interior_trim_level",
-            "interior_seat_code",
-            "interior_seat_label",
-            "interior_color_family",
-            "interior_material_family",
-            "interior_variant_label",
-            "interior_group_display_order",
-            "interior_material_display_order",
-            "interior_choice_display_order",
-            "interior_hierarchy_levels",
-            "interior_hierarchy_path",
-            "interior_parent_group_label",
-            "interior_leaf_label",
-            "interior_reference_order",
-        ],
-        interiors,
-    )
-    write_sheet(
-        wb,
-        "form_color_overrides",
-        ["override_id", "interior_id", "option_id", "rule_type", "adds_rpo", "notes"],
-        color_overrides,
-    )
-    write_sheet(
-        wb,
-        "form_validation",
-        ["check_id", "severity", "entity_type", "entity_id", "message"],
-        validation_rows,
-    )
-    workbook_backup_path = save_workbook_safely(wb, WORKBOOK_PATH, loaded_mtime_ns=loaded_mtime_ns)
-
     generated_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     data = {
         "dataset": {
@@ -815,6 +623,7 @@ def main() -> None:
         "colorOverrides": color_overrides,
         "validation": validation_rows,
     }
+    wb.close()
 
     OUTPUT_DIR.mkdir(exist_ok=True)
     APP_DIR.mkdir(exist_ok=True)
@@ -851,7 +660,7 @@ def main() -> None:
 
     print(json.dumps({
         "workbook": str(WORKBOOK_PATH),
-        "workbook_backup": str(workbook_backup_path),
+        "workbook_backup": None,
         "json": str(json_path),
         "runtime_contract_json": str(runtime_json_path),
         "csv": str(csv_path),

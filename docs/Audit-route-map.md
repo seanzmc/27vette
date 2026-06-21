@@ -72,26 +72,15 @@ Every active model now uses it. Remaining route work is source-row assembly/outp
 
 ### 2. Generated workbook `form_*` sheets are Stingray-only
 
-The workbook has generated output sheets such as `form_steps`, `form_choices`, `form_rules`, `form_price_rules`, `form_interiors`, and `form_validation`, and the docs say those are generated outputs that should not be hand-edited.
+**Pass 3 normalized:** generated workbook `form_*` sheets were retired from the routine runtime-generation workflow.
 
-But only the Stingray production path writes these sheets. The Grand Sport/Z06 path writes JSON/Markdown artifacts under `form-output/inspection/` instead.
-
-This creates a false mental model: the workbook appears to contain the generated form contract for Stingray, while the other active models live outside the workbook.
-
-**Normalize to one of two policies after a consumer audit:**
-
-**Preferred:** retire `form_*` sheets from the runtime pathway and treat them as optional debug/report exports only.
-
-**Alternative:** generate model-scoped workbook output sheets for every active model:
+The active generated runtime source is now the promoted runtime-contract path:
 
 ```text
-form_stingray_choices
-form_grandSport_choices
-form_z06_choices
-...
+form-output/runtime/<slug>-runtime-contract.json
 ```
 
-Do not keep one shared `form_*` surface that is effectively Stingray-owned. Either way, generated sheets remain outputs, not workbook source truth.
+Stingray still writes its compatibility JSON/CSV artifacts, but normal `generate_form.py --model stingray` runs no longer rewrite or save workbook generated sheets. Any future workbook-native generated export should be an explicitly scoped debug/report writer with a named consumer, not the default runtime path.
 
 ### 3. Grand Sport/Z06 runtime artifacts still carry “draft/inspection” ancestry
 
@@ -248,14 +237,11 @@ Then update `model_registry_promotion.artifact_path` to point to the neutral run
 
 Because this pass changes workbook promotion metadata, it must use the workbook safe-save path, refuse Excel lock files, and verify the saved `model_registry_promotion` rows on disk before claiming the change landed. It must also update registry/promotion tests to validate the new path semantics.
 
-### Pass 3 — Decide the `form_*` sheet policy
+### Pass 3 — Generated workbook `form_*` sheet policy
 
-Pick one after the consumer audit:
+Status: implemented in `docs/audit-cleanup/pass-3-form-sheet-retirement-policy-spec.md`.
 
-1. Retire shared workbook `form_*` sheets from the runtime path and keep any needed sheet export as an optional debug/report writer, or
-2. Generate model-scoped workbook output sheets for every active model.
-
-The current “Stingray writes workbook form sheets, other models write inspection files” setup should be removed. Do not delete `form_*` sheets or stop writing them until current consumers and docs are accounted for.
+Shared Stingray-only workbook `form_*` generated sheets are retired from the routine runtime path. Active generated runtime contracts live under `form-output/runtime/`; optional inspection/preview/draft artifacts remain under `form-output/inspection/`. Do not recreate workbook generated sheets unless a future opt-in debug/report export pass names the consumer.
 
 ### Pass 4 — Make model discovery workbook-owned
 
@@ -289,12 +275,11 @@ Those are real, but they should come after the builder/pathway fork is removed u
 
 The repo is past the worst version of the problem. The registry, promotion metadata, workbook source roles, and model metadata are largely workbook-owned now.
 
-The remaining structural issue is narrower and clearer after Passes 1-2:
+The remaining structural issue is narrower and clearer after Passes 1-3:
 
 ```text
 One CLI entrypoint
 but two model-generation engines
-and one unresolved generated workbook form_* policy.
 ```
 
-Next safe pass: decide the generated workbook `form_*` sheet policy from the Pass 0 consumer inventory, without deleting or stopping sheet writes until current consumers and docs are accounted for.
+Next safe pass: make model discovery workbook-owned so adding a future model does not require editing `generate_form.py`, while keeping inactive scaffold rows non-promoted unless workbook metadata explicitly activates and promotes them.

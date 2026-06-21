@@ -21,20 +21,6 @@ WORKBOOK_PATH = ROOT / "stingray_master.xlsx"
 OUTPUT_DIR = ROOT / "form-output"
 APP_DIR = ROOT / "form-app"
 
-GENERATED_SHEETS = (
-    "form_steps",
-    "form_context_choices",
-    "form_choices",
-    "form_standard_equipment",
-    "form_rule_groups",
-    "form_exclusive_groups",
-    "form_rules",
-    "form_price_rules",
-    "form_interiors",
-    "form_color_overrides",
-    "form_validation",
-)
-
 STEP_ORDER = (
     "body_style",
     "trim_level",
@@ -204,7 +190,6 @@ def base_model_config(model_key: str) -> ModelConfig:
         workbook_path=WORKBOOK_PATH,
         output_dir=OUTPUT_DIR,
         app_dir=APP_DIR,
-        generated_sheets=GENERATED_SHEETS,
         step_order=STEP_ORDER,
         step_labels=STEP_LABELS,
         context_sections=CONTEXT_SECTIONS,

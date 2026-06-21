@@ -337,9 +337,11 @@ test("workbook package validation rejects duplicate worksheet AutoFilters on tab
   );
 });
 
-test("Stingray generator uses the hardened workbook save path", () => {
-  assert.match(generatorSource, /save_workbook_safely/);
-  assert.match(fs.readFileSync("scripts/corvette_form_generator/workbook.py", "utf8"), /remove_table_sheet_auto_filters/);
+test("Stingray generator no longer performs routine workbook generated-sheet writes", () => {
+  assert.doesNotMatch(generatorSource, /save_workbook_safely/);
+  assert.doesNotMatch(generatorSource, /write_sheet\(/);
+  assert.doesNotMatch(generatorSource, /workbook_backup_path/);
+  assert.match(generatorSource, /"workbook_backup": None/);
   assert.doesNotMatch(generatorSource, /\bwb\.save\(WORKBOOK_PATH\)/);
   assert.doesNotMatch(generatorSource, /write_app_data_registry/);
 });

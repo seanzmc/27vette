@@ -199,7 +199,7 @@ def build_ops_fixture() -> Workbook:
     append_sheet(wb, "zr1_options", OPTION_HEADERS, [option_row("opt_zzz_001", "ZZZ", "sec_a", 10)])
     append_sheet(wb, "zr1_ovs", ["option_id", "variant_id", "status"],
                  [{"option_id": "opt_zzz_001", "variant_id": "zr1_c", "status": "available"}])
-    append_sheet(wb, "form_steps", ["step_key"], [{"step_key": "paint"}])
+    append_sheet(wb, "readonly_generated_fixture", ["step_key"], [{"step_key": "paint"}])
     return wb
 
 
@@ -243,7 +243,7 @@ class ValidateBatchTest(OpsFixtureBase):
         self.assertEqual(result["errors"], [])
 
     def test_readonly_and_unknown_sheet(self):
-        self.assertTrue(self.errors_of(op("update", "form_steps", {"step_key": "paint"}, {"step_key": "x"})))
+        self.assertTrue(self.errors_of(op("update", "readonly_generated_fixture", {"step_key": "paint"}, {"step_key": "x"})))
         self.assertTrue(self.errors_of(op("update", "section_master", {"section_id": "sec_a"}, {"section_name": "X"})))
         self.assertTrue(self.errors_of(op("update", "nope", {"option_id": "a"}, {})))
 

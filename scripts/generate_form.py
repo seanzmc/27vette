@@ -2,7 +2,7 @@
 """Single entry point for Corvette form-data generation.
 
 Usage:
-    python scripts/generate_form.py --model stingray      # production: form_* sheets and Stingray JSON/CSV
+    python scripts/generate_form.py --model stingray      # Stingray JSON/CSV/runtime-contract artifacts
     python scripts/generate_form.py --model grand_sport   # inspection/preview/draft/runtime-contract artifacts
     python scripts/generate_form.py --model z06           # inspection/preview/draft/runtime-contract artifacts
     python scripts/generate_registry.py                   # app registry from promoted runtime artifacts

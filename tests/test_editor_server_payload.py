@@ -178,7 +178,7 @@ def build_fixture_workbook() -> Workbook:
           "option_name": "Z07 Performance Package", "section_id": "sec_pain_001"}],
     )
     append_sheet(
-        wb, "form_steps",
+        wb, "readonly_generated_fixture",
         ["step_key", "label"],
         [{"step_key": "paint", "label": "Paint"}],
     )
@@ -228,8 +228,8 @@ class ModelSheetsTest(PayloadTestBase):
 class SheetClassificationTest(PayloadTestBase):
     def test_generated_and_unregistered_sheets_read_only(self):
         by_name = {s["name"]: s for s in self.payload["sheets"]}
-        self.assertTrue(by_name["form_steps"]["readOnly"])
-        self.assertIsNone(by_name["form_steps"]["family"])
+        self.assertTrue(by_name["readonly_generated_fixture"]["readOnly"])
+        self.assertIsNone(by_name["readonly_generated_fixture"]["family"])
         self.assertTrue(by_name["section_master"]["readOnly"])
 
     def test_registered_source_sheet_carries_meta(self):

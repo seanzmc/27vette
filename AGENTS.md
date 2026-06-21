@@ -150,19 +150,7 @@ Current Z06 model-scoped sheets include:
 
 Inactive or future model source sheets are outside the default runtime workflow until explicitly promoted through workbook metadata in an approved pass.
 
-Current generated sheets are written by the generator and should not be edited manually:
-
-- `form_steps`
-- `form_context_choices`
-- `form_choices`
-- `form_standard_equipment`
-- `form_rule_groups`
-- `form_exclusive_groups`
-- `form_rules`
-- `form_price_rules`
-- `form_interiors`
-- `form_color_overrides`
-- `form_validation`
+Active runtime contracts are generated under `form-output/runtime/` and published to the browser registry through `scripts/generate_registry.py`. Historical workbook `form_*` generated sheets are not part of the routine runtime workflow and should not be recreated or hand-edited unless a separately approved opt-in debug/export pass defines a named consumer.
 
 ## Workbook Safety
 

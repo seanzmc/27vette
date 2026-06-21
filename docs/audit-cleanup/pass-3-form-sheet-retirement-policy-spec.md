@@ -1,6 +1,6 @@
 # Pass 3 — Generated Workbook `form_*` Retirement Policy Spec
 
-Status: Spec only. Do not implement until approved.
+Status: Implemented 2026-06-21.
 Date: 2026-06-21
 Recommended reasoning level for implementation agent: high.
 
@@ -319,6 +319,89 @@ The grep should return only historical/spec references, tests intentionally cove
 - Regenerate active models and registry.
 - Compare restored runtime contracts against pre-pass snapshots.
 
+## Implementation results — 2026-06-21
+
+### Changed surfaces
+
+- `scripts/corvette_form_generator/production.py`
+  - Removed routine workbook `form_*` sheet writes from normal Stingray generation.
+  - Removed the normal-generation `save_workbook_safely()` call and `workbook_backup_path` dependency.
+  - Kept Stingray JSON, CSV, and runtime-contract artifact writes.
+  - Emits `"workbook_backup": null` in stdout JSON for compatibility; normal generation no longer creates a workbook backup.
+- `scripts/corvette_form_generator/model_config.py` and `scripts/corvette_form_generator/model_configs.py`
+  - Removed `ModelConfig.generated_sheets` and `GENERATED_SHEETS` wiring after all active consumers were removed.
+- `scripts/corvette_form_generator/workbook.py`
+  - Kept `write_sheet()` available for explicit future workbook export/debug callers, but removed the stale routine `form_*` wording.
+- `scripts/generate_form.py`
+  - Updated Stingray usage text to describe JSON/CSV/runtime-contract artifact generation, not workbook generated-sheet output.
+- `tests/test_editor_ops_apply.py` and `tests/test_editor_server_payload.py`
+  - Replaced `form_steps` fixtures with a generic `readonly_generated_fixture` while preserving read-only editor coverage for unregistered/generated/debug sheets.
+- `tests/stingray-generator-stability.test.mjs`
+  - Replaced the old hardened workbook-save assertion with a guard that Stingray generation no longer calls `save_workbook_safely()`, `write_sheet()`, or `workbook_backup_path` during routine generation.
+- `AGENTS.md`, `README.md`, `docs/Audit-route-map.md`, and `docs/ingest/pass-1/schema-and-ingest-process-report.md`
+  - Updated active workflow docs to describe `form-output/runtime/` as the generated runtime-contract surface and retired workbook `form_*` sheets from the routine workflow.
+
+### Workbook change
+
+- Deleted existing generated workbook sheets from `stingray_master.xlsx` through `save_workbook_safely()`:
+  - `form_steps`
+  - `form_context_choices`
+  - `form_choices`
+  - `form_standard_equipment`
+  - `form_rule_groups`
+  - `form_exclusive_groups`
+  - `form_rules`
+  - `form_price_rules`
+  - `form_interiors`
+  - `form_color_overrides`
+  - `form_validation`
+- Safe-save backup: `backups/stingray_master-20260621-135747.xlsx`.
+- Read-only pre-delete probe found no formulas or defined names outside retired sheets referencing retired sheet names.
+- Read-only post-delete and post-regeneration probes verified all retired sheet names are absent on disk.
+
+### Regeneration and generated-diff handling
+
+- Ran:
+  - `.venv/bin/python scripts/generate_form.py --model stingray`
+  - `.venv/bin/python scripts/generate_form.py --model grand_sport`
+  - `.venv/bin/python scripts/generate_form.py --model z06`
+  - `.venv/bin/python scripts/generate_registry.py`
+- Stingray generator smoke output included `"workbook_backup": null`, `choices: 1422`, `context_choices: 8`, `standard_equipment: 467`, `rules: 144`, `price_rules: 45`, `interiors: 130`, and `validation_errors: 0`.
+- Compared pre/post generated contracts with `node scripts/compare-generated-contracts.mjs`; all matched after timestamp normalization:
+  - `form-output/runtime/stingray-runtime-contract.json`
+  - `form-output/runtime/grand-sport-runtime-contract.json`
+  - `form-output/runtime/z06-runtime-contract.json`
+  - `form-output/stingray-form-data.json`
+- Restored timestamp-only generated artifact churn in `form-output/*` and `form-app/data.js`; retained diff is source/docs/tests plus workbook sheet deletion.
+
+### Validation results
+
+- Preflight:
+  - `git status --short --branch` on `schema-ingestion-normalization`.
+  - Excel lock probe: lock absent.
+  - `.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx` — valid, 0 issues.
+- Python:
+  - `.venv/bin/python -m py_compile scripts/generate_form.py scripts/corvette_form_generator/production.py scripts/corvette_form_generator/model_config.py scripts/corvette_form_generator/model_configs.py scripts/corvette_form_generator/workbook.py` — pass.
+  - `.venv/bin/python -m pytest tests/test_editor_ops_apply.py tests/test_editor_server_payload.py tests/test_model_config_metadata.py tests/test_runtime_contract_builder.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_runtime_metadata_guards.py -q` — 95 passed.
+- Workbook/schema:
+  - `.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx` — valid, 0 issues.
+  - `.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx` — valid, 0 errors, 0 warnings.
+- Runtime/generator:
+  - `node --test --test-name-pattern "routine workbook|generated JSON|Stingray generated contract" tests/stingray-generator-stability.test.mjs` — 3 passed.
+  - `node --test tests/stingray-form-regression.test.mjs` — 86 passed.
+  - `node --test tests/workbook-schema-standardization.test.mjs` — 9 passed.
+  - `node --test tests/grand-sport-contract-preview.test.mjs` — 6 passed.
+  - `node --test tests/grand-sport-draft-data.test.mjs` — 19 passed.
+  - `node --test tests/z06-form-data-draft.test.mjs` — 23 passed.
+  - `node --test tests/multi-model-runtime-switching.test.mjs` — 44 passed.
+- Docs/checks:
+  - `git diff --check` — pass.
+  - Active `scripts/` and `tests/` search shows no retired sheet names or `GENERATED_SHEETS` consumers; only `workbook.py::write_sheet()` remains as an explicit helper.
+
+### Known red not fixed in this pass
+
+- A broader `tests/stingray-generator-stability.test.mjs` run with the spec's original `workbook|generated JSON|Stingray generated contract` pattern still hits the pre-existing Z06 `required_charges` expected-list drift in the Phase 6 workbook-owned metadata assertion. This is the known non-goal called out above and was not fixed in Pass 3.
+
 ## Residual risks
 
 - Some human workflow may still open `form_*` sheets for ad hoc debugging even though Pass 0 found no code/formula/table dependency. Mitigation: do not create a new debug writer until someone names a real consumer.
@@ -326,7 +409,7 @@ The grep should return only historical/spec references, tests intentionally cove
 - Removing default workbook save from Stingray generation changes operational expectation: `generate_form.py --model stingray` should no longer require Excel closed for generated-sheet writes. Real future workbook writes still need the lock guard.
 - Existing docs/archive files may still mention historical `form_*` behavior. Active docs should be updated; archive docs should not be rewritten just to erase history.
 
-## Approval prompt
+## Historical Approval Prompt
 
 Approve Pass 3 implementation as scoped above?
 
