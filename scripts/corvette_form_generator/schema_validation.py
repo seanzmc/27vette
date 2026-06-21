@@ -10,6 +10,7 @@ from typing import Any, Iterable
 from openpyxl import load_workbook
 
 from corvette_form_generator.contract import load_model_asset_map
+from corvette_form_generator.model_configs import OPTIONAL_GENERATION_SOURCE_ROLES, REQUIRED_GENERATION_SOURCE_ROLES
 from corvette_form_generator.registry_promotion import (
     build_registry_from_artifacts,
     parse_app_data_registry,
@@ -18,82 +19,21 @@ from corvette_form_generator.registry_promotion import (
 
 
 BOOLEAN_COLUMNS: dict[str, tuple[str, ...]] = {
-    "stingray_options": ("selectable", "active"),
-    "grandSport_options": ("selectable", "active"),
-    "rule_groups": ("active",),
-    "grandSport_rule_groups": ("active",),
-    "rule_group_members": ("active",),
-    "grandSport_rule_group_members": ("active",),
-    "exclusive_groups": ("active",),
-    "grandSport_exclusive_groups": ("active",),
-    "exclusive_group_members": ("active",),
-    "grandSport_exclusive_members": ("active",),
-    "grandSport_variant_overrides": ("active", "selectable"),
-    "lt_interiors": ("active_for_stingray", "requires_r6x"),
     "model_registry_promotion": ("promoted_to_runtime", "default_model", "active"),
     # NOTE: LZ_Interiors / model_interior_scope / interior_components intentionally
     # excluded. Their bool cell-typing is cosmetic (generator coerces; data.js is
-    # byte-identical with or without it). Guard kept on live model/rule sheets only.
+    # byte-identical with or without it). Model source sheets are added by source role.
 }
 
 PRICE_COLUMNS: dict[str, tuple[str, ...]] = {
-    "stingray_options": ("price",),
-    "grandSport_options": ("price",),
-    "price_rules": ("price_value",),
-    "grandSport_price_rules": ("price_value",),
     "PriceRef": ("Price",),
-    "lt_interiors": ("Price",),
-    # LZ_Interiors excluded: future-model interior scaffold, not read by live
-    # generation (proven). Numeric-price guard stays on live option/price/ref sheets.
 }
 
 RPO_COLUMNS: dict[str, tuple[str, ...]] = {
-    "stingray_options": ("rpo",),
-    "grandSport_options": ("rpo",),
     "interior_components": ("rpo",),
 }
 
-MODEL_SOURCE_ROLES: set[str] = {
-    "source_option_sheet",
-    "status_sheet",
-    "rule_mapping_sheet",
-    "price_rules_sheet",
-    "rule_groups_sheet",
-    "rule_group_members_sheet",
-    "exclusive_groups_sheet",
-    "exclusive_group_members_sheet",
-    "color_overrides_sheet",
-    "variant_option_overrides_sheet",
-    "interior_source_sheet",
-}
-
-LEGACY_MODEL_SOURCES: dict[str, dict[str, str]] = {
-    "stingray": {
-        "source_option_sheet": "stingray_options",
-        "status_sheet": "stingray_ovs",
-        "rule_mapping_sheet": "rule_mapping",
-        "price_rules_sheet": "price_rules",
-        "rule_groups_sheet": "rule_groups",
-        "rule_group_members_sheet": "rule_group_members",
-        "exclusive_groups_sheet": "exclusive_groups",
-        "exclusive_group_members_sheet": "exclusive_group_members",
-        "color_overrides_sheet": "color_overrides",
-        "interior_source_sheet": "lt_interiors",
-    },
-    "grand_sport": {
-        "source_option_sheet": "grandSport_options",
-        "status_sheet": "grandSport_ovs",
-        "rule_mapping_sheet": "grandSport_rule_mapping",
-        "price_rules_sheet": "grandSport_price_rules",
-        "rule_groups_sheet": "grandSport_rule_groups",
-        "rule_group_members_sheet": "grandSport_rule_group_members",
-        "exclusive_groups_sheet": "grandSport_exclusive_groups",
-        "exclusive_group_members_sheet": "grandSport_exclusive_members",
-        "color_overrides_sheet": "color_overrides",
-        "variant_option_overrides_sheet": "grandSport_variant_overrides",
-        "interior_source_sheet": "lt_interiors",
-    },
-}
+MODEL_SOURCE_ROLES = frozenset(REQUIRED_GENERATION_SOURCE_ROLES + OPTIONAL_GENERATION_SOURCE_ROLES)
 
 ROLE_BOOLEAN_COLUMNS: dict[str, tuple[str, ...]] = {
     "source_option_sheet": ("selectable", "active"),
@@ -127,28 +67,13 @@ HEADER_MATCH_ROLES: tuple[str, ...] = (
     "interior_source_sheet",
 )
 
-HEADER_PAIRS: tuple[tuple[str, str], ...] = (
-    ("stingray_options", "grandSport_options"),
-    ("stingray_ovs", "grandSport_ovs"),
-    ("rule_mapping", "grandSport_rule_mapping"),
-    ("price_rules", "grandSport_price_rules"),
-    ("rule_groups", "grandSport_rule_groups"),
-    ("rule_group_members", "grandSport_rule_group_members"),
-    ("exclusive_groups", "grandSport_exclusive_groups"),
-    ("exclusive_group_members", "grandSport_exclusive_members"),
-)
-
 REQUIRED_SHEETS: tuple[str, ...] = (
+    "model_master",
+    "model_workbook_sources",
+    "model_variants",
+    "model_registry_promotion",
     "variant_master",
     "section_master",
-    "stingray_options",
-    "stingray_ovs",
-    "grandSport_options",
-    "grandSport_ovs",
-    "rule_mapping",
-    "grandSport_rule_mapping",
-    "price_rules",
-    "grandSport_price_rules",
     "lt_interiors",
     "LZ_Interiors",
     "model_interior_scope",
@@ -411,11 +336,11 @@ def active_metadata_rows(wb, sheet: str, model_key: str | None = None) -> list[d
 
 
 def metadata_source_graph(wb, issues: list[SchemaIssue]) -> dict[str, dict[str, str]]:
-    """Return active model source-role mapping with legacy fallback seeds."""
+    """Return exact-match active model source-role mapping from workbook metadata."""
 
-    graph = {model: dict(sources) for model, sources in LEGACY_MODEL_SOURCES.items()}
     active_models = {clean_text(row.get("model_key")).lower() for row in active_metadata_rows(wb, "model_master")}
     active_models.discard("")
+    graph: dict[str, dict[str, str]] = {model_key: {} for model_key in active_models}
 
     if "model_workbook_sources" not in wb.sheetnames:
         return graph
@@ -427,9 +352,9 @@ def metadata_source_graph(wb, issues: list[SchemaIssue]) -> dict[str, dict[str, 
         model_key = clean_text(row.get("model_key")).lower()
         source_role = clean_text(row.get("source_role"))
         sheet_name = clean_text(row.get("sheet_name"))
-        if not model_key or not source_role or not sheet_name:
+        if not model_key or not source_role:
             continue
-        if active_models and model_key not in active_models and model_key not in {"*", "all", "shared"}:
+        if model_key not in active_models:
             continue
         if source_role not in MODEL_SOURCE_ROLES:
             add_issue(
@@ -442,6 +367,8 @@ def metadata_source_graph(wb, issues: list[SchemaIssue]) -> dict[str, dict[str, 
                 value=source_role,
                 message=f"Unknown model_workbook_sources source_role {source_role!r}.",
             )
+            continue
+        if not sheet_name:
             continue
         duplicate_key = (model_key, source_role)
         if duplicate_key in seen:
@@ -458,6 +385,21 @@ def metadata_source_graph(wb, issues: list[SchemaIssue]) -> dict[str, dict[str, 
             continue
         seen.add(duplicate_key)
         graph.setdefault(model_key, {})[source_role] = sheet_name
+
+    for model_key in sorted(active_models):
+        sources = graph.setdefault(model_key, {})
+        for source_role in REQUIRED_GENERATION_SOURCE_ROLES:
+            if source_role in sources:
+                continue
+            add_issue(
+                issues,
+                "error",
+                "missing_model_source_role",
+                sheet="model_workbook_sources",
+                column="source_role",
+                value={"model_key": model_key, "source_role": source_role},
+                message=f"Active model {model_key!r} is missing required model_workbook_sources role {source_role!r}.",
+            )
 
     for model_key, sources in graph.items():
         for source_role, sheet_name in sources.items():
@@ -747,21 +689,6 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
         source_sheets_by_role = sheets_by_role(source_graph)
         if model_master_valid:
             validate_registry_promotion_metadata(wb, issues)
-
-        for left, right in HEADER_PAIRS:
-            if left not in wb.sheetnames or right not in wb.sheetnames:
-                continue
-            left_headers = nonblank_headers(wb[left])
-            right_headers = nonblank_headers(wb[right])
-            if left_headers != right_headers:
-                add_issue(
-                    issues,
-                    "error",
-                    "header_pair_drift",
-                    sheet=f"{left}/{right}",
-                    value={"left": left_headers, "right": right_headers},
-                    message=f"{left} and {right} headers must match after schema standardization.",
-                )
 
         for source_role in HEADER_MATCH_ROLES:
             existing_sheets = [sheet for sheet in source_sheets_by_role.get(source_role, []) if sheet in wb.sheetnames]

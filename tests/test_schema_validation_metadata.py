@@ -16,6 +16,7 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+from corvette_form_generator.model_configs import REQUIRED_GENERATION_SOURCE_ROLES  # noqa: E402
 from corvette_form_generator.schema_validation import live_contract_provenance_leaks, validate_workbook_schema  # noqa: E402
 
 
@@ -32,6 +33,63 @@ ACTIVE_GROUP_HEADERS = ["group_id", "active"]
 ACTIVE_MEMBER_HEADERS = ["group_id", "option_id", "active"]
 VARIANT_OVERRIDE_HEADERS = ["option_id", "variant_id", "active", "selectable"]
 INTERIOR_HEADERS = ["interior_id", "Trim", "Price", "active_for_stingray", "requires_r6x", "Seat"]
+
+
+def source_rows(model_key: str, role_to_sheet: dict[str, str], *, active: bool = True) -> list[dict[str, object]]:
+    return [
+        {"model_key": model_key, "source_role": role, "sheet_name": role_to_sheet[role], "active": active}
+        for role in REQUIRED_GENERATION_SOURCE_ROLES
+    ]
+
+
+def z06_source_map(*, option_sheet: str = "z06_options", status_sheet: str = "z06_ovs") -> dict[str, str]:
+    return {
+        "source_option_sheet": option_sheet,
+        "status_sheet": status_sheet,
+        "rule_mapping_sheet": "z06_rule_mapping",
+        "price_rules_sheet": "z06_price_rules",
+        "rule_groups_sheet": "z06_rule_groups",
+        "rule_group_members_sheet": "z06_rule_group_members",
+        "exclusive_groups_sheet": "z06_exclusive_groups",
+        "exclusive_group_members_sheet": "z06_exclusive_members",
+        "color_overrides_sheet": "color_overrides",
+        "interior_source_sheet": "LZ_Interiors",
+    }
+
+
+def stingray_source_map() -> dict[str, str]:
+    return {
+        "source_option_sheet": "stingray_options",
+        "status_sheet": "stingray_ovs",
+        "rule_mapping_sheet": "rule_mapping",
+        "price_rules_sheet": "price_rules",
+        "rule_groups_sheet": "rule_groups",
+        "rule_group_members_sheet": "rule_group_members",
+        "exclusive_groups_sheet": "exclusive_groups",
+        "exclusive_group_members_sheet": "exclusive_group_members",
+        "color_overrides_sheet": "color_overrides",
+        "interior_source_sheet": "lt_interiors",
+    }
+
+
+def z06_source_sheets(
+    *,
+    option_headers: list[str] | None = None,
+    option_rows: list[dict[str, object]] | None = None,
+) -> dict[str, tuple[list[str], list[dict[str, object]]]]:
+    return {
+        "z06_options": (
+            option_headers or OPTION_HEADERS,
+            option_rows or [{"option_id": "opt_z06_known", "rpo": "Z06", "selectable": True, "active": True, "price": 0}],
+        ),
+        "z06_ovs": (OVS_HEADERS, [{"option_id": "opt_z06_known", "variant_id": "1lz_h07", "status": "available"}]),
+        "z06_rule_mapping": (RULE_MAPPING_HEADERS, []),
+        "z06_price_rules": (PRICE_RULE_HEADERS, []),
+        "z06_rule_groups": (ACTIVE_GROUP_HEADERS, []),
+        "z06_rule_group_members": (ACTIVE_MEMBER_HEADERS, []),
+        "z06_exclusive_groups": (ACTIVE_GROUP_HEADERS, []),
+        "z06_exclusive_members": (ACTIVE_MEMBER_HEADERS, []),
+    }
 
 
 def append_sheet(wb: Workbook, name: str, headers: list[str], rows: list[dict[str, object]] | None = None) -> None:
@@ -85,6 +143,11 @@ def minimal_schema_workbook(
         append_sheet(wb, name, RULE_MAPPING_HEADERS)
     for name in ("price_rules", "grandSport_price_rules"):
         append_sheet(wb, name, PRICE_RULE_HEADERS)
+    for name in ("rule_groups", "grandSport_rule_groups", "exclusive_groups", "grandSport_exclusive_groups"):
+        append_sheet(wb, name, ACTIVE_GROUP_HEADERS)
+    for name in ("rule_group_members", "grandSport_rule_group_members", "exclusive_group_members", "grandSport_exclusive_members"):
+        append_sheet(wb, name, ACTIVE_MEMBER_HEADERS)
+    append_sheet(wb, "color_overrides", ["model_key", "interior_id", "option_id", "active"])
     append_sheet(wb, "lt_interiors", INTERIOR_HEADERS)
     append_sheet(wb, "LZ_Interiors", INTERIOR_HEADERS)
     append_sheet(wb, "model_interior_scope", ["model_key", "interior_id", "active"])
@@ -149,6 +212,91 @@ class SchemaValidationMetadataTests(unittest.TestCase):
         issues = validate_temp_workbook(wb)
 
         self.assertTrue(any(issue.check_id == "duplicate_active_model_master_row" for issue in issues), issues)
+
+    def test_model_workbook_sources_sheet_is_required(self) -> None:
+        wb = minimal_schema_workbook(extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True}])
+        del wb["model_workbook_sources"]
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(
+            any(issue.check_id == "missing_required_sheet" and issue.sheet == "model_workbook_sources" for issue in issues),
+            issues,
+        )
+
+    def test_active_model_missing_required_source_option_role_is_error(self) -> None:
+        role_map = z06_source_map()
+        rows = [row for row in source_rows("z06", role_map) if row["source_role"] != "source_option_sheet"]
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "z06", "registry_key": "z06", "active": True}],
+            extra_source_rows=rows,
+            extra_sheets=z06_source_sheets(),
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(
+            any(
+                issue.check_id == "missing_model_source_role"
+                and issue.sheet == "model_workbook_sources"
+                and issue.value == {"model_key": "z06", "source_role": "source_option_sheet"}
+                for issue in issues
+            ),
+            issues,
+        )
+
+    def test_active_model_missing_required_status_role_is_error(self) -> None:
+        role_map = z06_source_map()
+        rows = [row for row in source_rows("z06", role_map) if row["source_role"] != "status_sheet"]
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "z06", "registry_key": "z06", "active": True}],
+            extra_source_rows=rows,
+            extra_sheets=z06_source_sheets(),
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(
+            any(
+                issue.check_id == "missing_model_source_role"
+                and issue.sheet == "model_workbook_sources"
+                and issue.value == {"model_key": "z06", "source_role": "status_sheet"}
+                for issue in issues
+            ),
+            issues,
+        )
+
+    def test_shared_source_roles_do_not_satisfy_active_model_exact_match_requirements(self) -> None:
+        role_map = z06_source_map()
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "z06", "registry_key": "z06", "active": True}],
+            extra_source_rows=source_rows("shared", role_map),
+            extra_sheets=z06_source_sheets(),
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(
+            any(
+                issue.check_id == "missing_model_source_role"
+                and issue.value == {"model_key": "z06", "source_role": "source_option_sheet"}
+                for issue in issues
+            ),
+            issues,
+        )
+
+    def test_active_model_complete_source_roles_validate_without_legacy_seeds(self) -> None:
+        role_map = z06_source_map()
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "z06", "registry_key": "z06", "active": True}],
+            extra_source_rows=source_rows("z06", role_map),
+            extra_sheets=z06_source_sheets(),
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertFalse(any(issue.check_id == "missing_model_source_role" for issue in issues), issues)
+        self.assertFalse(any(issue.check_id == "missing_model_source_sheet" for issue in issues), issues)
 
     def test_live_contract_provenance_leaks_flags_future_model_review_lineage_only(self) -> None:
         data = {
@@ -238,17 +386,17 @@ class SchemaValidationMetadataTests(unittest.TestCase):
         )
 
     def test_metadata_discovered_option_headers_match_by_role(self) -> None:
+        role_map = z06_source_map()
         wb = minimal_schema_workbook(
-            extra_model_rows=[{"model_key": "zr1x", "registry_key": "zr1x", "active": True}],
-            extra_source_rows=[
-                {"model_key": "zr1x", "source_role": "source_option_sheet", "sheet_name": "zr1x_options", "active": True},
+            extra_model_rows=[
+                {"model_key": "stingray", "registry_key": "stingray", "active": True},
+                {"model_key": "z06", "registry_key": "z06", "active": True},
             ],
-            extra_sheets={
-                "zr1x_options": (
-                    ["option_id", "rpo", "selectable", "active", "price", "unexpected_extra"],
-                    [{"option_id": "opt_zr1x_known", "rpo": "ZX", "selectable": True, "active": True, "price": 0}],
-                ),
-            },
+            extra_source_rows=[*source_rows("stingray", stingray_source_map()), *source_rows("z06", role_map)],
+            extra_sheets=z06_source_sheets(
+                option_headers=["option_id", "rpo", "selectable", "active", "price", "unexpected_extra"],
+                option_rows=[{"option_id": "opt_z06_known", "rpo": "Z06", "selectable": True, "active": True, "price": 0}],
+            ),
         )
 
         issues = validate_temp_workbook(wb)

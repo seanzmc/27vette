@@ -1,16 +1,16 @@
-# Audit result
+# Audit route map
 
-I did not change repo files, workbook sheets, generated artifacts, or runtime behavior. This is a code/docs audit from the current GitHub repo state.
+Status refreshed 2026-06-21 after Passes 5A and 5B. This document is a code/docs route map; the refresh did not change workbook sheets, generated artifacts, or runtime behavior.
 
 The main diagnosis: **the public workflow has been mostly normalized, but the internal generation route is still split by model.** `generate_form.py` is now the single entry point, but it still sends **Stingray** through `production.main()` and sends **Grand Sport / Z06** through the inspection/draft/runtime-contract path. The repo docs say every active model should follow the same workbook → generator → registry → runtime contract shape, but the code still has a model-based fork.
 
 ## Status and evidence anchors
 
-This file is an audit/action map. Passes 0, 1, and 2 now have implementation evidence under `docs/audit-cleanup/`; later passes still need their own spec before edits.
+This file is an audit/action map. Passes 0 through 5 now have implementation evidence under `docs/audit-cleanup/`. Later passes still need their own spec before edits.
 
 Current tree evidence:
 
-- `scripts/generate_form.py` still hardcodes `MODEL_CONFIGS` and `PRODUCTION_MODEL_KEYS = {"stingray"}`.
+- `scripts/generate_form.py` no longer hardcodes `MODEL_CONFIGS`; active/generatable models come from workbook discovery. It still keeps `PRODUCTION_MODEL_KEYS = {"stingray"}` for the remaining internal route split.
 - `scripts/generate_form.py` still routes Stingray to `production.main()` and Grand Sport/Z06 to `run_draft()`.
 - `scripts/corvette_form_generator/runtime_contract.py` now provides the shared finalization seam used by both active routes.
 - `scripts/corvette_form_generator/registry_promotion.py` still supports legacy `current_generation` and `draft_artifact` rows, but active promoted rows now use `artifact_type=runtime_contract`.
@@ -20,7 +20,8 @@ Current tree evidence:
   - Z06: `artifact_type=runtime_contract`, `artifact_path=form-output/runtime/z06-runtime-contract.json`.
 - `scripts/compare-generated-contracts.mjs` strips only timestamp keys (`generated_at`, `sourceGeneratedAt`, `generatedAt`) and then deep-compares everything else. It is a strict no-drift parity check, not a general validator for approved artifact-shape/path migrations.
 - `form-app/app.js` still has a product/RPO-specific runtime exception: `choice.rpo === "GBA" && rule.source_id === "opt_zyc_001"`. The workbook exception row is `ex_gba_zyc`, source `opt_gba_001`, target `opt_zyc_001`.
-- `scripts/corvette_form_generator/editor_ops.py` still includes `node --test tests/grand-sport-rule-audit.test.mjs` in Grand Sport gate reminders, even though `AGENTS.md` classifies that audit/report gate as optional.
+- `scripts/corvette_form_generator/editor_ops.py` no longer includes `node --test tests/grand-sport-rule-audit.test.mjs` in Grand Sport default gate reminders; the rule-audit tooling remains optional.
+- `scripts/corvette_form_generator/schema_validation.py` now shares generation role lists from `model_configs.py` and no longer uses `LEGACY_MODEL_SOURCES` or `HEADER_PAIRS`.
 
 ## Codebase philosophy constraints
 
@@ -35,7 +36,7 @@ Current tree evidence:
 
 **Stingray route**
 
-`stingray_master.xlsx` → `scripts/generate_form.py --model stingray` → `production.py` → writes workbook `form_*` sheets → writes compatibility `form-output/stingray-form-data.json` / `.csv` plus `form-output/runtime/stingray-runtime-contract.json` → `generate_registry.py` → `form-app/data.js`.
+`stingray_master.xlsx` → `scripts/generate_form.py --model stingray` → `production.py` → writes compatibility `form-output/stingray-form-data.json` / `.csv` plus `form-output/runtime/stingray-runtime-contract.json` → `generate_registry.py` → `form-app/data.js`.
 
 Stingray now reaches registry promotion as `artifact_type=runtime_contract`; the workbook points the promoted input at `form-output/runtime/stingray-runtime-contract.json`.
 
@@ -98,15 +99,17 @@ form-output/runtime/z06-runtime-contract.json
 
 Inspection/preview/draft artifacts remain optional adjacent reports. This was a workbook metadata migration because `model_registry_promotion.artifact_path` owns promoted artifact paths.
 
-### 4. Adding future models still requires Python edits
+### 4. Workbook-owned model discovery is normalized
 
-`base_model_config(model_key)` is already generic enough to build a conventional config for any model key. But `generate_form.py` still hardcodes the accepted models in `MODEL_CONFIGS`, and argparse restricts `--model` to those keys.
+Pass 4 removed the hardcoded `MODEL_CONFIGS` accepted-model list. Active/generatable models are discovered from workbook metadata:
 
-So adding ZR1/ZR1X or another model still requires Python changes even if the workbook has the right metadata rows.
+```text
+model_master.active
+model_workbook_sources exact-match active required source roles
+model_variants exact-match active rows matching expected_variant_count
+```
 
-**Normalize to:** resolve generatable model keys from active/eligible workbook metadata in `model_master` and `model_workbook_sources`, then call `base_model_config(model_key)`. The script should fail if required workbook metadata is missing or incomplete.
-
-Success condition: adding a future model requires workbook rows and assets/interior/rule data, not editing `generate_form.py`. Generatable/preview-eligible is not the same as promoted runtime-active; inactive future scaffold rows must not be accidentally published.
+Adding a future model should require workbook rows and assets/interior/rule data, not editing `generate_form.py`. Generatable/preview-eligible is still separate from promoted runtime-active; inactive future scaffold rows must not be accidentally published.
 
 ### 5. Stingray has a contract-shape compatibility exception
 
@@ -159,26 +162,33 @@ The corresponding workbook-authored exception is `ex_gba_zyc`, source `opt_gba_0
 
 **Normalize to:** add/confirm a focused RED test for the GBA/`opt_zyc_001` behavior, verify the workbook-driven `runtime_rule_exceptions` row covers the runtime case, then remove the hardcoded runtime exception only if the generated exception covers the behavior.
 
-### 9. Editor gate reminders still create a Grand Sport-only audit pathway
+### 9. Editor gate reminders are normalized
 
-Docs say `build_rule_sources.py` and `grand-sport-rule-audit` are optional audit/report tooling, not default readiness. But `editor_ops.py` still includes `node --test tests/grand-sport-rule-audit.test.mjs` in the default Grand Sport gate reminders.
+Pass 5A removed `node --test tests/grand-sport-rule-audit.test.mjs` from Grand Sport default editor gate reminders and added focused `gate_reminders()` tests.
 
-**Normalize to:** split editor gates into:
+`build_rule_sources.py` and `grand-sport-rule-audit` remain available as optional audit/report tooling, not default readiness gates.
+
+Current default readiness reminders keep:
 
 ```text
-default readiness gates
-optional audit/report gates
+generate_form.py --model grand_sport
+validate_workbook_schema.py
+grand-sport-contract-preview.test.mjs
+grand-sport-draft-data.test.mjs
 ```
 
-Otherwise Grand Sport continues to carry a special process burden that Z06 and Stingray do not. This can be a small workflow/config pass independent of the larger route consolidation.
+That removes the Grand Sport-only optional audit burden from the default editor workflow without deleting audit tooling.
 
-### 10. Schema validation is mostly dynamic, but still has legacy model seeds
+### 10. Schema validation is role-driven
 
-The schema validator now builds a source graph from workbook metadata and validates active source-role sheets dynamically.
+Pass 5B made schema validation share the canonical generation source-role lists from `model_configs.py`:
 
-But it still contains legacy/static model assumptions for Stingray and Grand Sport in `LEGACY_MODEL_SOURCES`, `HEADER_PAIRS`, and required sheet lists.
+```text
+REQUIRED_GENERATION_SOURCE_ROLES
+OPTIONAL_GENERATION_SOURCE_ROLES
+```
 
-**Normalize to:** make validation fully role-driven from `model_workbook_sources`, with legacy seeds only for documented backward compatibility or removed entirely once the workbook graph is complete. Add tests for active workbook graph completeness before deleting fallback assumptions.
+The validator no longer uses `LEGACY_MODEL_SOURCES` or `HEADER_PAIRS`. Active model source sheets are required through exact-match active `model_workbook_sources` rows, and missing required roles emit `missing_model_source_role`. Shared/all rows do not satisfy active generation requirements. Boolean/RPO/price checks for active source sheets are now role-derived rather than hardcoded to Stingray/Grand Sport sheet names.
 
 ## Recommended cleanup sequence
 
@@ -253,12 +263,12 @@ Adding a future model should not require touching `generate_form.py`, but inacti
 
 ### Pass 5 — Gate and validator cleanup
 
-Remove Grand Sport’s optional audit test from default editor gate reminders, and make schema validation rely on workbook source roles instead of legacy Stingray/Grand Sport seed assumptions.
+Status: implemented in:
 
-This should be split if needed:
+- `docs/audit-cleanup/pass-5a-editor-gate-reminders-spec.md`
+- `docs/audit-cleanup/pass-5b-schema-validator-role-driven-spec.md`
 
-- editor gate reminder cleanup is a small workflow/config fix;
-- schema validator cleanup is a source-contract pass that needs tests for role-driven active sheet discovery, header parity, required source roles, and any retained compatibility fallback.
+Pass 5A removed Grand Sport’s optional audit test from default editor gate reminders while preserving optional audit tooling. Pass 5B made schema validation rely on workbook source roles and the canonical generator role constants instead of legacy Stingray/Grand Sport seed assumptions.
 
 ### Pass 6 — Business-rule hardcode cleanup
 
@@ -275,13 +285,13 @@ Those are real, but they should come after the builder/pathway fork is removed u
 
 ## Bottom line
 
-The repo is past the worst version of the problem. The registry, promotion metadata, workbook source roles, and model metadata are largely workbook-owned now.
+The repo is past the worst version of the problem. The registry, promotion metadata, model discovery, workbook source roles, and schema source-contract validation are workbook-owned now.
 
-The remaining structural issue is narrower and clearer after Passes 1-3:
+The remaining structural issue is narrower and clearer after Passes 1-5:
 
 ```text
 One CLI entrypoint
 but two model-generation engines
 ```
 
-Next safe pass: Pass 5 gate and validator cleanup, starting with the smaller gate-reminder cleanup before touching schema-validator fallback assumptions.
+Next safe pass: write a route-unification spec for the remaining Stingray `production.py` vs Grand Sport/Z06 `inspection.py`/draft route split. Keep it parity-first and do not fold runtime product-hardcode cleanup or rule-field classification into the route pass unless separately scoped.
