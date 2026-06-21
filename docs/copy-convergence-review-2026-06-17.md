@@ -21,7 +21,7 @@ Generated from read-only `stingray_master.xlsx` probe before workbook edits.
 - `opt_efr_001`: R-4: model-specific Stingray EFR copy; do not copy GS/Z06 long CFV/CFZ text.
 - `opt_edu_001`: R-4: shared EDU name; Stingray keeps current desc; GS/Z06 get approved shorter desc.
 - `opt_nga_001`: R-5: per-model exhaust-exit descriptions.
-- `sec_seat_002` / R-6: implemented in `docs/seat-presentation-order-spec.md`; AUP uses `Asymmetrical Seats` / `Competition Driver Seat, GT2 Passenger Seat`, with seat order AQ9/AH2/AE4/AUP.
+- `sec_seat_002` / R-6: implemented in `docs/archive/completed-specs/seat-presentation-order-spec.md`; AUP uses `Asymmetrical Seats` / `Competition Driver Seat, GT2 Passenger Seat`, with seat order AQ9/AH2/AE4/AUP.
 
 ## Field-Level Review
 
@@ -169,4 +169,3 @@ Generated from read-only `stingray_master.xlsx` probe before workbook edits.
 - `stingray_options.opt_sc7_001.section_id`: approved migration `sec_lpoi_001` -> `sec_lpoe_001`.
 - `stingray_options.opt_sc7_001.display_order`: set to `71` during implementation so active `sec_lpoe_001` display order remains unique after the section move.
 - `z06_options.opt_uv6_001.section_id`: remains `sec_1lte_001`; drift intentional per R-1.
-

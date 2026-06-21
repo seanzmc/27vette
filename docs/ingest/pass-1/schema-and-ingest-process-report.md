@@ -45,7 +45,7 @@ So the correct next move is not to resurrect the older review-sheet workflow who
 - `README.md`
 - `Order-Guide_IngestPrompt.md`
 - `docs/workbook-sheet-index.md`
-- `docs/model-metadata-schema-gate-repair-spec.md`
+- `docs/archive/completed-specs/model-metadata-schema-gate-repair-spec.md`
 - `scripts/generate_form.py`
 - `scripts/promote_model.py`
 - `scripts/corvette_form_generator/model_configs.py`

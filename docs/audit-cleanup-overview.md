@@ -55,7 +55,7 @@ Current approach: keep live form/workbook-contract gates separate from optional 
 
 ### Pass A — “Audit scaffolding retirement”
 
-Status: Completed. See `docs/audit-cleanup/pass-a-audit-scaffolding-retirement-spec.md`.
+Status: Completed. See `docs/archive/completed-specs/audit-cleanup/pass-a-audit-scaffolding-retirement-spec.md`.
 
 Goal: remove audit-only workbook sheets and their required-gate expectations without changing form runtime behavior.
 
@@ -80,8 +80,8 @@ Validation:
 
 Status: Completed. See:
 
-- `docs/audit-cleanup/pass-b-one-pass-script-retirement-spec.md`
-- `docs/audit-cleanup/pass-b-script-retirement-inventory.md`
+- `docs/archive/completed-specs/audit-cleanup/pass-b-one-pass-script-retirement-spec.md`
+- `docs/archive/completed-specs/audit-cleanup/pass-b-script-retirement-inventory.md`
 
 Goal: remove stale apply*, repair*, populate*, audit* scripts that are no longer workflow entrypoints.
 
@@ -100,8 +100,8 @@ Method:
 
 Status: Completed. See:
 
-- `docs/audit-cleanup/pass-c-dead-end-rule-row-retirement-spec.md`
-- `docs/audit-cleanup/pass-c-rule-row-retirement-inventory.md`
+- `docs/archive/completed-specs/audit-cleanup/pass-c-dead-end-rule-row-retirement-spec.md`
+- `docs/archive/completed-specs/audit-cleanup/pass-c-rule-row-retirement-inventory.md`
 
 Goal: delete all workbook `rule_mapping` / `grandSport_rule_mapping` rows that current runtime generation skips, then update tests so skipped-row counts are no longer treated as protected infrastructure.
 
@@ -136,8 +136,8 @@ Current result: `AGENTS.md` and `README.md` now split default readiness from opt
 
 Status: Completed for option (a). See:
 
-- `docs/audit-cleanup/pass-e-runtime-metadata-consolidation-spec.md`
-- `docs/audit-cleanup/pass-e-runtime-metadata-inventory.md`
+- `docs/archive/completed-specs/audit-cleanup/pass-e-runtime-metadata-consolidation-spec.md`
+- `docs/archive/completed-specs/audit-cleanup/pass-e-runtime-metadata-inventory.md`
 
 Goal: address the real architectural frustration: each model taking a different path.
 

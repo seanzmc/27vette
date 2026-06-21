@@ -4,7 +4,7 @@ Sources reviewed:
 
 - `docs/audit-cleanup-overview.md`
 - `docs/workbook-consistency-review-2026-06-11.md`
-- `docs/interior-pipeline-assessment.md`
+- `docs/archive/old-reports/interior-pipeline-assessment.md`
 
 Scope: read-only audit of the current codebase and `stingray_master.xlsx` to identify which findings or follow-ups from those three planning/audit files still persist. This file is an action-plan handoff only; it does not approve workbook writes or runtime behavior changes.
 
@@ -60,9 +60,9 @@ Intentionally deferred, not part of the completed source-row purge: active emitt
 
 Evidence:
 
-- `docs/active-model-nonruntime-option-row-purge-spec.md` is now historical: current workbook probes found none of the approved purge-list option IDs in their active-model option sheets or OVS sheets, and no active-model `section_presentation.sec_cust_002` rows remain.
-- `docs/active-seat-standard-equipment-ownership-spec.md` is now historical: current workbook probes found exactly four active Stingray seat source rows in `sec_seat_002` and found the three required Stingray seat price rules.
-- `docs/rule-mapping-column-cleanup-pass1-spec.md` is now historical: current workbook probes found the reduced promoted rule-mapping headers, no retired duplicate/lifecycle columns, no `zr1_rule_mapping` / `zr1x_rule_mapping` sheets, and no future-model rule-mapping registrations.
+- `docs/archive/completed-specs/active-model-nonruntime-option-row-purge-spec.md` is now historical: current workbook probes found none of the approved purge-list option IDs in their active-model option sheets or OVS sheets, and no active-model `section_presentation.sec_cust_002` rows remain.
+- `docs/archive/completed-specs/active-seat-standard-equipment-ownership-spec.md` is now historical: current workbook probes found exactly four active Stingray seat source rows in `sec_seat_002` and found the three required Stingray seat price rules.
+- `docs/archive/completed-specs/rule-mapping-column-cleanup-pass1-spec.md` is now historical: current workbook probes found the reduced promoted rule-mapping headers, no retired duplicate/lifecycle columns, no `zr1_rule_mapping` / `zr1x_rule_mapping` sheets, and no future-model rule-mapping registrations.
 
 Status: completed. These are not current recommended next passes.
 
@@ -168,7 +168,7 @@ Status: completed 2026-06-17.
 Action plan:
 
 1. No remaining implementation action for Stingray rear-script badges.
-2. Keep `docs/stingray-rear-script-exclusive-group-spec.md` as the historical implementation spec.
+2. Keep `docs/archive/completed-specs/stingray-rear-script-exclusive-group-spec.md` as the historical implementation spec.
 3. Treat the intentional UX change as complete: selecting a rear-script badge now replaces the prior badge peer instead of disabling the alternatives through pairwise excludes.
 
 ---
@@ -214,7 +214,7 @@ Status: completed 2026-06-17 for the confirmed active ordering surfaces.
 Action plan:
 
 1. No remaining implementation action for the scoped cross-model ordering pass.
-2. Keep `docs/cross-model-ordering-pass-spec.md` as the historical implementation spec.
+2. Keep `docs/archive/completed-specs/cross-model-ordering-pass-spec.md` as the historical implementation spec.
 3. If a future source update makes `CF8` active in multiple promoted models, revisit roof ordering with a new product-order decision rather than assuming the old inactive-row finding is current.
 
 ---
