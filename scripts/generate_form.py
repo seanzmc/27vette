@@ -30,7 +30,7 @@ from corvette_form_generator.inspection import (
 )
 from corvette_form_generator.model_config import ModelConfig
 from corvette_form_generator.model_configs import GRAND_SPORT_MODEL, STINGRAY_MODEL, Z06_MODEL
-from corvette_form_generator.registry_promotion import export_slug
+from corvette_form_generator.registry_promotion import export_slug, runtime_contract_artifact_path
 from corvette_form_generator.runtime_metadata import load_model_config_overrides
 
 MODEL_CONFIGS: dict[str, ModelConfig] = {
@@ -81,9 +81,10 @@ def run_draft(base_config: ModelConfig) -> None:
         config.draft_artifact_prefix,
     )
     runtime_contract_paths = write_runtime_contract_artifact(
+        config,
         draft,
-        config.output_dir / "inspection",
-        f"{slug}-runtime-contract",
+        runtime_contract_artifact_path(config.root, config.model_key).parent,
+        runtime_contract_artifact_path(config.root, config.model_key).stem,
     )
     print(
         json.dumps(

@@ -21,7 +21,7 @@ from typing import Any
 from openpyxl import load_workbook
 
 from corvette_form_generator.model_configs import WORKBOOK_PATH
-from corvette_form_generator.registry_promotion import export_slug, registry_model_key
+from corvette_form_generator.registry_promotion import export_slug, registry_model_key, runtime_contract_artifact_path
 from corvette_form_generator.workbook import clean, excel_lock_path, rows_from_sheet, save_workbook_safely
 
 
@@ -85,10 +85,10 @@ def model_promotion_plan(wb, model_key: str) -> dict[str, Any]:
         "dataset_name": f"{model_year} Corvette {model_label} operational form",
         "registry_key": registry_key,
         "export_slug": slug,
-        "artifact_path": f"form-output/inspection/{slug}-runtime-contract.json",
+        "artifact_path": str(runtime_contract_artifact_path(Path("."), model_key)),
         "variant_ids": variant_ids,
         "model_notes": f"{model_label} promoted to runtime after source data review.",
-        "promotion_notes": f"{model_label} draft artifact promoted to branch runtime registry.",
+        "promotion_notes": f"{model_label} runtime contract promoted to branch runtime registry.",
     }
 
 
@@ -112,7 +112,7 @@ def promote_model(wb, model_key: str, plan: dict[str, Any]) -> list[dict[str, An
     set_cell(promotion_ws, promotion_row, promotion_headers, "promoted_to_runtime", True, changes)
     set_cell(promotion_ws, promotion_row, promotion_headers, "default_model", False, changes)
     set_cell(promotion_ws, promotion_row, promotion_headers, "artifact_path", plan["artifact_path"], changes)
-    set_cell(promotion_ws, promotion_row, promotion_headers, "artifact_type", "draft_artifact", changes)
+    set_cell(promotion_ws, promotion_row, promotion_headers, "artifact_type", "runtime_contract", changes)
     set_cell(promotion_ws, promotion_row, promotion_headers, "active", True, changes)
     set_cell(promotion_ws, promotion_row, promotion_headers, "notes", plan["promotion_notes"], changes)
 
@@ -143,7 +143,7 @@ def verify_workbook(path: Path, model_key: str, plan: dict[str, Any]) -> dict[st
             "promoted_to_runtime": "True",
             "active": "True",
             "artifact_path": plan["artifact_path"],
-            "artifact_type": "draft_artifact",
+            "artifact_type": "runtime_contract",
             "default_model": "False",
             "registry_key": plan["registry_key"],
         }

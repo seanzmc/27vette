@@ -42,8 +42,8 @@ The runtime should render and evaluate the generated contract. It should not inf
 - `docs/` - current planning, review, workbook editor, and ingest/schema docs. The stale workbook sheet index was archived to `docs/archive/workbook-sheet-index-2026-06-12.md`.
 - `stingray_master.xlsx` - canonical workbook, source/metadata sheets, and generated `form_*` sheets.
 - `form-app/` - static app shell, styles, runtime behavior, and generated data bundle.
-- `form-output/` - generated Stingray JSON/CSV outputs plus Grand Sport and Z06 inspection, contract preview, draft, rule-audit, and clean runtime-contract artifacts under `form-output/inspection/`.
-- `scripts/generate_form.py` - single model-artifact generator entry point. `--model stingray` writes form sheets plus Stingray JSON/CSV outputs; `--model grand_sport` and `--model z06` emit inspection/preview/draft artifacts plus clean `*-runtime-contract.json` artifacts.
+- `form-output/` - generated Stingray JSON/CSV compatibility outputs, clean promoted runtime contracts under `form-output/runtime/`, and Grand Sport/Z06 inspection, contract preview, draft, and rule-audit artifacts under `form-output/inspection/`.
+- `scripts/generate_form.py` - single model-artifact generator entry point. `--model stingray` writes form sheets plus Stingray JSON/CSV compatibility outputs and a clean runtime contract; `--model grand_sport` and `--model z06` emit inspection/preview/draft artifacts plus clean runtime contracts.
 - `scripts/generate_registry.py` - publishes promoted runtime artifacts from `model_registry_promotion` into `form-app/data.js`.
 - `scripts/promote_model.py` - workbook-driven runtime promotion (`--model <key> --write`).
 - `scripts/build_rule_sources.py` - opt-in workbook rule-source audit/report helper; not part of default model readiness.
@@ -259,7 +259,7 @@ node --test tests/stingray-form-regression.test.mjs
 node --test tests/stingray-generator-stability.test.mjs
 ```
 
-The Stingray generator reads `stingray_master.xlsx`, rewrites generated `form_*` sheets, writes `form-output/stingray-form-data.json`, and writes `form-output/stingray-form-data.csv`. `scripts/generate_registry.py` publishes the current promoted model registry to `form-app/data.js`.
+The Stingray generator reads `stingray_master.xlsx`, rewrites generated `form_*` sheets, writes compatibility outputs at `form-output/stingray-form-data.json` and `form-output/stingray-form-data.csv`, and writes `form-output/runtime/stingray-runtime-contract.json`. `scripts/generate_registry.py` publishes the current promoted model registry to `form-app/data.js`.
 
 Grand Sport source/runtime-contract refresh:
 
@@ -284,7 +284,7 @@ node --test tests/z06-performance-package-interactions.test.mjs
 node --test tests/z06-runtime-rule-corrections.test.mjs
 ```
 
-The Grand Sport and Z06 generators write inspection, contract preview, draft, and clean `*-runtime-contract.json` artifacts under `form-output/inspection/`. `scripts/generate_registry.py` embeds the promoted `*-runtime-contract.json` artifacts verbatim; draft-only provenance never reaches `form-app/data.js`. By design, model generator runs do not directly mutate `form-app/data.js`.
+The Grand Sport and Z06 generators write inspection, contract preview, and draft artifacts under `form-output/inspection/`, then write clean promoted runtime contracts under `form-output/runtime/`. `scripts/generate_registry.py` embeds the promoted `form-output/runtime/*-runtime-contract.json` artifacts verbatim; draft-only provenance never reaches `form-app/data.js`. By design, model generator runs do not directly mutate `form-app/data.js`.
 
 Optional Grand Sport audit/report refresh:
 

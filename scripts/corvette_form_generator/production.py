@@ -32,7 +32,6 @@ from corvette_form_generator.mapping import (
 )
 from corvette_form_generator.model_configs import STINGRAY_MODEL
 from corvette_form_generator.output import write_json_output
-from corvette_form_generator.registry_promotion import live_contract_data
 from corvette_form_generator.rules import (
     entity_section,
     entity_type,
@@ -45,6 +44,8 @@ from corvette_form_generator.rules import (
     section_selection_mode,
     truncate_reason,
 )
+from corvette_form_generator.registry_promotion import runtime_contract_artifact_path
+from corvette_form_generator.runtime_contract import build_model_runtime_contract
 from corvette_form_generator.runtime_metadata import (
     load_context_sections,
     load_default_selection_rules,
@@ -818,8 +819,11 @@ def main() -> None:
     OUTPUT_DIR.mkdir(exist_ok=True)
     APP_DIR.mkdir(exist_ok=True)
     json_path = OUTPUT_DIR / "stingray-form-data.json"
-    runtime_data = live_contract_data(data)
+    runtime_data = build_model_runtime_contract(MODEL_CONFIG, data)
     write_json_output(json_path, runtime_data)
+    runtime_json_path = runtime_contract_artifact_path(ROOT, MODEL_CONFIG.model_key)
+    runtime_json_path.parent.mkdir(parents=True, exist_ok=True)
+    write_json_output(runtime_json_path, runtime_data)
     csv_path = OUTPUT_DIR / "stingray-form-data.csv"
     with csv_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(
@@ -849,6 +853,7 @@ def main() -> None:
         "workbook": str(WORKBOOK_PATH),
         "workbook_backup": str(workbook_backup_path),
         "json": str(json_path),
+        "runtime_contract_json": str(runtime_json_path),
         "csv": str(csv_path),
         "choices": len(choices),
         "context_choices": len(context_choices),

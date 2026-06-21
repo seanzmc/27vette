@@ -106,9 +106,9 @@ Current `model_registry_promotion` rows:
 
 | model_key | registry_key | promoted_to_runtime | artifact_path | active |
 |---|---|---:|---|---:|
-| `stingray` | `stingray` | true | current generation | true |
-| `grand_sport` | `grandSport` | true | `form-output/inspection/grand-sport-runtime-contract.json` | true |
-| `z06` | `z06` | true | `form-output/inspection/z06-runtime-contract.json` | true |
+| `stingray` | `stingray` | true | `form-output/runtime/stingray-runtime-contract.json` | true |
+| `grand_sport` | `grandSport` | true | `form-output/runtime/grand-sport-runtime-contract.json` | true |
+| `z06` | `z06` | true | `form-output/runtime/z06-runtime-contract.json` | true |
 | `zr1` | `zr1` | false | blank | false |
 | `zr1x` | `zr1x` | false | blank | false |
 

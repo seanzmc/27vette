@@ -202,7 +202,7 @@ MODEL_REGISTRY_PROMOTION_HEADERS: tuple[str, ...] = (
     "display_order",
     "notes",
 )
-VALID_REGISTRY_PROMOTION_ARTIFACT_TYPES: set[str] = {"current_generation", "draft_artifact"}
+VALID_REGISTRY_PROMOTION_ARTIFACT_TYPES: set[str] = {"current_generation", "draft_artifact", "runtime_contract"}
 
 
 @dataclass

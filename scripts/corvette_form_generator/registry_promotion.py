@@ -40,7 +40,7 @@ RUNTIME_CHOICE_ROW_TRIM_FIELDS = frozenset(
     ("source_detail_raw", "choice_mode", "selection_mode", "selection_mode_label")
 )
 RUNTIME_STANDARD_EQUIPMENT_ROW_TRIM_FIELDS = frozenset(("source_detail_raw",))
-VALID_ARTIFACT_TYPES = {"current_generation", "draft_artifact"}
+VALID_ARTIFACT_TYPES = {"current_generation", "draft_artifact", "runtime_contract"}
 
 
 @dataclass(frozen=True)
@@ -134,8 +134,8 @@ def assert_runtime_contract(data: dict[str, Any], *, source: str) -> None:
         problems.append(f"draft-only fields present: {', '.join(leaks[:5])}{'...' if len(leaks) > 5 else ''}")
     dataset = data.get("dataset")
     status = dataset.get("status") if isinstance(dataset, dict) else None
-    if status != "runtime_active":
-        problems.append(f"dataset.status is {status!r}, expected 'runtime_active'")
+    if status not in (None, "", "runtime_active"):
+        problems.append(f"dataset.status is {status!r}, expected 'runtime_active' or absent")
     if problems:
         raise ValueError(
             f"Promoted artifact {source} is not a clean runtime contract ({'; '.join(problems)}). "
@@ -266,10 +266,20 @@ def current_generation_artifact_path(root: Path, promotion: RegistryPromotion) -
     return root / "form-output" / f"{promotion.export_slug}-form-data.json"
 
 
+def runtime_contract_artifact_path(root: Path, model_key: str) -> Path:
+    return root / "form-output" / "runtime" / f"{export_slug(model_key)}-runtime-contract.json"
+
+
 def artifact_path_for_promotion(root: Path, promotion: RegistryPromotion) -> Path:
     if promotion.artifact_type == "current_generation":
         return current_generation_artifact_path(root, promotion)
     return resolve_artifact_path(root, promotion.artifact_path)
+
+
+def promotion_requires_runtime_contract_assertion(promotion: RegistryPromotion) -> bool:
+    if promotion.artifact_type == "runtime_contract":
+        return True
+    return promotion.artifact_type != "current_generation"
 
 
 def load_promotion_data(
@@ -299,7 +309,7 @@ def load_promotion_artifact_data(promotion: RegistryPromotion, *, root: Path) ->
     if not artifact.exists():
         raise FileNotFoundError(f"Promoted model artifact does not exist for {promotion.model_key}: {artifact}")
     data = json.loads(artifact.read_text(encoding="utf-8"))
-    if promotion.artifact_type != "current_generation":
+    if promotion_requires_runtime_contract_assertion(promotion):
         assert_runtime_contract(data, source=str(artifact))
     return data
 

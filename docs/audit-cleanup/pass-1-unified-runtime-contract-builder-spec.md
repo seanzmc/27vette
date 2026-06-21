@@ -1,6 +1,6 @@
 # Pass 1 — Unified Runtime Contract Builder Spec
 
-Status: Spec proposed. Do not implement until approved.
+Status: Implemented; previously blocked Stingray generator parity gate completed on 2026-06-21.
 Date: 2026-06-21
 
 ## Goal
@@ -265,8 +265,64 @@ git diff -- scripts/corvette_form_generator/production.py scripts/corvette_form_
 
 If generated JSON/Markdown, `form-app/data.js`, or workbook binary changes are timestamp-only validation churn, restore them before final handoff and rerun the focused checks needed to prove retained artifacts are still valid.
 
-## Approval prompt
+## Implementation results
 
-Approve this Pass 1 implementation as scoped above?
+Implemented files:
 
-Recommended approval: approve the narrow shared runtime-contract finalization seam now. Keep full `form_*` retirement for the later Pass 3-style workflow/artifact-surface pass, but design this Pass 1 so it does not add new `form_*` dependencies.
+- Added `scripts/corvette_form_generator/runtime_contract.py` with `build_model_runtime_contract(config, data)`.
+- Updated `scripts/corvette_form_generator/production.py` so Stingray finalizes runtime JSON through `build_model_runtime_contract(MODEL_CONFIG, data)`.
+- Updated `scripts/corvette_form_generator/inspection.py` so runtime-contract artifact writing finalizes through `build_model_runtime_contract(config, draft)`.
+- Updated `scripts/generate_form.py` to pass the resolved model config into `write_runtime_contract_artifact()`.
+- Added `tests/test_runtime_contract_builder.py` for the shared finalization behavior and route-usage guard.
+
+Generated/workbook handling:
+
+- No workbook source rows or metadata were intentionally changed.
+- Grand Sport/Z06 generator/test runs produced timestamp-only generated inspection artifact churn; those generated files were restored.
+- Stingray generator was rerun after the Excel lock cleared. The regenerated promoted input matched the Pass 1 before snapshot after timestamp stripping.
+
+Gate results:
+
+```text
+.venv/bin/python -m py_compile scripts/generate_form.py scripts/corvette_form_generator/runtime_contract.py scripts/corvette_form_generator/production.py scripts/corvette_form_generator/inspection.py
+PASS
+
+.venv/bin/python -m pytest tests/test_runtime_contract_builder.py tests/test_registry_promotion_metadata.py -q
+PASS: 11 passed
+
+.venv/bin/python scripts/generate_form.py --model grand_sport
+.venv/bin/python scripts/generate_form.py --model z06
+PASS
+
+node scripts/compare-generated-contracts.mjs <baseline>/grand-sport-runtime-contract.json form-output/inspection/grand-sport-runtime-contract.json
+PASS: contracts match
+
+node scripts/compare-generated-contracts.mjs <baseline>/z06-runtime-contract.json form-output/inspection/z06-runtime-contract.json
+PASS: contracts match
+
+node scripts/compare-generated-contracts.mjs /tmp/27vette-pass1-finish-20260621T061020Z/stingray-form-data.json form-output/stingray-form-data.json
+PASS: contracts match after rerunning scripts/generate_form.py --model stingray
+
+node --test tests/grand-sport-draft-data.test.mjs
+PASS: 19 passed
+
+node --test tests/z06-form-data-draft.test.mjs
+PASS: 23 passed
+
+node --test tests/multi-model-runtime-switching.test.mjs
+PASS: 44 passed
+
+node --test tests/stingray-generator-stability.test.mjs
+FAIL: pre-existing workbook metadata expectation mismatch for Z06 order-summary sections; actual workbook data includes required_charges / Required Charges / 15 while this test's shared expected list has 11 sections.
+```
+
+Previously blocked, now complete:
+
+- `.venv/bin/python scripts/generate_form.py --model stingray`: PASS after Excel lock cleared.
+- `.venv/bin/python scripts/generate_registry.py`: PASS; registry generation output reported `stingray`, `grandSport`, and `z06` models with `STINGRAY_FORM_DATA` legacy alias.
+- Full Stingray regenerated-artifact parity: PASS against `/tmp/27vette-pass1-finish-20260621T061020Z/stingray-form-data.json`.
+
+Residual risk:
+
+- The code path change is intentionally small and behavior-preserving; strict timestamp-ignored parity passed for all three promoted Pass 1 inputs.
+- The `tests/stingray-generator-stability.test.mjs` Z06 expected-order-summary failure remains unrelated to this code change and should be handled as a separate test/workbook expectation cleanup, not hidden in this pass.

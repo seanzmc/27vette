@@ -6,17 +6,18 @@ The main diagnosis: **the public workflow has been mostly normalized, but the in
 
 ## Status and evidence anchors
 
-This file is an audit/action map, not an approved implementation spec. Each pass below still needs its own spec before edits.
+This file is an audit/action map. Passes 0, 1, and 2 now have implementation evidence under `docs/audit-cleanup/`; later passes still need their own spec before edits.
 
 Current tree evidence:
 
-- `scripts/generate_form.py` hardcodes `MODEL_CONFIGS` and `PRODUCTION_MODEL_KEYS = {"stingray"}`.
-- `scripts/generate_form.py` routes Stingray to `production.main()` and Grand Sport/Z06 to `run_draft()`.
-- `scripts/corvette_form_generator/registry_promotion.py` resolves `artifact_type=current_generation` with no explicit `artifact_path` to `form-output/<export_slug>-form-data.json`.
-- Read-only workbook inspection confirms the promoted rows are currently:
-  - Stingray: `artifact_type=current_generation`, no `artifact_path`, resolves to `form-output/stingray-form-data.json`.
-  - Grand Sport: `artifact_type=draft_artifact`, `artifact_path=form-output/inspection/grand-sport-runtime-contract.json`.
-  - Z06: `artifact_type=draft_artifact`, `artifact_path=form-output/inspection/z06-runtime-contract.json`.
+- `scripts/generate_form.py` still hardcodes `MODEL_CONFIGS` and `PRODUCTION_MODEL_KEYS = {"stingray"}`.
+- `scripts/generate_form.py` still routes Stingray to `production.main()` and Grand Sport/Z06 to `run_draft()`.
+- `scripts/corvette_form_generator/runtime_contract.py` now provides the shared finalization seam used by both active routes.
+- `scripts/corvette_form_generator/registry_promotion.py` still supports legacy `current_generation` and `draft_artifact` rows, but active promoted rows now use `artifact_type=runtime_contract`.
+- Read-only workbook inspection confirms the promoted rows are now:
+  - Stingray: `artifact_type=runtime_contract`, `artifact_path=form-output/runtime/stingray-runtime-contract.json`.
+  - Grand Sport: `artifact_type=runtime_contract`, `artifact_path=form-output/runtime/grand-sport-runtime-contract.json`.
+  - Z06: `artifact_type=runtime_contract`, `artifact_path=form-output/runtime/z06-runtime-contract.json`.
 - `scripts/compare-generated-contracts.mjs` strips only timestamp keys (`generated_at`, `sourceGeneratedAt`, `generatedAt`) and then deep-compares everything else. It is a strict no-drift parity check, not a general validator for approved artifact-shape/path migrations.
 - `form-app/app.js` still has a product/RPO-specific runtime exception: `choice.rpo === "GBA" && rule.source_id === "opt_zyc_001"`. The workbook exception row is `ex_gba_zyc`, source `opt_gba_001`, target `opt_zyc_001`.
 - `scripts/corvette_form_generator/editor_ops.py` still includes `node --test tests/grand-sport-rule-audit.test.mjs` in Grand Sport gate reminders, even though `AGENTS.md` classifies that audit/report gate as optional.
@@ -34,15 +35,15 @@ Current tree evidence:
 
 **Stingray route**
 
-`stingray_master.xlsx` → `scripts/generate_form.py --model stingray` → `production.py` → writes workbook `form_*` sheets → writes `form-output/stingray-form-data.json` and `.csv` → `generate_registry.py` → `form-app/data.js`.
+`stingray_master.xlsx` → `scripts/generate_form.py --model stingray` → `production.py` → writes workbook `form_*` sheets → writes compatibility `form-output/stingray-form-data.json` / `.csv` plus `form-output/runtime/stingray-runtime-contract.json` → `generate_registry.py` → `form-app/data.js`.
 
-Stingray currently reaches registry promotion as `artifact_type=current_generation`. With no workbook `artifact_path`, the registry resolver uses `form-output/stingray-form-data.json` for the promoted input.
+Stingray now reaches registry promotion as `artifact_type=runtime_contract`; the workbook points the promoted input at `form-output/runtime/stingray-runtime-contract.json`.
 
 **Grand Sport / Z06 route**
 
-`stingray_master.xlsx` → `scripts/generate_form.py --model grand_sport|z06` → `inspection.py` → writes inspection report, contract preview, form-data draft, and clean `*-runtime-contract.json` under `form-output/inspection/` → `generate_registry.py` → `form-app/data.js`.
+`stingray_master.xlsx` → `scripts/generate_form.py --model grand_sport|z06` → `inspection.py` → writes inspection report, contract preview, and form-data draft under `form-output/inspection/`, plus clean runtime contracts under `form-output/runtime/` → `generate_registry.py` → `form-app/data.js`.
 
-`run_draft()` in `generate_form.py` does exactly that for non-Stingray models. The promoted Grand Sport/Z06 workbook rows point at the clean runtime-contract artifacts under `form-output/inspection/`, and `generate_registry.py` embeds those clean contracts.
+`run_draft()` in `generate_form.py` does exactly that for non-Stingray models. The promoted Grand Sport/Z06 workbook rows point at the clean runtime-contract artifacts under `form-output/runtime/`, and `generate_registry.py` embeds those clean contracts.
 
 **Registry route**
 
@@ -54,20 +55,20 @@ This part is mostly normalized. `generate_registry.py` is the only workflow that
 
 `generate_form.py` has one command surface, but `PRODUCTION_MODEL_KEYS = {"stingray"}` still decides whether the model goes to `production.main()` or the draft/inspection path.
 
-That means active runtime models are still built by different internal logic:
+Pass 1 unified the final runtime-contract builder, but active runtime models are still assembled by different internal logic:
 
 - Stingray: `production.py`
-- Grand Sport / Z06: `inspection.py` → `build_contract_preview()` → `build_form_data_draft()` → `live_contract_data()`
+- Grand Sport / Z06: `inspection.py` → `build_contract_preview()` → `build_form_data_draft()` → `build_model_runtime_contract()`
 
 This is the same class of problem you described: the pathway looks consistent from the outside, but not inside the generator.
 
-**Normalize to:** one model-neutral runtime-contract builder, for example:
+**Pass 1 normalized:** one model-neutral runtime-contract builder:
 
 ```text
-build_model_runtime_contract(config)
+build_model_runtime_contract(config, data)
 ```
 
-Then make every active model use it. Keep inspection/preview/draft outputs as optional reporting surfaces, not as the actual production route for only some models.
+Every active model now uses it. Remaining route work is source-row assembly/output-surface policy, not final contract cleanup.
 
 ### 2. Generated workbook `form_*` sheets are Stingray-only
 
@@ -94,16 +95,9 @@ Do not keep one shared `form_*` surface that is effectively Stingray-owned. Eith
 
 ### 3. Grand Sport/Z06 runtime artifacts still carry “draft/inspection” ancestry
 
-The runtime contract for Grand Sport/Z06 is clean by the time it reaches `form-app/data.js`, because `write_runtime_contract_artifact()` strips draft-only fields and writes a clean runtime artifact. Promotion also validates that promoted artifacts are clean and have `dataset.status === "runtime_active"`.
+The runtime contract for Grand Sport/Z06 is clean by the time it reaches `form-app/data.js`, because `write_runtime_contract_artifact()` strips draft-only fields and writes a clean runtime artifact. Promotion validates that promoted artifacts are clean; legacy Stingray-compatible contracts may still omit `dataset.status`, while draft status is rejected.
 
-But the file path and workflow still make active models feel provisional:
-
-```text
-form-output/inspection/grand-sport-runtime-contract.json
-form-output/inspection/z06-runtime-contract.json
-```
-
-**Normalize to:**
+Pass 2 moved active promoted runtime artifacts out of inspection ancestry:
 
 ```text
 form-output/runtime/stingray-runtime-contract.json
@@ -111,7 +105,9 @@ form-output/runtime/grand-sport-runtime-contract.json
 form-output/runtime/z06-runtime-contract.json
 ```
 
-Keep inspection/preview/draft artifacts only as optional adjacent reports. Treat this as a workbook metadata migration because `model_registry_promotion.artifact_path` owns promoted artifact paths. It is not a simple file move.
+**Pass 2 normalized to that same path set.**
+
+Inspection/preview/draft artifacts remain optional adjacent reports. This was a workbook metadata migration because `model_registry_promotion.artifact_path` owns promoted artifact paths.
 
 ### 4. Adding future models still requires Python edits
 
@@ -199,9 +195,9 @@ But it still contains legacy/static model assumptions for Stingray and Grand Spo
 
 ### Pass 0 — Baseline promoted inputs and consumers
 
-Goal: prove what the registry consumes today before changing builders or artifact surfaces.
+Goal: prove what the registry consumed before changing builders or artifact surfaces.
 
-Read current promoted inputs from `model_registry_promotion` and the registry resolver:
+Pass 0 read then-current promoted inputs from `model_registry_promotion` and the registry resolver:
 
 ```text
 stingray     current_generation -> form-output/stingray-form-data.json
@@ -222,6 +218,8 @@ For a no-behavior-change builder pass, snapshot those promoted inputs before/aft
 
 ### Pass 1 — Unified runtime contract builder
 
+Status: implemented in `docs/audit-cleanup/pass-1-unified-runtime-contract-builder-spec.md`.
+
 Goal: make Stingray, Grand Sport, and Z06 use the same contract-builder function.
 
 Do not change generated behavior yet. Keep output parity as the success condition. Extract around the clean runtime contract shape first; do not force Stingray workbook sheet writing into the draft/inspection path or vice versa just to make the first refactor look symmetrical.
@@ -237,6 +235,8 @@ generate_form.py --model z06
 all call the same model-neutral runtime-contract builder. Output writers may still differ during this pass, and strict timestamp-only contract parity should hold for the promoted runtime inputs.
 
 ### Pass 2 — Artifact surface normalization
+
+Status: implemented in `docs/audit-cleanup/pass-2-runtime-artifact-surface-normalization-spec.md`.
 
 Move every active model to the same clean runtime artifact contract:
 
@@ -289,12 +289,12 @@ Those are real, but they should come after the builder/pathway fork is removed u
 
 The repo is past the worst version of the problem. The registry, promotion metadata, workbook source roles, and model metadata are largely workbook-owned now.
 
-The remaining structural issue is narrower and clearer:
+The remaining structural issue is narrower and clearer after Passes 1-2:
 
 ```text
 One CLI entrypoint
 but two model-generation engines
-and two output-surface styles.
+and one unresolved generated workbook form_* policy.
 ```
 
-Fix that first with explicit promoted-input baselines and strict no-drift checks where no behavior change is intended. Then normalize artifact paths and workbook promotion metadata in a separate safe-save pass.
+Next safe pass: decide the generated workbook `form_*` sheet policy from the Pass 0 consumer inventory, without deleting or stopping sheet writes until current consumers and docs are accounted for.

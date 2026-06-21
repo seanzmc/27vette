@@ -72,8 +72,8 @@ def metadata_workbook(*, promoted: bool, runtime_rows: list[dict[str, object]] |
                 "registry_key": "z06",
                 "promoted_to_runtime": promoted,
                 "default_model": False,
-                "artifact_path": "form-output/inspection/z06-runtime-contract.json",
-                "artifact_type": "draft_artifact",
+                "artifact_path": "form-output/runtime/z06-runtime-contract.json",
+                "artifact_type": "runtime_contract",
                 "active": True,
                 "display_order": 3,
             }

@@ -101,12 +101,12 @@ def promoted_grand_sport_row(**overrides: object) -> dict[str, object]:
         "registry_key": "grandSport",
         "promoted_to_runtime": True,
         "default_model": False,
-        "artifact_path": "form-output/inspection/grand-sport-runtime-contract.json",
-        "artifact_type": "draft_artifact",
+        "artifact_path": "form-output/runtime/grand-sport-runtime-contract.json",
+        "artifact_type": "runtime_contract",
         "legacy_alias": "",
         "active": True,
         "display_order": 2,
-        "notes": "Grand Sport draft artifact promoted to runtime registry.",
+        "notes": "Grand Sport runtime contract promoted to runtime registry.",
     }
     row.update(overrides)
     return row
@@ -130,7 +130,7 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
     def test_promoted_rows_build_ordered_registry_and_aliases_from_workbook_metadata(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
-            artifact_path = root / "form-output" / "inspection" / "grand-sport-runtime-contract.json"
+            artifact_path = root / "form-output" / "runtime" / "grand-sport-runtime-contract.json"
             artifact_path.parent.mkdir(parents=True)
             artifact_path.write_text(
                 json.dumps(
@@ -229,18 +229,27 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
     def test_file_backed_registry_loads_current_generation_and_runtime_contract_artifacts(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
-            stingray_path = root / "form-output" / "stingray-form-data.json"
-            gs_path = root / "form-output" / "inspection" / "grand-sport-runtime-contract.json"
+            stingray_path = root / "form-output" / "runtime" / "stingray-runtime-contract.json"
+            gs_path = root / "form-output" / "runtime" / "grand-sport-runtime-contract.json"
             gs_path.parent.mkdir(parents=True)
             stingray_path.write_text(
-                json.dumps({"dataset": {"source_sheet": "stingray_options"}, "choices": []}),
+                json.dumps({"dataset": {"source_sheet": "stingray_options", "status": "runtime_active"}, "choices": []}),
                 encoding="utf-8",
             )
             gs_path.write_text(
                 json.dumps({"dataset": {"source_sheet": "grandSport_options", "status": "runtime_active"}, "choices": []}),
                 encoding="utf-8",
             )
-            wb = workbook_with_promotions([promoted_grand_sport_row(display_order=2), promoted_stingray_row(display_order=1)])
+            wb = workbook_with_promotions(
+                [
+                    promoted_grand_sport_row(display_order=2),
+                    promoted_stingray_row(
+                        display_order=1,
+                        artifact_path="form-output/runtime/stingray-runtime-contract.json",
+                        artifact_type="runtime_contract",
+                    ),
+                ]
+            )
 
             registry = build_registry_from_artifacts(
                 wb,
@@ -257,7 +266,7 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
     def test_promoted_artifact_with_draft_fields_fails_fast(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
-            artifact_path = root / "form-output" / "inspection" / "grand-sport-runtime-contract.json"
+            artifact_path = root / "form-output" / "runtime" / "grand-sport-runtime-contract.json"
             artifact_path.parent.mkdir(parents=True)
             artifact_path.write_text(
                 json.dumps(
