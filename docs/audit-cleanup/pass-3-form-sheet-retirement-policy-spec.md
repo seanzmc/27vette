@@ -74,6 +74,7 @@ Change type: mixed generator/workbook/tests/docs. Runtime behavior should remain
      - `form_color_overrides`
      - `form_validation`
    - Stop saving `stingray_master.xlsx` during normal `generate_form.py --model stingray` runs when no workbook source data changes.
+   - Remove the normal-generation `workbook_backup_path` dependency created by `save_workbook_safely()`. The generator's stdout JSON must not call `str(workbook_backup_path)` after the save is removed; either remove `workbook_backup` from the normal output or keep it as explicit `null` for compatibility.
    - Keep writing:
      - `form-output/stingray-form-data.json` compatibility artifact.
      - `form-output/stingray-form-data.csv` compatibility artifact, unless a separate CSV retirement pass approves removal.
@@ -141,7 +142,7 @@ Change type: mixed generator/workbook/tests/docs. Runtime behavior should remain
    - Remove stale active references that imply `form_*` sheets are current workflow surfaces.
 
 15. `docs/audit-cleanup/pass-3-form-sheet-retirement-policy-spec.md`
-   - After implementation, append implementation results, workbook backup path, gates, generated-diff handling, and residual risks.
+   - After implementation, append implementation results, the sheet-deletion workbook backup path, gates, generated-diff handling, and residual risks. Do not report a normal Stingray generation workbook backup path unless a future approved workbook write actually creates one.
 
 ## Constraints
 
@@ -207,7 +208,35 @@ cp form-output/stingray-form-data.json "$BASE/stingray-form-data.json"
 .venv/bin/python scripts/generate_registry.py
 ```
 
-8. Compare runtime payloads:
+8. Reopen the workbook after regeneration and verify the retired sheet list is still absent:
+
+```sh
+.venv/bin/python - <<'PY'
+from openpyxl import load_workbook
+
+retired = {
+    'form_steps',
+    'form_context_choices',
+    'form_choices',
+    'form_standard_equipment',
+    'form_rule_groups',
+    'form_exclusive_groups',
+    'form_rules',
+    'form_price_rules',
+    'form_interiors',
+    'form_color_overrides',
+    'form_validation',
+}
+wb = load_workbook('stingray_master.xlsx', read_only=True, data_only=False)
+present = sorted(retired.intersection(wb.sheetnames))
+wb.close()
+if present:
+    raise SystemExit(f'retired generated workbook sheets reappeared: {present}')
+print('retired generated workbook sheets absent after regeneration')
+PY
+```
+
+9. Compare runtime payloads:
 
 ```sh
 node scripts/compare-generated-contracts.mjs "$BASE/stingray-runtime-contract.json" form-output/runtime/stingray-runtime-contract.json
@@ -216,7 +245,7 @@ node scripts/compare-generated-contracts.mjs "$BASE/z06-runtime-contract.json" f
 node scripts/compare-generated-contracts.mjs "$BASE/stingray-form-data.json" form-output/stingray-form-data.json
 ```
 
-9. Restore unrelated timestamp-only generated churn unless the generated runtime artifacts are intentionally part of the retained diff.
+10. Restore unrelated timestamp-only generated churn unless the generated runtime artifacts are intentionally part of the retained diff.
 
 ## Validation plan
 
@@ -233,6 +262,7 @@ Focused Python/tests:
 .venv/bin/python -m pytest \
   tests/test_editor_ops_apply.py \
   tests/test_editor_server_payload.py \
+  tests/test_model_config_metadata.py \
   tests/test_runtime_contract_builder.py \
   tests/test_registry_promotion_metadata.py \
   tests/test_schema_validation_metadata.py \
@@ -250,6 +280,7 @@ Workbook/schema:
 Runtime/generator:
 
 ```sh
+.venv/bin/python scripts/generate_form.py --model stingray
 node --test tests/stingray-form-regression.test.mjs
 node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
