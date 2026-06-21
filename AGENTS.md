@@ -26,6 +26,12 @@ Every handoff must report:
 
 For multi-pass work, keep the broader path visible without expanding the current scope. The next-step guidance should name the logical next pass, not implement it, unless the user explicitly approves that pass.
 
+## Spec and Plan Closure
+
+When completing an approved spec, pass, or implementation plan, update the owning spec/plan file before final handoff. Mark it implemented or completed with the completion date, changed files/sheets/artifacts, gate results, and any residual follow-up.
+
+If a standing reference document or route map would otherwise become stale, either update that document in the same pass or clearly name it as intentionally stale/deferred in the completed spec and handoff. Do not leave active approval prompts, "spec only" status, or obsolete next-step claims in completed spec files unless they are explicitly rewritten as historical context.
+
 ## Using This File
 
 Treat this file as the current operating guide, not a freeze on the repo's implementation. Safety rules, source-of-truth rules, generated-file ownership, dealer submission boundaries, and validation gates are strict. Current architecture notes, active sheet lists, named workflow paths, and expected outputs are checkpoints to verify against the repo before acting.
