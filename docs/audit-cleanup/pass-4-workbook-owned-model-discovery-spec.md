@@ -1,6 +1,6 @@
 # Pass 4 — Workbook-Owned Model Discovery Spec
 
-Status: Spec only. Do not implement until approved.
+Status: Implemented 2026-06-21.
 Date: 2026-06-21
 Recommended reasoning level for implementation agent: high.
 
@@ -36,6 +36,8 @@ Preflight evidence from this spec-writing pass:
 - `scripts/generate_form.py:31-41` imports per-model constants and hardcodes `MODEL_CONFIGS` and `PRODUCTION_MODEL_KEYS`.
 - `scripts/corvette_form_generator/model_configs.py:169-210` already exposes `base_model_config(model_key)` but still defines `STINGRAY_MODEL`, `GRAND_SPORT_MODEL`, and `Z06_MODEL` constants.
 - `scripts/corvette_form_generator/runtime_metadata.py:526-657` loads `model_master`, `model_workbook_sources`, and `model_variants`, then applies workbook metadata through `load_model_config_overrides()`.
+- `scripts/corvette_form_generator/runtime_metadata.py:629-632` still lets `load_model_config_overrides()` fall back to the base config's `expected_variant_count` and `variant_ids` when active `model_variants` rows are absent. Because `base_model_config()` defaults to `expected_variant_count=0` and `variant_ids=()`, discovery must validate active workbook variant rows directly before treating a model as generatable.
+- `scripts/corvette_form_generator/runtime_metadata.py:69-81` scopes `active_rows(..., model_key)` to the requested key plus global keys (`all`, `shared`, `*`). That behavior is valid for runtime metadata, but generation discovery must prove model-owned source completeness with exact `model_key` matches.
 - `tests/test_model_config_metadata.py` currently imports `STINGRAY_MODEL` and covers workbook override behavior, duplicate source roles, unknown roles, variant counts, duplicate variants, and registry-key drift.
 - `tests/test_runtime_contract_builder.py` currently imports `GRAND_SPORT_MODEL`.
 - Read-only workbook probe of `stingray_master.xlsx` found:
@@ -59,6 +61,8 @@ This pass should not change generated runtime payloads or workbook source data, 
 
 - accidentally make inactive ZR1/ZR1X scaffolds generatable or promoted;
 - silently fall back to default sheet names when required workbook metadata is missing;
+- silently treat an active future model with complete source roles but missing/blank variant metadata as generatable because Python defaults are empty/zero;
+- let shared/global source rows satisfy per-model generation completeness if discovery reuses `active_rows(..., model_key)` without exact-match filtering;
 - break `--model stingray` by removing the production route boundary too early;
 - break imports/tests that still rely on per-model constants;
 - make `--help` or error handling depend on a corrupt/missing workbook in a confusing way.
@@ -73,6 +77,7 @@ Mixed code/tests/docs, no workbook source-data change intended.
 - Workbook owns runtime promotion separately through `model_registry_promotion.promoted_to_runtime` and `active`.
 - Python may keep generic filesystem paths, compatibility defaults, output route selection, and validation helpers.
 - Python should not keep a hardcoded list of active model keys in `generate_form.py`.
+- Discovery must not rely on Python fallback config to prove workbook variant availability. Active `model_master.expected_variant_count` and exact-match active `model_variants` rows are part of the generation-eligibility contract.
 
 ## Exact files to change
 
@@ -88,10 +93,15 @@ Mixed code/tests/docs, no workbook source-data change intended.
      - open `stingray_master.xlsx` read-only;
      - load active `model_master` rows in workbook row order;
      - exclude inactive `model_master` rows such as `zr1` and `zr1x`;
-     - require every active/generatable model to have the complete required active source-role set;
+     - require every active/generatable model to have `model_master.expected_variant_count > 0`;
+     - require at least one exact-match active `model_variants` row for the model;
+     - require exact-match active `model_variants` count to equal `model_master.expected_variant_count`;
+     - require every active/generatable model to have the complete required active source-role set with exact `model_key` matches only;
+     - not let global/shared rows (`all`, `shared`, `*`) satisfy generation source-role completeness;
      - treat `variant_option_overrides_sheet` as optional because Stingray currently has no active role for it;
      - call `base_model_config(model_key)` then `load_model_config_overrides(wb, base_config)`;
-     - fail fast on duplicate active model rows, unknown roles, missing required roles, duplicate variants, and expected-variant-count mismatch;
+     - use `load_model_config_overrides()` as a second-stage config resolver, not as the sole proof that variants exist;
+     - fail fast on duplicate active model rows, unknown roles, missing required exact-match roles, duplicate exact-match variants, missing/zero expected variant count, no active exact-match variant rows, and expected-variant-count mismatch;
      - not inspect or require runtime promotion.
    - Remove `STINGRAY_MODEL`, `GRAND_SPORT_MODEL`, and `Z06_MODEL` after all imports are updated.
 
@@ -124,6 +134,10 @@ Mixed code/tests/docs, no workbook source-data change intended.
      - inactive scaffold rows are excluded even if sheet names exist;
      - missing required active source roles for an active model fail fast;
      - inactive source-role rows do not satisfy required-role completeness;
+     - global/shared source rows (`all`, `shared`, `*`) do not satisfy per-model generation completeness;
+     - missing or zero `model_master.expected_variant_count` fails fast for active models;
+     - missing/blank exact-match active `model_variants` rows fail fast even if source roles are complete;
+     - exact-match active variant count must equal `expected_variant_count`;
      - runtime promotion metadata is not required for discovery.
 
 2. `tests/test_runtime_contract_builder.py`
@@ -133,8 +147,9 @@ Mixed code/tests/docs, no workbook source-data change intended.
    - Add or update a source guard that `scripts/generate_form.py` no longer defines a hardcoded `MODEL_CONFIGS` map or uses `choices=sorted(MODEL_CONFIGS)`.
    - Keep the existing Pass 3 guard proving routine Stingray generation does not write workbook generated sheets.
 
-4. Optional if implementation touches CLI parsing enough to justify it: add a small Python or Node CLI smoke test/probe that verifies:
+4. Add a required focused Python or Node CLI smoke/negative test, for example `tests/test_generate_form_model_discovery_cli.py`, that verifies:
    - `generate_form.py --model stingray` succeeds;
+   - `generate_form.py --model stingray` still reaches the Stingray production path, not the draft/inspection path;
    - `generate_form.py --model zr1` fails while ZR1 is inactive, without writing artifacts or promoting it.
 
 ### Required docs changes
@@ -152,7 +167,7 @@ Mixed code/tests/docs, no workbook source-data change intended.
 
 ## Required source-role completeness policy
 
-For active/generatable models, require active `model_workbook_sources` rows for:
+For active/generatable models, require active `model_workbook_sources` rows with an exact `model_key` equal to the candidate model for:
 
 - `source_option_sheet`
 - `status_sheet`
@@ -170,6 +185,19 @@ Treat this role as optional:
 - `variant_option_overrides_sheet`
 
 Reason: the current workbook has no active Stingray `variant_option_overrides_sheet` role, while Grand Sport and Z06 do. Requiring it would create a workbook schema change not needed for model discovery.
+
+Do not use `active_rows(wb, "model_workbook_sources", model_key)` directly for this completeness check unless that helper is changed or wrapped to exact-match semantics. The current helper intentionally includes global keys (`all`, `shared`, `*`), which must not satisfy model-owned generation availability.
+
+## Required variant completeness policy
+
+For active/generatable models, require active workbook variant metadata with exact `model_key` matches:
+
+- `model_master.expected_variant_count` must parse to an integer greater than 0.
+- At least one active `model_variants` row must exist for the model.
+- Active exact-match `model_variants` count must equal `model_master.expected_variant_count`.
+- Duplicate active exact-match `variant_id` values must fail fast.
+
+Do not rely on `load_model_config_overrides()` alone to prove variant availability. It still has compatibility fallback semantics for absent variant metadata; generation discovery must be stricter than that fallback path.
 
 ## Constraints
 
@@ -216,8 +244,10 @@ Suggested semantics:
 
 ```text
 active model_master row
-+ complete required active model_workbook_sources roles
-+ valid model_variants count through load_model_config_overrides()
++ expected_variant_count > 0
++ complete required exact-match active model_workbook_sources roles
++ at least one exact-match active model_variants row
++ exact-match active model_variants count == expected_variant_count
 = generatable model config
 ```
 
@@ -258,6 +288,7 @@ Expected after implementation: only historical/docs references or intentionally 
 ```sh
 .venv/bin/python -m pytest \
   tests/test_model_config_metadata.py \
+  tests/test_generate_form_model_discovery_cli.py \
   tests/test_runtime_contract_builder.py \
   tests/test_registry_promotion_metadata.py \
   tests/test_schema_validation_metadata.py \
@@ -353,8 +384,73 @@ Review generated artifact diffs. If they are timestamp-only and no generated pay
 - Existing full `tests/stingray-generator-stability.test.mjs` has a known unrelated Z06 `required_charges` expected-list drift from Pass 3 validation. If still present, report it separately and do not patch it inside Pass 4 unless the user explicitly approves that fix.
 - `--help` behavior depends on the chosen CLI implementation. Prefer parsing `--model` as a string then validating after workbook discovery so help remains available even if workbook metadata is temporarily invalid.
 
-## Approval prompt
+## Historical approval prompt
 
-Approve Pass 4 implementation as scoped above?
+Pre-implementation approval prompt:
 
-Recommended answer: approve. This removes the remaining Python active-model allowlist from `generate_form.py` while preserving current generated runtime contracts, keeping ZR1/ZR1X inactive/unpromoted, and leaving the larger production-vs-draft route unification for a later pass.
+Historical question: should Pass 4 implementation proceed as scoped above?
+
+Recommended answer was: approve. This removes the remaining Python active-model allowlist from `generate_form.py` while preserving current generated runtime contracts, keeping ZR1/ZR1X inactive/unpromoted, and leaving the larger production-vs-draft route unification for a later pass.
+
+## Implementation evidence
+
+Implemented 2026-06-21.
+
+Changed code/tests:
+
+- `scripts/corvette_form_generator/model_configs.py`
+  - Added `REQUIRED_GENERATION_SOURCE_ROLES` and `discover_generation_model_configs()`.
+  - Discovery reads `stingray_master.xlsx` metadata read-only.
+  - Active/generatable models must have complete exact-match active `model_workbook_sources` roles, positive `model_master.expected_variant_count`, and exact-match active `model_variants` count equal to expected count.
+  - Per-model config constants were removed.
+- `scripts/generate_form.py`
+  - Removed hardcoded `MODEL_CONFIGS` and argparse choices.
+  - Validates requested model against workbook-discovered active/generatable configs.
+  - Keeps `PRODUCTION_MODEL_KEYS = {"stingray"}` unchanged.
+- `scripts/corvette_form_generator/production.py`
+  - Uses `base_model_config("stingray")` instead of `STINGRAY_MODEL`.
+- `tests/test_model_config_metadata.py`
+  - Added discovery tests for active metadata, inactive scaffold exclusion, exact source-role matching, shared/global row rejection, positive expected variant count, active variant rows, variant-count matching, and promotion independence.
+- `tests/test_generate_form_model_discovery_cli.py`
+  - Added CLI smoke/negative tests for Stingray production-path generation and inactive `zr1` rejection.
+- `tests/stingray-generator-stability.test.mjs`
+  - Added source guard against reintroducing hardcoded `MODEL_CONFIGS` / per-model constants / argparse choices.
+- `tests/test_runtime_contract_builder.py`
+  - Replaced `GRAND_SPORT_MODEL` import with `base_model_config("grand_sport")`.
+
+Validation summary:
+
+- `origin/main` verified as ancestor of `HEAD`; branch was not stale (`HEAD...origin/main` count `0\t0`).
+- `.venv/bin/python -m py_compile scripts/generate_form.py scripts/build_rule_sources.py scripts/corvette_form_generator/model_config.py scripts/corvette_form_generator/model_configs.py scripts/corvette_form_generator/production.py scripts/corvette_form_generator/runtime_metadata.py` — pass.
+- `rg -n "MODEL_CONFIGS|STINGRAY_MODEL|GRAND_SPORT_MODEL|Z06_MODEL|choices=sorted\(MODEL_CONFIGS\)" scripts tests` — active hits only in the new source guard assertions.
+- `.venv/bin/python -m pytest tests/test_model_config_metadata.py tests/test_generate_form_model_discovery_cli.py tests/test_runtime_contract_builder.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py -q` — 47 passed.
+- `PYTHONPATH=scripts .venv/bin/python` discovery probe — discovered `['stingray', 'grand_sport', 'z06']`; all have six active variants and expected count 6.
+- Negative CLI probe: `.venv/bin/python scripts/generate_form.py --model zr1` rejects `zr1` with `Unsupported or inactive model 'zr1'. Active generatable models: grand_sport, stingray, z06`.
+- `.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx` — valid, 0 issues.
+- `.venv/bin/python scripts/generate_form.py --model stingray` — pass, `choices=1422`, `rules=144`, `validation_errors=0`.
+- `.venv/bin/python scripts/generate_form.py --model grand_sport` — pass, `choices=1422`, `rules=122`, `validation_warnings=1`.
+- `.venv/bin/python scripts/generate_form.py --model z06` — pass, `choices=1428`, `rules=73`, `validation_warnings=1`.
+- `.venv/bin/python scripts/generate_registry.py` — pass, published `stingray`, `grandSport`, `z06` from runtime contracts.
+- `.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx` — valid, 0 issues.
+- Runtime-contract parity checks against `/tmp/27vette-pass4-model-discovery-20260621T185808Z` — all matched after timestamp normalization for Stingray, Grand Sport, Z06 runtime contracts and `form-output/stingray-form-data.json`.
+- Generated `form-output/*` and `form-app/data.js` timestamp-only churn was restored; no generated artifact diff is retained.
+
+Node gate results:
+
+- Passed:
+  - `node --test tests/stingray-form-regression.test.mjs`
+  - `node --test tests/workbook-schema-standardization.test.mjs`
+  - `node --test tests/grand-sport-contract-preview.test.mjs`
+  - `node --test tests/grand-sport-draft-data.test.mjs`
+  - `node --test tests/z06-form-data-draft.test.mjs`
+  - `node --test tests/multi-model-runtime-switching.test.mjs`
+  - `node --test tests/workbook-visual-copy-standardization.test.mjs`
+  - `node --test tests/z06-runtime-promotion.test.mjs`
+  - `node --test tests/z06-interior-accessory-cleanup.test.mjs`
+  - `node --test tests/z06-performance-package-interactions.test.mjs`
+  - `node --test tests/z06-runtime-rule-corrections.test.mjs`
+- Known pre-existing/stale expectation failures, not patched in this pass:
+  - `node --test tests/stingray-generator-stability.test.mjs` fails only in the existing Z06 order-summary expectation: actual workbook data includes `required_charges / Required Charges / 15`; the new Pass 4 source guard in that file passed.
+  - `node --test tests/z06-contract-preview.test.mjs` fails because Z06 preview section count is now 12 vs stale expected 11, same required-charges surface.
+
+No workbook source rows were changed. No ZR1/ZR1X rows were activated or promoted.

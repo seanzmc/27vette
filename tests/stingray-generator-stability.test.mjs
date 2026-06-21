@@ -25,6 +25,7 @@ function loadAppData() {
 const jsonData = JSON.parse(fs.readFileSync("form-output/stingray-form-data.json", "utf8"));
 const appData = loadAppData();
 const generatorSource = fs.readFileSync("scripts/corvette_form_generator/production.py", "utf8");
+const generateFormSource = fs.readFileSync("scripts/generate_form.py", "utf8");
 const stingrayVariantIds = ["1lt_c07", "2lt_c07", "3lt_c07", "1lt_c67", "2lt_c67", "3lt_c67"];
 const grandSportVariantIds = ["1lt_e07", "2lt_e07", "3lt_e07", "1lt_e67", "2lt_e67", "3lt_e67"];
 const optionSourceHeaders = [
@@ -344,6 +345,13 @@ test("Stingray generator no longer performs routine workbook generated-sheet wri
   assert.match(generatorSource, /"workbook_backup": None/);
   assert.doesNotMatch(generatorSource, /\bwb\.save\(WORKBOOK_PATH\)/);
   assert.doesNotMatch(generatorSource, /write_app_data_registry/);
+});
+
+test("generate_form model discovery is workbook-owned, not a hardcoded active-model map", () => {
+  assert.doesNotMatch(generateFormSource, /MODEL_CONFIGS\s*[:=]/);
+  assert.doesNotMatch(generateFormSource, /choices\s*=\s*sorted\(MODEL_CONFIGS\)/);
+  assert.doesNotMatch(generateFormSource, /STINGRAY_MODEL|GRAND_SPORT_MODEL|Z06_MODEL/);
+  assert.match(generateFormSource, /discover_generation_model_configs/);
 });
 
 test("generated JSON and static app data stay synchronized apart from timestamp", () => {

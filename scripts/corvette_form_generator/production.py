@@ -30,7 +30,7 @@ from corvette_form_generator.mapping import (
     status_to_label,
     step_for_section as shared_step_for_section,
 )
-from corvette_form_generator.model_configs import STINGRAY_MODEL
+from corvette_form_generator.model_configs import base_model_config
 from corvette_form_generator.output import write_json_output
 from corvette_form_generator.rules import (
     entity_section,
@@ -61,7 +61,7 @@ from corvette_form_generator.validation import validation_error_count
 from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet
 
 
-MODEL_CONFIG = STINGRAY_MODEL
+MODEL_CONFIG = base_model_config("stingray")
 ROOT = MODEL_CONFIG.root
 WORKBOOK_PATH = MODEL_CONFIG.workbook_path
 OUTPUT_DIR = MODEL_CONFIG.output_dir
@@ -159,7 +159,7 @@ def main() -> None:
     global MODEL_CONFIG
 
     wb = load_workbook(WORKBOOK_PATH)
-    MODEL_CONFIG = load_model_config_overrides(wb, STINGRAY_MODEL)
+    MODEL_CONFIG = load_model_config_overrides(wb, base_model_config("stingray"))
 
     variants_raw = rows_from_sheet(wb, "variant_master")
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}

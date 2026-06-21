@@ -13,8 +13,10 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from corvette_form_generator.model_configs import GRAND_SPORT_MODEL  # noqa: E402
+from corvette_form_generator.model_configs import base_model_config  # noqa: E402
 from corvette_form_generator.registry_promotion import live_contract_data  # noqa: E402
+
+BASE_GRAND_SPORT_CONFIG = base_model_config("grand_sport")
 from corvette_form_generator.runtime_contract import build_model_runtime_contract  # noqa: E402
 
 
@@ -58,7 +60,7 @@ class RuntimeContractBuilderTests(unittest.TestCase):
         }
 
         expected = live_contract_data(draft)
-        actual = build_model_runtime_contract(GRAND_SPORT_MODEL, draft)
+        actual = build_model_runtime_contract(BASE_GRAND_SPORT_CONFIG, draft)
 
         self.assertEqual(actual, expected)
         self.assertEqual(actual["dataset"]["status"], "runtime_active")

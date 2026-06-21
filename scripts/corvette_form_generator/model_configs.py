@@ -13,7 +13,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from openpyxl import load_workbook
+
 from corvette_form_generator.model_config import ModelConfig
+from corvette_form_generator.runtime_metadata import load_model_config_overrides, truthy
+from corvette_form_generator.workbook import clean, intish, rows_from_sheet
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -165,6 +169,21 @@ _MODEL_NOTES = {
     ),
 }
 
+REQUIRED_GENERATION_SOURCE_ROLES = (
+    "source_option_sheet",
+    "status_sheet",
+    "rule_mapping_sheet",
+    "price_rules_sheet",
+    "rule_groups_sheet",
+    "rule_group_members_sheet",
+    "exclusive_groups_sheet",
+    "exclusive_group_members_sheet",
+    "color_overrides_sheet",
+    "interior_source_sheet",
+)
+OPTIONAL_GENERATION_SOURCE_ROLES = ("variant_option_overrides_sheet",)
+_GENERATION_SOURCE_ROLES = frozenset(REQUIRED_GENERATION_SOURCE_ROLES + OPTIONAL_GENERATION_SOURCE_ROLES)
+
 
 def base_model_config(model_key: str) -> ModelConfig:
     """Build the Python-side base config for any model key.
@@ -205,6 +224,100 @@ def base_model_config(model_key: str) -> ModelConfig:
     )
 
 
-STINGRAY_MODEL = base_model_config("stingray")
-GRAND_SPORT_MODEL = base_model_config("grand_sport")
-Z06_MODEL = base_model_config("z06")
+def _metadata_rows(wb, sheet_name: str) -> list[dict[str, str]]:
+    if sheet_name not in wb.sheetnames:
+        raise ValueError(f"Missing required workbook metadata sheet {sheet_name!r}.")
+    return rows_from_sheet(wb, sheet_name)
+
+
+def _active_exact_model_rows(wb, sheet_name: str, model_key: str) -> list[dict[str, str]]:
+    model = clean(model_key).lower()
+    return [
+        row
+        for row in _metadata_rows(wb, sheet_name)
+        if clean(row.get("model_key")).lower() == model
+        and truthy(row.get("active", "True"), default=True)
+    ]
+
+
+def _active_model_master_rows(wb) -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for row in _metadata_rows(wb, "model_master"):
+        model_key = clean(row.get("model_key")).lower()
+        if not model_key or not truthy(row.get("active", "True"), default=True):
+            continue
+        if model_key in seen:
+            raise ValueError(f"Duplicate active model_master rows for model {model_key}")
+        seen.add(model_key)
+        rows.append(row)
+    return rows
+
+
+def _duplicate_values(values: list[str]) -> list[str]:
+    return sorted({value for value in values if values.count(value) > 1})
+
+
+def _require_generation_sources(wb, model_key: str) -> None:
+    rows = _active_exact_model_rows(wb, "model_workbook_sources", model_key)
+    roles = [clean(row.get("source_role")) for row in rows if clean(row.get("source_role"))]
+    duplicate_roles = _duplicate_values(roles)
+    if duplicate_roles:
+        raise ValueError(
+            f"Duplicate active model_workbook_sources roles for {model_key}: {', '.join(duplicate_roles)}"
+        )
+
+    unknown_roles = sorted(set(roles) - _GENERATION_SOURCE_ROLES)
+    if unknown_roles:
+        raise ValueError(f"Unknown model_workbook_sources roles for {model_key}: {', '.join(unknown_roles)}")
+
+    missing_roles = [role for role in REQUIRED_GENERATION_SOURCE_ROLES if role not in roles]
+    if missing_roles:
+        raise ValueError(
+            f"Model {model_key} is missing required active model_workbook_sources roles: "
+            f"{', '.join(missing_roles)}"
+        )
+
+
+def _require_generation_variants(wb, model_key: str, model_row: dict[str, str]) -> None:
+    expected_variant_count = intish(model_row.get("expected_variant_count"), 0)
+    if expected_variant_count <= 0:
+        raise ValueError(f"Model {model_key} requires model_master.expected_variant_count greater than 0.")
+
+    rows = _active_exact_model_rows(wb, "model_variants", model_key)
+    if not rows:
+        raise ValueError(f"Model {model_key} requires active model_variants rows.")
+
+    variant_ids = [clean(row.get("variant_id")) for row in rows if clean(row.get("variant_id"))]
+    duplicate_variants = _duplicate_values(variant_ids)
+    if duplicate_variants:
+        raise ValueError(
+            f"Duplicate active model_variants rows for {model_key}: {', '.join(duplicate_variants)}"
+        )
+    if len(variant_ids) != expected_variant_count:
+        raise ValueError(
+            f"Model {model_key} expected {expected_variant_count} active model_variants rows; "
+            f"found {len(variant_ids)}."
+        )
+
+
+def discover_generation_model_configs(workbook_path: Path = WORKBOOK_PATH) -> dict[str, ModelConfig]:
+    """Return workbook-discovered configs for active/generatable models.
+
+    Discovery is stricter than runtime compatibility fallback metadata: a model
+    is generatable only when it has an active model_master row, complete
+    exact-match active source roles, and exact-match active variant rows whose
+    count equals model_master.expected_variant_count.
+    """
+
+    wb = load_workbook(workbook_path, read_only=True, data_only=True)
+    try:
+        configs: dict[str, ModelConfig] = {}
+        for model_row in _active_model_master_rows(wb):
+            model_key = clean(model_row.get("model_key")).lower()
+            _require_generation_sources(wb, model_key)
+            _require_generation_variants(wb, model_key, model_row)
+            configs[model_key] = load_model_config_overrides(wb, base_model_config(model_key))
+        return configs
+    finally:
+        wb.close()

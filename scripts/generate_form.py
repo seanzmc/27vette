@@ -17,8 +17,6 @@ from __future__ import annotations
 import argparse
 import json
 
-from openpyxl import load_workbook
-
 from corvette_form_generator.inspection import (
     build_contract_preview,
     build_form_data_draft,
@@ -29,24 +27,10 @@ from corvette_form_generator.inspection import (
     write_runtime_contract_artifact,
 )
 from corvette_form_generator.model_config import ModelConfig
-from corvette_form_generator.model_configs import GRAND_SPORT_MODEL, STINGRAY_MODEL, Z06_MODEL
+from corvette_form_generator.model_configs import discover_generation_model_configs
 from corvette_form_generator.registry_promotion import export_slug, runtime_contract_artifact_path
-from corvette_form_generator.runtime_metadata import load_model_config_overrides
 
-MODEL_CONFIGS: dict[str, ModelConfig] = {
-    "stingray": STINGRAY_MODEL,
-    "grand_sport": GRAND_SPORT_MODEL,
-    "z06": Z06_MODEL,
-}
 PRODUCTION_MODEL_KEYS = {"stingray"}
-
-
-def resolve_config(base_config: ModelConfig) -> ModelConfig:
-    wb = load_workbook(base_config.workbook_path, read_only=True, data_only=True)
-    try:
-        return load_model_config_overrides(wb, base_config)
-    finally:
-        wb.close()
 
 
 def run_production(base_config: ModelConfig) -> None:
@@ -56,7 +40,7 @@ def run_production(base_config: ModelConfig) -> None:
 
 
 def run_draft(base_config: ModelConfig) -> None:
-    config = resolve_config(base_config)
+    config = base_config
     slug = export_slug(config.model_key)
     inspection_prefix = f"{slug}-inspection"
     rule_audit_path = config.output_dir / "inspection" / f"{slug}-rule-audit.json"
@@ -133,12 +117,16 @@ def main() -> None:
     parser.add_argument(
         "--model",
         required=True,
-        choices=sorted(MODEL_CONFIGS),
         help="model key to generate",
     )
     args = parser.parse_args()
 
-    base_config = MODEL_CONFIGS[args.model]
+    configs = discover_generation_model_configs()
+    if args.model not in configs:
+        active_models = ", ".join(sorted(configs)) or "none"
+        parser.error(f"Unsupported or inactive model {args.model!r}. Active generatable models: {active_models}")
+
+    base_config = configs[args.model]
     if args.model in PRODUCTION_MODEL_KEYS:
         run_production(base_config)
     else:

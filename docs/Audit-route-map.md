@@ -245,9 +245,9 @@ Shared Stingray-only workbook `form_*` generated sheets are retired from the rou
 
 ### Pass 4 — Make model discovery workbook-owned
 
-Spec: `docs/audit-cleanup/pass-4-workbook-owned-model-discovery-spec.md`.
+Status: implemented in `docs/audit-cleanup/pass-4-workbook-owned-model-discovery-spec.md`.
 
-Replace the hardcoded `MODEL_CONFIGS` list with workbook-driven model discovery from `model_master` plus complete active `model_workbook_sources` rows.
+`generate_form.py` no longer keeps a hardcoded `MODEL_CONFIGS` active-model list. Active/generatable models are discovered from `model_master`, exact-match complete active `model_workbook_sources` rows, and valid exact-match active `model_variants` rows. `model_registry_promotion` remains a separate runtime-publication decision.
 
 Adding a future model should not require touching `generate_form.py`, but inactive scaffold rows must remain non-promoted unless the workbook metadata explicitly activates and promotes them.
 
@@ -284,4 +284,4 @@ One CLI entrypoint
 but two model-generation engines
 ```
 
-Next safe pass: make model discovery workbook-owned so adding a future model does not require editing `generate_form.py`, while keeping inactive scaffold rows non-promoted unless workbook metadata explicitly activates and promotes them.
+Next safe pass: Pass 5 gate and validator cleanup, starting with the smaller gate-reminder cleanup before touching schema-validator fallback assumptions.
