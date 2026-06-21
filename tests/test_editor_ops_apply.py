@@ -24,6 +24,7 @@ from corvette_form_generator.editor_ops import (  # noqa: E402
     coerce_value,
     extract_workbook,
     flatten_items,
+    gate_reminders,
     validate_batch,
 )
 
@@ -117,6 +118,25 @@ class CoerceTest(unittest.TestCase):
     def test_free_text_stripped(self):
         self.assertEqual(coerce_value("options", "option_name", "  X  "), "X")
         self.assertIsNone(coerce_value("options", "description", ""))
+
+
+class GateRemindersTest(unittest.TestCase):
+    def test_grand_sport_default_reminders_exclude_optional_audit_gate(self):
+        reminders = gate_reminders({"grand_sport"})
+
+        self.assertIn(".venv/bin/python scripts/generate_form.py --model grand_sport", reminders)
+        self.assertIn(".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx", reminders)
+        self.assertIn("node --test tests/grand-sport-contract-preview.test.mjs", reminders)
+        self.assertIn("node --test tests/grand-sport-draft-data.test.mjs", reminders)
+        self.assertNotIn("node --test tests/grand-sport-rule-audit.test.mjs", reminders)
+
+    def test_multi_model_reminders_dedupe_schema_validation(self):
+        reminders = gate_reminders({"stingray", "grand_sport"})
+
+        self.assertEqual(
+            reminders.count(".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx"),
+            1,
+        )
 
 
 # ─────────────────────────────────────────────────────────────
