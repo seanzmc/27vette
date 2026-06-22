@@ -1,6 +1,6 @@
 # Pass 6B — Optional Inspection Artifact Emission Spec
 
-Status: Spec only. Do not implement until approved.
+Status: Implemented 2026-06-21.
 Date: 2026-06-21
 Recommended reasoning level for implementation agent: high.
 
@@ -453,6 +453,93 @@ After Pass 6C is proven, handle business-rule cleanup as separate workbook/runti
 5. Z06 option-ID suffix / no-RPO drift.
 6. residual copy allowlist decisions.
 
-## Approval prompt
+## Implementation completion — 2026-06-21
 
-Approve Pass 6B implementation as scoped above?
+Changed files:
+
+- `scripts/generate_form.py`
+- `scripts/corvette_form_generator/model_generation.py`
+- `tests/test_generate_form_model_discovery_cli.py`
+- `tests/test_model_generation_route.py`
+- `tests/grand-sport-contract-preview.test.mjs`
+- `tests/grand-sport-draft-data.test.mjs`
+- `tests/grand-sport-rule-audit.test.mjs`
+- `tests/z06-contract-preview.test.mjs`
+- `tests/z06-form-data-draft.test.mjs`
+- `tests/z06-interior-accessory-cleanup.test.mjs`
+- `README.md`
+- `docs/Audit-route-map.md`
+- `docs/audit-cleanup/pass-6b-inspection-artifact-policy-spec.md`
+
+Deleted routine checked-in review artifacts:
+
+- `form-output/inspection/grand-sport-inspection.json`
+- `form-output/inspection/grand-sport-inspection.md`
+- `form-output/inspection/grand-sport-contract-preview.json`
+- `form-output/inspection/grand-sport-contract-preview.md`
+- `form-output/inspection/grand-sport-form-data-draft.json`
+- `form-output/inspection/grand-sport-form-data-draft.md`
+- `form-output/inspection/z06-inspection.json`
+- `form-output/inspection/z06-inspection.md`
+- `form-output/inspection/z06-contract-preview.json`
+- `form-output/inspection/z06-contract-preview.md`
+- `form-output/inspection/z06-form-data-draft.json`
+- `form-output/inspection/z06-form-data-draft.md`
+
+Preserved generated artifacts:
+
+- `form-output/runtime/*.json` retained checked-in baseline content after timestamp-only validation churn was restored.
+- `form-output/stingray-form-data.json` retained checked-in baseline content after timestamp-only validation churn was restored.
+- `form-output/stingray-form-data.csv` stayed byte-identical; SHA-256 remained `1168abba23572a3bbfe9e86d62c2c43e421c47a7da8a54cc08a8e8426f464364`.
+- `form-app/data.js` retained checked-in baseline content after timestamp-only validation churn was restored.
+- `form-output/inspection/grand-sport-rule-audit.json` / `.md` were kept and restored after optional audit test regeneration.
+
+Default-generation evidence:
+
+- `generate_form.py --model grand_sport` and `--model z06` stdout retained Pass 6A keys but returned `{}` for `inspection_artifacts`, `preview_artifacts`, and `draft_artifacts`.
+- Default generation for Grand Sport and Z06 did not recreate any of the twelve deleted inspection/preview/draft files under `form-output/inspection/`.
+
+Explicit review-mode evidence:
+
+- `generate_form.py --model grand_sport --emit-inspection --inspection-output /tmp/27vette-pass6b-grand-sport-inspection` emitted inspection, preview, and draft JSON/Markdown files to the requested temp directory.
+- `generate_form.py --model z06 --emit-inspection --inspection-output /tmp/27vette-pass6b-z06-inspection` emitted inspection, preview, and draft JSON/Markdown files to the requested temp directory.
+- Review-mode JSON matched the before-baseline artifacts with `scripts/compare-generated-contracts.mjs` for both models and all three JSON artifact types.
+
+Parity evidence:
+
+- `scripts/compare-generated-contracts.mjs` passed for all three runtime contracts against `/tmp/27vette-pass6b-before/runtime`.
+- `scripts/compare-generated-contracts.mjs` passed for `form-output/stingray-form-data.json` against `/tmp/27vette-pass6b-before/compat/stingray-form-data.json`.
+- `cmp -s` passed for `form-output/stingray-form-data.csv` against `/tmp/27vette-pass6b-before/compat/stingray-form-data.csv`.
+
+Gates run:
+
+- RED focused Python tests before implementation: `6 failed, 1 passed` in `tests/test_generate_form_model_discovery_cli.py` and `tests/test_model_generation_route.py`.
+- Focused Python tests after implementation: `7 passed`.
+- `py_compile` passed for `scripts/generate_form.py`, `scripts/corvette_form_generator/model_generation.py`, `scripts/corvette_form_generator/inspection.py`, and `scripts/corvette_form_generator/production.py`.
+- Targeted Node review/audit tests passed:
+  - `tests/grand-sport-contract-preview.test.mjs`: `6` passed.
+  - `tests/grand-sport-draft-data.test.mjs`: `19` passed.
+  - `tests/z06-contract-preview.test.mjs`: `3` passed.
+  - `tests/z06-form-data-draft.test.mjs`: `23` passed.
+  - `tests/z06-interior-accessory-cleanup.test.mjs`: `7` passed.
+  - `tests/grand-sport-rule-audit.test.mjs`: `10` passed.
+- Final broad gate command exited `0`:
+  - `scripts/validate_workbook_schema.py stingray_master.xlsx`
+  - sequential Node tests from the full model/runtime set in `AGENTS.md`
+  - Python pytest for CLI/model-generation route, runtime contract builder, model config metadata, registry promotion metadata, and schema validation metadata: `57 passed`.
+- Final parity and absence check exited `0`.
+
+Docs updated:
+
+- `README.md` now describes Grand Sport/Z06 inspection artifacts as explicit review-mode output.
+- `docs/Audit-route-map.md` now marks Pass 6B implemented and moves source-row assembly unification to Pass 6C.
+
+Residual risks:
+
+- Source-row assembly is still split by `TEMPORARY_ROUTE_ENGINES`: Stingray uses `production.py`, Grand Sport/Z06 use inspection/draft assembly.
+- Stingray compatibility JSON/CSV remains intentionally unchanged and is not retired by this pass.
+- Optional review artifacts are no longer checked in for Grand Sport/Z06; developers must use `--emit-inspection --inspection-output <dir>` when manual review files are needed.
+
+Recommended next pass:
+
+- Pass 6C: source-row assembly route unification. Keep it parity-first and exclude GBA/ZYC, `runtime_action`, `body_style_scope`, exclusive-group drift, and option-ID cleanup unless separately scoped.
