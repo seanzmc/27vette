@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
+
+const reviewDir = "/tmp/27vette-z06-interior-accessory-draft-test";
+const draftPath = `${reviewDir}/z06-form-data-draft.json`;
+let cachedDraft;
 
 function makeElement() {
   return {
@@ -130,7 +135,18 @@ function autoAddedRpos(runtime) {
 }
 
 function draftData() {
-  return JSON.parse(fs.readFileSync("form-output/inspection/z06-form-data-draft.json", "utf8"));
+  if (cachedDraft) return cachedDraft;
+  fs.rmSync(reviewDir, { recursive: true, force: true });
+  execFileSync(
+    ".venv/bin/python",
+    ["scripts/generate_form.py", "--model", "z06", "--emit-inspection", "--inspection-output", reviewDir],
+    {
+      encoding: "utf8",
+      stdio: "pipe",
+    }
+  );
+  cachedDraft = JSON.parse(fs.readFileSync(draftPath, "utf8"));
+  return cachedDraft;
 }
 
 test("Z06 UQT follows LZ trim-scoped selectable and standard-equipment contract", () => {

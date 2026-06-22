@@ -41,8 +41,8 @@ The runtime should render and evaluate the generated contract. It should not inf
 - `docs/` - current planning, review, workbook editor, and ingest/schema docs. The stale workbook sheet index was archived to `docs/archive/workbook-sheet-index-2026-06-12.md`.
 - `stingray_master.xlsx` - canonical workbook, source/metadata sheets, and generated `form_*` sheets.
 - `form-app/` - static app shell, styles, runtime behavior, and generated data bundle.
-- `form-output/` - generated Stingray JSON/CSV compatibility outputs, clean promoted runtime contracts under `form-output/runtime/`, and Grand Sport/Z06 inspection, contract preview, draft, and rule-audit artifacts under `form-output/inspection/`.
-- `scripts/generate_form.py` - single model-artifact generator entry point. `--model stingray` writes form sheets plus Stingray JSON/CSV compatibility outputs and a clean runtime contract; `--model grand_sport` and `--model z06` emit inspection/preview/draft artifacts plus clean runtime contracts.
+- `form-output/` - generated Stingray JSON/CSV compatibility outputs, clean promoted runtime contracts under `form-output/runtime/`, and optional Grand Sport/Z06 rule-audit artifacts under `form-output/inspection/`.
+- `scripts/generate_form.py` - single model-artifact generator entry point. `--model stingray` writes Stingray JSON/CSV compatibility outputs and a clean runtime contract; `--model grand_sport` and `--model z06` write clean runtime contracts by default. Use `--emit-inspection --inspection-output <dir>` for optional inspection/preview/draft review artifacts.
 - `scripts/generate_registry.py` - publishes promoted runtime artifacts from `model_registry_promotion` into `form-app/data.js`.
 - `scripts/promote_model.py` - workbook-driven runtime promotion (`--model <key> --write`).
 - `scripts/build_rule_sources.py` - opt-in workbook rule-source audit/report helper; not part of default model readiness.
@@ -271,7 +271,7 @@ node --test tests/z06-performance-package-interactions.test.mjs
 node --test tests/z06-runtime-rule-corrections.test.mjs
 ```
 
-The Grand Sport and Z06 generators write inspection, contract preview, and draft artifacts under `form-output/inspection/`, then write clean promoted runtime contracts under `form-output/runtime/`. `scripts/generate_registry.py` embeds the promoted `form-output/runtime/*-runtime-contract.json` artifacts verbatim; draft-only provenance never reaches `form-app/data.js`. By design, model generator runs do not directly mutate `form-app/data.js`.
+The Grand Sport and Z06 generators build inspection/preview/draft data in memory but write only clean promoted runtime contracts under `form-output/runtime/` by default. Use `scripts/generate_form.py --model <model> --emit-inspection --inspection-output <dir>` when review artifacts are needed. `scripts/generate_registry.py` embeds the promoted `form-output/runtime/*-runtime-contract.json` artifacts verbatim; draft-only provenance never reaches `form-app/data.js`. By design, model generator runs do not directly mutate `form-app/data.js`.
 
 Optional Grand Sport audit/report refresh:
 

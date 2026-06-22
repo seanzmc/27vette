@@ -42,7 +42,7 @@ Stingray now reaches registry promotion as `artifact_type=runtime_contract`; the
 
 **Grand Sport / Z06 route**
 
-`stingray_master.xlsx` → `scripts/generate_form.py --model grand_sport|z06` → `model_generation.generate_model_artifacts()` → `inspection.py` source-row assembly → writes inspection report, contract preview, and form-data draft under `form-output/inspection/`, plus clean runtime contracts under `form-output/runtime/` → `generate_registry.py` → `form-app/data.js`.
+`stingray_master.xlsx` → `scripts/generate_form.py --model grand_sport|z06` → `model_generation.generate_model_artifacts()` → `inspection.py` source-row assembly → writes clean runtime contracts under `form-output/runtime/` by default → `generate_registry.py` → `form-app/data.js`. Optional review mode writes inspection report, contract preview, and form-data draft artifacts only when `--emit-inspection --inspection-output <dir>` is passed.
 
 The promoted Grand Sport/Z06 workbook rows point at the clean runtime-contract artifacts under `form-output/runtime/`, and `generate_registry.py` embeds those clean contracts.
 
@@ -251,7 +251,7 @@ Because this pass changes workbook promotion metadata, it must use the workbook 
 
 Status: implemented in `docs/audit-cleanup/pass-3-form-sheet-retirement-policy-spec.md`.
 
-Shared Stingray-only workbook `form_*` generated sheets are retired from the routine runtime path. Active generated runtime contracts live under `form-output/runtime/`; optional inspection/preview/draft artifacts remain under `form-output/inspection/`. Do not recreate workbook generated sheets unless a future opt-in debug/report export pass names the consumer.
+Shared Stingray-only workbook `form_*` generated sheets are retired from the routine runtime path. Active generated runtime contracts live under `form-output/runtime/`; optional inspection/preview/draft artifacts are explicit review outputs via `--emit-inspection --inspection-output <dir>`. Do not recreate workbook generated sheets unless a future opt-in debug/report export pass names the consumer.
 
 ### Pass 4 — Make model discovery workbook-owned
 
@@ -276,7 +276,13 @@ Status: implemented in `docs/audit-cleanup/pass-6-route-unification-spec.md`.
 
 Pass 6A made `generate_form.py` delegate all active models through `model_generation.generate_model_artifacts()`, named the stdout/output-artifact contract, and preserved parity against freshly regenerated current-route baselines. It intentionally kept the source-row assembly split in place: Stingray still uses production assembly, and Grand Sport/Z06 still use inspection/draft assembly.
 
-### Pass 6B — Source-row assembly route unification
+### Pass 6B — Optional inspection artifact emission
+
+Status: implemented in `docs/audit-cleanup/pass-6b-inspection-artifact-policy-spec.md`.
+
+Pass 6B made Grand Sport/Z06 normal generation write only clean runtime contracts by default, while keeping inspection/preview/draft artifacts available through explicit review mode. It removed routine checked-in Grand Sport/Z06 inspection/preview/draft artifacts and moved tests that need draft/preview data to temp review output. It preserved the source-row assembly split.
+
+### Pass 6C — Source-row assembly route unification
 
 Status: not implemented. Needs its own spec before edits.
 
@@ -307,4 +313,4 @@ one output orchestration layer
 but two source-row assembly engines
 ```
 
-Next safe pass: write Pass 6B for source-row assembly unification. Keep it parity-first and do not fold runtime product-hardcode cleanup or rule-field classification into the route pass unless separately scoped.
+Next safe pass: write Pass 6C for source-row assembly unification. Keep it parity-first and do not fold runtime product-hardcode cleanup or rule-field classification into the route pass unless separately scoped.

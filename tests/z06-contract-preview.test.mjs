@@ -3,17 +3,23 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 
-const previewPath = "form-output/inspection/z06-contract-preview.json";
-const previewMarkdownPath = "form-output/inspection/z06-contract-preview.md";
+const reviewDir = "/tmp/27vette-z06-contract-preview-test";
+const previewPath = `${reviewDir}/z06-contract-preview.json`;
+const previewMarkdownPath = `${reviewDir}/z06-contract-preview.md`;
 const appDataPath = "form-app/data.js";
 const expectedVariantIds = ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"];
 
 function generatePreviewWithoutAppMutation() {
+  fs.rmSync(reviewDir, { recursive: true, force: true });
   const beforeAppData = fs.readFileSync(appDataPath, "utf8");
-  execFileSync(".venv/bin/python", ["scripts/generate_form.py", "--model", "z06"], {
-    encoding: "utf8",
-    stdio: "pipe",
-  });
+  execFileSync(
+    ".venv/bin/python",
+    ["scripts/generate_form.py", "--model", "z06", "--emit-inspection", "--inspection-output", reviewDir],
+    {
+      encoding: "utf8",
+      stdio: "pipe",
+    }
+  );
   const afterAppData = fs.readFileSync(appDataPath, "utf8");
   assert.equal(afterAppData, beforeAppData, "Z06 preview generation must not mutate form-app/data.js");
   assert.ok(fs.existsSync(previewPath), "Z06 contract preview JSON should exist");

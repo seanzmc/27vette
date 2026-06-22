@@ -3,8 +3,9 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 
-const draftPath = "form-output/inspection/z06-form-data-draft.json";
-const draftMarkdownPath = "form-output/inspection/z06-form-data-draft.md";
+const reviewDir = "/tmp/27vette-z06-form-data-draft-test";
+const draftPath = `${reviewDir}/z06-form-data-draft.json`;
+const draftMarkdownPath = `${reviewDir}/z06-form-data-draft.md`;
 const appDataPath = "form-app/data.js";
 const expectedVariantIds = ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"];
 const standardSections = new Set([
@@ -43,11 +44,16 @@ const fullLengthStripeOptionIds = [
 ];
 
 function generateDraftWithoutAppMutation() {
+  fs.rmSync(reviewDir, { recursive: true, force: true });
   const beforeAppData = fs.readFileSync(appDataPath, "utf8");
-  execFileSync(".venv/bin/python", ["scripts/generate_form.py", "--model", "z06"], {
-    encoding: "utf8",
-    stdio: "pipe",
-  });
+  execFileSync(
+    ".venv/bin/python",
+    ["scripts/generate_form.py", "--model", "z06", "--emit-inspection", "--inspection-output", reviewDir],
+    {
+      encoding: "utf8",
+      stdio: "pipe",
+    }
+  );
   const afterAppData = fs.readFileSync(appDataPath, "utf8");
   assert.equal(afterAppData, beforeAppData, "Z06 draft generation must not mutate form-app/data.js");
   assert.ok(fs.existsSync(draftPath), "Z06 draft JSON should exist");

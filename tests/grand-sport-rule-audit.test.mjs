@@ -5,7 +5,8 @@ import test from "node:test";
 
 const auditPath = "form-output/inspection/grand-sport-rule-audit.json";
 const auditMarkdownPath = "form-output/inspection/grand-sport-rule-audit.md";
-const draftPath = "form-output/inspection/grand-sport-form-data-draft.json";
+const reviewDir = "/tmp/27vette-grand-sport-rule-audit-draft-test";
+const draftPath = `${reviewDir}/grand-sport-form-data-draft.json`;
 const heritageHashOptionIds = ["opt_17a_001", "opt_20a_001", "opt_55a_001", "opt_75a_001", "opt_97a_001", "opt_dx4_001"];
 const heritageCenterStripeOptionIds = ["opt_dmu_001", "opt_dmv_001", "opt_dmw_001", "opt_dmx_001", "opt_dmy_001"];
 const nonCenterStripeOptionIds = [
@@ -59,10 +60,15 @@ const buildOutput = JSON.parse(
     encoding: "utf8",
   })
 );
+fs.rmSync(reviewDir, { recursive: true, force: true });
 const generateOutput = JSON.parse(
-  execFileSync(".venv/bin/python", ["scripts/generate_form.py", "--model", "grand_sport"], {
-    encoding: "utf8",
-  })
+  execFileSync(
+    ".venv/bin/python",
+    ["scripts/generate_form.py", "--model", "grand_sport", "--emit-inspection", "--inspection-output", reviewDir],
+    {
+      encoding: "utf8",
+    }
+  )
 );
 const audit = JSON.parse(fs.readFileSync(auditPath, "utf8"));
 const draft = JSON.parse(fs.readFileSync(draftPath, "utf8"));

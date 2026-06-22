@@ -45,6 +45,8 @@ Current evidence:
   - `form-output/runtime/z06-runtime-contract.json`
 - `scripts/generate_registry.py` consumes promoted runtime contracts from workbook promotion metadata and writes `form-app/data.js`.
 - `tests/grand-sport-contract-preview.test.mjs`, `tests/grand-sport-draft-data.test.mjs`, `tests/z06-contract-preview.test.mjs`, and `tests/z06-form-data-draft.test.mjs` currently shell out to `generate_form.py` and read `form-output/inspection/*` files.
+- `tests/z06-interior-accessory-cleanup.test.mjs` currently reads `form-output/inspection/z06-form-data-draft.json` directly.
+- `tests/grand-sport-rule-audit.test.mjs` currently reads `form-output/inspection/grand-sport-form-data-draft.json` after running default `generate_form.py --model grand_sport`.
 - `tests/test_generate_form_model_discovery_cli.py` currently expects Grand Sport/Z06 default stdout to contain non-empty `inspection_artifacts`, `preview_artifacts`, and `draft_artifacts` paths.
 - `form-output/inspection/grand-sport-rule-audit.json` / `.md` are produced by optional audit tooling, not by the normal `generate_form.py` route. They are outside the default-output slimming target.
 
@@ -150,6 +152,16 @@ Test files:
 - `tests/z06-form-data-draft.test.mjs`
   - Same temp review-output or direct-builder pattern for Z06 draft.
 
+- `tests/z06-interior-accessory-cleanup.test.mjs`
+  - Stop reading `form-output/inspection/z06-form-data-draft.json` from tracked default output.
+  - Use temp explicit review output or direct `build_form_data_draft()` output.
+  - Keep existing interior/accessory assertions unchanged.
+
+- `tests/grand-sport-rule-audit.test.mjs`
+  - Stop depending on default `generate_form.py --model grand_sport` to recreate `form-output/inspection/grand-sport-form-data-draft.json`.
+  - Keep optional rule-audit coverage runnable by generating the draft into a temp review output or direct builder fixture before reading it.
+  - Keep `scripts/build_rule_sources.py --model grand_sport` and `grand-sport-rule-audit.*` behavior unchanged.
+
 Docs/spec files:
 
 - `docs/audit-cleanup/pass-6b-inspection-artifact-policy-spec.md`
@@ -203,6 +215,8 @@ Generated artifacts to keep:
 
 4. Move tests off default `form-output/inspection` side effects.
    - Update preview/draft tests to use temp explicit review output or direct builders.
+   - Update `tests/z06-interior-accessory-cleanup.test.mjs` so it does not read the tracked Z06 draft file.
+   - Update `tests/grand-sport-rule-audit.test.mjs` so optional audit coverage stays runnable without default generation recreating the tracked Grand Sport draft file.
    - Keep assertions unchanged where possible.
 
 5. Remove routine tracked inspection/preview/draft files.
@@ -326,6 +340,23 @@ node scripts/compare-generated-contracts.mjs "$BASE/grand-sport-runtime-contract
 node scripts/compare-generated-contracts.mjs "$BASE/z06-runtime-contract.json" form-output/runtime/z06-runtime-contract.json
 node scripts/compare-generated-contracts.mjs "$BASE/stingray-form-data.json" form-output/stingray-form-data.json
 cmp -s "$BASE/stingray-form-data.csv" form-output/stingray-form-data.csv
+
+for path in \
+  form-output/inspection/grand-sport-inspection.json \
+  form-output/inspection/grand-sport-inspection.md \
+  form-output/inspection/grand-sport-contract-preview.json \
+  form-output/inspection/grand-sport-contract-preview.md \
+  form-output/inspection/grand-sport-form-data-draft.json \
+  form-output/inspection/grand-sport-form-data-draft.md \
+  form-output/inspection/z06-inspection.json \
+  form-output/inspection/z06-inspection.md \
+  form-output/inspection/z06-contract-preview.json \
+  form-output/inspection/z06-contract-preview.md \
+  form-output/inspection/z06-form-data-draft.json \
+  form-output/inspection/z06-form-data-draft.md
+  do
+    test ! -e "$path" || { echo "default generation recreated stale inspection artifact: $path"; exit 1; }
+  done
 ```
 
 Explicit review output smoke:
@@ -345,11 +376,14 @@ node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
 node --test tests/z06-contract-preview.test.mjs
 node --test tests/z06-form-data-draft.test.mjs
-node --test tests/grand-sport-contract-preview.test.mjs
-node --test tests/grand-sport-draft-data.test.mjs
-node --test tests/z06-contract-preview.test.mjs
-node --test tests/z06-form-data-draft.test.mjs
+node --test tests/z06-interior-accessory-cleanup.test.mjs
 node --test tests/multi-model-runtime-switching.test.mjs
+```
+
+Optional audit path still runnable:
+
+```sh
+node --test tests/grand-sport-rule-audit.test.mjs
 ```
 
 Final docs/diff checks:

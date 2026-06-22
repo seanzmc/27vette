@@ -6,6 +6,8 @@ orchestration behind one model-neutral entrypoint.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from corvette_form_generator.inspection import (
@@ -22,6 +24,14 @@ from corvette_form_generator.registry_promotion import export_slug, runtime_cont
 
 TEMPORARY_ROUTE_ENGINES = {"stingray": "production"}
 DEFAULT_ROUTE_ENGINE = "inspection_draft"
+
+
+@dataclass(frozen=True)
+class GenerationOptions:
+    """Controls optional generated review artifacts without changing source assembly."""
+
+    emit_inspection: bool = False
+    inspection_output_dir: Path | None = None
 
 
 REQUIRED_RESULT_KEYS = (
@@ -83,11 +93,16 @@ def _generate_production(config: ModelConfig) -> dict[str, Any]:
     return _normalize_production_result(config, production.generate_production_artifacts(config))
 
 
-def _generate_inspection_draft(config: ModelConfig) -> dict[str, Any]:
+def _inspection_output_dir(config: ModelConfig, options: GenerationOptions) -> Path:
+    return options.inspection_output_dir or config.output_dir / "inspection"
+
+
+def _generate_inspection_draft(config: ModelConfig, options: GenerationOptions) -> dict[str, Any]:
     slug = export_slug(config.model_key)
     inspection_prefix = f"{slug}-inspection"
     rule_audit_path = config.output_dir / "inspection" / f"{slug}-rule-audit.json"
     rule_audit_markdown_path = config.output_dir / "inspection" / f"{slug}-rule-audit.md"
+    inspection_output_dir = _inspection_output_dir(config, options)
     rule_audit_artifacts = {}
     if rule_audit_path.exists():
         rule_audit_artifacts["json"] = str(rule_audit_path)
@@ -95,19 +110,25 @@ def _generate_inspection_draft(config: ModelConfig) -> dict[str, Any]:
         rule_audit_artifacts["markdown"] = str(rule_audit_markdown_path)
 
     report = inspect_model_sources(config)
-    inspection_artifacts = write_inspection_artifacts(report, config.output_dir / "inspection", inspection_prefix)
+    inspection_artifacts = {}
+    if options.emit_inspection:
+        inspection_artifacts = write_inspection_artifacts(report, inspection_output_dir, inspection_prefix)
     preview = build_contract_preview(config)
-    preview_artifacts = write_contract_preview_artifacts(
-        preview,
-        config.output_dir / "inspection",
-        config.preview_artifact_prefix,
-    )
+    preview_artifacts = {}
+    if options.emit_inspection:
+        preview_artifacts = write_contract_preview_artifacts(
+            preview,
+            inspection_output_dir,
+            config.preview_artifact_prefix,
+        )
     draft = build_form_data_draft(config, preview=preview)
-    draft_artifacts = write_form_data_draft_artifacts(
-        draft,
-        config.output_dir / "inspection",
-        config.draft_artifact_prefix,
-    )
+    draft_artifacts = {}
+    if options.emit_inspection:
+        draft_artifacts = write_form_data_draft_artifacts(
+            draft,
+            inspection_output_dir,
+            config.draft_artifact_prefix,
+        )
     runtime_contract_artifacts = write_runtime_contract_artifact(
         config,
         draft,
@@ -158,14 +179,15 @@ def _generate_inspection_draft(config: ModelConfig) -> dict[str, Any]:
     }
 
 
-def generate_model_artifacts(config: ModelConfig) -> dict[str, Any]:
+def generate_model_artifacts(config: ModelConfig, *, options: GenerationOptions | None = None) -> dict[str, Any]:
     """Generate artifacts for one workbook-discovered active model."""
 
+    options = options or GenerationOptions()
     route_engine = TEMPORARY_ROUTE_ENGINES.get(config.model_key, DEFAULT_ROUTE_ENGINE)
     if route_engine == "production":
         result = _generate_production(config)
     elif route_engine == "inspection_draft":
-        result = _generate_inspection_draft(config)
+        result = _generate_inspection_draft(config, options)
     else:
         raise ValueError(f"Unknown generation route {route_engine!r} for model {config.model_key!r}")
 
