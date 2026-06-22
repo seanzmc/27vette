@@ -30,6 +30,7 @@ from corvette_form_generator.mapping import (
     status_to_label,
     step_for_section as shared_step_for_section,
 )
+from corvette_form_generator.model_config import ModelConfig
 from corvette_form_generator.model_configs import base_model_config
 from corvette_form_generator.output import write_json_output
 from corvette_form_generator.rules import (
@@ -155,11 +156,13 @@ def build_standard_equipment(choices: list[dict[str, Any]]) -> list[dict[str, An
     return [standard_equipment_row(selected[key][1]) for key in key_order]
 
 
-def main() -> None:
+def generate_production_artifacts(config: ModelConfig | None = None) -> dict[str, Any]:
     global MODEL_CONFIG
 
     wb = load_workbook(WORKBOOK_PATH)
-    MODEL_CONFIG = load_model_config_overrides(wb, base_model_config("stingray"))
+    MODEL_CONFIG = load_model_config_overrides(wb, config or base_model_config("stingray"))
+    if MODEL_CONFIG.model_key != "stingray":
+        raise ValueError("production generation currently supports only stingray")
 
     variants_raw = rows_from_sheet(wb, "variant_master")
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
@@ -658,7 +661,7 @@ def main() -> None:
         for row in choices:
             writer.writerow({key: row.get(key, "") for key in writer.fieldnames})
 
-    print(json.dumps({
+    return {
         "workbook": str(WORKBOOK_PATH),
         "workbook_backup": None,
         "json": str(json_path),
@@ -671,4 +674,8 @@ def main() -> None:
         "price_rules": len(price_rules),
         "interiors": len(data["interiors"]),
         "validation_errors": validation_error_count(validation_rows),
-    }, indent=2))
+    }
+
+
+def main() -> None:
+    print(json.dumps(generate_production_artifacts(), indent=2))

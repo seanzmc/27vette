@@ -1,17 +1,17 @@
 # Audit route map
 
-Status refreshed 2026-06-21 after Passes 5A and 5B. This document is a code/docs route map; the refresh did not change workbook sheets, generated artifacts, or runtime behavior.
+Status refreshed 2026-06-21 after Pass 6A. This document is a code/docs route map; the refresh did not change workbook sheets or runtime behavior.
 
-The main diagnosis: **the public workflow has been mostly normalized, but the internal generation route is still split by model.** `generate_form.py` is now the single entry point, but it still sends **Stingray** through `production.main()` and sends **Grand Sport / Z06** through the inspection/draft/runtime-contract path. The repo docs say every active model should follow the same workbook → generator → registry → runtime contract shape, but the code still has a model-based fork.
+The main diagnosis: **the public workflow has been mostly normalized, and Pass 6A extracted one shared output-orchestration entrypoint, but source-row assembly is still split by model.** `generate_form.py` now delegates every active model to `model_generation.generate_model_artifacts()`, but that module still sends **Stingray** through the production assembly engine and sends **Grand Sport / Z06** through the inspection/draft assembly engine.
 
 ## Status and evidence anchors
 
-This file is an audit/action map. Passes 0 through 5 now have implementation evidence under `docs/audit-cleanup/`. Later passes still need their own spec before edits.
+This file is an audit/action map. Passes 0 through 6A now have implementation evidence under `docs/audit-cleanup/`. Later passes still need their own spec before edits.
 
 Current tree evidence:
 
-- `scripts/generate_form.py` no longer hardcodes `MODEL_CONFIGS`; active/generatable models come from workbook discovery. It still keeps `PRODUCTION_MODEL_KEYS = {"stingray"}` for the remaining internal route split.
-- `scripts/generate_form.py` still routes Stingray to `production.main()` and Grand Sport/Z06 to `run_draft()`.
+- `scripts/generate_form.py` no longer hardcodes `MODEL_CONFIGS` or owns the production/draft route branch; active/generatable models come from workbook discovery and generation delegates to `model_generation.generate_model_artifacts()`.
+- `scripts/corvette_form_generator/model_generation.py` now owns the temporary Pass 6A route-engine classifier: Stingray remains `production`, while Grand Sport/Z06 remain `inspection_draft`.
 - `scripts/corvette_form_generator/runtime_contract.py` now provides the shared finalization seam used by both active routes.
 - `scripts/corvette_form_generator/registry_promotion.py` still supports legacy `current_generation` and `draft_artifact` rows, but active promoted rows now use `artifact_type=runtime_contract`.
 - Read-only workbook inspection confirms the promoted rows are now:
@@ -36,15 +36,15 @@ Current tree evidence:
 
 **Stingray route**
 
-`stingray_master.xlsx` → `scripts/generate_form.py --model stingray` → `production.py` → writes compatibility `form-output/stingray-form-data.json` / `.csv` plus `form-output/runtime/stingray-runtime-contract.json` → `generate_registry.py` → `form-app/data.js`.
+`stingray_master.xlsx` → `scripts/generate_form.py --model stingray` → `model_generation.generate_model_artifacts()` → `production.py` source-row assembly → writes compatibility `form-output/stingray-form-data.json` / `.csv` plus `form-output/runtime/stingray-runtime-contract.json` → `generate_registry.py` → `form-app/data.js`.
 
 Stingray now reaches registry promotion as `artifact_type=runtime_contract`; the workbook points the promoted input at `form-output/runtime/stingray-runtime-contract.json`.
 
 **Grand Sport / Z06 route**
 
-`stingray_master.xlsx` → `scripts/generate_form.py --model grand_sport|z06` → `inspection.py` → writes inspection report, contract preview, and form-data draft under `form-output/inspection/`, plus clean runtime contracts under `form-output/runtime/` → `generate_registry.py` → `form-app/data.js`.
+`stingray_master.xlsx` → `scripts/generate_form.py --model grand_sport|z06` → `model_generation.generate_model_artifacts()` → `inspection.py` source-row assembly → writes inspection report, contract preview, and form-data draft under `form-output/inspection/`, plus clean runtime contracts under `form-output/runtime/` → `generate_registry.py` → `form-app/data.js`.
 
-`run_draft()` in `generate_form.py` does exactly that for non-Stingray models. The promoted Grand Sport/Z06 workbook rows point at the clean runtime-contract artifacts under `form-output/runtime/`, and `generate_registry.py` embeds those clean contracts.
+The promoted Grand Sport/Z06 workbook rows point at the clean runtime-contract artifacts under `form-output/runtime/`, and `generate_registry.py` embeds those clean contracts.
 
 **Registry route**
 
@@ -52,16 +52,16 @@ This part is mostly normalized. `generate_registry.py` is the only workflow that
 
 ## Main drift points to normalize
 
-### 1. The model-based builder fork is the biggest remaining architecture problem
+### 1. Source-row assembly is the biggest remaining architecture problem
 
-`generate_form.py` has one command surface, but `PRODUCTION_MODEL_KEYS = {"stingray"}` still decides whether the model goes to `production.main()` or the draft/inspection path.
+Pass 6A moved output orchestration behind `model_generation.generate_model_artifacts()`, but `model_generation.py` still carries a temporary route-engine classifier while source-row assembly remains split.
 
-Pass 1 unified the final runtime-contract builder, but active runtime models are still assembled by different internal logic:
+Active runtime models are still assembled by different internal logic:
 
 - Stingray: `production.py`
 - Grand Sport / Z06: `inspection.py` → `build_contract_preview()` → `build_form_data_draft()` → `build_model_runtime_contract()`
 
-This is the same class of problem you described: the pathway looks consistent from the outside, but not inside the generator.
+This is the remaining version of the problem you described: the pathway looks consistent from the CLI/output layer, but not yet inside source-row assembly.
 
 **Pass 1 normalized:** one model-neutral runtime-contract builder:
 
@@ -69,7 +69,7 @@ This is the same class of problem you described: the pathway looks consistent fr
 build_model_runtime_contract(config, data)
 ```
 
-Every active model now uses it. Remaining route work is source-row assembly/output-surface policy, not final contract cleanup.
+Every active model now uses it, and Pass 6A made stdout/output artifact reporting explicit across active models. Remaining route work is source-row assembly, not final contract cleanup or output orchestration.
 
 ### 2. Generated workbook `form_*` sheets are Stingray-only
 
@@ -270,9 +270,21 @@ Status: implemented in:
 
 Pass 5A removed Grand Sport’s optional audit test from default editor gate reminders while preserving optional audit tooling. Pass 5B made schema validation rely on workbook source roles and the canonical generator role constants instead of legacy Stingray/Grand Sport seed assumptions.
 
-### Pass 6 — Business-rule hardcode cleanup
+### Pass 6A — Route unification characterization and output orchestration
 
-After the route is unified, handle the smaller rule cleanup items:
+Status: implemented in `docs/audit-cleanup/pass-6-route-unification-spec.md`.
+
+Pass 6A made `generate_form.py` delegate all active models through `model_generation.generate_model_artifacts()`, named the stdout/output-artifact contract, and preserved parity against freshly regenerated current-route baselines. It intentionally kept the source-row assembly split in place: Stingray still uses production assembly, and Grand Sport/Z06 still use inspection/draft assembly.
+
+### Pass 6B — Source-row assembly route unification
+
+Status: not implemented. Needs its own spec before edits.
+
+Goal: remove the temporary route-engine classifier in `model_generation.py` and make Stingray, Grand Sport, and Z06 use one source-row assembly route without runtime-contract drift. This pass must stay parity-first and must not include business-rule hardcode cleanup.
+
+### Pass 7 — Business-rule hardcode cleanup
+
+After the source-row assembly route is unified, handle the smaller rule cleanup items:
 
 - GBA / `opt_zyc_001` runtime hardcode backed by workbook `ex_gba_zyc`
 - `runtime_action=replace` classification
@@ -287,11 +299,12 @@ Those are real, but they should come after the builder/pathway fork is removed u
 
 The repo is past the worst version of the problem. The registry, promotion metadata, model discovery, workbook source roles, and schema source-contract validation are workbook-owned now.
 
-The remaining structural issue is narrower and clearer after Passes 1-5:
+The remaining structural issue is narrower and clearer after Pass 6A:
 
 ```text
 One CLI entrypoint
-but two model-generation engines
+one output orchestration layer
+but two source-row assembly engines
 ```
 
-Next safe pass: write a route-unification spec for the remaining Stingray `production.py` vs Grand Sport/Z06 `inspection.py`/draft route split. Keep it parity-first and do not fold runtime product-hardcode cleanup or rule-field classification into the route pass unless separately scoped.
+Next safe pass: write Pass 6B for source-row assembly unification. Keep it parity-first and do not fold runtime product-hardcode cleanup or rule-field classification into the route pass unless separately scoped.
