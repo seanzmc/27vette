@@ -2263,15 +2263,37 @@ test("BC7 ZZ3 requirement is constrained by OVS availability", () => {
   assert.deepEqual([...zz3Bodies].sort(), ["convertible"]);
 });
 
-test("spoiler replacement rules preserve ZYC and replace T0A without blocking TVS/5ZZ/5ZU", () => {
+test("spoiler replacement ownership preserves ZYC and keeps T0A replacement behavior", () => {
   const spoilerSection = data.sections.find((section) => section.section_id === "sec_spoi_001");
   assert.equal(spoilerSection.selection_mode, "multi_select_opt");
-  for (const sourceId of ["opt_tvs_001", "opt_5zz_001", "opt_5zu_001", "opt_5zw_001", "opt_zf1_001"]) {
+  for (const sourceId of ["opt_tvs_001", "opt_5zz_001", "opt_5zu_001"]) {
     const rule = data.rules.find((item) => item.source_id === sourceId && item.target_id === "opt_t0a_001");
-    assert.ok(rule, `${sourceId} should remove T0A`);
+    assert.equal(rule, undefined, `${sourceId} should use grp_spoiler_high_wing instead of a direct T0A replace row`);
+  }
+  for (const sourceId of ["opt_5zw_001", "opt_zf1_001"]) {
+    const rule = data.rules.find((item) => item.source_id === sourceId && item.target_id === "opt_t0a_001");
+    assert.ok(rule, `${sourceId} should preserve direct T0A replacement`);
     assert.equal(rule.runtime_action, "replace");
     assert.match(rule.disabled_reason, /Removes T0A when Z51 is selected/);
   }
+
+  for (const sourceId of ["opt_tvs_001", "opt_5zz_001", "opt_5zu_001"]) {
+    const runtime = loadRuntime();
+    runtime.state.bodyStyle = "coupe";
+    runtime.state.trimLevel = "1LT";
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+    runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001"));
+    runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_z51_001"));
+    runtime.state.selected.add("opt_t0a_001");
+    runtime.state.userSelected.add("opt_t0a_001");
+    assert.equal(runtime.state.selected.has("opt_t0a_001"), true, "T0A should be selectable after Z51");
+    runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === sourceId));
+    assert.equal(runtime.state.selected.has(sourceId), true, `${sourceId} should be selected`);
+    assert.equal(runtime.state.selected.has("opt_t0a_001"), false, `${sourceId} should remove selected T0A through grp_spoiler_high_wing`);
+    assert.equal(runtime.computeAutoAdded().has("opt_t0a_001"), false, `${sourceId} should keep T0A out of auto-added options`);
+  }
+
   const zycException = data.runtimeRuleExceptions.find(
     (exception) => exception.source_option_id === "opt_gba_001" && exception.target_option_id === "opt_zyc_001"
   );

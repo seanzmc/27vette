@@ -301,7 +301,7 @@ Current preflight counts from the spec:
 - `grandSport_rule_mapping`: 6 `replace` rows; 9 body-scoped rows.
 - `z06_rule_mapping`: 1 `replace` row; 3 body-scoped rows.
 
-Pass 8 was intentionally report-only. Pass 9 implemented Candidate A, the body-style scope retirement parity pass. Any `runtime_action=replace` migration, rule-column deletion, generator payload trim, or direct-rule runtime scope-matcher change still needs a later implementation spec.
+Pass 8 was intentionally report-only. Pass 9 implemented Candidate A, the body-style scope retirement parity pass. Pass 10 implemented Candidate B, the narrow Stingray spoiler replacement ownership pass. Any Grand Sport/Z06 `runtime_action=replace` migration, rule-column deletion, generator payload trim, or direct-rule runtime scope-matcher change still needs a later implementation spec.
 
 ### Pass 9 — Body-style scope retirement parity
 
@@ -309,10 +309,16 @@ Status: implemented in `docs/audit-cleanup/pass-9-body-style-scope-retirement-sp
 
 Pass 9 blanked all current OVS-derived direct-rule `body_style_scope` values in `rule_mapping`, `grandSport_rule_mapping`, and `z06_rule_mapping`; deleted the duplicate Grand Sport copy row `gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_002_requires_opt_zz3_001_convertible`; regenerated active model runtime artifacts and registry; and updated stale tests to assert OVS-owned scope rather than direct-rule scope. Runtime direct-rule matching code, `runtime_action=replace`, the `body_style_scope` column, and generated payload shape were unchanged.
 
-Recommended next pass: Candidate B from the Pass 8 report — a narrow Stingray spoiler replacement ownership pass for 5ZU/5ZZ/TVS and the 5ZW/ZF1 product-decision edges. Keep Grand Sport/Z06 replacement rows and direct-rule `scopeMatches()` semantics separate.
+### Pass 10 — Stingray spoiler replacement ownership
+
+Status: implemented in `docs/audit-cleanup/pass-10-stingray-spoiler-replacement-ownership-spec.md`.
+
+Pass 10 deleted the three redundant active Stingray direct replacement rows for 5ZU, 5ZZ, and TVS removing T0A, leaving that peer-switch behavior owned by `grp_spoiler_high_wing`. It preserved the 5ZW and ZF1 direct replacement rows because those remain product-decision edges. Runtime code, Grand Sport/Z06 replacement rows, `runtime_action` schema, and dealer submission behavior were unchanged.
+
+Recommended next pass: Candidate C from the Pass 8 report — Grand Sport package/default replacement ownership for FEY/FEB relationships to T0E, JX6, and J56. Keep NWI/NGA exhaust replacement and Z06 brake/default replacement separate.
 
 ## Bottom line
 
 The repo is past the worst version of the route problem. The registry, promotion metadata, model discovery, workbook source roles, schema source-contract validation, output orchestration, and active source-assembly facade are normalized for the active models.
 
-The next safe pass is a narrow Stingray spoiler replacement ownership spec/implementation for the Pass 8 Candidate B rows. Do not delete `runtime_action`, trim emitted rule fields, migrate Grand Sport/Z06 replacement behavior, or change direct-rule runtime matching until separately approved.
+The next safe pass is a narrow Grand Sport package/default replacement ownership spec for the Pass 8 Candidate C rows. Do not delete `runtime_action`, trim emitted rule fields, migrate NWI/NGA or Z06 replacement behavior, or change direct-rule runtime matching until separately approved.

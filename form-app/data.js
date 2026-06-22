@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-22T16:08:06+00:00"
+          "generated_at": "2026-06-22T17:10:04+00:00"
         },
         "variants": [
           {
@@ -37977,24 +37977,6 @@ window.CORVETTE_FORM_DATA = {
             "source_note": "1. Unavailable until further notice. Requires 5ZU, 5ZW, 5ZZ or Z51. Not available with 5V7, 5VM, STI, TVS, ZF1."
           },
           {
-            "rule_id": "rule_opt_5zu_001_excludes_opt_t0a_001",
-            "source_id": "opt_5zu_001",
-            "rule_type": "excludes",
-            "target_id": "opt_t0a_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_spoi_001",
-            "target_section": "sec_spoi_001",
-            "source_selection_mode": "multi_select_opt",
-            "target_selection_mode": "multi_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Removes T0A when Z51 is selected.",
-            "auto_add": "False",
-            "active": "True",
-            "runtime_action": "replace",
-            "source_note": "1. Requires exterior color (G8G) Arctic White, (GBA) Black or (GKZ) Torch Red. Not available with 5ZW, 5ZZ, TVS. Deletes (T0A) Z51 rear spoiler when ordered with (Z51) Z51 Performance Package."
-          },
-          {
             "rule_id": "rule_opt_5zw_001_excludes_opt_t0a_001",
             "source_id": "opt_5zw_001",
             "rule_type": "excludes",
@@ -38011,24 +37993,6 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "runtime_action": "replace",
             "source_note": "1. Not available at this time. Not available with 5ZU, 5ZZ, TVS. Deletes (T0A) Z51 rear spoiler when ordered with (Z51) Z51 Performance Package."
-          },
-          {
-            "rule_id": "rule_opt_5zz_001_excludes_opt_t0a_001",
-            "source_id": "opt_5zz_001",
-            "rule_type": "excludes",
-            "target_id": "opt_t0a_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_spoi_001",
-            "target_section": "sec_spoi_001",
-            "source_selection_mode": "multi_select_opt",
-            "target_selection_mode": "multi_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Removes T0A when Z51 is selected.",
-            "auto_add": "False",
-            "active": "True",
-            "runtime_action": "replace",
-            "source_note": "1. Not available with 5ZW, 5ZU, TVS. Deletes (T0A) Z51 rear spoiler when ordered with (Z51) Z51 Performance Package."
           },
           {
             "rule_id": "rule_opt_b6p_001_includes_opt_d3v_001",
@@ -39595,24 +39559,6 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "runtime_action": "active",
             "source_note": "T0A is available only when Z51 is selected."
-          },
-          {
-            "rule_id": "rule_opt_tvs_001_excludes_opt_t0a_001",
-            "source_id": "opt_tvs_001",
-            "rule_type": "excludes",
-            "target_id": "opt_t0a_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_spoi_001",
-            "target_section": "sec_spoi_001",
-            "source_selection_mode": "multi_select_opt",
-            "target_selection_mode": "multi_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Removes T0A when Z51 is selected.",
-            "auto_add": "False",
-            "active": "True",
-            "runtime_action": "replace",
-            "source_note": "TVS replaces the default T0A Z51 spoiler when selected."
           },
           {
             "rule_id": "rule_opt_bc7_001_requires_opt_zz3_001_convertible",
@@ -48058,7 +48004,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "144 active compatibility rules exported from 144 source rules."
+            "message": "141 active compatibility rules exported from 141 source rules."
           }
         ]
       },
@@ -48079,7 +48025,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-22T16:08:07+00:00",
+          "generated_at": "2026-06-22T16:10:30+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -97465,7 +97411,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-22T16:08:08+00:00",
+          "generated_at": "2026-06-22T16:10:32+00:00",
           "status": "runtime_active"
         },
         "variants": [

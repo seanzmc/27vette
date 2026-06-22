@@ -1,6 +1,6 @@
 # Pass 10 — Stingray Spoiler Replacement Ownership Spec
 
-Status: Spec only. Do not implement until approved.
+Status: Completed implementation on 2026-06-22.
 Date: 2026-06-22
 Recommended reasoning level for implementation agent: high.
 Source report: `docs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`.
@@ -16,7 +16,7 @@ This is Candidate B from the Pass 8 report. It is a narrow Stingray workbook/sou
 
 Change type for this spec: docs-only.
 
-Change type for approved implementation: mixed workbook/data + generated artifacts + tests. Risk level: medium.
+Change type for implementation: mixed workbook/data + generated artifacts + tests. Risk level: medium.
 
 Root cause: `rule_mapping` still carries five Stingray `runtime_action=replace` rows that remove `opt_t0a_001` / T0A when a spoiler source is selected. Three active/selectable sources (`opt_5zu_001`, `opt_5zz_001`, `opt_tvs_001`) already share `grp_spoiler_high_wing` with T0A. That exclusive group is the workbook-owned peer-selection mechanism and runtime already removes selected peers generically. Keeping both the exclusive group and direct replace rows duplicates ownership for the same active same-section spoiler peer replacement.
 
@@ -49,8 +49,7 @@ Evidence inspected:
 
 Current working tree note:
 
-- Pre-spec `git status --short --branch` reported existing unrelated dirty work, including docs, deleted retired audit scripts/tests, and editor test changes.
-- This spec creation must only add `docs/audit-cleanup/pass-10-stingray-spoiler-replacement-ownership-spec.md` unless implementation is later approved.
+- Implementation preflight `git status --short --branch` reported a clean working tree on branch `schema-ingestion-normalization`.
 
 ## Ownership decisions for this pass
 
@@ -129,7 +128,7 @@ Do not change in this pass:
 - Do not bundle Candidate C/D/E from the Pass 8 report.
 - Do not decide 5ZW or ZF1 ownership beyond explicitly preserving them.
 
-## Implementation plan if approved
+## Implementation plan completed
 
 1. Preflight.
 
@@ -343,11 +342,68 @@ git diff --check
 git status --short
 ```
 
-## Approval prompt
+## Completion summary
 
-Approve Pass 10 / Candidate B implementation?
+Completed on 2026-06-22.
 
-Approval should authorize only:
+Workbook source changes:
+
+- `stingray_master.xlsx` / `rule_mapping`: deleted three redundant active Stingray high-wing direct replacement rows now owned by `grp_spoiler_high_wing`:
+  - `rule_opt_5zu_001_excludes_opt_t0a_001`
+  - `rule_opt_5zz_001_excludes_opt_t0a_001`
+  - `rule_opt_tvs_001_excludes_opt_t0a_001`
+- `stingray_master.xlsx` / `rule_mapping`: preserved the 5ZW and ZF1 direct replacement rows unchanged:
+  - `rule_opt_5zw_001_excludes_opt_t0a_001`
+  - `rule_opt_zf1_001_excludes_opt_t0a_001`
+- Workbook backup created by safe-save: `backups/stingray_master-20260622-130954.xlsx`.
+
+Generated artifacts refreshed:
+
+- `form-output/runtime/stingray-runtime-contract.json`
+- `form-output/stingray-form-data.json`
+- `form-output/stingray-form-data.csv`
+- `form-app/data.js`
+
+Tests updated:
+
+- `tests/stingray-form-regression.test.mjs`: spoiler replacement ownership test now asserts 5ZU/5ZZ/TVS no longer carry direct T0A replace rows, 5ZW/ZF1 still do, and 5ZU/5ZZ/TVS still remove selected T0A through `grp_spoiler_high_wing`.
+
+Approved generated deltas:
+
+- Stingray runtime rule count changed from 144 to 141.
+- Stingray `runtime_action=replace` rule count changed from 5 to 2.
+- Removed generated rule IDs are exactly the three approved 5ZU/5ZZ/TVS direct T0A replacement rows.
+- `grp_spoiler_high_wing` generated metadata remained unchanged.
+- 5ZW and ZF1 direct replacement rows remained present.
+
+Changed behavior: intended customer-facing behavior unchanged for active 5ZU/5ZZ/TVS spoiler selection. Runtime code unchanged; generated exclusive-group metadata now solely owns those peer replacements.
+
+Validation results:
+
+- Implementation preflight clean tree / branch check — passed on `schema-ingestion-normalization`.
+- Excel lock check — passed; `~$stingray_master.xlsx` absent.
+- `.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx` — passed before and after workbook write.
+- Strong row-identity preflight — passed for every listed row (`rule_id`, `source_id`, `rule_type`, `target_id`, `runtime_action`, `body_style_scope`) plus option/group ownership assertions.
+- On-disk workbook verification — passed; `rule_mapping` has 141 rows, 2 `runtime_action=replace` rows, preserved 5ZW/ZF1 rows unchanged, spoiler exclusive-group membership unchanged, and Grand Sport/Z06 replacement counts unchanged.
+- `.venv/bin/python scripts/generate_form.py --model stingray` — passed, 141 rules, 0 validation errors.
+- `.venv/bin/python scripts/generate_registry.py` — passed, models `stingray`, `grandSport`, `z06`.
+- Focused runtime-contract delta script — passed with only approved Stingray rule deletions/count deltas.
+- `.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx` — passed.
+- `node --test tests/stingray-form-regression.test.mjs` — passed.
+- `node --test tests/multi-model-runtime-switching.test.mjs` — passed.
+
+Residual risks:
+
+- No browser smoke was run; Node runtime/model gates covered the generated exclusive-group behavior and dealer payload boundaries.
+- 5ZW and ZF1 remain direct replacement rows intentionally; their ownership still needs a later product decision or narrower pass.
+
+Recommended next pass: Candidate C from the Pass 8 report — Grand Sport package/default replacement ownership for FEY/FEB relationships to T0E, JX6, and J56. Keep NWI/NGA exhaust replacement and Z06 brake/default replacement separate.
+
+## Historical approval prompt
+
+Pass 10 / Candidate B implementation was approved on 2026-06-22.
+
+Approval authorized only:
 
 - deleting the three active high-wing peer duplicate direct replace rows for 5ZU, 5ZZ, and TVS from `rule_mapping`;
 - preserving the 5ZW and ZF1 direct replace rows;
@@ -355,4 +411,4 @@ Approval should authorize only:
 - updating focused tests only for intentional ownership migration from direct replace rows to `grp_spoiler_high_wing`;
 - closing this spec and route-map status.
 
-Approval should not authorize Grand Sport/Z06 replacement cleanup, ZF1 migration, 5ZW activation/group membership changes, direct-rule runtime matching changes, `runtime_action` column deletion, generated payload schema trimming, or dealer submission changes.
+Approval did not authorize Grand Sport/Z06 replacement cleanup, ZF1 migration, 5ZW activation/group membership changes, direct-rule runtime matching changes, `runtime_action` column deletion, generated payload schema trimming, or dealer submission changes.
