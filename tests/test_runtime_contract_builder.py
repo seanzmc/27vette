@@ -73,13 +73,18 @@ class RuntimeContractBuilderTests(unittest.TestCase):
     def test_active_routes_use_shared_runtime_contract_builder(self) -> None:
         production_source = (ROOT / "scripts" / "corvette_form_generator" / "production.py").read_text()
         inspection_source = (ROOT / "scripts" / "corvette_form_generator" / "inspection.py").read_text()
+        assembly_source = (ROOT / "scripts" / "corvette_form_generator" / "source_assembly.py").read_text()
 
         self.assertIn("from corvette_form_generator.runtime_contract import build_model_runtime_contract", production_source)
         self.assertIn("from corvette_form_generator.runtime_contract import build_model_runtime_contract", inspection_source)
-        self.assertIn("build_model_runtime_contract(MODEL_CONFIG, data)", production_source)
+        self.assertIn("from corvette_form_generator.runtime_contract import build_model_runtime_contract", assembly_source)
+        self.assertIn("build_model_runtime_contract(MODEL_CONFIG, source_data)", production_source)
         self.assertIn("build_model_runtime_contract(config, draft)", inspection_source)
+        self.assertIn("build_model_runtime_contract(config, source_data)", assembly_source)
+        self.assertIn("build_model_runtime_contract(config, draft)", assembly_source)
         self.assertNotIn("from corvette_form_generator.registry_promotion import live_contract_data", production_source)
         self.assertNotIn("from corvette_form_generator.registry_promotion import live_contract_data", inspection_source)
+        self.assertNotIn("from corvette_form_generator.registry_promotion import live_contract_data", assembly_source)
 
 
 if __name__ == "__main__":

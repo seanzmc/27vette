@@ -1,17 +1,17 @@
 # Audit route map
 
-Status refreshed 2026-06-21 after Pass 6A. This document is a code/docs route map; the refresh did not change workbook sheets or runtime behavior.
+Status refreshed 2026-06-21 after Pass 6C. This document is a code/docs route map; the refresh did not change workbook sheets or runtime behavior.
 
-The main diagnosis: **the public workflow has been mostly normalized, and Pass 6A extracted one shared output-orchestration entrypoint, but source-row assembly is still split by model.** `generate_form.py` now delegates every active model to `model_generation.generate_model_artifacts()`, but that module still sends **Stingray** through the production assembly engine and sends **Grand Sport / Z06** through the inspection/draft assembly engine.
+The main diagnosis: **the active public workflow and generator orchestration are now normalized through one source-assembly facade.** `generate_form.py` delegates every active model to `model_generation.generate_model_artifacts()`, and that module now calls `source_assembly.assemble_model_source()` for Stingray, Grand Sport, and Z06. Pass 6C preserved the existing Stingray compatibility JSON/CSV payload and the Grand Sport/Z06 review payload shapes with timestamp-ignored runtime parity.
 
 ## Status and evidence anchors
 
-This file is an audit/action map. Passes 0 through 6A now have implementation evidence under `docs/audit-cleanup/`. Later passes still need their own spec before edits.
+This file is an audit/action map. Passes 0 through 6C now have implementation evidence under `docs/audit-cleanup/`. Later passes still need their own spec before edits.
 
 Current tree evidence:
 
 - `scripts/generate_form.py` no longer hardcodes `MODEL_CONFIGS` or owns the production/draft route branch; active/generatable models come from workbook discovery and generation delegates to `model_generation.generate_model_artifacts()`.
-- `scripts/corvette_form_generator/model_generation.py` now owns the temporary Pass 6A route-engine classifier: Stingray remains `production`, while Grand Sport/Z06 remain `inspection_draft`.
+- `scripts/corvette_form_generator/model_generation.py` now uses one normalized route label, `source_assembly`, and delegates workbook source assembly to `scripts/corvette_form_generator/source_assembly.py` for every active model.
 - `scripts/corvette_form_generator/runtime_contract.py` now provides the shared finalization seam used by both active routes.
 - `scripts/corvette_form_generator/registry_promotion.py` still supports legacy `current_generation` and `draft_artifact` rows, but active promoted rows now use `artifact_type=runtime_contract`.
 - Read-only workbook inspection confirms the promoted rows are now:
@@ -34,17 +34,11 @@ Current tree evidence:
 
 ## Current route map
 
-**Stingray route**
+**Active model generation route**
 
-`stingray_master.xlsx` → `scripts/generate_form.py --model stingray` → `model_generation.generate_model_artifacts()` → `production.py` source-row assembly → writes compatibility `form-output/stingray-form-data.json` / `.csv` plus `form-output/runtime/stingray-runtime-contract.json` → `generate_registry.py` → `form-app/data.js`.
+`stingray_master.xlsx` → `scripts/generate_form.py --model stingray|grand_sport|z06` → `model_generation.generate_model_artifacts()` → `source_assembly.assemble_model_source()` → `build_model_runtime_contract()` → `form-output/runtime/<slug>-runtime-contract.json` → `generate_registry.py` → `form-app/data.js`.
 
-Stingray now reaches registry promotion as `artifact_type=runtime_contract`; the workbook points the promoted input at `form-output/runtime/stingray-runtime-contract.json`.
-
-**Grand Sport / Z06 route**
-
-`stingray_master.xlsx` → `scripts/generate_form.py --model grand_sport|z06` → `model_generation.generate_model_artifacts()` → `inspection.py` source-row assembly → writes clean runtime contracts under `form-output/runtime/` by default → `generate_registry.py` → `form-app/data.js`. Optional review mode writes inspection report, contract preview, and form-data draft artifacts only when `--emit-inspection --inspection-output <dir>` is passed.
-
-The promoted Grand Sport/Z06 workbook rows point at the clean runtime-contract artifacts under `form-output/runtime/`, and `generate_registry.py` embeds those clean contracts.
+Stingray still writes compatibility `form-output/stingray-form-data.json` / `.csv` in addition to `form-output/runtime/stingray-runtime-contract.json`. Grand Sport/Z06 still expose optional review payloads only when `--emit-inspection --inspection-output <dir>` is passed. The promoted workbook rows for all active models point at the clean runtime-contract artifacts under `form-output/runtime/`, and `generate_registry.py` embeds those clean contracts.
 
 **Registry route**
 
@@ -52,16 +46,11 @@ This part is mostly normalized. `generate_registry.py` is the only workflow that
 
 ## Main drift points to normalize
 
-### 1. Source-row assembly is the biggest remaining architecture problem
+### 1. Source-row assembly route is normalized for active generation
 
-Pass 6A moved output orchestration behind `model_generation.generate_model_artifacts()`, but `model_generation.py` still carries a temporary route-engine classifier while source-row assembly remains split.
+**Pass 6C normalized:** `model_generation.generate_model_artifacts()` no longer carries a temporary production-vs-review route classifier. Every active model now enters `source_assembly.assemble_model_source()` and reports the same stdout `route_engine` value, `source_assembly`.
 
-Active runtime models are still assembled by different internal logic:
-
-- Stingray: `production.py`
-- Grand Sport / Z06: `inspection.py` → `build_contract_preview()` → `build_form_data_draft()` → `build_model_runtime_contract()`
-
-This is the remaining version of the problem you described: the pathway looks consistent from the CLI/output layer, but not yet inside source-row assembly.
+Pass 6C was parity-first: it did not rewrite workbook source rows, retire Stingray compatibility JSON/CSV, or change Grand Sport/Z06 explicit review artifact shapes. The source-assembly facade preserves those current payload surfaces while removing the active orchestration split.
 
 **Pass 1 normalized:** one model-neutral runtime-contract builder:
 
@@ -69,7 +58,7 @@ This is the remaining version of the problem you described: the pathway looks co
 build_model_runtime_contract(config, data)
 ```
 
-Every active model now uses it, and Pass 6A made stdout/output artifact reporting explicit across active models. Remaining route work is source-row assembly, not final contract cleanup or output orchestration.
+Every active model now uses it, Pass 6A made stdout/output artifact reporting explicit across active models, and Pass 6C moved active generation behind one source-assembly facade.
 
 ### 2. Generated workbook `form_*` sheets are Stingray-only
 

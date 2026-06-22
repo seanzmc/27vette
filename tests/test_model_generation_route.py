@@ -22,18 +22,24 @@ def test_generate_form_delegates_to_shared_model_generation_module() -> None:
     assert "from corvette_form_generator.inspection import" not in source
 
 
-def test_model_generation_module_names_temporary_route_split_and_optional_inspection_output() -> None:
+def test_model_generation_uses_shared_source_assembly_without_temporary_route_split() -> None:
     module_path = ROOT / "scripts" / "corvette_form_generator" / "model_generation.py"
+    source_assembly_path = ROOT / "scripts" / "corvette_form_generator" / "source_assembly.py"
     assert module_path.exists()
+    assert source_assembly_path.exists()
+
     source = module_path.read_text()
+    retired_route_table = "TEMPORARY" + "_ROUTE_ENGINES"
+    retired_route_value = "inspection" + "_draft"
 
     assert "class GenerationOptions" in source
     assert "emit_inspection: bool = False" in source
     assert "inspection_output_dir" in source
     assert "def generate_model_artifacts" in source
-    assert "TEMPORARY_ROUTE_ENGINES" in source
-    assert '"stingray": "production"' in source
-    assert "inspection_draft" in source
+    assert "assemble_model_source" in source
+    assert retired_route_table not in source
+    assert retired_route_value not in source
+    assert "source_assembly" in source
     assert "runtime_contract_json" in source
     assert "compatibility_artifacts" in source
     assert "inspection_artifacts" in source

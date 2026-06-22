@@ -67,9 +67,9 @@ def assert_common_generation_contract(output: dict, model_key: str, slug: str) -
 
 def test_active_models_share_generation_stdout_contract() -> None:
     cases = [
-        ("stingray", "stingray", "production"),
-        ("grand_sport", "grand-sport", "inspection_draft"),
-        ("z06", "z06", "inspection_draft"),
+        ("stingray", "stingray", "source_assembly"),
+        ("grand_sport", "grand-sport", "source_assembly"),
+        ("z06", "z06", "source_assembly"),
     ]
 
     for model_key, slug, route_engine in cases:

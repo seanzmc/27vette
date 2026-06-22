@@ -1,8 +1,4 @@
-"""Shared model generation orchestration.
-
-Pass 6A keeps current source-row assembly engines intact while moving output
-orchestration behind one model-neutral entrypoint.
-"""
+"""Shared model generation orchestration."""
 
 from __future__ import annotations
 
@@ -11,19 +7,18 @@ from pathlib import Path
 from typing import Any
 
 from corvette_form_generator.inspection import (
-    build_contract_preview,
-    build_form_data_draft,
-    inspect_model_sources,
     write_contract_preview_artifacts,
     write_form_data_draft_artifacts,
     write_inspection_artifacts,
-    write_runtime_contract_artifact,
 )
 from corvette_form_generator.model_config import ModelConfig
+from corvette_form_generator.output import write_json_output
+from corvette_form_generator.production import write_stingray_compatibility_artifacts
 from corvette_form_generator.registry_promotion import export_slug, runtime_contract_artifact_path
+from corvette_form_generator.source_assembly import ModelSourceAssembly, assemble_model_source
+from corvette_form_generator.validation import validation_error_count
 
-TEMPORARY_ROUTE_ENGINES = {"stingray": "production"}
-DEFAULT_ROUTE_ENGINE = "inspection_draft"
+ROUTE_ENGINE = "source_assembly"
 
 
 @dataclass(frozen=True)
@@ -58,122 +53,140 @@ def _runtime_contract_json(config: ModelConfig) -> str:
     return str(runtime_contract_artifact_path(config.root, config.model_key))
 
 
-def _normalize_production_result(config: ModelConfig, result: dict[str, Any]) -> dict[str, Any]:
-    runtime_contract_json = result["runtime_contract_json"]
-    normalized = {
-        **result,
-        "model_key": config.model_key,
-        "model_label": config.model_label,
-        "route_engine": "production",
-        "runtime_contract_json": runtime_contract_json,
-        "runtime_contract_artifacts": {"json": runtime_contract_json},
-        "compatibility_artifacts": {
-            "json": result["json"],
-            "csv": result["csv"],
-        },
-        "inspection_artifacts": {},
-        "preview_artifacts": {},
-        "draft_artifacts": {},
-        "counts": {
-            "choices": result["choices"],
-            "context_choices": result["context_choices"],
-            "standard_equipment": result["standard_equipment"],
-            "rules": result["rules"],
-            "price_rules": result["price_rules"],
-            "interiors": result["interiors"],
-        },
-        "notes": list(config.notes),
-    }
-    return normalized
-
-
-def _generate_production(config: ModelConfig) -> dict[str, Any]:
-    from corvette_form_generator import production
-
-    return _normalize_production_result(config, production.generate_production_artifacts(config))
-
-
 def _inspection_output_dir(config: ModelConfig, options: GenerationOptions) -> Path:
     return options.inspection_output_dir or config.output_dir / "inspection"
 
 
-def _generate_inspection_draft(config: ModelConfig, options: GenerationOptions) -> dict[str, Any]:
+def _write_runtime_contract_artifact(config: ModelConfig, runtime_contract: dict[str, Any]) -> dict[str, str]:
+    runtime_json_path = runtime_contract_artifact_path(config.root, config.model_key)
+    runtime_json_path.parent.mkdir(parents=True, exist_ok=True)
+    write_json_output(runtime_json_path, runtime_contract)
+    return {"json": str(runtime_json_path)}
+
+
+def _rule_audit_artifacts(config: ModelConfig) -> dict[str, str]:
     slug = export_slug(config.model_key)
-    inspection_prefix = f"{slug}-inspection"
     rule_audit_path = config.output_dir / "inspection" / f"{slug}-rule-audit.json"
     rule_audit_markdown_path = config.output_dir / "inspection" / f"{slug}-rule-audit.md"
-    inspection_output_dir = _inspection_output_dir(config, options)
-    rule_audit_artifacts = {}
+    artifacts = {}
     if rule_audit_path.exists():
-        rule_audit_artifacts["json"] = str(rule_audit_path)
+        artifacts["json"] = str(rule_audit_path)
     if rule_audit_markdown_path.exists():
-        rule_audit_artifacts["markdown"] = str(rule_audit_markdown_path)
+        artifacts["markdown"] = str(rule_audit_markdown_path)
+    return artifacts
 
-    report = inspect_model_sources(config)
+
+def _inspection_artifact_prefix(config: ModelConfig) -> str:
+    return f"{export_slug(config.model_key)}-inspection"
+
+
+def _compatibility_result(config: ModelConfig, assembly: ModelSourceAssembly) -> dict[str, Any]:
+    compatibility_artifacts = write_stingray_compatibility_artifacts(
+        config,
+        assembly.source_data,
+        assembly.runtime_contract,
+    )
+    runtime_contract_artifacts = _write_runtime_contract_artifact(config, assembly.runtime_contract)
+    runtime_contract_json = runtime_contract_artifacts["json"]
+    return {
+        "workbook": str(config.workbook_path),
+        "workbook_backup": None,
+        "json": compatibility_artifacts["json"],
+        "runtime_contract_json": runtime_contract_json,
+        "csv": compatibility_artifacts["csv"],
+        "choices": len(assembly.source_data["choices"]),
+        "context_choices": len(assembly.source_data["contextChoices"]),
+        "standard_equipment": len(assembly.source_data["standardEquipment"]),
+        "rules": len(assembly.source_data["rules"]),
+        "price_rules": len(assembly.source_data["priceRules"]),
+        "interiors": len(assembly.source_data["interiors"]),
+        "validation_errors": validation_error_count(assembly.source_data["validation"]),
+        "model_key": config.model_key,
+        "model_label": config.model_label,
+        "route_engine": ROUTE_ENGINE,
+        "runtime_contract_artifacts": runtime_contract_artifacts,
+        "compatibility_artifacts": compatibility_artifacts,
+        "inspection_artifacts": {},
+        "preview_artifacts": {},
+        "draft_artifacts": {},
+        "counts": {
+            "choices": len(assembly.source_data["choices"]),
+            "context_choices": len(assembly.source_data["contextChoices"]),
+            "standard_equipment": len(assembly.source_data["standardEquipment"]),
+            "rules": len(assembly.source_data["rules"]),
+            "price_rules": len(assembly.source_data["priceRules"]),
+            "interiors": len(assembly.source_data["interiors"]),
+        },
+        "notes": list(config.notes),
+    }
+
+
+def _reviewable_result(config: ModelConfig, assembly: ModelSourceAssembly, options: GenerationOptions) -> dict[str, Any]:
+    if assembly.report is None or assembly.preview is None or assembly.draft is None:
+        raise ValueError(f"{config.model_key} source assembly has no review payloads")
+
+    inspection_output_dir = _inspection_output_dir(config, options)
     inspection_artifacts = {}
     if options.emit_inspection:
-        inspection_artifacts = write_inspection_artifacts(report, inspection_output_dir, inspection_prefix)
-    preview = build_contract_preview(config)
+        inspection_artifacts = write_inspection_artifacts(
+            assembly.report,
+            inspection_output_dir,
+            _inspection_artifact_prefix(config),
+        )
     preview_artifacts = {}
     if options.emit_inspection:
         preview_artifacts = write_contract_preview_artifacts(
-            preview,
+            assembly.preview,
             inspection_output_dir,
             config.preview_artifact_prefix,
         )
-    draft = build_form_data_draft(config, preview=preview)
     draft_artifacts = {}
     if options.emit_inspection:
         draft_artifacts = write_form_data_draft_artifacts(
-            draft,
+            assembly.draft,
             inspection_output_dir,
             config.draft_artifact_prefix,
         )
-    runtime_contract_artifacts = write_runtime_contract_artifact(
-        config,
-        draft,
-        runtime_contract_artifact_path(config.root, config.model_key).parent,
-        runtime_contract_artifact_path(config.root, config.model_key).stem,
-    )
+    runtime_contract_artifacts = _write_runtime_contract_artifact(config, assembly.runtime_contract)
     runtime_contract_json = runtime_contract_artifacts["json"]
 
-    validation_errors = _validation_error_count(draft.get("validation", []))
+    validation_errors = _validation_error_count(assembly.draft.get("validation", []))
     return {
         "model_key": config.model_key,
         "model_label": config.model_label,
         "model_year": config.model_year,
-        "route_engine": "inspection_draft",
-        "status": report["status"],
+        "route_engine": ROUTE_ENGINE,
+        "status": assembly.report["status"],
         "source_option_sheet": config.source_option_sheet,
         "variant_ids": list(config.variant_ids),
         "expected_variant_count": config.expected_variant_count,
-        "counts": report["counts"],
+        "counts": assembly.report["counts"],
         "blank_section_overrides": dict(config.blank_section_overrides),
-        "warnings": report["warnings"],
+        "warnings": assembly.report["warnings"],
         "runtime_contract_json": runtime_contract_json,
         "runtime_contract_artifacts": runtime_contract_artifacts,
         "compatibility_artifacts": {},
         "inspection_artifacts": inspection_artifacts,
         "preview": {
-            "status": preview["dataset"]["status"],
-            "variants": len(preview["variants"]),
-            "choices": len(preview["choices"]),
-            "candidate_standard_equipment": len(preview["candidateStandardEquipment"]),
-            "unresolved_issues": len(preview["normalization"]["unresolvedIssues"]),
+            "status": assembly.preview["dataset"]["status"],
+            "variants": len(assembly.preview["variants"]),
+            "choices": len(assembly.preview["choices"]),
+            "candidate_standard_equipment": len(assembly.preview["candidateStandardEquipment"]),
+            "unresolved_issues": len(assembly.preview["normalization"]["unresolvedIssues"]),
         },
         "preview_artifacts": preview_artifacts,
         "draft": {
-            "status": draft["dataset"]["status"],
-            "variants": len(draft["variants"]),
-            "choices": len(draft["choices"]),
-            "standard_equipment": len(draft["standardEquipment"]),
-            "rules": len(draft["rules"]),
-            "price_rules": len(draft["priceRules"]),
-            "interiors": len(draft["interiors"]),
-            "validation_warnings": sum(1 for row in draft["validation"] if row["severity"] == "warning"),
+            "status": assembly.draft["dataset"]["status"],
+            "variants": len(assembly.draft["variants"]),
+            "choices": len(assembly.draft["choices"]),
+            "standard_equipment": len(assembly.draft["standardEquipment"]),
+            "rules": len(assembly.draft["rules"]),
+            "price_rules": len(assembly.draft["priceRules"]),
+            "interiors": len(assembly.draft["interiors"]),
+            "validation_warnings": sum(1 for row in assembly.draft["validation"] if row["severity"] == "warning"),
         },
         "draft_artifacts": draft_artifacts,
-        "rule_audit_artifacts": rule_audit_artifacts,
+        "rule_audit_artifacts": _rule_audit_artifacts(config),
         "validation_errors": validation_errors,
         "notes": list(config.notes),
     }
@@ -183,13 +196,11 @@ def generate_model_artifacts(config: ModelConfig, *, options: GenerationOptions 
     """Generate artifacts for one workbook-discovered active model."""
 
     options = options or GenerationOptions()
-    route_engine = TEMPORARY_ROUTE_ENGINES.get(config.model_key, DEFAULT_ROUTE_ENGINE)
-    if route_engine == "production":
-        result = _generate_production(config)
-    elif route_engine == "inspection_draft":
-        result = _generate_inspection_draft(config, options)
+    assembly = assemble_model_source(config)
+    if assembly.compatibility_source:
+        result = _compatibility_result(config, assembly)
     else:
-        raise ValueError(f"Unknown generation route {route_engine!r} for model {config.model_key!r}")
+        result = _reviewable_result(config, assembly, options)
 
     missing_keys = [key for key in REQUIRED_RESULT_KEYS if key not in result]
     if missing_keys:

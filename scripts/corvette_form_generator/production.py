@@ -156,13 +156,15 @@ def build_standard_equipment(choices: list[dict[str, Any]]) -> list[dict[str, An
     return [standard_equipment_row(selected[key][1]) for key in key_order]
 
 
-def generate_production_artifacts(config: ModelConfig | None = None) -> dict[str, Any]:
+def build_production_source_data(config: ModelConfig | None = None) -> dict[str, Any]:
+    """Assemble the current-generation Stingray source payload without writing artifacts."""
+
     global MODEL_CONFIG
 
     wb = load_workbook(WORKBOOK_PATH)
     MODEL_CONFIG = load_model_config_overrides(wb, config or base_model_config("stingray"))
     if MODEL_CONFIG.model_key != "stingray":
-        raise ValueError("production generation currently supports only stingray")
+        raise ValueError("current-generation compatibility source assembly supports only Stingray")
 
     variants_raw = rows_from_sheet(wb, "variant_master")
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
@@ -627,15 +629,23 @@ def generate_production_artifacts(config: ModelConfig | None = None) -> dict[str
         "validation": validation_rows,
     }
     wb.close()
+    return data
+
+
+def write_stingray_compatibility_artifacts(
+    config: ModelConfig,
+    source_data: dict[str, Any],
+    runtime_data: dict[str, Any],
+) -> dict[str, Any]:
+    """Write legacy Stingray JSON/CSV compatibility artifacts."""
+
+    if config.model_key != "stingray":
+        raise ValueError("compatibility artifact writer supports only stingray")
 
     OUTPUT_DIR.mkdir(exist_ok=True)
     APP_DIR.mkdir(exist_ok=True)
     json_path = OUTPUT_DIR / "stingray-form-data.json"
-    runtime_data = build_model_runtime_contract(MODEL_CONFIG, data)
     write_json_output(json_path, runtime_data)
-    runtime_json_path = runtime_contract_artifact_path(ROOT, MODEL_CONFIG.model_key)
-    runtime_json_path.parent.mkdir(parents=True, exist_ok=True)
-    write_json_output(runtime_json_path, runtime_data)
     csv_path = OUTPUT_DIR / "stingray-form-data.csv"
     with csv_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(
@@ -658,22 +668,33 @@ def generate_production_artifacts(config: ModelConfig | None = None) -> dict[str
             ],
         )
         writer.writeheader()
-        for row in choices:
+        for row in source_data["choices"]:
             writer.writerow({key: row.get(key, "") for key in writer.fieldnames})
+
+    return {"json": str(json_path), "csv": str(csv_path)}
+
+
+def generate_production_artifacts(config: ModelConfig | None = None) -> dict[str, Any]:
+    source_data = build_production_source_data(config)
+    runtime_data = build_model_runtime_contract(MODEL_CONFIG, source_data)
+    runtime_json_path = runtime_contract_artifact_path(ROOT, MODEL_CONFIG.model_key)
+    runtime_json_path.parent.mkdir(parents=True, exist_ok=True)
+    write_json_output(runtime_json_path, runtime_data)
+    compatibility_artifacts = write_stingray_compatibility_artifacts(MODEL_CONFIG, source_data, runtime_data)
 
     return {
         "workbook": str(WORKBOOK_PATH),
         "workbook_backup": None,
-        "json": str(json_path),
+        "json": compatibility_artifacts["json"],
         "runtime_contract_json": str(runtime_json_path),
-        "csv": str(csv_path),
-        "choices": len(choices),
-        "context_choices": len(context_choices),
-        "standard_equipment": len(standard_equipment),
-        "rules": len(data["rules"]),
-        "price_rules": len(price_rules),
-        "interiors": len(data["interiors"]),
-        "validation_errors": validation_error_count(validation_rows),
+        "csv": compatibility_artifacts["csv"],
+        "choices": len(source_data["choices"]),
+        "context_choices": len(source_data["contextChoices"]),
+        "standard_equipment": len(source_data["standardEquipment"]),
+        "rules": len(source_data["rules"]),
+        "price_rules": len(source_data["priceRules"]),
+        "interiors": len(source_data["interiors"]),
+        "validation_errors": validation_error_count(source_data["validation"]),
     }
 
 
