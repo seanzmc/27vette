@@ -23,7 +23,7 @@ Generator / report consumer evidence:
 
 - `scripts/corvette_form_generator/production.py` reads/emits `body_style_scope` and `runtime_action` for Stingray rule rows.
 - `scripts/corvette_form_generator/rules.py` reads/emits `body_style_scope` and normalizes runtime action for Grand Sport/Z06 generated rule rows.
-- `scripts/build_rule_sources.py` carries both fields for optional audit/report explainability.
+- The retired Grand Sport rule-audit helper used to carry both fields for optional report explainability; current consumers are the generator/runtime/editor paths listed here.
 - `scripts/corvette_form_generator/editor_ops.py` exposes both fields as editable enum-backed workbook fields.
 
 Generated artifact inventory:

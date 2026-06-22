@@ -96,23 +96,19 @@ Action plan:
 
 ---
 
-### 2. Optional audit/report tooling remains as opt-in historical tooling
+### 2. Optional audit/report tooling was retired
 
 Evidence:
 
-- `scripts/build_rule_sources.py` remains in `scripts/`.
-- `README.md` and `AGENTS.md` classify it as opt-in audit/report tooling, not default readiness.
-- Optional tests remain: `tests/grand-sport-rule-audit.test.mjs` and `tests/audit-parser-metadata-loaders.test.mjs`.
+- The former `scripts/build_rule_sources.py` helper and optional Grand Sport rule-audit tests no longer protect current readiness.
+- Current validation should use generator, workbook schema, runtime contract, and runtime behavior gates.
 
-Status: persists intentionally. It is no longer a default-gate blocker.
+Status: retired. It is no longer a default-gate blocker or opt-in runnable path.
 
 Action plan:
 
-1. Keep as-is unless the user wants to retire optional historical audit tooling entirely.
-2. If retiring, first prove no current workflow still needs `build_rule_sources.py` for rule provenance investigations.
-3. Delete or quarantine the script and optional tests together, not piecemeal.
-4. Update README/AGENTS optional audit blocks in the same pass.
-5. Run default gates plus any replacement provenance checks selected in the spec.
+1. Keep current readiness on generator, workbook schema, runtime contract, and runtime behavior gates.
+2. If rule provenance reporting is needed again, write a new approved report-only spec instead of restoring the retired path.
 
 ---
 

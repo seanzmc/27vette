@@ -21,7 +21,7 @@ Current tree evidence:
 - `scripts/compare-generated-contracts.mjs` strips only timestamp keys (`generated_at`, `sourceGeneratedAt`, `generatedAt`) and then deep-compares everything else. It is a strict no-drift parity check, not a general validator for approved artifact-shape/path migrations.
 - `form-app/app.js` no longer has the product/RPO-specific GBA/ZYC bypass; Pass 7 replaced it with generic `runtimeRuleExceptions` precedence. The workbook exception row remains `ex_gba_zyc`, source `opt_gba_001`, target `opt_zyc_001`.
 - `runtime_action=replace` and `body_style_scope` still carry live direct-rule behavior. Pass 8 completed the row-level classification report in `docs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`; any column deletion, row deletion, emitted-rule trim, replacement migration, or direct-rule scope-matcher change still needs a later implementation spec.
-- `scripts/corvette_form_generator/editor_ops.py` no longer includes `node --test tests/grand-sport-rule-audit.test.mjs` in Grand Sport default gate reminders; the rule-audit tooling remains optional.
+- The old Grand Sport rule-audit script/tests have been retired; Grand Sport readiness now stays on generator, workbook schema, runtime contract, and runtime behavior gates.
 - `scripts/corvette_form_generator/schema_validation.py` now shares generation role lists from `model_configs.py` and no longer uses `LEGACY_MODEL_SOURCES` or `HEADER_PAIRS`.
 
 ## Codebase philosophy constraints
@@ -154,9 +154,7 @@ Remaining product-rule cleanup should not reuse this hardcode. Add workbook meta
 
 ### 9. Editor gate reminders are normalized
 
-Pass 5A removed `node --test tests/grand-sport-rule-audit.test.mjs` from Grand Sport default editor gate reminders and added focused `gate_reminders()` tests.
-
-`build_rule_sources.py` and `grand-sport-rule-audit` remain available as optional audit/report tooling, not default readiness gates.
+Pass 5A removed the old Grand Sport rule-audit test from default editor gate reminders and added focused `gate_reminders()` tests. The old rule-audit script/tests have since been retired rather than kept as optional tooling.
 
 Current default readiness reminders keep:
 

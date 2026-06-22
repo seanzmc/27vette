@@ -85,7 +85,7 @@ Status: Completed. See:
 
 Goal: remove stale apply*, repair*, populate*, audit* scripts that are no longer workflow entrypoints.
 
-Current result: no active tracked stale one-pass workbook writer was found. The active tree already lacks the obvious old one-off script names (`populate*.py`, `generate_*_form.py`, `promote_*runtime*.py`, `*future*review*.py`, extra `apply*.py`, extra `repair*.py`). The current `apply_workbook_ops.py`, `repair_workbook_tables.py`, `promote_model.py`, generator, validators, workbook editor server, and comparison helper are guarded workflow entrypoints and were kept. `build_rule_sources.py` remains a reusable read-only report/audit helper; whether it belongs in normal readiness gates is a Pass C question.
+Current result: no active tracked stale one-pass workbook writer was found. The active tree already lacks the obvious old one-off script names (`populate*.py`, `generate_*_form.py`, `promote_*runtime*.py`, `*future*review*.py`, extra `apply*.py`, extra `repair*.py`). The current `apply_workbook_ops.py`, `repair_workbook_tables.py`, `promote_model.py`, generator, validators, workbook editor server, and comparison helper are guarded workflow entrypoints and were kept. The old `build_rule_sources.py` report helper was later retired with its optional tests after no current readiness proof exception was found.
 
 Method:
 
@@ -114,7 +114,7 @@ Method:
 - Update/remove audit tests that assert omitted-row accounting.
 - Update the workbook editor referenced-delete warning so it no longer says rule convention is `normalization_status`, not deletion.
 - Regenerate affected artifacts and compare runtime contracts while allowing audit artifact drift.
-- Decide whether `build_rule_sources.py` still has unique read-only diagnostic value after workbook dead-end rows are retired.
+- Retire any remaining report-only diagnostics that no longer have unique current-workflow value after workbook dead-end rows are retired.
 
 Current result: 288 runtime-skipped rows were deleted (`rule_mapping`: 88, `grandSport_rule_mapping`: 200). `z06_rule_mapping` had no runtime-skipped control rows. Stingray, Grand Sport, and Z06 generated runtime contracts matched their pre-deletion snapshots, so no deleted row was restored.
 
@@ -130,7 +130,7 @@ Create/clarify:
 - workbook schema gate: only canonical active workbook contracts
 - optional historical/audit gate: not part of normal readiness unless explicitly running old audit tooling
 
-Current result: `AGENTS.md` and `README.md` now split default readiness from opt-in Grand Sport audit/report gates. `scripts/build_rule_sources.py`, `tests/grand-sport-rule-audit.test.mjs`, and `tests/audit-parser-metadata-loaders.test.mjs` were demoted from default readiness; no proof exception was found.
+Current result: `AGENTS.md` and `README.md` split default readiness from the former Grand Sport audit/report gates. `scripts/build_rule_sources.py`, `tests/grand-sport-rule-audit.test.mjs`, and `tests/audit-parser-metadata-loaders.test.mjs` were first demoted from default readiness, then retired after no proof exception was found.
 
 ### Pass E — “Runtime metadata consolidation”
 

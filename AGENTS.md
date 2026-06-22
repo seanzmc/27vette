@@ -363,15 +363,9 @@ node --test tests/grand-sport-contract-preview.test.mjs
 node --test tests/grand-sport-draft-data.test.mjs
 ```
 
-Optional Grand Sport audit/report refresh:
+Retired Grand Sport audit/report tooling:
 
-```sh
-.venv/bin/python scripts/build_rule_sources.py --model grand_sport
-node --test tests/grand-sport-rule-audit.test.mjs
-node --test tests/audit-parser-metadata-loaders.test.mjs
-```
-
-Use the optional block only when maintaining audit/report tooling, refreshing `form-output/inspection/grand-sport-rule-audit.json` / `.md`, or investigating parser/rule provenance. It is not part of default model readiness.
+The former `build_rule_sources.py` report and matching optional tests are no longer current workflow tools. Do not use them as validation gates; use the model generator, workbook schema validation, and runtime contract tests for Grand Sport readiness.
 
 Optional inspection/preview/draft artifact refresh:
 

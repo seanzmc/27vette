@@ -260,7 +260,7 @@ A later implementation pass may touch those surfaces only after the classificati
    - Runtime: `form-app/app.js` direct-rule helpers and replacement reconciliation.
    - Generators: `production.py`, `rules.py`, `inspection.py`, and `runtime_contract.py` if relevant.
    - Tests: generated-field guards and runtime behavior tests in Stingray, Grand Sport, Z06, and multi-model suites.
-   - Optional audit/report path: `scripts/build_rule_sources.py` and `tests/grand-sport-rule-audit.test.mjs`.
+   - Retired audit/report path: the old Grand Sport rule-audit script/tests are no longer active consumers.
 
 5. Produced `docs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`.
 

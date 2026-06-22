@@ -61,11 +61,8 @@ From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 
   - `sec_tech_001` rows still active emitted standard equipment.
   - Do not delete until workbook-owned replacement source model exists.
 
-- Optional audit/report tooling:
-  - `scripts/build_rule_sources.py`
-  - `tests/grand-sport-rule-audit.test.mjs`
-  - `tests/audit-parser-metadata-loaders.test.mjs`
-  - Still intentional opt-in tooling, not default readiness.
+- Retired audit/report tooling:
+  - The old Grand Sport rule-audit script/tests were retired after no proof exception was found for current readiness.
 
 - Z06 option-id suffix/no-RPO ID drift:
   - U2K/U5G/UE1/VV4/CFV suffix drift remains.

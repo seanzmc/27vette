@@ -128,7 +128,7 @@ class GateRemindersTest(unittest.TestCase):
         self.assertIn(".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx", reminders)
         self.assertIn("node --test tests/grand-sport-contract-preview.test.mjs", reminders)
         self.assertIn("node --test tests/grand-sport-draft-data.test.mjs", reminders)
-        self.assertNotIn("node --test tests/grand-sport-rule-audit.test.mjs", reminders)
+        self.assertFalse(any("rule-audit" in command for command in reminders), reminders)
 
     def test_multi_model_reminders_dedupe_schema_validation(self):
         reminders = gate_reminders({"stingray", "grand_sport"})
