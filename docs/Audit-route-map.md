@@ -286,7 +286,6 @@ Pass 7 removed the remaining browser runtime product hardcode for GBA / `opt_zyc
 
 Deferred to later separately scoped passes:
 
-- body-style scope retirement parity for OVS-derived candidates and the Grand Sport BC4/ZZ3 duplicate pair
 - `runtime_action=replace` ownership/migration passes by product area
 - Stingray exclusive-group ID/style drift
 - Z06 option-ID suffix / no-RPO drift
@@ -304,12 +303,18 @@ Current preflight counts from the spec:
 - `grandSport_rule_mapping`: 6 `replace` rows; 9 body-scoped rows.
 - `z06_rule_mapping`: 1 `replace` row; 3 body-scoped rows.
 
-Pass 8 is intentionally report-only. Any workbook row deletion, rule-column deletion, generator payload trim, or direct-rule runtime scope-matcher change needs a later implementation spec after the classification report is reviewed.
+Pass 8 was intentionally report-only. Pass 9 implemented Candidate A, the body-style scope retirement parity pass. Any `runtime_action=replace` migration, rule-column deletion, generator payload trim, or direct-rule runtime scope-matcher change still needs a later implementation spec.
 
-Recommended next pass from the report: a narrow body-style scope retirement parity pass for OVS-derived candidates plus the Grand Sport BC4/ZZ3 duplicate pair. Do not bundle direct-rule `scopeMatches()` runtime semantics or `runtime_action=replace` migration into that pass.
+### Pass 9 — Body-style scope retirement parity
+
+Status: implemented in `docs/audit-cleanup/pass-9-body-style-scope-retirement-spec.md`.
+
+Pass 9 blanked all current OVS-derived direct-rule `body_style_scope` values in `rule_mapping`, `grandSport_rule_mapping`, and `z06_rule_mapping`; deleted the duplicate Grand Sport copy row `gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_002_requires_opt_zz3_001_convertible`; regenerated active model runtime artifacts and registry; and updated stale tests to assert OVS-owned scope rather than direct-rule scope. Runtime direct-rule matching code, `runtime_action=replace`, the `body_style_scope` column, and generated payload shape were unchanged.
+
+Recommended next pass: Candidate B from the Pass 8 report — a narrow Stingray spoiler replacement ownership pass for 5ZU/5ZZ/TVS and the 5ZW/ZF1 product-decision edges. Keep Grand Sport/Z06 replacement rows and direct-rule `scopeMatches()` semantics separate.
 
 ## Bottom line
 
 The repo is past the worst version of the route problem. The registry, promotion metadata, model discovery, workbook source roles, schema source-contract validation, output orchestration, and active source-assembly facade are normalized for the active models.
 
-The next safe pass is a body-style scope retirement parity spec/implementation for OVS-derived candidates and the Grand Sport BC4/ZZ3 duplicate pair. Do not delete `runtime_action`, trim emitted rule fields, migrate replacement behavior, or change direct-rule runtime matching until a narrower implementation spec is approved.
+The next safe pass is a narrow Stingray spoiler replacement ownership spec/implementation for the Pass 8 Candidate B rows. Do not delete `runtime_action`, trim emitted rule fields, migrate Grand Sport/Z06 replacement behavior, or change direct-rule runtime matching until separately approved.

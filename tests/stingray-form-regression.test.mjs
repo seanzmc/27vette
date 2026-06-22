@@ -2247,13 +2247,20 @@ test("exterior appearance, engine appearance, and wheel sections use QA-4 orderi
   assert.equal(data.steps.some((step) => step.step_key === "calipers"), false);
 });
 
-test("BC7 has a convertible-only ZZ3 requirement", () => {
+test("BC7 ZZ3 requirement is constrained by OVS availability", () => {
   const bc7Rule = data.rules.find(
     (rule) => rule.source_id === "opt_bc7_001" && rule.target_id === "opt_zz3_001" && rule.rule_type === "requires"
   );
   assert.ok(bc7Rule, "BC7 should have a ZZ3 requirement rule");
-  assert.equal(bc7Rule.body_style_scope, "convertible");
+  assert.equal(bc7Rule.body_style_scope || "", "");
   assert.match(bc7Rule.disabled_reason, /Requires ZZ3 Convertible Engine Appearance Package/);
+  const variantsById = new Map(data.variants.map((variant) => [variant.variant_id, variant]));
+  const zz3Bodies = new Set(
+    data.choices
+      .filter((choice) => choice.option_id === "opt_zz3_001" && choice.active === "True" && choice.status !== "unavailable")
+      .map((choice) => variantsById.get(choice.variant_id)?.body_style)
+  );
+  assert.deepEqual([...zz3Bodies].sort(), ["convertible"]);
 });
 
 test("spoiler replacement rules preserve ZYC and replace T0A without blocking TVS/5ZZ/5ZU", () => {

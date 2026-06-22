@@ -395,9 +395,9 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
     "3LT_AH2_HZN::includes::opt_3n9_001::::active",
     "3LT_AH2_H8T::includes::opt_3a9_001::::active",
     "3LT_AH2_HUW::includes::opt_379_001::::active",
-    "opt_bc4_002::includes::opt_d3v_001::coupe::active",
-    "opt_bcp_002::includes::opt_d3v_001::coupe::active",
-    "opt_bcs_002::includes::opt_d3v_001::coupe::active",
+    "opt_bc4_002::includes::opt_d3v_001::::active",
+    "opt_bcp_002::includes::opt_d3v_001::::active",
+    "opt_bcs_002::includes::opt_d3v_001::::active",
   ]) {
     assert.ok(ruleKeys.has(key), `${key} should be generated`);
   }
