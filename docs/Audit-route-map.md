@@ -6,7 +6,7 @@ The main diagnosis: **the active public workflow and generator orchestration are
 
 ## Status and evidence anchors
 
-This file is an audit/action map. Passes 0 through 7 now have implementation evidence under `docs/audit-cleanup/`. Pass 8 is drafted as a report-only classification pass. Later implementation passes still need their own spec before edits.
+This file is an audit/action map. Passes 0 through 8 now have implementation evidence under `docs/audit-cleanup/`. Later implementation passes still need their own spec before edits.
 
 Current tree evidence:
 
@@ -20,7 +20,7 @@ Current tree evidence:
   - Z06: `artifact_type=runtime_contract`, `artifact_path=form-output/runtime/z06-runtime-contract.json`.
 - `scripts/compare-generated-contracts.mjs` strips only timestamp keys (`generated_at`, `sourceGeneratedAt`, `generatedAt`) and then deep-compares everything else. It is a strict no-drift parity check, not a general validator for approved artifact-shape/path migrations.
 - `form-app/app.js` no longer has the product/RPO-specific GBA/ZYC bypass; Pass 7 replaced it with generic `runtimeRuleExceptions` precedence. The workbook exception row remains `ex_gba_zyc`, source `opt_gba_001`, target `opt_zyc_001`.
-- `runtime_action=replace` and `body_style_scope` still carry live direct-rule behavior and are now scoped for a report-only classification pass in `docs/audit-cleanup/pass-8-direct-rule-field-classification-spec.md` before any column deletion or emitted-rule behavior changes.
+- `runtime_action=replace` and `body_style_scope` still carry live direct-rule behavior. Pass 8 completed the row-level classification report in `docs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`; any column deletion, row deletion, emitted-rule trim, replacement migration, or direct-rule scope-matcher change still needs a later implementation spec.
 - `scripts/corvette_form_generator/editor_ops.py` no longer includes `node --test tests/grand-sport-rule-audit.test.mjs` in Grand Sport default gate reminders; the rule-audit tooling remains optional.
 - `scripts/corvette_form_generator/schema_validation.py` now shares generation role lists from `model_configs.py` and no longer uses `LEGACY_MODEL_SOURCES` or `HEADER_PAIRS`.
 
@@ -119,7 +119,7 @@ That is a risk area because rules are exactly where hardcoded one-off fixes tend
 
 ### 7. `runtime_action` and `body_style_scope` are live behavior, not cleanup metadata
 
-A repo report records that all three active models still emit and consume these fields, with model-specific counts:
+Pass 8 records that all three active models still emit and consume these fields, with model-specific counts:
 
 - Stingray: 144 active direct rules, 5 `runtime_action=replace`, 8 with `body_style_scope`
 - Grand Sport: 122 active direct rules, 6 replace, 9 body-scoped
@@ -127,7 +127,7 @@ A repo report records that all three active models still emit and consume these 
 
 `form-app/app.js` consumes both fields for live behavior. `runtime_action=replace` affects disable/click/removal behavior, and `body_style_scope` gates rule application.
 
-**Do not delete these columns as “cleanup.”** First classify each use into a canonical owner:
+**Do not delete these columns as “cleanup.”** Pass 8 classified each use into candidate canonical owners:
 
 ```text
 default_selection_rules
@@ -138,7 +138,7 @@ runtime_rule_exceptions
 keep as true special behavior
 ```
 
-Any migration away from these direct-rule fields needs generated/runtime parity proof for the behavior, not just a workbook-column deletion.
+Pass 8 findings: most body-scoped rows are plausible OVS-derived cleanup candidates; Grand Sport BC4/ZZ3 rows 5 and 95 are an apparent duplicate/stale pair; replacement rows split across direct-default, exclusive-peer, default-selection, grouped-dependency, and product-decision candidates. Any migration away from these direct-rule fields still needs generated/runtime parity proof for the behavior, not just a workbook-column deletion.
 
 ### 8. GBA/ZYC runtime hardcode is normalized
 
@@ -286,15 +286,15 @@ Pass 7 removed the remaining browser runtime product hardcode for GBA / `opt_zyc
 
 Deferred to later separately scoped passes:
 
-- `runtime_action=replace` classification
-- `body_style_scope` classification
+- body-style scope retirement parity for OVS-derived candidates and the Grand Sport BC4/ZZ3 duplicate pair
+- `runtime_action=replace` ownership/migration passes by product area
 - Stingray exclusive-group ID/style drift
 - Z06 option-ID suffix / no-RPO drift
 - residual copy allowlist decisions
 
 ### Pass 8 — Direct rule field classification
 
-Status: spec drafted in `docs/audit-cleanup/pass-8-direct-rule-field-classification-spec.md`. Do not implement cleanup until approved.
+Status: completed report-only implementation in `docs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`; closure recorded in `docs/audit-cleanup/pass-8-direct-rule-field-classification-spec.md`.
 
 Goal: produce a report-only row classification for active `runtime_action=replace` and `body_style_scope` usage across `rule_mapping`, `grandSport_rule_mapping`, and `z06_rule_mapping` before deleting workbook columns, changing generated `rules` payload fields, or changing browser direct-rule evaluation.
 
@@ -306,8 +306,10 @@ Current preflight counts from the spec:
 
 Pass 8 is intentionally report-only. Any workbook row deletion, rule-column deletion, generator payload trim, or direct-rule runtime scope-matcher change needs a later implementation spec after the classification report is reviewed.
 
+Recommended next pass from the report: a narrow body-style scope retirement parity pass for OVS-derived candidates plus the Grand Sport BC4/ZZ3 duplicate pair. Do not bundle direct-rule `scopeMatches()` runtime semantics or `runtime_action=replace` migration into that pass.
+
 ## Bottom line
 
 The repo is past the worst version of the route problem. The registry, promotion metadata, model discovery, workbook source roles, schema source-contract validation, output orchestration, and active source-assembly facade are normalized for the active models.
 
-The next safe pass is to implement the Pass 8 report-only classification artifact. Do not delete `runtime_action` or `body_style_scope`, trim emitted rule fields, or change direct-rule runtime matching until that report is reviewed and a narrower implementation pass is approved.
+The next safe pass is a body-style scope retirement parity spec/implementation for OVS-derived candidates and the Grand Sport BC4/ZZ3 duplicate pair. Do not delete `runtime_action`, trim emitted rule fields, migrate replacement behavior, or change direct-rule runtime matching until a narrower implementation spec is approved.

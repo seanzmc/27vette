@@ -1,7 +1,8 @@
 # Pass 8 — Direct Rule Field Classification Report/Spec
 
-Status: Spec only. Do not implement workbook, generator, or runtime changes until approved.
+Status: Completed report-only implementation on 2026-06-22.
 Date: 2026-06-22
+Report: `docs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`.
 Recommended reasoning level for implementation agent: high.
 
 ## Goal
@@ -13,13 +14,13 @@ Run a report-only classification pass for the two direct-rule fields that still 
 
 This pass must happen before deleting either column from `rule_mapping`, `grandSport_rule_mapping`, or `z06_rule_mapping`, before changing generated `rules` payload fields, and before changing browser direct-rule evaluation.
 
-The deliverable for the approved pass is a classification report with row-level recommendations and parity criteria. It is not a workbook cleanup pass.
+The delivered pass is a classification report with row-level recommendations and parity criteria. It is not a workbook cleanup pass.
 
 ## Diagnosis
 
 Change type for this spec: docs-only.
 
-Change type for the proposed Pass 8 report: report-only/docs-only. It should not write `stingray_master.xlsx`, regenerate committed artifacts, or change runtime behavior.
+Change type for the completed Pass 8 report: report-only/docs-only. It did not write `stingray_master.xlsx`, regenerate committed artifacts, or change runtime behavior.
 
 Risk level: medium. `runtime_action=replace` and `body_style_scope` are not duplicate/lifecycle-only fields today:
 
@@ -33,18 +34,15 @@ Therefore these fields cannot be removed as part of a duplicate-column cleanup w
 
 ## Current evidence inspected
 
-Preflight command run 2026-06-22:
+Report implementation preflight run 2026-06-22:
 
 ```text
 ## schema-ingestion-normalization...origin/main
- M docs/Audit-route-map.md
- M form-app/app.js
- M tests/stingray-form-regression.test.mjs
-?? docs/audit-cleanup/pass-7-runtime-rule-exception-hardcode-cleanup-spec.md
 excel_lock_absent
+workbook_package status=valid issue_count=0
 ```
 
-Those modified/untracked files are Pass 7 work already present in the working tree. The Pass 8 report/spec should not modify them except for the route-map/spec documentation updates explicitly listed below.
+Pass 8 changed only the report artifact and status documentation listed below.
 
 Read-only workbook inventory from `stingray_master.xlsx`:
 
@@ -203,16 +201,11 @@ Classify every scoped direct rule into one of these buckets:
 
 ## Exact files for this report/spec pass
 
-Current docs-only request changed:
-
-- `docs/audit-cleanup/pass-8-direct-rule-field-classification-spec.md`
-- `docs/Audit-route-map.md`
-
-If Pass 8 is later approved as a report-only implementation, the expected changed files should be limited to:
+Completed Pass 8 report-only implementation changed:
 
 - `docs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`
-- `docs/audit-cleanup/pass-8-direct-rule-field-classification-spec.md` status/completion update
-- `docs/Audit-route-map.md` status update
+- `docs/audit-cleanup/pass-8-direct-rule-field-classification-spec.md`
+- `docs/Audit-route-map.md`
 
 Do not change these in Pass 8 report-only implementation:
 
@@ -238,7 +231,7 @@ A later implementation pass may touch those surfaces only after the classificati
 - Do not delete or suppress `runtime_action=replace` rows without replacing their behavior through workbook-owned metadata and proving parity.
 - Do not treat validator/test references as proof a field belongs in the workbook; classify by final generated/runtime behavior first.
 
-## Proposed Pass 8 report procedure
+## Completed Pass 8 report procedure
 
 1. Preflight.
 
@@ -269,7 +262,7 @@ A later implementation pass may touch those surfaces only after the classificati
    - Tests: generated-field guards and runtime behavior tests in Stingray, Grand Sport, Z06, and multi-model suites.
    - Optional audit/report path: `scripts/build_rule_sources.py` and `tests/grand-sport-rule-audit.test.mjs`.
 
-5. Produce `docs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`.
+5. Produced `docs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`.
 
    The report must include:
 
@@ -281,24 +274,25 @@ A later implementation pass may touch those surfaces only after the classificati
    - rows that appear redundant but need parity proof;
    - exact later-pass candidates, split by workbook cleanup, generator/runtime scope semantics, and test updates.
 
-6. Stop after the report.
+6. Stopped after the report.
 
    Do not edit workbook columns, rule rows, generator behavior, runtime behavior, tests, or generated artifacts in Pass 8.
 
-## Validation plan for this docs/report pass
+## Validation for this docs/report pass
 
-Docs-only validation:
+Docs-only validation run after implementation:
 
 ```sh
 git diff --check
-rg -n "Status: Spec only|Do not implement workbook, generator, or runtime changes" docs/audit-cleanup/pass-8-direct-rule-field-classification-spec.md docs/Audit-route-map.md
+pattern="$(printf 'Status: Spec %s|Approve Pass %s as a report-only classification implementation' only 8)"
+if rg -n "$pattern" docs/audit-cleanup/pass-8-direct-rule-field-classification-spec.md docs/Audit-route-map.md docs/audit-cleanup/pass-8-direct-rule-field-classification-report.md; then exit 1; fi
 ```
 
-Report completeness validation after Pass 8 report is implemented:
+Report completeness validation run after implementation:
 
 ```sh
 .venv/bin/python - <<'PY'
-# Read-only assertion sketch for the report implementation:
+# Read-only assertion for the report implementation:
 # - every runtime_action=replace row from rule_mapping/grandSport_rule_mapping/z06_rule_mapping appears in the report
 # - every nonblank body_style_scope row from those sheets appears in the report
 # - every report row has a classification bucket and proposed owner / decision state
@@ -306,6 +300,26 @@ PY
 ```
 
 No generators or runtime tests are required for the report-only pass because it must not change workbook, generated, or runtime behavior. If any implementation goes beyond report/docs, stop and write a separate implementation spec with model-specific gates.
+
+## Completion summary
+
+Completed on 2026-06-22 as a report-only/docs-only pass.
+
+Changed files:
+
+- `docs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`
+- `docs/audit-cleanup/pass-8-direct-rule-field-classification-spec.md`
+- `docs/Audit-route-map.md`
+
+Changed workbook sheets/artifacts/runtime behavior: none. `stingray_master.xlsx`, `form-output/*`, `form-app/data.js`, generator code, runtime code, and tests were not changed.
+
+Report findings:
+
+- `runtime_action=replace` remains live behavior and is split into direct-default, exclusive-peer, default-selection, grouped-dependency, and product-decision candidates.
+- Most nonblank `body_style_scope` direct rules appear OVS-derivable, but deletion needs a workbook parity pass.
+- Grand Sport BC4/ZZ3 rows 5 and 95 are the only duplicate/stale direct-rule pair identified in the scoped inventory.
+
+Recommended next pass: Candidate A from the report — a body-style scope retirement parity pass that deletes only reviewed OVS-derivable scope values / the Grand Sport duplicate candidate after safe workbook write, regeneration, contract comparison, and targeted runtime gates. Do not bundle runtime `scopeMatches()` semantics or replacement-rule migration into that pass.
 
 ## Risks
 
@@ -326,8 +340,8 @@ No generators or runtime tests are required for the report-only pass because it 
 - No ZR1/ZR1X rule cleanup.
 - No price-rule semantic classification; that remains a separate price-rule pass.
 
-## Approval prompt
+## Historical approval prompt
 
-Approve Pass 8 as a report-only classification implementation?
+The historical approval question was whether to run Pass 8 as a report-only classification implementation.
 
-Approval of Pass 8 should only authorize the report artifact and route/spec status updates. It should not authorize workbook edits, generated artifact changes, runtime code changes, or deletion of `runtime_action` / `body_style_scope`.
+Approval of Pass 8 authorized only the report artifact and route/spec status updates. It did not authorize workbook edits, generated artifact changes, runtime code changes, or deletion of `runtime_action` / `body_style_scope`.
