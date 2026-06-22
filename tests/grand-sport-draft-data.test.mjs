@@ -129,6 +129,11 @@ const expectedGrandSportExclusiveGroups = [
     option_ids: ["opt_feb_001", "opt_fey_001"],
   },
   {
+    group_id: "gs_excl_performance_aero",
+    option_ids: ["opt_t0e_001", "opt_t0f_001"],
+    selection_mode: "required_single_within_group",
+  },
+  {
     group_id: "gs_excl_exterior_accents",
     option_ids: ["opt_efr_001", "opt_edu_001"],
     selection_mode: "required_single_within_group",
@@ -386,7 +391,6 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
     "opt_nwi_001::excludes::opt_nga_001::::replace",
     "opt_t0f_001::requires::opt_j57_001::::active",
     "opt_j57_001::excludes::opt_j6a_001::::replace",
-    "opt_fey_001::excludes::opt_t0e_001::::replace",
     "opt_fey_001::includes::opt_t0f_001::::active",
     "opt_fey_001::includes::opt_cfz_001::::active",
     "opt_t0f_001::includes::opt_cfz_001::::active",
@@ -400,6 +404,15 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
     "opt_bcs_002::includes::opt_d3v_001::::active",
   ]) {
     assert.ok(ruleKeys.has(key), `${key} should be generated`);
+  }
+
+  for (const key of [
+    "opt_fey_001::excludes::opt_t0e_001::::replace",
+    "opt_feb_001::excludes::opt_jx6_001::::replace",
+    "opt_fey_001::excludes::opt_jx6_001::::replace",
+    "opt_fey_001::excludes::opt_j56_001::::replace",
+  ]) {
+    assert.equal(ruleKeys.has(key), false, `${key} should be owned by Grand Sport package/default metadata`);
   }
 
   const groupedBlockers = new Map(draft.ruleGroups.map((group) => [group.group_id, group]));
@@ -551,7 +564,7 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
         rule.target_id === "opt_jx6_001" &&
         rule.runtime_action === "replace"
     ),
-    true
+    false
   );
   assert.equal(
     draft.rules.some(
@@ -561,7 +574,7 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
         rule.target_id === "opt_jx6_001" &&
         rule.runtime_action === "replace"
     ),
-    true
+    false
   );
   assert.equal(
     draft.rules.some(
@@ -571,7 +584,7 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
         rule.target_id === "opt_j56_001" &&
         rule.runtime_action === "replace"
     ),
-    true
+    false
   );
   assert.equal(draft.rules.some((rule) => rule.source_id === "opt_fey_001" && rule.rule_type === "includes" && rule.target_id === "opt_j57_001"), true);
   assert.equal(draft.rules.some((rule) => rule.source_id === "opt_fey_001" && rule.rule_type === "includes" && rule.target_id === "opt_t0f_001"), true);
@@ -608,6 +621,17 @@ test("Grand Sport draft suppresses reviewed inactive/deferred option rows withou
     }
   );
   assert.equal(draft.rules.some((rule) => rule.source_id === "opt_j57_001" && rule.rule_type === "includes" && rule.target_id === "opt_j6d_001"), false);
+  assert.equal(
+    draft.defaultSelectionRules.some(
+      (rule) =>
+        rule.rule_id === "gs_default_t0e" &&
+        rule.target_option_id === "opt_t0e_001" &&
+        rule.condition_type === "unless_selected_section" &&
+        rule.condition_id === "sec_perf_aero_001"
+    ),
+    true,
+    "Grand Sport T0E should restore through workbook-authored default metadata"
+  );
   assert.equal(
     draft.defaultSelectionRules.some(
       (rule) =>

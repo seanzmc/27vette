@@ -315,10 +315,16 @@ Status: implemented in `docs/audit-cleanup/pass-10-stingray-spoiler-replacement-
 
 Pass 10 deleted the three redundant active Stingray direct replacement rows for 5ZU, 5ZZ, and TVS removing T0A, leaving that peer-switch behavior owned by `grp_spoiler_high_wing`. It preserved the 5ZW and ZF1 direct replacement rows because those remain product-decision edges. Runtime code, Grand Sport/Z06 replacement rows, `runtime_action` schema, and dealer submission behavior were unchanged.
 
-Recommended next pass: Candidate C from the Pass 8 report — Grand Sport package/default replacement ownership for FEY/FEB relationships to T0E, JX6, and J56. Keep NWI/NGA exhaust replacement and Z06 brake/default replacement separate.
+### Pass 11 — Grand Sport package/default replacement ownership
+
+Status: implemented in `docs/audit-cleanup/pass-11-grand-sport-package-default-replacement-ownership-spec.md`.
+
+Pass 11 deleted the four approved Grand Sport direct replacement rows for FEY/FEB package relationships to T0E, JX6, and J56. It added workbook-owned `gs_default_t0e` default-selection metadata and `gs_excl_performance_aero` exclusive-group metadata so FEY-included T0F owns T0E replacement generically, while existing `gs_excl_performance_brakes` owns FEB/FEY brake peer replacement. It preserved the J57/J6A and NWI/NGA direct replacement rows because those remain separate ownership classes. Runtime code, generator code, `runtime_action` schema, and dealer submission behavior were unchanged.
+
+Recommended next pass: Candidate D from the Pass 8 report — Grand Sport NWI/NGA exhaust default replacement ownership — only after a fresh preflight confirms current source rows, generated data, and tests still match the Pass 8 classification. Keep Z06 brake/default replacement separate.
 
 ## Bottom line
 
 The repo is past the worst version of the route problem. The registry, promotion metadata, model discovery, workbook source roles, schema source-contract validation, output orchestration, and active source-assembly facade are normalized for the active models.
 
-The next safe pass is a narrow Grand Sport package/default replacement ownership spec for the Pass 8 Candidate C rows. Do not delete `runtime_action`, trim emitted rule fields, migrate NWI/NGA or Z06 replacement behavior, or change direct-rule runtime matching until separately approved.
+The next safe candidate is a narrow Grand Sport NWI/NGA exhaust default replacement ownership spec if current repo evidence still supports the Pass 8 Candidate D classification. Do not delete `runtime_action`, trim emitted rule fields, migrate Z06 replacement behavior, or change direct-rule runtime matching until separately approved.
