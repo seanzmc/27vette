@@ -894,7 +894,7 @@ test("Grand Sport exclusive group selections remove peer options without runtime
   }
 });
 
-test("Grand Sport Z52 packages replace aero and brake defaults through workbook metadata", () => {
+test("Grand Sport Z52 packages keep direct replacement peers unavailable", () => {
   const runtime = loadRuntime();
   runtime.activateModel("grandSport");
   runtime.state.bodyStyle = "coupe";
@@ -912,6 +912,10 @@ test("Grand Sport Z52 packages replace aero and brake defaults through workbook 
   assert.equal(runtime.state.selected.has("opt_feb_001"), true, "FEB should remain selected");
   assert.equal(runtime.state.selected.has("opt_jx6_001"), false, "FEB included J56 should suppress JX6 through the brake group");
   assert.equal(autoAddedRpos().includes("J56"), true, "FEB should auto-add display-only J56");
+  assert.equal(runtime.disableReasonForChoice(choice("opt_jx6_001")), "FEB includes J56 performance disc brakes.");
+  assert.equal(runtime.disableReasonForChoice(choice("opt_j57_001")), "", "FEB should leave J57 optional");
+  runtime.handleChoice(choice("opt_jx6_001"));
+  assert.equal(runtime.state.selected.has("opt_jx6_001"), false, "blocked JX6 should not reselect while FEB is selected");
 
   runtime.handleChoice(choice("opt_fey_001"));
   assert.equal(runtime.state.selected.has("opt_feb_001"), false, "FEY should replace FEB in the Z52 package group");
@@ -922,6 +926,13 @@ test("Grand Sport Z52 packages replace aero and brake defaults through workbook 
   assert.equal(autoAddedRpos().includes("J57"), true, "FEY should auto-add J57");
   assert.equal(autoAddedRpos().includes("T0F"), true, "FEY should auto-add T0F");
   assert.equal(runtime.state.selected.has("opt_j6d_001"), true, "J57 should still soft-default J6D as a selected caliper");
+  assert.equal(runtime.disableReasonForChoice(choice("opt_jx6_001")), "FEY includes J57 carbon ceramic brakes.");
+  assert.equal(runtime.disableReasonForChoice(choice("opt_j56_001")), "FEY includes J57 carbon ceramic brakes.");
+  assert.equal(runtime.disableReasonForChoice(choice("opt_t0e_001")), "FEY replaces the low rear spoiler with the included carbon fiber aero package.");
+  runtime.handleChoice(choice("opt_jx6_001"));
+  runtime.handleChoice(choice("opt_t0e_001"));
+  assert.equal(runtime.state.selected.has("opt_jx6_001"), false, "blocked JX6 should not reselect while FEY is selected");
+  assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "blocked T0E should not reselect while FEY is selected");
 
   runtime.handleChoice(choice("opt_fey_001"));
   assert.equal(runtime.state.selected.has("opt_fey_001"), false, "FEY should be removable as an optional package");
@@ -1167,7 +1178,7 @@ test("Grand Sport workbook default_selected rows seed and reconcile defaults gen
   assert.equal(febRuntime.state.selected.has("opt_feb_001"), true, "FEB should be selectable");
   assert.equal(febRuntime.state.selected.has("opt_jx6_001"), false, "FEB should replace the default JX6 brake row");
   assert.equal(febRuntime.computeAutoAdded().get("opt_j56_001"), "Included with FEB Z52 Sport Performance Package.");
-  assert.equal(febRuntime.disableReasonForChoice(febRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_jx6_001")), "");
+  assert.equal(febRuntime.disableReasonForChoice(febRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_jx6_001")), "FEB includes J56 performance disc brakes.");
   assert.equal(febRuntime.disableReasonForChoice(febRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_j57_001")), "");
 
   const fey = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_fey_001");
@@ -1176,8 +1187,8 @@ test("Grand Sport workbook default_selected rows seed and reconcile defaults gen
   assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "FEY should replace the default T0E aero row");
   assert.equal(runtime.state.selected.has("opt_jx6_001"), false, "FEY auto-added J57 should replace the default JX6 brake row");
   assert.equal(runtime.state.selected.has("opt_j56_001"), false, "FEY auto-added J57 should not leave J56 selected");
-  assert.equal(runtime.disableReasonForChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_jx6_001")), "");
-  assert.equal(runtime.disableReasonForChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j56_001")), "Included with FEB Z52 Sport Performance Package.");
+  assert.equal(runtime.disableReasonForChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_jx6_001")), "FEY includes J57 carbon ceramic brakes.");
+  assert.equal(runtime.disableReasonForChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j56_001")), "FEY includes J57 carbon ceramic brakes.");
 
   const order = runtime.currentOrder();
   assert.equal(order.auto_added_options.some((item) => item.rpo === "J57"), true, "FEY should auto-add J57");

@@ -317,9 +317,9 @@ Pass 10 deleted the three redundant active Stingray direct replacement rows for 
 
 ### Pass 11 — Grand Sport package/default replacement ownership
 
-Status: implemented in `docs/audit-cleanup/pass-11-grand-sport-package-default-replacement-ownership-spec.md`.
+Status: corrected in `docs/audit-cleanup/pass-11-grand-sport-package-default-replacement-ownership-spec.md` after local-runtime regression.
 
-Pass 11 deleted the four approved Grand Sport direct replacement rows for FEY/FEB package relationships to T0E, JX6, and J56. It added workbook-owned `gs_default_t0e` default-selection metadata and `gs_excl_performance_aero` exclusive-group metadata so FEY-included T0F owns T0E replacement generically, while existing `gs_excl_performance_brakes` owns FEB/FEY brake peer replacement. It preserved the J57/J6A and NWI/NGA direct replacement rows because those remain separate ownership classes. Runtime code, generator code, `runtime_action` schema, and dealer submission behavior were unchanged.
+Pass 11 initially tried to delete the four Grand Sport direct replacement rows for FEY/FEB package relationships to T0E, JX6, and J56, while adding workbook-owned `gs_default_t0e` and `gs_excl_performance_aero` metadata. Local runtime testing proved the generic metadata was not behavior-equivalent: peer cards could still appear available/clickable without the direct replacement rows. The pass was corrected by restoring those four FEY/FEB replacement rows and adding tests for the actual user path. Runtime code, generator code, `runtime_action` schema, and dealer submission behavior were unchanged.
 
 Recommended next pass: Candidate D from the Pass 8 report — Grand Sport NWI/NGA exhaust default replacement ownership — only after a fresh preflight confirms current source rows, generated data, and tests still match the Pass 8 classification. Keep Z06 brake/default replacement separate.
 

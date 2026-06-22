@@ -1,6 +1,6 @@
 # Pass 11 — Grand Sport Package/Default Replacement Ownership Spec
 
-Status: Completed implementation on 2026-06-22.
+Status: Corrected implementation on 2026-06-22 after local-runtime regression.
 Date: 2026-06-22
 Recommended reasoning level for implementation agent: high.
 Source report: `docs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`.
@@ -411,14 +411,14 @@ Stop conditions:
 - Change visual styling or layout.
 - Change dealer submission behavior.
 
-## Implementation completed
+## Implementation corrected
 
-Completed on 2026-06-22.
+Initial implementation completed on 2026-06-22, then corrected the same day after local browser testing showed the four deleted direct replacement rows were still required to make peer cards unavailable/unclickable.
 
 Source workbook changes:
 
 - `stingray_master.xlsx`
-  - `grandSport_rule_mapping`: deleted exactly four Grand Sport direct replacement rows:
+  - `grandSport_rule_mapping`: restored and preserved these four Grand Sport direct replacement rows after proving the generic metadata replacement was not behavior-equivalent:
     - `gs_rule_opt_fey_001_excludes_opt_t0e_001_replace`
     - `gs_rule_opt_feb_001_excludes_opt_jx6_001_replace`
     - `gs_rule_opt_fey_001_excludes_opt_jx6_001_replace`
@@ -454,11 +454,13 @@ Preserved behavior and boundaries:
 
 Generated contract delta proof:
 
-- Grand Sport runtime rule count changed from 121 to 117.
-- Grand Sport `runtime_action=replace` count changed from 6 to 2.
-- Removed runtime rule IDs were exactly the four approved FEY/FEB package/default replacement rows.
-- Added generated metadata was limited to `gs_excl_performance_aero` and `gs_default_t0e`, plus timestamp churn.
-- Preserved direct replacement rows remained present for J57/J6A and NWI/NGA.
+- Grand Sport runtime rule count is back to 121 after restoring the four direct replacement rows.
+- Grand Sport `runtime_action=replace` count is back to 6.
+- Added generated metadata from the initial implementation remains limited to `gs_excl_performance_aero` and `gs_default_t0e`, plus timestamp churn.
+- Direct replacement rows now preserved: the four FEY/FEB package/default rows, J57/J6A, and NWI/NGA.
+- Browser smoke confirmed the corrected local runtime behavior:
+  - FEB selected: JX6 is unavailable, J56 is auto-added, and J57 remains optional.
+  - FEY selected: JX6, J56, and T0E are unavailable; J57 and T0F are auto-added.
 
 Gate results:
 
@@ -487,7 +489,7 @@ node --test tests/multi-model-runtime-switching.test.mjs
 
 Residual risks / follow-up:
 
-- Browser smoke was not run; coverage here is workbook/source verification, generated contract diff proof, and Node runtime tests.
+- Browser smoke was run locally against `form-app` on port 8030; console contained no JavaScript errors.
 - Candidate D, the NWI/NGA exhaust default replacement pass, remains separate and should be the next cleanup only after a fresh preflight confirms repo evidence still matches the Pass 8 classification.
 
 ## Historical approval prompt

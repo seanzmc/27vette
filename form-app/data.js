@@ -48025,7 +48025,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-22T20:51:49+00:00",
+          "generated_at": "2026-06-22T21:25:18+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -88321,6 +88321,24 @@ window.CORVETTE_FORM_DATA = {
             "source_note": "J57 replaces black painted calipers."
           },
           {
+            "rule_id": "gs_rule_opt_fey_001_excludes_opt_t0e_001_replace",
+            "source_id": "opt_fey_001",
+            "rule_type": "excludes",
+            "target_id": "opt_t0e_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_perf_z52_001",
+            "target_section": "sec_perf_aero_001",
+            "source_selection_mode": "single_select_opt",
+            "target_selection_mode": "single_select_req",
+            "body_style_scope": "",
+            "disabled_reason": "FEY replaces the low rear spoiler with the included carbon fiber aero package.",
+            "auto_add": "False",
+            "active": "True",
+            "runtime_action": "replace",
+            "source_note": "FEY includes T0F Carbon Fiber Aero Package and replaces T0E Low Rear Spoiler."
+          },
+          {
             "rule_id": "gs_rule_3lt_ae4_el9_includes_opt_z25_001",
             "source_id": "3LT_AE4_EL9",
             "rule_type": "includes",
@@ -88661,6 +88679,60 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "runtime_action": "active",
             "source_note": "Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior."
+          },
+          {
+            "rule_id": "gs_rule_opt_feb_001_excludes_opt_jx6_001_replace",
+            "source_id": "opt_feb_001",
+            "rule_type": "excludes",
+            "target_id": "opt_jx6_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_perf_z52_001",
+            "target_section": "sec_perf_brake_001",
+            "source_selection_mode": "single_select_opt",
+            "target_selection_mode": "single_select_req",
+            "body_style_scope": "",
+            "disabled_reason": "FEB includes J56 performance disc brakes.",
+            "auto_add": "False",
+            "active": "True",
+            "runtime_action": "replace",
+            "source_note": "FEB Z52 Sport Performance Package includes J56 performance disc brakes and replaces JX6 low-dust touring brakes."
+          },
+          {
+            "rule_id": "gs_rule_opt_fey_001_excludes_opt_jx6_001_replace",
+            "source_id": "opt_fey_001",
+            "rule_type": "excludes",
+            "target_id": "opt_jx6_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_perf_z52_001",
+            "target_section": "sec_perf_brake_001",
+            "source_selection_mode": "single_select_opt",
+            "target_selection_mode": "single_select_req",
+            "body_style_scope": "",
+            "disabled_reason": "FEY includes J57 carbon ceramic brakes.",
+            "auto_add": "False",
+            "active": "True",
+            "runtime_action": "replace",
+            "source_note": "FEY Z52 Track Performance Package includes J57 carbon ceramic brakes and replaces JX6 low-dust touring brakes."
+          },
+          {
+            "rule_id": "gs_rule_opt_fey_001_excludes_opt_j56_001_replace",
+            "source_id": "opt_fey_001",
+            "rule_type": "excludes",
+            "target_id": "opt_j56_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_perf_z52_001",
+            "target_section": "sec_perf_brake_001",
+            "source_selection_mode": "single_select_opt",
+            "target_selection_mode": "single_select_req",
+            "body_style_scope": "",
+            "disabled_reason": "FEY includes J57 carbon ceramic brakes.",
+            "auto_add": "False",
+            "active": "True",
+            "runtime_action": "replace",
+            "source_note": "FEY Z52 Track Performance Package includes J57 carbon ceramic brakes and replaces J56 performance disc brakes."
           },
           {
             "rule_id": "gs_rule_opt_nwi_001_excludes_opt_nga_001_replace",
@@ -97318,7 +97390,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "117 active compatibility rules exported from grandSport_rule_mapping."
+            "message": "121 active compatibility rules exported from grandSport_rule_mapping."
           },
           {
             "check_id": "interior_contract",
