@@ -1,12 +1,12 @@
 # Audit route map
 
-Status refreshed 2026-06-21 after Pass 6C. This document is a code/docs route map; the refresh did not change workbook sheets or runtime behavior.
+Status refreshed 2026-06-22 after Pass 7. This document is a code/docs route map; the refresh did not change workbook sheets or generated artifacts.
 
 The main diagnosis: **the active public workflow and generator orchestration are now normalized through one source-assembly facade.** `generate_form.py` delegates every active model to `model_generation.generate_model_artifacts()`, and that module now calls `source_assembly.assemble_model_source()` for Stingray, Grand Sport, and Z06. Pass 6C preserved the existing Stingray compatibility JSON/CSV payload and the Grand Sport/Z06 review payload shapes with timestamp-ignored runtime parity.
 
 ## Status and evidence anchors
 
-This file is an audit/action map. Passes 0 through 6C now have implementation evidence under `docs/audit-cleanup/`. Later passes still need their own spec before edits.
+This file is an audit/action map. Passes 0 through 7 now have implementation evidence under `docs/audit-cleanup/`. Later passes still need their own spec before edits.
 
 Current tree evidence:
 
@@ -19,7 +19,7 @@ Current tree evidence:
   - Grand Sport: `artifact_type=runtime_contract`, `artifact_path=form-output/runtime/grand-sport-runtime-contract.json`.
   - Z06: `artifact_type=runtime_contract`, `artifact_path=form-output/runtime/z06-runtime-contract.json`.
 - `scripts/compare-generated-contracts.mjs` strips only timestamp keys (`generated_at`, `sourceGeneratedAt`, `generatedAt`) and then deep-compares everything else. It is a strict no-drift parity check, not a general validator for approved artifact-shape/path migrations.
-- `form-app/app.js` still has a product/RPO-specific runtime exception: `choice.rpo === "GBA" && rule.source_id === "opt_zyc_001"`. The workbook exception row is `ex_gba_zyc`, source `opt_gba_001`, target `opt_zyc_001`.
+- `form-app/app.js` no longer has the product/RPO-specific GBA/ZYC bypass; Pass 7 replaced it with generic `runtimeRuleExceptions` precedence. The workbook exception row remains `ex_gba_zyc`, source `opt_gba_001`, target `opt_zyc_001`.
 - `scripts/corvette_form_generator/editor_ops.py` no longer includes `node --test tests/grand-sport-rule-audit.test.mjs` in Grand Sport default gate reminders; the rule-audit tooling remains optional.
 - `scripts/corvette_form_generator/schema_validation.py` now shares generation role lists from `model_configs.py` and no longer uses `LEGACY_MODEL_SOURCES` or `HEADER_PAIRS`.
 
@@ -139,17 +139,17 @@ keep as true special behavior
 
 Any migration away from these direct-rule fields needs generated/runtime parity proof for the behavior, not just a workbook-column deletion.
 
-### 8. Runtime JS still has at least one product hardcode
+### 8. GBA/ZYC runtime hardcode is normalized
 
-The runtime has a hardcoded exception in `form-app/app.js`:
+Pass 7 removed the hardcoded browser exception:
 
 ```js
 choice.rpo === "GBA" && rule.source_id === "opt_zyc_001"
 ```
 
-The corresponding workbook-authored exception is `ex_gba_zyc`, source `opt_gba_001`, target `opt_zyc_001`. This is the cleanest example of “runtime knows Corvette product facts.”
+The runtime now uses generated `runtimeRuleExceptions` metadata generically when a candidate source option should replace a currently selected exception target. The corresponding workbook-authored exception remains `ex_gba_zyc`, source `opt_gba_001`, target `opt_zyc_001`.
 
-**Normalize to:** add/confirm a focused RED test for the GBA/`opt_zyc_001` behavior, verify the workbook-driven `runtime_rule_exceptions` row covers the runtime case, then remove the hardcoded runtime exception only if the generated exception covers the behavior.
+Remaining product-rule cleanup should not reuse this hardcode. Add workbook metadata or generic generated-data evaluation with focused behavior tests.
 
 ### 9. Editor gate reminders are normalized
 
@@ -273,33 +273,26 @@ Pass 6B made Grand Sport/Z06 normal generation write only clean runtime contract
 
 ### Pass 6C — Source-row assembly route unification
 
-Status: not implemented. Needs its own spec before edits.
+Status: implemented in `docs/audit-cleanup/pass-6c-source-row-assembly-unification-spec.md`.
 
-Goal: remove the temporary route-engine classifier in `model_generation.py` and make Stingray, Grand Sport, and Z06 use one source-row assembly route without runtime-contract drift. This pass must stay parity-first and must not include business-rule hardcode cleanup.
+Pass 6C removed the temporary route-engine classifier in `model_generation.py`, added `source_assembly.assemble_model_source()`, and made Stingray, Grand Sport, and Z06 report the same `source_assembly` route while preserving runtime-contract, review-artifact, and Stingray compatibility parity.
 
-### Pass 7 — Business-rule hardcode cleanup
+### Pass 7 — Runtime rule exception hardcode cleanup
 
-After the source-row assembly route is unified, handle the smaller rule cleanup items:
+Status: implemented in `docs/audit-cleanup/pass-7-runtime-rule-exception-hardcode-cleanup-spec.md`.
 
-- GBA / `opt_zyc_001` runtime hardcode backed by workbook `ex_gba_zyc`
+Pass 7 removed the remaining browser runtime product hardcode for GBA / `opt_zyc_001` by making `form-app/app.js` use workbook-generated `runtimeRuleExceptions.ex_gba_zyc` generically. It did not change workbook rows, generated artifacts, dealer submission behavior, or broader direct-rule field semantics.
+
+Deferred to later separately scoped passes:
+
 - `runtime_action=replace` classification
 - `body_style_scope` classification
 - Stingray exclusive-group ID/style drift
 - Z06 option-ID suffix / no-RPO drift
 - residual copy allowlist decisions
 
-Those are real, but they should come after the builder/pathway fork is removed unless one is blocking current runtime correctness.
-
 ## Bottom line
 
-The repo is past the worst version of the problem. The registry, promotion metadata, model discovery, workbook source roles, and schema source-contract validation are workbook-owned now.
+The repo is past the worst version of the route problem. The registry, promotion metadata, model discovery, workbook source roles, schema source-contract validation, output orchestration, and active source-assembly facade are normalized for the active models.
 
-The remaining structural issue is narrower and clearer after Pass 6A:
-
-```text
-One CLI entrypoint
-one output orchestration layer
-but two source-row assembly engines
-```
-
-Next safe pass: write Pass 6C for source-row assembly unification. Keep it parity-first and do not fold runtime product-hardcode cleanup or rule-field classification into the route pass unless separately scoped.
+The next safe pass is direct-rule field classification: write a report/spec pass for `runtime_action=replace` and `body_style_scope` that classifies current active rule rows into canonical workbook owners before deleting columns or changing emitted rule behavior.

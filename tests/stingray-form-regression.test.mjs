@@ -1830,6 +1830,13 @@ test("runtime defaults and RPO exceptions are workbook-generated metadata", () =
     JSON.parse(JSON.stringify(data.runtimeRuleExceptions.map((exception) => exception.exception_id).sort())),
     ["ex_gba_zyc", "ex_nwi_nga", "ex_z51_fe1", "ex_z51_fe2"]
   );
+  const gbaZycException = data.runtimeRuleExceptions.find((exception) => exception.exception_id === "ex_gba_zyc");
+  assert.equal(gbaZycException.source_option_id, "opt_gba_001");
+  assert.equal(gbaZycException.target_option_id, "opt_zyc_001");
+  assert.equal(gbaZycException.exception_type, "remove_target_when_source_selected");
+  assert.equal(gbaZycException.body_style_scope, "*");
+  assert.equal(gbaZycException.trim_level_scope, "*");
+  assert.equal(gbaZycException.variant_scope, "*");
   const fe1Default = data.defaultSelectionRules.find((rule) => rule.rule_id === "default_fe1");
   assert.equal(fe1Default.condition_type, "unless_selected_section");
   assert.equal(fe1Default.condition_id, "sec_susp_001");
@@ -1838,6 +1845,8 @@ test("runtime defaults and RPO exceptions are workbook-generated metadata", () =
   assert.doesNotMatch(appSource, /deleteSelectedRpo\("FE2"\)/);
   assert.doesNotMatch(appSource, /deleteSelectedRpo\("NGA"\)/);
   assert.doesNotMatch(appSource, /if \(choice\.rpo === "GBA"\) deleteSelectedRpo\("ZYC"\)/);
+  assert.doesNotMatch(appSource, /choice\.rpo\s*===\s*["']GBA["']/);
+  assert.doesNotMatch(appSource, /rule\.source_id\s*===\s*["']opt_zyc_001["']/);
   assert.ok(
     data.rules.some((rule) => rule.source_id === "opt_z51_001" && rule.target_id === "opt_fe3_001" && rule.rule_type === "includes"),
     "Z51 should include FE3"
@@ -1859,6 +1868,34 @@ test("runtime defaults and RPO exceptions are workbook-generated metadata", () =
     data.rules.some((rule) => rule.source_id === "opt_fe4_001" && rule.target_id === "opt_z51_001" && rule.rule_type === "requires"),
     "FE4 should require Z51"
   );
+});
+
+test("GBA replaces selected ZYC through workbook-generated runtime exception metadata", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const gba = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001");
+  const zyc = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_zyc_001");
+  assert.ok(gba, "GBA should exist for the current variant");
+  assert.ok(zyc, "ZYC should exist for the current variant");
+
+  runtime.state.selected.add(zyc.option_id);
+  runtime.state.userSelected.add(zyc.option_id);
+  assert.equal(runtime.disableReasonForChoice(gba), "", "GBA should stay selectable while ZYC is selected");
+
+  runtime.handleChoice(gba);
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has(gba.option_id), true, "GBA should be selected");
+  assert.equal(runtime.state.selected.has(zyc.option_id), false, "ZYC should be removed by runtime exception metadata");
+  assert.equal(runtime.state.userSelected.has(zyc.option_id), false, "ZYC should be removed from user selections");
+
+  assert.match(runtime.disableReasonForChoice(zyc), /ZYC Body-Color Accents are not available with Black exterior paint/i);
+  runtime.handleChoice(zyc);
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has(zyc.option_id), false, "ZYC should not stick while GBA is selected");
 });
 
 test("FE3 disabled tile explains that Z51 includes it without duplicating the RPO", () => {

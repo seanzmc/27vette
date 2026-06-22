@@ -648,6 +648,17 @@ function runtimeExceptionForTarget(targetOptionId) {
   );
 }
 
+function runtimeExceptionAllowsCandidateOverSelectedTarget(candidateOptionId, selectedTargetOptionId) {
+  return generatedRuleExceptions().some(
+    (exception) =>
+      exception.exception_type === "remove_target_when_source_selected" &&
+      exception.source_option_id === candidateOptionId &&
+      exception.target_option_id === selectedTargetOptionId &&
+      exceptionApplies(exception) &&
+      state.selected.has(selectedTargetOptionId)
+  );
+}
+
 function removeRuntimeExceptionTargets(sourceOptionId = "") {
   for (const exception of generatedRuleExceptions()) {
     if (exception.exception_type !== "remove_target_when_source_selected") continue;
@@ -1004,7 +1015,7 @@ function disableReasonForChoice(choice, { includeSelectedRequirements = true } =
   for (const rule of targetRules) {
     if (rule.rule_type === "excludes" && selectedIds.has(rule.source_id) && ruleAppliesToCurrentVariant(rule)) {
       if (sameExclusiveGroupPeer(choice.option_id, rule.source_id)) continue;
-      if (choice.rpo === "GBA" && rule.source_id === "opt_zyc_001") continue;
+      if (runtimeExceptionAllowsCandidateOverSelectedTarget(choice.option_id, rule.source_id)) continue;
       if (rule.runtime_action === "replace") return rule.disabled_reason || `${getEntityLabel(rule.source_id)} removes this default.`;
       return rule.disabled_reason || `Blocked by ${getEntityLabel(rule.source_id)}.`;
     }
