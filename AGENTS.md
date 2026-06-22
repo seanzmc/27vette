@@ -48,7 +48,7 @@ The current default architecture is workbook-to-runtime for every active model:
 stingray_master.xlsx
   -> workbook source tables for the selected model
   -> scripts/generate_form.py --model <model>
-  -> generated workbook sheets and/or model runtime artifacts
+  -> model runtime artifacts under form-output/runtime/
   -> scripts/generate_registry.py
   -> form-app/data.js
   -> form-app static runtime
@@ -158,6 +158,8 @@ Inactive or future model source sheets are outside the default runtime workflow 
 
 Active runtime contracts are generated under `form-output/runtime/` and published to the browser registry through `scripts/generate_registry.py`. Historical workbook `form_*` generated sheets are not part of the routine runtime workflow and should not be recreated or hand-edited unless a separately approved opt-in debug/export pass defines a named consumer.
 
+Raw GM order-guide ingest is an edge workflow for new-model intake or broad source refreshes, not routine workbook maintenance. Use `Order-Guide_IngestPrompt.md` and `docs/ingest/` for that preflight path; raw ingest should emit transient candidates under `form-output/ingest/<run-id>/` and must not write `stingray_master.xlsx`, generated outputs, or promoted runtime data without a later approved apply pass.
+
 ## Workbook Safety
 
 Close Excel before running any script that writes `stingray_master.xlsx`.
@@ -210,7 +212,7 @@ Do not solve bad source data by suppressing it in Python or JavaScript. Correct 
 
 Do not add an extra module, staging sheet, review taxonomy, or duplicate scope column when an existing workbook sheet already carries the relationship. Use the current pipeline first: fill the canonical blank cells, source rows, membership rows, or scope rows that the generator already reads. Add a new layer only after documenting why the existing workbook contract cannot represent the decision.
 
-Do not edit generated `form_*` sheets directly. Change source sheets, then regenerate.
+Do not edit generated `form_*` sheets directly or recreate them for routine generation. Change source sheets, then regenerate runtime artifacts.
 
 For workbook schema and live-contract validation, run:
 
@@ -223,6 +225,14 @@ To compare generated JSON contracts while ignoring timestamp fields, run:
 ```sh
 node scripts/compare-generated-contracts.mjs before.json after.json
 ```
+
+Asset image maintenance has a separate documented helper at `asset_map-Sync/asset_map_sync.py`. Until an approved pass aligns its write path with the workbook safety contract and project dependencies, treat it as a dry-run/report tool only:
+
+```sh
+.venv/bin/python asset_map-Sync/asset_map_sync.py --workbook stingray_master.xlsx --report-dir /tmp/asset-map-sync
+```
+
+TODO: Decide whether `asset_map_sync.py --apply` should be migrated to `save_workbook_safely()` before it becomes part of routine workbook maintenance.
 
 ## Workbook Review & Edit Tool (dev only)
 
@@ -262,6 +272,14 @@ Current active model keys are:
 - `z06`
 
 `scripts/generate_form.py --model <model>` reads the model's workbook-owned source sheets and emits the model artifacts. `scripts/generate_registry.py` reads workbook promotion metadata and promoted model artifacts, then writes `form-app/data.js` for the browser runtime.
+
+Active generatable model keys are discovered from workbook metadata, not a hardcoded CLI list. Activating a future model requires complete active workbook source and variant metadata; publishing it to the browser remains a separate `model_registry_promotion` decision.
+
+Normal generation writes clean runtime contracts. Use `--emit-inspection --inspection-output <dir>` only when a review/spec needs optional inspection, preview, or draft artifacts:
+
+```sh
+.venv/bin/python scripts/generate_form.py --model z06 --emit-inspection --inspection-output /tmp/z06-inspection
+```
 
 Generated outputs are artifacts, not source of truth. Do not hand-edit generated workbook `form_*` sheets, `form-output/*`, or `form-app/data.js`; change workbook source rows or generic generator logic, regenerate, and review the diff.
 
@@ -354,6 +372,15 @@ node --test tests/audit-parser-metadata-loaders.test.mjs
 ```
 
 Use the optional block only when maintaining audit/report tooling, refreshing `form-output/inspection/grand-sport-rule-audit.json` / `.md`, or investigating parser/rule provenance. It is not part of default model readiness.
+
+Optional inspection/preview/draft artifact refresh:
+
+```sh
+.venv/bin/python scripts/generate_form.py --model grand_sport --emit-inspection --inspection-output /tmp/grand-sport-inspection
+.venv/bin/python scripts/generate_form.py --model z06 --emit-inspection --inspection-output /tmp/z06-inspection
+```
+
+Use optional inspection output only for review/spec work that needs those artifacts. Do not check in temp inspection output unless the approved pass names it as an expected artifact.
 
 Z06 data refresh:
 

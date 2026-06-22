@@ -1,12 +1,12 @@
 # Audit route map
 
-Status refreshed 2026-06-22 after Pass 7. This document is a code/docs route map; the refresh did not change workbook sheets or generated artifacts.
+Status refreshed 2026-06-22 after the Pass 8 report/spec. This document is a code/docs route map; the refresh did not change workbook sheets, runtime code, or generated artifacts.
 
 The main diagnosis: **the active public workflow and generator orchestration are now normalized through one source-assembly facade.** `generate_form.py` delegates every active model to `model_generation.generate_model_artifacts()`, and that module now calls `source_assembly.assemble_model_source()` for Stingray, Grand Sport, and Z06. Pass 6C preserved the existing Stingray compatibility JSON/CSV payload and the Grand Sport/Z06 review payload shapes with timestamp-ignored runtime parity.
 
 ## Status and evidence anchors
 
-This file is an audit/action map. Passes 0 through 7 now have implementation evidence under `docs/audit-cleanup/`. Later passes still need their own spec before edits.
+This file is an audit/action map. Passes 0 through 7 now have implementation evidence under `docs/audit-cleanup/`. Pass 8 is drafted as a report-only classification pass. Later implementation passes still need their own spec before edits.
 
 Current tree evidence:
 
@@ -20,6 +20,7 @@ Current tree evidence:
   - Z06: `artifact_type=runtime_contract`, `artifact_path=form-output/runtime/z06-runtime-contract.json`.
 - `scripts/compare-generated-contracts.mjs` strips only timestamp keys (`generated_at`, `sourceGeneratedAt`, `generatedAt`) and then deep-compares everything else. It is a strict no-drift parity check, not a general validator for approved artifact-shape/path migrations.
 - `form-app/app.js` no longer has the product/RPO-specific GBA/ZYC bypass; Pass 7 replaced it with generic `runtimeRuleExceptions` precedence. The workbook exception row remains `ex_gba_zyc`, source `opt_gba_001`, target `opt_zyc_001`.
+- `runtime_action=replace` and `body_style_scope` still carry live direct-rule behavior and are now scoped for a report-only classification pass in `docs/audit-cleanup/pass-8-direct-rule-field-classification-spec.md` before any column deletion or emitted-rule behavior changes.
 - `scripts/corvette_form_generator/editor_ops.py` no longer includes `node --test tests/grand-sport-rule-audit.test.mjs` in Grand Sport default gate reminders; the rule-audit tooling remains optional.
 - `scripts/corvette_form_generator/schema_validation.py` now shares generation role lists from `model_configs.py` and no longer uses `LEGACY_MODEL_SOURCES` or `HEADER_PAIRS`.
 
@@ -291,8 +292,22 @@ Deferred to later separately scoped passes:
 - Z06 option-ID suffix / no-RPO drift
 - residual copy allowlist decisions
 
+### Pass 8 — Direct rule field classification
+
+Status: spec drafted in `docs/audit-cleanup/pass-8-direct-rule-field-classification-spec.md`. Do not implement cleanup until approved.
+
+Goal: produce a report-only row classification for active `runtime_action=replace` and `body_style_scope` usage across `rule_mapping`, `grandSport_rule_mapping`, and `z06_rule_mapping` before deleting workbook columns, changing generated `rules` payload fields, or changing browser direct-rule evaluation.
+
+Current preflight counts from the spec:
+
+- `rule_mapping`: 5 `replace` rows; 8 body-scoped rows.
+- `grandSport_rule_mapping`: 6 `replace` rows; 9 body-scoped rows.
+- `z06_rule_mapping`: 1 `replace` row; 3 body-scoped rows.
+
+Pass 8 is intentionally report-only. Any workbook row deletion, rule-column deletion, generator payload trim, or direct-rule runtime scope-matcher change needs a later implementation spec after the classification report is reviewed.
+
 ## Bottom line
 
 The repo is past the worst version of the route problem. The registry, promotion metadata, model discovery, workbook source roles, schema source-contract validation, output orchestration, and active source-assembly facade are normalized for the active models.
 
-The next safe pass is direct-rule field classification: write a report/spec pass for `runtime_action=replace` and `body_style_scope` that classifies current active rule rows into canonical workbook owners before deleting columns or changing emitted rule behavior.
+The next safe pass is to implement the Pass 8 report-only classification artifact. Do not delete `runtime_action` or `body_style_scope`, trim emitted rule fields, or change direct-rule runtime matching until that report is reviewed and a narrower implementation pass is approved.
