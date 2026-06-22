@@ -321,10 +321,14 @@ Status: corrected in `docs/audit-cleanup/pass-11-grand-sport-package-default-rep
 
 Pass 11 initially tried to delete the four Grand Sport direct replacement rows for FEY/FEB package relationships to T0E, JX6, and J56, while adding workbook-owned `gs_default_t0e` and `gs_excl_performance_aero` metadata. Local runtime testing proved the generic metadata was not behavior-equivalent: peer cards could still appear available/clickable without the direct replacement rows. The pass was corrected by restoring those four FEY/FEB replacement rows and adding tests for the actual user path. Runtime code, generator code, `runtime_action` schema, and dealer submission behavior were unchanged.
 
-Recommended next pass: Candidate D from the Pass 8 report — Grand Sport NWI/NGA exhaust default replacement ownership — only after a fresh preflight confirms current source rows, generated data, and tests still match the Pass 8 classification. Keep Z06 brake/default replacement separate.
+### Pass 12 — Grand Sport exhaust default replacement ownership
+
+Status: spec pending approval in `docs/audit-cleanup/pass-12-grand-sport-exhaust-default-replacement-ownership-spec.md`.
+
+Pass 12 is Candidate D from the Pass 8 report. The spec scopes only the Grand Sport NWI/NGA exhaust relationship: NGA and NWI are mutually exclusive and one must be selected, but NWI separately requires WUB while NGA remains standard/default regardless of WUB. The proposed implementation would make the active exhaust peer group own NGA/NWI only, preserve NWI -> WUB and FEY -> WUB rules, and delete the NWI -> NGA direct replacement row only after generated-data and local-runtime parity proof. Stingray has the same expected product behavior, but its current behavior is segregated through `runtime_rule_exceptions.ex_nwi_nga`; that sheet is explicitly deferred to a later workbook-normalization pass along with `variant_option_overrides`. Keep Z06 brake/default replacement separate.
 
 ## Bottom line
 
 The repo is past the worst version of the route problem. The registry, promotion metadata, model discovery, workbook source roles, schema source-contract validation, output orchestration, and active source-assembly facade are normalized for the active models.
 
-The next safe candidate is a narrow Grand Sport NWI/NGA exhaust default replacement ownership spec if current repo evidence still supports the Pass 8 Candidate D classification. Do not delete `runtime_action`, trim emitted rule fields, migrate Z06 replacement behavior, or change direct-rule runtime matching until separately approved.
+The next safe candidate is implementing the pending Pass 12 Grand Sport NWI/NGA exhaust default replacement ownership spec if approved. After that, the next architecture-risk pass should retire segregated workbook behavior surfaces such as `runtime_rule_exceptions` and `variant_option_overrides` into normal rule/default/group ownership where parity can be proven. Do not delete `runtime_action`, trim emitted rule fields, migrate Z06 replacement behavior, or change direct-rule runtime matching until separately approved.
