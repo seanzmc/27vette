@@ -4,23 +4,23 @@
 
 ### Highest risk
 
-1. Runtime_rule_exceptions is still an active segregated runtime behavior surface.
-   - Current state: 3 rows / 3 active, all model_key=stingray.
+1. Runtime_rule_exceptions is still an active segregated runtime behavior surface, reduced by Pass 14.
+   - Current state after Pass 14: 2 rows / 2 active, all model_key=stingray.
    - Active rows:
      - ex_z51_fe1: opt_z51_001 removes opt_fe1_001
      - ex_z51_fe2: opt_z51_001 removes opt_fe2_001
-     - ex_gba_zyc: opt_gba_001 removes opt_zyc_001
    - Current consumers:
      - scripts/corvette_form_generator/runtime_metadata.py:283
      - scripts/corvette_form_generator/production.py:180, emitted at production.py:625
      - form-app/app.js:626-668, form-app/app.js:1004-1019
-     - Tests pin the current rows in tests/stingray-form-regression.test.mjs:1824-1855, 2309-2326
+     - Tests pin the current rows and the retired GBA/ZYC canonical owner in tests/stingray-form-regression.test.mjs:1824-1869, 2305-2351
    - This sheet is workbook-owned, but not proven canonical. It owns exception behavior that plausibly belongs in normal rule/default/group ownership.
    - ex_nwi_nga is not present in current workbook evidence and is correctly not treated as open.
-   - Likely canonical candidates:
-     - ex_gba_zyc: Stingray rule_groups / rule_group_members as excludes_any from GBA to ZYC, or a normal direct rule in the correct source->target direction. Z06 already has z06_group_gba_excludes_accent_and_roof_choices with source opt_gba_001 and target opt_zyc_001; Stingray currently has only grp_gba_excludes_edu and a reverse direct rule opt_zyc_001 excludes opt_gba_001.
+   - Retired canonical candidate:
+     - ex_gba_zyc: Pass 14 moved this behavior to Stingray rule_groups / rule_group_members as excludes_any from GBA to ZYC and removed the reverse direct rule opt_zyc_001 excludes opt_gba_001 after generated-data and browser/runtime parity proof.
+   - Remaining likely canonical candidates:
      - ex_z51_fe1 / ex_z51_fe2: suspension/default ownership, likely involving rule_mapping, exclusive_groups, and default_selection_rules.default_fe1. Current workbook already has default_fe1 and Z51 includes FE3, but no normal group/row currently owns “selecting Z51 removes FE1/FE2” without the exception sheet.
-   - Migration would probably require at least workbook-source changes and generated-contract/runtime parity proof. Runtime changes may not be needed for ex_gba_zyc if existing generic excludes_any reconciliation is behavior-equivalent, but that must be proven in browser/runtime tests before deleting the exception row.
+   - Any remaining migration requires workbook-source changes and generated-contract/runtime parity proof.
 
 ### Medium-high risk
 
@@ -75,18 +75,17 @@
 
 ## Sheet-by-sheet table:
 
-Sheet: runtime_rule_exceptions — 3 rows / 3 active; coverage stingray:3; keys model_key, exception_id, source_option_id, target_option_id, exception_type,
+Sheet: runtime_rule_exceptions — 2 rows / 2 active after Pass 14; coverage stingray:2; keys model_key, exception_id, source_option_id, target_option_id, exception_type,
 scopes, disabled_reason, active
 Current consumer(s): runtime_metadata.py:283; production.py:180,625; form-app/app.js:626-668,1004-1019;
-stingray-form-regression.test.mjs:1824-1855,2309-2326
+stingray-form-regression.test.mjs:1824-1869,2309-2351
 Current behavior/data ownership: Exception behavior. Removes/disables selected targets via generated runtimeRuleExceptions. Current active rows are
-ex_z51_fe1, ex_z51_fe2, ex_gba_zyc.
+ex_z51_fe1 and ex_z51_fe2. Pass 14 retired ex_gba_zyc into rule_groups.grp_gba_excludes_zyc plus rule_group_members.
 Canonical-owner candidate: Existing workbook owners: rule_mapping, rule_groups/members, exclusive_groups/members, default_selection_rules, option rows.
 Risk level: High
-Recommended next action: Migrate candidate, one behavior class at a time. Safest first candidate: ex_gba_zyc.
+Recommended next action: Migrate/classify the remaining Z51/FE1/FE2 suspension/default behavior as a separate behavior class, or defer if normal ownership cannot prove parity.
 Required parity gates: Future pass: regenerate affected model + registry; strict generated-contract diff with approved deltas; node --test
-tests/stingray-form-regression.test.mjs; node --test tests/multi-model-runtime-switching.test.mjs; local browser/runtime proof that selected ZYC is
-removed/disabled after selecting GBA and cannot be clicked back in.
+tests/stingray-form-regression.test.mjs; node --test tests/multi-model-runtime-switching.test.mjs; local browser/runtime proof for the specific remaining behavior.
 ────────────────────────────────────────
 Sheet: variant_option_overrides — 7 rows; raw active=True count 3 but loader consumes all 7; coverage stingray:7; keys model_key, option_id, variant_id,
 status, selectable, active, display_behavior, notes
@@ -255,24 +254,27 @@ Risk level: Low current runtime risk
 Recommended next action: Needs more evidence.
 Required parity gates: Future ZR1/ZR1X readiness audit only; no current runtime gate.
 
-## Safest next implementation pass:
+## Pass 14 completed implementation:
 
-The safest next implementation pass is a narrow spec-first pass for runtime_rule_exceptions.ex_gba_zyc only.
+Pass 14 implemented the former safest next pass for `runtime_rule_exceptions.ex_gba_zyc` only.
 
-Why:
+What changed:
 
-- It is one active Stingray exception row.
-- Z06 already has a normal workbook-owned grouped exclusion precedent: z06_group_gba_excludes_accent_and_roof_choices includes opt_zyc_001.
-- Current runtime already has generic excludes_any disable behavior and reconciliation paths, so this may be a workbook-source migration without JavaScript changes, but that must be proven.
-- It avoids the more complex Z51/FE1/FE2 suspension/default behavior and avoids the variant override sheet contract split.
+- Added Stingray `rule_groups.grp_gba_excludes_zyc` as an `excludes_any` group from `opt_gba_001` to `opt_zyc_001`.
+- Added the matching `rule_group_members` target `opt_zyc_001`.
+- Removed `runtime_rule_exceptions.ex_gba_zyc`.
+- Removed reverse direct rule `rule_mapping.rule_opt_zyc_001_excludes_opt_gba_001` so GBA remains selectable after ZYC is selected.
+- Preserved `rule_mapping.rule_opt_zyc_001_includes_opt_drg_001` and the remaining Z51/FE1/FE2 runtime exceptions.
+- Regenerated Stingray runtime artifacts and `form-app/data.js`.
 
-Do not implement it without a spec. The spec should explicitly prove:
+Parity proven:
 
-- selected ZYC is removed after selecting GBA,
-- ZYC remains disabled while GBA is selected,
-- ZYC cannot be clicked back in,
-- direct reverse rule behavior and grouped exclusion behavior are equivalent,
-- generated contract deltas are limited to the approved exception-row removal and grouped/direct-rule replacement.
+- Generated contract deltas were limited to the approved grouped-exclusion addition, reverse direct-rule removal, `ex_gba_zyc` removal, and the resulting compatibility-rule count change from 141 to 140.
+- Browser/runtime proof on the local form showed ZYC selected first leaves GBA selectable; selecting GBA removes ZYC from selected/user-selected state; ZYC remains disabled with the workbook-owned reason; clicking ZYC while GBA is selected does not re-add it; model switching to Grand Sport and Z06 still renders.
+
+Next implementation candidate:
+
+- The remaining `runtime_rule_exceptions` rows are the Z51/FE1/FE2 suspension/default behavior (`ex_z51_fe1`, `ex_z51_fe2`). Treat them as a separate spec-first pass because they involve default/standard suspension ownership, not paint/accent conflict behavior.
 
 Validation run for this audit:
 

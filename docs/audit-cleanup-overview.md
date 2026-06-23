@@ -120,7 +120,7 @@ Current result: 288 runtime-skipped rows were deleted (`rule_mapping`: 88, `gran
 
 ### Pass D — “Required gate split”
 
-Status: Completed. See `docs/audit-cleanup/pass-d-required-gate-split-spec.md`.
+Status: Completed. See `docs/archive/completed-specs/audit-cleanup/pass-d-required-gate-split-spec.md`.
 
 Goal: stop optional audit/report tooling from blocking normal form work after dead-end workbook rows are removed.
 

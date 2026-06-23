@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-23T04:00:33+00:00"
+          "generated_at": "2026-06-23T20:32:12+00:00"
         },
         "variants": [
           {
@@ -36983,6 +36983,20 @@ window.CORVETTE_FORM_DATA = {
             "disabled_reason": "GBA black paint blocks EDU exterior accent choice.",
             "active": "True",
             "notes": "Workbook-owned grouped exclusion metadata."
+          },
+          {
+            "group_id": "grp_gba_excludes_zyc",
+            "group_type": "excludes_any",
+            "source_id": "opt_gba_001",
+            "target_ids": [
+              "opt_zyc_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "ZYC Carbon Flash painted mirrors and spoiler package is not available with Black exterior paint.",
+            "active": "True",
+            "notes": "Workbook-owned grouped exclusion replacing retired runtime_rule_exceptions.ex_gba_zyc."
           }
         ],
         "exclusiveGroups": [
@@ -39481,24 +39495,6 @@ window.CORVETTE_FORM_DATA = {
             "source_note": "removes (T0A) Z51 rear spoiler and front splitter from Z51 Performance Package 1. Requires (Z51) Z51 Performance Package. Not available with 5ZU, 5ZW, 5ZZ, 5VM, 5W8."
           },
           {
-            "rule_id": "rule_opt_zyc_001_excludes_opt_gba_001",
-            "source_id": "opt_zyc_001",
-            "rule_type": "excludes",
-            "target_id": "opt_gba_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_spoi_001",
-            "target_section": "sec_pain_001",
-            "source_selection_mode": "multi_select_opt",
-            "target_selection_mode": "single_select_req",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by ZYC Carbon Flash Mirrors and Spoiler.",
-            "auto_add": "False",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": "includes (DRG) Carbon Flash Metallic-painted outside mirrors. Also includes Carbon Flash Metallic-painted spoiler when (Z51) Z51 Performance Package or (TVS) low-profile rear spoiler and front splitter is ordered. Not available with exterior color (GBA) Black."
-          },
-          {
             "rule_id": "rule_opt_zyc_001_includes_opt_drg_001",
             "source_id": "opt_zyc_001",
             "rule_type": "includes",
@@ -40187,17 +40183,6 @@ window.CORVETTE_FORM_DATA = {
           }
         ],
         "runtimeRuleExceptions": [
-          {
-            "exception_id": "ex_gba_zyc",
-            "source_option_id": "opt_gba_001",
-            "target_option_id": "opt_zyc_001",
-            "exception_type": "remove_target_when_source_selected",
-            "body_style_scope": "*",
-            "trim_level_scope": "*",
-            "variant_scope": "*",
-            "disabled_reason": "ZYC Body-Color Accents are not available with Black exterior paint.",
-            "notes": "Black paint removes ZYC body-color accent availability."
-          },
           {
             "exception_id": "ex_z51_fe1",
             "source_option_id": "opt_z51_001",
@@ -48003,7 +47988,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "141 active compatibility rules exported from 141 source rules."
+            "message": "140 active compatibility rules exported from 140 source rules."
           }
         ]
       },

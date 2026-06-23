@@ -19,8 +19,8 @@ Current tree evidence:
   - Grand Sport: `artifact_type=runtime_contract`, `artifact_path=form-output/runtime/grand-sport-runtime-contract.json`.
   - Z06: `artifact_type=runtime_contract`, `artifact_path=form-output/runtime/z06-runtime-contract.json`.
 - `scripts/compare-generated-contracts.mjs` strips only timestamp keys (`generated_at`, `sourceGeneratedAt`, `generatedAt`) and then deep-compares everything else. It is a strict no-drift parity check, not a general validator for approved artifact-shape/path migrations.
-- `form-app/app.js` no longer has the product/RPO-specific GBA/ZYC bypass; Pass 7 replaced it with generic `runtimeRuleExceptions` precedence. The workbook exception row remains `ex_gba_zyc`, source `opt_gba_001`, target `opt_zyc_001`.
-- `runtime_action=replace` and `body_style_scope` still carry live direct-rule behavior. Pass 8 completed the row-level classification report in `docs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`; any column deletion, row deletion, emitted-rule trim, replacement migration, or direct-rule scope-matcher change still needs a later implementation spec.
+- `form-app/app.js` no longer has the product/RPO-specific GBA/ZYC bypass; Pass 7 replaced it with generic `runtimeRuleExceptions` precedence. Pass 14 then retired the workbook exception row into `rule_groups.grp_gba_excludes_zyc` and removed the reverse direct rule.
+- `runtime_action=replace` and `body_style_scope` still carry live direct-rule behavior. Pass 8 completed the row-level classification report in `docs/archive/completed-specs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`; any column deletion, row deletion, emitted-rule trim, replacement migration, or direct-rule scope-matcher change still needs a later implementation spec.
 - The old Grand Sport rule-audit script/tests have been retired; Grand Sport readiness now stays on generator, workbook schema, runtime contract, and runtime behavior gates.
 - `scripts/corvette_form_generator/schema_validation.py` now shares generation role lists from `model_configs.py` and no longer uses `LEGACY_MODEL_SOURCES` or `HEADER_PAIRS`.
 
@@ -148,7 +148,7 @@ Pass 7 removed the hardcoded browser exception:
 choice.rpo === "GBA" && rule.source_id === "opt_zyc_001"
 ```
 
-The runtime now uses generated `runtimeRuleExceptions` metadata generically when a candidate source option should replace a currently selected exception target. The corresponding workbook-authored exception remains `ex_gba_zyc`, source `opt_gba_001`, target `opt_zyc_001`.
+The runtime still supports generated `runtimeRuleExceptions` metadata generically when a candidate source option should replace a currently selected exception target. Pass 14 moved the former GBA/ZYC case out of that sheet and into workbook-owned grouped exclusion metadata.
 
 Remaining product-rule cleanup should not reuse this hardcode. Add workbook metadata or generic generated-data evaluation with focused behavior tests.
 
@@ -205,7 +205,7 @@ For a no-behavior-change builder pass, snapshot those promoted inputs before/aft
 
 ### Pass 1 — Unified runtime contract builder
 
-Status: implemented in `docs/audit-cleanup/pass-1-unified-runtime-contract-builder-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-1-unified-runtime-contract-builder-spec.md`.
 
 Goal: make Stingray, Grand Sport, and Z06 use the same contract-builder function.
 
@@ -223,7 +223,7 @@ all call the same model-neutral runtime-contract builder. Output writers may sti
 
 ### Pass 2 — Artifact surface normalization
 
-Status: implemented in `docs/audit-cleanup/pass-2-runtime-artifact-surface-normalization-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-2-runtime-artifact-surface-normalization-spec.md`.
 
 Move every active model to the same clean runtime artifact contract:
 
@@ -237,13 +237,13 @@ Because this pass changes workbook promotion metadata, it must use the workbook 
 
 ### Pass 3 — Generated workbook `form_*` sheet policy
 
-Status: implemented in `docs/audit-cleanup/pass-3-form-sheet-retirement-policy-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-3-form-sheet-retirement-policy-spec.md`.
 
 Shared Stingray-only workbook `form_*` generated sheets are retired from the routine runtime path. Active generated runtime contracts live under `form-output/runtime/`; optional inspection/preview/draft artifacts are explicit review outputs via `--emit-inspection --inspection-output <dir>`. Do not recreate workbook generated sheets unless a future opt-in debug/report export pass names the consumer.
 
 ### Pass 4 — Make model discovery workbook-owned
 
-Status: implemented in `docs/audit-cleanup/pass-4-workbook-owned-model-discovery-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-4-workbook-owned-model-discovery-spec.md`.
 
 `generate_form.py` no longer keeps a hardcoded `MODEL_CONFIGS` active-model list. Active/generatable models are discovered from `model_master`, exact-match complete active `model_workbook_sources` rows, and valid exact-match active `model_variants` rows. `model_registry_promotion` remains a separate runtime-publication decision.
 
@@ -253,34 +253,34 @@ Adding a future model should not require touching `generate_form.py`, but inacti
 
 Status: implemented in:
 
-- `docs/audit-cleanup/pass-5a-editor-gate-reminders-spec.md`
-- `docs/audit-cleanup/pass-5b-schema-validator-role-driven-spec.md`
+- `docs/archive/completed-specs/audit-cleanup/pass-5a-editor-gate-reminders-spec.md`
+- `docs/archive/completed-specs/audit-cleanup/pass-5b-schema-validator-role-driven-spec.md`
 
 Pass 5A removed Grand Sport’s optional audit test from default editor gate reminders while preserving optional audit tooling. Pass 5B made schema validation rely on workbook source roles and the canonical generator role constants instead of legacy Stingray/Grand Sport seed assumptions.
 
 ### Pass 6A — Route unification characterization and output orchestration
 
-Status: implemented in `docs/audit-cleanup/pass-6-route-unification-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-6-route-unification-spec.md`.
 
 Pass 6A made `generate_form.py` delegate all active models through `model_generation.generate_model_artifacts()`, named the stdout/output-artifact contract, and preserved parity against freshly regenerated current-route baselines. It intentionally kept the source-row assembly split in place: Stingray still uses production assembly, and Grand Sport/Z06 still use inspection/draft assembly.
 
 ### Pass 6B — Optional inspection artifact emission
 
-Status: implemented in `docs/audit-cleanup/pass-6b-inspection-artifact-policy-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-6b-inspection-artifact-policy-spec.md`.
 
 Pass 6B made Grand Sport/Z06 normal generation write only clean runtime contracts by default, while keeping inspection/preview/draft artifacts available through explicit review mode. It removed routine checked-in Grand Sport/Z06 inspection/preview/draft artifacts and moved tests that need draft/preview data to temp review output. It preserved the source-row assembly split.
 
 ### Pass 6C — Source-row assembly route unification
 
-Status: implemented in `docs/audit-cleanup/pass-6c-source-row-assembly-unification-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-6c-source-row-assembly-unification-spec.md`.
 
 Pass 6C removed the temporary route-engine classifier in `model_generation.py`, added `source_assembly.assemble_model_source()`, and made Stingray, Grand Sport, and Z06 report the same `source_assembly` route while preserving runtime-contract, review-artifact, and Stingray compatibility parity.
 
 ### Pass 7 — Runtime rule exception hardcode cleanup
 
-Status: implemented in `docs/audit-cleanup/pass-7-runtime-rule-exception-hardcode-cleanup-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-7-runtime-rule-exception-hardcode-cleanup-spec.md`.
 
-Pass 7 removed the remaining browser runtime product hardcode for GBA / `opt_zyc_001` by making `form-app/app.js` use workbook-generated `runtimeRuleExceptions.ex_gba_zyc` generically. It did not change workbook rows, generated artifacts, dealer submission behavior, or broader direct-rule field semantics.
+Pass 7 removed the remaining browser runtime product hardcode for GBA / `opt_zyc_001` by making `form-app/app.js` use workbook-generated `runtimeRuleExceptions.ex_gba_zyc` generically. Pass 14 later retired that workbook exception row into normal grouped-exclusion metadata. Pass 7 itself did not change workbook rows, generated artifacts, dealer submission behavior, or broader direct-rule field semantics.
 
 Deferred to later separately scoped passes:
 
@@ -291,7 +291,7 @@ Deferred to later separately scoped passes:
 
 ### Pass 8 — Direct rule field classification
 
-Status: completed report-only implementation in `docs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`; closure recorded in `docs/audit-cleanup/pass-8-direct-rule-field-classification-spec.md`.
+Status: completed report-only implementation in `docs/archive/completed-specs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`; closure recorded in `docs/archive/completed-specs/audit-cleanup/pass-8-direct-rule-field-classification-spec.md`.
 
 Goal: produce a report-only row classification for active `runtime_action=replace` and `body_style_scope` usage across `rule_mapping`, `grandSport_rule_mapping`, and `z06_rule_mapping` before deleting workbook columns, changing generated `rules` payload fields, or changing browser direct-rule evaluation.
 
@@ -305,36 +305,42 @@ Pass 8 was intentionally report-only. Pass 9 implemented Candidate A, the body-s
 
 ### Pass 9 — Body-style scope retirement parity
 
-Status: implemented in `docs/audit-cleanup/pass-9-body-style-scope-retirement-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-9-body-style-scope-retirement-spec.md`.
 
 Pass 9 blanked all current OVS-derived direct-rule `body_style_scope` values in `rule_mapping`, `grandSport_rule_mapping`, and `z06_rule_mapping`; deleted the duplicate Grand Sport copy row `gs_copy_rule_opt_bc4_002_requires_opt_zz3_001_opt_bc4_002_requires_opt_zz3_001_convertible`; regenerated active model runtime artifacts and registry; and updated stale tests to assert OVS-owned scope rather than direct-rule scope. Runtime direct-rule matching code, `runtime_action=replace`, the `body_style_scope` column, and generated payload shape were unchanged.
 
 ### Pass 10 — Stingray spoiler replacement ownership
 
-Status: implemented in `docs/audit-cleanup/pass-10-stingray-spoiler-replacement-ownership-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-10-stingray-spoiler-replacement-ownership-spec.md`.
 
 Pass 10 deleted the three redundant active Stingray direct replacement rows for 5ZU, 5ZZ, and TVS removing T0A, leaving that peer-switch behavior owned by `grp_spoiler_high_wing`. It preserved the 5ZW and ZF1 direct replacement rows because those remain product-decision edges. Runtime code, Grand Sport/Z06 replacement rows, `runtime_action` schema, and dealer submission behavior were unchanged.
 
 ### Pass 11 — Grand Sport package/default replacement ownership
 
-Status: corrected in `docs/audit-cleanup/pass-11-grand-sport-package-default-replacement-ownership-spec.md` after local-runtime regression.
+Status: corrected in `docs/archive/completed-specs/audit-cleanup/pass-11-grand-sport-package-default-replacement-ownership-spec.md` after local-runtime regression.
 
 Pass 11 initially tried to delete the four Grand Sport direct replacement rows for FEY/FEB package relationships to T0E, JX6, and J56, while adding workbook-owned `gs_default_t0e` and `gs_excl_performance_aero` metadata. Local runtime testing proved the generic metadata was not behavior-equivalent: peer cards could still appear available/clickable without the direct replacement rows. The pass was corrected by restoring those four FEY/FEB replacement rows and adding tests for the actual user path. Runtime code, generator code, `runtime_action` schema, and dealer submission behavior were unchanged.
 
 ### Pass 12 — Grand Sport exhaust default replacement ownership
 
-Status: implemented in `docs/audit-cleanup/pass-12-grand-sport-exhaust-default-replacement-ownership-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-12-grand-sport-exhaust-default-replacement-ownership-spec.md`.
 
 Pass 12 implemented Candidate D from the Pass 8 report for Grand Sport only. It activated `gs_excl_exhaust_path` as a required NGA/NWI peer group, removed WUB from that peer group, preserved NWI -> WUB and FEY -> WUB rules, preserved `gs_default_nga_unless_nwi`, and removed the Grand Sport NWI -> NGA direct replacement row after generated-data and local-runtime parity proof. Runtime behavior now shows WUB enabling NWI without removing NGA; NWI replaces/restores NGA through generic group/default behavior. Stingray has the same expected product behavior, but its current behavior remains segregated through `runtime_rule_exceptions.ex_nwi_nga`; that sheet is explicitly deferred to a later workbook-normalization pass along with `variant_option_overrides`. Keep Z06 brake/default replacement separate.
 
 ### Pass 13 — Stingray exhaust runtime-rule-exception retirement
 
-Status: implemented in `docs/audit-cleanup/pass-13-stingray-exhaust-runtime-rule-exception-retirement-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-13-stingray-exhaust-runtime-rule-exception-retirement-spec.md`.
 
 Pass 13 retired only `runtime_rule_exceptions.ex_nwi_nga` by adding normal Stingray NGA/NWI exclusive-group ownership, preserving `rule_mapping.rule_opt_nwi_001_requires_opt_wub_001` and `default_selection_rules.default_nga`, and proving generated-data plus local-runtime parity against the same NGA/NWI/WUB behavior established in Pass 12. Runtime support needed one generic correction: generated default-selection rules can now act as required-exclusive fallback metadata even when the fallback choice is not emitted as `display_behavior=default_selected`. The pass left `ex_z51_fe1`, `ex_z51_fe2`, `ex_gba_zyc`, `variant_option_overrides`, Z06 brake/default behavior, `runtime_action`, direct-rule scope semantics, and dealer submission behavior untouched.
+
+### Pass 14 — Stingray GBA/ZYC runtime-rule-exception retirement
+
+Status: implemented in `docs/audit-cleanup/pass-14-stingray-gba-zyc-runtime-rule-exception-retirement-spec.md`.
+
+Pass 14 retired only `runtime_rule_exceptions.ex_gba_zyc` by adding normal Stingray grouped-exclusion ownership (`rule_groups.grp_gba_excludes_zyc` plus `rule_group_members` target `opt_zyc_001`), removing reverse direct rule `rule_mapping.rule_opt_zyc_001_excludes_opt_gba_001`, preserving `rule_mapping.rule_opt_zyc_001_includes_opt_drg_001`, and proving generated-data plus browser/runtime parity. Runtime JavaScript, Z51/FE1/FE2 exception behavior, variant override sheets, Grand Sport/Z06 source data, visual styling, and dealer submission behavior were unchanged.
 
 ## Bottom line
 
 The repo is past the worst version of the route problem. The registry, promotion metadata, model discovery, workbook source roles, schema source-contract validation, output orchestration, active source-assembly facade, and Grand Sport Candidate D exhaust ownership path are normalized for the active models.
 
-The next safe architecture-risk candidate is a report-only classification of the remaining segregated workbook behavior surfaces (`ex_z51_fe1`, `ex_z51_fe2`, `ex_gba_zyc`, and `variant_option_overrides`) into normal rule/default/group ownership where parity can be proven. Do not delete `runtime_action`, trim emitted rule fields, migrate Z06 replacement behavior, or change direct-rule runtime matching until separately approved.
+The next safe architecture-risk candidate is a report-only classification or narrow spec-first pass for the remaining segregated workbook behavior surfaces (`ex_z51_fe1`, `ex_z51_fe2`, and the variant override sheets) into normal rule/default/group ownership where parity can be proven. Treat Z51/FE1/FE2 suspension/default behavior separately from variant override semantics. Do not delete `runtime_action`, trim emitted rule fields, migrate Z06 replacement behavior, or change direct-rule runtime matching until separately approved.

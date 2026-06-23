@@ -1828,7 +1828,12 @@ test("runtime defaults and RPO exceptions are workbook-generated metadata", () =
   );
   assert.deepEqual(
     JSON.parse(JSON.stringify(data.runtimeRuleExceptions.map((exception) => exception.exception_id).sort())),
-    ["ex_gba_zyc", "ex_z51_fe1", "ex_z51_fe2"]
+    ["ex_z51_fe1", "ex_z51_fe2"]
+  );
+  assert.equal(
+    data.runtimeRuleExceptions.some((exception) => exception.exception_id === "ex_gba_zyc"),
+    false,
+    "Stingray GBA/ZYC conflict should be owned by grouped exclusion metadata"
   );
   assert.equal(
     data.runtimeRuleExceptions.some((exception) => exception.exception_id === "ex_nwi_nga"),
@@ -1844,13 +1849,21 @@ test("runtime defaults and RPO exceptions are workbook-generated metadata", () =
     data.rules.some((rule) => rule.source_id === "opt_nwi_001" && rule.target_id === "opt_wub_001" && rule.rule_type === "requires"),
     "NWI should keep its WUB prerequisite after ex_nwi_nga retirement"
   );
-  const gbaZycException = data.runtimeRuleExceptions.find((exception) => exception.exception_id === "ex_gba_zyc");
-  assert.equal(gbaZycException.source_option_id, "opt_gba_001");
-  assert.equal(gbaZycException.target_option_id, "opt_zyc_001");
-  assert.equal(gbaZycException.exception_type, "remove_target_when_source_selected");
-  assert.equal(gbaZycException.body_style_scope, "*");
-  assert.equal(gbaZycException.trim_level_scope, "*");
-  assert.equal(gbaZycException.variant_scope, "*");
+  const gbaZycGroup = data.ruleGroups.find((group) => group.group_id === "grp_gba_excludes_zyc");
+  assert.ok(gbaZycGroup, "Stingray GBA/ZYC conflict should be generated as a grouped exclusion");
+  assert.equal(gbaZycGroup.source_id, "opt_gba_001");
+  assert.equal(gbaZycGroup.group_type, "excludes_any");
+  assert.deepEqual(JSON.parse(JSON.stringify(gbaZycGroup.target_ids)), ["opt_zyc_001"]);
+  assert.equal(gbaZycGroup.disabled_reason, "ZYC Carbon Flash painted mirrors and spoiler package is not available with Black exterior paint.");
+  assert.equal(
+    data.rules.some((rule) => rule.rule_id === "rule_opt_zyc_001_excludes_opt_gba_001"),
+    false,
+    "Reverse ZYC -> GBA direct rule should not remain after GBA -> ZYC grouped ownership"
+  );
+  assert.ok(
+    data.rules.some((rule) => rule.rule_id === "rule_opt_zyc_001_includes_opt_drg_001"),
+    "ZYC should keep its DRG include rule after GBA/ZYC conflict migration"
+  );
   const fe1Default = data.defaultSelectionRules.find((rule) => rule.rule_id === "default_fe1");
   assert.equal(fe1Default.condition_type, "unless_selected_section");
   assert.equal(fe1Default.condition_id, "sec_susp_001");
@@ -1884,7 +1897,7 @@ test("runtime defaults and RPO exceptions are workbook-generated metadata", () =
   );
 });
 
-test("GBA replaces selected ZYC through workbook-generated runtime exception metadata", () => {
+test("GBA replaces selected ZYC through workbook-owned grouped exclusion metadata", () => {
   const runtime = loadRuntime();
   runtime.state.bodyStyle = "coupe";
   runtime.state.trimLevel = "1LT";
@@ -1906,10 +1919,22 @@ test("GBA replaces selected ZYC through workbook-generated runtime exception met
   assert.equal(runtime.state.selected.has(zyc.option_id), false, "ZYC should be removed by runtime exception metadata");
   assert.equal(runtime.state.userSelected.has(zyc.option_id), false, "ZYC should be removed from user selections");
 
-  assert.match(runtime.disableReasonForChoice(zyc), /ZYC Body-Color Accents are not available with Black exterior paint/i);
+  assert.match(runtime.disableReasonForChoice(zyc), /ZYC Carbon Flash painted mirrors and spoiler package is not available with Black exterior paint/i);
   runtime.handleChoice(zyc);
   runtime.reconcileSelections();
   assert.equal(runtime.state.selected.has(zyc.option_id), false, "ZYC should not stick while GBA is selected");
+
+  const nonGbaRuntime = loadRuntime();
+  nonGbaRuntime.state.bodyStyle = "coupe";
+  nonGbaRuntime.state.trimLevel = "1LT";
+  nonGbaRuntime.resetDefaults();
+  nonGbaRuntime.reconcileSelections();
+  const zycWithoutGba = nonGbaRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_zyc_001");
+  assert.equal(nonGbaRuntime.disableReasonForChoice(zycWithoutGba), "", "ZYC should remain selectable without GBA selected");
+  nonGbaRuntime.handleChoice(zycWithoutGba);
+  nonGbaRuntime.reconcileSelections();
+  assert.equal(nonGbaRuntime.state.selected.has("opt_zyc_001"), true, "ZYC should remain selected on a non-GBA path");
+  assert.equal(nonGbaRuntime.computeAutoAdded().has("opt_drg_001"), true, "ZYC should still include DRG after conflict migration");
 });
 
 test("FE3 disabled tile explains that Z51 includes it without duplicating the RPO", () => {
@@ -2308,12 +2333,13 @@ test("spoiler replacement ownership preserves ZYC and keeps T0A replacement beha
     assert.equal(runtime.computeAutoAdded().has("opt_t0a_001"), false, `${sourceId} should keep T0A out of auto-added options`);
   }
 
-  const zycException = data.runtimeRuleExceptions.find(
-    (exception) => exception.source_option_id === "opt_gba_001" && exception.target_option_id === "opt_zyc_001"
+  const zycExclusionGroup = data.ruleGroups.find(
+    (group) => group.group_id === "grp_gba_excludes_zyc" && group.source_id === "opt_gba_001"
   );
-  assert.ok(zycException, "GBA should remove ZYC through generated runtime exceptions");
-  assert.equal(zycException.exception_type, "remove_target_when_source_selected");
-  assert.match(zycException.disabled_reason, /ZYC Body-Color Accents are not available with Black exterior paint/);
+  assert.ok(zycExclusionGroup, "GBA should remove ZYC through workbook-owned grouped exclusion metadata");
+  assert.equal(zycExclusionGroup.group_type, "excludes_any");
+  assert.deepEqual(JSON.parse(JSON.stringify(zycExclusionGroup.target_ids)), ["opt_zyc_001"]);
+  assert.match(zycExclusionGroup.disabled_reason, /ZYC Carbon Flash painted mirrors and spoiler package is not available with Black exterior paint/);
 
   const runtime = loadRuntime();
   runtime.state.bodyStyle = "coupe";
@@ -2322,7 +2348,7 @@ test("spoiler replacement ownership preserves ZYC and keeps T0A replacement beha
   runtime.reconcileSelections();
   runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_gba_001"));
   const zyc = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_zyc_001");
-  assert.equal(runtime.disableReasonForChoice(zyc), "ZYC Body-Color Accents are not available with Black exterior paint.");
+  assert.equal(runtime.disableReasonForChoice(zyc), "ZYC Carbon Flash painted mirrors and spoiler package is not available with Black exterior paint.");
 });
 
 test("step rendering resets scroll to the top after content replacement", () => {
