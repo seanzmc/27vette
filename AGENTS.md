@@ -79,6 +79,8 @@ Workbook-owned business data includes:
 
 Scripts should be boring. They should read workbook tables, normalize rows, validate references, emit artifacts, and apply generic runtime concepts. Avoid adding code such as "if this RPO on this model, do special behavior" when a workbook row can express the rule.
 
+Workbook-owned does not automatically mean normalized or canonical. Exception, override, runtime-specific, and model-specific behavior sheets are architecture-risk surfaces until a review proves they are the right canonical owner. Treat sheets such as `runtime_rule_exceptions` and variant override sheets (`variant_option_overrides`, `grandSport_variant_overrides`, `z06_variant_overrides`) as surfaces requiring canonical-owner review before expansion, defense, migration, or retirement. They are not automatic deletion targets; first prove the behavior they currently own, identify the intended canonical owner, and verify parity before moving or removing rows.
+
 Before adding a new helper module, review sheet, parallel taxonomy, or redundant column, first prove the existing workbook pipeline cannot express the decision. Prefer filling canonical workbook blanks/metadata and using current source sheets, generators, and runtime data paths over adding another intermediate layer. If an existing sheet already owns the relationship, use that sheet rather than duplicating its meaning somewhere else.
 
 Model differences belong in model-scoped workbook rows, shared workbook metadata, or validated generated artifacts. They should not be hidden in one-off Python branches, browser JavaScript exceptions, stale audit scaffolding, or process notes that leak into runtime data.
