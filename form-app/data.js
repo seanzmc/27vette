@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-22T17:10:04+00:00"
+          "generated_at": "2026-06-23T04:00:33+00:00"
         },
         "variants": [
           {
@@ -37091,6 +37091,16 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "single_within_group",
             "active": "True",
             "notes": "Rear Corvette script badge color choices are mutually exclusive within the LPO Exterior section."
+          },
+          {
+            "group_id": "excl_exhaust_path",
+            "option_ids": [
+              "opt_nga_001",
+              "opt_nwi_001"
+            ],
+            "selection_mode": "required_single_within_group",
+            "active": "True",
+            "notes": "Stingray NGA and NWI are mutually exclusive required exhaust-tip choices; NWI still requires WUB, and WUB is not an exhaust-tip peer."
           }
         ],
         "rules": [
@@ -40187,17 +40197,6 @@ window.CORVETTE_FORM_DATA = {
             "variant_scope": "*",
             "disabled_reason": "ZYC Body-Color Accents are not available with Black exterior paint.",
             "notes": "Black paint removes ZYC body-color accent availability."
-          },
-          {
-            "exception_id": "ex_nwi_nga",
-            "source_option_id": "opt_nwi_001",
-            "target_option_id": "opt_nga_001",
-            "exception_type": "remove_target_when_source_selected",
-            "body_style_scope": "*",
-            "trim_level_scope": "*",
-            "variant_scope": "*",
-            "disabled_reason": "Replaced by NWI center exhaust.",
-            "notes": "NWI replaces NGA exhaust tips."
           },
           {
             "exception_id": "ex_z51_fe1",
@@ -48025,7 +48024,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-23T00:46:08+00:00",
+          "generated_at": "2026-06-23T00:50:17+00:00",
           "status": "runtime_active"
         },
         "variants": [

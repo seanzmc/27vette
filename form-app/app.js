@@ -1585,11 +1585,30 @@ function hasIncludedFallbackForRequiredChoice(choice) {
   return false;
 }
 
+function generatedDefaultRuleCanSelect(rule, autoAdded = computeAutoAdded()) {
+  if (!scopeMatches(rule.body_style_scope, state.bodyStyle)) return false;
+  if (!scopeMatches(rule.trim_level_scope, state.trimLevel)) return false;
+  if (!scopeMatches(rule.variant_scope, currentVariantId())) return false;
+
+  const targetChoice = choiceForCurrentVariant(rule.target_option_id) || optionsById.get(rule.target_option_id);
+  const targetSectionId = targetChoice?.section_id || optionSectionId(rule.target_option_id);
+  const conditionSelected = state.selected.has(rule.condition_id) || autoAdded.has(rule.condition_id);
+
+  if (rule.condition_type === "unless_selected_rpo" && selectedOptionByRpo(rule.condition_id)) return false;
+  if (rule.condition_type === "unless_selected_section" && selectedOrAutoInSection(rule.condition_id, autoAdded)) return false;
+  if (rule.condition_type === "when_selected_unless_selected_section") {
+    if (!conditionSelected) return false;
+    if (targetSectionId && userSelectedInSection(targetSectionId, rule.target_option_id)) return false;
+  }
+  if (selectedOrAutoExclusiveGroupPeer(rule.target_option_id, new Set(state.selected), autoAdded)) return false;
+  return true;
+}
+
 function hasWorkbookDefaultFallbackForRequiredExclusiveChoice(choice) {
   const group = optionExclusiveGroup(choice.option_id);
   if (!exclusiveGroupRequiresSelection(group)) return false;
   const fallbackChoices = activeChoicesForExclusiveGroup(group).filter(
-    (candidate) => candidate.option_id !== choice.option_id && candidate.display_behavior === "default_selected" && candidate.selectable === "True"
+    (candidate) => candidate.option_id !== choice.option_id && candidate.selectable === "True"
   );
   if (!fallbackChoices.length) return false;
 
@@ -1602,11 +1621,7 @@ function hasWorkbookDefaultFallbackForRequiredExclusiveChoice(choice) {
     return fallbackChoices.some(
       (candidate) =>
         generatedDefaultRules().some(
-          (rule) =>
-            rule.target_option_id === candidate.option_id &&
-            scopeMatches(rule.body_style_scope, state.bodyStyle) &&
-            scopeMatches(rule.trim_level_scope, state.trimLevel) &&
-            scopeMatches(rule.variant_scope, currentVariantId())
+          (rule) => rule.target_option_id === candidate.option_id && generatedDefaultRuleCanSelect(rule, autoAdded)
         ) && !disableReasonForChoice(candidate)
     );
   } finally {

@@ -1828,7 +1828,21 @@ test("runtime defaults and RPO exceptions are workbook-generated metadata", () =
   );
   assert.deepEqual(
     JSON.parse(JSON.stringify(data.runtimeRuleExceptions.map((exception) => exception.exception_id).sort())),
-    ["ex_gba_zyc", "ex_nwi_nga", "ex_z51_fe1", "ex_z51_fe2"]
+    ["ex_gba_zyc", "ex_z51_fe1", "ex_z51_fe2"]
+  );
+  assert.equal(
+    data.runtimeRuleExceptions.some((exception) => exception.exception_id === "ex_nwi_nga"),
+    false,
+    "Stingray NGA/NWI replacement should be owned by the exhaust exclusive group plus NGA default metadata"
+  );
+  const exhaustGroup = data.exclusiveGroups.find((group) => group.group_id === "excl_exhaust_path");
+  assert.ok(exhaustGroup, "Stingray NGA/NWI exhaust peer group should be generated");
+  assert.equal(exhaustGroup.selection_mode, "required_single_within_group");
+  assert.deepEqual(JSON.parse(JSON.stringify(exhaustGroup.option_ids)), ["opt_nga_001", "opt_nwi_001"]);
+  assert.equal(exhaustGroup.option_ids.includes("opt_wub_001"), false, "WUB enables NWI but should not be an exhaust-tip peer");
+  assert.ok(
+    data.rules.some((rule) => rule.source_id === "opt_nwi_001" && rule.target_id === "opt_wub_001" && rule.rule_type === "requires"),
+    "NWI should keep its WUB prerequisite after ex_nwi_nga retirement"
   );
   const gbaZycException = data.runtimeRuleExceptions.find((exception) => exception.exception_id === "ex_gba_zyc");
   assert.equal(gbaZycException.source_option_id, "opt_gba_001");

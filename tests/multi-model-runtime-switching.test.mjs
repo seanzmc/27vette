@@ -281,6 +281,11 @@ const expectedStingrayExclusiveGroups = [
     groupId: "excl_seat_belts",
     optionIds: ["opt_719_001", "opt_3n9_001", "opt_379_001", "opt_3a9_001", "opt_3f9_001", "opt_3m9_001"],
   },
+  {
+    groupId: "excl_exhaust_path",
+    optionIds: ["opt_nga_001", "opt_nwi_001"],
+    selectionMode: "required_single_within_group",
+  },
 ];
 
 const expectedTrimTooltips = {
@@ -1283,6 +1288,41 @@ test("Grand Sport WUB enables NWI without replacing NGA; NWI replaces and restor
   const wub = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_wub_001");
   const nwi = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_nwi_001");
   assert.ok(wub && nwi, "WUB and NWI should be active Grand Sport exhaust choices");
+  assert.equal(runtime.state.selected.has("opt_nga_001"), true, "NGA should seed as the default exhaust tip");
+  assert.match(runtime.disableReasonForChoice(nwi), /WUB|Quad Center Exit/i, "NWI should require WUB before WUB is selected");
+
+  runtime.handleChoice(wub);
+  assert.equal(runtime.state.selected.has("opt_wub_001"), true, "WUB should be selected");
+  assert.equal(runtime.state.selected.has("opt_nga_001"), true, "WUB alone should not remove NGA");
+  assert.equal(runtime.disableReasonForChoice(nwi), "", "WUB should make NWI selectable");
+
+  runtime.handleChoice(nwi);
+  assert.equal(runtime.state.selected.has("opt_nwi_001"), true, "NWI should be selected");
+  assert.equal(runtime.state.selected.has("opt_nga_001"), false, "NWI should replace NGA");
+
+  runtime.handleChoice(nwi);
+  assert.equal(runtime.state.selected.has("opt_nwi_001"), false, "NWI should be removable");
+  assert.equal(runtime.state.selected.has("opt_nga_001"), true, "removing NWI should restore NGA");
+
+  runtime.handleChoice(nwi);
+  runtime.handleChoice(wub);
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has("opt_wub_001"), false, "WUB should be removable");
+  assert.equal(runtime.state.selected.has("opt_nwi_001"), false, "removing WUB should remove invalid NWI");
+  assert.equal(runtime.state.selected.has("opt_nga_001"), true, "removing WUB from the NWI path should restore NGA");
+});
+
+test("Stingray WUB enables NWI without replacing NGA; NWI replaces and restores NGA", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("stingray");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const wub = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_wub_001");
+  const nwi = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_nwi_001");
+  assert.ok(wub && nwi, "WUB and NWI should be active Stingray exhaust choices");
   assert.equal(runtime.state.selected.has("opt_nga_001"), true, "NGA should seed as the default exhaust tip");
   assert.match(runtime.disableReasonForChoice(nwi), /WUB|Quad Center Exit/i, "NWI should require WUB before WUB is selected");
 

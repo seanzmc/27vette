@@ -329,12 +329,12 @@ Pass 12 implemented Candidate D from the Pass 8 report for Grand Sport only. It 
 
 ### Pass 13 — Stingray exhaust runtime-rule-exception retirement
 
-Status: spec only in `docs/audit-cleanup/pass-13-stingray-exhaust-runtime-rule-exception-retirement-spec.md`.
+Status: implemented in `docs/audit-cleanup/pass-13-stingray-exhaust-runtime-rule-exception-retirement-spec.md`.
 
-Pass 13 is the recommended next narrow implementation pass. It should retire only `runtime_rule_exceptions.ex_nwi_nga` by adding normal Stingray NGA/NWI exclusive-group ownership, preserving `rule_mapping.rule_opt_nwi_001_requires_opt_wub_001` and `default_selection_rules.default_nga`, and proving generated-data plus local-runtime parity against the same NGA/NWI/WUB behavior established in Pass 12. It must leave `ex_z51_fe1`, `ex_z51_fe2`, `ex_gba_zyc`, `variant_option_overrides`, Z06 brake/default behavior, `runtime_action`, direct-rule scope semantics, and dealer submission behavior untouched.
+Pass 13 retired only `runtime_rule_exceptions.ex_nwi_nga` by adding normal Stingray NGA/NWI exclusive-group ownership, preserving `rule_mapping.rule_opt_nwi_001_requires_opt_wub_001` and `default_selection_rules.default_nga`, and proving generated-data plus local-runtime parity against the same NGA/NWI/WUB behavior established in Pass 12. Runtime support needed one generic correction: generated default-selection rules can now act as required-exclusive fallback metadata even when the fallback choice is not emitted as `display_behavior=default_selected`. The pass left `ex_z51_fe1`, `ex_z51_fe2`, `ex_gba_zyc`, `variant_option_overrides`, Z06 brake/default behavior, `runtime_action`, direct-rule scope semantics, and dealer submission behavior untouched.
 
 ## Bottom line
 
 The repo is past the worst version of the route problem. The registry, promotion metadata, model discovery, workbook source roles, schema source-contract validation, output orchestration, active source-assembly facade, and Grand Sport Candidate D exhaust ownership path are normalized for the active models.
 
-The next safe architecture-risk candidate is the narrow Pass 13 Stingray `ex_nwi_nga` retirement. After that, classify the remaining segregated workbook behavior surfaces (`ex_z51_fe1`, `ex_z51_fe2`, `ex_gba_zyc`, and `variant_option_overrides`) into normal rule/default/group ownership where parity can be proven. Do not delete `runtime_action`, trim emitted rule fields, migrate Z06 replacement behavior, or change direct-rule runtime matching until separately approved.
+The next safe architecture-risk candidate is a report-only classification of the remaining segregated workbook behavior surfaces (`ex_z51_fe1`, `ex_z51_fe2`, `ex_gba_zyc`, and `variant_option_overrides`) into normal rule/default/group ownership where parity can be proven. Do not delete `runtime_action`, trim emitted rule fields, migrate Z06 replacement behavior, or change direct-rule runtime matching until separately approved.

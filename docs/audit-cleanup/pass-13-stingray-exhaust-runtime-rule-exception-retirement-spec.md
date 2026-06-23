@@ -1,6 +1,6 @@
 # Pass 13 — Stingray Exhaust Runtime-Rule-Exception Retirement Spec
 
-Status: Spec only. Do not implement until approved.
+Status: Implemented 2026-06-23.
 Date: 2026-06-22
 Recommended reasoning level for implementation agent: high.
 Source context:
@@ -408,9 +408,68 @@ Required local runtime/browser smoke:
 - Stingray NGA/NWI/WUB path as described in step 10.
 - Grand Sport NGA/NWI/WUB path still green.
 
-## Approval prompt
+## Implementation result
 
-Approve Pass 13 to implement the Stingray `ex_nwi_nga` retirement exactly as scoped above: add normal Stingray NGA/NWI exclusive-group ownership, preserve NWI -> WUB and `default_nga`, remove only `runtime_rule_exceptions.ex_nwi_nga`, regenerate Stingray/registry artifacts, update targeted tests, run the listed gates, and leave all other runtime exceptions and variant override surfaces untouched.
+Implemented 2026-06-23.
+
+Workbook sheets changed:
+
+- `exclusive_groups`: added active `excl_exhaust_path` with `selection_mode=required_single_within_group`.
+- `exclusive_group_members`: added active `excl_exhaust_path` members `opt_nga_001` and `opt_nwi_001`; WUB is not a member.
+- `runtime_rule_exceptions`: removed only `ex_nwi_nga`; `ex_z51_fe1`, `ex_z51_fe2`, and `ex_gba_zyc` remain active.
+
+Runtime/source files changed:
+
+- `form-app/app.js`: updated the generic required-exclusive fallback check so generated default-selection rules can restore a required exclusive-group peer even when the fallback choice is not emitted as `display_behavior=default_selected`. This was required because Stingray `default_nga` is a generated default rule while Grand Sport also emits NGA as default-selected choice metadata. The change is generic and not Stingray/RPO-specific.
+
+Generated artifacts refreshed:
+
+- `form-output/runtime/stingray-runtime-contract.json`
+- `form-output/stingray-form-data.json`
+- `form-app/data.js`
+
+Generated behavior changed as intended:
+
+- `ex_nwi_nga` is absent from Stingray `runtimeRuleExceptions`.
+- `excl_exhaust_path` is emitted with exactly `opt_nga_001` and `opt_nwi_001` and `required_single_within_group`.
+- `default_nga` remains emitted.
+- NWI -> WUB remains emitted as a direct `requires` rule.
+- `ex_z51_fe1`, `ex_z51_fe2`, and `ex_gba_zyc` remain emitted.
+
+Tests changed:
+
+- `tests/stingray-form-regression.test.mjs`: asserts `ex_nwi_nga` retirement and new canonical Stingray exhaust group/default/dependency ownership.
+- `tests/multi-model-runtime-switching.test.mjs`: adds Stingray local-runtime coverage for WUB enabling NWI, WUB not replacing NGA, NWI replacing/restoring NGA, and WUB removal invalidating NWI/restoring NGA.
+- `tests/stingray-generator-stability.test.mjs`: updates the closed-out Stingray rule count from 144 to 141 after removing the emitted runtime exception row payload.
+
+Validation results:
+
+- Preflight RED tests failed for the intended reason before workbook changes:
+  - `node --test --test-name-pattern 'runtime defaults and RPO exceptions' tests/stingray-form-regression.test.mjs` failed because `ex_nwi_nga` was still emitted.
+  - `node --test --test-name-pattern 'exclusive groups are model-scoped|Stingray WUB enables NWI' tests/multi-model-runtime-switching.test.mjs` failed because the Stingray exhaust group was not emitted.
+- Workbook backup from safe-save: `backups/stingray_master-20260623-000004.xlsx`.
+- Reopened workbook verification passed for the new group, members, removed exception row, preserved remaining exception rows, preserved `default_nga`, and preserved NWI -> WUB.
+- `.venv/bin/python scripts/generate_form.py --model stingray` passed with 0 validation errors.
+- `.venv/bin/python scripts/generate_registry.py` passed.
+- Generated contract probe passed for expected exception/group/default/rule drift.
+- `.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx` passed.
+- `.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx` passed.
+- `node --test tests/stingray-form-regression.test.mjs` passed: 87/87.
+- `node --test tests/stingray-generator-stability.test.mjs` passed: 13/13.
+- `node --test tests/multi-model-runtime-switching.test.mjs` passed: 46/46.
+- Because `form-app/app.js` changed generically, adjacent Z06 runtime gates were run:
+  - `node --test tests/z06-runtime-rule-corrections.test.mjs` passed: 14/14.
+  - `node --test tests/z06-performance-package-interactions.test.mjs` passed: 17/17.
+- `git diff --check` passed.
+
+Manual verification still pending:
+
+- No separate browser smoke was run. The local runtime harness now covers the required Stingray and Grand Sport NGA/NWI/WUB click behavior.
+
+Residual follow-up:
+
+- `runtime_rule_exceptions` still contains `ex_z51_fe1`, `ex_z51_fe2`, and `ex_gba_zyc`; those need classification before migration or deletion.
+- `variant_option_overrides` and model-scoped variant override sheets remain separate architecture-risk surfaces and were not touched.
 
 ## Recommended next pass after this one
 
