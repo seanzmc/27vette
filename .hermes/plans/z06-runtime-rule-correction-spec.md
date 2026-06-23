@@ -16,8 +16,8 @@ Evidence already inspected before this spec:
 
 - Relevant old plans:
   - `.hermes/plans/z06-package-pricing-cascade-spec.md`
-  - `.hermes/plans/z06-runtime-preview-contract-spec.md`
-  - `.hermes/plans/z06-full-runtime-promotion-spec.md`
+  - `docs/hermes-plans/z06-runtime-preview-contract-spec.md`
+  - `docs/hermes-plans/z06-full-runtime-promotion-spec.md`
 - Current branch:
   - `z06-zr1-migration`
 - Workbook validation:

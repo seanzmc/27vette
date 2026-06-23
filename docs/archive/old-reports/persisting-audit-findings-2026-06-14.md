@@ -332,7 +332,7 @@ Original audit gates:
 - `openpyxl` read-only probes against `stingray_master.xlsx` — confirmed Z06 WKS membership/order, no promoted option-sheet duplicate display-order buckets, current copy/order drift counts, remaining ZR1/ZR1X scaffold duplicate buckets, and remaining `interior_reference_path` config field.
 - `node` probe against `form-app/data.js` — confirmed Stingray, Grand Sport, and Z06 all emit 11 `orderSummary.sections` rows and 13 `stepMap` entries; confirmed Z06 1LZ/2LZ/3LZ trim choices now have non-empty `info_tooltip` copy.
 - `search_files` / `read_file` probes — confirmed current runtime/config fallback symbols, tests covering Z06 tooltip/WKS/orderSummary and interior fallback-symbol guards, and copy test scope.
-- `git diff -- docs/persisting-audit-findings-2026-06-14.md` — docs-only diff review.
+- `git diff -- docs/archive/old-reports/persisting-audit-findings-2026-06-14.md` — docs-only diff review.
 
 2026-06-17 documentation refresh evidence:
 

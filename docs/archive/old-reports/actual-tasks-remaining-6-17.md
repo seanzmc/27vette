@@ -1,6 +1,6 @@
 # Actual remaining tasks called out by recent docs
 
-From `docs/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 passes.
+From `docs/archive/old-reports/persisting-audit-findings-2026-06-14.md`, refreshed after 2026-06-17 passes.
 
 ## Completed
 

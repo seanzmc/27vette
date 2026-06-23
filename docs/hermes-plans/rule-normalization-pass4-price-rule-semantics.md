@@ -46,7 +46,7 @@ Files/docs:
 
 - `AGENTS.md`
 - `codex-context.md`
-- `.hermes/plans/rule-normalization-pass3-z06-replace-defaults.md`
+- `docs/hermes-plans/rule-normalization-pass3-z06-replace-defaults.md`
 - `27vette-workbook-guard/references/rule-exclusive-price-normalization.md`
 - `27vette-workbook-guard/references/z06-package-combo-pricing.md`
 - `27vette-workbook-guard/references/z-option-pricing-section-repair.md`
