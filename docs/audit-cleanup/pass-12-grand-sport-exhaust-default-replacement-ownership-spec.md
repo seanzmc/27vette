@@ -1,6 +1,6 @@
 # Pass 12 — Grand Sport Exhaust Default Replacement Ownership Spec
 
-Status: Spec only. Do not implement until approved.
+Status: Implemented 2026-06-22.
 Date: 2026-06-22
 Recommended reasoning level for implementation agent: high.
 Source report: `docs/audit-cleanup/pass-8-direct-rule-field-classification-report.md`.
@@ -396,6 +396,61 @@ Manual/runtime verification still required for implementation:
 - Local Grand Sport form behavior for WUB/NWI/NGA click sequence listed in Implementation step 10.
 - Confirm no visual/styling/dealer-submission changes.
 
-## Approval prompt
+## Implementation closure — 2026-06-22
 
-Approve Pass 12 to implement the Grand Sport NGA/NWI exhaust ownership cleanup exactly as scoped above?
+Implemented as scoped for Grand Sport only.
+
+Changed workbook sheets:
+
+- `grandSport_exclusive_groups`: activated `gs_excl_exhaust_path` as `required_single_within_group` so one Grand Sport exhaust-path choice must remain selected.
+- `grandSport_exclusive_members`: changed `gs_excl_exhaust_path` membership to NGA/NWI only. WUB was removed from the peer group because it is an NWI dependency, not an NGA/NWI peer.
+- `grandSport_rule_mapping`: removed `gs_rule_opt_nwi_001_excludes_opt_nga_001_replace` after replacing its ownership with the active required exclusive group and existing NGA default-selection row.
+- `default_selection_rules`: preserved `gs_default_nga_unless_nwi`; this remains the workbook-owned NGA restoration path.
+
+Generated artifacts:
+
+- Regenerated `form-output/runtime/grand-sport-runtime-contract.json` with `gs_excl_exhaust_path` active for `opt_nga_001` and `opt_nwi_001` only.
+- Regenerated `form-app/data.js` through `scripts/generate_registry.py`.
+
+Runtime/test changes:
+
+- `form-app/app.js` now permits a selected required-exclusive choice to be removed when a matching generated default-selection rule can restore a workbook default for the same required group. This is generic default/group behavior, not an RPO-specific branch.
+- `tests/grand-sport-draft-data.test.mjs` now asserts Grand Sport exhaust group ownership and absence of the retired direct replacement row.
+- `tests/multi-model-runtime-switching.test.mjs` now covers `gs_excl_exhaust_path` as a Grand Sport required exclusive group and verifies the WUB/NWI/NGA runtime sequence.
+
+Gate results:
+
+```sh
+.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+# status: valid, issue_count: 0
+
+.venv/bin/python scripts/generate_form.py --model grand_sport
+.venv/bin/python scripts/generate_registry.py
+
+node --test tests/grand-sport-contract-preview.test.mjs
+# pass 6, fail 0
+
+node --test tests/grand-sport-draft-data.test.mjs
+# pass 19, fail 0
+
+node --test tests/multi-model-runtime-switching.test.mjs
+# pass 45, fail 0
+
+git diff --check
+# passed
+```
+
+Local runtime smoke:
+
+- Served `form-app` locally and drove the browser runtime against `http://127.0.0.1:8027/`.
+- Grand Sport Coupe 1LT initial state: NGA selected, NWI unselected, WUB unselected, NWI disabled with `Requires WUB Quad Center Exit Exhaust.`
+- After selecting WUB: WUB selected, NGA still selected, NWI enabled.
+- After selecting NWI: NWI selected and NGA removed.
+- After removing NWI: NWI removed and NGA restored.
+- After removing WUB from the NWI path: WUB removed, invalid NWI removed, NGA restored, and NWI disabled again for WUB.
+
+Residual risks and follow-up:
+
+- Stingray still has the same product behavior split across normal rules/defaults and `runtime_rule_exceptions.ex_nwi_nga`; retire that special metadata surface in a separate workbook-normalization pass.
+- `variant_option_overrides` remains a separate debt target for a future audit/retirement pass where `default_selection_rules` already owns equivalent behavior.
+- Z06 brake/default replacement cleanup remains out of scope.

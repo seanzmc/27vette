@@ -1585,10 +1585,41 @@ function hasIncludedFallbackForRequiredChoice(choice) {
   return false;
 }
 
+function hasWorkbookDefaultFallbackForRequiredExclusiveChoice(choice) {
+  const group = optionExclusiveGroup(choice.option_id);
+  if (!exclusiveGroupRequiresSelection(group)) return false;
+  const fallbackChoices = activeChoicesForExclusiveGroup(group).filter(
+    (candidate) => candidate.option_id !== choice.option_id && candidate.display_behavior === "default_selected" && candidate.selectable === "True"
+  );
+  if (!fallbackChoices.length) return false;
+
+  const wasSelected = state.selected.has(choice.option_id);
+  const wasUserSelected = state.userSelected.has(choice.option_id);
+  deleteSelectedOption(choice.option_id);
+  try {
+    const autoAdded = computeAutoAdded();
+    if (selectedOrAutoInExclusiveGroup(group, autoAdded)) return false;
+    return fallbackChoices.some(
+      (candidate) =>
+        generatedDefaultRules().some(
+          (rule) =>
+            rule.target_option_id === candidate.option_id &&
+            scopeMatches(rule.body_style_scope, state.bodyStyle) &&
+            scopeMatches(rule.trim_level_scope, state.trimLevel) &&
+            scopeMatches(rule.variant_scope, currentVariantId())
+        ) && !disableReasonForChoice(candidate)
+    );
+  } finally {
+    if (wasSelected) state.selected.add(choice.option_id);
+    if (wasUserSelected) state.userSelected.add(choice.option_id);
+  }
+}
+
 function wouldClearRequiredExclusiveGroup(choice, autoAdded = computeAutoAdded()) {
   const group = optionExclusiveGroup(choice.option_id);
   if (!exclusiveGroupRequiresSelection(group)) return false;
   if (hasIncludedFallbackForRequiredChoice(choice)) return false;
+  if (hasWorkbookDefaultFallbackForRequiredExclusiveChoice(choice)) return false;
   const selectedIds = new Set(state.selected);
   selectedIds.delete(choice.option_id);
   return !selectedOrAutoInExclusiveGroup(group, autoAdded, selectedIds);

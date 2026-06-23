@@ -218,6 +218,11 @@ const expectedGrandSportExclusiveGroups = [
     optionIds: ["opt_feb_001", "opt_fey_001"],
   },
   {
+    groupId: "gs_excl_exhaust_path",
+    optionIds: ["opt_nga_001", "opt_nwi_001"],
+    selectionMode: "required_single_within_group",
+  },
+  {
     groupId: "gs_excl_performance_aero",
     optionIds: ["opt_t0e_001", "opt_t0f_001"],
     selectionMode: "required_single_within_group",
@@ -871,6 +876,11 @@ test("Grand Sport exclusive group selections remove peer options without runtime
       assert.ok(feb, "FEB should be active before testing J57 as a Grand Sport performance brake peer");
       runtime.handleChoice(feb);
     }
+    if (expected.groupId === "gs_excl_exhaust_path") {
+      const wub = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_wub_001");
+      assert.ok(wub, "WUB should be active before testing NWI as a Grand Sport exhaust peer");
+      runtime.handleChoice(wub);
+    }
 
     const activeGroupChoices = expected.optionIds
       .map((optionId) => runtime.activeChoiceRows().find((choice) => choice.option_id === optionId))
@@ -1000,11 +1010,22 @@ test("Grand Sport required exclusive groups cannot be left empty", () => {
     runtime.handleChoice(defaultChoice);
     assert.equal(runtime.state.selected.has(defaultChoice.option_id), true, `${defaultChoice.option_id} should not unselect as the last required choice`);
 
+    if (expected.groupId === "gs_excl_exhaust_path") {
+      const wub = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_wub_001");
+      assert.ok(wub, "WUB should be active before testing NWI as a Grand Sport exhaust peer");
+      runtime.handleChoice(wub);
+    }
+
     runtime.handleChoice(alternateChoice);
     assert.equal(runtime.state.selected.has(alternateChoice.option_id), true, `${alternateChoice.option_id} should be selected after switching`);
     assert.equal(runtime.state.selected.has(defaultChoice.option_id), false, `${defaultChoice.option_id} should be removed after alternate selection`);
 
     runtime.handleChoice(alternateChoice);
+    if (expected.groupId === "gs_excl_exhaust_path") {
+      assert.equal(runtime.state.selected.has(alternateChoice.option_id), false, `${alternateChoice.option_id} should be removable when workbook defaults can restore NGA`);
+      assert.equal(runtime.state.selected.has(defaultChoice.option_id), true, `${defaultChoice.option_id} should restore as the required exhaust default`);
+      continue;
+    }
     assert.equal(runtime.state.selected.has(alternateChoice.option_id), true, `${alternateChoice.option_id} should not unselect as the last required choice`);
   }
 });

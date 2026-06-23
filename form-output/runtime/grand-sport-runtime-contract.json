@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-06-22T21:26:31+00:00",
+    "generated_at": "2026-06-23T00:50:17+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -38565,6 +38565,16 @@
       "notes": "Grand Sport brake choices require one active brake selection; selected default cannot be cleared without choosing another brake package."
     },
     {
+      "group_id": "gs_excl_exhaust_path",
+      "option_ids": [
+        "opt_nga_001",
+        "opt_nwi_001"
+      ],
+      "selection_mode": "required_single_within_group",
+      "active": "True",
+      "notes": "NGA and NWI are mutually exclusive required exhaust-tip choices. NWI separately requires WUB; WUB is not an exhaust-tip peer."
+    },
+    {
       "group_id": "gs_excl_seat_belts",
       "option_ids": [
         "opt_719_001",
@@ -40713,24 +40723,6 @@
       "active": "True",
       "runtime_action": "replace",
       "source_note": "FEY Z52 Track Performance Package includes J57 carbon ceramic brakes and replaces J56 performance disc brakes."
-    },
-    {
-      "rule_id": "gs_rule_opt_nwi_001_excludes_opt_nga_001_replace",
-      "source_id": "opt_nwi_001",
-      "rule_type": "excludes",
-      "target_id": "opt_nga_001",
-      "target_type": "option",
-      "source_type": "option",
-      "source_section": "sec_exha_001",
-      "target_section": "sec_exha_001",
-      "source_selection_mode": "multi_select_opt",
-      "target_selection_mode": "multi_select_opt",
-      "body_style_scope": "",
-      "disabled_reason": "NWI replaces standard NGA black exhaust tips.",
-      "auto_add": "False",
-      "active": "True",
-      "runtime_action": "replace",
-      "source_note": "NWI bright chrome exhaust tips replace standard NGA black exhaust tips when selected."
     },
     {
       "rule_id": "gs_rule_opt_pda_001_includes_opt_sne_001",
@@ -49370,7 +49362,7 @@
       "severity": "pass",
       "entity_type": "rule",
       "entity_id": "",
-      "message": "121 active compatibility rules exported from grandSport_rule_mapping."
+      "message": "120 active compatibility rules exported from grandSport_rule_mapping."
     },
     {
       "check_id": "interior_contract",

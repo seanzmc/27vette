@@ -129,6 +129,11 @@ const expectedGrandSportExclusiveGroups = [
     option_ids: ["opt_feb_001", "opt_fey_001"],
   },
   {
+    group_id: "gs_excl_exhaust_path",
+    option_ids: ["opt_nga_001", "opt_nwi_001"],
+    selection_mode: "required_single_within_group",
+  },
+  {
     group_id: "gs_excl_performance_aero",
     option_ids: ["opt_t0e_001", "opt_t0f_001"],
     selection_mode: "required_single_within_group",
@@ -365,6 +370,9 @@ test("Grand Sport draft emits the approved model-scoped exclusive groups", () =>
     }
   }
   assert.equal([...byId.values()].some((group) => (group.option_ids || []).includes("opt_jxa_001")), false);
+  const exhaustGroup = byId.get("gs_excl_exhaust_path");
+  assert.deepEqual(JSON.parse(JSON.stringify(exhaustGroup.option_ids)), ["opt_nga_001", "opt_nwi_001"]);
+  assert.equal(exhaustGroup.option_ids.includes("opt_wub_001"), false, "WUB enables NWI but should not be an exhaust-tip peer");
   for (const legacyOptionId of ["opt_bc4_001", "opt_bcp_001", "opt_bcs_001"]) {
     assert.equal(choiceOptionIds.has(legacyOptionId), false, `${legacyOptionId} legacy engine cover row should not be emitted`);
     assert.equal([...byId.values()].some((group) => (group.option_ids || []).includes(legacyOptionId)), false, `${legacyOptionId} should not appear in generated exclusive groups`);
@@ -388,10 +396,11 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
     "opt_5jr_001::includes::opt_drg_001::::active",
     "opt_j6l_001::requires::opt_j57_001::::active",
     "opt_j6d_001::requires::opt_j57_001::::active",
-    "opt_nwi_001::excludes::opt_nga_001::::replace",
+    "opt_nwi_001::requires::opt_wub_001::::active",
     "opt_t0f_001::requires::opt_j57_001::::active",
     "opt_j57_001::excludes::opt_j6a_001::::replace",
     "opt_fey_001::excludes::opt_t0e_001::::replace",
+    "opt_fey_001::includes::opt_wub_001::::active",
     "opt_fey_001::includes::opt_t0f_001::::active",
     "opt_fey_001::includes::opt_cfz_001::::active",
     "opt_t0f_001::includes::opt_cfz_001::::active",
@@ -406,6 +415,12 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
   ]) {
     assert.ok(ruleKeys.has(key), `${key} should be generated`);
   }
+
+  assert.equal(
+    ruleKeys.has("opt_nwi_001::excludes::opt_nga_001::::replace"),
+    false,
+    "Grand Sport NGA/NWI replacement should be owned by the exhaust exclusive group plus NGA default metadata"
+  );
 
   const groupedBlockers = new Map(draft.ruleGroups.map((group) => [group.group_id, group]));
   for (const [groupId, sourceId] of [
