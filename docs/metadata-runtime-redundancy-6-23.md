@@ -21,24 +21,25 @@
 
 ### Medium-high risk
 
-1. Variant override behavior is split across three sheet contracts with different active semantics.
-   - variant_option_overrides: 4 consumed Stingray rows after Pass 17. The loader still treats `active` as an emitted override value, not row activation, because all remaining rows are UQT `active=False` behavior.
-   - grandSport_variant_overrides: 4 active rows after Pass 17, conventional row activation.
+1. Variant override behavior is now model-scoped for active UQT behavior, but the historical global sheet/loader path remains.
+   - variant_option_overrides: 0 rows after Pass 18. The loader still supports the historical global contract where `active` is an emitted override value, not row activation, but no active UQT/BC7/NGA behavior remains there.
+   - stingray_variant_overrides: 4 active rows after Pass 18, conventional row activation.
+   - grandSport_variant_overrides: 4 active rows after Pass 18, conventional row activation.
    - z06_variant_overrides: 4 active rows, conventional row activation.
    - Current consumers:
      - runtime_metadata.py: variant override loading plus Pass 17 `derived_default_selected_display_behavior()`.
-     - production.py: variant override application and derived default-selected display metadata for Stingray BC7.
+     - production.py: generic Stingray model-scoped variant override `section_id` application, standard-preserving `display_only`, and derived default-selected display metadata for Stingray BC7.
      - inspection.py: model-scoped variant override application and derived default-selected display metadata for Grand Sport BC7/NGA.
      - schema/type guards in schema_validation.py:42-45
      - tests in stingray-generator-stability.test.mjs, grand-sport-draft-data.test.mjs, workbook-schema-standardization.test.mjs
    - Current behavior carried:
-     - Stingray variant_option_overrides: UQT unavailable override for 2LT/3LT rows only. BC7 coupe default_selected was removed in Pass 17 and now derives from default_selection_rules plus exclusive groups.
+     - Stingray model-scoped overrides: UQT display-only standard rows for 2LT/3LT only. Global Stingray UQT suppression rows were removed in Pass 18.
      - Grand Sport overrides: UQT display-only standard rows for 2LT/3LT only. BC7 coupe and NGA all-variant default_selected rows were removed in Pass 17 and now derive from default_selection_rules plus exclusive groups.
      - Z06 overrides: UQT display-only standard rows for 2LZ/3LZ.
-   - This is not safe to delete just because it looks redundant. It still changes emitted choice status, selectable, active, display_behavior, and section_id for UQT.
+   - This is not safe to delete wholesale just because the global sheet is empty. The remaining model-scoped sheets still carry canonical UQT emitted choice selectability, display-only behavior, and section_id placement.
    - Remaining canonical candidate:
-     - UQT trim display-only behavior: existing option/status rows plus model/variant metadata or standard-equipment presentation metadata. Current \*\_ovs sheets only carry status, so moving selectable, display_behavior, or per-variant section_id requires a separate source-ownership design.
-   - Pass 17 completed the BC7/NGA default-selected migration with generated parity and browser/runtime proof.
+     - None for active UQT source ownership after Pass 18. The current source model is canonical option rows plus model-scoped variant presentation overrides for trim-standard placement/selectability.
+   - Pass 17 completed the BC7/NGA default-selected migration with generated parity and browser/runtime proof. Pass 18 completed the UQT single-canonical-option-row migration with allowlisted UQT drift and browser/runtime proof.
 
 ### Medium risk
 
@@ -81,34 +82,40 @@ Risk level: High
 Recommended next action: Keep empty unless a future, separately approved pass proves a true exception cannot be expressed through normal rule/default/group ownership.
 Required parity gates: If future rows are added, require workbook edit with safe save, generated contract diff, targeted runtime tests, and local browser proof.
 ────────────────────────────────────────
-Sheet: variant_option_overrides — 4 rows after Pass 17; loader consumes all 4 because this sheet’s active column is an override value, not row activation; coverage stingray:4; keys model_key, option_id, variant_id,
+Sheet: variant_option_overrides — 0 rows after Pass 18; historical global/Stingray contract retained; keys model_key, option_id, variant_id,
 status, selectable, active, display_behavior, notes
 Current consumer(s): runtime_metadata.py variant override loader; production.py variant override application; Pass 17 default-selected derivation helper; tests in stingray-generator-stability.test.mjs
-Current behavior/data ownership: Override behavior. For Stingray, remaining UQT rows use active=False as emitted override value. BC7 coupe default-selected rows were removed in Pass 17 and now derive from default_selection_rules plus exclusive groups.
-Canonical-owner candidate: UQT: option rows / OVS / possibly variant metadata or standard-equipment presentation metadata. BC7 default: migrated in Pass 17.
+Current behavior/data ownership: Empty historical/global override surface. Stingray UQT global suppression rows were removed in Pass 18. BC7 coupe default-selected rows were removed in Pass 17 and now derive from default_selection_rules plus exclusive groups.
+Canonical-owner candidate: No active UQT/BC7/NGA behavior remains here. Keep the sheet/loader path until a separate sheet-retirement spec proves it has no current or future source-role use.
 Risk level: Medium-high
-Recommended next action: Do not delete. If continuing, spec UQT source ownership separately.
-Required parity gates: Future UQT pass: Stingray generator + registry; generated choice parity for UQT; stingray-generator-stability.test.mjs;
-stingray-form-regression.test.mjs; browser/default replay checks.
+Recommended next action: Do not delete without a separate sheet-retirement spec.
+Required parity gates: Future retirement pass: prove no active model role depends on the global contract; run schema/source-role validation, Stingray generation + registry, stingray-generator-stability.test.mjs, stingray-form-regression.test.mjs, and browser/runtime proof.
 ────────────────────────────────────────
-Sheet: grandSport_variant_overrides — 4 rows / 4 active after Pass 17; coverage Grand Sport sheet-scoped; keys option_id, variant_id, selectable, display_behavior,
+Sheet: stingray_variant_overrides — 4 rows / 4 active after Pass 18; coverage Stingray sheet-scoped; keys option_id, variant_id, selectable, display_behavior,
+section_id, active, note
+Current consumer(s): runtime_metadata.py model-scoped variant override loader; production.py generic section override/display-only application; stingray-runtime-contract.json; tests in stingray-generator-stability.test.mjs
+Current behavior/data ownership: Canonical Stingray UQT display-only standard rows for 2LT/3LT.
+Canonical-owner candidate: Keep as canonical for Stingray UQT trim-standard placement/selectability unless a later approved model-scoped presentation-owner replacement is designed.
+Risk level: Medium-high
+Recommended next action: Keep.
+Required parity gates: Stingray generator + registry; allowlisted UQT contract drift if edited; stingray-generator-stability.test.mjs; stingray-form-regression.test.mjs; browser/runtime UQT proof.
+────────────────────────────────────────
+Sheet: grandSport_variant_overrides — 4 rows / 4 active after Pass 18; coverage Grand Sport sheet-scoped; keys option_id, variant_id, selectable, display_behavior,
 section_id, active, note
 Current consumer(s): Same loader via model_workbook_sources.variant_option_overrides_sheet; inspection.py draft/runtime path;
 grand-sport-runtime-contract.json; Pass 17 default-selected derivation helper
 Current behavior/data ownership: Override behavior. Remaining rows are Grand Sport UQT display-only standard rows. BC7 coupe and NGA all variants default-selected rows were removed in Pass 17 and now derive from default_selection_rules plus exclusive groups.
-Canonical-owner candidate: UQT trim/section behavior: model/variant metadata or source option/status remodeling; may need generator/schema work. BC7/NGA defaults: migrated in Pass 17.
+Canonical-owner candidate: Keep as canonical for Grand Sport UQT trim-standard placement/selectability. BC7/NGA defaults: migrated in Pass 17.
 Risk level: Medium-high
-Recommended next action: Do not delete. If continuing, spec UQT source ownership separately.
-Required parity gates: Future UQT pass: generate_form.py --model grand_sport, registry, grand-sport-contract-preview.test.mjs, grand-sport-draft-data.test.mjs,
-runtime/browser checks for UQT.
+Recommended next action: Keep.
+Required parity gates: If edited, generate_form.py --model grand_sport, registry, grand-sport-contract-preview.test.mjs, grand-sport-draft-data.test.mjs, runtime/browser checks for UQT.
 ────────────────────────────────────────
 Sheet: z06_variant_overrides — 4 rows / 4 active; coverage Z06 sheet-scoped; keys same as Grand Sport
 Current consumer(s): Same loader via model_workbook_sources; inspection.py; Z06 runtime contract/tests
 Current behavior/data ownership: Override behavior. UQT 2LZ/3LZ display-only standard rows.
-Canonical-owner candidate: Likely source option/status plus standard-equipment presentation metadata, but current z06_ovs cannot carry selectable,
-display_behavior, or section_id.
+Canonical-owner candidate: Keep as canonical for Z06 UQT trim-standard placement/selectability unless a later approved owner replaces model-scoped overrides; current z06_ovs cannot carry selectable, display_behavior, or section_id.
 Risk level: Medium
-Recommended next action: Needs more evidence before migration. Do not migrate Z06 replacement behavior under this pass.
+Recommended next action: Keep. Do not migrate Z06 replacement behavior under a UQT cleanup pass.
 Required parity gates: Future pass: generate_form.py --model z06, registry, z06-contract-preview.test.mjs, z06-form-data-draft.test.mjs, relevant Z06
 runtime tests, browser check for UQT display-only rows.
 ────────────────────────────────────────
@@ -130,7 +137,7 @@ Risk level: Low
 Recommended next action: Keep.
 Required parity gates: generate_registry.py only in future implementation; registry promotion tests; multi-model runtime switching.
 ────────────────────────────────────────
-Sheet: model_workbook_sources — 52 rows / 32 active; active roles: Stingray 10, Grand Sport 11, Z06 11; inactive ZR1/ZR1X roles; keys model_key,
+Sheet: model_workbook_sources — 53 rows / 33 active after Pass 18; active roles: Stingray 11, Grand Sport 11, Z06 11; inactive ZR1/ZR1X roles; keys model_key,
 source_role, sheet_name, active, notes
 Current consumer(s): model_configs.py:261-320; runtime_metadata.py:545-657; schema_validation.py:339-402; editor payload/tests
 Current behavior/data ownership: Generated workflow metadata. Maps each model to source sheets.

@@ -425,7 +425,7 @@ Manual verification still pending:
 
 Recommended next pass after Pass 16:
 
-- Historical context: Pass 16 recommended a narrow default-selected display metadata derivation pass for Stingray BC7, Grand Sport BC7, and Grand Sport NGA, while keeping UQT trim-standard placement separate. That follow-up became Pass 17 and was implemented on 2026-06-24. The remaining follow-up on this track is a separate UQT source-ownership spec before any remaining variant override row migration.
+- Historical context: Pass 16 recommended a narrow default-selected display metadata derivation pass for Stingray BC7, Grand Sport BC7, and Grand Sport NGA, while keeping UQT trim-standard placement separate. That follow-up became Pass 17 and was implemented on 2026-06-24. The remaining follow-up at that time was UQT source ownership; that became Pass 18 and was implemented on 2026-06-24.
 
 ## Historical approval prompt
 

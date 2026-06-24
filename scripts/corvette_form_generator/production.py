@@ -281,34 +281,41 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
         active_variants, context_copy_rows, MODEL_CONFIG.model_key, BODY_STYLE_DISPLAY_ORDER
     ) + build_trim_context_choices(active_variants, context_copy_rows, MODEL_CONFIG.model_key)
 
-    options_by_id: dict[str, dict[str, Any]] = {}
-    for option in options_raw:
-        if option["option_id"] in options_by_id and option.get("active") != "True":
-            continue
-        section = sections.get(option.get("section_id", ""), {})
-        presentation = section_presentation.get(option.get("section_id", ""), {})
+    def choice_section_metadata(section_id: str) -> dict[str, Any]:
+        section = sections.get(section_id, {})
+        presentation = section_presentation.get(section_id, {})
         section_name = clean(presentation.get("display_label")) or section.get("section_name", "")
         presentation_step_key = clean(presentation.get("step_key"))
         step_key = step_for_section(
-            option.get("section_id", ""),
+            section_id,
             section_name,
             presentation_step_key or section.get("step_key", ""),
             standard_sections=standard_section_ids,
         )
         mode = section.get("selection_mode", "")
-        options_by_id[option["option_id"]] = {
-            "option_id": option["option_id"],
-            "rpo": option.get("rpo", ""),
-            "label": option.get("option_name", ""),
-            "description": option.get("description", ""),
-            "source_detail_raw": option.get("detail_raw", ""),
-            "section_id": option.get("section_id", ""),
+        return {
             "section_name": section_name,
             "standard_equipment_group_type": clean(presentation.get("standard_equipment_group_type")),
             "step_key": step_key,
             "selection_mode": mode,
             "selection_mode_label": selection_mode_label(mode),
             "choice_mode": normalize_mode(mode),
+        }
+
+    options_by_id: dict[str, dict[str, Any]] = {}
+    for option in options_raw:
+        if option["option_id"] in options_by_id and option.get("active") != "True":
+            continue
+        section_id = option.get("section_id", "")
+        section_metadata = choice_section_metadata(section_id)
+        options_by_id[option["option_id"]] = {
+            "option_id": option["option_id"],
+            "rpo": option.get("rpo", ""),
+            "label": option.get("option_name", ""),
+            "description": option.get("description", ""),
+            "source_detail_raw": option.get("detail_raw", ""),
+            "section_id": section_id,
+            **section_metadata,
             "selectable": option.get("selectable", ""),
             "active": option.get("active", ""),
             "display_behavior": option.get("_display_behavior", ""),
@@ -343,19 +350,21 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
                 selectable = "False"
                 active = "False"
             elif display_behavior == "display_only":
-                status = "available"
+                status = "standard" if status == "standard" else "available"
                 selectable = "False"
                 active = "True"
+            choice_section_id = clean(override.get("section_id")) or option["section_id"]
+            choice_section = choice_section_metadata(choice_section_id)
             choice = {
                 "choice_id": f"{variant['variant_id']}__{option_id}",
                 "option_id": option_id,
                 "rpo": option["rpo"],
                 "label": option["label"],
                 "description": option["description"],
-                "section_id": option["section_id"],
-                "section_name": option["section_name"],
-                "standard_equipment_group_type": option.get("standard_equipment_group_type", ""),
-                "step_key": option["step_key"],
+                "section_id": choice_section_id,
+                "section_name": choice_section["section_name"],
+                "standard_equipment_group_type": choice_section.get("standard_equipment_group_type", ""),
+                "step_key": choice_section["step_key"],
                 "variant_id": variant["variant_id"],
                 "body_style": variant["body_style"],
                 "trim_level": variant["trim_level"],
@@ -363,9 +372,9 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
                 "status_label": status_to_label(status),
                 "selectable": selectable,
                 "active": active,
-                "choice_mode": option["choice_mode"],
-                "selection_mode": option["selection_mode"],
-                "selection_mode_label": option["selection_mode_label"],
+                "choice_mode": choice_section["choice_mode"],
+                "selection_mode": choice_section["selection_mode"],
+                "selection_mode_label": choice_section["selection_mode_label"],
                 "base_price": option["base_price"],
                 "display_order": option["display_order"],
                 "source_detail_raw": option["source_detail_raw"],

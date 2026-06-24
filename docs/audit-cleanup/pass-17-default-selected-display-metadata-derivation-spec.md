@@ -77,9 +77,9 @@ Completion validation:
 
 Residual risk and follow-up:
 
-- UQT is intentionally still deferred/accepted as-is. Its current rows continue to own selectability, display-only behavior, and trim-standard section placement that OVS/default rules do not own.
-- `z06_variant_overrides` remains unchanged and still carries Z06 UQT display-only standard rows.
-- Recommended next pass: if continuing this cleanup track, spec UQT source ownership separately before any row migration. Do not delete variant override sheets wholesale.
+- UQT was deferred/accepted as-is during Pass 17 because its then-current rows owned selectability, display-only behavior, and trim-standard section placement that OVS/default rules did not own. Historical follow-up: Pass 18 later implemented UQT single-canonical-option source ownership.
+- `z06_variant_overrides` remained unchanged during Pass 17 and still carried Z06 UQT display-only standard rows.
+- Recommended next pass at Pass 17 closure was UQT source ownership; that follow-up became Pass 18 and was implemented on 2026-06-24. Do not delete variant override sheets wholesale.
 
 ## Goal
 

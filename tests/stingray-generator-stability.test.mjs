@@ -374,7 +374,7 @@ test("Stingray generated contract keeps the closed-out shape", () => {
   );
   assert.equal(jsonData.variants.length, 6);
   assert.equal(jsonData.contextChoices.length, 8);
-  assert.equal(jsonData.choices.length, 1422);
+  assert.equal(jsonData.choices.length, 1416);
   assert.equal(jsonData.standardEquipment.length, 467);
   assert.equal(jsonData.rules.length, 141);
   assert.equal(jsonData.priceRules.length, 45);
@@ -391,15 +391,134 @@ test("model option source sheets use the same normalized contract", () => {
   assertOptionVariantStatusCoverage("grandSport_options", "grandSport_ovs", grandSportVariantIds);
 });
 
+test("Stingray production applies model-scoped variant override section placement generically", () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "vette-stingray-variant-override-"));
+  const workbookCopy = path.join(tempDir, "stingray-variant-override.xlsx");
+  fs.copyFileSync("stingray_master.xlsx", workbookCopy);
+
+  const output = execFileSync(
+    ".venv/bin/python",
+    [
+      "-c",
+      String.raw`
+import json
+import sys
+from pathlib import Path
+from openpyxl import load_workbook
+
+workbook_path = Path(sys.argv[1])
+wb = load_workbook(workbook_path)
+
+global_sheet = wb["variant_option_overrides"]
+if global_sheet.max_row > 1:
+    global_sheet.delete_rows(2, global_sheet.max_row - 1)
+
+for sheet_name in ["stingray_options", "stingray_ovs"]:
+    sheet = wb[sheet_name]
+    for row_idx in range(sheet.max_row, 1, -1):
+        if sheet.cell(row_idx, 1).value == "opt_uqt_001":
+            sheet.delete_rows(row_idx, 1)
+
+if "stingray_variant_overrides" in wb.sheetnames:
+    del wb["stingray_variant_overrides"]
+variant_sheet = wb.create_sheet("stingray_variant_overrides")
+variant_sheet.append(["option_id", "variant_id", "selectable", "display_behavior", "section_id", "active", "note"])
+variant_sheet.append(["opt_uqt_002", "2lt_c07", "False", "display_only", "sec_2lte_001", "True", "Test display-only trim placement."])
+
+sources = wb["model_workbook_sources"]
+headers = [sources.cell(1, col).value for col in range(1, sources.max_column + 1)]
+source_cols = {header: index + 1 for index, header in enumerate(headers)}
+source_row = None
+for row_idx in range(2, sources.max_row + 1):
+    if sources.cell(row_idx, source_cols["model_key"]).value == "stingray" and sources.cell(row_idx, source_cols["source_role"]).value == "variant_option_overrides_sheet":
+        source_row = row_idx
+        break
+if source_row is None:
+    sources.append(["stingray", "variant_option_overrides_sheet", "stingray_variant_overrides", True, "Test model-scoped Stingray override sheet."])
+else:
+    sources.cell(source_row, source_cols["sheet_name"]).value = "stingray_variant_overrides"
+    sources.cell(source_row, source_cols["active"]).value = True
+wb.save(workbook_path)
+
+sys.path.insert(0, "scripts")
+from corvette_form_generator import production
+
+production.WORKBOOK_PATH = workbook_path
+data = production.build_production_source_data()
+choice = next(row for row in data["choices"] if row["choice_id"] == "2lt_c07__opt_uqt_002")
+standard = next((row for row in data["standardEquipment"] if row["equipment_id"] == "std_2lt_c07__opt_uqt_002"), None)
+print(json.dumps({
+    "status": choice.get("status"),
+    "selectable": choice.get("selectable"),
+    "active": choice.get("active"),
+    "display_behavior": choice.get("display_behavior"),
+    "section_id": choice.get("section_id"),
+    "step_key": choice.get("step_key"),
+    "standard_equipment_group_type": choice.get("standard_equipment_group_type"),
+    "standard_equipment_present": standard is not None,
+}))
+      `,
+      workbookCopy,
+    ],
+    { encoding: "utf8" }
+  );
+
+  assert.deepEqual(JSON.parse(output), {
+    status: "standard",
+    selectable: "False",
+    active: "True",
+    display_behavior: "display_only",
+    section_id: "sec_2lte_001",
+    step_key: "standard_equipment",
+    standard_equipment_group_type: "trim_equipment",
+    standard_equipment_present: true,
+  });
+});
+
 test("Stingray Phase 4 availability rules are workbook-owned", () => {
   const uqtOverrides = workbookRows("variant_option_overrides").filter(
     (row) => row.model_key === "stingray" && row.option_id === "opt_uqt_002"
   );
+  assert.equal(uqtOverrides.length, 0, "Stingray UQT should no longer depend on global emitted-value overrides");
+
+  const stingrayVariantOverrides = workbookRows("stingray_variant_overrides").filter(
+    (row) => row.option_id === "opt_uqt_002"
+  );
   assert.deepEqual(
-    uqtOverrides.map((row) => row.variant_id).sort(),
+    stingrayVariantOverrides.map((row) => row.variant_id).sort(),
     ["2lt_c07", "2lt_c67", "3lt_c07", "3lt_c67"]
   );
-  assert.equal(uqtOverrides.every((row) => row.status === "unavailable" && row.selectable === "False" && row.active === "False"), true);
+  assert.equal(
+    stingrayVariantOverrides.every(
+      (row) =>
+        row.selectable === "False" &&
+        row.active === "True" &&
+        row.display_behavior === "display_only" &&
+        ["sec_2lte_001", "sec_3lte_001"].includes(row.section_id)
+    ),
+    true
+  );
+
+  const uqtChoices = jsonData.choices.filter((choice) => choice.option_id === "opt_uqt_002");
+  assert.equal(uqtChoices.length, 6);
+  assert.equal(
+    uqtChoices
+      .filter((choice) => choice.trim_level === "1LT")
+      .every((choice) => choice.status === "available" && choice.selectable === "True" && choice.step_key === "interior_trim"),
+    true
+  );
+  assert.equal(
+    uqtChoices
+      .filter((choice) => choice.trim_level !== "1LT")
+      .every(
+        (choice) =>
+          choice.status === "standard" &&
+          choice.selectable === "False" &&
+          choice.display_behavior === "display_only" &&
+          choice.step_key === "standard_equipment"
+      ),
+    true
+  );
 
   const bc7Overrides = workbookRows("variant_option_overrides").filter(
     (row) => row.model_key === "stingray" && row.option_id === "opt_bc7_001"
