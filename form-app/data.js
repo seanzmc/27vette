@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-23T20:32:12+00:00"
+          "generated_at": "2026-06-24T02:59:06+00:00"
         },
         "variants": [
           {
@@ -38541,24 +38541,6 @@ window.CORVETTE_FORM_DATA = {
             "source_note": "1. Not available with exterior color (GBA) Black. 2. Not available with exterior color (GBA) Black. Also includes tonneau grille."
           },
           {
-            "rule_id": "rule_opt_fe2_001_excludes_opt_z51_001",
-            "source_id": "opt_fe2_001",
-            "rule_type": "excludes",
-            "target_id": "opt_z51_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_susp_001",
-            "target_section": "sec_perf_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "multi_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by FE2 Magnetic Selective Ride Control Suspension.",
-            "auto_add": "False",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": "1. Not available with (Z51) Z51 Performance Package."
-          },
-          {
             "rule_id": "rule_opt_fe4_001_includes_opt_b4z_001",
             "source_id": "opt_fe4_001",
             "rule_type": "includes",
@@ -39637,6 +39619,42 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "runtime_action": "active",
             "source_note": "Auto-add ZF1 Aero Delete when 5ZW is selected with Z51 Performance Package."
+          },
+          {
+            "rule_id": "rule_opt_z51_001_excludes_opt_fe1_001",
+            "source_id": "opt_z51_001",
+            "rule_type": "excludes",
+            "target_id": "opt_fe1_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_perf_001",
+            "target_section": "sec_susp_001",
+            "source_selection_mode": "multi_select_opt",
+            "target_selection_mode": "single_select_opt",
+            "body_style_scope": "",
+            "disabled_reason": "Replaced by FE3 Z51 performance suspension.",
+            "auto_add": "False",
+            "active": "True",
+            "runtime_action": "replace",
+            "source_note": "Z51 includes FE3 Z51 performance suspension and replaces FE1 standard suspension."
+          },
+          {
+            "rule_id": "rule_opt_z51_001_excludes_opt_fe2_001",
+            "source_id": "opt_z51_001",
+            "rule_type": "excludes",
+            "target_id": "opt_fe2_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_perf_001",
+            "target_section": "sec_susp_001",
+            "source_selection_mode": "multi_select_opt",
+            "target_selection_mode": "single_select_opt",
+            "body_style_scope": "",
+            "disabled_reason": "Not available with Z51 Performance Package.",
+            "auto_add": "False",
+            "active": "True",
+            "runtime_action": "replace",
+            "source_note": "FE2 is not available with Z51 Performance Package."
           }
         ],
         "priceRules": [
@@ -40182,30 +40200,7 @@ window.CORVETTE_FORM_DATA = {
             "notes": "Workbook-owned coupe BC7 default/restoration rule. Runtime serves this through generic defaultSelectionRules, while grp_ls6_engine_covers prevents BC7 from re-adding when a paid engine-cover peer is selected."
           }
         ],
-        "runtimeRuleExceptions": [
-          {
-            "exception_id": "ex_z51_fe1",
-            "source_option_id": "opt_z51_001",
-            "target_option_id": "opt_fe1_001",
-            "exception_type": "remove_target_when_source_selected",
-            "body_style_scope": "*",
-            "trim_level_scope": "*",
-            "variant_scope": "*",
-            "disabled_reason": "Replaced by FE3 Z51 performance suspension.",
-            "notes": "Z51 replaces FE1 standard suspension."
-          },
-          {
-            "exception_id": "ex_z51_fe2",
-            "source_option_id": "opt_z51_001",
-            "target_option_id": "opt_fe2_001",
-            "exception_type": "remove_target_when_source_selected",
-            "body_style_scope": "*",
-            "trim_level_scope": "*",
-            "variant_scope": "*",
-            "disabled_reason": "Not available with Z51 Performance Package.",
-            "notes": "Z51 suppresses FE2."
-          }
-        ],
+        "runtimeRuleExceptions": [],
         "orderSummary": {
           "sections": [
             {
@@ -47988,7 +47983,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "140 active compatibility rules exported from 140 source rules."
+            "message": "141 active compatibility rules exported from 141 source rules."
           }
         ]
       },

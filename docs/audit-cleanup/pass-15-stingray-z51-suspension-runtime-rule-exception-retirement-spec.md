@@ -1,6 +1,6 @@
 # Pass 15 — Stingray Z51 Suspension Runtime-Rule-Exception Retirement Spec
 
-Status: Spec only. Do not implement until approved.
+Status: Implemented on 2026-06-23.
 Date: 2026-06-23
 Recommended reasoning level for implementation agent: high.
 
@@ -157,7 +157,7 @@ Edit only `stingray_master.xlsx` source sheets listed below, through a safe-save
    - `target_id=opt_fe1_001`
    - `original_detail_raw=Z51 includes FE3 Z51 performance suspension and replaces FE1 standard suspension.`
    - `body_style_scope=` blank
-   - `runtime_action=` blank
+   - `runtime_action=replace`
    - `disabled_reason=Replaced by FE3 Z51 performance suspension.`
 
    Add:
@@ -168,7 +168,7 @@ Edit only `stingray_master.xlsx` source sheets listed below, through a safe-save
    - `target_id=opt_fe2_001`
    - `original_detail_raw=FE2 is not available with Z51 Performance Package.`
    - `body_style_scope=` blank
-   - `runtime_action=` blank
+   - `runtime_action=replace`
    - `disabled_reason=Not available with Z51 Performance Package.`
 
    Delete:
@@ -220,11 +220,11 @@ Do not change:
 - Dealer submission endpoint, payload shape, Turnstile behavior, or deployment paths.
 - Visual CSS/HTML.
 
-If the direct `rule_mapping` migration cannot prove parity in generated data and browser/runtime behavior, stop and bring back an amended spec. Do not silently solve it with a JavaScript exception, a new broad suspension exclusive group, or a new workbook sheet.
+Implementation note: the first generated-data attempt with blank `runtime_action` proved non-parity in `tests/stingray-form-regression.test.mjs` because the new Z51 -> FE1/FE2 direct excludes disabled peers but did not remove already selected FE1/FE2 the way the retired exceptions did. The final workbook rows therefore use existing direct-rule semantics `runtime_action=replace`, with no runtime JavaScript change, no new group/sheet, and no broad suspension exclusive group.
 
 ## Constraints
 
-- Follow `AGENTS.md` spec-first rules. Do not implement until this spec is approved.
+- Follow `AGENTS.md` spec-first rules. Implementation began only after user approval.
 - Use current repo/workbook evidence only. Do not rely on archived `codex-context.md`.
 - Workbook owns the business rule; do not hide this in Python or JavaScript.
 - Keep the implementation pass limited to the remaining two runtime exception rows and the one reverse FE2 -> Z51 direct row required for parity.
@@ -243,6 +243,7 @@ Expected intentional deltas after regeneration:
 - `data.rules` gains:
   - `rule_opt_z51_001_excludes_opt_fe1_001`
   - `rule_opt_z51_001_excludes_opt_fe2_001`
+- the new Z51 -> FE1/FE2 rows emit `runtime_action=replace`.
 - `data.rules` removes:
   - `rule_opt_fe2_001_excludes_opt_z51_001`
 - `data.rules` still contains:
@@ -339,6 +340,54 @@ Local browser/manual verification required before final handoff:
   - select FE4 and confirm B4Z is included.
 - Smoke model switching to Grand Sport and Z06 to confirm no obvious runtime break.
 
+## Completion evidence
+
+Implemented workbook changes:
+
+- `runtime_rule_exceptions`: removed `ex_z51_fe1` and `ex_z51_fe2`; the generated Stingray contract now emits `runtimeRuleExceptions: []`.
+- `rule_mapping`: added `rule_opt_z51_001_excludes_opt_fe1_001` and `rule_opt_z51_001_excludes_opt_fe2_001` as Z51-sourced `excludes` rows with `runtime_action=replace`.
+- `rule_mapping`: removed obsolete reverse row `rule_opt_fe2_001_excludes_opt_z51_001` so FE2 selected first does not block selecting Z51.
+- Preserved `default_selection_rules.default_fe1`, `rule_opt_z51_001_includes_opt_fe3_001`, `rule_opt_fe4_001_requires_opt_z51_001`, and `rule_opt_fe4_001_includes_opt_b4z_001`.
+- No suspension `rule_groups` or `exclusive_groups` were introduced.
+
+Generated artifacts refreshed:
+
+- `form-output/runtime/stingray-runtime-contract.json`
+- `form-output/stingray-form-data.json`
+- `form-output/stingray-form-data.csv`
+- `form-app/data.js`
+
+Generated-contract evidence after regeneration:
+
+- Stingray `rules`: 141.
+- Stingray `runtimeRuleExceptions`: 0.
+- FE1/FE2/FE3/FE4/Z51 choice row counts and active/selectable/status/display-order/display-behavior fields were unchanged in focused pre/post drift checks.
+- `rule_opt_fe2_001_excludes_opt_z51_001` is absent.
+- `rule_opt_z51_001_excludes_opt_fe1_001` and `rule_opt_z51_001_excludes_opt_fe2_001` are present with `runtime_action=replace`.
+
+Validation run:
+
+```sh
+.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+.venv/bin/python scripts/generate_form.py --model stingray
+.venv/bin/python scripts/generate_registry.py
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+node --test tests/stingray-form-regression.test.mjs
+node --test tests/stingray-generator-stability.test.mjs
+node --test tests/multi-model-runtime-switching.test.mjs
+```
+
+All listed gates passed after the final `runtime_action=replace` correction.
+
+Local browser/runtime proof on `http://127.0.0.1:8000/`:
+
+- FE2 selected first leaves Z51 clickable (`disableReasonForChoice(Z51) === ""`).
+- Selecting Z51 removes selected FE1/FE2.
+- FE1 disabled reason remains `Replaced by FE3 Z51 performance suspension.`
+- FE2 disabled reason remains `Not available with Z51 Performance Package.`
+- FE3 remains auto-added with Z51 and reports `Included with Z51 Performance Package.`
+- Runtime data reports no Stingray `runtimeRuleExceptions`.
+
 ## Risks and mitigations
 
 - Risk: deleting the exceptions while leaving `rule_opt_fe2_001_excludes_opt_z51_001` changes behavior by making Z51 unavailable after FE2 is selected.
@@ -362,6 +411,6 @@ Local browser/manual verification required before final handoff:
 - Do not change runtime JavaScript product behavior.
 - Do not change dealer submission behavior.
 
-## Approval prompt
+## Closure
 
-Approve Pass 15 implementation exactly as scoped above: add Z51 -> FE1 and Z51 -> FE2 direct excludes, delete reverse FE2 -> Z51 direct exclude, delete `runtime_rule_exceptions.ex_z51_fe1` and `runtime_rule_exceptions.ex_z51_fe2`, regenerate, update focused tests/docs, and prove generated-data plus local-runtime parity.
+Pass 15 is complete. The remaining Stingray `runtime_rule_exceptions` rows were retired into normal workbook-owned direct-rule metadata with generated-data and local-browser parity proof.

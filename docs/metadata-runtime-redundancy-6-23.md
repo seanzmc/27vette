@@ -4,23 +4,20 @@
 
 ### Highest risk
 
-1. Runtime_rule_exceptions is still an active segregated runtime behavior surface, reduced by Pass 14.
-   - Current state after Pass 14: 2 rows / 2 active, all model_key=stingray.
-   - Active rows:
-     - ex_z51_fe1: opt_z51_001 removes opt_fe1_001
-     - ex_z51_fe2: opt_z51_001 removes opt_fe2_001
+1. Runtime_rule_exceptions is now an empty segregated runtime behavior surface after Pass 15.
+   - Current state after Pass 15: 0 rows / 0 active.
+   - Active rows: none.
    - Current consumers:
      - scripts/corvette_form_generator/runtime_metadata.py:283
      - scripts/corvette_form_generator/production.py:180, emitted at production.py:625
      - form-app/app.js:626-668, form-app/app.js:1004-1019
-     - Tests pin the current rows and the retired GBA/ZYC canonical owner in tests/stingray-form-regression.test.mjs:1824-1869, 2305-2351
-   - This sheet is workbook-owned, but not proven canonical. It owns exception behavior that plausibly belongs in normal rule/default/group ownership.
+     - Tests now pin the empty exception surface and retired GBA/ZYC plus Z51/FE1/FE2 canonical owners in tests/stingray-form-regression.test.mjs.
+   - This sheet is workbook-owned, but no longer owns active Stingray behavior after Pass 15.
    - ex_nwi_nga is not present in current workbook evidence and is correctly not treated as open.
-   - Retired canonical candidate:
+   - Retired canonical candidates:
      - ex_gba_zyc: Pass 14 moved this behavior to Stingray rule_groups / rule_group_members as excludes_any from GBA to ZYC and removed the reverse direct rule opt_zyc_001 excludes opt_gba_001 after generated-data and browser/runtime parity proof.
-   - Remaining likely canonical candidates:
-     - ex_z51_fe1 / ex_z51_fe2: suspension/default ownership, likely involving rule_mapping, exclusive_groups, and default_selection_rules.default_fe1. Current workbook already has default_fe1 and Z51 includes FE3, but no normal group/row currently owns “selecting Z51 removes FE1/FE2” without the exception sheet.
-   - Any remaining migration requires workbook-source changes and generated-contract/runtime parity proof.
+     - ex_z51_fe1 / ex_z51_fe2: Pass 15 moved this behavior to Stingray rule_mapping direct excludes from opt_z51_001 to opt_fe1_001/opt_fe2_001 with runtime_action=replace, removed the reverse FE2 -> Z51 direct rule, and preserved default_fe1 plus Z51 -> FE3 include behavior after generated-data and browser/runtime parity proof.
+   - Remaining migration: none for active runtime_rule_exceptions rows.
 
 ### Medium-high risk
 
@@ -75,17 +72,15 @@
 
 ## Sheet-by-sheet table:
 
-Sheet: runtime_rule_exceptions — 2 rows / 2 active after Pass 14; coverage stingray:2; keys model_key, exception_id, source_option_id, target_option_id, exception_type,
+Sheet: runtime_rule_exceptions — 0 rows / 0 active after Pass 15; coverage none; keys model_key, exception_id, source_option_id, target_option_id, exception_type,
 scopes, disabled_reason, active
 Current consumer(s): runtime_metadata.py:283; production.py:180,625; form-app/app.js:626-668,1004-1019;
-stingray-form-regression.test.mjs:1824-1869,2309-2351
-Current behavior/data ownership: Exception behavior. Removes/disables selected targets via generated runtimeRuleExceptions. Current active rows are
-ex_z51_fe1 and ex_z51_fe2. Pass 14 retired ex_gba_zyc into rule_groups.grp_gba_excludes_zyc plus rule_group_members.
+stingray-form-regression.test.mjs
+Current behavior/data ownership: Empty exception behavior surface. Pass 14 retired ex_gba_zyc into rule_groups.grp_gba_excludes_zyc plus rule_group_members. Pass 15 retired ex_z51_fe1 and ex_z51_fe2 into rule_mapping Z51 -> FE1/FE2 replacement excludes.
 Canonical-owner candidate: Existing workbook owners: rule_mapping, rule_groups/members, exclusive_groups/members, default_selection_rules, option rows.
 Risk level: High
-Recommended next action: Migrate/classify the remaining Z51/FE1/FE2 suspension/default behavior as a separate behavior class, or defer if normal ownership cannot prove parity.
-Required parity gates: Future pass: regenerate affected model + registry; strict generated-contract diff with approved deltas; node --test
-tests/stingray-form-regression.test.mjs; node --test tests/multi-model-runtime-switching.test.mjs; local browser/runtime proof for the specific remaining behavior.
+Recommended next action: Keep empty unless a future, separately approved pass proves a true exception cannot be expressed through normal rule/default/group ownership.
+Required parity gates: If future rows are added, require workbook edit with safe save, generated contract diff, targeted runtime tests, and local browser proof.
 ────────────────────────────────────────
 Sheet: variant_option_overrides — 7 rows; raw active=True count 3 but loader consumes all 7; coverage stingray:7; keys model_key, option_id, variant_id,
 status, selectable, active, display_behavior, notes
@@ -274,9 +269,30 @@ Parity proven:
 
 Next implementation candidate:
 
-- The remaining `runtime_rule_exceptions` rows are the Z51/FE1/FE2 suspension/default behavior (`ex_z51_fe1`, `ex_z51_fe2`). Treat them as a separate spec-first pass because they involve default/standard suspension ownership, not paint/accent conflict behavior.
+- Completed by Pass 15. There are no remaining active `runtime_rule_exceptions` rows.
 
-Validation run for this audit:
+## Pass 15 completed implementation:
+
+Pass 15 implemented the former remaining `runtime_rule_exceptions` cleanup for Stingray Z51 suspension/default behavior.
+
+What changed:
+
+- Added `rule_mapping.rule_opt_z51_001_excludes_opt_fe1_001` and `rule_mapping.rule_opt_z51_001_excludes_opt_fe2_001` as direct Z51 replacement excludes with `runtime_action=replace`.
+- Removed reverse direct rule `rule_mapping.rule_opt_fe2_001_excludes_opt_z51_001` so FE2 selected first does not block selecting Z51.
+- Removed `runtime_rule_exceptions.ex_z51_fe1` and `runtime_rule_exceptions.ex_z51_fe2`.
+- Preserved `default_selection_rules.default_fe1`, Z51 -> FE3 include behavior, and FE4 requires/includes behavior.
+- Regenerated Stingray runtime artifacts and `form-app/data.js`.
+
+Parity proven:
+
+- Generated contract deltas were limited to the approved direct-rule additions, reverse direct-rule removal, `runtimeRuleExceptions` reduction from 2 to 0, and the resulting compatibility-rule count change from 140 to 141.
+- Local browser/runtime proof showed FE2 selected first leaves Z51 clickable; selecting Z51 removes FE1/FE2; FE3 remains auto-added; FE1/FE2 disabled reasons match the retired exceptions; and no Stingray runtime exceptions are emitted.
+
+Next implementation candidate:
+
+- `runtime_rule_exceptions` has no remaining active rows. The next architecture-risk surface in this report is variant override semantics, not another runtime-rule-exception retirement pass.
+
+Original report validation run before implementation passes:
 
 - Read-only probes only:
   - git status --short and branch check: branch schema-ingestion-normalization; no status output.

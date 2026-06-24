@@ -1828,8 +1828,9 @@ test("runtime defaults and RPO exceptions are workbook-generated metadata", () =
   );
   assert.deepEqual(
     JSON.parse(JSON.stringify(data.runtimeRuleExceptions.map((exception) => exception.exception_id).sort())),
-    ["ex_z51_fe1", "ex_z51_fe2"]
+    []
   );
+  assert.equal(data.runtimeRuleExceptions.length, 0, "Stingray runtime-rule exception sheet should no longer own active behavior");
   assert.equal(
     data.runtimeRuleExceptions.some((exception) => exception.exception_id === "ex_gba_zyc"),
     false,
@@ -1867,6 +1868,35 @@ test("runtime defaults and RPO exceptions are workbook-generated metadata", () =
   const fe1Default = data.defaultSelectionRules.find((rule) => rule.rule_id === "default_fe1");
   assert.equal(fe1Default.condition_type, "unless_selected_section");
   assert.equal(fe1Default.condition_id, "sec_susp_001");
+  const z51ExcludesFe1 = data.rules.find((rule) => rule.rule_id === "rule_opt_z51_001_excludes_opt_fe1_001");
+  assert.ok(z51ExcludesFe1, "Z51 should remove FE1 through workbook-owned direct rule metadata");
+  assert.equal(z51ExcludesFe1.source_id, "opt_z51_001");
+  assert.equal(z51ExcludesFe1.target_id, "opt_fe1_001");
+  assert.equal(z51ExcludesFe1.rule_type, "excludes");
+  assert.equal(z51ExcludesFe1.runtime_action, "replace");
+  assert.equal(z51ExcludesFe1.disabled_reason, "Replaced by FE3 Z51 performance suspension.");
+  const z51ExcludesFe2 = data.rules.find((rule) => rule.rule_id === "rule_opt_z51_001_excludes_opt_fe2_001");
+  assert.ok(z51ExcludesFe2, "Z51 should remove FE2 through workbook-owned direct rule metadata");
+  assert.equal(z51ExcludesFe2.source_id, "opt_z51_001");
+  assert.equal(z51ExcludesFe2.target_id, "opt_fe2_001");
+  assert.equal(z51ExcludesFe2.rule_type, "excludes");
+  assert.equal(z51ExcludesFe2.runtime_action, "replace");
+  assert.equal(z51ExcludesFe2.disabled_reason, "Not available with Z51 Performance Package.");
+  assert.equal(
+    data.rules.some((rule) => rule.rule_id === "rule_opt_fe2_001_excludes_opt_z51_001"),
+    false,
+    "Reverse FE2 -> Z51 rule should not remain after Z51-owned suspension exclusion migration"
+  );
+  assert.equal(
+    data.ruleGroups.some((group) => (group.target_ids || []).some((id) => ["opt_fe1_001", "opt_fe2_001", "opt_fe3_001", "opt_fe4_001"].includes(id))),
+    false,
+    "Pass 15 should not introduce suspension rule groups"
+  );
+  assert.equal(
+    data.exclusiveGroups.some((group) => (group.option_ids || []).some((id) => ["opt_fe1_001", "opt_fe2_001", "opt_fe3_001", "opt_fe4_001"].includes(id))),
+    false,
+    "Pass 15 should not introduce suspension exclusive groups"
+  );
   assert.doesNotMatch(appSource, /for \(const defaultRpo of \["FE1", "NGA", "BC7"\]\)/);
   assert.doesNotMatch(appSource, /deleteSelectedRpo\("FE1"\)/);
   assert.doesNotMatch(appSource, /deleteSelectedRpo\("FE2"\)/);
@@ -2053,16 +2083,54 @@ test("initial selected FE1 state is de-duped to the visible suspension choice", 
   assert.equal(selectedRpos.includes("FE1"), false, "Z51 should remove FE1");
   assert.equal(selectedRpos.includes("FE2"), false, "Z51 should remove FE2");
   assert.equal(runtime.computeAutoAdded().has("opt_fe3_001"), true, "Z51 should still include FE3");
+  const fe1 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_fe1_001");
+  assert.equal(runtime.disableReasonForChoice(fe1), "Replaced by FE3 Z51 performance suspension.");
+  runtime.handleChoice(fe1);
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has("opt_fe1_001"), false, "FE1 should not be selectable while Z51 is selected");
+
+  runtime.handleChoice(z51);
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has("opt_z51_001"), false, "Z51 should be removable from the selected package path");
+  assert.equal(runtime.computeAutoAdded().has("opt_fe3_001"), false, "Removing Z51 should remove FE3 auto-add");
+  assert.equal(runtime.state.selected.has("opt_fe1_001"), true, "FE1 default should restore after Z51 is removed");
 
   const fe2Runtime = loadRuntime();
   fe2Runtime.state.bodyStyle = "coupe";
   fe2Runtime.state.trimLevel = "1LT";
   fe2Runtime.resetDefaults();
   fe2Runtime.reconcileSelections();
-  fe2Runtime.handleChoice(fe2Runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_fe2_001"));
+  const fe2Z51 = fe2Runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_z51_001");
+  const fe2 = fe2Runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_fe2_001");
+  fe2Runtime.handleChoice(fe2);
   const fe2SelectedRpos = [...fe2Runtime.state.selected].map((id) => data.choices.find((choice) => choice.option_id === id)?.rpo);
   assert.equal(fe2SelectedRpos.includes("FE2"), true, "FE2 should remain selected");
   assert.equal(fe2SelectedRpos.includes("FE1"), false, "FE2 should suppress the FE1 default");
+  assert.equal(fe2Runtime.disableReasonForChoice(fe2Z51), "", "Z51 should stay selectable after FE2 is selected");
+  fe2Runtime.handleChoice(fe2Z51);
+  fe2Runtime.reconcileSelections();
+  assert.equal(fe2Runtime.state.selected.has("opt_z51_001"), true, "Z51 should be selectable after FE2");
+  assert.equal(fe2Runtime.state.selected.has("opt_fe2_001"), false, "Z51 should remove FE2");
+  assert.equal(fe2Runtime.disableReasonForChoice(fe2), "Not available with Z51 Performance Package.");
+  fe2Runtime.handleChoice(fe2);
+  fe2Runtime.reconcileSelections();
+  assert.equal(fe2Runtime.state.selected.has("opt_fe2_001"), false, "FE2 should not be selectable while Z51 is selected");
+  assert.equal(fe2Runtime.computeAutoAdded().has("opt_fe3_001"), true, "Z51 should include FE3 after replacing FE2");
+
+  const fe4Runtime = loadRuntime();
+  fe4Runtime.state.bodyStyle = "coupe";
+  fe4Runtime.state.trimLevel = "1LT";
+  fe4Runtime.resetDefaults();
+  fe4Runtime.reconcileSelections();
+  const fe4 = fe4Runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_fe4_001");
+  assert.equal(fe4Runtime.disableReasonForChoice(fe4), "Requires Z51 Performance Package.");
+  fe4Runtime.handleChoice(fe4Runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_z51_001"));
+  fe4Runtime.reconcileSelections();
+  assert.equal(fe4Runtime.disableReasonForChoice(fe4), "");
+  fe4Runtime.handleChoice(fe4);
+  fe4Runtime.reconcileSelections();
+  assert.equal(fe4Runtime.state.selected.has("opt_fe4_001"), true, "FE4 should remain selectable once Z51 is selected");
+  assert.equal(fe4Runtime.computeAutoAdded().has("opt_b4z_001"), true, "FE4 should still include B4Z");
 });
 
 test("Stingray workbook default-selected standard choices seed every variant", () => {
