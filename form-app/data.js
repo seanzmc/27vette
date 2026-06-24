@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-24T02:59:06+00:00"
+          "generated_at": "2026-06-24T14:29:47+00:00"
         },
         "variants": [
           {
@@ -48004,7 +48004,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-23T00:50:17+00:00",
+          "generated_at": "2026-06-24T14:31:24+00:00",
           "status": "runtime_active"
         },
         "variants": [

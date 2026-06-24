@@ -401,6 +401,17 @@ test("Stingray Phase 4 availability rules are workbook-owned", () => {
   );
   assert.equal(uqtOverrides.every((row) => row.status === "unavailable" && row.selectable === "False" && row.active === "False"), true);
 
+  const bc7Overrides = workbookRows("variant_option_overrides").filter(
+    (row) => row.model_key === "stingray" && row.option_id === "opt_bc7_001"
+  );
+  assert.equal(bc7Overrides.length, 0, "Stingray BC7 default-selected display metadata should derive from default rules");
+  const coupeBc7Defaults = jsonData.choices.filter((choice) => choice.option_id === "opt_bc7_001" && choice.body_style === "coupe");
+  assert.equal(coupeBc7Defaults.length, 3);
+  assert.equal(coupeBc7Defaults.every((choice) => choice.status === "standard" && choice.display_behavior === "default_selected"), true);
+  const stingrayNgaDefaults = jsonData.choices.filter((choice) => choice.option_id === "opt_nga_001");
+  assert.equal(stingrayNgaDefaults.length, 6);
+  assert.equal(stingrayNgaDefaults.every((choice) => choice.display_behavior !== "default_selected"), true);
+
   const stitchPresentation = workbookRows("section_presentation").find(
     (row) => row.model_key === "stingray" && row.section_id === "sec_cust_002" && row.active === "True"
   );

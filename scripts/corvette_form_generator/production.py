@@ -48,6 +48,7 @@ from corvette_form_generator.rules import (
 from corvette_form_generator.registry_promotion import runtime_contract_artifact_path
 from corvette_form_generator.runtime_contract import build_model_runtime_contract
 from corvette_form_generator.runtime_metadata import (
+    derived_default_selected_display_behavior,
     load_context_sections,
     load_default_selection_rules,
     load_model_config_overrides,
@@ -369,6 +370,10 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
                 "display_order": option["display_order"],
                 "source_detail_raw": option["source_detail_raw"],
             }
+            if not display_behavior and derived_default_selected_display_behavior(
+                choice, MODEL_CONFIG.model_key, default_selection_rules, exclusive_groups
+            ):
+                display_behavior = "default_selected"
             if display_behavior:
                 choice["display_behavior"] = display_behavior
             if asset := option_assets.get(option_id):

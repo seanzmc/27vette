@@ -345,8 +345,20 @@ Status: implemented in `docs/audit-cleanup/pass-15-stingray-z51-suspension-runti
 
 Pass 15 retired the final active Stingray `runtime_rule_exceptions` rows (`ex_z51_fe1`, `ex_z51_fe2`) by adding workbook-owned Z51 -> FE1 and Z51 -> FE2 direct replacement excludes with `runtime_action=replace`, removing obsolete reverse direct rule `rule_mapping.rule_opt_fe2_001_excludes_opt_z51_001`, and preserving `default_selection_rules.default_fe1`, Z51 -> FE3 include behavior, and FE4 requires/includes behavior. Generated-data plus local-browser parity proved FE2 selected first leaves Z51 clickable, selecting Z51 removes FE1/FE2, and FE3 remains auto-added. No runtime JavaScript, visual styling, dealer submission behavior, Grand Sport/Z06 source data, suspension grouped rule, or suspension exclusive group changed.
 
+### Pass 16 — Variant override sheet semantics classification
+
+Status: completed report-only implementation in `docs/audit-cleanup/pass-16-variant-override-sheet-semantics-report.md`; closure recorded in `docs/audit-cleanup/pass-16-variant-override-sheet-semantics-report-spec.md`.
+
+Pass 16 kept the workbook and generated artifacts read-only and classified the active variant override sheet behavior. It confirmed that `variant_option_overrides.active` is an emitted value for Stingray rows, while `grandSport_variant_overrides.active` and `z06_variant_overrides.active` are row activation flags. It also split the remaining override behavior into two implementation classes: BC7/NGA default-selected display metadata could move first through generator derivation from existing default-selection rules plus exclusive groups; UQT trim-standard placement/selectability needs a separate source-row remodel or constrained derivation design because OVS status rows do not carry selectability, display-only behavior, or per-variant section movement.
+
+### Pass 17 — Default-selected display metadata derivation
+
+Status: implemented in `docs/audit-cleanup/pass-17-default-selected-display-metadata-derivation-spec.md`.
+
+Pass 17 added narrow generator derivation for `display_behavior=default_selected` from workbook `default_selection_rules` plus active single-selection exclusive groups, guarded to Stingray `default_bc7`, Grand Sport `gs_default_bc7_coupe`, and Grand Sport `gs_default_nga_unless_nwi`. It then deleted only the redundant BC7/NGA rows from `variant_option_overrides` and `grandSport_variant_overrides`, preserved all UQT rows and `z06_variant_overrides`, regenerated Stingray/Grand Sport/registry artifacts, and proved timestamp-normalized generated parity plus local browser/runtime BC7/NGA/UQT behavior.
+
 ## Bottom line
 
 The repo is past the worst version of the route problem. The registry, promotion metadata, model discovery, workbook source roles, schema source-contract validation, output orchestration, active source-assembly facade, and Grand Sport Candidate D exhaust ownership path are normalized for the active models.
 
-The next safe architecture-risk candidate is a report-only classification or narrow spec-first pass for the remaining segregated workbook behavior surfaces in the variant override sheets. `runtime_rule_exceptions` has no remaining active rows after Pass 15. Do not delete `runtime_action`, trim emitted rule fields, migrate Z06 replacement behavior, or change direct-rule runtime matching until separately approved.
+The next safe architecture-risk candidate on this cleanup track is a separate UQT source-ownership spec for trim-standard placement/selectability. Keep UQT rows accepted-as-is until that source model is chosen. `runtime_rule_exceptions` has no remaining active rows after Pass 15, and Pass 17 removed the BC7/NGA default-selected override rows without generated payload drift. Do not delete variant override sheets wholesale, delete `runtime_action`, trim emitted rule fields, migrate Z06 replacement behavior, or change direct-rule runtime matching until separately approved.

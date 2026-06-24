@@ -1,6 +1,6 @@
 # Pass 16 — Variant Override Sheet Semantics Report Spec
 
-Status: Spec only. Do not implement until approved.
+Status: Completed report-only implementation on 2026-06-24.
 Date: 2026-06-23
 Recommended reasoning level for implementation agent: high.
 
@@ -383,6 +383,50 @@ Do not run model generators for the report pass unless the report explicitly nee
 - No schema/header normalization.
 - No new canonical sheet or column proposal unless the report proves existing workbook owners cannot represent a behavior class.
 
-## Approval prompt
+## Completion evidence
 
-Approve Pass 16 as a report-only semantics classification: create `docs/audit-cleanup/pass-16-variant-override-sheet-semantics-report.md`, update this spec with completion evidence, optionally refresh standing docs if the report changes next-step guidance, and perform only read-only workbook/generated/code/test probes plus docs-only validation.
+Pass 16 was completed as a report-only classification on 2026-06-24.
+
+Created:
+
+- `docs/audit-cleanup/pass-16-variant-override-sheet-semantics-report.md`
+
+Updated:
+
+- `docs/audit-cleanup/pass-16-variant-override-sheet-semantics-report-spec.md`
+- `docs/metadata-runtime-redundancy-6-23.md`
+- `docs/Audit-route-map.md`
+
+Read-only probes performed:
+
+- `git status --short --branch`: branch `schema-ingestion-normalization` with no dirty files at Pass 16 start.
+- Workbook lock probe: no `~$stingray_master.xlsx` lock file.
+- `openpyxl.load_workbook(..., read_only=True, data_only=True)` workbook inventory for `variant_option_overrides`, `grandSport_variant_overrides`, `z06_variant_overrides`, adjacent source sheets, OVS rows, default-selection rules, exclusive groups, and section-presentation metadata.
+- Checked-in generated contract JSON inspection for `form-output/runtime/stingray-runtime-contract.json`, `form-output/runtime/grand-sport-runtime-contract.json`, and `form-output/runtime/z06-runtime-contract.json`.
+- Code/test consumer inventory through `read_file` / `search_files` for the loader, production/inspection application paths, schema/editor mappings, and UQT/BC7/NGA test anchors.
+
+Report conclusions:
+
+- `variant_option_overrides.active` remains emitted-value metadata, not row activation.
+- UQT trim-scoped included-equipment placement/selectability is a source-row remodel or constrained generator-derivation candidate, not a simple OVS-owned deletion candidate.
+- Stingray/Grand Sport BC7 and Grand Sport NGA default-selected display metadata are better follow-up candidates for generator derivation from existing `default_selection_rules` plus exclusive groups.
+- No sheet-wide variant override deletion pass is recommended.
+
+Gates run after docs edits:
+
+- `git diff --check`: pass.
+- Targeted stale active-prompt scan against this spec: pass after final wording cleanup; no active approval prompt remains.
+- Targeted docs diff/status review: pass; changed files are docs-only.
+
+Manual verification still pending:
+
+- None for runtime behavior because this was report-only and did not regenerate artifacts or change runtime/source data.
+- Future implementation passes still need generated-data parity and local browser/runtime proof before retiring any override rows.
+
+Recommended next pass after Pass 16:
+
+- Historical context: Pass 16 recommended a narrow default-selected display metadata derivation pass for Stingray BC7, Grand Sport BC7, and Grand Sport NGA, while keeping UQT trim-standard placement separate. That follow-up became Pass 17 and was implemented on 2026-06-24. The remaining follow-up on this track is a separate UQT source-ownership spec before any remaining variant override row migration.
+
+## Historical approval prompt
+
+Original pre-approval wording: Pass 16 was requested as a report-only semantics classification to create `docs/audit-cleanup/pass-16-variant-override-sheet-semantics-report.md`, update this spec with completion evidence, optionally refresh standing docs if the report changed next-step guidance, and perform only read-only workbook/generated/code/test probes plus docs-only validation.

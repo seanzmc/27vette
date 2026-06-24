@@ -17,6 +17,13 @@ from corvette_form_generator.workbook import clean, intish, rows_from_sheet
 _TRUE_VALUES = {"1", "true", "t", "yes", "y", "on", "active", "enabled"}
 _FALSE_VALUES = {"0", "false", "f", "no", "n", "off", "inactive", "disabled"}
 _GLOBAL_MODEL_KEYS = {"all", "shared", "*"}
+_DEFAULT_SELECTED_DISPLAY_RULE_IDS_BY_MODEL = {
+    # Narrow Pass 17 derivation guard.  The workbook default-selection rules
+    # remain the behavior owner; this allowlist prevents the display-metadata
+    # cleanup from expanding to other defaults such as Stingray NGA or Z06 rows.
+    "stingray": frozenset({"default_bc7"}),
+    "grand_sport": frozenset({"gs_default_bc7_coupe", "gs_default_nga_unless_nwi"}),
+}
 _MODEL_CONFIG_SOURCE_ROLES = {
     "source_option_sheet",
     "status_sheet",
@@ -278,6 +285,69 @@ def load_variant_option_overrides(
 
 def load_default_selection_rules(wb: Any, model_key: str) -> list[dict[str, Any]]:
     return _load_rule_rows(wb, "default_selection_rules", model_key, id_field="rule_id")
+
+
+def _scope_matches(scope: Any, value: Any) -> bool:
+    entries = [entry.strip() for entry in clean(scope).split("|") if entry.strip()]
+    if not entries or "*" in entries:
+        return True
+    return clean(value) in entries
+
+
+def _active_single_selection_group_option_ids(exclusive_groups: Iterable[Mapping[str, Any]]) -> set[str]:
+    option_ids: set[str] = set()
+    for group in exclusive_groups:
+        if clean(group.get("active")) != "True":
+            continue
+        if clean(group.get("selection_mode")) not in {"single_within_group", "required_single_within_group"}:
+            continue
+        members = [clean(option_id) for option_id in group.get("option_ids", []) if clean(option_id)]
+        if len(members) < 2:
+            continue
+        option_ids.update(members)
+    return option_ids
+
+
+def derived_default_selected_display_behavior(
+    choice: Mapping[str, Any],
+    model_key: str,
+    default_selection_rules: Iterable[Mapping[str, Any]],
+    exclusive_groups: Iterable[Mapping[str, Any]],
+) -> bool:
+    """Return whether a choice should emit default_selected display metadata.
+
+    The source of truth is workbook ``default_selection_rules`` plus active
+    single-selection exclusive-group metadata.  The rule-id allowlist is a
+    migration guard for the Pass 17 BC7/NGA cleanup so this derivation cannot
+    silently add display metadata for defaults outside the approved row class.
+    """
+
+    model = clean(model_key).lower()
+    allowed_rule_ids = _DEFAULT_SELECTED_DISPLAY_RULE_IDS_BY_MODEL.get(model, frozenset())
+    if not allowed_rule_ids:
+        return False
+    if clean(choice.get("status")) != "standard":
+        return False
+    if clean(choice.get("selectable")) != "True" or clean(choice.get("active")) != "True":
+        return False
+    option_id = clean(choice.get("option_id"))
+    if not option_id or option_id not in _active_single_selection_group_option_ids(exclusive_groups):
+        return False
+    for rule in default_selection_rules:
+        if clean(rule.get("rule_id")) not in allowed_rule_ids:
+            continue
+        if clean(rule.get("target_option_id")) != option_id:
+            continue
+        if clean(rule.get("condition_type")) not in {"always", "unless_selected_rpo"}:
+            continue
+        if not _scope_matches(rule.get("body_style_scope"), choice.get("body_style")):
+            continue
+        if not _scope_matches(rule.get("trim_level_scope"), choice.get("trim_level")):
+            continue
+        if not _scope_matches(rule.get("variant_scope"), choice.get("variant_id")):
+            continue
+        return True
+    return False
 
 
 def load_runtime_rule_exceptions(wb: Any, model_key: str) -> list[dict[str, Any]]:

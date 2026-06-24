@@ -240,6 +240,21 @@ test("Grand Sport trim-scoped overrides collapse AQ9 and UQT duplicate rows", ()
   assert.equal(draft.choices.some((choice) => choice.option_id === "opt_aq9_003"), false);
   assert.equal(draft.choices.some((choice) => choice.option_id === "opt_uqt_002"), false);
 
+  const defaultSelectedOverrides = workbookRows("grandSport_variant_overrides").filter(
+    (row) => row.option_id === "opt_bc7_001" || row.option_id === "opt_nga_001"
+  );
+  assert.equal(defaultSelectedOverrides.length, 0, "Grand Sport BC7/NGA default-selected display metadata should derive from default rules");
+  const uqtOverrides = workbookRows("grandSport_variant_overrides").filter((row) => row.option_id === "opt_uqt_001");
+  assert.deepEqual(
+    uqtOverrides.map((row) => [row.variant_id, row.selectable, row.display_behavior, row.section_id]).sort(),
+    [
+      ["2lt_e07", "False", "display_only", "sec_2lte_001"],
+      ["2lt_e67", "False", "display_only", "sec_2lte_001"],
+      ["3lt_e07", "False", "display_only", "sec_3lte_001"],
+      ["3lt_e67", "False", "display_only", "sec_3lte_001"],
+    ]
+  );
+
   for (const variantId of ["1lt_e07", "1lt_e67", "2lt_e07", "2lt_e67"]) {
     const aq9 = draft.choices.find((choice) => choice.choice_id === `${variantId}__opt_aq9_001`);
     assert.ok(aq9, `${variantId} should emit canonical AQ9`);
