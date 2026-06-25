@@ -241,28 +241,19 @@ def load_variant_option_overrides(
     model_key: str,
     fallback_sheet: str = "",
 ) -> list[dict[str, Any]]:
-    """Single loader for variant option overrides across both sheet contracts.
+    """Load model-scoped variant option override rows.
 
-    The workbook-global ``variant_option_overrides`` sheet uses the ``active``
-    column as the override value for the generated choice, not as row
-    activation, so it must not be read through active_rows(). Model-scoped
-    fallback sheets (e.g. ``grandSport_variant_overrides``) use ``active`` as
-    row activation and carry ``section_id``/``note`` columns instead of
-    ``status``/``active`` override values; the loader normalizes both
-    contracts into one field set.
+    Active runtime models now resolve variant presentation overrides through
+    their configured ``model_workbook_sources.variant_option_overrides_sheet``.
+    The historical global ``variant_option_overrides`` contract is retired and
+    must not shadow a model-scoped sheet if rows are reintroduced there.
+    Model-scoped sheets use ``active`` as row activation, so emitted active
+    override values remain neutralized.
     """
 
-    model = clean(model_key).lower()
-    allowed_model_keys = _GLOBAL_MODEL_KEYS | {model}
-    sourced_rows = [
-        (row, True)
-        for row in optional_rows(wb, "variant_option_overrides")
-        if clean(row.get("model_key", "")).lower() in allowed_model_keys
-    ]
-    if not sourced_rows and fallback_sheet:
-        sourced_rows = [(row, False) for row in active_rows(wb, fallback_sheet, model_key=None)]
+    sourced_rows = active_rows(wb, fallback_sheet, model_key=None) if fallback_sheet else []
     overrides: list[dict[str, Any]] = []
-    for row, value_active in sourced_rows:
+    for row in sourced_rows:
         option_id = clean(row.get("option_id") or row.get("rpo"))
         variant_id = clean(row.get("variant_id"))
         if not option_id or not variant_id:
@@ -271,9 +262,9 @@ def load_variant_option_overrides(
             {
                 "option_id": option_id,
                 "variant_id": variant_id,
-                "status": clean(row.get("status")) if value_active else "",
+                "status": "",
                 "selectable": clean(row.get("selectable")),
-                "active": clean(row.get("active")) if value_active else "",
+                "active": "",
                 "display_behavior": clean(row.get("display_behavior")),
                 "section_id": clean(row.get("section_id")),
                 "note": clean(row.get("note") or row.get("notes")),

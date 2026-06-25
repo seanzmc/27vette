@@ -129,8 +129,10 @@ Current workbook-owned runtime metadata and audit sheets include:
 - `step_order_summary_map`
 - `default_selection_rules`
 - `runtime_rule_exceptions`
-- `variant_option_overrides`
+- `stingray_variant_overrides`
 - `rule_phrase_map`
+
+The historical global `variant_option_overrides` sheet was retired after active Stingray UQT behavior moved to `stingray_variant_overrides`; active variant presentation overrides are model-scoped.
 
 Current Grand Sport model-scoped sheets include:
 

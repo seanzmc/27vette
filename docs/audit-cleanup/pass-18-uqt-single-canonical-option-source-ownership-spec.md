@@ -93,9 +93,9 @@ What stayed unchanged:
 
 Residual risks and follow-up:
 
-- `variant_option_overrides` is now empty for active UQT/BC7/NGA behavior but remains as a historical/global contract surface. Do not delete the sheet or loader path without a separate sheet-retirement spec.
+- `variant_option_overrides` was left empty for active UQT/BC7/NGA behavior at Pass 18 completion. Historical follow-up: Pass 19 later retired the physical sheet and global-first loader path.
 - The remaining model-scoped UQT display-only rows are still canonical behavior owners for trim-standard placement/selectability; there is no immediate reason to refactor them further.
-- No obvious next cleanup pass is implied by UQT after this implementation. A future pass could separately decide whether empty global `variant_option_overrides` should be retired, but only after proving no active or future model source role still needs it.
+- No obvious next cleanup pass is implied by UQT after this implementation. Historical follow-up on the empty global sheet became Pass 19 and was implemented on 2026-06-24.
 
 ## Goal
 
@@ -364,8 +364,8 @@ Expected code changes:
 - No new dependencies.
 - No broad refactor of generator routing.
 - No changes to BC7/NGA Pass 17 derivation.
-- Do not delete `grandSport_variant_overrides` or `z06_variant_overrides` wholesale.
-- Do not delete the global `variant_option_overrides` sheet wholesale in this pass; making it header-only for active rows is enough unless a later sheet-retirement spec approves deletion.
+- Pass 18 did not delete `grandSport_variant_overrides` or `z06_variant_overrides` wholesale.
+- Pass 18 did not delete the global `variant_option_overrides` sheet wholesale; making it header-only for active rows was enough for that pass. Historical follow-up: Pass 19 later retired the empty sheet and global-first loader path.
 - Do not change Z06 UQT behavior, including `z06_price_rules.z06_pr_1lz_uqt_001`.
 - Do not force cross-model `option_id` unification for UQT unless the user explicitly approves the extra identity churn.
 

@@ -1,6 +1,6 @@
 # Pass 19 — Global Variant Option Overrides Retirement Spec
 
-Status: Spec only. Do not implement until approved.
+Status: Implemented 2026-06-24.
 Date: 2026-06-24
 Recommended reasoning level for implementation agent: high.
 
@@ -13,6 +13,88 @@ Source context:
 - `docs/metadata-runtime-redundancy-6-23.md`
 - `docs/Audit-route-map.md`
 - `27vette-workbook-guard` reference `variant-override-semantics-classification.md`
+
+## Implementation completion evidence
+
+Implemented on 2026-06-24 after approval.
+
+Changed source/workbook/test/docs:
+
+- `scripts/corvette_form_generator/runtime_metadata.py`
+  - `load_variant_option_overrides()` now loads only the configured model-scoped `variant_option_overrides_sheet`.
+  - Removed the hardcoded global `optional_rows(wb, "variant_option_overrides")` first-read, so a reintroduced global sheet cannot shadow model-scoped sheets.
+  - Preserved model-scoped row semantics: `active` controls row activation and does not emit an active override value.
+- `stingray_master.xlsx`
+  - Deleted physical worksheet `variant_option_overrides` after preflight proved it had 0 data rows and no active `model_workbook_sources` reference.
+  - Preserved `stingray_variant_overrides`, `grandSport_variant_overrides`, and `z06_variant_overrides` with four active UQT rows each.
+- `tests/stingray-generator-stability.test.mjs`
+  - Added guards for absent/empty global `variant_option_overrides`.
+  - Added a no-shadow guard by injecting a conflicting temporary global row and proving the model-scoped Stingray override still controls output.
+  - Added an active-source-role guard so active models cannot point back to the retired global sheet.
+- `AGENTS.md`
+  - Removed `variant_option_overrides` from the active workbook-owned runtime metadata/audit sheet list.
+  - Added `stingray_variant_overrides` and a note that active variant presentation overrides are model-scoped.
+- `docs/metadata-runtime-redundancy-6-23.md`
+- `docs/Audit-route-map.md`
+- `docs/audit-cleanup/pass-19-global-variant-option-overrides-retirement-spec.md`
+
+Workbook/package verification:
+
+- Preflight returned `PASS19_PREFLIGHT_OK`:
+  - no Excel lock file,
+  - `variant_option_overrides` had 0 rows,
+  - no active source role pointed to `variant_option_overrides`,
+  - active models pointed to their model-scoped override sheets,
+  - all model-scoped UQT rows were present.
+- `.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx`: valid, 0 issues.
+- `.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx`: valid, 0 issues.
+- Post-save `openpyxl` verification returned `PASS19_WORKBOOK_OVERRIDE_SURFACES_OK`:
+  - `variant_option_overrides` absent,
+  - `stingray_variant_overrides`, `grandSport_variant_overrides`, and `z06_variant_overrides` present,
+  - each model-scoped sheet retained four active UQT rows,
+  - no active source role points to the retired global sheet.
+
+Generated parity:
+
+- Regenerated active models and registry:
+  - `.venv/bin/python scripts/generate_form.py --model stingray`
+  - `.venv/bin/python scripts/generate_form.py --model grand_sport`
+  - `.venv/bin/python scripts/generate_form.py --model z06`
+  - `.venv/bin/python scripts/generate_registry.py`
+- `node scripts/compare-generated-contracts.mjs` showed timestamp-normalized runtime contracts matched before/after for Stingray, Grand Sport, and Z06.
+- `form-output/stingray-form-data.csv` was byte-identical (`stingray_csv_cmp=0`).
+- Generated timestamp churn was restored from `/tmp/pass-19-before`; final status has no generated artifact diffs.
+- Registry sync probes passed:
+  - `PASS19_GENERATED_RESTORED_SYNC_OK`
+  - `PASS19_FINAL_GENERATED_CLEAN_SYNC_OK`
+
+Gate results:
+
+- `.venv/bin/python -m py_compile scripts/corvette_form_generator/runtime_metadata.py`: pass.
+- `.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx`: valid, 0 issues.
+- `.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx`: valid, 0 issues.
+- `node --test tests/stingray-generator-stability.test.mjs`: 14/14 pass.
+- `node --test tests/stingray-form-regression.test.mjs`: 87/87 pass.
+- `node --test tests/grand-sport-draft-data.test.mjs`: 19/19 pass.
+- `node --test tests/z06-interior-accessory-cleanup.test.mjs`: 7/7 pass; Z06 runtime contract restored if rewritten.
+- `node --test tests/workbook-schema-standardization.test.mjs`: 9/9 pass.
+- `node --test tests/multi-model-runtime-switching.test.mjs`: 46/46 pass.
+- `git diff --check`: pass.
+- Final Z06 artifact check: no `form-output/runtime/z06-runtime-contract.json` diff.
+
+What stayed unchanged:
+
+- No runtime JavaScript changes.
+- No visual/layout behavior changes.
+- No dealer submission endpoint, payload shape, or Turnstile behavior changes.
+- No model-scoped variant override rows changed.
+- No final generated artifact diffs.
+
+Residual risks and follow-up:
+
+- The `variant_option_overrides_sheet` role remains valid and canonical for model-scoped override sheets. Do not delete `stingray_variant_overrides`, `grandSport_variant_overrides`, or `z06_variant_overrides` under this cleanup.
+- Inactive/future model-scoped override sheets remain outside the default runtime workflow until promoted through workbook metadata.
+- The next logical cleanup candidate is variant topology clarification between `variant_master` and `model_variants`, but that should be a separate classification/spec pass, not a deletion pass.
 
 ## Goal
 
@@ -107,6 +189,7 @@ Standing docs after Pass 18:
 
 - `docs/metadata-runtime-redundancy-6-23.md` already classifies `variant_option_overrides` as 0 rows and as a historical/global contract surface requiring a separate sheet-retirement spec.
 - `docs/Audit-route-map.md` says the global sheet/loader path should not be deleted without a separate sheet-retirement spec.
+- `AGENTS.md` still lists `variant_option_overrides` as a current workbook-owned runtime metadata/audit sheet. Because this pass changes active workbook sheet inventory if the physical sheet is deleted, `AGENTS.md` must be updated in the same pass rather than left stale.
 
 ## Proposed implementation
 
@@ -202,6 +285,7 @@ Expected source/test/docs changes:
 
 - `scripts/corvette_form_generator/runtime_metadata.py`
 - `tests/stingray-generator-stability.test.mjs`
+- `AGENTS.md`
 - `docs/audit-cleanup/pass-19-global-variant-option-overrides-retirement-spec.md`
 - `docs/metadata-runtime-redundancy-6-23.md`
 - `docs/Audit-route-map.md`
@@ -348,10 +432,11 @@ If implemented, update this spec to `Implemented` with:
 - generated parity results,
 - exact gates run,
 - whether the physical `variant_option_overrides` sheet was deleted or retained with reason,
+- AGENTS.md active sheet list update or an explicit stale/deferred note if the physical sheet is retained,
 - residual risks and next-step guidance.
 
 Update standing docs if they would otherwise still describe the global sheet as an active future cleanup item.
 
-## Approval prompt
+## Historical approval prompt
 
-Approve Pass 19 as a no-behavior-change cleanup to retire the empty global `variant_option_overrides` contract: preflight that no active model or row still uses it, update the loader to use only configured model-scoped override sheets, delete the physical empty sheet only if package/editor/schema checks allow it, add tests preventing global sheet reintroduction/shadowing, prove generated runtime contracts are timestamp-normalized identical, restore timestamp-only generated churn, and update this spec plus standing docs with completion evidence before handoff.
+Pass 19 was approved and implemented on 2026-06-24 as a no-behavior-change cleanup to retire the empty global `variant_option_overrides` contract: preflight that no active model or row still used it, update the loader to use only configured model-scoped override sheets, delete the physical empty sheet after package/schema checks allowed it, add tests preventing global sheet reintroduction/shadowing, prove generated runtime contracts are timestamp-normalized identical, restore timestamp-only generated churn, and update this spec plus standing docs with completion evidence before handoff.

@@ -26,6 +26,7 @@ const jsonData = JSON.parse(fs.readFileSync("form-output/stingray-form-data.json
 const appData = loadAppData();
 const generatorSource = fs.readFileSync("scripts/corvette_form_generator/production.py", "utf8");
 const generateFormSource = fs.readFileSync("scripts/generate_form.py", "utf8");
+const runtimeMetadataSource = fs.readFileSync("scripts/corvette_form_generator/runtime_metadata.py", "utf8");
 const stingrayVariantIds = ["1lt_c07", "2lt_c07", "3lt_c07", "1lt_c67", "2lt_c67", "3lt_c67"];
 const grandSportVariantIds = ["1lt_e07", "2lt_e07", "3lt_e07", "1lt_e67", "2lt_e67", "3lt_e67"];
 const optionSourceHeaders = [
@@ -238,7 +239,7 @@ function workbookHeaders(sheetName) {
   return JSON.parse(output);
 }
 
-function workbookRows(sheetName) {
+function workbookRows(sheetName, { optional = false } = {}) {
   const output = execFileSync(
     ".venv/bin/python",
     [
@@ -247,6 +248,13 @@ function workbookRows(sheetName) {
         "import json",
         "from openpyxl import load_workbook",
         "wb = load_workbook('stingray_master.xlsx', read_only=True, data_only=True)",
+        `optional = ${optional ? "True" : "False"}`,
+        `sheet_name = '${sheetName}'`,
+        "if sheet_name not in wb.sheetnames:",
+        "    if optional:",
+        "        print(json.dumps([]))",
+        "        raise SystemExit(0)",
+        "    raise KeyError(sheet_name)",
         `ws = wb['${sheetName}']`,
         "headers = [ws.cell(1, col).value for col in range(1, ws.max_column + 1)]",
         "rows = []",
@@ -409,9 +417,14 @@ from openpyxl import load_workbook
 workbook_path = Path(sys.argv[1])
 wb = load_workbook(workbook_path)
 
-global_sheet = wb["variant_option_overrides"]
+if "variant_option_overrides" in wb.sheetnames:
+    global_sheet = wb["variant_option_overrides"]
+else:
+    global_sheet = wb.create_sheet("variant_option_overrides")
+    global_sheet.append(["model_key", "option_id", "variant_id", "status", "selectable", "active", "display_behavior", "notes"])
 if global_sheet.max_row > 1:
     global_sheet.delete_rows(2, global_sheet.max_row - 1)
+global_sheet.append(["stingray", "opt_uqt_002", "2lt_c07", "unavailable", "False", "False", "", "Global row should not shadow model-scoped override."])
 
 for sheet_name in ["stingray_options", "stingray_ovs"]:
     sheet = wb[sheet_name]
@@ -476,7 +489,15 @@ print(json.dumps({
 });
 
 test("Stingray Phase 4 availability rules are workbook-owned", () => {
-  const uqtOverrides = workbookRows("variant_option_overrides").filter(
+  const activeGlobalOverrideSources = workbookRows("model_workbook_sources").filter(
+    (row) =>
+      row.active === "True" &&
+      row.source_role === "variant_option_overrides_sheet" &&
+      row.sheet_name === "variant_option_overrides"
+  );
+  assert.equal(activeGlobalOverrideSources.length, 0, "active models should not point at the retired global variant_option_overrides sheet");
+
+  const uqtOverrides = workbookRows("variant_option_overrides", { optional: true }).filter(
     (row) => row.model_key === "stingray" && row.option_id === "opt_uqt_002"
   );
   assert.equal(uqtOverrides.length, 0, "Stingray UQT should no longer depend on global emitted-value overrides");
@@ -520,7 +541,7 @@ test("Stingray Phase 4 availability rules are workbook-owned", () => {
     true
   );
 
-  const bc7Overrides = workbookRows("variant_option_overrides").filter(
+  const bc7Overrides = workbookRows("variant_option_overrides", { optional: true }).filter(
     (row) => row.model_key === "stingray" && row.option_id === "opt_bc7_001"
   );
   assert.equal(bc7Overrides.length, 0, "Stingray BC7 default-selected display metadata should derive from default rules");
@@ -544,6 +565,7 @@ test("Stingray Phase 4 availability rules are workbook-owned", () => {
 
   assert.match(generatorSource, /load_variant_option_overrides/);
   assert.match(generatorSource, /load_section_presentation/);
+  assert.doesNotMatch(runtimeMetadataSource, /optional_rows\(wb, ["']variant_option_overrides["']\)/);
   assert.doesNotMatch(generatorSource, /option_id\s*==\s*["']opt_uqt_002["']/);
   assert.doesNotMatch(generatorSource, /HIDDEN_SECTION_IDS/);
   assert.doesNotMatch(generatorSource, /opt_r6x_001["']\s+if\s+active_for_stingray\s+and\s+requires_r6x/);

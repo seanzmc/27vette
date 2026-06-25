@@ -21,8 +21,8 @@
 
 ### Medium-high risk
 
-1. Variant override behavior is now model-scoped for active UQT behavior, but the historical global sheet/loader path remains.
-   - variant_option_overrides: 0 rows after Pass 18. The loader still supports the historical global contract where `active` is an emitted override value, not row activation, but no active UQT/BC7/NGA behavior remains there.
+1. Variant override behavior is now model-scoped for active UQT behavior; the historical global sheet/loader path was retired in Pass 19.
+   - variant_option_overrides: physical sheet deleted after Pass 19. No active model source role points to it, and `runtime_metadata.load_variant_option_overrides()` no longer reads a global first-choice sheet.
    - stingray_variant_overrides: 4 active rows after Pass 18, conventional row activation.
    - grandSport_variant_overrides: 4 active rows after Pass 18, conventional row activation.
    - z06_variant_overrides: 4 active rows, conventional row activation.
@@ -36,10 +36,10 @@
      - Stingray model-scoped overrides: UQT display-only standard rows for 2LT/3LT only. Global Stingray UQT suppression rows were removed in Pass 18.
      - Grand Sport overrides: UQT display-only standard rows for 2LT/3LT only. BC7 coupe and NGA all-variant default_selected rows were removed in Pass 17 and now derive from default_selection_rules plus exclusive groups.
      - Z06 overrides: UQT display-only standard rows for 2LZ/3LZ.
-   - This is not safe to delete wholesale just because the global sheet is empty. The remaining model-scoped sheets still carry canonical UQT emitted choice selectability, display-only behavior, and section_id placement.
+   - The remaining model-scoped sheets still carry canonical UQT emitted choice selectability, display-only behavior, and section_id placement.
    - Remaining canonical candidate:
      - None for active UQT source ownership after Pass 18. The current source model is canonical option rows plus model-scoped variant presentation overrides for trim-standard placement/selectability.
-   - Pass 17 completed the BC7/NGA default-selected migration with generated parity and browser/runtime proof. Pass 18 completed the UQT single-canonical-option-row migration with allowlisted UQT drift and browser/runtime proof.
+   - Pass 17 completed the BC7/NGA default-selected migration with generated parity and browser/runtime proof. Pass 18 completed the UQT single-canonical-option-row migration with allowlisted UQT drift and browser/runtime proof. Pass 19 retired the empty global override sheet/loader path with timestamp-normalized generated parity.
 
 ### Medium risk
 
@@ -82,14 +82,14 @@ Risk level: High
 Recommended next action: Keep empty unless a future, separately approved pass proves a true exception cannot be expressed through normal rule/default/group ownership.
 Required parity gates: If future rows are added, require workbook edit with safe save, generated contract diff, targeted runtime tests, and local browser proof.
 ────────────────────────────────────────
-Sheet: variant_option_overrides — 0 rows after Pass 18; historical global/Stingray contract retained; keys model_key, option_id, variant_id,
+Sheet: variant_option_overrides — retired after Pass 19; physical worksheet absent. Former keys: model_key, option_id, variant_id,
 status, selectable, active, display_behavior, notes
-Current consumer(s): runtime_metadata.py variant override loader; production.py variant override application; Pass 17 default-selected derivation helper; tests in stingray-generator-stability.test.mjs
-Current behavior/data ownership: Empty historical/global override surface. Stingray UQT global suppression rows were removed in Pass 18. BC7 coupe default-selected rows were removed in Pass 17 and now derive from default_selection_rules plus exclusive groups.
-Canonical-owner candidate: No active UQT/BC7/NGA behavior remains here. Keep the sheet/loader path until a separate sheet-retirement spec proves it has no current or future source-role use.
-Risk level: Medium-high
-Recommended next action: Do not delete without a separate sheet-retirement spec.
-Required parity gates: Future retirement pass: prove no active model role depends on the global contract; run schema/source-role validation, Stingray generation + registry, stingray-generator-stability.test.mjs, stingray-form-regression.test.mjs, and browser/runtime proof.
+Current consumer(s): none for active workflow. `runtime_metadata.load_variant_option_overrides()` now reads only configured model-scoped `variant_option_overrides_sheet` roles.
+Current behavior/data ownership: None. Stingray UQT global suppression rows were removed in Pass 18. The empty global sheet and global-first loader path were removed in Pass 19.
+Canonical-owner candidate: Retired surface. Do not reintroduce without a new source-owner spec.
+Risk level: Retired / guarded
+Recommended next action: Keep retired. Use model-scoped override sheets for active variant presentation overrides.
+Required parity gates: If reintroduced, require a new spec, active-source-role proof, generated contract parity, and browser/runtime proof.
 ────────────────────────────────────────
 Sheet: stingray_variant_overrides — 4 rows / 4 active after Pass 18; coverage Stingray sheet-scoped; keys option_id, variant_id, selectable, display_behavior,
 section_id, active, note
