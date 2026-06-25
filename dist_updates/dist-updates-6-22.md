@@ -8,6 +8,8 @@ _Updates for USA 2027 Chevrolet Car Corvette_
 
 ### Stingray
 
+TL;DR: 3N9 standard with EJH, EPX
+
 - Stingray Interior section-(719) Seat belt color, Black, updated footnote 1 to now read "(HZN,
   HUF) Natural Dipped interiors and (EJH, EPX) Very Dark Atmosphere interiors comes with
   (3N9) Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini
@@ -36,6 +38,11 @@ _Updates for USA 2027 Chevrolet Car Corvette_
   (H8T) Santorini Blue interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
 
 ### Grand Sport
+
+TL;DR:
+
+- 3N9 standard with EJH, EPX
+- CFV available to order
 
 - Grand Sport Interior section-(719) Seat belt color, Black, updated footnote 1 to now read
   "(HZN, HUF) Natural Dipped interiors and (EJH, EPX) Very Dark Atmosphere interiors comes
@@ -78,6 +85,12 @@ _Updates for USA 2027 Chevrolet Car Corvette_
 
 ### Z06
 
+TL;DR:
+
+- 3N9 standard with EJH, EPX
+- R8E without T0F/T0G = $2,600
+- R8E with T0F/T0G = $3,000
+
 - Z06 Interior section-(719) Seat belt color, Black, updated footnote 1 to now read "(HZN, HUF)
   Natural Dipped interiors and (EJH, EPX) Very Dark Atmosphere interiors comes with (3N9)
   Natural seat belt color; (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/
@@ -106,6 +119,11 @@ _Updates for USA 2027 Chevrolet Car Corvette_
   (H8T) Santorini Blue interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior."
 
 ### ZR1 and ZR1X
+
+- 3N9 standard with EJH, EPX
+- PCQ, VWT not available at this time
+- ZR1= R8E: $3000
+- ZR1X= R8E: $2600
 
 - ZR1 and ZR1X Interior section-(719) Seat belt color, Black, updated footnote 1 to now read
   "(HZN, HUF) Natural Dipped interiors and (EJH, EPX) Very Dark Atmosphere interiors comes
