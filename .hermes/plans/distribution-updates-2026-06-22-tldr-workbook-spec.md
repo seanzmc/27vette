@@ -1,6 +1,6 @@
 # Distribution Updates 2026-06-22 TL;DR Workbook Spec
 
-Status: spec only / awaiting approval
+Status: implemented / completed 2026-06-25
 Created: 2026-06-25
 Repo: `/Users/seandm/Projects/27vette`
 Branch observed: `main`
@@ -542,12 +542,90 @@ Manual verification pending after gates:
   - Z06 EJH/EPX interiors auto-add 3N9 at zero price and block other seatbelts.
   - Z06 R8E remains selected by default at `$2,600`, rising to `$3,000` with T0F/T0G.
 
-## Approval question
+## Completion evidence
 
-Approve this workbook-only TL;DR pass as scoped above?
+Completed: 2026-06-25.
 
-Recommended approval shape: approve active-model EJH/EPX seatbelt rows, Grand Sport CFV activation, Z06 R8E verification/preservation, and inactive ZR1/ZR1X source-prep for R8E + PCQ/VWT, with ZR1/ZR1X 3N9 behavior explicitly deferred because the required direct-rule source sheets do not exist under the no-new-sheet/no-code boundary.
+Workbook/source sheets changed:
+
+- `stingray_master.xlsx`
+  - `rule_mapping`: added active Stingray EJH/EPX -> `opt_3n9_001` include rows for `3LT_AE4_EJH`, `3LT_AE4_EPX_N26`, `3LT_AH2_EJH`, and `3LT_AH2_EPX_N26`.
+  - `price_rules`: added matching zero-price Stingray EJH/EPX -> `opt_3n9_001` overrides.
+  - `grandSport_rule_mapping`: added active Grand Sport EJH/EPX -> `opt_3n9_001` include rows for `3LT_AE4_EJH`, `3LT_AE4_EPX_N26`, `3LT_AH2_EJH`, and `3LT_AH2_EPX_N26`.
+  - `grandSport_price_rules`: added matching zero-price Grand Sport EJH/EPX -> `opt_3n9_001` overrides.
+  - `z06_rule_mapping`: added active Z06 EJH/EPX -> `opt_3n9_001` include rows for `3LZ_AE4_EJH`, `3LZ_AE4_EPX_N2Z`, `3LZ_AH2_EJH`, and `3LZ_AH2_EPX_N2Z`.
+  - `z06_price_rules`: added matching zero-price Z06 EJH/EPX -> `opt_3n9_001` overrides.
+  - `grandSport_options`: activated `opt_cfv_001` and removed the unavailable-at-this-time source detail while preserving price `4495`, section `sec_perf_ground_001`, and selectable status.
+  - Future-Z source prep: preserved/verified Z06 R8E behavior, set/verified ZR1/ZR1X R8E prices and default-selection rules, and set/verified ZR1/ZR1X PCQ/VWT OVS statuses as unavailable within existing source sheets.
+
+Generated artifacts refreshed:
+
+- `form-output/runtime/stingray-runtime-contract.json`
+- `form-output/stingray-form-data.json`
+- `form-output/runtime/grand-sport-runtime-contract.json`
+- `form-output/runtime/z06-runtime-contract.json`
+- `form-app/data.js`
+
+Tests updated:
+
+- `tests/stingray-form-regression.test.mjs`: covers Stingray EJH/EPX 3N9 auto-add, zero-price, and peer lock including D30.
+- `tests/multi-model-runtime-switching.test.mjs`: covers Grand Sport EJH/EPX 3N9 auto-add through runtime behavior.
+- `tests/grand-sport-contract-preview.test.mjs`: updates approved Grand Sport CFV counts/hotspot expectations.
+- `tests/grand-sport-draft-data.test.mjs`: asserts CFV is emitted as available/selectable at `$4,495` and updates approved count expectations.
+- `tests/z06-form-data-draft.test.mjs`: covers Z06 EJH/EPX 3N9 generated include rows.
+- `tests/z06-runtime-rule-corrections.test.mjs`: covers Z06 EJH/EPX 3N9 runtime behavior.
+
+Workbook verification on disk passed after save:
+
+- 12 active-model EJH/EPX include rows present across `rule_mapping`, `grandSport_rule_mapping`, and `z06_rule_mapping`.
+- 12 matching zero-price override rows present across `price_rules`, `grandSport_price_rules`, and `z06_price_rules`.
+- Active model seat-belt exclusive groups still contain all six seat-belt option IDs.
+- `grandSport_options.opt_cfv_001.active=True`, detail no longer says unavailable at this time, and `grandSport_ovs.opt_cfv_001` still has six available rows.
+- Z06 R8E base/default and T0F/T0G price override behavior preserved.
+- ZR1/ZR1X R8E source prices, default rules, and PCQ/VWT unavailable source statuses verified.
+
+Commands run and passed:
+
+```sh
+.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+.venv/bin/python scripts/generate_form.py --model stingray
+.venv/bin/python scripts/generate_form.py --model grand_sport
+.venv/bin/python scripts/generate_form.py --model z06
+.venv/bin/python scripts/generate_registry.py
+node --test tests/stingray-form-regression.test.mjs
+node --test tests/grand-sport-contract-preview.test.mjs
+node --test tests/grand-sport-draft-data.test.mjs
+node --test tests/z06-contract-preview.test.mjs
+node --test tests/z06-form-data-draft.test.mjs
+node --test tests/z06-runtime-rule-corrections.test.mjs
+node --test tests/multi-model-runtime-switching.test.mjs
+.venv/bin/python -m pytest tests/test_model_config_metadata.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py -q
+git diff --check
+```
+
+Gate results:
+
+- Workbook package validation: pass.
+- Workbook schema validation: pass, `issue_count=0`.
+- Focused active-model Node gates: pass.
+- Python metadata tests: pass, `52 passed`.
+- Diff whitespace check: pass.
+
+Not run:
+
+- Browser smoke remains manual. Runtime behavior is covered by focused Node/jsdom tests, but no live local browser session was exercised in this pass.
+- Future-Z pytest gates remain not run because the repo does not contain `tests/test_future_z_rule_audit.py` or `tests/test_future_model_option_pricing.py`.
+
+Residual risks / deferred work:
+
+- ZR1/ZR1X 3N9 EJH/EPX auto-include behavior is still deferred because the no-new-sheet/no-code boundary remains and `zr1_rule_mapping` / `zr1x_rule_mapping` do not exist.
+- Full footnote/copy convergence for `dist_updates/dist-updates-6-22.md` remains outside this TL;DR behavior pass.
+
+## Historical approval question
+
+This pass was approved and run from the prior approval prompt: active-model EJH/EPX seatbelt rows, Grand Sport CFV activation, Z06 R8E verification/preservation, and inactive ZR1/ZR1X source-prep for R8E + PCQ/VWT, with ZR1/ZR1X 3N9 behavior explicitly deferred because the required direct-rule source sheets do not exist under the no-new-sheet/no-code boundary.
 
 ## Next step guidance
 
-If approved and implemented, the next safe pass is a separate footnote/copy convergence review for the full `dist_updates/dist-updates-6-22.md` text, because this spec deliberately models only the TL;DR behavior and minimal supporting notes. That pass should be copy/data-only and should not change rule/pricing behavior unless a new business rule is found during workbook-source inspection.
+The next safe pass is a separate footnote/copy convergence review for the full `dist_updates/dist-updates-6-22.md` text, because this completed pass deliberately modeled only the TL;DR behavior and minimal supporting notes. That pass should be copy/data-only and should not change rule/pricing behavior unless a new business rule is found during workbook-source inspection.

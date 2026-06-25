@@ -2652,6 +2652,27 @@ test("Stingray 3LT interiors lock included color seatbelts against other seatbel
   runtime.reconcileSelections();
   assert.equal(runtime.state.selected.has("opt_3f9_001"), false, "D30 should not unlock a 3LT included seatbelt peer");
 
+  for (const interiorId of ["3LT_AE4_EJH", "3LT_AE4_EPX_N26", "3LT_AH2_EJH", "3LT_AH2_EPX_N26"]) {
+    const seatRpo = interiorId.includes("_AE4_") ? "AE4" : "AH2";
+    const vdaRuntime = configureInteriorOrder({ trimLevel: "3LT", seatRpo, interiorId });
+    vdaRuntime.reconcileSelections();
+    assert.equal(vdaRuntime.computeAutoAdded().has("opt_3n9_001"), true, `${interiorId} should auto-add 3N9`);
+    assert.equal(vdaRuntime.optionPrice("opt_3n9_001"), 0, `${interiorId} should zero-price 3N9`);
+
+    const otherSeatbelt = vdaRuntime.activeChoiceRows().find(
+      (choice) => choice.section_id === "sec_seat_001" && choice.option_id !== "opt_3n9_001" && choice.selectable === "True"
+    );
+    assert.ok(otherSeatbelt, "expected another selectable seatbelt for VDA lock test");
+    vdaRuntime.handleChoice(otherSeatbelt);
+    vdaRuntime.reconcileSelections();
+    assert.equal(vdaRuntime.state.selected.has(otherSeatbelt.option_id), false, `${interiorId} should block other seatbelt colors`);
+
+    vdaRuntime.state.selected.add("opt_d30_001");
+    vdaRuntime.handleChoice(otherSeatbelt);
+    vdaRuntime.reconcileSelections();
+    assert.equal(vdaRuntime.state.selected.has(otherSeatbelt.option_id), false, `${interiorId} should keep other seatbelts blocked even with D30`);
+  }
+
   const dippedRuntime = configureInteriorOrder({ trimLevel: "3LT", seatRpo: "AH2", interiorId: "3LT_AH2_HNK" });
   dippedRuntime.reconcileSelections();
   const autoAdded = dippedRuntime.computeAutoAdded();

@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-06-22T16:10:32+00:00",
+    "generated_at": "2026-06-25T18:23:06+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -40680,6 +40680,78 @@
       "active": "True",
       "runtime_action": "active",
       "source_note": "3LZ_AUP_HVZ includes Torch Red seat belt."
+    },
+    {
+      "rule_id": "z06_rule_3lz_ah2_ejh_includes_opt_3n9_001",
+      "source_id": "3LZ_AH2_EJH",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with 3LZ_AH2_EJH.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "(EJH, EPX) Very Dark Atmosphere interiors comes with (3N9) Natural seat belt color."
+    },
+    {
+      "rule_id": "z06_rule_3lz_ae4_ejh_includes_opt_3n9_001",
+      "source_id": "3LZ_AE4_EJH",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with 3LZ_AE4_EJH.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "(EJH, EPX) Very Dark Atmosphere interiors comes with (3N9) Natural seat belt color."
+    },
+    {
+      "rule_id": "z06_rule_3lz_ah2_epx_n2z_includes_opt_3n9_001",
+      "source_id": "3LZ_AH2_EPX_N2Z",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with 3LZ_AH2_EPX_N2Z.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "(EJH, EPX) Very Dark Atmosphere interiors comes with (3N9) Natural seat belt color."
+    },
+    {
+      "rule_id": "z06_rule_3lz_ae4_epx_n2z_includes_opt_3n9_001",
+      "source_id": "3LZ_AE4_EPX_N2Z",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with 3LZ_AE4_EPX_N2Z.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "(EJH, EPX) Very Dark Atmosphere interiors comes with (3N9) Natural seat belt color."
     }
   ],
   "priceRules": [
@@ -41430,6 +41502,50 @@
       "trim_level_scope": "*",
       "variant_scope": "",
       "notes": "T0G raises the Z06 gas guzzler tax to $3,000."
+    },
+    {
+      "price_rule_id": "z06_pr_ah2_ejh_3n9_zero",
+      "condition_option_id": "3LZ_AH2_EJH",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "*",
+      "trim_level_scope": "3LZ",
+      "variant_scope": "",
+      "notes": "EJH/EPX Very Dark Atmosphere interior includes Natural seat belt color."
+    },
+    {
+      "price_rule_id": "z06_pr_ae4_ejh_3n9_zero",
+      "condition_option_id": "3LZ_AE4_EJH",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "*",
+      "trim_level_scope": "3LZ",
+      "variant_scope": "",
+      "notes": "EJH/EPX Very Dark Atmosphere interior includes Natural seat belt color."
+    },
+    {
+      "price_rule_id": "z06_pr_ah2_epx_n2z_3n9_zero",
+      "condition_option_id": "3LZ_AH2_EPX_N2Z",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "*",
+      "trim_level_scope": "3LZ",
+      "variant_scope": "",
+      "notes": "EJH/EPX Very Dark Atmosphere interior includes Natural seat belt color."
+    },
+    {
+      "price_rule_id": "z06_pr_ae4_epx_n2z_3n9_zero",
+      "condition_option_id": "3LZ_AE4_EPX_N2Z",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "*",
+      "trim_level_scope": "3LZ",
+      "variant_scope": "",
+      "notes": "EJH/EPX Very Dark Atmosphere interior includes Natural seat belt color."
     }
   ],
   "interiors": [
@@ -48571,7 +48687,7 @@
       "severity": "pass",
       "entity_type": "rule",
       "entity_id": "",
-      "message": "73 active compatibility rules exported from z06_rule_mapping."
+      "message": "77 active compatibility rules exported from z06_rule_mapping."
     },
     {
       "check_id": "interior_contract",
@@ -48585,7 +48701,7 @@
       "severity": "pass",
       "entity_type": "price_rule",
       "entity_id": "",
-      "message": "68 active price rules exported from z06_price_rules."
+      "message": "72 active price rules exported from z06_price_rules."
     },
     {
       "check_id": "color_overrides",

@@ -1703,6 +1703,8 @@ test("Grand Sport 3LT interiors auto-add included color seatbelts from workbook 
   runtime.handleChoice(ah2Seat);
 
   for (const [interiorId, rpo, optionId] of [
+    ["3LT_AH2_EJH", "3N9", "opt_3n9_001"],
+    ["3LT_AH2_EPX_N26", "3N9", "opt_3n9_001"],
     ["3LT_AH2_HZN", "3N9", "opt_3n9_001"],
     ["3LT_AH2_HNK", "3F9", "opt_3f9_001"],
     ["3LT_AH2_H8T", "3A9", "opt_3a9_001"],

@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-06-24T18:29:36+00:00"
+    "generated_at": "2026-06-25T18:18:18+00:00"
   },
   "variants": [
     {
@@ -39531,6 +39531,78 @@
       "active": "True",
       "runtime_action": "replace",
       "source_note": "FE2 is not available with Z51 Performance Package."
+    },
+    {
+      "rule_id": "rule_3lt_ae4_ejh_includes_opt_3n9_001",
+      "source_id": "3LT_AE4_EJH",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_intc_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "single_select_req",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with 3LT_AE4_EJH Very Dark Atmosphere.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "(EJH, EPX) Very Dark Atmosphere interiors comes with (3N9) Natural seat belt color."
+    },
+    {
+      "rule_id": "rule_3lt_ae4_epx_n26_includes_opt_3n9_001",
+      "source_id": "3LT_AE4_EPX_N26",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_intc_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "single_select_req",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with 3LT_AE4_EPX_N26 Very Dark Atmosphere Suede.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "(EJH, EPX) Very Dark Atmosphere interiors comes with (3N9) Natural seat belt color."
+    },
+    {
+      "rule_id": "rule_3lt_ah2_ejh_includes_opt_3n9_001",
+      "source_id": "3LT_AH2_EJH",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_intc_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "single_select_req",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with 3LT_AH2_EJH Very Dark Atmosphere.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "(EJH, EPX) Very Dark Atmosphere interiors comes with (3N9) Natural seat belt color."
+    },
+    {
+      "rule_id": "rule_3lt_ah2_epx_n26_includes_opt_3n9_001",
+      "source_id": "3LT_AH2_EPX_N26",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_intc_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "single_select_req",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with 3LT_AH2_EPX_N26 Very Dark Atmosphere Suede.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "(EJH, EPX) Very Dark Atmosphere interiors comes with (3N9) Natural seat belt color."
     }
   ],
   "priceRules": [
@@ -40028,6 +40100,50 @@
       "trim_level_scope": "3LT",
       "variant_scope": "",
       "notes": "Preserve Stingray 3LT AH2 standard seat price after seat canonicalization."
+    },
+    {
+      "price_rule_id": "pr_ae4_ejh3n9_001",
+      "condition_option_id": "3LT_AE4_EJH",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "EJH/EPX Very Dark Atmosphere interior includes Natural seat belt color."
+    },
+    {
+      "price_rule_id": "pr_ae4_epx_n26_3n9_001",
+      "condition_option_id": "3LT_AE4_EPX_N26",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "EJH/EPX Very Dark Atmosphere interior includes Natural seat belt color."
+    },
+    {
+      "price_rule_id": "pr_ah2_ejh3n9_001",
+      "condition_option_id": "3LT_AH2_EJH",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "EJH/EPX Very Dark Atmosphere interior includes Natural seat belt color."
+    },
+    {
+      "price_rule_id": "pr_ah2_epx_n26_3n9_001",
+      "condition_option_id": "3LT_AH2_EPX_N26",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "EJH/EPX Very Dark Atmosphere interior includes Natural seat belt color."
     }
   ],
   "defaultSelectionRules": [
@@ -47859,7 +47975,7 @@
       "severity": "pass",
       "entity_type": "rule",
       "entity_id": "",
-      "message": "141 active compatibility rules exported from 141 source rules."
+      "message": "145 active compatibility rules exported from 145 source rules."
     }
   ]
 }

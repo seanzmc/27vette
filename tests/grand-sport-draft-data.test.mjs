@@ -209,9 +209,9 @@ test("Grand Sport draft includes the full variant matrix and standard equipment 
       ["summary", "Summary"],
     ]
   );
-  assert.equal(draft.choices.length, 1422);
+  assert.equal(draft.choices.length, 1428);
   assert.equal(draft.standardEquipment.length, 455);
-  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 811);
+  assert.equal(draft.choices.filter((choice) => choice.status === "available").length, 817);
   assert.equal(draft.choices.filter((choice) => choice.status === "standard").length, 455);
   assert.equal(draft.choices.filter((choice) => choice.status === "unavailable").length, 156);
 });
@@ -421,6 +421,8 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
     "opt_t0f_001::includes::opt_cfz_001::::active",
     "opt_bv4_001::excludes::opt_r8c_001::::active",
     "3LT_AH2_EL9::includes::opt_3f9_001::::active",
+    "3LT_AH2_EJH::includes::opt_3n9_001::::active",
+    "3LT_AH2_EPX_N26::includes::opt_3n9_001::::active",
     "3LT_AH2_HZN::includes::opt_3n9_001::::active",
     "3LT_AH2_H8T::includes::opt_3a9_001::::active",
     "3LT_AH2_HUW::includes::opt_379_001::::active",
@@ -535,9 +537,24 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
 
 test("Grand Sport draft suppresses reviewed inactive/deferred option rows without hiding selectable seatbelts", () => {
   const optionIds = new Set(draft.choices.map((choice) => choice.option_id));
-  for (const optionId of ["opt_36s_001", "opt_37s_001", "opt_38s_001", "opt_r6p_001", "opt_r9v_001", "opt_r9w_001", "opt_r9y_001", "opt_u2k_001", "opt_cfv_001"]) {
+  for (const optionId of ["opt_36s_001", "opt_37s_001", "opt_38s_001", "opt_r6p_001", "opt_r9v_001", "opt_r9w_001", "opt_r9y_001", "opt_u2k_001"]) {
     assert.equal(optionIds.has(optionId), false, `${optionId} should not be emitted as an active Grand Sport option`);
   }
+  const cfvChoices = draft.choices.filter((choice) => choice.option_id === "opt_cfv_001");
+  assert.equal(cfvChoices.length, 6, "CFV should emit for each Grand Sport variant");
+  assert.equal(
+    cfvChoices.every(
+      (choice) =>
+        choice.rpo === "CFV" &&
+        choice.status === "available" &&
+        choice.active === "True" &&
+        choice.selectable === "True" &&
+        choice.base_price === 4495 &&
+        choice.section_id === "sec_perf_ground_001"
+    ),
+    true,
+    "CFV should be available/selectable at $4,495 in the Grand Sport ground-effects section"
+  );
   for (const optionId of ["opt_379_001", "opt_3a9_001", "opt_3f9_001", "opt_3m9_001", "opt_3n9_001"]) {
     assert.equal(optionIds.has(optionId), true, `${optionId} should remain selectable for Grand Sport`);
   }
@@ -896,9 +913,9 @@ test("Grand Sport Jake graphics are selectable choices with rear hash graphics i
 });
 
 test("Grand Sport draft preserves rule hot spots and normalization metadata for later phases", () => {
-  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1284);
-  assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1422);
-  assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 113);
+  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1290);
+  assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1428);
+  assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 112);
   assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 27);
   assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);
   assert.equal(draft.draftMetadata.priceRuleSourceRows, draft.priceRules.length);
