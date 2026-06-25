@@ -7,6 +7,7 @@ Stay read-only.
 Map the actual repo evidence:
 
 - Find relevant files, functions, tests, generated artifacts, and workbook-related consumers.
+- Identify companion files that may need updates with the primary target, especially generated-contract tests with hardcoded counts, expected IDs, sections, maps, or artifact paths.
 - Cite exact files and symbols.
 - Do not propose broad refactors.
 - Do not edit files.

@@ -8,6 +8,7 @@ The spec must include:
 
 - Diagnosis: root cause, exact files/sheets/symbols to inspect, risk level, and whether the change is behavior-only, styling-only, data-only, docs-only, or mixed.
 - Exact files to change.
+- Companion-file impact check: tests, generated contracts, docs/specs, gate reminders, and profile/Codex guidance that may encode the old contract; each must be marked update / inspected-no-change / not applicable.
 - Constraints repeated back, including visual preservation, no refactor, no new dependencies, workbook source-of-truth rules, and any explicit user boundaries.
 - Risks and non-goals.
 - Validation plan.
@@ -38,6 +39,20 @@ Treat this file as the current operating guide, not a freeze on the repo's imple
 
 If a task intentionally migrates away from a documented workflow, call that out in the spec, inspect the current scripts/tests/artifacts first, and update this file only when the new workflow is proven.
 
+## Companion-File Impact Checks
+
+Before editing, identify companion files that may need to change with the direct target. This is required for workbook, generator, runtime, generated-contract, validation, workflow, and guidance changes.
+
+Use this minimum matrix:
+
+- Workbook/source-data changes: inspect affected generated runtime contracts, `form-app/data.js` when promoted data changes, model draft/preview/contract tests, count/ID expectations, and the owning spec/plan.
+- Generator/registry changes: inspect generated artifacts, registry publication, schema freshness checks, generated-contract tests, and documented commands.
+- Runtime behavior changes: inspect runtime tests, multi-model switching tests, generated fields consumed by runtime, build download, and dealer-submission boundaries.
+- Test/gate/workflow changes: inspect this file, `27vette-gate`, workbook-editor gate reminders, and Codex/Hermes worker guidance.
+- Spec/docs/guidance changes: inspect owning specs/plans and matching profile/Codex guidance when they steer future agents.
+
+For each companion surface, report one of: updated, inspected-no-change, or not applicable with reason. Do not leave stale generated-contract counts, expected IDs, gate commands, or active approval prompts behind because they were not the primary file.
+
 ## Current Architecture
 
 The live customer app is a static Corvette order-form runtime for Stingray, Grand Sport, and Z06. It is deployed at `order.stingraychevroletcorvette.com` and supports active dealer submissions.
@@ -63,19 +78,7 @@ The workflow contract is the same for each active model: workbook source rows ow
 
 The workbook owns Corvette product data and business rules.
 
-Workbook-owned business data includes:
-
-- model, body style, trim, and variant status
-- option placement and section ownership
-- active/selectable/display behavior
-- display order
-- customer-facing labels, descriptions, disclosures, and raw source detail
-- explicit includes, requires, excludes, grouped requirements, and exclusive groups
-- package includes and auto-add behavior
-- price overrides and zero-price package policies
-- color overrides
-- interior availability, components, and model scoping
-- validation and review metadata
+Workbook-owned business data includes model/body/trim/variant status, option placement, active/selectable/display behavior, display order, customer labels/descriptions/disclosures/source detail, includes/requires/excludes/groups, package auto-adds, prices/zero-price policies, color overrides, interiors/components/scope, and validation/review metadata.
 
 Scripts should be boring. They should read workbook tables, normalize rows, validate references, emit artifacts, and apply generic runtime concepts. Avoid adding code such as "if this RPO on this model, do special behavior" when a workbook row can express the rule.
 
@@ -89,78 +92,20 @@ Runtime JavaScript should render and evaluate generated data. It should not beco
 
 If a proposed change requires hardcoded model-specific business logic, flag it before implementing.
 
-## Active Workbook Source Sheets
+## Active Workbook Source Surfaces
 
-The canonical workbook is `stingray_master.xlsx`.
+The canonical workbook is `stingray_master.xlsx`. Inspect the current workbook and metadata before editing; do not rely on stale sheet inventories.
 
-Current shared/base sheets include:
+Current active source surfaces are organized as:
 
-- `model_master`
-- `model_registry_promotion`
-- `variant_master`
-- `section_master`
-- `stingray_options`
-- `stingray_ovs`
-- `rule_mapping`
-- `price_rules`
-- `rule_groups`
-- `rule_group_members`
-- `exclusive_groups`
-- `exclusive_group_members`
-- `color_overrides`
-- `lt_interiors`
-- `LZ_Interiors`
-- `PriceRef`
-- `asset_map`
+- shared model/variant/section/promotion metadata, including `model_master`, `model_workbook_sources`, `model_variants`, `variant_master`, `section_master`, and `model_registry_promotion`;
+- active model option, OVS/status, rule, price-rule, group/member, exclusive-group/member, and variant-override sheets for Stingray, Grand Sport, and Z06;
+- shared runtime metadata such as `runtime_steps`, `context_section_master`, `context_choice_copy`, `section_presentation`, `order_summary_sections`, `step_order_summary_map`, and `default_selection_rules`;
+- shared data tables such as interiors, interior components, color overrides, `PriceRef`, and `asset_map`.
 
-`variant_master` owns variant fact rows and whether those facts are active/usable; `model_variants` owns model membership and generated display order. Active/generatable models must have active `model_variants` rows that reference active `variant_master` fact rows. `model_registry_promotion` remains the separate browser publication decision.
+`variant_master` owns variant facts and whether those facts are active/usable; `model_variants` owns model membership and generated display order. `model_registry_promotion` remains the separate browser publication decision.
 
-`category_master` is not an active source sheet. Historical evidence sheets (`archive_*` and `*_raw`, including `archive_category_master`) were extracted to `archive/stingray_archive.xlsx` and no longer live in `stingray_master.xlsx`.
-
-Current workbook-owned runtime metadata and audit sheets include:
-
-- `model_workbook_sources`
-- `model_variants`
-- `model_interior_scope`
-- `interior_components`
-- `runtime_steps`
-- `context_section_master`
-- `context_choice_copy`
-- `section_presentation`
-- `order_summary_sections`
-- `step_order_summary_map`
-- `default_selection_rules`
-- `runtime_rule_exceptions`
-- `stingray_variant_overrides`
-- `rule_phrase_map`
-
-The historical global `variant_option_overrides` sheet was retired after active Stingray UQT behavior moved to `stingray_variant_overrides`; active variant presentation overrides are model-scoped.
-
-Current Grand Sport model-scoped sheets include:
-
-- `grandSport_options`
-- `grandSport_ovs`
-- `grandSport_rule_mapping`
-- `grandSport_price_rules`
-- `grandSport_rule_groups`
-- `grandSport_rule_group_members`
-- `grandSport_exclusive_groups`
-- `grandSport_exclusive_members`
-- `grandSport_variant_overrides`
-
-Current Z06 model-scoped sheets include:
-
-- `z06_options`
-- `z06_ovs`
-- `z06_rule_mapping`
-- `z06_price_rules`
-- `z06_rule_groups`
-- `z06_rule_group_members`
-- `z06_exclusive_groups`
-- `z06_exclusive_members`
-- `z06_variant_overrides`
-
-Inactive or future model source sheets are outside the default runtime workflow until explicitly promoted through workbook metadata in an approved pass.
+Inactive or future model source sheets are outside the default runtime workflow until explicitly promoted through workbook metadata in an approved pass. Historical/archive/raw sheets are not active workflow inputs unless a scoped spec proves a current consumer.
 
 Active runtime contracts are generated under `form-output/runtime/` and published to the browser registry through `scripts/generate_registry.py`. Historical workbook `form_*` generated sheets are not part of the routine runtime workflow and should not be recreated or hand-edited unless a separately approved opt-in debug/export pass defines a named consumer.
 
@@ -187,15 +132,7 @@ After any workbook write, reopen the saved workbook or inspect it with `openpyxl
 
 Use the project virtual environment for Python commands.
 
-Create it if needed:
-
-```sh
-cd <repo-root>
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-```
+Create it if needed with `python3 -m venv .venv`, activate it, then install `requirements.txt`.
 
 Do not commit `.venv/`.
 
@@ -203,16 +140,7 @@ Do not run workbook generators with bare system Python. Use `.venv/bin/python` o
 
 ## Workbook Update Workflow
 
-Use this current default workflow for workbook data edits:
-
-1. Identify the business decision and the workbook sheet that should own it.
-2. Inspect existing rows, headers, generator consumers, and tests before editing.
-3. Write a spec and get approval for non-trivial changes.
-4. Make the smallest workbook/source-data edit possible.
-5. Verify the workbook saved on disk.
-6. Regenerate the affected artifacts.
-7. Run targeted tests first, then broader gates if generated app data or runtime behavior changed.
-8. Review diffs so generated artifacts do not hide unrelated workbook or runtime changes.
+Default workflow for workbook data edits: identify the business decision and owning sheet; inspect rows, headers, generator consumers, tests, and companions; write/approve a spec for non-trivial changes; make the smallest source-data edit; verify the saved workbook; regenerate artifacts; run gates; review generated diffs for unrelated drift.
 
 Do not solve bad source data by suppressing it in Python or JavaScript. Correct the workbook row unless there is a documented reason not to.
 
@@ -232,13 +160,7 @@ To compare generated JSON contracts while ignoring timestamp fields, run:
 node scripts/compare-generated-contracts.mjs before.json after.json
 ```
 
-Asset image maintenance has a separate documented helper at `asset_map-Sync/asset_map_sync.py`. Until an approved pass aligns its write path with the workbook safety contract and project dependencies, treat it as a dry-run/report tool only:
-
-```sh
-.venv/bin/python asset_map-Sync/asset_map_sync.py --workbook stingray_master.xlsx --report-dir /tmp/asset-map-sync
-```
-
-TODO: Decide whether `asset_map_sync.py --apply` should be migrated to `save_workbook_safely()` before it becomes part of routine workbook maintenance.
+Asset image maintenance has a separate helper at `asset_map-Sync/asset_map_sync.py`; treat it as dry-run/report-only until an approved pass aligns its write path with `save_workbook_safely()` and project dependencies.
 
 ## Workbook Review & Edit Tool (dev only)
 
@@ -249,17 +171,7 @@ TODO: Decide whether `asset_map_sync.py --apply` should be migrated to `save_wor
 # open http://127.0.0.1:8027/
 ```
 
-The editor derives models, sheet registries, schemas, and reference domains from workbook metadata such as `model_master`, `model_workbook_sources`, `runtime_steps`, `section_master`, and `section_presentation`. It should not hardcode business relationships that the workbook owns.
-
-Editor writes follow the same safety contract as hand edits:
-
-- Queue typed operations client-side; do not touch the workbook until Apply.
-- Edit source sheets through workbook metadata. Generated `form_*` sheets are outputs and remain read-only.
-- Validate references, OVS coverage, group integrity, duplicate keys, display-order collisions, and stale references before save.
-- Save through `save_workbook_safely()`, maintain Excel table refs, and write the workbook edit log.
-- Treat an editor apply as a workbook source-data edit only. Regenerate affected model artifacts with `scripts/generate_form.py --model <model>`, then run `scripts/generate_registry.py` and the relevant gates.
-
-Editor lint/compare views are review aids. They can surface workbook drift, but they do not replace source-data validation, generation, registry publication, or runtime tests.
+The editor derives models, sheet registries, schemas, and reference domains from workbook metadata and must not hardcode workbook-owned business relationships. Treat Apply as a workbook source-data edit: validate before save, save through `save_workbook_safely()`, maintain table refs/logs, regenerate affected models, run `generate_registry.py` when promoted data changes, then run relevant gates. Lint/compare views are review aids, not replacements for generation, registry publication, or runtime tests.
 
 ## Model Generation Workflow
 
@@ -271,15 +183,7 @@ cd <repo-root>
 .venv/bin/python scripts/generate_registry.py
 ```
 
-Current active model keys are:
-
-- `stingray`
-- `grand_sport`
-- `z06`
-
-`scripts/generate_form.py --model <model>` reads the model's workbook-owned source sheets and emits the model artifacts. `scripts/generate_registry.py` reads workbook promotion metadata and promoted model artifacts, then writes `form-app/data.js` for the browser runtime.
-
-Active generatable model keys are discovered from workbook metadata, not a hardcoded CLI list. Activating a future model requires complete active workbook source and variant metadata; publishing it to the browser remains a separate `model_registry_promotion` decision.
+Current active model keys are `stingray`, `grand_sport`, and `z06`. `generate_form.py` reads workbook-owned source sheets and emits model artifacts; `generate_registry.py` reads promotion metadata and promoted artifacts, then writes `form-app/data.js`. Generatable models come from workbook metadata, while browser publication remains a separate `model_registry_promotion` decision.
 
 Normal generation writes clean runtime contracts. Use `--emit-inspection --inspection-output <dir>` only when a review/spec needs optional inspection, preview, or draft artifacts:
 
@@ -291,7 +195,7 @@ Generated outputs are artifacts, not source of truth. Do not hand-edit generated
 
 If generation reports validation errors, stop and inspect the workbook source rows, generated validation output, and affected JSON artifact before proceeding.
 
-Run model-focused tests after generation:
+Run model-focused tests after generation; pick the subset that matches the changed model and behavior surface, then broaden when generated app data, registry promotion, or runtime behavior changes:
 
 ```sh
 node --test tests/stingray-form-regression.test.mjs
@@ -302,8 +206,6 @@ node --test tests/z06-contract-preview.test.mjs
 node --test tests/z06-form-data-draft.test.mjs
 node --test tests/multi-model-runtime-switching.test.mjs
 ```
-
-Pick the subset that matches the changed model and behavior surface, then run broader gates when generated app data, registry promotion, or runtime behavior changes.
 
 ## Static App Workflow
 
@@ -318,18 +220,7 @@ cd <repo-root>/form-app
 
 Open `http://localhost:8000`.
 
-For runtime changes, verify:
-
-- model switching between Stingray, Grand Sport, and Z06
-- body style and trim selection
-- required step completion
-- option select/deselect behavior
-- standard and included equipment summary
-- selected and auto-added RPO summaries
-- price totals
-- build download
-- dealer submission modal validation
-- dealer submission payload model scoping
+For runtime changes, verify model switching, body/trim selection, required-step completion, option select/deselect, summaries, price totals, build download, dealer modal validation, and dealer payload model scoping.
 
 The dealer submission runtime posts to:
 
@@ -401,25 +292,7 @@ node --test tests/stingray-form-regression.test.mjs
 node --test tests/multi-model-runtime-switching.test.mjs
 ```
 
-Full current default suite:
-
-```sh
-.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
-node --test tests/stingray-form-regression.test.mjs
-node --test tests/stingray-generator-stability.test.mjs
-node --test tests/grand-sport-contract-preview.test.mjs
-node --test tests/grand-sport-draft-data.test.mjs
-node --test tests/workbook-schema-standardization.test.mjs
-node --test tests/workbook-visual-copy-standardization.test.mjs
-node --test tests/z06-contract-preview.test.mjs
-node --test tests/z06-form-data-draft.test.mjs
-node --test tests/z06-runtime-promotion.test.mjs
-node --test tests/z06-interior-accessory-cleanup.test.mjs
-node --test tests/z06-performance-package-interactions.test.mjs
-node --test tests/z06-runtime-rule-corrections.test.mjs
-node --test tests/multi-model-runtime-switching.test.mjs
-.venv/bin/python -m pytest tests/test_model_config_metadata.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py -q
-```
+Full current default suite: run the workbook schema validator, all model-focused Node tests listed above plus `tests/workbook-schema-standardization.test.mjs`, `tests/workbook-visual-copy-standardization.test.mjs`, `tests/z06-runtime-promotion.test.mjs`, and the Python metadata tests (`tests/test_model_config_metadata.py`, `tests/test_registry_promotion_metadata.py`, `tests/test_schema_validation_metadata.py`). Run Node files sequentially.
 
 ## Boundaries
 

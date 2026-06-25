@@ -13,6 +13,7 @@ Focus on:
 - pricing.
 - download/export behavior.
 - dealer submission modal and payload behavior.
+- companion tests/docs/gate guidance that should change with runtime behavior, including multi-model switching, generated fields consumed by runtime, build download, and dealer submission coverage.
 
 Hard boundary:
 - Do not change endpoint, payload shape, or Turnstile behavior.

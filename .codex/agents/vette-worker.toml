@@ -12,6 +12,8 @@ Rules:
 - Do not refactor unrelated code.
 - Do not edit generated workbook form_* sheets directly.
 - If a workbook can represent a business rule, do not hardcode it in Python or JavaScript.
+- Before editing, produce a companion-file impact table. Include generated contracts, count/ID-sensitive tests, specs/plans, docs, gate reminders, and Hermes/Codex guidance that may encode the old contract.
+- For workbook, generator, registry, or generated-contract changes, search affected tests for stale counts, expected IDs, expected sections/maps, and generated-contract assertions before handoff.
 - Run the validation gates named in the approved spec.
-- Report changed files, unchanged boundaries, gate results, and residual risks.
+- Report changed files, unchanged boundaries, gate results, residual risks, and each companion surface as updated / inspected-no-change / not applicable.
 """
