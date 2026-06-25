@@ -221,10 +221,16 @@ test("Z06 3LZ interiors include locked zero-price seatbelt colors", () => {
   }
 });
 
-test("Z06 GBA paint blocks EDU exterior accent but not CFL ground effect", () => {
+test("Z06 GBA paint blocks CBF and EDU but not CFL ground effect", () => {
   const runtime = z06Runtime();
   runtime.handleChoice(choice(runtime, "GBA"));
   runtime.reconcileSelections();
+  const cbf = choice(runtime, "CBF");
+  assert.match(runtime.disableReasonForChoice(cbf), /GBA|black paint|CBF/i);
+  runtime.handleChoice(cbf);
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has(cbf.option_id), false, "CBF should not stick with GBA selected");
+
   const edu = choice(runtime, "EDU");
   assert.match(runtime.disableReasonForChoice(edu), /GBA|black paint|EDU/i);
   runtime.handleChoice(edu);
@@ -233,6 +239,20 @@ test("Z06 GBA paint blocks EDU exterior accent but not CFL ground effect", () =>
 
   const cfl = choice(runtime, "CFL");
   assert.equal(runtime.disableReasonForChoice(cfl), "", "CFL should remain selectable with GBA selected");
+});
+
+test("Z06 CBF conflicts only with its explicit exterior and ground-effect blockers", () => {
+  const runtime = z06Runtime();
+  const cbf = choice(runtime, "CBF");
+  assert.equal(runtime.disableReasonForChoice(cbf), "", "CBF should be normally selectable");
+
+  runtime.handleChoice(cbf);
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has(cbf.option_id), true, "CBF should remain selected without blockers");
+  assert.match(runtime.disableReasonForChoice(choice(runtime, "EFY")), /CBF|ground effects|exterior accents/i);
+  assert.match(runtime.disableReasonForChoice(choice(runtime, "CFV")), /CBF|ground effects|exterior accents/i);
+  assert.match(runtime.disableReasonForChoice(choice(runtime, "CFZ")), /CBF|ground effects|exterior accents/i);
+  assert.equal(runtime.disableReasonForChoice(choice(runtime, "EDU")), "", "CBF should not block EDU");
 });
 
 test("Z06 Z07 defaults T0F, allows T0G switching, and keeps J57 included at zero", () => {

@@ -211,7 +211,7 @@ const expectedGrandSportExclusiveGroups = [
   },
   {
     groupId: "gs_excl_ground_effects",
-    optionIds: ["opt_cfl_001", "opt_cfz_001"],
+    optionIds: ["opt_cfl_001", "opt_cfz_001", "opt_cfv_001"],
   },
   {
     groupId: "gs_excl_z52_packages",
@@ -944,10 +944,13 @@ test("Grand Sport Z52 packages keep direct replacement peers unavailable", () =>
   assert.equal(runtime.disableReasonForChoice(choice("opt_jx6_001")), "FEY includes J57 carbon ceramic brakes.");
   assert.equal(runtime.disableReasonForChoice(choice("opt_j56_001")), "FEY includes J57 carbon ceramic brakes.");
   assert.equal(runtime.disableReasonForChoice(choice("opt_t0e_001")), "FEY replaces the low rear spoiler with the included carbon fiber aero package.");
+  assert.match(runtime.disableReasonForChoice(choice("opt_cfv_001")), /included with (?:FEY|T0F)/i);
   runtime.handleChoice(choice("opt_jx6_001"));
   runtime.handleChoice(choice("opt_t0e_001"));
+  runtime.handleChoice(choice("opt_cfv_001"));
   assert.equal(runtime.state.selected.has("opt_jx6_001"), false, "blocked JX6 should not reselect while FEY is selected");
   assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "blocked T0E should not reselect while FEY is selected");
+  assert.equal(runtime.state.selected.has("opt_cfv_001"), false, "blocked CFV should not suppress FEY-included CFZ");
 
   runtime.handleChoice(choice("opt_fey_001"));
   assert.equal(runtime.state.selected.has("opt_fey_001"), false, "FEY should be removable as an optional package");
@@ -1460,11 +1463,15 @@ test("Grand Sport Pass 1 workbook rules drive engine, brake, ground-effect, and 
   runtime.handleChoice(j57);
   const t0f = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0f_001");
   const cfl = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_cfl_001");
+  const cfv = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_cfv_001");
   runtime.handleChoice(t0f);
   assert.equal(runtime.currentOrder().auto_added_options.some((item) => item.rpo === "CFZ" && item.price === 0), true, "T0F should auto-add CFZ at $0");
   runtime.handleChoice(cfl);
   assert.equal(runtime.state.selected.has("opt_cfl_001"), false, "T0F's included CFZ should keep other ground effects unavailable");
   assert.match(runtime.disableReasonForChoice(cfl), /included with T0F/i);
+  runtime.handleChoice(cfv);
+  assert.equal(runtime.state.selected.has("opt_cfv_001"), false, "T0F's included CFZ should also keep CFV unavailable");
+  assert.match(runtime.disableReasonForChoice(cfv), /included with T0F/i);
   assert.equal(runtime.currentOrder().auto_added_options.some((item) => item.rpo === "CFZ"), true, "T0F should keep CFZ auto-added while selected");
 
   runtime.state.trimLevel = "3LT";

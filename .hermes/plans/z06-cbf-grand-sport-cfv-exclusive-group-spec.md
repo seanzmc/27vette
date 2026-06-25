@@ -1,6 +1,6 @@
 # Z06 CBF Option + Grand Sport CFV Exclusive-Group Spec
 
-Status: spec only / awaiting approval
+Status: completed / implemented 2026-06-25
 Date: 2026-06-25
 
 ## Diagnosis
@@ -216,3 +216,55 @@ Approve this narrow workbook/data pass to implement:
 3. Regenerate Grand Sport + Z06 + registry artifacts and update focused tests.
 
 Broader exclusive-group consolidation, section/layout grouping, and front-end copy cleanup remain deferred.
+
+## Implementation Closure — 2026-06-25
+
+Implemented as specified.
+
+Workbook sheets changed:
+
+- `grandSport_exclusive_members`: activated existing `gs_excl_ground_effects / opt_cfv_001` row at display order `30`.
+- `z06_options`: added active/selectable `opt_cbf_001` / `CBF` in `sec_exte_001` at `$495`, display order `25`.
+- `z06_ovs`: added six `available` rows for `opt_cbf_001` across all Z06 variants.
+- `z06_rule_group_members`: added `opt_cbf_001` to `z06_group_gba_excludes_accent_and_roof_choices` at display order `60`.
+- `z06_rule_groups`: updated the GBA blocker disabled reason to include CBF.
+- `z06_rule_mapping`: added the three CBF direct blockers for `CFV`, `CFZ`, and `EFY`, plus five `runtime_action=replace` rows from `T0F`, `T0G`, `Z07`, `PDD`, and `PDF` to `CBF`.
+
+Generated artifacts changed:
+
+- `form-output/runtime/grand-sport-runtime-contract.json`
+- `form-output/runtime/z06-runtime-contract.json`
+- `form-app/data.js`
+
+Tests changed:
+
+- `tests/grand-sport-draft-data.test.mjs`
+- `tests/multi-model-runtime-switching.test.mjs`
+- `tests/z06-form-data-draft.test.mjs`
+- `tests/z06-runtime-rule-corrections.test.mjs`
+- `tests/z06-performance-package-interactions.test.mjs`
+
+Verification performed:
+
+- Workbook preflight lock check: no `~$stingray_master.xlsx` present.
+- `.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx`: valid before and after workbook write.
+- On-disk `openpyxl` verification passed for the exact Grand Sport CFV row, Z06 CBF option/OVS rows, GBA group member, three direct CBF blockers, and five CBF replacement rules.
+- Regenerated:
+  - `.venv/bin/python scripts/generate_form.py --model grand_sport`
+  - `.venv/bin/python scripts/generate_form.py --model z06`
+  - `.venv/bin/python scripts/generate_registry.py`
+- Targeted gates passed:
+  - `.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx`
+  - `node --test tests/grand-sport-contract-preview.test.mjs`
+  - `node --test tests/grand-sport-draft-data.test.mjs`
+  - `node --test tests/z06-contract-preview.test.mjs`
+  - `node --test tests/z06-form-data-draft.test.mjs`
+  - `node --test tests/z06-runtime-rule-corrections.test.mjs`
+  - `node --test tests/z06-performance-package-interactions.test.mjs`
+  - `node --test tests/multi-model-runtime-switching.test.mjs`
+
+Residual risks / manual verification pending:
+
+- Browser smoke was not run in this pass. Pending checks remain the Grand Sport FEY/T0F CFZ lock path and Z06 CBF availability/GBA/EFY/CFV/CFZ/package-replacement behavior in the live browser UI.
+
+Deferred follow-up remains unchanged: broader Grand Sport aero package grouping, stripe/Jake section ownership, accessory layout/grouping, and customer-facing rule/copy cleanup should stay in a separate report-first pass.

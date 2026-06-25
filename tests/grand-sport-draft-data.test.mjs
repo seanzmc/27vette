@@ -122,7 +122,7 @@ const expectedGrandSportExclusiveGroups = [
   },
   {
     group_id: "gs_excl_ground_effects",
-    option_ids: ["opt_cfl_001", "opt_cfz_001"],
+    option_ids: ["opt_cfl_001", "opt_cfz_001", "opt_cfv_001"],
   },
   {
     group_id: "gs_excl_z52_packages",
@@ -461,7 +461,7 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
   }
 
   const groundEffectsGroup = draft.exclusiveGroups.find((group) => group.group_id === "gs_excl_ground_effects");
-  assert.deepEqual(JSON.parse(JSON.stringify(groundEffectsGroup.option_ids)), ["opt_cfl_001", "opt_cfz_001"]);
+  assert.deepEqual(JSON.parse(JSON.stringify(groundEffectsGroup.option_ids)), ["opt_cfl_001", "opt_cfz_001", "opt_cfv_001"]);
 
   const z15Group = draft.ruleGroups.find((group) => group.group_id === "gs_group_z15_excludes_non_center_stripes");
   assert.ok(z15Group, "Z15 grouped exclusion source should be present for Pass 3 runtime wiring");

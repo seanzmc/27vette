@@ -238,6 +238,29 @@ test("Z06 package-included aero ground effects stay locked until the aero peer c
   assert.equal(autoAddedRpos(runtime).includes("CFZ"), false, "switching away from T0F should release CFZ");
 });
 
+test("Z06 aero and package choices replace selected CBF without becoming blocked by it", () => {
+  for (const [sourceRpo, expectedGroundEffectRpo] of [
+    ["T0F", "CFZ"],
+    ["T0G", "CFV"],
+    ["Z07", "CFZ"],
+    ["PDD", "CFZ"],
+    ["PDF", "CFV"],
+  ]) {
+    const runtime = z06Runtime();
+    runtime.handleChoice(choice(runtime, "CBF"));
+    runtime.reconcileSelections();
+    assert.equal(runtime.state.selected.has(choice(runtime, "CBF").option_id), true, "CBF should be selected before replacement");
+    assert.equal(runtime.disableReasonForChoice(choice(runtime, sourceRpo)), "", `${sourceRpo} should stay selectable while CBF is selected`);
+
+    runtime.handleChoice(choice(runtime, sourceRpo));
+    runtime.reconcileSelections();
+
+    assert.equal(runtime.state.selected.has(choice(runtime, sourceRpo).option_id), true, `${sourceRpo} should remain selected after replacing CBF`);
+    assert.equal(runtime.state.selected.has(choice(runtime, "CBF").option_id), false, `${sourceRpo} should remove selected CBF`);
+    assert.equal(autoAddedRpos(runtime).includes(expectedGroundEffectRpo), true, `${sourceRpo} should keep its ${expectedGroundEffectRpo} ground-effect path`);
+  }
+});
+
 test("Z06 Z07 defaults Carbon Flash aero and lets the user switch to visible carbon aero", () => {
   const runtime = z06Runtime();
   runtime.handleChoice(choice(runtime, "Z07"));

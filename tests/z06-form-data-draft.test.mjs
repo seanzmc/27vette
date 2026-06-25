@@ -258,13 +258,63 @@ test("Z06 3LZ interiors include locked zero-price seatbelt colors", () => {
   }
 });
 
-test("Z06 GBA excludes EDU, not CFL, through workbook group metadata", () => {
+test("Z06 GBA excludes CBF and EDU, not CFL, through workbook group metadata", () => {
   const group = draft.ruleGroups.find((row) => row.group_id === "z06_group_gba_excludes_accent_and_roof_choices");
   assert.ok(group, "GBA blocker group should exist");
   assert.equal(group.source_id, "opt_gba_001");
   assert.equal(group.group_type, "excludes_any");
+  assert.ok(group.target_ids.includes("opt_cbf_001"), "GBA should block CBF");
   assert.ok(group.target_ids.includes("opt_edu_001"), "GBA should block EDU");
   assert.equal(group.target_ids.includes("opt_cfl_001"), false, "GBA should not block CFL");
+});
+
+test("Z06 CBF drafts with availability, direct blockers, and package/aero replacement rules", () => {
+  const cbfChoices = draft.choices.filter((choice) => choice.option_id === "opt_cbf_001");
+  assert.equal(cbfChoices.length, expectedVariantIds.length, "CBF should emit for every Z06 variant");
+  assert.deepEqual(cbfChoices.map((choice) => choice.variant_id).sort(), [...expectedVariantIds].sort());
+  for (const choice of cbfChoices) {
+    assert.equal(choice.rpo, "CBF");
+    assert.equal(choice.label, "Body-color painted Rockers and splitter");
+    assert.equal(choice.base_price, 495);
+    assert.equal(choice.section_id, "sec_exte_001");
+    assert.equal(choice.status, "available");
+    assert.equal(choice.selectable, "True");
+    assert.equal(choice.active, "True");
+    assert.equal(choice.display_order, 25);
+  }
+
+  const exteriorAccentGroup = draft.exclusiveGroups.find((row) => row.group_id === "z06_excl_exterior_accents");
+  assert.equal(exteriorAccentGroup.option_ids.includes("opt_cbf_001"), false, "CBF should not be an exterior-accent exclusive peer");
+
+  const ruleById = new Map(draft.rules.map((rule) => [rule.rule_id, rule]));
+  for (const [ruleId, targetId] of [
+    ["z06_rule_opt_cbf_001_excludes_opt_cfv_002", "opt_cfv_002"],
+    ["z06_rule_opt_cbf_001_excludes_opt_cfz_001", "opt_cfz_001"],
+    ["z06_rule_opt_cbf_001_excludes_opt_efy_001", "opt_efy_001"],
+  ]) {
+    const rule = ruleById.get(ruleId);
+    assert.ok(rule, `${ruleId} should emit`);
+    assert.equal(rule.source_id, "opt_cbf_001");
+    assert.equal(rule.rule_type, "excludes");
+    assert.equal(rule.target_id, targetId);
+    assert.equal(rule.runtime_action, "active");
+  }
+
+  for (const [ruleId, sourceId, reasonPattern] of [
+    ["z06_rule_opt_t0f_001_replaces_opt_cbf_001", "opt_t0f_001", /T0F.*CFZ.*replaces CBF/i],
+    ["z06_rule_opt_t0g_001_replaces_opt_cbf_001", "opt_t0g_001", /T0G.*CFV.*replaces CBF/i],
+    ["z06_rule_opt_z07_001_replaces_opt_cbf_001", "opt_z07_001", /Z07.*ground-effects aero path.*replaces CBF/i],
+    ["z06_rule_opt_pdd_001_replaces_opt_cbf_001", "opt_pdd_001", /PDD.*CFZ.*replaces CBF/i],
+    ["z06_rule_opt_pdf_001_replaces_opt_cbf_001", "opt_pdf_001", /PDF.*CFV.*replaces CBF/i],
+  ]) {
+    const rule = ruleById.get(ruleId);
+    assert.ok(rule, `${ruleId} should emit`);
+    assert.equal(rule.source_id, sourceId);
+    assert.equal(rule.rule_type, "excludes");
+    assert.equal(rule.target_id, "opt_cbf_001");
+    assert.equal(rule.runtime_action, "replace");
+    assert.match(rule.disabled_reason, reasonPattern);
+  }
 });
 
 test("Z06 seatbelt colors are exclusive peers for interior-included locks", () => {
