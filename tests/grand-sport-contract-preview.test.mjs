@@ -36,7 +36,7 @@ test("Grand Sport contract preview has the expected read-only contract shape", (
     ["1lt_e07", "2lt_e07", "3lt_e07", "1lt_e67", "2lt_e67", "3lt_e67"]
   );
   assert.equal(preview.variants.every((variant) => variant.preview_included === true), true);
-  assert.equal(preview.variants.every((variant) => variant.source_active === "False"), true);
+  assert.equal(preview.variants.every((variant) => variant.source_active === "True"), true);
   assert.equal(preview.contextChoices.length, 8);
   assert.equal(preview.steps.length, 14);
   assert.equal(preview.orderSummary.sections.length, 11);

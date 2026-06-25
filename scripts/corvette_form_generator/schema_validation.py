@@ -311,6 +311,16 @@ def display_order_key(value: Any) -> str:
     return str(int(numeric)) if numeric.is_integer() else text
 
 
+def intish(value: Any, default: int = 0) -> int:
+    text = clean_text(value)
+    if not text:
+        return default
+    try:
+        return int(float(text))
+    except ValueError:
+        return default
+
+
 def truthy(value: Any, default: bool = True) -> bool:
     if value is None:
         return default
@@ -472,6 +482,124 @@ def validate_model_master_metadata(wb, issues: list[SchemaIssue]) -> bool:
             continue
         seen_active_model_keys[model_key] = row_number
     return True
+
+
+def validate_model_variant_topology(wb, issues: list[SchemaIssue]) -> None:
+    """Validate active model membership references active variant fact rows."""
+
+    if not all(sheet in wb.sheetnames for sheet in ("model_master", "model_variants", "variant_master")):
+        return
+
+    active_models: dict[str, dict[str, Any]] = {}
+    for _, row in records(wb["model_master"]):
+        if not truthy(row.get("active"), default=True):
+            continue
+        model_key = clean_text(row.get("model_key")).lower()
+        if model_key:
+            active_models[model_key] = row
+
+    variant_master: dict[str, tuple[int, dict[str, Any]]] = {}
+    for row_number, row in records(wb["variant_master"]):
+        variant_id = clean_text(row.get("variant_id"))
+        if variant_id and variant_id not in variant_master:
+            variant_master[variant_id] = (row_number, row)
+
+    active_variant_counts: dict[str, int] = {model_key: 0 for model_key in active_models}
+    display_orders: dict[tuple[str, str], tuple[int, str]] = {}
+
+    for row_number, row in records(wb["model_variants"]):
+        if not truthy(row.get("active"), default=True):
+            continue
+        model_key = clean_text(row.get("model_key")).lower()
+        if model_key not in active_models:
+            continue
+        variant_id = clean_text(row.get("variant_id"))
+        active_variant_counts[model_key] += 1
+
+        if variant_id:
+            source = variant_master.get(variant_id)
+            if source is None:
+                add_issue(
+                    issues,
+                    "error",
+                    "model_variant_unknown_variant_master",
+                    sheet="model_variants",
+                    row=row_number,
+                    column="variant_id",
+                    value={"model_key": model_key, "variant_id": variant_id},
+                    message=(
+                        f"Active model_variants row for active model {model_key!r} references missing "
+                        f"variant_master row {variant_id!r}."
+                    ),
+                )
+            elif not truthy(source[1].get("active"), default=True):
+                add_issue(
+                    issues,
+                    "error",
+                    "model_variant_inactive_variant_master",
+                    sheet="model_variants",
+                    row=row_number,
+                    column="variant_id",
+                    value={"model_key": model_key, "variant_id": variant_id, "variant_master_row": source[0]},
+                    message=(
+                        f"Active model_variants row for active model {model_key!r} references inactive "
+                        f"variant_master row {variant_id!r}."
+                    ),
+                )
+
+        display_order = display_order_key(row.get("display_order"))
+        if not display_order:
+            continue
+        order_key = (model_key, display_order)
+        previous = display_orders.get(order_key)
+        if previous:
+            previous_row, previous_variant = previous
+            add_issue(
+                issues,
+                "error",
+                "duplicate_model_variant_display_order",
+                sheet="model_variants",
+                row=row_number,
+                column="display_order",
+                value={
+                    "model_key": model_key,
+                    "display_order": display_order,
+                    "first_row": previous_row,
+                    "first_variant_id": previous_variant,
+                    "duplicate_row": row_number,
+                    "duplicate_variant_id": variant_id,
+                },
+                message=(
+                    f"Active model_variants rows for model {model_key!r} duplicate display_order "
+                    f"{display_order!r}."
+                ),
+            )
+        else:
+            display_orders[order_key] = (row_number, variant_id)
+
+    for model_key, row in active_models.items():
+        expected_variant_count = intish(row.get("expected_variant_count"), 0)
+        if expected_variant_count <= 0:
+            continue
+        actual_count = active_variant_counts.get(model_key, 0)
+        if actual_count == expected_variant_count:
+            continue
+        add_issue(
+            issues,
+            "error",
+            "model_variant_count_mismatch",
+            sheet="model_variants",
+            column="active",
+            value={
+                "model_key": model_key,
+                "expected_variant_count": expected_variant_count,
+                "active_model_variant_count": actual_count,
+            },
+            message=(
+                f"Active model {model_key!r} expected {expected_variant_count} active model_variants rows; "
+                f"found {actual_count}."
+            ),
+        )
 
 
 def validate_registry_promotion_metadata(wb, issues: list[SchemaIssue]) -> None:
@@ -688,6 +816,7 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
         source_graph = metadata_source_graph(wb, issues)
         source_sheets_by_role = sheets_by_role(source_graph)
         if model_master_valid:
+            validate_model_variant_topology(wb, issues)
             validate_registry_promotion_metadata(wb, issues)
 
         for source_role in HEADER_MATCH_ROLES:

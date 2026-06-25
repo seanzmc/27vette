@@ -113,6 +113,8 @@ Current shared/base sheets include:
 - `PriceRef`
 - `asset_map`
 
+`variant_master` owns variant fact rows and whether those facts are active/usable; `model_variants` owns model membership and generated display order. Active/generatable models must have active `model_variants` rows that reference active `variant_master` fact rows. `model_registry_promotion` remains the separate browser publication decision.
+
 `category_master` is not an active source sheet. Historical evidence sheets (`archive_*` and `*_raw`, including `archive_category_master`) were extracted to `archive/stingray_archive.xlsx` and no longer live in `stingray_master.xlsx`.
 
 Current workbook-owned runtime metadata and audit sheets include:

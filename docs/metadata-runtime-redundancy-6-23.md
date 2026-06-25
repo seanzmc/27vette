@@ -43,19 +43,19 @@
 
 ### Medium risk
 
-3. Variant topology is split between variant_master and model_variants, and their active semantics are not aligned.
-   - variant_master: 32 rows / 12 active, shared catalog.
+3. Variant topology is split between variant_master and model_variants, with active semantics clarified after Pass 20.
+   - variant_master: 32 rows / 18 active, shared fact catalog.
    - model_variants: 26 rows / 18 active, model membership/order for Stingray, Grand Sport, Z06.
    - Evidence:
      - model_variants has 6 active Grand Sport variants.
-     - variant_master Grand Sport 1lt_e07 etc. rows are inactive.
+     - Pass 20 set the six Grand Sport variant_master fact rows active to match active Grand Sport model_variants membership.
      - Inspection/generation path still includes configured variants from model_variants; inspection.py:671-688 builds variants from config.variant_ids and preserves source_active.
-     - inspection.py:566-572 explicitly warns when configured variants are inactive in variant_master.
-   - This is duplicate topology, not necessarily bad. Current evidence suggests:
-     - variant_master owns variant facts: trim, body style, display name, base price.
+     - schema_validation.py now rejects active model_variants for active models when the referenced variant_master fact row is missing/inactive.
+   - This is duplicate-looking topology, but the ownership split is now explicit:
+     - variant_master owns variant facts: trim, body style, display name, base price, and active/usable fact-row status.
      - model_variants owns model membership and generation order.
-     - variant_master.active is ambiguous for promoted non-Stingray models and should not be treated as the sole active-model gate.
-   - Recommended future action is consolidation/clarification, not deletion.
+     - variant_master.active is not the sole active-model gate because it lacks model_key/order.
+   - Recommended future action is keep/guard, not deletion.
 
 ### Lower risk
 
@@ -147,20 +147,20 @@ Recommended next action: Keep.
 Required parity gates: Schema validation; model config metadata tests; generator discovery for active models.
 ────────────────────────────────────────
 Sheet: model_variants — 26 rows / 18 active; active coverage Stingray 6, Grand Sport 6, Z06 6; keys model_key, variant_id, display_order, active, notes
-Current consumer(s): model_configs.py:282-320; runtime_metadata.py:552-568; generator config resolution
+Current consumer(s): model_configs.py:282-320; runtime_metadata.py:552-568; schema_validation.py variant topology guard; generator config resolution
 Current behavior/data ownership: Model-to-variant membership/order.
-Canonical-owner candidate: Keep, but clarify relationship to variant_master.active.
-Risk level: Medium
-Recommended next action: Consolidate candidate for active semantics only; do not delete.
-Required parity gates: Generator discovery tests; generated contract variant parity; model switching tests.
+Canonical-owner candidate: Keep as canonical model membership/order. Active rows for active models must reference active variant_master fact rows.
+Risk level: Low-medium after Pass 20 guard
+Recommended next action: Keep/guard; do not delete.
+Required parity gates: Schema validation; generator discovery tests; generated contract variant parity; model switching tests.
 ────────────────────────────────────────
-Sheet: variant_master — 32 rows / 12 active; shared catalog; keys variant_id, model_year, trim_level, body_style, display_name, base_price, display_order,
+Sheet: variant_master — 32 rows / 18 active after Pass 20; shared catalog; keys variant_id, model_year, trim_level, body_style, display_name, base_price, display_order,
 active
-Current consumer(s): production.py:169,226-238; inspection.py:428,671-688; generated contracts
-Current behavior/data ownership: Variant product facts: trim/body/display/base price. active is not currently the sole promoted-model membership signal.
-Canonical-owner candidate: Keep as canonical product-fact catalog; model_variants owns membership.
-Risk level: Medium
-Recommended next action: Consolidate candidate: define/validate active semantics against model_variants.
+Current consumer(s): production.py:169,226-238; inspection.py:428,671-688; schema_validation.py variant topology guard; generated contracts
+Current behavior/data ownership: Variant product facts: trim/body/display/base price plus active/usable fact-row status. model_variants owns membership/order.
+Canonical-owner candidate: Keep as canonical product-fact catalog; do not use as the sole model membership gate.
+Risk level: Low-medium after Pass 20 guard
+Recommended next action: Keep/guard.
 Required parity gates: Schema validation; all active model generators; generated variant count/name/base-price parity tests.
 ────────────────────────────────────────
 Sheet: model_interior_scope — 572 rows / 572 active; coverage Grand Sport 132, Z06 130, ZR1 90, ZR1X 90, Stingray 130; keys include model_key, interior_id,

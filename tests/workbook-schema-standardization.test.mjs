@@ -89,6 +89,7 @@ payload = {
     'grand_sport_variant_selectable': column_values('grandSport_variant_overrides', 'selectable'),
     'rule_mapping_rows': records('rule_mapping'),
     'grand_sport_rule_mapping_rows': records('grandSport_rule_mapping'),
+    'variant_master_rows': records('variant_master'),
     'model_master_rows': records('model_master'),
     'model_variant_rows': records('model_variants'),
     'model_source_rows': records('model_workbook_sources'),
@@ -237,6 +238,16 @@ test("future Corvette model metadata is scaffolded against shared LZ interiors",
     // model_workbook_sources rows are active. ZR1/ZR1X remain inactive scaffolds.
     const expectActive = expected.active ?? false;
     assert.equal(variantRows.every((row) => row.active === expectActive), true);
+    if (expectActive) {
+      const variantFactRows = new Map(snapshot.variant_master_rows.map((row) => [row.variant_id, row]));
+      for (const row of variantRows) {
+        assert.equal(
+          variantFactRows.get(row.variant_id)?.active,
+          true,
+          `${modelKey}.${row.variant_id} should reference an active variant_master fact row`,
+        );
+      }
+    }
 
     const sourceRows = snapshot.model_source_rows.filter((row) => row.model_key === modelKey);
     assert.equal(sourceRows.length, Object.keys(sourceSheetNames[modelKey]).length);

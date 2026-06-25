@@ -47888,7 +47888,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-24T18:29:37+00:00",
+          "generated_at": "2026-06-25T02:33:25+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -47901,7 +47901,7 @@ window.CORVETTE_FORM_DATA = {
             "display_name": "Corvette Grand Sport Coupe 1LT",
             "base_price": 88495,
             "display_order": 7,
-            "source_active": "False",
+            "source_active": "True",
             "preview_included": true
           },
           {
@@ -47913,7 +47913,7 @@ window.CORVETTE_FORM_DATA = {
             "display_name": "Corvette Grand Sport Coupe 2LT",
             "base_price": 95595,
             "display_order": 8,
-            "source_active": "False",
+            "source_active": "True",
             "preview_included": true
           },
           {
@@ -47925,7 +47925,7 @@ window.CORVETTE_FORM_DATA = {
             "display_name": "Corvette Grand Sport Coupe 3LT",
             "base_price": 100245,
             "display_order": 9,
-            "source_active": "False",
+            "source_active": "True",
             "preview_included": true
           },
           {
@@ -47937,7 +47937,7 @@ window.CORVETTE_FORM_DATA = {
             "display_name": "Corvette Grand Sport Convertible 1LT",
             "base_price": 95495,
             "display_order": 10,
-            "source_active": "False",
+            "source_active": "True",
             "preview_included": true
           },
           {
@@ -47949,7 +47949,7 @@ window.CORVETTE_FORM_DATA = {
             "display_name": "Corvette Grand Sport Convertible 2LT",
             "base_price": 102595,
             "display_order": 11,
-            "source_active": "False",
+            "source_active": "True",
             "preview_included": true
           },
           {
@@ -47961,7 +47961,7 @@ window.CORVETTE_FORM_DATA = {
             "display_name": "Corvette Grand Sport Convertible 3LT",
             "base_price": 107245,
             "display_order": 12,
-            "source_active": "False",
+            "source_active": "True",
             "preview_included": true
           }
         ],

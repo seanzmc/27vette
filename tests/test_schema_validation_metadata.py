@@ -298,6 +298,99 @@ class SchemaValidationMetadataTests(unittest.TestCase):
         self.assertFalse(any(issue.check_id == "missing_model_source_role" for issue in issues), issues)
         self.assertFalse(any(issue.check_id == "missing_model_source_sheet" for issue in issues), issues)
 
+    def test_active_model_variant_must_reference_active_variant_master_row(self) -> None:
+        role_map = z06_source_map()
+        wb = minimal_schema_workbook(
+            extra_model_rows=[
+                {"model_key": "z06", "registry_key": "z06", "expected_variant_count": 1, "active": True}
+            ],
+            extra_source_rows=source_rows("z06", role_map),
+            extra_sheets={
+                **z06_source_sheets(),
+                "variant_master": (["variant_id", "active"], [{"variant_id": "1lz_h07", "active": False}]),
+                "model_variants": (
+                    ["model_key", "variant_id", "display_order", "active", "notes"],
+                    [{"model_key": "z06", "variant_id": "1lz_h07", "display_order": 1, "active": True}],
+                ),
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(
+            any(issue.check_id == "model_variant_inactive_variant_master" for issue in issues),
+            issues,
+        )
+
+    def test_active_model_variant_must_reference_existing_variant_master_row(self) -> None:
+        role_map = z06_source_map()
+        wb = minimal_schema_workbook(
+            extra_model_rows=[
+                {"model_key": "z06", "registry_key": "z06", "expected_variant_count": 1, "active": True}
+            ],
+            extra_source_rows=source_rows("z06", role_map),
+            extra_sheets={
+                **z06_source_sheets(),
+                "variant_master": (["variant_id", "active"], []),
+                "model_variants": (
+                    ["model_key", "variant_id", "display_order", "active", "notes"],
+                    [{"model_key": "z06", "variant_id": "1lz_h07", "display_order": 1, "active": True}],
+                ),
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(any(issue.check_id == "model_variant_unknown_variant_master" for issue in issues), issues)
+
+    def test_active_model_variants_require_unique_display_order(self) -> None:
+        role_map = z06_source_map()
+        wb = minimal_schema_workbook(
+            extra_model_rows=[
+                {"model_key": "z06", "registry_key": "z06", "expected_variant_count": 2, "active": True}
+            ],
+            extra_source_rows=source_rows("z06", role_map),
+            extra_sheets={
+                **z06_source_sheets(),
+                "variant_master": (
+                    ["variant_id", "active"],
+                    [{"variant_id": "1lz_h07", "active": True}, {"variant_id": "2lz_h07", "active": True}],
+                ),
+                "model_variants": (
+                    ["model_key", "variant_id", "display_order", "active", "notes"],
+                    [
+                        {"model_key": "z06", "variant_id": "1lz_h07", "display_order": 1, "active": True},
+                        {"model_key": "z06", "variant_id": "2lz_h07", "display_order": 1, "active": True},
+                    ],
+                ),
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(any(issue.check_id == "duplicate_model_variant_display_order" for issue in issues), issues)
+
+    def test_active_model_variant_count_matches_model_master_expected_count(self) -> None:
+        role_map = z06_source_map()
+        wb = minimal_schema_workbook(
+            extra_model_rows=[
+                {"model_key": "z06", "registry_key": "z06", "expected_variant_count": 2, "active": True}
+            ],
+            extra_source_rows=source_rows("z06", role_map),
+            extra_sheets={
+                **z06_source_sheets(),
+                "variant_master": (["variant_id", "active"], [{"variant_id": "1lz_h07", "active": True}]),
+                "model_variants": (
+                    ["model_key", "variant_id", "display_order", "active", "notes"],
+                    [{"model_key": "z06", "variant_id": "1lz_h07", "display_order": 1, "active": True}],
+                ),
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(any(issue.check_id == "model_variant_count_mismatch" for issue in issues), issues)
+
     def test_live_contract_provenance_leaks_flags_future_model_review_lineage_only(self) -> None:
         data = {
             "dataset": {"source_sheet": "grandSport_options"},
