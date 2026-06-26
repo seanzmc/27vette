@@ -160,7 +160,7 @@ To compare generated JSON contracts while ignoring timestamp fields, run:
 node scripts/compare-generated-contracts.mjs before.json after.json
 ```
 
-Asset image maintenance has a separate helper at `asset_map-Sync/asset_map_sync.py`; treat it as dry-run/report-only until an approved pass aligns its write path with `save_workbook_safely()` and project dependencies.
+Asset image maintenance uses `.venv/bin/python scripts/sync_asset_map.py --workbook stingray_master.xlsx --report-dir <dir>`. The retired `asset_map-Sync/asset_map_sync.py` entry point is a deprecation stub and must not contain workbook-writing logic. The safe command defaults to report-only mode, uses promoted runtime models from workbook metadata, supports deterministic `--media-url-list` validation, and may write the workbook only with `--apply` through `save_workbook_safely()`. After any real apply, validate the workbook package and schema before regenerating affected active models and the registry.
 
 ## Workbook Review & Edit Tool (dev only)
 

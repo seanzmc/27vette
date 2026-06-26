@@ -1,0 +1,657 @@
+"""Safe asset_map maintenance helpers and CLI implementation.
+
+This module keeps WordPress media discovery separate from workbook-authored
+runtime image metadata. Dry-run/report mode is the default; apply mode saves
+through the project safe-save helper.
+"""
+
+from __future__ import annotations
+
+import argparse
+import base64
+import csv
+from collections import Counter, defaultdict
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
+import json
+import os
+from pathlib import Path
+import re
+import sys
+from typing import Any, Callable, Iterable
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode, urlparse, unquote
+from urllib.request import Request, urlopen
+
+from openpyxl import load_workbook
+
+from corvette_form_generator.workbook import clean, rows_from_sheet, save_workbook_safely, workbook_truthy
+
+SITE = "stingraychevroletcorvette.com"
+MEDIA_ENDPOINT = f"https://{SITE}/wp-json/wp/v2/media"
+PATH_FILTER = "/wp-content/uploads/pictures/27vette/"
+ASSET_SHEET = "asset_map"
+TARGET_TYPE = "option"
+NEW_ROW_FIT = "cover"
+NEW_ROW_POSITION = "center"
+NEW_ROW_NOTE = "auto-seeded"
+
+IMGI_RE = re.compile(r"^imgi_\d+_(.+)$")
+PREFIX_RE = re.compile(r"^([cehrsg])-(.+)$")
+SPLIT_RE = re.compile(r"[-_]")
+RPO_RE = re.compile(r"^[0-9a-z]{3}$")
+
+MODEL_PREFIX = {
+    "c": "stingray",
+    "e": "grand_sport",
+    "h": "z06",
+    "r": "zr1",
+    "s": "zr1x",
+    "g": "grand_sport_x",
+}
+
+
+@dataclass(frozen=True)
+class SyncResult:
+    report_path: Path
+    unmatched_path: Path
+    url_write_count: int
+    insert_count: int
+    action_counts: dict[str, int]
+    unmatched_count: int
+    unparseable_count: int
+    backup_path: Path | None = None
+
+
+def filename_stem(url: str) -> str:
+    base = unquote(os.path.basename(urlparse(url).path))
+    return os.path.splitext(base)[0].lower()
+
+
+def parse_media(url: str) -> tuple[str | None, str, bool]:
+    """Return ``(model_key_or_none, rpo, is_valid)`` parsed from a media URL."""
+
+    stem = filename_stem(url)
+    match = IMGI_RE.match(stem)
+    if match:
+        stem = match.group(1)
+    model = None
+    match = PREFIX_RE.match(stem)
+    if match:
+        model = MODEL_PREFIX[match.group(1)]
+        stem = match.group(2)
+    rpo = SPLIT_RE.split(stem)[0]
+    return model, rpo, bool(RPO_RE.match(rpo))
+
+
+def build_media_index(media_urls: Iterable[str]) -> tuple[dict[tuple[str, str], list[str]], dict[str, list[str]], list[str]]:
+    exact: dict[tuple[str, str], list[str]] = defaultdict(list)
+    bare: dict[str, list[str]] = defaultdict(list)
+    unparseable: list[str] = []
+    for url in media_urls:
+        model, rpo, ok = parse_media(url)
+        if not ok:
+            unparseable.append(url)
+        elif model:
+            exact[(model, rpo)].append(url)
+        else:
+            bare[rpo].append(url)
+    return exact, bare, unparseable
+
+
+def _auth_header_from_env() -> str | None:
+    user = os.environ.get("WP_USER")
+    password = os.environ.get("WP_APP_PASSWORD")
+    if not user or not password:
+        return None
+    token = f"{user}:{password.replace(' ', '')}".encode("utf-8")
+    return "Basic " + base64.b64encode(token).decode("ascii")
+
+
+def _open_json(url: str, *, auth_header: str | None, timeout: float) -> tuple[list[dict[str, Any]], dict[str, str]]:
+    headers = {"Accept": "application/json"}
+    if auth_header:
+        headers["Authorization"] = auth_header
+    request = Request(url, headers=headers)
+    with urlopen(request, timeout=timeout) as response:  # noqa: S310 - project-controlled endpoint/CLI URL
+        payload = json.loads(response.read().decode("utf-8"))
+        response_headers = {key.lower(): value for key, value in response.headers.items()}
+    return payload, response_headers
+
+
+def fetch_media(timeout: float, modified_after: str | None = None) -> list[str]:
+    """Fetch WordPress media URLs using stdlib HTTP and optional Basic auth."""
+
+    auth_header = _auth_header_from_env()
+    urls: list[str] = []
+    page = 1
+    while True:
+        params: dict[str, Any] = {
+            "per_page": 100,
+            "page": page,
+            "_fields": "source_url",
+            "media_type": "image",
+        }
+        if modified_after:
+            params.update({"modified_after": modified_after, "orderby": "modified", "order": "desc"})
+        api_url = f"{MEDIA_ENDPOINT}?{urlencode(params)}"
+        try:
+            batch, headers = _open_json(api_url, auth_header=auth_header, timeout=timeout)
+        except HTTPError as exc:
+            if exc.code == 400 and page > 1:
+                break
+            raise
+        if not batch:
+            break
+        for item in batch:
+            url = clean(item.get("source_url"))
+            if PATH_FILTER in url:
+                urls.append(url)
+        total_pages = int(headers.get("x-wp-totalpages", page))
+        if page >= total_pages:
+            break
+        page += 1
+    return urls
+
+
+def read_media_url_list(path: Path | str) -> list[str]:
+    media_path = Path(path)
+    urls: list[str] = []
+    for line in media_path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if stripped and not stripped.startswith("#"):
+            urls.append(stripped)
+    return urls
+
+
+def state_path(report_dir: Path) -> Path:
+    return report_dir / ".asset_map_sync_state.json"
+
+
+def read_since_auto(report_dir: Path, cushion_hours: int = 6) -> str | None:
+    path = state_path(report_dir)
+    if not path.exists():
+        return None
+    try:
+        timestamp = json.loads(path.read_text(encoding="utf-8")).get("last_run_utc")
+        if not timestamp:
+            return None
+        return (datetime.fromisoformat(timestamp) - timedelta(hours=cushion_hours)).strftime("%Y-%m-%dT%H:%M:%S")
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        return None
+
+
+def write_state(report_dir: Path) -> None:
+    payload = {"last_run_utc": datetime.now(timezone.utc).replace(tzinfo=None).isoformat(timespec="seconds")}
+    state_path(report_dir).write_text(json.dumps(payload), encoding="utf-8")
+
+
+def url_alive(url: str, timeout: float) -> bool:
+    try:
+        request = Request(url, method="HEAD")
+        with urlopen(request, timeout=timeout) as response:  # noqa: S310 - user/workbook-provided URL liveness check
+            return response.status < 400
+    except HTTPError as exc:
+        if exc.code != 405:
+            return False
+        try:
+            request = Request(url, method="GET")
+            with urlopen(request, timeout=timeout) as response:  # noqa: S310 - user/workbook-provided URL liveness check
+                return response.status < 400
+        except (HTTPError, URLError, TimeoutError):
+            return False
+    except (URLError, TimeoutError):
+        return False
+
+
+def check_existing(urls: Iterable[str], timeout: float, workers: int) -> dict[str, bool]:
+    unique_urls = sorted(set(urls))
+    with ThreadPoolExecutor(max_workers=max(1, workers)) as executor:
+        return dict(executor.map(lambda url: (url, url_alive(url, timeout)), unique_urls))
+
+
+def discover_promoted_option_sources(wb) -> dict[str, str]:
+    """Return promoted runtime model -> source option sheet mapping."""
+
+    if "model_registry_promotion" not in wb.sheetnames:
+        raise ValueError("Missing required workbook sheet 'model_registry_promotion'.")
+    if "model_workbook_sources" not in wb.sheetnames:
+        raise ValueError("Missing required workbook sheet 'model_workbook_sources'.")
+
+    promoted_rows = [
+        row
+        for row in rows_from_sheet(wb, "model_registry_promotion")
+        if workbook_truthy(row.get("active")) and workbook_truthy(row.get("promoted_to_runtime"))
+    ]
+    promoted_rows.sort(key=lambda row: (int(clean(row.get("display_order")) or 0), clean(row.get("model_key"))))
+    promoted_models = [clean(row.get("model_key")).lower() for row in promoted_rows if clean(row.get("model_key"))]
+
+    source_rows = [
+        row
+        for row in rows_from_sheet(wb, "model_workbook_sources")
+        if workbook_truthy(row.get("active")) and clean(row.get("source_role")) == "source_option_sheet"
+    ]
+    source_by_model = {clean(row.get("model_key")).lower(): clean(row.get("sheet_name")) for row in source_rows}
+
+    sources: dict[str, str] = {}
+    for model_key in promoted_models:
+        sheet_name = source_by_model.get(model_key)
+        if not sheet_name:
+            raise ValueError(f"Promoted model {model_key!r} is missing an active source_option_sheet row.")
+        if sheet_name not in wb.sheetnames:
+            raise ValueError(f"Promoted model {model_key!r} source option sheet {sheet_name!r} is missing.")
+        sources[model_key] = sheet_name
+    return sources
+
+
+def _header_index(ws) -> dict[str, int]:
+    headers = [clean(cell.value).lower() for cell in ws[1]]
+    return {header: index for index, header in enumerate(headers) if header}
+
+
+def read_option_sheets(wb, sources: dict[str, str]) -> dict[tuple[str, str], dict[str, str]]:
+    desired: dict[tuple[str, str], dict[str, str]] = {}
+    for model_key, sheet_name in sources.items():
+        ws = wb[sheet_name]
+        index = _header_index(ws)
+        missing = {"option_id", "rpo", "selectable", "active"} - set(index)
+        if missing:
+            raise ValueError(f"{sheet_name} missing required columns: {', '.join(sorted(missing))}")
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            if not any(clean(value) for value in row):
+                continue
+            option_id = clean(row[index["option_id"]]).lower()
+            if not option_id:
+                continue
+            if not (workbook_truthy(row[index["active"]]) and workbook_truthy(row[index["selectable"]])):
+                continue
+            rpo = clean(row[index["rpo"]]).lower()
+            name = clean(row[index["option_name"]]) if "option_name" in index else ""
+            desired[(model_key, option_id)] = {"rpo": rpo, "name": name}
+    return desired
+
+
+def existing_option_asset_rows(ws, header_index: dict[str, int]) -> dict[tuple[str, str], dict[str, Any]]:
+    rows: dict[tuple[str, str], dict[str, Any]] = {}
+    for row_number in range(2, ws.max_row + 1):
+        target_type = clean(ws.cell(row_number, header_index["target_type"] + 1).value).lower()
+        if target_type != TARGET_TYPE:
+            continue
+        model_key = clean(ws.cell(row_number, header_index["model_key"] + 1).value).lower()
+        target_id = clean(ws.cell(row_number, header_index["target_id"] + 1).value).lower()
+        if not model_key or not target_id:
+            continue
+        url = clean(ws.cell(row_number, header_index["image_url"] + 1).value)
+        rows[(model_key, target_id)] = {"row": row_number, "url": url}
+    return rows
+
+
+def reconcile(
+    desired: dict[tuple[str, str], dict[str, str]],
+    exact: dict[tuple[str, str], list[str]],
+    bare: dict[str, list[str]],
+    existing_rows: dict[tuple[str, str], dict[str, Any]],
+    alive: dict[str, bool],
+    incremental: bool,
+    *,
+    seed_blank_missing: bool = False,
+) -> tuple[list[dict[str, str]], dict[int, str], list[dict[str, str]], dict[int, str], set[str]]:
+    """Pure reconciliation of desired option assets vs media candidates."""
+
+    models_for_rpo: dict[str, set[str]] = defaultdict(set)
+    for (model_key, _target_id), info in desired.items():
+        if info["rpo"]:
+            models_for_rpo[info["rpo"]].add(model_key)
+    prefixed_models_for_rpo: dict[str, set[str]] = defaultdict(set)
+    for model_key, rpo in exact:
+        prefixed_models_for_rpo[rpo].add(model_key)
+
+    def resolve(model_key: str, rpo: str) -> tuple[str | None, str]:
+        if not rpo:
+            return None, "no-rpo"
+        if (model_key, rpo) in exact:
+            return exact[(model_key, rpo)][0], "prefixed"
+        if rpo in bare:
+            eligible = models_for_rpo.get(rpo, set()) - prefixed_models_for_rpo.get(rpo, set())
+            if eligible == {model_key}:
+                return bare[rpo][0], "bare-unique"
+            if model_key in eligible:
+                return None, "bare-ambiguous"
+        return None, "none"
+
+    report: list[dict[str, str]] = []
+    url_writes: dict[int, str] = {}
+    inserts: list[dict[str, str]] = []
+    status: dict[int, str] = {}
+    used: set[str] = set()
+
+    def add_report(
+        scope: str,
+        model_key: str,
+        target_id: str,
+        rpo: str,
+        action: str,
+        source: str,
+        existing_url: str,
+        new_url: str,
+        image_status: str,
+        note: str = "",
+    ) -> None:
+        report.append(
+            {
+                "scope": scope,
+                "model_key": model_key,
+                "target_id": target_id,
+                "rpo": rpo,
+                "action": action,
+                "candidate_source": source,
+                "existing_url": existing_url,
+                "new_url": new_url,
+                "image_status": image_status,
+                "note": note,
+            }
+        )
+
+    for (model_key, target_id), info in desired.items():
+        rpo = info["rpo"]
+        candidate, source = resolve(model_key, rpo)
+        if candidate:
+            used.add(candidate)
+        note = "" if rpo else "no rpo in option sheet"
+        if source == "bare-ambiguous":
+            note = f"bare file for '{rpo}' shared across models; add a c/e/h/r/s/g prefix"
+
+        existing = existing_rows.get((model_key, target_id))
+        if existing:
+            row_number = int(existing["row"])
+            existing_url = clean(existing.get("url"))
+            if existing_url:
+                ok = alive.get(existing_url, True)
+                if ok:
+                    status[row_number] = "ok"
+                    add_report("existing", model_key, target_id, rpo, "keep", source, existing_url, existing_url, "ok")
+                elif candidate:
+                    url_writes[row_number] = candidate
+                    status[row_number] = "ok"
+                    add_report("existing", model_key, target_id, rpo, "replace_404", source, existing_url, candidate, "ok")
+                else:
+                    image_status = "url_dead"
+                    action = "dead_no_match_incremental" if incremental else "flag_dead_no_match"
+                    status[row_number] = image_status
+                    add_report("existing", model_key, target_id, rpo, action, source, existing_url, existing_url, image_status, note)
+            elif candidate:
+                url_writes[row_number] = candidate
+                status[row_number] = "ok"
+                add_report("existing", model_key, target_id, rpo, "fill", source, "", candidate, "ok")
+            elif source == "bare-ambiguous":
+                status[row_number] = "ambiguous"
+                add_report("existing", model_key, target_id, rpo, "flag_ambiguous", source, "", "", "ambiguous", note)
+            elif incremental:
+                add_report("existing", model_key, target_id, rpo, "skip_no_candidate_incremental", source, "", "", "missing")
+            else:
+                status[row_number] = "missing"
+                add_report("existing", model_key, target_id, rpo, "flag_missing", source, "", "", "missing", note)
+            continue
+
+        if candidate:
+            inserts.append(
+                {"model": model_key, "tid": target_id, "rpo": rpo, "name": info["name"], "url": candidate, "status": "ok"}
+            )
+            add_report("new", model_key, target_id, rpo, "insert_filled", source, "", candidate, "ok", note)
+        elif source == "bare-ambiguous":
+            if seed_blank_missing:
+                inserts.append(
+                    {"model": model_key, "tid": target_id, "rpo": rpo, "name": info["name"], "url": "", "status": "ambiguous"}
+                )
+                add_report("new", model_key, target_id, rpo, "insert_ambiguous", source, "", "", "ambiguous", note)
+            else:
+                add_report("new", model_key, target_id, rpo, "flag_ambiguous", source, "", "", "ambiguous", note)
+        elif incremental:
+            add_report("new", model_key, target_id, rpo, "skip_no_candidate_incremental", source, "", "", "missing", note)
+        elif seed_blank_missing:
+            inserts.append(
+                {"model": model_key, "tid": target_id, "rpo": rpo, "name": info["name"], "url": "", "status": "missing"}
+            )
+            add_report("new", model_key, target_id, rpo, "insert_blank", source, "", "", "missing", note)
+        else:
+            add_report("new", model_key, target_id, rpo, "flag_missing", source, "", "", "missing", note)
+
+    for (model_key, target_id), existing in existing_rows.items():
+        if (model_key, target_id) not in desired:
+            row_number = int(existing["row"])
+            status[row_number] = "stale_option"
+            add_report(
+                "stale",
+                model_key,
+                target_id,
+                "",
+                "stale_option",
+                "",
+                clean(existing.get("url")),
+                clean(existing.get("url")),
+                "stale_option",
+                "option no longer active+selectable",
+            )
+
+    return report, url_writes, inserts, status, used
+
+
+def _ensure_asset_headers(headers: list[str]) -> dict[str, int]:
+    index = {header: offset for offset, header in enumerate(headers)}
+    missing = {"model_key", "target_type", "target_id", "image_url"} - set(index)
+    if missing:
+        raise ValueError(f"asset_map missing required columns: {', '.join(sorted(missing))}")
+    return index
+
+
+def _write_reports(report_dir: Path, report: list[dict[str, str]], unmatched: list[str], unparseable: list[str], incremental: bool) -> tuple[Path, Path]:
+    report_dir.mkdir(parents=True, exist_ok=True)
+    report_path = report_dir / "asset_map_sync_report.csv"
+    with report_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=[
+                "scope",
+                "model_key",
+                "target_id",
+                "rpo",
+                "action",
+                "candidate_source",
+                "existing_url",
+                "new_url",
+                "image_status",
+                "note",
+            ],
+        )
+        writer.writeheader()
+        writer.writerows(report)
+
+    unmatched_path = report_dir / "asset_map_unmatched_media.csv"
+    reason = "new media in window, no row yet" if incremental else "no desired (model, rpo) for this file"
+    with unmatched_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["source_url", "parsed_model", "parsed_rpo", "reason"])
+        for url in unmatched:
+            model_key, rpo, _ = parse_media(url)
+            writer.writerow([url, model_key or "", rpo, reason])
+        for url in unparseable:
+            writer.writerow([url, "", "", "filename did not yield a 3-char RPO"])
+    return report_path, unmatched_path
+
+
+def run_sync(
+    *,
+    workbook_path: Path | str,
+    report_dir: Path | str,
+    media_urls: Iterable[str],
+    apply: bool = False,
+    asset_sheet: str = ASSET_SHEET,
+    verify_existing: bool = True,
+    timeout: float = 10.0,
+    workers: int = 16,
+    incremental: bool = False,
+    status_col: bool = False,
+    deactivate_stale: bool = False,
+    seed_blank_missing: bool = False,
+    save_fn: Callable[..., Path] = save_workbook_safely,
+) -> SyncResult:
+    workbook_path = Path(workbook_path)
+    report_dir = Path(report_dir)
+    loaded_mtime_ns = workbook_path.stat().st_mtime_ns if workbook_path.exists() else None
+    wb = load_workbook(workbook_path)
+    backup_path: Path | None = None
+    try:
+        if asset_sheet not in wb.sheetnames:
+            raise ValueError(f"Sheet {asset_sheet!r} not found.")
+        ws = wb[asset_sheet]
+        headers = [clean(cell.value) for cell in ws[1]]
+        header_index = _ensure_asset_headers(headers)
+        status_index = header_index.get("image_status")
+        if status_col and status_index is None:
+            status_index = len(headers)
+            ws.cell(1, status_index + 1).value = "image_status"
+            headers.append("image_status")
+
+        sources = discover_promoted_option_sources(wb)
+        desired = read_option_sheets(wb, sources)
+        existing_rows = existing_option_asset_rows(ws, header_index)
+        exact, bare, unparseable = build_media_index(media_urls)
+
+        if verify_existing:
+            alive = check_existing([row["url"] for row in existing_rows.values() if row.get("url")], timeout, workers)
+        else:
+            alive = {}
+
+        report, url_writes, inserts, status, used = reconcile(
+            desired,
+            exact,
+            bare,
+            existing_rows,
+            alive,
+            incremental,
+            seed_blank_missing=seed_blank_missing,
+        )
+
+        for row_number, url in url_writes.items():
+            ws.cell(row_number, header_index["image_url"] + 1).value = url
+        if status_col and status_index is not None:
+            for row_number, image_status in status.items():
+                ws.cell(row_number, status_index + 1).value = image_status
+        if deactivate_stale and "active" in header_index:
+            for row in report:
+                if row["action"] != "stale_option":
+                    continue
+                existing = existing_rows.get((row["model_key"], row["target_id"]))
+                if existing:
+                    ws.cell(int(existing["row"]), header_index["active"] + 1).value = False
+
+        for insert in inserts:
+            row_values = [""] * len(headers)
+            row_values[header_index["model_key"]] = insert["model"]
+            row_values[header_index["target_type"]] = TARGET_TYPE
+            row_values[header_index["target_id"]] = insert["tid"]
+            row_values[header_index["image_url"]] = insert["url"]
+            if "image_alt" in header_index:
+                row_values[header_index["image_alt"]] = insert["name"]
+            if "image_fit" in header_index:
+                row_values[header_index["image_fit"]] = NEW_ROW_FIT
+            if "image_position" in header_index:
+                row_values[header_index["image_position"]] = NEW_ROW_POSITION
+            if "active" in header_index:
+                row_values[header_index["active"]] = True
+            if "notes" in header_index:
+                row_values[header_index["notes"]] = NEW_ROW_NOTE
+            if status_col and status_index is not None:
+                row_values[status_index] = insert["status"]
+            ws.append(row_values)
+
+        unmatched = sorted(set(media_urls) - used - set(unparseable))
+        report_path, unmatched_path = _write_reports(report_dir, report, unmatched, unparseable, incremental)
+
+        if apply:
+            backup_path = save_fn(wb, workbook_path, loaded_mtime_ns=loaded_mtime_ns)
+            check_wb = load_workbook(workbook_path, read_only=True, data_only=True)
+            check_wb.close()
+    finally:
+        wb.close()
+
+    action_counts = dict(Counter(row["action"] for row in report))
+    return SyncResult(
+        report_path=report_path,
+        unmatched_path=unmatched_path,
+        url_write_count=len(url_writes),
+        insert_count=len(inserts),
+        action_counts=action_counts,
+        unmatched_count=len(unmatched),
+        unparseable_count=len(unparseable),
+        backup_path=backup_path,
+    )
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Report or safely apply asset_map option image URL sync.")
+    parser.add_argument("--workbook", required=True, type=Path)
+    parser.add_argument("--asset-sheet", default=ASSET_SHEET)
+    parser.add_argument("--report-dir", required=True, type=Path)
+    parser.add_argument("--media-url-list", type=Path, help="Deterministic newline-delimited media URL fixture/list")
+    parser.add_argument("--apply", action="store_true", help="Write workbook changes through save_workbook_safely()")
+    parser.add_argument("--timeout", type=float, default=10.0)
+    parser.add_argument("--workers", type=int, default=16)
+    parser.add_argument("--no-verify-existing", action="store_true", help="Skip existing URL liveness checks")
+    parser.add_argument("--since", default=None, metavar="DATE", help="Media modified-after date, or 'auto' for saved cursor")
+    parser.add_argument("--status-col", action="store_true", help="Maintain image_status column")
+    parser.add_argument("--deactivate-stale", action="store_true", help="Set active=FALSE on stale option rows")
+    parser.add_argument("--seed-blank-missing", action="store_true", help="Opt in to blank row insertion for missing images")
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+
+    modified_after = read_since_auto(args.report_dir) if args.since == "auto" else args.since
+    if args.media_url_list:
+        media_urls = read_media_url_list(args.media_url_list)
+        print(f"Loaded {len(media_urls)} media URLs from {args.media_url_list}")
+    else:
+        label = f"incremental after {modified_after}" if modified_after else "full"
+        print(f"Pulling media [{label}] ...")
+        media_urls = fetch_media(args.timeout, modified_after)
+        print(f"  {len(media_urls)} images under {PATH_FILTER}")
+
+    result = run_sync(
+        workbook_path=args.workbook,
+        report_dir=args.report_dir,
+        media_urls=media_urls,
+        apply=args.apply,
+        asset_sheet=args.asset_sheet,
+        verify_existing=not args.no_verify_existing,
+        timeout=args.timeout,
+        workers=args.workers,
+        incremental=modified_after is not None,
+        status_col=args.status_col,
+        deactivate_stale=args.deactivate_stale,
+        seed_blank_missing=args.seed_blank_missing,
+    )
+
+    print("\n=== Summary ===")
+    for action, count in sorted(result.action_counts.items()):
+        print(f"  {action:<30} {count}")
+    print(f"  {'unmatched media':<30} {result.unmatched_count}")
+    print(f"  {'unparseable files':<30} {result.unparseable_count}")
+    print(f"\nReports: {result.report_path}\n         {result.unmatched_path}")
+
+    if args.apply:
+        if args.since == "auto":
+            write_state(args.report_dir)
+        print(f"\nAPPLIED: {result.url_write_count} url change(s), {result.insert_count} row insert(s).")
+        if result.backup_path:
+            print(f"Backup -> {result.backup_path}")
+    else:
+        print(f"\nDRY RUN -- would write {result.url_write_count} url change(s) and {result.insert_count} new row(s).")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

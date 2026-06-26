@@ -1,0 +1,3 @@
+https://example.test/c-gba.png
+https://example.test/h-stx.png
+https://example.test/readme.txt
