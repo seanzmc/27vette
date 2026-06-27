@@ -50,9 +50,8 @@ The runtime should render and evaluate the generated contract. It should not inf
 - `scripts/compare-generated-contracts.mjs` - compares generated JSON contracts while ignoring timestamp fields.
 - `scripts/corvette_form_generator/` - shared model configuration, workbook I/O, runtime metadata, mapping, pricing, interiors, rules, contract, production, inspection, registry promotion, schema validation, output, and validation utilities.
 - `tests/` - Node and Python tests for generated data, runtime behavior, multi-model switching, workbook schema/visual-copy standardization, Z06 promotion and rule corrections, dealer submission payloads, and workbook-owned metadata.
-- `architectureAudit/` - retained audits and migration notes.
-- `archive/` - extracted historical workbook evidence (`stingray_archive.xlsx`).
-- `archive-2026-05-29/`, `backups/` - retained historical snapshots and workbook backups.
+- `archive/` - consolidated historical evidence: extracted workbook evidence (`stingray_archive.xlsx`), dated historical snapshots under `archive/2026-05-29/`, and retained audits under dated subfolders such as `archive/2026-06-09/`.
+- `backups/` - ignored local workbook recovery output created by safe-save helpers; not tracked source.
 - `product/`, `dist_updates/` - GM product reference PDFs and distribution updates.
 - `visualizer/`, `src/` - 2D visualizer scripts, exterior/wheel image assets, and the local workbook review tool under `visualizer/workbook-editor/` (separate from the order-form runtime).
 - `scripts/workbook_editor_server.py` - localhost-only server for the workbook review/editing UI. See [Workbook Editor Workflow](#workbook-editor-workflow) for start, review, edit/apply, exported ops, and post-apply regeneration steps.

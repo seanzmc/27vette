@@ -21,7 +21,7 @@ Evidence:
 - ZR1/ZR1X metadata and source sheets exist as inactive future scaffolds, but they are not runtime-promoted.
 - Active scripts/tests do not reference `future_model_source_review`, `future_model_option_review`, `source_review`, or `option_review` as an executable current pipeline.
 - `Order-Guide_IngestPrompt.md` exists, but it describes an older first-pass staging schema whose workbook sheets are not present in the current workbook.
-- The archived ingest skill/files live under `archive-2026-05-29/...` and should not be treated as current workflow.
+- The archived ingest skill/files live under `archive/2026-05-29/...` and should not be treated as current workflow.
 
 So the correct next move is not to resurrect the older review-sheet workflow wholesale. The smaller safe path is to document and guard the current normalized target schema first, then add a deliberately edge-scoped ingest workflow that emits auditable draft artifacts or a working-copy review sheet before any safe-save write to `stingray_master.xlsx`.
 
@@ -68,7 +68,7 @@ So the correct next move is not to resurrect the older review-sheet workflow who
   - `raw_export`
 - Result: no active Python script references in `scripts/`.
 - Active test search for model source sheet coverage found current guards around normalized sheets and metadata, not an active raw ingest path.
-- File search found archived ingest materials only under `archive-2026-05-29/...`, plus the root `Order-Guide_IngestPrompt.md`.
+- File search found archived ingest materials only under `archive/2026-05-29/...`, plus the root `Order-Guide_IngestPrompt.md`.
 
 ### Workbook/read-only probes
 
