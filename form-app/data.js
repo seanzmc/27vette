@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-06-25T18:18:18+00:00"
+          "generated_at": "2026-06-27T02:09:15+00:00"
         },
         "variants": [
           {
@@ -1165,7 +1165,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 10
+            "display_order": 10,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png",
+            "image_alt": "Black Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c07__opt_j6a_001",
@@ -1185,7 +1189,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 10
+            "display_order": 10,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png",
+            "image_alt": "Black Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c07__opt_j6a_001",
@@ -1205,7 +1213,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 10
+            "display_order": 10,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png",
+            "image_alt": "Black Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c67__opt_j6a_001",
@@ -1225,7 +1237,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 10
+            "display_order": 10,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png",
+            "image_alt": "Black Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c67__opt_j6a_001",
@@ -1245,7 +1261,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 10
+            "display_order": 10,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png",
+            "image_alt": "Black Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c67__opt_j6a_001",
@@ -1265,7 +1285,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 10
+            "display_order": 10,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png",
+            "image_alt": "Black Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c07__opt_j6f_001",
@@ -1285,7 +1309,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png",
+            "image_alt": "Bright Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c07__opt_j6f_001",
@@ -1305,7 +1333,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png",
+            "image_alt": "Bright Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c07__opt_j6f_001",
@@ -1325,7 +1357,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png",
+            "image_alt": "Bright Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c67__opt_j6f_001",
@@ -1345,7 +1381,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png",
+            "image_alt": "Bright Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c67__opt_j6f_001",
@@ -1365,7 +1405,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png",
+            "image_alt": "Bright Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c67__opt_j6f_001",
@@ -1385,7 +1429,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png",
+            "image_alt": "Bright Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c07__opt_j6e_001",
@@ -1405,7 +1453,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png",
+            "image_alt": "Velocity Yellow-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c07__opt_j6e_001",
@@ -1425,7 +1477,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png",
+            "image_alt": "Velocity Yellow-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c07__opt_j6e_001",
@@ -1445,7 +1501,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png",
+            "image_alt": "Velocity Yellow-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c67__opt_j6e_001",
@@ -1465,7 +1525,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png",
+            "image_alt": "Velocity Yellow-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c67__opt_j6e_001",
@@ -1485,7 +1549,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png",
+            "image_alt": "Velocity Yellow-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c67__opt_j6e_001",
@@ -1505,7 +1573,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png",
+            "image_alt": "Velocity Yellow-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c07__opt_j6n_001",
@@ -1525,7 +1597,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 40
+            "display_order": 40,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png",
+            "image_alt": "Edge Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c07__opt_j6n_001",
@@ -1545,7 +1621,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 40
+            "display_order": 40,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png",
+            "image_alt": "Edge Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c07__opt_j6n_001",
@@ -1565,7 +1645,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 40
+            "display_order": 40,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png",
+            "image_alt": "Edge Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c67__opt_j6n_001",
@@ -1585,7 +1669,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 40
+            "display_order": 40,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png",
+            "image_alt": "Edge Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c67__opt_j6n_001",
@@ -1605,7 +1693,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 40
+            "display_order": 40,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png",
+            "image_alt": "Edge Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c67__opt_j6n_001",
@@ -1625,7 +1717,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 40
+            "display_order": 40,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png",
+            "image_alt": "Edge Red-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c07__opt_j6b_001",
@@ -1645,7 +1741,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 50
+            "display_order": 50,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png",
+            "image_alt": "Blue-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c07__opt_j6b_001",
@@ -1665,7 +1765,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 50
+            "display_order": 50,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png",
+            "image_alt": "Blue-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c07__opt_j6b_001",
@@ -1685,7 +1789,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 50
+            "display_order": 50,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png",
+            "image_alt": "Blue-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c67__opt_j6b_001",
@@ -1705,7 +1813,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 50
+            "display_order": 50,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png",
+            "image_alt": "Blue-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_c67__opt_j6b_001",
@@ -1725,7 +1837,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 50
+            "display_order": 50,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png",
+            "image_alt": "Blue-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_c67__opt_j6b_001",
@@ -1745,7 +1861,11 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 795,
-            "display_order": 50
+            "display_order": 50,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png",
+            "image_alt": "Blue-Painted Calipers",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_c07__opt_r6x_001",
@@ -48004,7 +48124,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-06-25T21:54:32+00:00",
+          "generated_at": "2026-06-27T02:09:16+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -56745,7 +56865,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 10
+            "display_order": 10,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/17a.png",
+            "image_alt": "Blade Silver Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_17a_001",
@@ -56766,7 +56890,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 10
+            "display_order": 10,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/17a.png",
+            "image_alt": "Blade Silver Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_17a_001",
@@ -56787,7 +56915,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 10
+            "display_order": 10,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/17a.png",
+            "image_alt": "Blade Silver Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_17a_001",
@@ -56808,7 +56940,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 10
+            "display_order": 10,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/17a.png",
+            "image_alt": "Blade Silver Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_17a_001",
@@ -56829,7 +56965,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 10
+            "display_order": 10,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/17a.png",
+            "image_alt": "Blade Silver Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_17a_001",
@@ -56850,7 +56990,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 10
+            "display_order": 10,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/17a.png",
+            "image_alt": "Blade Silver Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_20a_001",
@@ -56871,7 +57015,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/20a.png",
+            "image_alt": "Admiral Blue Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_20a_001",
@@ -56892,7 +57040,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/20a.png",
+            "image_alt": "Admiral Blue Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_20a_001",
@@ -56913,7 +57065,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/20a.png",
+            "image_alt": "Admiral Blue Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_20a_001",
@@ -56934,7 +57090,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/20a.png",
+            "image_alt": "Admiral Blue Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_20a_001",
@@ -56955,7 +57115,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/20a.png",
+            "image_alt": "Admiral Blue Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_20a_001",
@@ -56976,7 +57140,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/20a.png",
+            "image_alt": "Admiral Blue Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_55a_001",
@@ -56997,7 +57165,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/55a.png",
+            "image_alt": "Competition Yellow Hash Marks.",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_55a_001",
@@ -57018,7 +57190,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/55a.png",
+            "image_alt": "Competition Yellow Hash Marks.",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_55a_001",
@@ -57039,7 +57215,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/55a.png",
+            "image_alt": "Competition Yellow Hash Marks.",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_55a_001",
@@ -57060,7 +57240,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/55a.png",
+            "image_alt": "Competition Yellow Hash Marks.",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_55a_001",
@@ -57081,7 +57265,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/55a.png",
+            "image_alt": "Competition Yellow Hash Marks.",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_55a_001",
@@ -57102,7 +57290,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/55a.png",
+            "image_alt": "Competition Yellow Hash Marks.",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_75a_001",
@@ -57123,7 +57315,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 40,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/75a.png",
+            "image_alt": "Torch Red Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_75a_001",
@@ -57144,7 +57340,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 40,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/75a.png",
+            "image_alt": "Torch Red Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_75a_001",
@@ -57165,7 +57365,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 40,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/75a.png",
+            "image_alt": "Torch Red Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_75a_001",
@@ -57186,7 +57390,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 40,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/75a.png",
+            "image_alt": "Torch Red Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_75a_001",
@@ -57207,7 +57415,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 40,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/75a.png",
+            "image_alt": "Torch Red Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_75a_001",
@@ -57228,7 +57440,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 40
+            "display_order": 40,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/75a.png",
+            "image_alt": "Torch Red Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_97a_001",
@@ -57249,7 +57465,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 50
+            "display_order": 50,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/97a.png",
+            "image_alt": "Carbon Flash Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_97a_001",
@@ -57270,7 +57490,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 50
+            "display_order": 50,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/97a.png",
+            "image_alt": "Carbon Flash Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_97a_001",
@@ -57291,7 +57515,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 50
+            "display_order": 50,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/97a.png",
+            "image_alt": "Carbon Flash Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_97a_001",
@@ -57312,7 +57540,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 50
+            "display_order": 50,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/97a.png",
+            "image_alt": "Carbon Flash Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_97a_001",
@@ -57333,7 +57565,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 50
+            "display_order": 50,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/97a.png",
+            "image_alt": "Carbon Flash Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_97a_001",
@@ -57354,7 +57590,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 50
+            "display_order": 50,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/97a.png",
+            "image_alt": "Carbon Flash Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_dx4_001",
@@ -57375,7 +57615,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 60
+            "display_order": 60,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/dx4.png",
+            "image_alt": "Red Mist Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e07__opt_dx4_001",
@@ -57396,7 +57640,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 60
+            "display_order": 60,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/dx4.png",
+            "image_alt": "Red Mist Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e07__opt_dx4_001",
@@ -57417,7 +57665,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 60
+            "display_order": 60,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/dx4.png",
+            "image_alt": "Red Mist Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e67__opt_dx4_001",
@@ -57438,7 +57690,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 60
+            "display_order": 60,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/dx4.png",
+            "image_alt": "Red Mist Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "2lt_e67__opt_dx4_001",
@@ -57459,7 +57715,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 60
+            "display_order": 60,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/dx4.png",
+            "image_alt": "Red Mist Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "3lt_e67__opt_dx4_001",
@@ -57480,7 +57740,11 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_behavior": "",
-            "display_order": 60
+            "display_order": 60,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/dx4.png",
+            "image_alt": "Red Mist Hash Marks",
+            "image_fit": "cover",
+            "image_position": "center"
           },
           {
             "choice_id": "1lt_e07__opt_drg_001",
@@ -97646,7 +97910,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-06-25T21:54:33+00:00",
+          "generated_at": "2026-06-25T21:57:04+00:00",
           "status": "runtime_active"
         },
         "variants": [

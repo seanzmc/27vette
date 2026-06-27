@@ -2,7 +2,7 @@
   "dataset": {
     "name": "2027 Corvette Stingray operational form",
     "source_workbook": "stingray_master.xlsx",
-    "generated_at": "2026-06-25T18:18:18+00:00"
+    "generated_at": "2026-06-27T02:09:15+00:00"
   },
   "variants": [
     {
@@ -1157,7 +1157,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 0,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png",
+      "image_alt": "Black Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c07__opt_j6a_001",
@@ -1177,7 +1181,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 0,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png",
+      "image_alt": "Black Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c07__opt_j6a_001",
@@ -1197,7 +1205,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 0,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png",
+      "image_alt": "Black Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c67__opt_j6a_001",
@@ -1217,7 +1229,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 0,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png",
+      "image_alt": "Black Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c67__opt_j6a_001",
@@ -1237,7 +1253,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 0,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png",
+      "image_alt": "Black Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c67__opt_j6a_001",
@@ -1257,7 +1277,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 0,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png",
+      "image_alt": "Black Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c07__opt_j6f_001",
@@ -1277,7 +1301,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png",
+      "image_alt": "Bright Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c07__opt_j6f_001",
@@ -1297,7 +1325,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png",
+      "image_alt": "Bright Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c07__opt_j6f_001",
@@ -1317,7 +1349,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png",
+      "image_alt": "Bright Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c67__opt_j6f_001",
@@ -1337,7 +1373,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png",
+      "image_alt": "Bright Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c67__opt_j6f_001",
@@ -1357,7 +1397,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png",
+      "image_alt": "Bright Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c67__opt_j6f_001",
@@ -1377,7 +1421,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png",
+      "image_alt": "Bright Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c07__opt_j6e_001",
@@ -1397,7 +1445,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png",
+      "image_alt": "Velocity Yellow-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c07__opt_j6e_001",
@@ -1417,7 +1469,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png",
+      "image_alt": "Velocity Yellow-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c07__opt_j6e_001",
@@ -1437,7 +1493,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png",
+      "image_alt": "Velocity Yellow-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c67__opt_j6e_001",
@@ -1457,7 +1517,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png",
+      "image_alt": "Velocity Yellow-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c67__opt_j6e_001",
@@ -1477,7 +1541,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png",
+      "image_alt": "Velocity Yellow-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c67__opt_j6e_001",
@@ -1497,7 +1565,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png",
+      "image_alt": "Velocity Yellow-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c07__opt_j6n_001",
@@ -1517,7 +1589,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png",
+      "image_alt": "Edge Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c07__opt_j6n_001",
@@ -1537,7 +1613,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png",
+      "image_alt": "Edge Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c07__opt_j6n_001",
@@ -1557,7 +1637,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png",
+      "image_alt": "Edge Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c67__opt_j6n_001",
@@ -1577,7 +1661,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png",
+      "image_alt": "Edge Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c67__opt_j6n_001",
@@ -1597,7 +1685,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png",
+      "image_alt": "Edge Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c67__opt_j6n_001",
@@ -1617,7 +1709,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png",
+      "image_alt": "Edge Red-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c07__opt_j6b_001",
@@ -1637,7 +1733,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png",
+      "image_alt": "Blue-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c07__opt_j6b_001",
@@ -1657,7 +1757,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png",
+      "image_alt": "Blue-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c07__opt_j6b_001",
@@ -1677,7 +1781,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png",
+      "image_alt": "Blue-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c67__opt_j6b_001",
@@ -1697,7 +1805,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png",
+      "image_alt": "Blue-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "2lt_c67__opt_j6b_001",
@@ -1717,7 +1829,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png",
+      "image_alt": "Blue-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "3lt_c67__opt_j6b_001",
@@ -1737,7 +1853,11 @@
       "selectable": "True",
       "active": "True",
       "base_price": 795,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png",
+      "image_alt": "Blue-Painted Calipers",
+      "image_fit": "cover",
+      "image_position": "center"
     },
     {
       "choice_id": "1lt_c07__opt_r6x_001",

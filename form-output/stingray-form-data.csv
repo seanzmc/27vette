@@ -11,36 +11,36 @@ choice_id,option_id,rpo,label,section_id,step_key,variant_id,body_style,trim_lev
 1lt_c67__opt_eyk_001,opt_eyk_001,EYK,Chrome Exterior Badge Package,sec_badg_001,exterior_appearance,1lt_c67,convertible,1LT,available,True,395,,,,
 2lt_c67__opt_eyk_001,opt_eyk_001,EYK,Chrome Exterior Badge Package,sec_badg_001,exterior_appearance,2lt_c67,convertible,2LT,available,True,395,,,,
 3lt_c67__opt_eyk_001,opt_eyk_001,EYK,Chrome Exterior Badge Package,sec_badg_001,exterior_appearance,3lt_c67,convertible,3LT,available,True,395,,,,
-1lt_c07__opt_j6a_001,opt_j6a_001,J6A,Black Painted Calipers,sec_cali_001,wheels,1lt_c07,coupe,1LT,standard,True,0,,,,
-2lt_c07__opt_j6a_001,opt_j6a_001,J6A,Black Painted Calipers,sec_cali_001,wheels,2lt_c07,coupe,2LT,standard,True,0,,,,
-3lt_c07__opt_j6a_001,opt_j6a_001,J6A,Black Painted Calipers,sec_cali_001,wheels,3lt_c07,coupe,3LT,standard,True,0,,,,
-1lt_c67__opt_j6a_001,opt_j6a_001,J6A,Black Painted Calipers,sec_cali_001,wheels,1lt_c67,convertible,1LT,standard,True,0,,,,
-2lt_c67__opt_j6a_001,opt_j6a_001,J6A,Black Painted Calipers,sec_cali_001,wheels,2lt_c67,convertible,2LT,standard,True,0,,,,
-3lt_c67__opt_j6a_001,opt_j6a_001,J6A,Black Painted Calipers,sec_cali_001,wheels,3lt_c67,convertible,3LT,standard,True,0,,,,
-1lt_c07__opt_j6f_001,opt_j6f_001,J6F,Bright Red-Painted Calipers,sec_cali_001,wheels,1lt_c07,coupe,1LT,available,True,795,,,,
-2lt_c07__opt_j6f_001,opt_j6f_001,J6F,Bright Red-Painted Calipers,sec_cali_001,wheels,2lt_c07,coupe,2LT,available,True,795,,,,
-3lt_c07__opt_j6f_001,opt_j6f_001,J6F,Bright Red-Painted Calipers,sec_cali_001,wheels,3lt_c07,coupe,3LT,available,True,795,,,,
-1lt_c67__opt_j6f_001,opt_j6f_001,J6F,Bright Red-Painted Calipers,sec_cali_001,wheels,1lt_c67,convertible,1LT,available,True,795,,,,
-2lt_c67__opt_j6f_001,opt_j6f_001,J6F,Bright Red-Painted Calipers,sec_cali_001,wheels,2lt_c67,convertible,2LT,available,True,795,,,,
-3lt_c67__opt_j6f_001,opt_j6f_001,J6F,Bright Red-Painted Calipers,sec_cali_001,wheels,3lt_c67,convertible,3LT,available,True,795,,,,
-1lt_c07__opt_j6e_001,opt_j6e_001,J6E,Velocity Yellow-Painted Calipers,sec_cali_001,wheels,1lt_c07,coupe,1LT,available,True,795,,,,
-2lt_c07__opt_j6e_001,opt_j6e_001,J6E,Velocity Yellow-Painted Calipers,sec_cali_001,wheels,2lt_c07,coupe,2LT,available,True,795,,,,
-3lt_c07__opt_j6e_001,opt_j6e_001,J6E,Velocity Yellow-Painted Calipers,sec_cali_001,wheels,3lt_c07,coupe,3LT,available,True,795,,,,
-1lt_c67__opt_j6e_001,opt_j6e_001,J6E,Velocity Yellow-Painted Calipers,sec_cali_001,wheels,1lt_c67,convertible,1LT,available,True,795,,,,
-2lt_c67__opt_j6e_001,opt_j6e_001,J6E,Velocity Yellow-Painted Calipers,sec_cali_001,wheels,2lt_c67,convertible,2LT,available,True,795,,,,
-3lt_c67__opt_j6e_001,opt_j6e_001,J6E,Velocity Yellow-Painted Calipers,sec_cali_001,wheels,3lt_c67,convertible,3LT,available,True,795,,,,
-1lt_c07__opt_j6n_001,opt_j6n_001,J6N,Edge Red-Painted Calipers,sec_cali_001,wheels,1lt_c07,coupe,1LT,available,True,795,,,,
-2lt_c07__opt_j6n_001,opt_j6n_001,J6N,Edge Red-Painted Calipers,sec_cali_001,wheels,2lt_c07,coupe,2LT,available,True,795,,,,
-3lt_c07__opt_j6n_001,opt_j6n_001,J6N,Edge Red-Painted Calipers,sec_cali_001,wheels,3lt_c07,coupe,3LT,available,True,795,,,,
-1lt_c67__opt_j6n_001,opt_j6n_001,J6N,Edge Red-Painted Calipers,sec_cali_001,wheels,1lt_c67,convertible,1LT,available,True,795,,,,
-2lt_c67__opt_j6n_001,opt_j6n_001,J6N,Edge Red-Painted Calipers,sec_cali_001,wheels,2lt_c67,convertible,2LT,available,True,795,,,,
-3lt_c67__opt_j6n_001,opt_j6n_001,J6N,Edge Red-Painted Calipers,sec_cali_001,wheels,3lt_c67,convertible,3LT,available,True,795,,,,
-1lt_c07__opt_j6b_001,opt_j6b_001,J6B,Blue-Painted Calipers,sec_cali_001,wheels,1lt_c07,coupe,1LT,available,True,795,,,,
-2lt_c07__opt_j6b_001,opt_j6b_001,J6B,Blue-Painted Calipers,sec_cali_001,wheels,2lt_c07,coupe,2LT,available,True,795,,,,
-3lt_c07__opt_j6b_001,opt_j6b_001,J6B,Blue-Painted Calipers,sec_cali_001,wheels,3lt_c07,coupe,3LT,available,True,795,,,,
-1lt_c67__opt_j6b_001,opt_j6b_001,J6B,Blue-Painted Calipers,sec_cali_001,wheels,1lt_c67,convertible,1LT,available,True,795,,,,
-2lt_c67__opt_j6b_001,opt_j6b_001,J6B,Blue-Painted Calipers,sec_cali_001,wheels,2lt_c67,convertible,2LT,available,True,795,,,,
-3lt_c67__opt_j6b_001,opt_j6b_001,J6B,Blue-Painted Calipers,sec_cali_001,wheels,3lt_c67,convertible,3LT,available,True,795,,,,
+1lt_c07__opt_j6a_001,opt_j6a_001,J6A,Black Painted Calipers,sec_cali_001,wheels,1lt_c07,coupe,1LT,standard,True,0,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png,Black Painted Calipers,cover,center
+2lt_c07__opt_j6a_001,opt_j6a_001,J6A,Black Painted Calipers,sec_cali_001,wheels,2lt_c07,coupe,2LT,standard,True,0,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png,Black Painted Calipers,cover,center
+3lt_c07__opt_j6a_001,opt_j6a_001,J6A,Black Painted Calipers,sec_cali_001,wheels,3lt_c07,coupe,3LT,standard,True,0,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png,Black Painted Calipers,cover,center
+1lt_c67__opt_j6a_001,opt_j6a_001,J6A,Black Painted Calipers,sec_cali_001,wheels,1lt_c67,convertible,1LT,standard,True,0,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png,Black Painted Calipers,cover,center
+2lt_c67__opt_j6a_001,opt_j6a_001,J6A,Black Painted Calipers,sec_cali_001,wheels,2lt_c67,convertible,2LT,standard,True,0,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png,Black Painted Calipers,cover,center
+3lt_c67__opt_j6a_001,opt_j6a_001,J6A,Black Painted Calipers,sec_cali_001,wheels,3lt_c67,convertible,3LT,standard,True,0,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6a-c.png,Black Painted Calipers,cover,center
+1lt_c07__opt_j6f_001,opt_j6f_001,J6F,Bright Red-Painted Calipers,sec_cali_001,wheels,1lt_c07,coupe,1LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png,Bright Red-Painted Calipers,cover,center
+2lt_c07__opt_j6f_001,opt_j6f_001,J6F,Bright Red-Painted Calipers,sec_cali_001,wheels,2lt_c07,coupe,2LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png,Bright Red-Painted Calipers,cover,center
+3lt_c07__opt_j6f_001,opt_j6f_001,J6F,Bright Red-Painted Calipers,sec_cali_001,wheels,3lt_c07,coupe,3LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png,Bright Red-Painted Calipers,cover,center
+1lt_c67__opt_j6f_001,opt_j6f_001,J6F,Bright Red-Painted Calipers,sec_cali_001,wheels,1lt_c67,convertible,1LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png,Bright Red-Painted Calipers,cover,center
+2lt_c67__opt_j6f_001,opt_j6f_001,J6F,Bright Red-Painted Calipers,sec_cali_001,wheels,2lt_c67,convertible,2LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png,Bright Red-Painted Calipers,cover,center
+3lt_c67__opt_j6f_001,opt_j6f_001,J6F,Bright Red-Painted Calipers,sec_cali_001,wheels,3lt_c67,convertible,3LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6f-c.png,Bright Red-Painted Calipers,cover,center
+1lt_c07__opt_j6e_001,opt_j6e_001,J6E,Velocity Yellow-Painted Calipers,sec_cali_001,wheels,1lt_c07,coupe,1LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png,Velocity Yellow-Painted Calipers,cover,center
+2lt_c07__opt_j6e_001,opt_j6e_001,J6E,Velocity Yellow-Painted Calipers,sec_cali_001,wheels,2lt_c07,coupe,2LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png,Velocity Yellow-Painted Calipers,cover,center
+3lt_c07__opt_j6e_001,opt_j6e_001,J6E,Velocity Yellow-Painted Calipers,sec_cali_001,wheels,3lt_c07,coupe,3LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png,Velocity Yellow-Painted Calipers,cover,center
+1lt_c67__opt_j6e_001,opt_j6e_001,J6E,Velocity Yellow-Painted Calipers,sec_cali_001,wheels,1lt_c67,convertible,1LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png,Velocity Yellow-Painted Calipers,cover,center
+2lt_c67__opt_j6e_001,opt_j6e_001,J6E,Velocity Yellow-Painted Calipers,sec_cali_001,wheels,2lt_c67,convertible,2LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png,Velocity Yellow-Painted Calipers,cover,center
+3lt_c67__opt_j6e_001,opt_j6e_001,J6E,Velocity Yellow-Painted Calipers,sec_cali_001,wheels,3lt_c67,convertible,3LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6e-c.png,Velocity Yellow-Painted Calipers,cover,center
+1lt_c07__opt_j6n_001,opt_j6n_001,J6N,Edge Red-Painted Calipers,sec_cali_001,wheels,1lt_c07,coupe,1LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png,Edge Red-Painted Calipers,cover,center
+2lt_c07__opt_j6n_001,opt_j6n_001,J6N,Edge Red-Painted Calipers,sec_cali_001,wheels,2lt_c07,coupe,2LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png,Edge Red-Painted Calipers,cover,center
+3lt_c07__opt_j6n_001,opt_j6n_001,J6N,Edge Red-Painted Calipers,sec_cali_001,wheels,3lt_c07,coupe,3LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png,Edge Red-Painted Calipers,cover,center
+1lt_c67__opt_j6n_001,opt_j6n_001,J6N,Edge Red-Painted Calipers,sec_cali_001,wheels,1lt_c67,convertible,1LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png,Edge Red-Painted Calipers,cover,center
+2lt_c67__opt_j6n_001,opt_j6n_001,J6N,Edge Red-Painted Calipers,sec_cali_001,wheels,2lt_c67,convertible,2LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png,Edge Red-Painted Calipers,cover,center
+3lt_c67__opt_j6n_001,opt_j6n_001,J6N,Edge Red-Painted Calipers,sec_cali_001,wheels,3lt_c67,convertible,3LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6n-c.png,Edge Red-Painted Calipers,cover,center
+1lt_c07__opt_j6b_001,opt_j6b_001,J6B,Blue-Painted Calipers,sec_cali_001,wheels,1lt_c07,coupe,1LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png,Blue-Painted Calipers,cover,center
+2lt_c07__opt_j6b_001,opt_j6b_001,J6B,Blue-Painted Calipers,sec_cali_001,wheels,2lt_c07,coupe,2LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png,Blue-Painted Calipers,cover,center
+3lt_c07__opt_j6b_001,opt_j6b_001,J6B,Blue-Painted Calipers,sec_cali_001,wheels,3lt_c07,coupe,3LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png,Blue-Painted Calipers,cover,center
+1lt_c67__opt_j6b_001,opt_j6b_001,J6B,Blue-Painted Calipers,sec_cali_001,wheels,1lt_c67,convertible,1LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png,Blue-Painted Calipers,cover,center
+2lt_c67__opt_j6b_001,opt_j6b_001,J6B,Blue-Painted Calipers,sec_cali_001,wheels,2lt_c67,convertible,2LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png,Blue-Painted Calipers,cover,center
+3lt_c67__opt_j6b_001,opt_j6b_001,J6B,Blue-Painted Calipers,sec_cali_001,wheels,3lt_c67,convertible,3LT,available,True,795,https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-j6b.png,Blue-Painted Calipers,cover,center
 1lt_c07__opt_r6x_001,opt_r6x_001,R6X,Custom Interior Trim and Seat Combination,sec_colo_001,interior_trim,1lt_c07,coupe,1LT,unavailable,False,995,,,,
 2lt_c07__opt_r6x_001,opt_r6x_001,R6X,Custom Interior Trim and Seat Combination,sec_colo_001,interior_trim,2lt_c07,coupe,2LT,unavailable,False,995,,,,
 3lt_c07__opt_r6x_001,opt_r6x_001,R6X,Custom Interior Trim and Seat Combination,sec_colo_001,interior_trim,3lt_c07,coupe,3LT,unavailable,False,995,,,,
