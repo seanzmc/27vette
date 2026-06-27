@@ -335,43 +335,43 @@ Pass 13 retired only `runtime_rule_exceptions.ex_nwi_nga` by adding normal Sting
 
 ### Pass 14 — Stingray GBA/ZYC runtime-rule-exception retirement
 
-Status: implemented in `docs/audit-cleanup/pass-14-stingray-gba-zyc-runtime-rule-exception-retirement-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-14-stingray-gba-zyc-runtime-rule-exception-retirement-spec.md`.
 
 Pass 14 retired only `runtime_rule_exceptions.ex_gba_zyc` by adding normal Stingray grouped-exclusion ownership (`rule_groups.grp_gba_excludes_zyc` plus `rule_group_members` target `opt_zyc_001`), removing reverse direct rule `rule_mapping.rule_opt_zyc_001_excludes_opt_gba_001`, preserving `rule_mapping.rule_opt_zyc_001_includes_opt_drg_001`, and proving generated-data plus browser/runtime parity. Runtime JavaScript, Z51/FE1/FE2 exception behavior, variant override sheets, Grand Sport/Z06 source data, visual styling, and dealer submission behavior were unchanged.
 
 ### Pass 15 — Stingray Z51 suspension runtime-rule-exception retirement
 
-Status: implemented in `docs/audit-cleanup/pass-15-stingray-z51-suspension-runtime-rule-exception-retirement-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-15-stingray-z51-suspension-runtime-rule-exception-retirement-spec.md`.
 
 Pass 15 retired the final active Stingray `runtime_rule_exceptions` rows (`ex_z51_fe1`, `ex_z51_fe2`) by adding workbook-owned Z51 -> FE1 and Z51 -> FE2 direct replacement excludes with `runtime_action=replace`, removing obsolete reverse direct rule `rule_mapping.rule_opt_fe2_001_excludes_opt_z51_001`, and preserving `default_selection_rules.default_fe1`, Z51 -> FE3 include behavior, and FE4 requires/includes behavior. Generated-data plus local-browser parity proved FE2 selected first leaves Z51 clickable, selecting Z51 removes FE1/FE2, and FE3 remains auto-added. No runtime JavaScript, visual styling, dealer submission behavior, Grand Sport/Z06 source data, suspension grouped rule, or suspension exclusive group changed.
 
 ### Pass 16 — Variant override sheet semantics classification
 
-Status: completed report-only implementation in `docs/audit-cleanup/pass-16-variant-override-sheet-semantics-report.md`; closure recorded in `docs/audit-cleanup/pass-16-variant-override-sheet-semantics-report-spec.md`.
+Status: completed report-only implementation in `docs/archive/completed-specs/audit-cleanup/pass-16-variant-override-sheet-semantics-report.md`; closure recorded in `docs/archive/completed-specs/audit-cleanup/pass-16-variant-override-sheet-semantics-report-spec.md`.
 
 Pass 16 kept the workbook and generated artifacts read-only and classified the active variant override sheet behavior. It confirmed that `variant_option_overrides.active` is an emitted value for Stingray rows, while `grandSport_variant_overrides.active` and `z06_variant_overrides.active` are row activation flags. It also split the remaining override behavior into two implementation classes: BC7/NGA default-selected display metadata could move first through generator derivation from existing default-selection rules plus exclusive groups; UQT trim-standard placement/selectability needs a separate source-row remodel or constrained derivation design because OVS status rows do not carry selectability, display-only behavior, or per-variant section movement.
 
 ### Pass 17 — Default-selected display metadata derivation
 
-Status: implemented in `docs/audit-cleanup/pass-17-default-selected-display-metadata-derivation-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-17-default-selected-display-metadata-derivation-spec.md`.
 
 Pass 17 added narrow generator derivation for `display_behavior=default_selected` from workbook `default_selection_rules` plus active single-selection exclusive groups, guarded to Stingray `default_bc7`, Grand Sport `gs_default_bc7_coupe`, and Grand Sport `gs_default_nga_unless_nwi`. It then deleted only the redundant BC7/NGA rows from `variant_option_overrides` and `grandSport_variant_overrides`, preserved all UQT rows and `z06_variant_overrides`, regenerated Stingray/Grand Sport/registry artifacts, and proved timestamp-normalized generated parity plus local browser/runtime BC7/NGA/UQT behavior.
 
 ### Pass 18 — UQT single canonical option source ownership
 
-Status: implemented in `docs/audit-cleanup/pass-18-uqt-single-canonical-option-source-ownership-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-18-uqt-single-canonical-option-source-ownership-spec.md`.
 
 Pass 18 normalized UQT to one canonical active option row per active model while preserving selectable vs standard/display-only behavior. Stingray now uses canonical `opt_uqt_002` plus model-scoped `stingray_variant_overrides` for 2LT/3LT display-only trim placement; Grand Sport now uses canonical `opt_uqt_001` after deleting inactive duplicate `opt_uqt_002`; Z06 remains canonical on `opt_uqt_001` with no workbook or final generated-artifact change. The pass added generic Stingray production support for model-scoped override `section_id` and standard-preserving `display_only`, removed the global Stingray UQT suppression rows from `variant_option_overrides`, regenerated Stingray/Grand Sport/registry artifacts, restored Z06 timestamp churn after the Z06 gate, and proved behavior with targeted Node gates plus browser/runtime UQT proof.
 
 ### Pass 19 — Global variant option overrides retirement
 
-Status: implemented in `docs/audit-cleanup/pass-19-global-variant-option-overrides-retirement-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-19-global-variant-option-overrides-retirement-spec.md`.
 
 Pass 19 retired the empty historical global `variant_option_overrides` contract from the active workflow. It removed the global-first loader branch from `runtime_metadata.load_variant_option_overrides()`, deleted the physical empty `variant_option_overrides` worksheet after preflight proved no active model or row used it, kept all model-scoped variant override sheets intact, updated `AGENTS.md`, and added tests proving a reintroduced global row cannot shadow configured model-scoped overrides. Regenerated Stingray, Grand Sport, Z06, and registry artifacts were timestamp-normalized identical to the pre-pass snapshots, so final generated artifact diffs were restored.
 
 ### Pass 20 — Variant topology clarification
 
-Status: implemented in `docs/audit-cleanup/pass-20-variant-topology-clarification-spec.md`.
+Status: implemented in `docs/archive/completed-specs/audit-cleanup/pass-20-variant-topology-clarification-spec.md`.
 
 Pass 20 clarified that `variant_master` owns variant facts and active/usable fact-row status, while `model_variants` owns model membership and generated order. It aligned the six active Grand Sport memberships by setting the matching Grand Sport `variant_master.active` cells to `True`, added schema/test guards so active model variants for active models must reference existing active variant fact rows, and regenerated Grand Sport plus the registry. The only allowed generated drift was Grand Sport `variants[*].source_active` changing from `"False"` to `"True"` in both `form-output/runtime/grand-sport-runtime-contract.json` and `form-app/data.js`; Stingray and Z06 runtime contracts remained timestamp-normalized identical.
 
