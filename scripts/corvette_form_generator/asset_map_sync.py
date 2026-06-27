@@ -31,11 +31,16 @@ from corvette_form_generator.workbook import clean, rows_from_sheet, save_workbo
 SITE = "stingraychevroletcorvette.com"
 MEDIA_ENDPOINT = f"https://{SITE}/wp-json/wp/v2/media"
 PATH_FILTER = "/wp-content/uploads/pictures/27vette/"
+WORDPRESS_USER_AGENT = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+    "AppleWebKit/537.36 Chrome/125 Safari/537.36 27vette-asset-map-sync/1.0"
+)
 ASSET_SHEET = "asset_map"
 TARGET_TYPE = "option"
 NEW_ROW_FIT = "cover"
 NEW_ROW_POSITION = "center"
 NEW_ROW_NOTE = "auto-seeded"
+MISSING_IMAGE_ACTIONS = {"flag_missing", "flag_ambiguous", "flag_dead_no_match"}
 
 IMGI_RE = re.compile(r"^imgi_\d+_(.+)$")
 PREFIX_RE = re.compile(r"^([cehrsg])-(.+)$")
@@ -55,6 +60,7 @@ MODEL_PREFIX = {
 @dataclass(frozen=True)
 class SyncResult:
     report_path: Path
+    missing_path: Path
     unmatched_path: Path
     manifest_path: Path
     url_write_count: int
@@ -63,6 +69,10 @@ class SyncResult:
     unmatched_count: int
     unparseable_count: int
     backup_path: Path | None = None
+
+
+class WordPressMediaFetchError(RuntimeError):
+    """Raised when live WordPress media fetch is blocked with actionable guidance."""
 
 
 @dataclass(frozen=True)
@@ -129,7 +139,7 @@ def _auth_header_from_env() -> str | None:
 
 
 def _open_json(url: str, *, auth_header: str | None, timeout: float) -> tuple[list[dict[str, Any]], dict[str, str]]:
-    headers = {"Accept": "application/json"}
+    headers = {"Accept": "application/json", "User-Agent": WORDPRESS_USER_AGENT}
     if auth_header:
         headers["Authorization"] = auth_header
     request = Request(url, headers=headers)
@@ -137,6 +147,14 @@ def _open_json(url: str, *, auth_header: str | None, timeout: float) -> tuple[li
         payload = json.loads(response.read().decode("utf-8"))
         response_headers = {key.lower(): value for key, value in response.headers.items()}
     return payload, response_headers
+
+
+def _media_fetch_error(exc: HTTPError, api_url: str) -> WordPressMediaFetchError:
+    return WordPressMediaFetchError(
+        f"WordPress media fetch failed with HTTP {exc.code} from {api_url}. "
+        "If media is private, set WP_USER/WP_APP_PASSWORD; otherwise use "
+        "--media-url-list <path> for deterministic report/apply review."
+    )
 
 
 def fetch_media(timeout: float, modified_after: str | None = None) -> list[str]:
@@ -160,6 +178,8 @@ def fetch_media(timeout: float, modified_after: str | None = None) -> list[str]:
         except HTTPError as exc:
             if exc.code == 400 and page > 1:
                 break
+            if exc.code in {401, 403}:
+                raise _media_fetch_error(exc, api_url) from exc
             raise
         if not batch:
             break
@@ -287,7 +307,13 @@ def read_option_sheets(wb, sources: dict[str, str]) -> dict[tuple[str, str], dic
                 continue
             rpo = clean(row[index["rpo"]]).lower()
             name = clean(row[index["option_name"]]) if "option_name" in index else ""
-            desired[(model_key, option_id)] = {"rpo": rpo, "name": name, "source_sheet": sheet_name}
+            section_id = clean(row[index["section_id"]]).lower() if "section_id" in index else ""
+            desired[(model_key, option_id)] = {
+                "rpo": rpo,
+                "name": name,
+                "section_id": section_id,
+                "source_sheet": sheet_name,
+            }
     return desired
 
 
@@ -361,8 +387,10 @@ def reconcile(
                 "scope": scope,
                 "model_key": model_key,
                 "source_sheet": source_sheet,
+                "section_id": desired.get((model_key, target_id), {}).get("section_id", ""),
                 "target_id": target_id,
                 "rpo": rpo,
+                "option_name": desired.get((model_key, target_id), {}).get("name", ""),
                 "action": action,
                 "candidate_source": source,
                 "existing_url": existing_url,
@@ -456,28 +484,54 @@ def _ensure_asset_headers(headers: list[str]) -> dict[str, int]:
     return index
 
 
-def _write_reports(report_dir: Path, report: list[dict[str, str]], unmatched: list[str], unparseable: list[str], incremental: bool) -> tuple[Path, Path]:
+def _write_reports(
+    report_dir: Path,
+    report: list[dict[str, str]],
+    unmatched: list[str],
+    unparseable: list[str],
+    incremental: bool,
+) -> tuple[Path, Path, Path, int]:
     report_dir.mkdir(parents=True, exist_ok=True)
     report_path = report_dir / "asset_map_sync_report.csv"
+    report_fieldnames = [
+        "scope",
+        "model_key",
+        "source_sheet",
+        "section_id",
+        "target_id",
+        "rpo",
+        "option_name",
+        "action",
+        "candidate_source",
+        "existing_url",
+        "new_url",
+        "image_status",
+        "note",
+    ]
     with report_path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(
-            handle,
-            fieldnames=[
-                "scope",
-                "model_key",
-                "source_sheet",
-                "target_id",
-                "rpo",
-                "action",
-                "candidate_source",
-                "existing_url",
-                "new_url",
-                "image_status",
-                "note",
-            ],
-        )
+        writer = csv.DictWriter(handle, fieldnames=report_fieldnames)
         writer.writeheader()
         writer.writerows(report)
+
+    missing_path = report_dir / "asset_map_missing_images.csv"
+    missing_fieldnames = [
+        "model_key",
+        "source_sheet",
+        "section_id",
+        "target_id",
+        "rpo",
+        "option_name",
+        "action",
+        "candidate_source",
+        "image_status",
+        "note",
+    ]
+    missing_rows = [row for row in report if row["action"] in MISSING_IMAGE_ACTIONS]
+    with missing_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=missing_fieldnames)
+        writer.writeheader()
+        for row in missing_rows:
+            writer.writerow({field: row.get(field, "") for field in missing_fieldnames})
 
     unmatched_path = report_dir / "asset_map_unmatched_media.csv"
     reason = "new media in window, no row yet" if incremental else "no desired (model, rpo) for this file"
@@ -489,7 +543,7 @@ def _write_reports(report_dir: Path, report: list[dict[str, str]], unmatched: li
             writer.writerow([url, model_key or "", rpo, reason])
         for url in unparseable:
             writer.writerow([url, "", "", "filename did not yield a 3-char RPO"])
-    return report_path, unmatched_path
+    return report_path, missing_path, unmatched_path, len(missing_rows)
 
 
 def _write_manifest(
@@ -513,6 +567,8 @@ def _write_manifest(
     unmatched_count: int,
     unparseable_count: int,
     report_path: Path,
+    missing_path: Path,
+    missing_count: int,
     unmatched_path: Path,
 ) -> Path:
     manifest_path = report_dir / "asset_map_sync_manifest.json"
@@ -541,6 +597,8 @@ def _write_manifest(
         "unmatched_count": unmatched_count,
         "unparseable_count": unparseable_count,
         "report_path": str(report_path),
+        "missing_images_path": str(missing_path),
+        "missing_images_count": missing_count,
         "unmatched_path": str(unmatched_path),
     }
     manifest_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -652,7 +710,13 @@ def run_sync(
     finally:
         plan_wb.close()
 
-    report_path, unmatched_path = _write_reports(report_dir, plan.report, unmatched, unparseable, incremental)
+    report_path, missing_path, unmatched_path, missing_count = _write_reports(
+        report_dir,
+        plan.report,
+        unmatched,
+        unparseable,
+        incremental,
+    )
     action_counts = dict(Counter(row["action"] for row in plan.report))
 
     if apply:
@@ -688,11 +752,14 @@ def run_sync(
         unmatched_count=len(unmatched),
         unparseable_count=len(unparseable),
         report_path=report_path,
+        missing_path=missing_path,
+        missing_count=missing_count,
         unmatched_path=unmatched_path,
     )
 
     return SyncResult(
         report_path=report_path,
+        missing_path=missing_path,
         unmatched_path=unmatched_path,
         manifest_path=manifest_path,
         url_write_count=len(plan.url_writes),
@@ -735,7 +802,11 @@ def main(argv: list[str] | None = None) -> int:
         media_source = "live"
         label = f"incremental after {modified_after}" if modified_after else "full"
         print(f"Pulling media [{label}] ...")
-        media_urls = fetch_media(args.timeout, modified_after)
+        try:
+            media_urls = fetch_media(args.timeout, modified_after)
+        except WordPressMediaFetchError as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
         print(f"  {len(media_urls)} images under {PATH_FILTER}")
 
     result = run_sync(
@@ -759,7 +830,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  {action:<30} {count}")
     print(f"  {'unmatched media':<30} {result.unmatched_count}")
     print(f"  {'unparseable files':<30} {result.unparseable_count}")
-    print(f"\nReports: {result.report_path}\n         {result.unmatched_path}\nManifest: {result.manifest_path}")
+    print(
+        f"\nReports: {result.report_path}\n"
+        f"         {result.missing_path}\n"
+        f"         {result.unmatched_path}\n"
+        f"Manifest: {result.manifest_path}"
+    )
 
     if args.apply:
         print(f"\nAPPLIED: {result.url_write_count} url change(s), {result.insert_count} row insert(s).")

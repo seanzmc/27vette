@@ -776,8 +776,9 @@ Companion-file impact:
 Residual risks / follow-up:
 
 - Live WordPress media fetch from the sync CLI still returns 403 with the default Python urllib user agent; this pass used the reviewed media-url-list workflow instead of changing sync fetch behavior.
+  - Historical note: the follow-up closure spec `.hermes/plans/asset-map-sync-closure-spec.md` handles the live-fetch hardening and dedicated missing-images artifact.
 - Red shade distinctions remain visually close; the browser smoke verified images render but did not independently certify color accuracy beyond filename/RPO and visual class.
-- The remaining `flag_missing`, unmatched media, and unparseable filename rows remain out of scope.
+- The remaining `flag_missing`, unmatched media, and unparseable filename rows remain out of scope for this apply pass; the closure spec adds a report artifact for that triage surface.
 
 ## Historical Approval Prompt
 

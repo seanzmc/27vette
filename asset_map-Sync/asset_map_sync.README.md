@@ -21,17 +21,18 @@ The supported command:
 - defaults to dry-run/report mode;
 - resolves default scope from promoted runtime models in `model_registry_promotion`;
 - resolves each model's option sheet through `model_workbook_sources`;
-- uses stdlib HTTP, with optional `WP_USER` / `WP_APP_PASSWORD` only when the public media endpoint requires auth;
+- uses stdlib HTTP with an explicit browser-like User-Agent, with optional `WP_USER` / `WP_APP_PASSWORD` only when the public media endpoint requires auth;
 - supports deterministic validation with `--media-url-list tests/fixtures/asset-map-sync-media-urls.txt`;
-- writes CSV reports plus `asset_map_sync_manifest.json` to `--report-dir`;
+- writes review reports plus `asset_map_sync_manifest.json` to `--report-dir`;
 - keeps dry-run/report mode read-only with respect to workbook rows and state files;
 - saves workbook changes only when `--apply` is passed, through `save_workbook_safely()`.
 
-Treat `asset_map_sync_manifest.json` as the review contract for a run. It records
-the workbook path/sheet, included promoted model option sheets, media source mode,
-`--since` state handling, existing URL verification mode, action counts, planned
-URL writes/inserts, unmatched media count, unparseable filename count, and report
-paths.
+Report outputs:
+
+- `asset_map_sync_report.csv`: full reconciliation report.
+- `asset_map_missing_images.csv`: review-only list of active/selectable options whose image coverage is missing, ambiguous, or dead with no candidate. This file is for triage; it does not imply blank-row seeding or automatic workbook edits.
+- `asset_map_unmatched_media.csv`: uploaded media that did not map to a desired active option target, plus unparseable filenames.
+- `asset_map_sync_manifest.json`: run contract with workbook path/sheet, included promoted model option sheets, media source mode, `--since` state handling, existing URL verification mode, action counts, planned URL writes/inserts, missing-image count/path, unmatched media count/path, unparseable filename count, and report paths.
 
 Blank-row seeding, stale-row deactivation, and workbook schema/status-column
 changes are not routine asset-map maintenance. They need a separate approved

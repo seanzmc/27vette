@@ -6,7 +6,10 @@ from __future__ import annotations
 import subprocess
 import sys
 import json
+import csv
+from email.message import Message
 from pathlib import Path
+from urllib.error import HTTPError
 
 import pytest
 from openpyxl import Workbook, load_workbook
@@ -107,6 +110,139 @@ def make_apply_workbook(path: Path) -> None:
     )
     wb.save(path)
     wb.close()
+
+
+class FakeJsonResponse:
+    def __init__(self, payload: bytes = b"[]", headers: dict[str, str] | None = None) -> None:
+        self.payload = payload
+        self.headers = headers or {}
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, traceback) -> None:
+        return None
+
+    def read(self) -> bytes:
+        return self.payload
+
+
+def make_missing_report_workbook(path: Path) -> None:
+    wb = Workbook()
+    del wb[wb.sheetnames[0]]
+    add_sheet(
+        wb,
+        "model_registry_promotion",
+        ["model_key", "promoted_to_runtime", "active", "display_order"],
+        [
+            {"model_key": "stingray", "promoted_to_runtime": True, "active": True, "display_order": 1},
+            {"model_key": "grand_sport", "promoted_to_runtime": True, "active": True, "display_order": 2},
+        ],
+    )
+    add_sheet(
+        wb,
+        "model_workbook_sources",
+        ["model_key", "source_role", "sheet_name", "active"],
+        [
+            {"model_key": "stingray", "source_role": "source_option_sheet", "sheet_name": "stingray_options", "active": True},
+            {"model_key": "grand_sport", "source_role": "source_option_sheet", "sheet_name": "grandSport_options", "active": True},
+        ],
+    )
+    option_headers = ["option_id", "rpo", "option_name", "section_id", "active", "selectable"]
+    add_sheet(
+        wb,
+        "stingray_options",
+        option_headers,
+        [
+            {"option_id": "opt_gba_001", "rpo": "GBA", "option_name": "Black", "section_id": "sec_paint_001", "active": True, "selectable": True},
+            {"option_id": "opt_noimg_001", "rpo": "NIX", "option_name": "No Image", "section_id": "sec_test_001", "active": True, "selectable": True},
+            {"option_id": "opt_stx_001", "rpo": "STX", "option_name": "Stripe", "section_id": "sec_stripe_001", "active": True, "selectable": True},
+        ],
+    )
+    add_sheet(
+        wb,
+        "grandSport_options",
+        option_headers,
+        [
+            {"option_id": "opt_gba_002", "rpo": "GBA", "option_name": "Black GS", "section_id": "sec_paint_001", "active": True, "selectable": True},
+        ],
+    )
+    add_sheet(
+        wb,
+        "asset_map",
+        ["model_key", "target_type", "target_id", "image_url", "image_alt", "image_fit", "image_position", "active", "notes"],
+        [
+            {
+                "model_key": "stingray",
+                "target_type": "option",
+                "target_id": "opt_gba_001",
+                "image_url": "https://example.test/current-gba.png",
+                "image_alt": "Black",
+                "image_fit": "cover",
+                "image_position": "center",
+                "active": True,
+                "notes": "existing",
+            },
+        ],
+    )
+    wb.save(path)
+    wb.close()
+
+
+def test_open_json_sends_browser_like_user_agent(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: dict[str, str | None] = {}
+
+    def fake_urlopen(request, timeout):
+        captured["accept"] = request.get_header("Accept")
+        captured["user_agent"] = request.get_header("User-agent")
+        return FakeJsonResponse(b"[]", {"X-WP-TotalPages": "1"})
+
+    monkeypatch.setattr(asset_map_sync, "urlopen", fake_urlopen)
+
+    payload, headers = asset_map_sync._open_json("https://example.test/wp-json/wp/v2/media", auth_header=None, timeout=1)
+
+    assert payload == []
+    assert headers == {"x-wp-totalpages": "1"}
+    assert captured["accept"] == "application/json"
+    assert captured["user_agent"]
+    assert "Mozilla/5.0" in captured["user_agent"]
+
+
+def test_open_json_preserves_optional_basic_auth_header(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: dict[str, str | None] = {}
+    monkeypatch.setenv("WP_USER", "media-user")
+    monkeypatch.setenv("WP_APP_PASSWORD", "app pass")
+
+    def fake_urlopen(request, timeout):
+        captured["authorization"] = request.get_header("Authorization")
+        captured["user_agent"] = request.get_header("User-agent")
+        return FakeJsonResponse()
+
+    monkeypatch.setattr(asset_map_sync, "urlopen", fake_urlopen)
+
+    asset_map_sync._open_json(
+        "https://example.test/wp-json/wp/v2/media",
+        auth_header=asset_map_sync._auth_header_from_env(),
+        timeout=1,
+    )
+
+    assert captured["authorization"]
+    assert captured["authorization"].startswith("Basic ")
+    assert captured["user_agent"]
+
+
+def test_fetch_media_403_mentions_media_url_list_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
+    def blocked(url, *, auth_header, timeout):
+        raise HTTPError(url, 403, "Forbidden", Message(), None)
+
+    monkeypatch.setattr(asset_map_sync, "_open_json", blocked)
+
+    with pytest.raises(Exception) as excinfo:
+        asset_map_sync.fetch_media(timeout=1)
+
+    message = str(excinfo.value)
+    assert "HTTP 403" in message
+    assert "--media-url-list" in message
 
 
 def test_parse_media_requires_hyphen_for_model_prefix() -> None:
@@ -265,6 +401,66 @@ def test_report_manifest_records_source_inventory_and_counts(tmp_path: Path) -> 
     assert Path(manifest["report_path"]).name == "asset_map_sync_report.csv"
     assert Path(manifest["unmatched_path"]).name == "asset_map_unmatched_media.csv"
     assert result.manifest_path == report_dir / "asset_map_sync_manifest.json"
+
+
+def test_missing_images_artifact_written_and_manifested(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "missing-report.xlsx"
+    make_missing_report_workbook(workbook_path)
+    report_dir = tmp_path / "reports"
+
+    result = asset_map_sync.run_sync(
+        workbook_path=workbook_path,
+        report_dir=report_dir,
+        media_urls=[
+            "https://example.test/gba.png",
+            "https://example.test/c-stx.png",
+            "https://example.test/abc.png",
+        ],
+        apply=False,
+        verify_existing=False,
+        media_source="media-url-list",
+    )
+
+    manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
+    missing_path = report_dir / "asset_map_missing_images.csv"
+    assert result.missing_path == missing_path
+    assert Path(manifest["missing_images_path"]) == missing_path
+
+    rows = list(csv.DictReader(missing_path.open(encoding="utf-8")))
+    assert manifest["missing_images_count"] == len(rows) == 2
+    assert {(row["target_id"], row["action"]) for row in rows} == {
+        ("opt_noimg_001", "flag_missing"),
+        ("opt_gba_002", "flag_ambiguous"),
+    }
+    assert rows[0]["section_id"] == "sec_test_001"
+    assert rows[0]["option_name"] == "No Image"
+
+
+def test_missing_images_artifact_excludes_keep_insert_and_unmatched(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "missing-filter.xlsx"
+    make_missing_report_workbook(workbook_path)
+    report_dir = tmp_path / "reports"
+
+    result = asset_map_sync.run_sync(
+        workbook_path=workbook_path,
+        report_dir=report_dir,
+        media_urls=[
+            "https://example.test/gba.png",
+            "https://example.test/c-stx.png",
+            "https://example.test/abc.png",
+        ],
+        apply=False,
+        verify_existing=False,
+        media_source="media-url-list",
+    )
+
+    rows = list(csv.DictReader(result.missing_path.open(encoding="utf-8")))
+    assert {row["action"] for row in rows} <= {"flag_missing", "flag_ambiguous", "flag_dead_no_match"}
+    assert "opt_gba_001" not in {row["target_id"] for row in rows}
+    assert "opt_stx_001" not in {row["target_id"] for row in rows}
+    unmatched_rows = list(csv.DictReader(result.unmatched_path.open(encoding="utf-8")))
+    assert {row["parsed_rpo"] for row in unmatched_rows} == {"abc", "gba"}
+    assert "abc" not in {row["rpo"] for row in rows}
 
 
 def test_dry_run_reports_without_saving_workbook_rows_or_state(tmp_path: Path) -> None:
