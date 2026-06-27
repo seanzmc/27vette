@@ -1,6 +1,6 @@
 # Asset Map Sync Module Setup Spec
 
-Status: Spec only. Do not implement until approved.
+Status: Implemented on 2026-06-26.
 Date: 2026-06-26
 Recommended reasoning level for Sean: high
 
@@ -325,11 +325,55 @@ Treat live WordPress fetch as optional because network/media-library state is ex
 - No workbook rollback should be needed because this pass must not save `stingray_master.xlsx`.
 - No generated artifact rollback should be needed; restore from git if accidental generation occurs.
 
-## Approval Prompt
+## Completion Notes
 
-Approve this asset-map sync module setup pass?
+Implemented on 2026-06-26 after approval.
 
-Recommended scope: refactor/report-contract hardening only; no real workbook apply, no generated artifact refresh, no dependency change, no runtime behavior change.
+Changed files:
+
+- `scripts/corvette_form_generator/asset_map_sync.py`
+  - Added explicit plan/report/apply separation with `SyncPlan`, `build_sync_plan()`, and `apply_sync_plan()`.
+  - Added `asset_map_sync_manifest.json` output on successful runs.
+  - Dry-run/report mode now builds the plan without mutating workbook rows or state.
+  - Apply mode consumes the already-built plan, uses `save_workbook_safely()`, and advances `.asset_map_sync_state.json` only after successful safe-save when `--since auto` is used.
+  - Removed supported CLI exposure for `--status-col`, `--deactivate-stale`, and `--seed-blank-missing`.
+- `tests/test_asset_map_sync.py`
+  - Added coverage for manifest required fields, included promoted sources, dry-run no-save/no-state behavior, unsupported mutating flag rejection, and apply-success/apply-failure state boundaries.
+- `asset_map-Sync/asset_map_sync.README.md`
+  - Documented the report-first workflow, deterministic fixture run, manifest review contract, and excluded schema/lifecycle mutations.
+- `.hermes/plans/asset-map-sync-module-setup-spec.md`
+  - Marked this spec implemented and recorded completion evidence.
+
+Companion-file impact:
+
+- Workbook/source data — inspected-no-change. `stingray_master.xlsx` was not saved or modified.
+- Generated runtime contracts — not applicable / unchanged. No generation or registry publication was run.
+- Runtime JS/CSS/HTML — not applicable / unchanged.
+- Tests — updated in `tests/test_asset_map_sync.py`.
+- Workbook-editor gate reminders — inspected-no-change for `scripts/corvette_form_generator/editor_ops.py` and `tests/test_editor_ops_apply.py`; no editor reminder contract changed.
+- Dependencies — inspected-no-change for `requirements.txt`; no dependency added.
+- Docs/specs — updated README and this spec. `AGENTS.md` inspected-no-change; standing command guidance remains current.
+- Gate reminders / worker guidance — inspected-no-change; no checked-in `27vette-gate` file exists in the repo.
+- Profile/Codex guidance — not applicable; no Hermes profile skills were edited.
+
+Gate results:
+
+- Preflight passed: `git status --short --branch`, `git branch --show-current`, `.venv/bin/python scripts/sync_asset_map.py --help`.
+- RED verification before implementation: `.venv/bin/python -m pytest tests/test_asset_map_sync.py -q` failed with the expected missing manifest/API and unsupported-flag help assertions.
+- After implementation passed:
+  - `.venv/bin/python -m py_compile scripts/corvette_form_generator/asset_map_sync.py scripts/sync_asset_map.py asset_map-Sync/asset_map_sync.py`
+  - `.venv/bin/python scripts/sync_asset_map.py --help`
+  - `.venv/bin/python -m pytest tests/test_asset_map_sync.py -q` (`10 passed`)
+  - `.venv/bin/python scripts/sync_asset_map.py --workbook stingray_master.xlsx --report-dir /tmp/asset-map-sync-module-setup --media-url-list tests/fixtures/asset-map-sync-media-urls.txt --no-verify-existing`
+  - `.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx`
+  - `.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx`
+  - `git diff --check -- scripts/corvette_form_generator/asset_map_sync.py scripts/sync_asset_map.py asset_map-Sync/asset_map_sync.py asset_map-Sync/asset_map_sync.README.md tests/test_asset_map_sync.py tests/fixtures/asset-map-sync-media-urls.txt AGENTS.md .hermes/plans/asset-map-sync-module-setup-spec.md`
+  - `git diff --exit-code -- stingray_master.xlsx form-output/runtime form-output/stingray-form-data.json form-output/stingray-form-data.csv form-app/data.js`
+
+Residual risks / follow-up:
+
+- Live WordPress media state remains mutable; required validation used the deterministic fixture list.
+- `--apply` still exists for temp/test-covered plan application, but a real canonical-workbook apply remains out of scope until a separate reviewed apply spec classifies the actual candidate rows.
 
 ## Recommended Next Pass After This One
 

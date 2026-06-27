@@ -9,6 +9,13 @@ Use the safe project command instead:
 .venv/bin/python scripts/sync_asset_map.py --workbook stingray_master.xlsx --report-dir /tmp/asset-map-sync
 ```
 
+For deterministic review/test runs, avoid live WordPress state and use the
+checked-in fixture list:
+
+```sh
+.venv/bin/python scripts/sync_asset_map.py --workbook stingray_master.xlsx --report-dir /tmp/asset-map-sync --media-url-list tests/fixtures/asset-map-sync-media-urls.txt --no-verify-existing
+```
+
 The supported command:
 
 - defaults to dry-run/report mode;
@@ -16,8 +23,23 @@ The supported command:
 - resolves each model's option sheet through `model_workbook_sources`;
 - uses stdlib HTTP, with optional `WP_USER` / `WP_APP_PASSWORD` only when the public media endpoint requires auth;
 - supports deterministic validation with `--media-url-list tests/fixtures/asset-map-sync-media-urls.txt`;
-- writes reports to `--report-dir`;
+- writes CSV reports plus `asset_map_sync_manifest.json` to `--report-dir`;
+- keeps dry-run/report mode read-only with respect to workbook rows and state files;
 - saves workbook changes only when `--apply` is passed, through `save_workbook_safely()`.
+
+Treat `asset_map_sync_manifest.json` as the review contract for a run. It records
+the workbook path/sheet, included promoted model option sheets, media source mode,
+`--since` state handling, existing URL verification mode, action counts, planned
+URL writes/inserts, unmatched media count, unparseable filename count, and report
+paths.
+
+Blank-row seeding, stale-row deactivation, and workbook schema/status-column
+changes are not routine asset-map maintenance. They need a separate approved
+workbook-data spec before being reintroduced or applied to `stingray_master.xlsx`.
+
+Do not use `--apply` on the canonical workbook from a fresh live media pull. A
+real apply requires a reviewed manifest/report and separate approval for the
+specific workbook row changes.
 
 After any real workbook apply, run:
 
