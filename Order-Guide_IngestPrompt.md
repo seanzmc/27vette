@@ -32,7 +32,18 @@ form-output/ingest/<run-id>/disclosure-links.json
 form-output/ingest/<run-id>/checkpoint-report.md
 ```
 
-Candidate-normalizer output such as `candidate-options.json`, `candidate-ovs.json`, `candidate-rules.json`, `candidate-price-rules.json`, and `unresolved-review.md` belongs to a later approved pass after the evidence profiler is proven.
+Pass 1 is the CLI candidate normalizer. It may write only run-scoped transient candidate/review artifacts outside the workbook, for example:
+
+```text
+form-output/ingest/<run-id>/candidate-options.json
+form-output/ingest/<run-id>/candidate-ovs.json
+form-output/ingest/<run-id>/candidate-rules.json
+form-output/ingest/<run-id>/candidate-price-rules.json
+form-output/ingest/<run-id>/candidate-summary.json
+form-output/ingest/<run-id>/unresolved-review.md
+```
+
+Candidate-normalizer artifacts are not approved workbook rows.
 
 Canonical workbook writes require a separate reviewed apply pass after candidate normalization and human/product review.
 
@@ -90,11 +101,12 @@ Candidate variant IDs must later reconcile with `variant_master` and `model_vari
 
 Preserve every raw status cell exactly before normalization.
 
-Candidate normalized status values may only map to canonical OVS values:
+Candidate normalized status values may only map to canonical OVS values or explicit unresolved review state:
 
 - `standard`
 - `available`
 - `unavailable`
+- `unresolved`
 
 Common source mapping guidance:
 

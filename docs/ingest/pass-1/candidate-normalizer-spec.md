@@ -2,7 +2,7 @@
 
 Date: 2026-06-27
 Branch: `ingest-wizard-pass1-spec`
-Status: Spec only. Do not implement until approved.
+Status: Implemented 2026-06-27.
 Recommended reasoning level for implementation agent: high.
 
 ## Purpose
@@ -409,12 +409,88 @@ git status --short -- form-output
 
 No Node runtime tests are required unless the implementation touches runtime/generated/browser files, which would be a scope violation.
 
-## Approval question
+## Implementation completion — 2026-06-27
 
-Approve Pass 1 implementation as scoped here: a CLI-only, read-only candidate normalizer that consumes Pass 0 evidence, emits transient candidate/unresolved artifacts, and performs no workbook/generated/runtime/app writes?
+Implemented after approval as a CLI-only, read-only normalizer.
 
-Recommended approval: yes, if the candidate artifact boundaries are strict enough and price/interior extraction should stay out of this pass.
+Changed files:
+
+- `scripts/order_guide_candidate_normalizer.py` — new CLI entry point for Pass 1 candidate normalization.
+- `scripts/corvette_form_generator/ingest/candidate_normalizer.py` — loads Pass 0 evidence, validates manifest/artifact shapes, builds option/OVS/rule candidates, preserves out-of-scope price/interior boundaries, writes unresolved review output, and reuses the ingest output path guard.
+- `tests/test_order_guide_candidate_normalizer.py` — focused fixture tests for option/OVS/rule candidate output, failed-manifest rejection, and generated-output path rejection.
+- `Order-Guide_IngestPrompt.md` — updated to describe Pass 1 transient candidate artifacts and explicit unresolved status state.
+- `docs/ingest/README.md` — marked Pass 1 candidate normalizer as implemented.
+- `docs/ingest/pass-1/candidate-normalizer-spec.md` — closed this spec with implementation evidence.
+
+Implemented behavior:
+
+- CLI command:
+
+```sh
+.venv/bin/python scripts/order_guide_candidate_normalizer.py \
+  --evidence-dir /tmp/27vette-pass1-smoke-evidence \
+  --workbook stingray_master.xlsx \
+  --run-id pass1-smoke-candidates \
+  --output-dir /tmp/27vette-pass1-smoke-candidates
+```
+
+- Emits:
+  - `candidate-options.json`
+  - `candidate-ovs.json`
+  - `candidate-rules.json`
+  - `candidate-price-rules.json`
+  - `candidate-summary.json`
+  - `unresolved-review.md`
+- Requires Pass 0 `manifest.json` status `passed`.
+- Refuses protected generated-output paths outside approved ingest output roots.
+- Preserves artifact-local candidate IDs as `candidate_*` values, not workbook IDs.
+- Emits price candidates as an empty list and reports `price_schedule_rows_not_extracted` because Pass 0 currently records price schedule layout evidence only.
+- Reports `color_trim_rows_not_extracted` because Pass 0 currently records Color and Trim layout evidence only.
+
+Manual smoke result against the real raw export through fresh Pass 0 evidence:
+
+```text
+candidate_counts:
+  options: 1744
+  ovs: 11244
+  rules: 791
+  price_rules: 0
+unresolved_counts:
+  color_trim_rows_not_extracted: 2
+  disclosure_relationship_requires_review: 8
+  missing_or_invalid_primary_rpo: 208
+  price_schedule_rows_not_extracted: 1
+  section_context_requires_review: 12
+  target_rpo_token_ambiguous_or_missing: 707
+```
+
+Validation evidence:
+
+```sh
+.venv/bin/python -m pytest tests/test_order_guide_candidate_normalizer.py -q
+# 3 passed
+
+.venv/bin/python scripts/order_guide_ingest_profiler.py \
+  --raw-export "2027 Chevrolet Car Corvette Export_RAW.xlsx" \
+  --workbook stingray_master.xlsx \
+  --run-id pass1-smoke-evidence \
+  --output-dir /tmp/27vette-pass1-smoke-evidence
+# status: passed; raw_row_count: 1964; variant_column_count: 130; disclosure_link_count: 1088
+
+.venv/bin/python scripts/order_guide_candidate_normalizer.py \
+  --evidence-dir /tmp/27vette-pass1-smoke-evidence \
+  --workbook stingray_master.xlsx \
+  --run-id pass1-smoke-candidates \
+  --output-dir /tmp/27vette-pass1-smoke-candidates
+# status: passed; candidate artifacts written under /tmp
+```
+
+Residual risks:
+
+- Rule candidates are still review-only phrase/token hints. They are not direct workbook `rule_mapping`, group, or exclusive-group rows.
+- Price Schedule and Color and Trim need later evidence extractors before price/interior/color candidates can be reliable.
+- Candidate option copy is raw source text. Customer-facing copy cleanup remains a later review concern.
 
 ## Expected next pass after Pass 1
 
-After CLI candidate artifacts are proven, the next safe pass is a review UI / interactive wizard spec. That UI should display candidate rows next to exact source evidence and current workbook context, but still avoid workbook writes until a later controlled apply pass is approved.
+After CLI candidate artifacts are reviewed and proven useful, the next safe pass is a review UI / interactive wizard spec. That UI should display candidate rows next to exact source evidence and current workbook context, but still avoid workbook writes until a later controlled apply pass is approved.
