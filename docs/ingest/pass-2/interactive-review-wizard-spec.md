@@ -528,4 +528,4 @@ Known residual issue:
 
 ## Expected next pass after Pass 2
 
-Pass 3 should be controlled apply planning. It should consume exported review decisions and produce a dry-run workbook-op plan only. The first Pass 3 implementation should still avoid writing the workbook until the dry-run plan, stale checks, and generated-impact review are proven.
+Historical note: this originally pointed directly to controlled apply planning. Sean corrected the next-step direction on 2026-06-28 after reviewing the Pass 2 UI: Pass 3 should first be expert interpretation and review reduction, scoped in `docs/ingest/pass-3/expert-interpretation-review-reduction-spec.md`. Apply planning should wait until that pass proves model/RPO review units, RPO-only workbook matching, duplicate source classification, and reduced review queues.

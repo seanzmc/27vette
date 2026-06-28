@@ -12,6 +12,7 @@ The current staged ingest workflow is documented in:
 - `docs/ingest/pass-0/ingest-wizard-source-profiler-spec.md`
 - `docs/ingest/pass-1/candidate-normalizer-spec.md`
 - `docs/ingest/pass-2/interactive-review-wizard-spec.md`
+- `docs/ingest/pass-3/expert-interpretation-review-reduction-spec.md`
 
 Raw ingest must produce transient evidence and candidate artifacts first. Pass 0 may write run-scoped evidence artifacts under `form-output/ingest/<run-id>/` or `/tmp`, but it must not write `stingray_master.xlsx`, generated workbook `form_*` sheets, tracked generated/runtime outputs elsewhere under `form-output/`, or `form-app/data.js` unless a later approved apply pass explicitly allows that.
 
@@ -49,9 +50,22 @@ form-output/ingest/<run-id>/unresolved-review.md
 
 Candidate-normalizer artifacts are not approved workbook rows.
 
-Pass 2 review-decision exports are also transient review artifacts. They must preserve candidate/evidence fingerprints and reviewer decisions for a later controlled apply-planning pass, but they are not workbook operations and must not be applied directly.
+Pass 2 review-decision exports are also transient review artifacts. They must preserve candidate/evidence fingerprints and reviewer decisions, but they are not workbook operations and must not be applied directly.
 
-Canonical workbook writes require a separate reviewed apply pass after candidate normalization and human/product review.
+Pass 3 is the CLI/report-first expert interpretation/review-reduction pass. It aggregates Pass 1 rows into model/RPO review units, matches workbook context by RPO identity only, classifies duplicate source RPO rows and source-sheet coverage, and writes only transient interpretation artifacts such as:
+
+```text
+form-output/ingest/<run-id>/interpretation-summary.json
+form-output/ingest/<run-id>/interpreted-options.json
+form-output/ingest/<run-id>/review-queue.json
+form-output/ingest/<run-id>/duplicate-rpo-report.json
+form-output/ingest/<run-id>/duplicate-rpo-report.md
+form-output/ingest/<run-id>/source-sheet-coverage.json
+form-output/ingest/<run-id>/source-sheet-coverage.md
+form-output/ingest/<run-id>/blocked-interpretation.json
+```
+
+Canonical workbook writes require separate reviewed UI/review and apply-planning/apply passes after expert interpretation and human/product review.
 
 ## Hard guardrails
 
