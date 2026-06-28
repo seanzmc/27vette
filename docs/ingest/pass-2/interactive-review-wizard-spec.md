@@ -34,7 +34,8 @@ Current implemented inputs:
 - Pass 1 candidate normalizer:
   - `scripts/order_guide_candidate_normalizer.py`
   - `scripts/corvette_form_generator/ingest/candidate_normalizer.py`
-  - candidate artifacts: `candidate-options.json`, `candidate-ovs.json`, `candidate-rules.json`, `candidate-price-rules.json`, `candidate-summary.json`, `unresolved-review.md`
+  - current implemented candidate artifacts: `candidate-options.json`, `candidate-ovs.json`, `candidate-rules.json`, `candidate-price-rules.json`, `candidate-summary.json`, `unresolved-review.md`
+  - Pass 2 required candidate artifacts after prerequisite update: `candidate-options.json`, `candidate-ovs.json`, `candidate-rules.json`, `candidate-price-rules.json`, `candidate-summary.json`, `unresolved-review.json`, `unresolved-review.md`
 - Existing local workbook editor:
   - `scripts/workbook_editor_server.py`
   - `scripts/corvette_form_generator/editor_ops.py`
@@ -73,6 +74,7 @@ Pass 1 artifacts are useful but too large/noisy to review directly in JSON. The 
 - every decision must show exact source evidence so the reviewer does not guess;
 - current workbook matches/context must be visible next to candidate values;
 - rule/disclosure hints need review states rather than hidden parser decisions;
+- unresolved review needs machine-readable rows for filters, category counts, exact evidence display, and decision export;
 - review decisions need to be captured as a durable artifact for a later apply pass;
 - workbook writes remain too risky until the review-decision contract is proven.
 
@@ -84,6 +86,12 @@ Change type: mixed tooling/UI/tests/docs, no workbook data/runtime behavior chan
 
 Expected implementation files:
 
+- `scripts/corvette_form_generator/ingest/candidate_normalizer.py`
+  - first add a Pass 1-compatible `unresolved-review.json` artifact;
+  - keep `unresolved-review.md` as the human-readable report;
+  - do not duplicate unresolved derivation in the UI.
+- `scripts/order_guide_candidate_normalizer.py`
+  - no new write mode; continue routing through the protected output-dir guard.
 - `scripts/workbook_editor_server.py`
   - add optional ingest candidate/evidence directory arguments;
   - add read-only ingest review API endpoints;
@@ -101,16 +109,61 @@ Expected implementation files:
   - styles for ingest review panels, evidence/source cells, status chips, unresolved badges, and decision controls.
 - `tests/test_ingest_review_payload.py`
   - focused Python tests for payload construction, candidate/evidence joins, source-reference preservation, out-of-scope sections, and review-decision validation.
+- `tests/test_order_guide_candidate_normalizer.py`
+  - assert `unresolved-review.json` is emitted and contains categories, reasons, source refs, raw values, and candidate references without parsing Markdown.
 - `tests/test_editor_server_payload.py` or a new server-focused test file
   - verify new `/api/ingest/*` endpoints are read-only and return expected payload/errors.
+- `docs/ingest/pass-1/candidate-normalizer-spec.md`
+  - update completion evidence after adding `unresolved-review.json` as a compatibility artifact for Pass 2.
 - `docs/ingest/pass-2/interactive-review-wizard-spec.md`
   - close with implementation evidence after approval and implementation.
 - `docs/ingest/README.md`
   - point to this Pass 2 spec and status.
 - `Order-Guide_IngestPrompt.md`
+  - remove the stale `docs/ingest/pass-2/normalized-ingest-contract.md` pointer;
   - clarify Pass 2 review-decision artifacts are still transient and not workbook rows.
 
 No workbook binary/source sheet, generated runtime artifact, browser runtime app, registry, or dealer-submission file should be changed.
+
+## Pass 1 unresolved JSON prerequisite
+
+Pass 2 must not parse `unresolved-review.md` and must not recompute unresolved categories from raw Pass 0 evidence. Markdown remains a human-readable report only.
+
+Before the review UI work, add a small machine-readable unresolved artifact to the Pass 1 normalizer:
+
+```text
+unresolved-review.json
+```
+
+Required top-level fields:
+
+- `version`
+- `run_id`
+- `generated_at`
+- `input_evidence_dir`
+- `workbook`
+- `unresolved_counts`
+- `items`
+
+Each item must include:
+
+- `unresolved_id` — stable artifact-local ID.
+- `reason` — stable filter key matching `candidate-summary.json.unresolved_counts` keys.
+- `category` — broader UI grouping, such as `source_shape`, `rpo_identity`, `section_context`, `relationship_hint`, `price_out_of_scope`, or `color_trim_out_of_scope`.
+- `severity` — `review`, `blocked`, or `out_of_scope`.
+- `candidate_refs` — related `candidate_id` values when they exist.
+- `source_refs` — exact Pass 0 evidence coordinates.
+- `raw_values` — raw source values/status/disclosure markers needed for review.
+- `normalized_values` — normalized parser values or empty object when no safe normalization exists.
+- `blocked_decision` — concise statement of the decision that cannot be made mechanically.
+- `suggested_decision_states` — allowed reviewer choices for this unresolved item.
+
+Rules:
+
+- The UI unresolved filters must read `unresolved-review.json`, not Markdown.
+- `candidate-summary.json.artifact_files` must include `unresolved-review.json` after the compatibility update.
+- Every unresolved item that points at source data must carry exact source evidence; summary-only unresolved rows are allowed only for whole-sheet out-of-scope notices and must say so explicitly.
+- `unresolved-review.md` should be rendered from the same unresolved item data structure so JSON and Markdown counts cannot drift.
 
 ## Proposed server contract
 
@@ -131,6 +184,7 @@ New read-only endpoints:
 GET /api/ingest/summary
 GET /api/ingest/candidates?family=<options|ovs|rules|price_rules|unresolved>&status=<...>&model=<...>&q=<...>
 GET /api/ingest/candidate/<candidate_id>
+GET /api/ingest/unresolved/<unresolved_id>
 GET /api/ingest/source?sheet=<source_sheet>&row=<source_row_index>
 ```
 
@@ -153,7 +207,7 @@ Required panels:
 1. Run summary
    - Pass 0 manifest status and paths.
    - Pass 1 candidate counts and unresolved counts.
-   - Candidate artifact timestamps/paths.
+   - Candidate/evidence artifact timestamps, file sizes, and hashes/mtimes.
    - Clear banner that this tab is review-only and cannot apply workbook changes.
 
 2. Candidate browser
@@ -196,7 +250,7 @@ Required panels:
 
 7. Export decisions
    - Download a review-decision JSON artifact.
-   - Include run metadata, workbook path/mtime, evidence/candidate artifact paths, reviewer timestamp, decisions, and unresolved items.
+   - Include run metadata, workbook path/mtime, evidence/candidate artifact fingerprints, reviewer timestamp, decisions, and unresolved items.
    - The exported artifact is input to a later Pass 3 apply-planning pass, not an apply manifest itself.
 
 ## Review-decision artifact contract
@@ -216,6 +270,10 @@ Required top-level fields:
   - `mtime_ns`
 - `evidence_dir`
 - `candidates_dir`
+- `evidence_artifacts`
+  - per-file `path`, `mtime_ns`, `size_bytes`, and `sha256`
+- `candidate_artifacts`
+  - per-file `path`, `mtime_ns`, `size_bytes`, and `sha256`
 - `candidate_summary`
 - `decisions`
 - `unresolved_rollup`
@@ -237,11 +295,24 @@ Each decision must include:
   - `canonical_key`
   - `field_overrides`
 
+Each unresolved decision must include:
+
+- `unresolved_id`
+- `reason`
+- `category`
+- `decision_state`
+- `reviewer_notes`
+- `source_refs`
+- `raw_values_snapshot`
+- `normalized_values_snapshot`
+- optional `candidate_refs`
+
 Rules:
 
 - `proposed_target` is still not an applied workbook op.
 - Do not use row numbers as stable workbook targets.
 - Preserve raw and normalized snapshots so later apply planning can detect stale candidate drift.
+- Preserve candidate/evidence file fingerprints so Pass 3 can detect regenerated `/tmp` artifacts at the same path.
 - Validation must fail if a decision lacks source refs or if `decision_state` is outside the allowed vocabulary.
 
 ## Explicit no-write boundaries
@@ -267,7 +338,7 @@ The existing workbook editor's normal Pending Changes / Apply feature may remain
 |---|---|---|
 | Workbook source sheets | inspected-no-change | Read-only context only. |
 | Pass 0 evidence artifacts | inspected-no-change | UI consumes current contract; if new evidence fields are needed, revise Pass 0/Pass 1 specs first. |
-| Pass 1 candidate artifacts | inspected/update consumers | UI consumes candidate contracts and validates decision exports. |
+| Pass 1 candidate artifacts | update | Add `unresolved-review.json`; update candidate summary artifact list; keep Markdown as companion report. |
 | `form-output/*` tracked generated outputs | not applicable | Must remain unchanged. Smoke artifacts should stay under `/tmp`. |
 | `form-app/data.js` | not applicable | Must remain unchanged. |
 | Runtime app JS/CSS/HTML | not applicable | Workbook-editor UI is dev tooling, not customer runtime. |
@@ -275,7 +346,7 @@ The existing workbook editor's normal Pending Changes / Apply feature may remain
 | Workbook editor server | update | Add read-only ingest endpoints and optional startup args. |
 | Workbook editor UI | update | Add Ingest Review tab and styles. |
 | Tests | update | Add focused payload/server tests. Browser smoke optional but recommended after UI implementation. |
-| `Order-Guide_IngestPrompt.md` | update | Add Pass 2 review-decision artifact boundary. |
+| `Order-Guide_IngestPrompt.md` | update | Remove stale contract path, add `unresolved-review.json`, and add Pass 2 review-decision artifact boundary. |
 | `docs/ingest/README.md` | update | Point to this Pass 2 spec/status. |
 | Agent/project guidance | inspected-no-change | Existing guardrails cover no workbook/generated writes. |
 
@@ -289,6 +360,7 @@ The existing workbook editor's normal Pending Changes / Apply feature may remain
 - No new dependencies unless separately approved.
 - Use existing workbook-editor patterns before adding a separate web app.
 - Preserve exact source coordinates and raw evidence in every review detail.
+- Use `unresolved-review.json` for unresolved filters/categories/evidence; do not parse Markdown for UI data.
 - Keep rule/detail-disclosure interpretation review-only.
 - Keep price/interior/color extraction out of scope until their evidence extractors exist.
 - Keep browser UI responsive for thousands of candidates.
@@ -317,7 +389,7 @@ The existing workbook editor's normal Pending Changes / Apply feature may remain
    - Mitigation: candidate detail must show exact source refs, raw cells, status markers, and disclosure fragments.
 
 4. Decisions become stale after artifacts or workbook change.
-   - Mitigation: export workbook mtime, artifact paths, candidate snapshots, and source refs for later stale checks.
+   - Mitigation: export workbook mtime, candidate/evidence artifact fingerprints, candidate snapshots, and source refs for later stale checks.
 
 5. UI implies confidence that parser does not have.
    - Mitigation: surface `resolution_status`, `confidence`, unresolved reasons, and review notes prominently.
@@ -338,9 +410,11 @@ git status --short --branch
 Implementation tests:
 
 ```sh
-.venv/bin/python -m pytest tests/test_ingest_review_payload.py tests/test_editor_server_payload.py -q
+.venv/bin/python -m pytest tests/test_order_guide_candidate_normalizer.py tests/test_ingest_review_payload.py tests/test_editor_server_payload.py -q
 .venv/bin/python -m py_compile \
+  scripts/order_guide_candidate_normalizer.py \
   scripts/workbook_editor_server.py \
+  scripts/corvette_form_generator/ingest/candidate_normalizer.py \
   scripts/corvette_form_generator/ingest/review_payload.py
 ```
 
@@ -369,6 +443,7 @@ Manual browser smoke:
 - Open `http://127.0.0.1:8027/`.
 - Open `Ingest Review` tab.
 - Confirm summary counts match `candidate-summary.json`.
+- Confirm unresolved filters and unresolved detail panels are driven by `unresolved-review.json`.
 - Filter options by a known RPO and inspect source evidence/workbook context.
 - Open a rule candidate and confirm disclosure fragment and target token hints are visible as hints.
 - Open unresolved categories for price schedule and color/trim and confirm they are blocked/out-of-scope.
@@ -389,7 +464,7 @@ No customer runtime Node tests are required unless implementation touches runtim
 
 ## Approval question
 
-Approve Pass 2 implementation as scoped here: add a read-only Ingest Review tab and server payload endpoints to inspect Pass 1 candidate artifacts, capture/export review decisions, and perform no workbook/generated/runtime/app writes?
+Approve Pass 2 implementation as scoped here: first add Pass 1-compatible `unresolved-review.json`, then add a read-only Ingest Review tab and server payload endpoints to inspect Pass 1 candidate artifacts, capture/export review decisions with artifact fingerprints, and perform no workbook/generated/runtime/app writes?
 
 Recommended approval: yes, after confirming review-decision export is enough for this pass and that server-side saving/apply planning should remain deferred.
 

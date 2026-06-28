@@ -6,9 +6,12 @@ Do not use raw ingest for routine workbook maintenance. Day-to-day option, copy,
 
 ## Current contract
 
-The canonical target is the normalized workbook source graph documented in:
+The current staged ingest workflow is documented in:
 
-- `docs/ingest/pass-2/normalized-ingest-contract.md`
+- `docs/ingest/README.md`
+- `docs/ingest/pass-0/ingest-wizard-source-profiler-spec.md`
+- `docs/ingest/pass-1/candidate-normalizer-spec.md`
+- `docs/ingest/pass-2/interactive-review-wizard-spec.md`
 
 Raw ingest must produce transient evidence and candidate artifacts first. Pass 0 may write run-scoped evidence artifacts under `form-output/ingest/<run-id>/` or `/tmp`, but it must not write `stingray_master.xlsx`, generated workbook `form_*` sheets, tracked generated/runtime outputs elsewhere under `form-output/`, or `form-app/data.js` unless a later approved apply pass explicitly allows that.
 
@@ -40,10 +43,13 @@ form-output/ingest/<run-id>/candidate-ovs.json
 form-output/ingest/<run-id>/candidate-rules.json
 form-output/ingest/<run-id>/candidate-price-rules.json
 form-output/ingest/<run-id>/candidate-summary.json
+form-output/ingest/<run-id>/unresolved-review.json
 form-output/ingest/<run-id>/unresolved-review.md
 ```
 
 Candidate-normalizer artifacts are not approved workbook rows.
+
+Pass 2 review-decision exports are also transient review artifacts. They must preserve candidate/evidence fingerprints and reviewer decisions for a later controlled apply-planning pass, but they are not workbook operations and must not be applied directly.
 
 Canonical workbook writes require a separate reviewed apply pass after candidate normalization and human/product review.
 
