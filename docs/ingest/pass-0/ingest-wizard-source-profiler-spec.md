@@ -2,7 +2,7 @@
 
 Date: 2026-06-27
 Branch: `ingest-wizard-pass0-spec`
-Status: Spec only. Do not implement until approved.
+Status: Implemented 2026-06-27.
 Recommended reasoning level for implementation agent: high.
 
 ## Purpose
@@ -50,6 +50,7 @@ Expected implementation files:
 - `tests/fixtures/ingest/` — compact fixture workbook(s) or fixture-builder code that represent the relevant raw export shapes without using the live workbook as expected truth.
 - `Order-Guide_IngestPrompt.md` — update the root prompt to require the new Pass 0 artifact contract and to keep candidate/apply behavior deferred.
 - `docs/ingest/README.md` — add the Pass 0 spec and status.
+- `docs/ingest/pass-2/normalized-ingest-contract.md` — update the allowed sequence so it explicitly reads: Pass 0 evidence profiler -> candidate normalizer -> review UI -> controlled apply. This is mandatory before implementation can be called complete.
 - `docs/ingest/pass-0/ingest-wizard-source-profiler-spec.md` — update to `Implemented` during the implementation pass with changed files, artifact paths, gates, residual risks, and next pass.
 
 Expected generated/transient artifacts from running the CLI, not checked in unless explicitly approved:
@@ -84,7 +85,7 @@ Command shape:
 Required behavior:
 
 1. Read the raw export and canonical workbook only.
-2. Refuse any flag or path that would write `stingray_master.xlsx`, `form-app/data.js`, `form-output/runtime/*`, generated workbook `form_*` sheets, or promotion metadata.
+2. Refuse any flag or path that would write `stingray_master.xlsx`, `form-app/data.js`, generated workbook `form_*` sheets, promotion metadata, or tracked generated outputs under `form-output/` outside explicitly approved run-scoped ingest artifacts.
 3. Create only the run-scoped ingest output directory and JSON/Markdown evidence artifacts.
 4. Exit non-zero on parser invariant failure.
 5. Print a concise checkpoint summary and the artifact directory.
@@ -231,13 +232,13 @@ If a raw source item cannot map to an existing family, Pass 0 reports the gap. I
 | Surface | Status for Pass 0 implementation | Notes |
 |---|---|---|
 | Workbook source sheets | inspected-no-change | CLI must read `stingray_master.xlsx` only. No workbook writes. |
-| Generated runtime contracts under `form-output/runtime/` | not applicable | Pass 0 must not regenerate or edit runtime contracts. |
+| Tracked generated outputs under `form-output/` | not applicable | Pass 0 must not regenerate or edit any tracked generated outputs, including runtime contracts, root model data JSON/CSV, inspection output, or workbook edit logs. Run-scoped ingest smoke output should go to `/tmp` unless checked-in `form-output/ingest/<run-id>/` artifacts are explicitly approved. |
 | `form-app/data.js` | not applicable | Registry publication is out of scope. |
 | Runtime JS/CSS/HTML | not applicable | No browser behavior changes. |
 | Dealer submission endpoint/payload | not applicable | No runtime/dealer path touched. |
-| `Order-Guide_IngestPrompt.md` | update | Add the Pass 0 artifact contract and CLI-first boundary. |
+| `Order-Guide_IngestPrompt.md` | update | Mandatory: replace the current preflight candidate-output list with the Pass 0 evidence-artifact list and defer candidate outputs to the later candidate-normalizer pass. |
 | `docs/ingest/README.md` | update | Add Pass 0 spec/status and artifact overview. |
-| Existing ingest docs | inspected-no-change or targeted update | `pass-2/normalized-ingest-contract.md` may need a short note that CLI Pass 0 precedes the earlier Pass 3/4/5 sequence. Avoid rewriting history. |
+| `docs/ingest/pass-2/normalized-ingest-contract.md` | update | Mandatory: make the sequence explicit as Pass 0 evidence profiler -> candidate normalizer -> review UI -> controlled apply. Avoid rewriting historical diagnosis. |
 | Tests | update | Add focused Python tests for profiler behavior and write-boundary guards. |
 | Gate reminders / `AGENTS.md` | inspected-no-change | Current guidance already says raw ingest is transient and no workbook/generated writes without apply pass. Update only if implementation discovers contradictory guidance. |
 | Profile/Codex/Hermes guidance | not applicable | No agent-guide behavior change required for CLI profiler. |
@@ -247,7 +248,7 @@ If a raw source item cannot map to an existing family, Pass 0 reports the gap. I
 - CLI first; no UI/wizard tab in this pass.
 - No workbook writes.
 - No generated workbook `form_*` writes.
-- No `form-output/runtime/*` writes.
+- No tracked `form-output/*` changes outside explicitly approved run-scoped ingest artifacts; prefer `/tmp` for manual-smoke output.
 - No `form-app/data.js` writes.
 - No model promotion.
 - No runtime/dealer-submission changes.
@@ -287,7 +288,7 @@ If a raw source item cannot map to an existing family, Pass 0 reports the gap. I
    - Mitigation: use compact fixtures that encode shape classes, plus an optional manual smoke against `2027 Chevrolet Car Corvette Export_RAW.xlsx`.
 
 6. Accidentally producing generated/runtime churn.
-   - Mitigation: tests and handoff must include `git diff -- form-output/runtime form-app/data.js stingray_master.xlsx` or equivalent proof of no touched runtime/workbook files.
+   - Mitigation: tests and handoff must include a guard over all tracked `form-output` files, `form-app/data.js`, and `stingray_master.xlsx`. Do not limit the guard to `form-output/runtime`.
 
 ## Validation plan
 
@@ -314,10 +315,12 @@ Post-implementation guards:
 ```sh
 .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
 git diff --check -- scripts tests docs Order-Guide_IngestPrompt.md
-git diff --exit-code -- stingray_master.xlsx form-app/data.js form-output/runtime
+git diff --exit-code -- stingray_master.xlsx form-app/data.js
+git diff --exit-code -- $(git ls-files form-output)
+git status --short -- form-output
 ```
 
-If implementation writes run-scoped artifacts under `form-output/ingest/<run-id>/`, either keep them out of git unless approved or use `/tmp` for manual smoke output.
+The `git status --short -- form-output` output must be empty unless the pass explicitly approves checked-in `form-output/ingest/<run-id>/` evidence artifacts. Manual smoke output should normally use `/tmp` so the generated-output guard stays clean.
 
 No Node runtime tests are required unless implementation unexpectedly touches generated/runtime/browser files, which should be treated as scope violation.
 
@@ -332,3 +335,80 @@ Recommended approval: yes, as the safest foundation before any candidate normali
 Pass 1 should be a candidate normalizer spec only after the source profiler artifacts are proven against the real raw export and compact fixtures. That pass should convert raw evidence into reviewable candidate families while still avoiding workbook writes.
 
 A later Pass 2 can add an interactive review surface, preferably by reusing the workbook editor metadata/API patterns. Controlled workbook apply should remain a separate later pass with dry-run default and safe-save requirements.
+
+## Implementation completion — 2026-06-27
+
+Implemented on branch `ingest-wizard-pass0-spec` after approval and the final wording fixes.
+
+Changed files:
+
+- `scripts/order_guide_ingest_profiler.py` — new CLI entry point for the read-only source profiler.
+- `scripts/corvette_form_generator/ingest/__init__.py` — new ingest package marker.
+- `scripts/corvette_form_generator/ingest/source_profiler.py` — source-layout detection, variant reconciliation, raw-row/status preservation, disclosure-link extraction, output path guard, JSON/Markdown artifact writer.
+- `tests/test_order_guide_ingest_profiler.py` — focused fixture tests for layout/variant/disclosure artifacts and generated-output path guards.
+- `Order-Guide_IngestPrompt.md` — clarified Pass 0 may write run-scoped evidence under `form-output/ingest/<run-id>/` or `/tmp`, while tracked generated/runtime outputs remain blocked.
+- `docs/ingest/README.md` — indexed the Pass 0 spec.
+- `docs/ingest/pass-2/normalized-ingest-contract.md` — updated the sequence to Pass 0 evidence profiler -> Pass 1 candidate normalizer -> Pass 2 review UI -> Pass 3 controlled apply, and split evidence artifacts from later candidate artifacts.
+- `docs/ingest/pass-0/ingest-wizard-source-profiler-spec.md` — closed this spec with implementation evidence.
+
+Implemented behavior:
+
+- CLI command:
+
+```sh
+.venv/bin/python scripts/order_guide_ingest_profiler.py \
+  --raw-export "2027 Chevrolet Car Corvette Export_RAW.xlsx" \
+  --workbook stingray_master.xlsx \
+  --run-id manual-smoke \
+  --output-dir /tmp/27vette-ingest-manual-smoke
+```
+
+- Emits:
+  - `source-layout.json`
+  - `variant-matrix.json`
+  - `raw-rows.json`
+  - `disclosure-links.json`
+  - `manifest.json`
+  - `checkpoint-report.md`
+- Refuses output paths under tracked `form-output/` except `form-output/ingest/<run-id>/`.
+- Treats `Price Schedule` and `Color and Trim` as non-matrix evidence-only layouts.
+- Splits matrix variants by raw variant header/model code, including combined `ZR1 and ZR1X` sheets.
+- Preserves raw status values, parsed base status, status disclosure markers, source coordinates, description disclosure markers, and phrase-level relationship hints.
+
+Gate results:
+
+```sh
+.venv/bin/python -m pytest tests/test_order_guide_ingest_profiler.py
+# 3 passed
+
+.venv/bin/python scripts/order_guide_ingest_profiler.py \
+  --raw-export "2027 Chevrolet Car Corvette Export_RAW.xlsx" \
+  --workbook stingray_master.xlsx \
+  --run-id manual-smoke \
+  --output-dir /tmp/27vette-ingest-manual-smoke
+# status: passed
+# source_sheet_count: 23
+# parsed_matrix_sheet_count: 20
+# raw_row_count: 1964
+# variant_column_count: 130
+# disclosure_link_count: 1088
+# invariant_failures: []
+
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+# status: valid, error_count: 0, warning_count: 0
+
+git diff --exit-code -- stingray_master.xlsx form-app/data.js
+git diff --exit-code -- $(git ls-files form-output)
+git status --short -- form-output
+# no output / no tracked generated-output changes
+```
+
+Residual risks:
+
+- Pass 0 only emits evidence and lightweight relationship hints. It does not decide canonical option IDs, section IDs, prices, rules, or workbook rows.
+- `Price Schedule` and `Color and Trim` are classified and preserved as layout evidence only; deeper price/interior candidate normalization belongs to Pass 1.
+- Manual smoke output was written to `/tmp/27vette-ingest-manual-smoke`, not checked in.
+
+Next pass:
+
+Spec Pass 1 as a candidate normalizer over the Pass 0 artifacts. Keep it read-only, with candidate rows and unresolved review output only; no workbook apply or UI until the candidate artifact contract is reviewed.

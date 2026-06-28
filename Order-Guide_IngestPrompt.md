@@ -10,7 +10,7 @@ The canonical target is the normalized workbook source graph documented in:
 
 - `docs/ingest/pass-2/normalized-ingest-contract.md`
 
-Raw ingest must produce transient evidence and candidate artifacts first. It must not write `stingray_master.xlsx`, generated workbook `form_*` sheets, `form-output/*`, or `form-app/data.js` unless a later approved apply pass explicitly allows that.
+Raw ingest must produce transient evidence and candidate artifacts first. Pass 0 may write run-scoped evidence artifacts under `form-output/ingest/<run-id>/` or `/tmp`, but it must not write `stingray_master.xlsx`, generated workbook `form_*` sheets, tracked generated/runtime outputs elsewhere under `form-output/`, or `form-app/data.js` unless a later approved apply pass explicitly allows that.
 
 ## Inputs
 
@@ -20,21 +20,21 @@ Raw ingest must produce transient evidence and candidate artifacts first. It mus
 
 Never overwrite the raw export or the live master workbook during ingest preflight.
 
-## Required output for ingest preflight
+## Required output sequence
 
-Write run-scoped artifacts outside the workbook, for example:
+Pass 0 is the CLI evidence profiler. It must write only run-scoped evidence artifacts outside the workbook, for example:
 
 ```text
+form-output/ingest/<run-id>/source-layout.json
+form-output/ingest/<run-id>/variant-matrix.json
 form-output/ingest/<run-id>/raw-rows.json
-form-output/ingest/<run-id>/candidate-options.json
-form-output/ingest/<run-id>/candidate-ovs.json
-form-output/ingest/<run-id>/candidate-rules.json
-form-output/ingest/<run-id>/candidate-price-rules.json
-form-output/ingest/<run-id>/unresolved-review.md
+form-output/ingest/<run-id>/disclosure-links.json
 form-output/ingest/<run-id>/checkpoint-report.md
 ```
 
-These artifacts are evidence and candidate data only. Canonical workbook writes require a separate reviewed apply pass.
+Candidate-normalizer output such as `candidate-options.json`, `candidate-ovs.json`, `candidate-rules.json`, `candidate-price-rules.json`, and `unresolved-review.md` belongs to a later approved pass after the evidence profiler is proven.
+
+Canonical workbook writes require a separate reviewed apply pass after candidate normalization and human/product review.
 
 ## Hard guardrails
 

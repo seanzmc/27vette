@@ -235,18 +235,26 @@ Rules:
 
 ## Transient ingest artifacts
 
-A future ingest implementation should emit run-scoped artifacts before any workbook write.
+A future ingest implementation should emit run-scoped artifacts before any workbook write. Keep evidence artifacts separate from later candidate-normalizer artifacts so Pass 0 cannot be mistaken for an apply-ready ingest.
 
-Recommended artifact families:
+Pass 0 evidence-profiler artifact families:
 
 ```text
+form-output/ingest/<run-id>/source-layout.json
+form-output/ingest/<run-id>/variant-matrix.json
 form-output/ingest/<run-id>/raw-rows.json
+form-output/ingest/<run-id>/disclosure-links.json
+form-output/ingest/<run-id>/checkpoint-report.md
+```
+
+Later candidate-normalizer artifact families:
+
+```text
 form-output/ingest/<run-id>/candidate-options.json
 form-output/ingest/<run-id>/candidate-ovs.json
 form-output/ingest/<run-id>/candidate-rules.json
 form-output/ingest/<run-id>/candidate-price-rules.json
 form-output/ingest/<run-id>/unresolved-review.md
-form-output/ingest/<run-id>/checkpoint-report.md
 ```
 
 These are evidence/candidate artifacts, not source of truth. They may be regenerated or discarded after canonical workbook rows are approved and applied.
@@ -279,31 +287,36 @@ This is intentionally stricter than normal active-model maintenance because the 
 
 ## Allowed implementation sequence
 
-### Pass 3 — Schema/inventory guard spec
+### Pass 0 — CLI evidence profiler
 
-Spec first. Candidate goal: add read-only validators that protect the normalized source graph before any ingest writer exists.
+Spec first. Candidate goal: parse a raw GM export into evidence artifacts only:
 
-Candidate checks:
-
-- active promoted models have complete required source roles;
-- active option sheets and OVS sheets have stable header parity and reference integrity;
-- no active option lacks required OVS coverage;
-- no dangling OVS rows;
-- inactive future scaffolds are reported separately from active runtime readiness;
-- retired ZR1/ZR1X scaffold references are not used as ingest truth.
-
-### Pass 4 — Raw ingest preflight
-
-Spec first. Candidate goal: parse a raw GM export into evidence/candidate artifacts only.
+- source layout and exact source cell coordinates;
+- variant matrix reconciliation, including combined-model tabs such as `ZR1 and ZR1X`;
+- raw rows/status cells with disclosure markers preserved;
+- disclosure links and checkpoint reporting.
 
 Must not:
 
 - write `stingray_master.xlsx`;
+- emit candidate workbook rows as approved decisions;
 - regenerate model artifacts;
 - promote models;
 - rely on current ZR1/ZR1X workbook rows as expected output.
 
-### Pass 5 — Controlled canonical apply
+### Pass 1 — Candidate normalizer
+
+Spec first. Candidate goal: convert proven evidence artifacts into reviewable candidate families such as option, OVS, rule, price-rule, interior/color/component, section/presentation, and unresolved-review artifacts.
+
+Candidate rows remain transient. They are not canonical workbook rows and cannot be applied without later review/approval.
+
+### Pass 2 — Review UI / interactive wizard
+
+Spec first. Candidate goal: help a human/product reviewer approve, edit, skip, or mark unresolved candidate rows while showing exact raw source evidence, current workbook context, detail disclosures, and variant-matrix context.
+
+Prefer reusing the workbook editor metadata/API patterns rather than creating a parallel workbook schema map.
+
+### Pass 3 — Controlled canonical apply
 
 Spec first. Candidate goal: convert approved candidate rows into canonical workbook edits.
 
