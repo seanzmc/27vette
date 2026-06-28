@@ -7,6 +7,7 @@ import json
 import sys
 import tempfile
 import unittest
+from collections import Counter
 from pathlib import Path
 
 from openpyxl import Workbook
@@ -249,6 +250,7 @@ class OrderGuideCandidateNormalizerTests(unittest.TestCase):
                 "candidate-rules.json",
                 "candidate-price-rules.json",
                 "candidate-summary.json",
+                "unresolved-review.json",
                 "unresolved-review.md",
             ]:
                 self.assertTrue((output_dir / name).exists(), name)
@@ -290,10 +292,27 @@ class OrderGuideCandidateNormalizerTests(unittest.TestCase):
             self.assertIn("color_trim_rows_not_extracted", unresolved)
             self.assertIn("section_context_requires_review", unresolved)
 
+            unresolved_json = json.loads((output_dir / "unresolved-review.json").read_text())
+            self.assertEqual(unresolved_json["version"], 1)
+            self.assertEqual(unresolved_json["run_id"], "unit-candidates")
+            self.assertIn("price_schedule_rows_not_extracted", unresolved_json["unresolved_counts"])
+            self.assertEqual(unresolved_json["unresolved_counts"], dict(Counter(item["reason"] for item in unresolved_json["items"])))
+            by_reason = {item["reason"]: item for item in unresolved_json["items"]}
+            price_item = by_reason["price_schedule_rows_not_extracted"]
+            self.assertEqual(price_item["category"], "price_out_of_scope")
+            self.assertEqual(price_item["severity"], "out_of_scope")
+            self.assertTrue(price_item["source_refs"])
+            self.assertIn("blocked_out_of_scope", price_item["suggested_decision_states"])
+            target_item = by_reason["target_rpo_token_ambiguous_or_missing"]
+            self.assertEqual(target_item["category"], "relationship_hint")
+            self.assertTrue(target_item["source_refs"])
+            self.assertIn("description_fragment", target_item["raw_values"])
+
             summary = json.loads((output_dir / "candidate-summary.json").read_text())
             self.assertEqual(summary["candidate_counts"]["price_rules"], 0)
             self.assertGreaterEqual(summary["candidate_counts"]["options"], 2)
             self.assertGreaterEqual(summary["unresolved_counts"]["price_schedule_rows_not_extracted"], 1)
+            self.assertIn("unresolved-review.json", summary["artifact_files"])
 
     def test_rejects_failed_or_incomplete_evidence(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -13,7 +13,7 @@ Routine corrections belong in canonical workbook source sheets, followed by norm
 
 - `pass-0/ingest-wizard-source-profiler-spec.md` — implemented CLI-first, read-only source profiler that emits source-layout, variant-matrix, raw-row, disclosure-link, manifest, and checkpoint artifacts before any candidate normalization or workbook apply exists.
 - `pass-1/candidate-normalizer-spec.md` — implemented CLI-first, read-only candidate normalizer over Pass 0 evidence artifacts; emits transient candidate and unresolved-review artifacts only.
-- `pass-2/interactive-review-wizard-spec.md` — current spec for a read-only Ingest Review tab over Pass 1 candidate artifacts; captures/export review decisions without workbook apply.
+- `pass-2/interactive-review-wizard-spec.md` — implemented read-only Ingest Review tab over Pass 1 candidate artifacts; captures/export review decisions without workbook apply.
 
 ## Current decisions
 

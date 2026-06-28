@@ -2,7 +2,7 @@
 
 Date: 2026-06-27
 Branch: `ingest-wizard`
-Status: Spec only. Do not implement until approved.
+Status: Implemented 2026-06-28.
 Recommended reasoning level for implementation agent: high.
 
 ## Branch policy
@@ -462,11 +462,69 @@ git status --short -- form-output
 
 No customer runtime Node tests are required unless implementation touches runtime/generated/browser app files, which would be a scope violation. If only workbook-editor UI changes, focused Python tests plus manual localhost browser smoke are the relevant gates.
 
-## Approval question
+## Implementation completion — 2026-06-28
 
-Approve Pass 2 implementation as scoped here: first add Pass 1-compatible `unresolved-review.json`, then add a read-only Ingest Review tab and server payload endpoints to inspect Pass 1 candidate artifacts, capture/export review decisions with artifact fingerprints, and perform no workbook/generated/runtime/app writes?
+Implemented after approval on the single `ingest-wizard` branch.
 
-Recommended approval: yes, after confirming review-decision export is enough for this pass and that server-side saving/apply planning should remain deferred.
+Changed files:
+
+- `scripts/corvette_form_generator/ingest/candidate_normalizer.py` — emits `unresolved-review.json` alongside the Markdown report, from the same unresolved item data.
+- `scripts/corvette_form_generator/ingest/review_payload.py` — new read-only Pass 2 payload/fingerprint/decision-validation helper.
+- `scripts/workbook_editor_server.py` — optional `--ingest-evidence-dir` and `--ingest-candidates-dir` args plus read-only `/api/ingest/*` endpoints and decision validation.
+- `visualizer/workbook-editor/editor.js` — new `Ingest Review` tab with candidate/unresolved browsing, detail panels, review decisions, validation, and client-side decision export.
+- `visualizer/workbook-editor/editor.css` — styles for the Ingest Review panels, candidate list, metrics, JSON evidence blocks, and decision controls.
+- `tests/test_order_guide_candidate_normalizer.py` — asserts machine-readable unresolved JSON output and artifact list.
+- `tests/test_ingest_review_payload.py` — focused review payload, fingerprint, source lookup, and decision-validation tests.
+- `tests/test_editor_server_ingest_review.py` — server endpoint tests for read-only ingest summary/list/detail/source/validation paths.
+- `docs/ingest/pass-1/candidate-normalizer-spec.md` — updated Pass 1 artifact contract and completion evidence for the `unresolved-review.json` compatibility artifact.
+- `docs/ingest/pass-2/interactive-review-wizard-spec.md` — closed this spec with implementation evidence.
+- `docs/ingest/README.md` — marked Pass 2 as implemented.
+
+Implemented behavior:
+
+- Pass 1 now emits `unresolved-review.json` with categories, severities, candidate refs, exact source refs, raw/normalized values, blocked decisions, and suggested decision states.
+- The workbook editor still works without ingest directories; the Ingest Review tab shows a disabled/empty state.
+- When ingest directories are supplied, the server exposes read-only endpoints for summary, candidates, candidate detail, unresolved detail, source evidence, and decision validation.
+- The UI displays candidate counts, unresolved counts, artifact fingerprints including `sha256`, candidate/unresolved filters, source/raw/normalized/workbook context, and review decision controls.
+- Review decisions export client-side as JSON with workbook metadata, evidence/candidate artifact fingerprints, candidate snapshots, unresolved decisions, and notes.
+- The Ingest Review tab does not enqueue workbook ops and does not call `/api/apply`.
+
+Validation evidence:
+
+```sh
+.venv/bin/python -m pytest tests/test_order_guide_ingest_profiler.py tests/test_order_guide_candidate_normalizer.py tests/test_ingest_review_payload.py tests/test_editor_server_ingest_review.py tests/test_editor_server_payload.py -q
+# 32 passed
+
+.venv/bin/python -m py_compile scripts/order_guide_ingest_profiler.py scripts/order_guide_candidate_normalizer.py scripts/workbook_editor_server.py scripts/corvette_form_generator/ingest/source_profiler.py scripts/corvette_form_generator/ingest/candidate_normalizer.py scripts/corvette_form_generator/ingest/review_payload.py tests/test_order_guide_ingest_profiler.py tests/test_order_guide_candidate_normalizer.py tests/test_ingest_review_payload.py tests/test_editor_server_ingest_review.py
+# passed
+
+node --check visualizer/workbook-editor/editor.js
+# passed
+
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+# valid; 0 issues
+
+git diff --check -- scripts tests visualizer docs Order-Guide_IngestPrompt.md
+# passed
+
+git diff --exit-code -- stingray_master.xlsx form-app/data.js
+git diff --exit-code -- $(git ls-files form-output)
+git status --short -- form-output
+# no output
+```
+
+Manual smoke:
+
+```text
+Pass 0 -> /tmp/27vette-pass2-smoke-evidence: status passed; 23 source sheets; 20 parsed matrix sheets; 1964 raw rows; 130 variant columns; 1088 disclosure links.
+Pass 1 -> /tmp/27vette-pass2-smoke-candidates: status passed; options 1744; ovs 11244; rules 791; price_rules 0; unresolved items 938.
+Server API smoke on http://127.0.0.1:8027: /api/ingest/summary, /api/ingest/candidates, /api/ingest/source, and /api/ingest/review/validate returned expected JSON.
+Browser smoke: opened Ingest Review tab, confirmed summary counts and candidate detail panels load, and browser console reported 0 JavaScript errors.
+```
+
+Known residual issue:
+
+- A broader editor test sweep also ran and reported 99 passed / 3 failed in `tests/test_editor_lints.py` real-workbook assertions (`opt_rwj_001`, `opt_cj2_001`, `opt_drz_001`). Those failures are in existing lint/compare real-workbook expectations and are not caused by the Pass 2 ingest review code path; they are left for a separate workbook/editor-lint expectation cleanup pass.
 
 ## Expected next pass after Pass 2
 

@@ -943,6 +943,204 @@ function ReviewTab({ onOpenRow }) {
       : html`<${ComparePanel} />`}`;
 }
 
+/* ── Ingest Review tab (Pass 2, read-only) ────────────────── */
+
+function JsonBlock({ value }) {
+  return html`<pre class="jsonblock">${JSON.stringify(value ?? null, null, 2)}</pre>`;
+}
+
+function candidateLabel(row) {
+  const normalized = row.normalized_values || {};
+  return normalized.rpo || normalized.candidate_option_ref || normalized.candidate_rule_ref
+    || row.candidate_id || row.unresolved_id;
+}
+
+function IngestReviewTab() {
+  const [summary, setSummary] = useState(null);
+  const [error, setError] = useState(null);
+  const [family, setFamily] = useState("options");
+  const [query, setQuery] = useState("");
+  const [reason, setReason] = useState("");
+  const [rows, setRows] = useState(null);
+  const [selected, setSelected] = useState(null);
+  const [detail, setDetail] = useState(null);
+  const [decisions, setDecisions] = useState({});
+  const [validation, setValidation] = useState(null);
+
+  useEffect(() => {
+    fetchJson("/api/ingest/summary").then(setSummary).catch((e) => setError(e.message));
+  }, []);
+
+  useEffect(() => {
+    if (!summary?.enabled) return;
+    const params = new URLSearchParams({ family, limit: "200" });
+    if (query.trim()) params.set("q", query.trim());
+    if (family === "unresolved" && reason) params.set("reason", reason);
+    setRows(null); setDetail(null); setSelected(null);
+    fetchJson(`/api/ingest/candidates?${params.toString()}`)
+      .then(setRows).catch((e) => setError(e.message));
+  }, [summary?.enabled, family, query, reason]);
+
+  const decisionKey = (row) => family === "unresolved" ? row.unresolved_id : row.candidate_id;
+  const loadDetail = (row) => {
+    setSelected(row);
+    const id = decisionKey(row);
+    const route = family === "unresolved" ? "unresolved" : "candidate";
+    fetchJson(`/api/ingest/${route}/${encodeURIComponent(id)}`)
+      .then(setDetail).catch((e) => setError(e.message));
+  };
+
+  const setDecisionState = (row, state) => {
+    const key = decisionKey(row);
+    setDecisions((current) => ({ ...current, [key]: { ...(current[key] || {}), state, row, family } }));
+  };
+  const setDecisionNote = (row, note) => {
+    const key = decisionKey(row);
+    setDecisions((current) => ({ ...current, [key]: { ...(current[key] || {}), note, row, family } }));
+  };
+
+  const buildDecisionExport = () => {
+    const picked = Object.values(decisions).filter((d) => d.state);
+    const candidateDecisions = picked.filter((d) => d.family !== "unresolved").map((d) => ({
+      candidate_id: d.row.candidate_id,
+      candidate_family: d.row.candidate_family,
+      decision_state: d.state,
+      reviewer_notes: d.note || "",
+      source_refs: d.row.source_refs || [],
+      raw_values_snapshot: d.row.raw_values || {},
+      normalized_values_snapshot: d.row.normalized_values || {},
+      workbook_match_snapshot: d.row.workbook_match || null,
+    }));
+    const unresolvedDecisions = picked.filter((d) => d.family === "unresolved").map((d) => ({
+      unresolved_id: d.row.unresolved_id,
+      reason: d.row.reason,
+      category: d.row.category,
+      decision_state: d.state,
+      reviewer_notes: d.note || "",
+      source_refs: d.row.source_refs || [],
+      raw_values_snapshot: d.row.raw_values || {},
+      normalized_values_snapshot: d.row.normalized_values || {},
+      candidate_refs: d.row.candidate_refs || [],
+    }));
+    return {
+      version: 1,
+      created_at: new Date().toISOString(),
+      workbook: summary.workbook,
+      evidence_dir: summary.evidence_dir,
+      candidates_dir: summary.candidates_dir,
+      evidence_artifacts: summary.evidence_artifacts,
+      candidate_artifacts: summary.candidate_artifacts,
+      candidate_summary: summary.candidate_summary,
+      decisions: candidateDecisions,
+      unresolved_decisions: unresolvedDecisions,
+      unresolved_rollup: summary.unresolved_counts,
+      notes: "Exported from Pass 2 Ingest Review; not a workbook apply manifest.",
+    };
+  };
+
+  const exportDecisions = () => {
+    const blob = new Blob([JSON.stringify(buildDecisionExport(), null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ingest-review-decisions-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const validateDecisions = async () => {
+    const { data } = await postJson("/api/ingest/review/validate", buildDecisionExport());
+    setValidation(data);
+  };
+
+  if (error) return html`<div class="error">${error}</div>`;
+  if (!summary) return html`<div class="loading">Loading ingest review payload…</div>`;
+  if (!summary.enabled) return html`<div class="panel"><p class="note pad">${summary.message}</p></div>`;
+
+  const reasons = Object.keys(summary.unresolved_counts || {}).sort();
+  const selectedDecision = selected ? decisions[decisionKey(selected)] || {} : {};
+
+  return html`<div class="space ingest-review">
+    <div class="panel">
+      <div class="bar">
+        <span class="title">Ingest Review</span>
+        <span class="badge amber">review-only</span>
+        <span class="meta">No workbook ops are queued or applied from this tab.</span>
+        <span class="spacer"></span>
+        <button class="btn" onClick=${validateDecisions}>Validate decisions</button>
+        <button class="btn primary" onClick=${exportDecisions}>Export decisions JSON</button>
+      </div>
+      <div class="ingest-summary">
+        ${Object.entries(summary.candidate_counts || {}).map(([k, v]) => html`
+          <div class="metric" key=${k}><b>${v}</b><span>${k}</span></div>`)}
+        <div class="metric warn"><b>${Object.values(summary.unresolved_counts || {}).reduce((a, b) => a + b, 0)}</b><span>unresolved</span></div>
+      </div>
+      <details class="artifact-details">
+        <summary>Artifact fingerprints</summary>
+        <${JsonBlock} value=${{ evidence: summary.evidence_artifacts, candidates: summary.candidate_artifacts }} />
+      </details>
+    </div>
+
+    ${validation && html`<div class=${validation.ok ? "panel applied" : "panel"}>
+      <div class="bar"><span class="title">${validation.ok ? "✓ Review decisions valid" : "✗ Review decisions need fixes"}</span></div>
+      ${(validation.errors || []).length > 0 && html`<ul class="errlist">
+        ${validation.errors.map((e, i) => html`<li key=${i}>${e}</li>`)}
+      </ul>`}
+    </div>`}
+
+    <div class="panel">
+      <div class="bar">
+        <span class="title">Candidates</span>
+        <select value=${family} onChange=${(e) => { setFamily(e.target.value); setReason(""); }}>
+          ${summary.families.map((f) => html`<option value=${f} key=${f}>${f}</option>`)}
+        </select>
+        ${family === "unresolved" && html`<select value=${reason} onChange=${(e) => setReason(e.target.value)}>
+          <option value="">all unresolved reasons</option>
+          ${reasons.map((r) => html`<option value=${r} key=${r}>${r} (${summary.unresolved_counts[r]})</option>`)}
+        </select>`}
+        <input type="search" placeholder="Filter candidates…" value=${query}
+          onInput=${(e) => setQuery(e.target.value)} />
+      </div>
+      ${!rows && html`<div class="loading">Loading candidates…</div>`}
+      ${rows && html`<div class="ingest-grid">
+        <div class="ingest-list">
+          <div class="meta pad">Showing ${rows.items.length} of ${rows.total} ${rows.family} rows.</div>
+          ${rows.items.map((row) => html`<button class=${"ingest-row" + (selected && decisionKey(selected) === decisionKey(row) ? " on" : "")}
+            key=${decisionKey(row)} onClick=${() => loadDetail(row)}>
+            <span class="mono strong">${candidateLabel(row)}</span>
+            <span class="badge">${row.reason || row.resolution_status}</span>
+            <span class="small dim">${row.category || row.candidate_family}</span>
+          </button>`)}
+        </div>
+        <div class="ingest-detail">
+          ${!detail && html`<p class="note pad">Select a row to inspect source evidence and record a review decision.</p>`}
+          ${detail && html`<div class="detail-panels">
+            <div class="panel mini">
+              <div class="bar"><span class="title">Decision</span></div>
+              <div class="pad decision-box">
+                <select value=${selectedDecision.state || ""} onChange=${(e) => setDecisionState(selected, e.target.value)}>
+                  <option value="">undecided</option>
+                  <option value="accept_for_later_apply">accept for later apply</option>
+                  <option value="edit_before_apply">edit before apply</option>
+                  <option value="skip">skip</option>
+                  <option value="needs_source_review">needs source review</option>
+                  <option value="blocked_out_of_scope">blocked out of scope</option>
+                </select>
+                <textarea placeholder="Reviewer notes…" value=${selectedDecision.note || ""}
+                  onInput=${(e) => setDecisionNote(selected, e.target.value)} />
+              </div>
+            </div>
+            <div class="panel mini"><div class="bar"><span class="title">Source evidence</span></div><${JsonBlock} value=${detail.source_refs || []} /></div>
+            <div class="panel mini"><div class="bar"><span class="title">Raw values</span></div><${JsonBlock} value=${detail.raw_values || {}} /></div>
+            <div class="panel mini"><div class="bar"><span class="title">Normalized values</span></div><${JsonBlock} value=${detail.normalized_values || {}} /></div>
+            <div class="panel mini"><div class="bar"><span class="title">Workbook match / context</span></div><${JsonBlock} value=${detail.workbook_match || detail.candidate_refs || null} /></div>
+          </div>`}
+        </div>
+      </div>`}
+    </div>
+  </div>`;
+}
+
 /* ── Pending Changes tab ──────────────────────────────────── */
 
 function opLine(o) {
@@ -1115,6 +1313,7 @@ function App() {
         <button class=${tab === "structure" ? "on" : ""} onClick=${() => setTab("structure")}>Form Structure</button>
         <button class=${tab === "browser" ? "on" : ""} onClick=${() => setTab("browser")}>Sheet Browser</button>
         <button class=${tab === "review" ? "on" : ""} onClick=${() => setTab("review")}>Review</button>
+        <button class=${tab === "ingest" ? "on" : ""} onClick=${() => setTab("ingest")}>Ingest Review</button>
         <button class=${tab === "pending" ? "on" : ""} onClick=${() => setTab("pending")}>
           Pending Changes${queue.length ? ` (${queue.length})` : ""}</button>
       </nav>
@@ -1130,6 +1329,8 @@ function App() {
                key=${refreshKey} />`}
       ${data && tab === "review" &&
         html`<${ReviewTab} onOpenRow=${openLintRow} key=${"review" + refreshKey} />`}
+      ${data && tab === "ingest" &&
+        html`<${IngestReviewTab} key=${"ingest" + refreshKey} />`}
       ${data && tab === "pending" &&
         html`<${PendingTab} data=${data} queue=${queue} removeItem=${removeItem}
                clearQueue=${clearQueue} onApplied=${onApplied} />`}

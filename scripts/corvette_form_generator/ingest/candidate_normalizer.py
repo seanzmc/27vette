@@ -70,6 +70,7 @@ def normalize_order_guide_candidates(
         "candidate-rules.json",
         "candidate-price-rules.json",
         "candidate-summary.json",
+        "unresolved-review.json",
         "unresolved-review.md",
     ]
     summary = {
@@ -92,6 +93,13 @@ def normalize_order_guide_candidates(
     write_json(output_dir / "candidate-rules.json", candidate_rules)
     write_json(output_dir / "candidate-price-rules.json", candidate_price_rules)
     write_json(output_dir / "candidate-summary.json", summary)
+    write_json(output_dir / "unresolved-review.json", unresolved_review_payload(
+        unresolved,
+        run_id=run_id,
+        generated_at=summary["generated_at"],
+        evidence_dir=evidence_dir,
+        workbook=workbook,
+    ))
     (output_dir / "unresolved-review.md").write_text(render_unresolved_review(unresolved) + "\n")
     return summary
 
@@ -177,6 +185,7 @@ def build_option_candidates(
                 unresolved_item(
                     reason="section_context_requires_review",
                     source_refs=[source_ref],
+                    raw_values=raw_values_for_row(row),
                     message="Source row is a section/context row, not an option candidate.",
                 )
             )
@@ -187,6 +196,7 @@ def build_option_candidates(
                 unresolved_item(
                     reason="missing_or_invalid_primary_rpo",
                     source_refs=[source_ref],
+                    raw_values=raw_values_for_row(row),
                     message="No valid primary RPO candidate was available for this row.",
                 )
             )
@@ -258,6 +268,13 @@ def build_ovs_candidates(
                     unresolved_item(
                         reason="unmatched_or_ambiguous_variant_evidence",
                         source_refs=[source_ref],
+                        candidate_refs=[option_ref],
+                        raw_values={
+                            "raw_status": clean(cell.get("raw_status")),
+                            "raw_variant_header": clean(cell.get("raw_variant_header")),
+                            "status_marker": clean(cell.get("status_marker")),
+                        },
+                        normalized_values={"normalized_status_candidate": status},
                         message="Status cell lacks matched variant/model evidence.",
                     )
                 )
@@ -314,6 +331,11 @@ def build_rule_candidates(
                 unresolved_item(
                     reason="disclosure_relationship_requires_review",
                     source_refs=[source_ref],
+                    raw_values={
+                        "marker": clean(link.get("marker")),
+                        "description_fragment": clean(link.get("description_fragment")),
+                        "phrase_hints": phrase_hints,
+                    },
                     message="Disclosure relationship hint could not be linked to an option candidate.",
                 )
             )
@@ -337,6 +359,16 @@ def build_rule_candidates(
                 unresolved_item(
                     reason="target_rpo_token_ambiguous_or_missing",
                     source_refs=[source_ref],
+                    candidate_refs=[normalized["candidate_rule_ref"]],
+                    raw_values={
+                        "marker": normalized["marker"],
+                        "description_fragment": fragment,
+                        "target_rpo_tokens": target_tokens,
+                    },
+                    normalized_values={
+                        "relationship_hint": relationship_hint,
+                        "target_match_status": target_match_status,
+                    },
                     message="Disclosure relationship hint requires target RPO review before apply.",
                 )
             )
@@ -364,6 +396,7 @@ def add_layout_unresolved(source_layout: list[dict[str, Any]], unresolved: list[
                 unresolved_item(
                     reason="price_schedule_rows_not_extracted",
                     source_refs=[{"source_sheet": layout.get("source_sheet"), "header_row": layout.get("header_row")}],
+                    raw_values={"sheet_type": sheet_type, "source_sheet": layout.get("source_sheet")},
                     message="Price Schedule is layout evidence only in Pass 0; no price candidates emitted in Pass 1.",
                 )
             )
@@ -372,6 +405,7 @@ def add_layout_unresolved(source_layout: list[dict[str, Any]], unresolved: list[
                 unresolved_item(
                     reason="color_trim_rows_not_extracted",
                     source_refs=[{"source_sheet": layout.get("source_sheet"), "header_row": layout.get("header_row")}],
+                    raw_values={"sheet_type": sheet_type, "source_sheet": layout.get("source_sheet")},
                     message="Color and Trim is layout evidence only in Pass 0; no interior/color candidates emitted in Pass 1.",
                 )
             )
@@ -380,6 +414,7 @@ def add_layout_unresolved(source_layout: list[dict[str, Any]], unresolved: list[
                 unresolved_item(
                     reason="non_matrix_sheet_evidence_only",
                     source_refs=[{"source_sheet": layout.get("source_sheet"), "header_row": layout.get("header_row")}],
+                    raw_values={"sheet_type": sheet_type, "source_sheet": layout.get("source_sheet")},
                     message="Non-matrix source sheet preserved as evidence only.",
                 )
             )
@@ -488,8 +523,95 @@ def candidate_envelope(
     }
 
 
-def unresolved_item(*, reason: str, source_refs: list[dict[str, Any]], message: str) -> dict[str, Any]:
-    return {"reason": reason, "source_refs": source_refs, "message": message}
+CATEGORY_BY_REASON = {
+    "section_context_requires_review": "section_context",
+    "missing_or_invalid_primary_rpo": "rpo_identity",
+    "unmatched_or_ambiguous_variant_evidence": "source_shape",
+    "disclosure_relationship_requires_review": "relationship_hint",
+    "target_rpo_token_ambiguous_or_missing": "relationship_hint",
+    "price_schedule_rows_not_extracted": "price_out_of_scope",
+    "color_trim_rows_not_extracted": "color_trim_out_of_scope",
+    "non_matrix_sheet_evidence_only": "source_shape",
+}
+OUT_OF_SCOPE_REASONS = {
+    "price_schedule_rows_not_extracted",
+    "color_trim_rows_not_extracted",
+    "non_matrix_sheet_evidence_only",
+}
+
+
+def unresolved_item(
+    *,
+    reason: str,
+    source_refs: list[dict[str, Any]],
+    message: str,
+    raw_values: dict[str, Any] | None = None,
+    normalized_values: dict[str, Any] | None = None,
+    candidate_refs: list[str] | None = None,
+) -> dict[str, Any]:
+    severity = "out_of_scope" if reason in OUT_OF_SCOPE_REASONS else "review"
+    return {
+        "reason": reason,
+        "category": CATEGORY_BY_REASON.get(reason, "source_shape"),
+        "severity": severity,
+        "candidate_refs": candidate_refs or [],
+        "source_refs": source_refs,
+        "raw_values": raw_values or {},
+        "normalized_values": normalized_values or {},
+        "blocked_decision": message,
+        "suggested_decision_states": suggested_decision_states(severity),
+        "message": message,
+    }
+
+
+def suggested_decision_states(severity: str) -> list[str]:
+    if severity == "out_of_scope":
+        return ["blocked_out_of_scope", "needs_source_review", "skip"]
+    return ["needs_source_review", "edit_before_apply", "skip"]
+
+
+def raw_values_for_row(row: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "orderable_rpo_raw": row.get("orderable_rpo", {}).get("raw_value", ""),
+        "ref_only_rpo_raw": row.get("ref_only_rpo", {}).get("raw_value", ""),
+        "source_description_raw": row.get("description", {}).get("raw_value", ""),
+        "section_context_raw": row.get("section_context", ""),
+    }
+
+
+def unresolved_review_payload(
+    unresolved: list[dict[str, Any]],
+    *,
+    run_id: str,
+    generated_at: str,
+    evidence_dir: Path,
+    workbook: Path,
+) -> dict[str, Any]:
+    counts = Counter(item["reason"] for item in unresolved)
+    items = []
+    for index, item in enumerate(unresolved, start=1):
+        reason = item["reason"]
+        items.append({
+            "unresolved_id": f"unres-{index:05d}-{slug(reason)}",
+            "reason": reason,
+            "category": item.get("category") or CATEGORY_BY_REASON.get(reason, "source_shape"),
+            "severity": item.get("severity") or ("out_of_scope" if reason in OUT_OF_SCOPE_REASONS else "review"),
+            "candidate_refs": item.get("candidate_refs", []),
+            "source_refs": item.get("source_refs", []),
+            "raw_values": item.get("raw_values", {}),
+            "normalized_values": item.get("normalized_values", {}),
+            "blocked_decision": item.get("blocked_decision") or item.get("message", ""),
+            "suggested_decision_states": item.get("suggested_decision_states") or suggested_decision_states(item.get("severity", "review")),
+        })
+    return {
+        "version": 1,
+        "run_id": run_id,
+        "generated_at": generated_at,
+        "input_evidence_dir": str(evidence_dir),
+        "workbook": str(workbook),
+        "unresolved_counts": dict(sorted(counts.items())),
+        "items": items,
+    }
 
 
 def recommended_rule_review_action(relationship_hint: str, target_match_status: str) -> str:

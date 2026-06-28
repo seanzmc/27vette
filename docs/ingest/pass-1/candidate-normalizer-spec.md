@@ -1,8 +1,8 @@
 # Pass 1 — CLI candidate normalizer spec
 
 Date: 2026-06-27
-Branch: `ingest-wizard-pass1-spec`
-Status: Implemented 2026-06-27.
+Branch: `ingest-wizard`
+Status: Implemented 2026-06-27; Pass 2 compatibility update completed 2026-06-28.
 Recommended reasoning level for implementation agent: high.
 
 ## Purpose
@@ -144,6 +144,7 @@ candidate-ovs.json
 candidate-rules.json
 candidate-price-rules.json
 candidate-summary.json
+unresolved-review.json
 unresolved-review.md
 ```
 
@@ -151,7 +152,6 @@ Optional output files if useful:
 
 ```text
 normalizer-manifest.json
-unresolved-review.json
 ```
 
 These files are transient review artifacts. They are not workbook source data.
@@ -278,6 +278,33 @@ Group unresolved items by reason:
 - any candidate that would require guessing.
 
 Each item must include exact source references and a short statement of the blocked decision.
+
+## `unresolved-review.json`
+
+Purpose: machine-readable unresolved review rows for Pass 2 filters, categories, exact evidence display, and decision export. The UI must not parse `unresolved-review.md` or recompute unresolved categories.
+
+Required top-level fields:
+
+- `version`
+- `run_id`
+- `generated_at`
+- `input_evidence_dir`
+- `workbook`
+- `unresolved_counts`
+- `items`
+
+Each item must include:
+
+- `unresolved_id`
+- `reason`
+- `category`
+- `severity`
+- `candidate_refs`
+- `source_refs`
+- `raw_values`
+- `normalized_values`
+- `blocked_decision`
+- `suggested_decision_states`
 
 ## `candidate-summary.json`
 
@@ -440,12 +467,14 @@ Implemented behavior:
   - `candidate-rules.json`
   - `candidate-price-rules.json`
   - `candidate-summary.json`
+  - `unresolved-review.json`
   - `unresolved-review.md`
 - Requires Pass 0 `manifest.json` status `passed`.
 - Refuses protected generated-output paths outside approved ingest output roots.
 - Preserves artifact-local candidate IDs as `candidate_*` values, not workbook IDs.
 - Emits price candidates as an empty list and reports `price_schedule_rows_not_extracted` because Pass 0 currently records price schedule layout evidence only.
 - Reports `color_trim_rows_not_extracted` because Pass 0 currently records Color and Trim layout evidence only.
+- `unresolved-review.json` is emitted from the same unresolved item data as `unresolved-review.md` and includes unresolved categories, severities, candidate refs, exact source refs, raw/normalized values, blocked decisions, and suggested review states for Pass 2.
 
 Manual smoke result against the real raw export through fresh Pass 0 evidence:
 
@@ -490,6 +519,15 @@ Residual risks:
 - Rule candidates are still review-only phrase/token hints. They are not direct workbook `rule_mapping`, group, or exclusive-group rows.
 - Price Schedule and Color and Trim need later evidence extractors before price/interior/color candidates can be reliable.
 - Candidate option copy is raw source text. Customer-facing copy cleanup remains a later review concern.
+
+Pass 2 compatibility validation update — 2026-06-28:
+
+```sh
+.venv/bin/python -m pytest tests/test_order_guide_candidate_normalizer.py tests/test_ingest_review_payload.py tests/test_editor_server_ingest_review.py -q
+# 8 passed
+```
+
+Fresh Pass 2 smoke output against the real raw export emitted `unresolved-review.json` with 938 unresolved items and the same unresolved reason counts listed above.
 
 ## Expected next pass after Pass 1
 
