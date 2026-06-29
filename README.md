@@ -113,7 +113,7 @@ The active normalized model-scoped shape is:
 - `<model>_exclusive_members`
 - `<model>_variant_overrides`
 
-Existing ZR1 and ZR1X scaffold rows remain unpromoted and should be treated as historical seed data until a clean reprocess/apply pass replaces or retires them.
+Existing ZR1 and ZR1X scaffold rows remain unpromoted and should be treated as historical seed data until a clean focused ingest reprocess replaces or retires them. The current ingest direction is to select ZR1/ZR1X plus one comparator immediately after raw order-guide header/model profiling, then review workbook-destination lanes before any dry-run apply planning.
 
 `category_master` is not an active source sheet. Historical evidence sheets (`archive_*` and `*_raw`) were extracted to `archive/stingray_archive.xlsx` and no longer live in `stingray_master.xlsx`.
 

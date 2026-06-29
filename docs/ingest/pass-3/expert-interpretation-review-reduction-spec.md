@@ -112,7 +112,9 @@ Pass 0 evidence profiler
   -> Pass 1 candidate normalizer
   -> Pass 2 raw candidate review UI
   -> Pass 3 expert interpretation / reduced review units
-  -> later Pass 4 dry-run apply planning
+  -> Pass 4 reduced review UI over Pass 3 artifacts
+  -> Pass 5 focused selected-model workbook-build review
+  -> later dry-run apply planning
   -> later controlled workbook apply only after reviewed dry-run output
 ```
 
@@ -568,13 +570,13 @@ No customer runtime Node tests are required unless implementation touches runtim
 
 ## Historical approval prompt
 
-Approve Pass 3 implementation as scoped above: a CLI/report-first, read-only expert interpretation and review-reduction layer that aggregates raw candidates into model/RPO review units, matches workbook context by RPO identity only, classifies duplicate source rows and source-sheet coverage, reports strict success/reduction metrics, and still performs no workbook/generated/runtime/UI writes?
+Historical approved Pass 3 scope: a CLI/report-first, read-only expert interpretation and review-reduction layer that aggregates raw candidates into model/RPO review units, matches workbook context by RPO identity only, classifies duplicate source rows and source-sheet coverage, reports strict success/reduction metrics, and still performs no workbook/generated/runtime/UI writes.
 
 Recommended approval: yes. This is the right safety step before dry-run apply planning because it directly addresses duplicate RPO noise and avoids forcing manual review of the raw 10k+ candidate surface.
 
 ## Expected next pass after Pass 3
 
-If Pass 3 proves material reduction and duplicate-source classification are useful, the next pass should update the Ingest Review UI/server to consume Pass 3 interpretation artifacts as the default reduced review view. Dry-run apply planning should wait until after the reduced UI/review workflow is proven useful.
+Pass 4 is implemented in `docs/ingest/pass-4/reduced-review-ui-spec.md`. It updates the Ingest Review UI/server to consume Pass 3 interpretation artifacts as the default reduced review view when configured. User review found that the broad reduced queue and abstract decision vocabulary were still not usable enough for ZR1/ZR1X intake. Pass 5, scoped in `docs/ingest/pass-5/focused-model-workbook-build-review-spec.md`, must correct direction before dry-run apply planning: early selected-model processing and workbook-destination review lanes.
 
 ## Implementation completion — 2026-06-28
 

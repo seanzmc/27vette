@@ -238,7 +238,7 @@ Required panels:
    - Reference-domain choices from existing editor payload, but displayed as context only.
 
 6. Review decision panel
-   - Per-candidate decision states:
+   - Legacy Pass 2 per-candidate decision states:
      - `accept_for_later_apply`
      - `edit_before_apply`
      - `skip`
@@ -247,11 +247,12 @@ Required panels:
    - Reviewer notes.
    - Optional proposed target family and canonical key fields, still review decisions only.
    - No direct workbook queueing by default.
+   - Current direction note: these abstract states were later proven too vague for ZR1/ZR1X intake. Pass 5 replaces them as primary reviewer language with workbook-destination actions.
 
 7. Export decisions
    - Download a review-decision JSON artifact.
    - Include run metadata, workbook path/mtime, evidence/candidate artifact fingerprints, reviewer timestamp, decisions, and unresolved items.
-   - The exported artifact is input to a later Pass 3 apply-planning pass, not an apply manifest itself.
+   - Historical Pass 2 note: the exported artifact was originally expected to feed apply planning. Current direction routes through Pass 3, Pass 4, and then Pass 5 focused workbook-build review before any dry-run apply planning.
 
 ## Review-decision artifact contract
 
@@ -528,4 +529,4 @@ Known residual issue:
 
 ## Expected next pass after Pass 2
 
-Historical note: this originally pointed directly to controlled apply planning. Sean corrected the next-step direction on 2026-06-28 after reviewing the Pass 2 UI: Pass 3 should first be expert interpretation and review reduction, scoped in `docs/ingest/pass-3/expert-interpretation-review-reduction-spec.md`. Apply planning should wait until that pass proves model/RPO review units, RPO-only workbook matching, duplicate source classification, and reduced review queues.
+Historical note: this originally pointed directly to controlled apply planning. Sean corrected the next-step direction on 2026-06-28 after reviewing the Pass 2 UI: Pass 3 first added expert interpretation and review reduction, scoped in `docs/ingest/pass-3/expert-interpretation-review-reduction-spec.md`; Pass 4 put that reduced queue in the browser, scoped in `docs/ingest/pass-4/reduced-review-ui-spec.md`. User review of Pass 4 showed the broad reduced queue and abstract decision labels were still not usable for the actual ZR1/ZR1X intake task. Pass 5, scoped in `docs/ingest/pass-5/focused-model-workbook-build-review-spec.md`, is now required before apply planning: select target models after Pass 0 header/model profiling and review concrete workbook-destination lanes.

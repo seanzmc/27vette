@@ -23,8 +23,10 @@ if str(TESTS_DIR) not in sys.path:
 
 import workbook_editor_server as srv  # noqa: E402
 from corvette_form_generator.ingest.candidate_normalizer import normalize_order_guide_candidates  # noqa: E402
+from corvette_form_generator.ingest.expert_interpreter import interpret_order_guide_candidates  # noqa: E402
 from corvette_form_generator.ingest.review_payload import IngestReviewStore  # noqa: E402
 from test_order_guide_candidate_normalizer import build_evidence  # noqa: E402
+from test_order_guide_ingest_interpreter import build_candidates  # noqa: E402
 
 
 class IngestReviewServerTest(unittest.TestCase):
@@ -120,6 +122,63 @@ class IngestReviewServerTest(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertFalse(validation["ok"])
         self.assertIn("source_refs", validation["errors"][0])
+
+    def test_interpretation_endpoints_are_read_only_and_preserve_raw_routes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            workbook, evidence_dir, candidates_dir = build_candidates(tmp)
+            interpretation_dir = tmp / "interpretation"
+            interpret_order_guide_candidates(
+                evidence_dir=evidence_dir,
+                candidates_dir=candidates_dir,
+                workbook=workbook,
+                output_dir=interpretation_dir,
+                run_id="server-interpretation",
+                root=ROOT,
+            )
+            previous_store = srv.EditorHandler.ingest_review
+            srv.EditorHandler.ingest_review = IngestReviewStore(
+                evidence_dir=evidence_dir,
+                candidates_dir=candidates_dir,
+                interpretation_dir=interpretation_dir,
+                workbook_path=workbook,
+                workbook_mtime_ns=workbook.stat().st_mtime_ns,
+            )
+            mtime_before = workbook.stat().st_mtime_ns
+            try:
+                status, summary = self.request("/api/ingest/summary")
+                self.assertEqual(status, 200)
+                self.assertEqual(summary["mode"], "interpretation")
+                self.assertTrue(summary["interpretation_enabled"])
+
+                status, queue = self.request("/api/ingest/interpretations?limit=20")
+                self.assertEqual(status, 200)
+                self.assertEqual(queue["mode"], "interpretation")
+                self.assertNotIn("auto_confirmed", {row["interpretation_confidence"] for row in queue["items"]})
+
+                status, audit = self.request("/api/ingest/interpretations?include_auto=true&confidence=auto_confirmed&q=SAF")
+                self.assertEqual(status, 200)
+                self.assertTrue(audit["items"])
+                interpretation_id = audit["items"][0]["interpretation_id"]
+
+                status, detail = self.request(f"/api/ingest/interpretation/{interpretation_id}")
+                self.assertEqual(status, 200)
+                self.assertEqual(detail["rpo"], "SAF")
+                self.assertIn("source_occurrences", detail)
+
+                status, duplicates = self.request("/api/ingest/interpretation/reports/duplicates")
+                self.assertEqual(status, 200)
+                self.assertTrue(any(row["rpo"] == "DUP" for row in duplicates["items"]))
+                status, coverage = self.request("/api/ingest/interpretation/reports/source-coverage")
+                self.assertEqual(status, 200)
+                self.assertIn("stingray", coverage["items"])
+
+                status, raw_options = self.request("/api/ingest/candidates?family=options&q=SAF")
+                self.assertEqual(status, 200)
+                self.assertTrue(raw_options["items"])
+                self.assertEqual(workbook.stat().st_mtime_ns, mtime_before)
+            finally:
+                srv.EditorHandler.ingest_review = previous_store
 
 
 if __name__ == "__main__":

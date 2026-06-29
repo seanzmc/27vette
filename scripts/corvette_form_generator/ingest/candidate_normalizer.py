@@ -565,6 +565,10 @@ def unresolved_item(
 
 
 def suggested_decision_states(severity: str) -> list[str]:
+    # Legacy Pass 1/2 review vocabulary kept for backward-compatible raw-candidate
+    # artifacts. Pass 5 supersedes these as primary reviewer language with
+    # workbook-destination actions such as option rows, OVS rows, relationships,
+    # price gaps, duplicate-source classification, and blocked extractor gaps.
     if severity == "out_of_scope":
         return ["blocked_out_of_scope", "needs_source_review", "skip"]
     return ["needs_source_review", "edit_before_apply", "skip"]

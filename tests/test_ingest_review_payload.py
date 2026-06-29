@@ -18,11 +18,13 @@ if str(TESTS_DIR) not in sys.path:
     sys.path.insert(0, str(TESTS_DIR))
 
 from corvette_form_generator.ingest.candidate_normalizer import normalize_order_guide_candidates  # noqa: E402
+from corvette_form_generator.ingest.expert_interpreter import interpret_order_guide_candidates  # noqa: E402
 from corvette_form_generator.ingest.review_payload import (  # noqa: E402
     IngestReviewStore,
     validate_review_decisions,
 )
 from test_order_guide_candidate_normalizer import build_evidence  # noqa: E402
+from test_order_guide_ingest_interpreter import build_candidates  # noqa: E402
 
 
 class IngestReviewPayloadTests(unittest.TestCase):
@@ -43,6 +45,25 @@ class IngestReviewPayloadTests(unittest.TestCase):
             workbook_mtime_ns=workbook.stat().st_mtime_ns,
         )
 
+    def build_interpretation_store(self, tmp: Path) -> IngestReviewStore:
+        workbook, evidence_dir, candidates_dir = build_candidates(tmp)
+        interpretation_dir = tmp / "interpretation"
+        interpret_order_guide_candidates(
+            evidence_dir=evidence_dir,
+            candidates_dir=candidates_dir,
+            workbook=workbook,
+            output_dir=interpretation_dir,
+            run_id="unit-interpretation-review",
+            root=ROOT,
+        )
+        return IngestReviewStore(
+            evidence_dir=evidence_dir,
+            candidates_dir=candidates_dir,
+            interpretation_dir=interpretation_dir,
+            workbook_path=workbook,
+            workbook_mtime_ns=workbook.stat().st_mtime_ns,
+        )
+
     def test_summary_contains_artifact_fingerprints_and_counts(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             store = self.build_store(Path(tmpdir))
@@ -50,6 +71,8 @@ class IngestReviewPayloadTests(unittest.TestCase):
             summary = store.summary()
 
             self.assertTrue(summary["enabled"])
+            self.assertEqual(summary["mode"], "raw_candidates")
+            self.assertFalse(summary["interpretation_enabled"])
             self.assertEqual(summary["candidate_summary"]["candidate_counts"]["price_rules"], 0)
             self.assertIn("candidate-summary.json", summary["candidate_artifacts"])
             self.assertIn("manifest.json", summary["evidence_artifacts"])
@@ -69,6 +92,43 @@ class IngestReviewPayloadTests(unittest.TestCase):
             self.assertEqual(unresolved["family"], "unresolved")
             self.assertEqual(unresolved["items"][0]["category"], "price_out_of_scope")
             self.assertIn("source_refs", unresolved["items"][0])
+
+    def test_interpretation_summary_queue_reports_and_raw_drilldown(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            store = self.build_interpretation_store(Path(tmpdir))
+
+            summary = store.summary()
+
+            self.assertEqual(summary["mode"], "interpretation")
+            self.assertTrue(summary["interpretation_enabled"])
+            self.assertIn("interpretation-summary.json", summary["interpretation_artifacts"])
+            self.assertEqual(summary["interpretation_summary"]["interpreted_option_count"], 6)
+            self.assertEqual(summary["interpretation_summary"]["hidden_auto_confirmed_count"], 2)
+
+            queue = store.list_interpretations(limit=20)
+            self.assertEqual(queue["mode"], "interpretation")
+            self.assertNotIn("auto_confirmed", {row["interpretation_confidence"] for row in queue["items"]})
+            self.assertIn("ADI", {row["rpo"] for row in queue["items"]})
+
+            auto = store.list_interpretations(include_auto=True, confidence="auto_confirmed", q="SAF", limit=20)
+            self.assertTrue(any(row["rpo"] == "SAF" for row in auto["items"]))
+            duplicate = store.list_interpretations(include_auto=True, duplicate="redundant_duplicates", limit=20)
+            self.assertTrue(any(row["rpo"] == "DUP" for row in duplicate["items"]))
+            reason = store.list_interpretations(reason="dealer_installed_or_adi", limit=20)
+            self.assertEqual({row["rpo"] for row in reason["items"]}, {"ADI"})
+
+            detail = store.interpretation(auto["items"][0]["interpretation_id"])
+            self.assertEqual(detail["rpo"], "SAF")
+            self.assertIn("source_occurrences", detail)
+            self.assertIn("workbook_identity_match", detail)
+            self.assertIn("workbook_status_match", detail)
+
+            reports = store.interpretation_reports()
+            self.assertTrue(any(row["rpo"] == "DUP" for row in reports["duplicates"]))
+            self.assertIn("stingray", reports["source_coverage"])
+
+            raw_options = store.list_candidates(family="options", q="SAF", limit=10)
+            self.assertTrue(any(row["normalized_values"]["rpo"] == "SAF" for row in raw_options["items"]))
 
     def test_candidate_unresolved_source_and_decision_validation(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -109,6 +169,37 @@ class IngestReviewPayloadTests(unittest.TestCase):
             self.assertEqual(validate_review_decisions(decisions)["errors"], [])
             decisions["decisions"][0]["source_refs"] = []
             self.assertIn("source_refs", validate_review_decisions(decisions)["errors"][0])
+
+    def test_interpretation_decision_validation_is_versioned_and_strict(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            store = self.build_interpretation_store(Path(tmpdir))
+            row = store.list_interpretations(limit=1)["items"][0]
+            detail = store.interpretation(row["interpretation_id"])
+            payload = {
+                "version": 2,
+                "review_mode": "interpretation",
+                "interpretation_decisions": [{
+                    "interpretation_id": detail["interpretation_id"],
+                    "model_key": detail["model_key"],
+                    "rpo": detail["rpo"],
+                    "interpretation_confidence": detail["interpretation_confidence"],
+                    "decision_state": "needs_source_review",
+                    "reviewer_notes": "fixture",
+                    "review_reason_codes": detail["review_reason_codes"],
+                    "source_occurrences_snapshot": detail["source_occurrences"],
+                    "availability_matrix_snapshot": detail["availability_matrix"],
+                    "workbook_identity_match_snapshot": detail["workbook_identity_match"],
+                    "workbook_status_match_snapshot": detail["workbook_status_match"],
+                    "duplicate_classification_snapshot": detail["duplicate_classification"],
+                }],
+            }
+
+            self.assertEqual(validate_review_decisions(payload)["errors"], [])
+            payload["interpretation_decisions"][0]["source_occurrences_snapshot"] = []
+            self.assertIn("source_occurrences_snapshot", validate_review_decisions(payload)["errors"][0])
+            payload["interpretation_decisions"][0]["source_occurrences_snapshot"] = detail["source_occurrences"]
+            payload["interpretation_decisions"][0]["decision_state"] = "apply_now"
+            self.assertIn("invalid decision_state", validate_review_decisions(payload)["errors"][0])
 
 
 if __name__ == "__main__":

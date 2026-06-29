@@ -950,6 +950,7 @@ function JsonBlock({ value }) {
 }
 
 function candidateLabel(row) {
+  if (row.interpretation_id) return `${row.model_key || "model"} / ${row.rpo || row.interpretation_id}`;
   const normalized = row.normalized_values || {};
   return normalized.rpo || normalized.candidate_option_ref || normalized.candidate_rule_ref
     || row.candidate_id || row.unresolved_id;
@@ -958,9 +959,12 @@ function candidateLabel(row) {
 function IngestReviewTab() {
   const [summary, setSummary] = useState(null);
   const [error, setError] = useState(null);
-  const [family, setFamily] = useState("options");
+  const [family, setFamily] = useState("interpretations");
   const [query, setQuery] = useState("");
   const [reason, setReason] = useState("");
+  const [confidence, setConfidence] = useState("");
+  const [duplicate, setDuplicate] = useState("");
+  const [includeAuto, setIncludeAuto] = useState(false);
   const [rows, setRows] = useState(null);
   const [selected, setSelected] = useState(null);
   const [detail, setDetail] = useState(null);
@@ -968,24 +972,44 @@ function IngestReviewTab() {
   const [validation, setValidation] = useState(null);
 
   useEffect(() => {
-    fetchJson("/api/ingest/summary").then(setSummary).catch((e) => setError(e.message));
+    fetchJson("/api/ingest/summary").then((payload) => {
+      setSummary(payload);
+      setFamily(payload.interpretation_enabled ? "interpretations" : "options");
+    }).catch((e) => setError(e.message));
   }, []);
 
   useEffect(() => {
     if (!summary?.enabled) return;
-    const params = new URLSearchParams({ family, limit: "200" });
-    if (query.trim()) params.set("q", query.trim());
-    if (family === "unresolved" && reason) params.set("reason", reason);
+    if (family === "interpretations" && !summary.interpretation_enabled) {
+      setFamily("options");
+      return;
+    }
     setRows(null); setDetail(null); setSelected(null);
+    const params = new URLSearchParams({ limit: "200" });
+    if (query.trim()) params.set("q", query.trim());
+    if (family === "interpretations") {
+      if (confidence) params.set("confidence", confidence);
+      if (duplicate) params.set("duplicate", duplicate);
+      if (reason) params.set("reason", reason);
+      if (includeAuto) params.set("include_auto", "true");
+      fetchJson(`/api/ingest/interpretations?${params.toString()}`)
+        .then(setRows).catch((e) => setError(e.message));
+      return;
+    }
+    params.set("family", family);
+    if (family === "unresolved" && reason) params.set("reason", reason);
     fetchJson(`/api/ingest/candidates?${params.toString()}`)
       .then(setRows).catch((e) => setError(e.message));
-  }, [summary?.enabled, family, query, reason]);
+  }, [summary?.enabled, summary?.interpretation_enabled, family, query, reason, confidence, duplicate, includeAuto]);
 
-  const decisionKey = (row) => family === "unresolved" ? row.unresolved_id : row.candidate_id;
+  const decisionKey = (row) => {
+    if (family === "interpretations") return row.interpretation_id;
+    return family === "unresolved" ? row.unresolved_id : row.candidate_id;
+  };
   const loadDetail = (row) => {
     setSelected(row);
     const id = decisionKey(row);
-    const route = family === "unresolved" ? "unresolved" : "candidate";
+    const route = family === "interpretations" ? "interpretation" : (family === "unresolved" ? "unresolved" : "candidate");
     fetchJson(`/api/ingest/${route}/${encodeURIComponent(id)}`)
       .then(setDetail).catch((e) => setError(e.message));
   };
@@ -1001,7 +1025,21 @@ function IngestReviewTab() {
 
   const buildDecisionExport = () => {
     const picked = Object.values(decisions).filter((d) => d.state);
-    const candidateDecisions = picked.filter((d) => d.family !== "unresolved").map((d) => ({
+    const interpretationDecisions = picked.filter((d) => d.family === "interpretations").map((d) => ({
+      interpretation_id: d.row.interpretation_id,
+      model_key: d.row.model_key,
+      rpo: d.row.rpo,
+      interpretation_confidence: d.row.interpretation_confidence,
+      decision_state: d.state,
+      reviewer_notes: d.note || "",
+      review_reason_codes: d.row.review_reason_codes || [],
+      source_occurrences_snapshot: d.row.source_occurrences || [],
+      availability_matrix_snapshot: d.row.availability_matrix || {},
+      workbook_identity_match_snapshot: d.row.workbook_identity_match || {},
+      workbook_status_match_snapshot: d.row.workbook_status_match || {},
+      duplicate_classification_snapshot: d.row.duplicate_classification || "",
+    }));
+    const candidateDecisions = picked.filter((d) => d.family !== "unresolved" && d.family !== "interpretations").map((d) => ({
       candidate_id: d.row.candidate_id,
       candidate_family: d.row.candidate_family,
       decision_state: d.state,
@@ -1022,19 +1060,28 @@ function IngestReviewTab() {
       normalized_values_snapshot: d.row.normalized_values || {},
       candidate_refs: d.row.candidate_refs || [],
     }));
+    const interpretationMode = summary.interpretation_enabled;
     return {
-      version: 1,
+      version: interpretationMode ? 2 : 1,
+      review_mode: interpretationMode ? "interpretation" : "raw_candidates",
       created_at: new Date().toISOString(),
       workbook: summary.workbook,
       evidence_dir: summary.evidence_dir,
       candidates_dir: summary.candidates_dir,
+      interpretation_dir: summary.interpretation_dir || "",
       evidence_artifacts: summary.evidence_artifacts,
       candidate_artifacts: summary.candidate_artifacts,
+      interpretation_artifacts: summary.interpretation_artifacts || {},
       candidate_summary: summary.candidate_summary,
+      interpretation_summary: summary.interpretation_summary || {},
+      interpretation_decisions: interpretationDecisions,
+      raw_candidate_decisions: candidateDecisions,
       decisions: candidateDecisions,
       unresolved_decisions: unresolvedDecisions,
       unresolved_rollup: summary.unresolved_counts,
-      notes: "Exported from Pass 2 Ingest Review; not a workbook apply manifest.",
+      notes: interpretationMode
+        ? "Exported from Pass 4 reduced Ingest Review; not a workbook apply manifest."
+        : "Exported from Pass 2 Ingest Review; not a workbook apply manifest.",
     };
   };
 
@@ -1058,6 +1105,8 @@ function IngestReviewTab() {
   if (!summary.enabled) return html`<div class="panel"><p class="note pad">${summary.message}</p></div>`;
 
   const reasons = Object.keys(summary.unresolved_counts || {}).sort();
+  const interpretationSummary = summary.interpretation_summary || {};
+  const modeLabel = family === "interpretations" ? "Reduced review" : "Raw candidates";
   const selectedDecision = selected ? decisions[decisionKey(selected)] || {} : {};
 
   return html`<div class="space ingest-review">
@@ -1071,13 +1120,24 @@ function IngestReviewTab() {
         <button class="btn primary" onClick=${exportDecisions}>Export decisions JSON</button>
       </div>
       <div class="ingest-summary">
-        ${Object.entries(summary.candidate_counts || {}).map(([k, v]) => html`
+        ${summary.interpretation_enabled && html`
+          <div class="metric"><b>${interpretationSummary.raw_candidate_total || 0}</b><span>raw candidates</span></div>
+          <div class="metric"><b>${interpretationSummary.interpreted_option_count || 0}</b><span>model/RPO units</span></div>
+          <div class="metric"><b>${interpretationSummary.visible_review_queue_count || 0}</b><span>visible queue</span></div>
+          <div class="metric green"><b>${interpretationSummary.hidden_auto_confirmed_count || 0}</b><span>auto-confirmed</span></div>
+          <div class="metric"><b>${interpretationSummary.mechanical_safe_count || 0}</b><span>mechanical-safe</span></div>
+          <div class="metric warn"><b>${interpretationSummary.review_needed_count || 0}</b><span>review-needed</span></div>
+          <div class="metric warn"><b>${interpretationSummary.blocked_count || 0}</b><span>blocked</span></div>
+          <div class="metric"><b>${interpretationSummary.duplicate_rpo_count || 0}</b><span>duplicate RPOs</span></div>
+          <div class="metric"><b>${interpretationSummary.reduction_status || "—"}</b><span>reduction</span></div>
+        `}
+        ${!summary.interpretation_enabled && Object.entries(summary.candidate_counts || {}).map(([k, v]) => html`
           <div class="metric" key=${k}><b>${v}</b><span>${k}</span></div>`)}
-        <div class="metric warn"><b>${Object.values(summary.unresolved_counts || {}).reduce((a, b) => a + b, 0)}</b><span>unresolved</span></div>
+        ${!summary.interpretation_enabled && html`<div class="metric warn"><b>${Object.values(summary.unresolved_counts || {}).reduce((a, b) => a + b, 0)}</b><span>unresolved</span></div>`}
       </div>
       <details class="artifact-details">
         <summary>Artifact fingerprints</summary>
-        <${JsonBlock} value=${{ evidence: summary.evidence_artifacts, candidates: summary.candidate_artifacts }} />
+        <${JsonBlock} value=${{ evidence: summary.evidence_artifacts, candidates: summary.candidate_artifacts, interpretation: summary.interpretation_artifacts || {} }} />
       </details>
     </div>
 
@@ -1090,26 +1150,47 @@ function IngestReviewTab() {
 
     <div class="panel">
       <div class="bar">
-        <span class="title">Candidates</span>
-        <select value=${family} onChange=${(e) => { setFamily(e.target.value); setReason(""); }}>
+        <span class="title">${modeLabel}</span>
+        <select value=${family} onChange=${(e) => { setFamily(e.target.value); setReason(""); setConfidence(""); setDuplicate(""); }}>
+          ${summary.interpretation_enabled && html`<option value="interpretations">reduced review</option>`}
           ${summary.families.map((f) => html`<option value=${f} key=${f}>${f}</option>`)}
         </select>
+        ${family === "interpretations" && html`<select value=${confidence} onChange=${(e) => setConfidence(e.target.value)}>
+          <option value="">all visible confidence</option>
+          <option value="mechanical_safe">mechanical_safe</option>
+          <option value="review_needed">review_needed</option>
+          <option value="blocked">blocked</option>
+          <option value="auto_confirmed">auto_confirmed audit</option>
+        </select>`}
+        ${family === "interpretations" && html`<select value=${duplicate} onChange=${(e) => setDuplicate(e.target.value)}>
+          <option value="">all duplicate classes</option>
+          <option value="single_source">single_source</option>
+          <option value="redundant_duplicates">redundant_duplicates</option>
+          <option value="complementary_duplicates">complementary_duplicates</option>
+          <option value="conflicting_duplicates">conflicting_duplicates</option>
+          <option value="blocked_duplicate_review">blocked_duplicate_review</option>
+        </select>`}
+        ${family === "interpretations" && html`<label class="checkline"><input type="checkbox" checked=${includeAuto} onChange=${(e) => setIncludeAuto(e.target.checked)} /> include auto-confirmed</label>`}
         ${family === "unresolved" && html`<select value=${reason} onChange=${(e) => setReason(e.target.value)}>
           <option value="">all unresolved reasons</option>
           ${reasons.map((r) => html`<option value=${r} key=${r}>${r} (${summary.unresolved_counts[r]})</option>`)}
         </select>`}
-        <input type="search" placeholder="Filter candidates…" value=${query}
+        ${family === "interpretations" && html`<input type="search" placeholder="Filter model/RPO units…" value=${query}
+          onInput=${(e) => setQuery(e.target.value)} />`}
+        ${family !== "interpretations" && html`<input type="search" placeholder="Filter candidates…" value=${query}
           onInput=${(e) => setQuery(e.target.value)} />
+        `}
       </div>
-      ${!rows && html`<div class="loading">Loading candidates…</div>`}
+      ${!rows && html`<div class="loading">Loading ${modeLabel.toLowerCase()}…</div>`}
       ${rows && html`<div class="ingest-grid">
         <div class="ingest-list">
-          <div class="meta pad">Showing ${rows.items.length} of ${rows.total} ${rows.family} rows.</div>
+          <div class="meta pad">Showing ${rows.items.length} of ${rows.total} ${family === "interpretations" ? "model/RPO units" : `${rows.family} rows`}.</div>
           ${rows.items.map((row) => html`<button class=${"ingest-row" + (selected && decisionKey(selected) === decisionKey(row) ? " on" : "")}
             key=${decisionKey(row)} onClick=${() => loadDetail(row)}>
             <span class="mono strong">${candidateLabel(row)}</span>
-            <span class="badge">${row.reason || row.resolution_status}</span>
-            <span class="small dim">${row.category || row.candidate_family}</span>
+            <span class=${"badge " + (row.interpretation_confidence === "auto_confirmed" ? "green" : row.interpretation_confidence === "blocked" ? "sev-error" : row.interpretation_confidence === "review_needed" ? "amber" : "")}>${row.interpretation_confidence || row.reason || row.resolution_status}</span>
+            <span class="small dim">${row.duplicate_classification || row.category || row.candidate_family}</span>
+            ${row.review_reason_codes && html`<span class="small dim">${row.review_reason_codes.join(", ") || "no review reasons"}</span>`}
           </button>`)}
         </div>
         <div class="ingest-detail">
@@ -1118,6 +1199,7 @@ function IngestReviewTab() {
             <div class="panel mini">
               <div class="bar"><span class="title">Decision</span></div>
               <div class="pad decision-box">
+                ${html`<!-- Legacy Pass 4 states. Pass 5 replaces this primary control with workbook-destination actions. -->`}
                 <select value=${selectedDecision.state || ""} onChange=${(e) => setDecisionState(selected, e.target.value)}>
                   <option value="">undecided</option>
                   <option value="accept_for_later_apply">accept for later apply</option>
@@ -1130,10 +1212,13 @@ function IngestReviewTab() {
                   onInput=${(e) => setDecisionNote(selected, e.target.value)} />
               </div>
             </div>
-            <div class="panel mini"><div class="bar"><span class="title">Source evidence</span></div><${JsonBlock} value=${detail.source_refs || []} /></div>
+            ${detail.interpretation_id && html`<div class="panel mini"><div class="bar"><span class="title">Expert summary</span></div><div class="pad"><p>${detail.expert_summary}</p><p class="small dim">${(detail.review_reason_codes || []).join(", ") || "no review reasons"}</p></div></div>`}
+            <div class="panel mini"><div class="bar"><span class="title">Source evidence</span></div><${JsonBlock} value=${detail.source_occurrences || detail.source_refs || []} /></div>
+            ${detail.interpretation_id && html`<div class="panel mini"><div class="bar"><span class="title">Availability matrix</span></div><${JsonBlock} value=${detail.availability_matrix || {}} /></div>`}
+            ${detail.interpretation_id && html`<div class="panel mini"><div class="bar"><span class="title">Disclosure / rule evidence</span></div><${JsonBlock} value=${detail.disclosure_evidence || {}} /></div>`}
             <div class="panel mini"><div class="bar"><span class="title">Raw values</span></div><${JsonBlock} value=${detail.raw_values || {}} /></div>
             <div class="panel mini"><div class="bar"><span class="title">Normalized values</span></div><${JsonBlock} value=${detail.normalized_values || {}} /></div>
-            <div class="panel mini"><div class="bar"><span class="title">Workbook match / context</span></div><${JsonBlock} value=${detail.workbook_match || detail.candidate_refs || null} /></div>
+            <div class="panel mini"><div class="bar"><span class="title">Workbook match / context</span></div><${JsonBlock} value=${detail.interpretation_id ? { identity: detail.workbook_identity_match, status: detail.workbook_status_match, duplicate: detail.duplicate_classification } : (detail.workbook_match || detail.candidate_refs || null)} /></div>
           </div>`}
         </div>
       </div>`}

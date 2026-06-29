@@ -283,6 +283,10 @@ td.lintmsg { max-width: 460px; white-space: normal; font-size: 12px; }
 .metric b { display: block; color: var(--amber); font-size: 20px; line-height: 1; }
 .metric span { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
 .metric.warn b { color: var(--rose); }
+.metric.green b { color: #a7f3d0; }
+.checkline {
+  display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px;
+}
 .artifact-details {
   border-top: 1px solid var(--border); padding: 10px 16px;
 }

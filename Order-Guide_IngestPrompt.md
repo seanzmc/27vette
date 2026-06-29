@@ -13,6 +13,8 @@ The current staged ingest workflow is documented in:
 - `docs/ingest/pass-1/candidate-normalizer-spec.md`
 - `docs/ingest/pass-2/interactive-review-wizard-spec.md`
 - `docs/ingest/pass-3/expert-interpretation-review-reduction-spec.md`
+- `docs/ingest/pass-4/reduced-review-ui-spec.md`
+- `docs/ingest/pass-5/focused-model-workbook-build-review-spec.md`
 
 Raw ingest must produce transient evidence and candidate artifacts first. Pass 0 may write run-scoped evidence artifacts under `form-output/ingest/<run-id>/` or `/tmp`, but it must not write `stingray_master.xlsx`, generated workbook `form_*` sheets, tracked generated/runtime outputs elsewhere under `form-output/`, or `form-app/data.js` unless a later approved apply pass explicitly allows that.
 
@@ -67,6 +69,10 @@ form-output/ingest/<run-id>/blocked-interpretation.json
 
 Canonical workbook writes require separate reviewed UI/review and apply-planning/apply passes after expert interpretation and human/product review.
 
+Pass 4 is the reduced Ingest Review UI/server pass. It makes Pass 3 interpretation artifacts the default browser review queue when configured, preserves raw Pass 1 candidates as drill-down/debug, exports versioned review decisions, and still creates no workbook operations.
+
+Pass 5 is the corrective focused-model/workbook-build review pass. It must run after Pass 0 has identified source headers and variant/model columns, then select the target models before Pass 1/3 candidate expansion. Default controlled development scope is `zr1,zr1x,z06`: ZR1 and ZR1X as primary incoming models, Z06 as a comparator only. Pass 5 must replace broad all-model review and abstract decisions with workbook-destination lanes such as option rows, OVS rows, relationship candidates, price gaps, duplicate-source classification, and blocked extractor gaps. Do not proceed to dry-run apply planning until this focused review shape is usable.
+
 ## Hard guardrails
 
 1. Preserve raw values.
@@ -86,7 +92,8 @@ Canonical workbook writes require separate reviewed UI/review and apply-planning
 
 4. Keep ZR1/ZR1X clean for reprocessing.
    - Current ZR1/ZR1X workbook rows are inactive historical scaffolds and should not be treated as canonical expected output.
-   - If the raw export contains ZR1/ZR1X data, parse it into fresh transient artifacts and compare only after a separate reprocess/apply spec approves the target mapping.
+   - If the raw export contains ZR1/ZR1X data, parse it into fresh transient artifacts through the focused Pass 5 model-selection workflow and compare only after a separate reprocess/apply spec approves the target mapping.
+   - A comparator model such as Z06 may be used to verify source structure, but must not be used to invent ZR1/ZR1X product data.
 
 5. Stop on invariant failure.
    - Do not silently repair parser failures.

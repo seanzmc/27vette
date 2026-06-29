@@ -397,6 +397,31 @@ class EditorHandler(BaseHTTPRequestHandler):
                     offset=int(_query_value(query, "offset", "0") or 0),
                     limit=int(_query_value(query, "limit", "200") or 200),
                 ))
+            elif path == "/api/ingest/interpretations":
+                store = self._require_ingest_review()
+                self._send_json(store.list_interpretations(
+                    confidence=_query_value(query, "confidence"),
+                    model=_query_value(query, "model"),
+                    reason=_query_value(query, "reason"),
+                    duplicate=_query_value(query, "duplicate"),
+                    q=_query_value(query, "q"),
+                    include_auto=_query_value(query, "include_auto", "false").lower() == "true",
+                    offset=int(_query_value(query, "offset", "0") or 0),
+                    limit=int(_query_value(query, "limit", "200") or 200),
+                ))
+            elif path == "/api/ingest/interpretation/reports/duplicates":
+                store = self._require_ingest_review()
+                self._send_json({"items": store.interpretation_reports()["duplicates"]})
+            elif path == "/api/ingest/interpretation/reports/source-coverage":
+                store = self._require_ingest_review()
+                self._send_json({"items": store.interpretation_reports()["source_coverage"]})
+            elif path == "/api/ingest/interpretation/blocked":
+                store = self._require_ingest_review()
+                self._send_json(store.interpretation_reports()["blocked"])
+            elif path.startswith("/api/ingest/interpretation/"):
+                store = self._require_ingest_review()
+                interpretation_id = path[len("/api/ingest/interpretation/"):]
+                self._send_json(store.interpretation(interpretation_id))
             elif path.startswith("/api/ingest/candidate/"):
                 store = self._require_ingest_review()
                 candidate_id = path[len("/api/ingest/candidate/"):]
@@ -472,15 +497,19 @@ def main() -> None:
     parser.add_argument("--workbook", default=str(DEFAULT_WORKBOOK))
     parser.add_argument("--ingest-evidence-dir", default="")
     parser.add_argument("--ingest-candidates-dir", default="")
+    parser.add_argument("--ingest-interpretation-dir", default="")
     args = parser.parse_args()
     workbook_path = Path(args.workbook)
     EditorHandler.cache = WorkbookCache(workbook_path)
+    if args.ingest_interpretation_dir and not (args.ingest_evidence_dir and args.ingest_candidates_dir):
+        raise SystemExit("--ingest-interpretation-dir requires --ingest-evidence-dir and --ingest-candidates-dir")
     if args.ingest_evidence_dir or args.ingest_candidates_dir:
         if not (args.ingest_evidence_dir and args.ingest_candidates_dir):
             raise SystemExit("--ingest-evidence-dir and --ingest-candidates-dir must be provided together")
         EditorHandler.ingest_review = IngestReviewStore(
             evidence_dir=Path(args.ingest_evidence_dir),
             candidates_dir=Path(args.ingest_candidates_dir),
+            interpretation_dir=Path(args.ingest_interpretation_dir) if args.ingest_interpretation_dir else None,
             workbook_path=workbook_path,
             workbook_mtime_ns=workbook_path.stat().st_mtime_ns,
         )
@@ -492,6 +521,8 @@ def main() -> None:
     if EditorHandler.ingest_review is not None:
         print(f"Ingest evidence: {args.ingest_evidence_dir}")
         print(f"Ingest candidates: {args.ingest_candidates_dir}")
+        if args.ingest_interpretation_dir:
+            print(f"Ingest interpretation: {args.ingest_interpretation_dir}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

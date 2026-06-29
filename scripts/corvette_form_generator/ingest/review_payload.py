@@ -1,4 +1,4 @@
-"""Read-only payload builder for the Pass 2 ingest review wizard."""
+"""Read-only payload builder for ingest review wizard artifacts."""
 
 from __future__ import annotations
 
@@ -31,6 +31,18 @@ CANDIDATE_FILES = [
     "unresolved-review.json",
     "unresolved-review.md",
 ]
+INTERPRETATION_FILES = [
+    "interpretation-summary.json",
+    "interpreted-options.json",
+    "review-queue.json",
+    "duplicate-rpo-report.json",
+    "source-sheet-coverage.json",
+    "blocked-interpretation.json",
+]
+# Legacy Pass 2/4 review states. Keep accepting them for backward-compatible
+# review exports, but do not treat them as the next ingest direction. Pass 5
+# replaces the primary reviewer vocabulary with concrete workbook-destination
+# actions and a new export version.
 ALLOWED_DECISION_STATES = {
     "accept_for_later_apply",
     "edit_before_apply",
@@ -41,7 +53,7 @@ ALLOWED_DECISION_STATES = {
 
 
 class IngestReviewStore:
-    """Load Pass 0/1 artifacts and expose UI-friendly read-only views."""
+    """Load Pass 0/1 and optional Pass 3 artifacts for UI-friendly read-only views."""
 
     def __init__(
         self,
@@ -50,28 +62,36 @@ class IngestReviewStore:
         candidates_dir: Path,
         workbook_path: Path,
         workbook_mtime_ns: int | str,
+        interpretation_dir: Path | None = None,
     ) -> None:
         self.evidence_dir = Path(evidence_dir)
         self.candidates_dir = Path(candidates_dir)
+        self.interpretation_dir = Path(interpretation_dir) if interpretation_dir else None
         self.workbook_path = Path(workbook_path)
         self.workbook_mtime_ns = str(workbook_mtime_ns)
         self._loaded: dict[str, Any] | None = None
 
     def summary(self) -> dict[str, Any]:
         loaded = self._load()
+        interpretation_enabled = loaded["interpretation_enabled"]
         return {
             "enabled": True,
+            "mode": "interpretation" if interpretation_enabled else "raw_candidates",
+            "interpretation_enabled": interpretation_enabled,
             "workbook": {
                 "path": str(self.workbook_path),
                 "mtimeNs": self.workbook_mtime_ns,
             },
             "evidence_dir": str(self.evidence_dir),
             "candidates_dir": str(self.candidates_dir),
+            "interpretation_dir": str(self.interpretation_dir) if self.interpretation_dir else "",
             "evidence_artifacts": loaded["evidence_artifacts"],
             "candidate_artifacts": loaded["candidate_artifacts"],
+            "interpretation_artifacts": loaded.get("interpretation_artifacts", {}),
             "candidate_summary": loaded["candidate_summary"],
             "candidate_counts": loaded["candidate_summary"].get("candidate_counts", {}),
             "unresolved_counts": loaded["unresolved_review"].get("unresolved_counts", {}),
+            "interpretation_summary": loaded.get("interpretation_summary", {}),
             "families": ["options", "ovs", "rules", "price_rules", "unresolved"],
         }
 
@@ -118,6 +138,59 @@ class IngestReviewStore:
             if row.get("unresolved_id") == unresolved_id:
                 return row
         raise KeyError(f"unknown unresolved_id: {unresolved_id}")
+
+    def list_interpretations(
+        self,
+        *,
+        confidence: str = "",
+        model: str = "",
+        reason: str = "",
+        duplicate: str = "",
+        q: str = "",
+        include_auto: bool = False,
+        offset: int = 0,
+        limit: int = 200,
+    ) -> dict[str, Any]:
+        loaded = self._require_interpretation()
+        rows = loaded["interpretation"]["interpreted-options.json"]
+        filtered = [
+            row for row in rows
+            if self._interpretation_matches(
+                row,
+                confidence=confidence,
+                model=model,
+                reason=reason,
+                duplicate=duplicate,
+                q=q,
+                include_auto=include_auto,
+            )
+        ]
+        limit = max(1, min(int(limit or 200), 500))
+        offset = max(0, int(offset or 0))
+        return {
+            "mode": "interpretation",
+            "total": len(filtered),
+            "offset": offset,
+            "limit": limit,
+            "include_auto": include_auto,
+            "items": filtered[offset:offset + limit],
+        }
+
+    def interpretation(self, interpretation_id: str) -> dict[str, Any]:
+        interpretation_id = unquote(interpretation_id)
+        loaded = self._require_interpretation()
+        for row in loaded["interpretation"]["interpreted-options.json"]:
+            if row.get("interpretation_id") == interpretation_id:
+                return row
+        raise KeyError(f"unknown interpretation_id: {interpretation_id}")
+
+    def interpretation_reports(self) -> dict[str, Any]:
+        loaded = self._require_interpretation()
+        return {
+            "duplicates": loaded["interpretation"]["duplicate-rpo-report.json"],
+            "source_coverage": loaded["interpretation"]["source-sheet-coverage.json"],
+            "blocked": loaded["interpretation"]["blocked-interpretation.json"],
+        }
 
     def source(self, *, sheet: str, row: int) -> dict[str, Any]:
         loaded = self._load()
@@ -168,6 +241,37 @@ class IngestReviewStore:
             return False
         return True
 
+    def _interpretation_matches(
+        self,
+        row: dict[str, Any],
+        *,
+        confidence: str,
+        model: str,
+        reason: str,
+        duplicate: str,
+        q: str,
+        include_auto: bool,
+    ) -> bool:
+        if not include_auto and row.get("interpretation_confidence") == "auto_confirmed":
+            return False
+        if confidence and row.get("interpretation_confidence") != confidence:
+            return False
+        if model and row.get("model_key") != model:
+            return False
+        if reason and reason not in (row.get("review_reason_codes") or []):
+            return False
+        if duplicate and row.get("duplicate_classification") != duplicate:
+            return False
+        if q and q.lower() not in json.dumps(row, ensure_ascii=False).lower():
+            return False
+        return True
+
+    def _require_interpretation(self) -> dict[str, Any]:
+        loaded = self._load()
+        if not loaded["interpretation_enabled"]:
+            raise ValueError("No ingest interpretation directory configured.")
+        return loaded
+
     def _load(self) -> dict[str, Any]:
         if self._loaded is not None:
             return self._loaded
@@ -176,6 +280,12 @@ class IngestReviewStore:
         candidate_summary = _read_json(self.candidates_dir / "candidate-summary.json")
         unresolved_review = _read_json(self.candidates_dir / "unresolved-review.json")
         _validate_unresolved_review(unresolved_review)
+        interpretation: dict[str, Any] | None = None
+        interpretation_artifacts: dict[str, dict[str, Any]] = {}
+        if self.interpretation_dir is not None:
+            interpretation = {name: _read_json(self.interpretation_dir / name) for name in INTERPRETATION_FILES}
+            _validate_interpretation_artifacts(interpretation)
+            interpretation_artifacts = artifact_fingerprints(self.interpretation_dir, INTERPRETATION_FILES)
         self._loaded = {
             "evidence": evidence,
             "candidates": candidates,
@@ -183,12 +293,16 @@ class IngestReviewStore:
             "unresolved_review": unresolved_review,
             "evidence_artifacts": artifact_fingerprints(self.evidence_dir, EVIDENCE_FILES),
             "candidate_artifacts": artifact_fingerprints(self.candidates_dir, CANDIDATE_FILES),
+            "interpretation_enabled": interpretation is not None,
+            "interpretation": interpretation or {},
+            "interpretation_summary": (interpretation or {}).get("interpretation-summary.json", {}),
+            "interpretation_artifacts": interpretation_artifacts,
         }
         return self._loaded
 
 
 def disabled_summary(message: str = "No ingest evidence/candidate directories configured.") -> dict[str, Any]:
-    return {"enabled": False, "message": message}
+    return {"enabled": False, "message": message, "mode": "disabled", "interpretation_enabled": False}
 
 
 def artifact_fingerprints(directory: Path, filenames: list[str]) -> dict[str, dict[str, Any]]:
@@ -209,6 +323,25 @@ def artifact_fingerprints(directory: Path, filenames: list[str]) -> dict[str, di
 
 def validate_review_decisions(payload: dict[str, Any]) -> dict[str, Any]:
     errors: list[str] = []
+    for index, decision in enumerate(payload.get("interpretation_decisions") or []):
+        ctx = f"interpretation_decisions[{index}]"
+        if decision.get("decision_state") not in ALLOWED_DECISION_STATES:
+            errors.append(f"{ctx}: invalid decision_state")
+        for key in (
+            "interpretation_id",
+            "model_key",
+            "rpo",
+            "interpretation_confidence",
+            "duplicate_classification_snapshot",
+        ):
+            if not decision.get(key):
+                errors.append(f"{ctx}: missing {key}")
+        if not decision.get("source_occurrences_snapshot"):
+            errors.append(f"{ctx}: missing source_occurrences_snapshot")
+        if "workbook_identity_match_snapshot" not in decision:
+            errors.append(f"{ctx}: missing workbook_identity_match_snapshot")
+        if "workbook_status_match_snapshot" not in decision:
+            errors.append(f"{ctx}: missing workbook_status_match_snapshot")
     for index, decision in enumerate(payload.get("decisions") or []):
         ctx = f"decisions[{index}]"
         if decision.get("decision_state") not in ALLOWED_DECISION_STATES:
@@ -271,3 +404,28 @@ def _validate_unresolved_review(payload: dict[str, Any]) -> None:
         missing = sorted(required - set(item))
         if missing:
             raise ValueError(f"unresolved-review.json item {index} missing keys: {missing}")
+
+
+def _validate_interpretation_artifacts(artifacts: dict[str, Any]) -> None:
+    summary = artifacts["interpretation-summary.json"]
+    if summary.get("version") != 1:
+        raise ValueError("interpretation-summary.json must have version 1")
+    interpreted = artifacts["interpreted-options.json"]
+    if not isinstance(interpreted, list):
+        raise ValueError("interpreted-options.json must be a list")
+    for index, item in enumerate(interpreted, start=1):
+        required = {
+            "interpretation_id",
+            "model_key",
+            "rpo",
+            "interpretation_confidence",
+            "duplicate_classification",
+            "source_occurrences",
+            "availability_matrix",
+            "workbook_identity_match",
+            "workbook_status_match",
+            "review_reason_codes",
+        }
+        missing = sorted(required - set(item))
+        if missing:
+            raise ValueError(f"interpreted-options.json item {index} missing keys: {missing}")
