@@ -799,7 +799,7 @@ test("Grand Sport draft applies active option assets from asset_map", () => {
   for (const choice of brightRedCaliperChoices) {
     assert.equal(
       choice.image_url,
-      "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/clpr_298_j6f.png"
+      "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6f.png"
     );
     assert.equal(choice.image_alt, "Bright Red-Painted Calipers");
     assert.equal(choice.image_fit, "cover");
