@@ -206,6 +206,7 @@ window.__testApi = {
   currentOrder,
   render,
   renderChoiceCard,
+  renderContextCard: typeof renderContextCard === "function" ? renderContextCard : undefined,
   renderInteriorGroups: typeof renderInteriorGroups === "function" ? renderInteriorGroups : undefined,
   activateStep: typeof activateStep === "function" ? activateStep : undefined,
   setMobileDrawer: typeof setMobileDrawer === "function" ? setMobileDrawer : undefined,
@@ -977,7 +978,11 @@ test("card media support is optional and data-driven", () => {
   runtime.render();
   assert.doesNotMatch(runtime.elements.get("#stepContent").innerHTML, /choice-media/);
   assert.match(appSource, /function renderCardMedia/);
+  assert.match(appSource, /function cardSupportsHoverMedia/);
   assert.match(stylesSource, /\.choice-media\s*\{[\s\S]*aspect-ratio:\s*16 \/ 9/);
+  assert.match(stylesSource, /\.choice-card:hover \.choice-media\.has-hover-media \.choice-media-base,/);
+  assert.match(stylesSource, /\.choice-card:focus-visible \.choice-media\.has-hover-media \.choice-media-base\s*\{[\s\S]*?opacity:\s*0/);
+  assert.doesNotMatch(stylesSource, /\.choice-card:hover \.choice-media-base\s*\{/);
 
   runtime.state.bodyStyle = "coupe";
   runtime.state.trimLevel = "1LT";
@@ -997,12 +1002,10 @@ test("card media support is optional and data-driven", () => {
   runtime.render();
   let html = runtime.elements.get("#stepContent").innerHTML;
   assert.match(html, /class="choice-card has-media/);
-  assert.match(html, /<span class="choice-media has-hover-media" data-fit="contain">/);
+  assert.match(html, /<span class="choice-media" data-fit="contain">/);
   assert.match(html, /src="\.\/assets\/cards\/black&amp;trim\.webp"/);
-  assert.match(html, /class="choice-media has-hover-media"/);
-  assert.match(html, /class="choice-media-hover" src="\.\/assets\/cards\/black-hover\.webp"/);
-  assert.match(html, /alt="Black hover preview"/);
-  assert.match(html, /object-position: 60% 45%;/);
+  assert.doesNotMatch(html, /class="choice-media has-hover-media"/);
+  assert.doesNotMatch(html, /class="choice-media-hover"/);
   assert.match(html, /alt="Black &quot;paint&quot; preview"/);
   assert.match(html, /object-position: 50% 40%;/);
 
@@ -1010,11 +1013,26 @@ test("card media support is optional and data-driven", () => {
   paint.image_position = "url(javascript:bad)";
   runtime.render();
   html = runtime.elements.get("#stepContent").innerHTML;
-  assert.match(html, /<span class="choice-media has-hover-media" data-fit="cover">/);
+  assert.match(html, /<span class="choice-media" data-fit="cover">/);
   assert.match(html, /object-position: center;/);
   paint.hover_image_url = "";
   paint.hover_image_alt = "";
   paint.hover_image_position = "";
+
+  const bodyChoice = runtime.data.contextChoices.find((choice) => choice.context_type === "body_style");
+  assert.ok(bodyChoice, "body-style context choice should exist for hover media test");
+  bodyChoice.image_url = "./assets/cards/body-base.webp";
+  bodyChoice.image_alt = "Body style base preview";
+  bodyChoice.image_fit = "cover";
+  bodyChoice.image_position = "45% 50%";
+  bodyChoice.hover_image_url = "./assets/cards/body-hover.webp";
+  bodyChoice.hover_image_alt = "Body style hover preview";
+  bodyChoice.hover_image_position = "55% 50%";
+  const bodyHtml = runtime.renderContextCard(bodyChoice, { setup: true, compact: true });
+  assert.match(bodyHtml, /class="choice-media has-hover-media"/);
+  assert.match(bodyHtml, /class="choice-media-hover" src="\.\/assets\/cards\/body-hover\.webp"/);
+  assert.match(bodyHtml, /alt="Body style hover preview"/);
+  assert.match(bodyHtml, /object-position: 55% 50%;/);
 });
 
 test("choice cards reserve availability slot and move disabled reason into tooltip pill", () => {

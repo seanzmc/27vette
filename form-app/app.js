@@ -313,11 +313,15 @@ function cardHasMedia(row = {}) {
   return Boolean(String(row.image_url || "").trim());
 }
 
+function cardSupportsHoverMedia(row = {}) {
+  return row.context_type === "body_style" || String(row.context_choice_id || "").startsWith("body_style__");
+}
+
 function renderCardMedia(row = {}, fallbackAlt = "", { disabled = false } = {}) {
   const imageUrl = String(row.image_url || "").trim();
   if (!imageUrl) return "";
   const imageAlt = String(row.image_alt || fallbackAlt || "").trim();
-  const hoverImageUrl = String(row.hover_image_url || "").trim();
+  const hoverImageUrl = cardSupportsHoverMedia(row) ? String(row.hover_image_url || "").trim() : "";
   const hoverImageAlt = String(row.hover_image_alt || imageAlt || fallbackAlt || "").trim();
   const imageFit = cardImageFit(row.image_fit);
   const imagePosition = cardImagePosition(row.image_position);

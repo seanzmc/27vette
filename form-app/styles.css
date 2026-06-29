@@ -1024,13 +1024,13 @@ textarea {
   opacity: 0;
 }
 
-.choice-card:hover .choice-media-hover,
-.choice-card:focus-visible .choice-media-hover {
+.choice-card:hover .choice-media.has-hover-media .choice-media-hover,
+.choice-card:focus-visible .choice-media.has-hover-media .choice-media-hover {
   opacity: 1;
 }
 
-.choice-card:hover .choice-media-base,
-.choice-card:focus-visible .choice-media-base {
+.choice-card:hover .choice-media.has-hover-media .choice-media-base,
+.choice-card:focus-visible .choice-media.has-hover-media .choice-media-base {
   opacity: 0;
 }
 
