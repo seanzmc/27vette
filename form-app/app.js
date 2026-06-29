@@ -317,13 +317,18 @@ function renderCardMedia(row = {}, fallbackAlt = "", { disabled = false } = {}) 
   const imageUrl = String(row.image_url || "").trim();
   if (!imageUrl) return "";
   const imageAlt = String(row.image_alt || fallbackAlt || "").trim();
+  const hoverImageUrl = String(row.hover_image_url || "").trim();
+  const hoverImageAlt = String(row.hover_image_alt || imageAlt || fallbackAlt || "").trim();
   const imageFit = cardImageFit(row.image_fit);
   const imagePosition = cardImagePosition(row.image_position);
+  const hoverImagePosition = cardImagePosition(row.hover_image_position || row.image_position);
   const classes = ["choice-media"];
   if (disabled) classes.push("disabled");
+  if (hoverImageUrl) classes.push("has-hover-media");
   return `
     <span class="${classes.join(" ")}" data-fit="${escapeHtml(imageFit)}">
-      <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}" loading="lazy" style="object-position: ${escapeHtml(imagePosition)};">
+      <img class="choice-media-base" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}" loading="lazy" style="object-position: ${escapeHtml(imagePosition)};">
+      ${hoverImageUrl ? `<img class="choice-media-hover" src="${escapeHtml(hoverImageUrl)}" alt="${escapeHtml(hoverImageAlt)}" loading="lazy" style="object-position: ${escapeHtml(hoverImagePosition)};">` : ""}
     </span>
   `;
 }
@@ -2035,6 +2040,9 @@ function modelEntries() {
     image_alt: model.image_alt || "",
     image_fit: model.image_fit || "",
     image_position: model.image_position || "",
+    hover_image_url: model.hover_image_url || "",
+    hover_image_alt: model.hover_image_alt || "",
+    hover_image_position: model.hover_image_position || "",
   }));
 }
 

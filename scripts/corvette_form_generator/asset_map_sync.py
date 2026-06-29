@@ -36,7 +36,10 @@ WORDPRESS_USER_AGENT = (
     "AppleWebKit/537.36 Chrome/125 Safari/537.36 27vette-asset-map-sync/1.0"
 )
 ASSET_SHEET = "asset_map"
-TARGET_TYPE = "option"
+TARGET_TYPE_OPTION = "option"
+TARGET_TYPE_MODEL = "model"
+TARGET_TYPE_CONTEXT_CHOICE = "context_choice"
+SUPPORTED_TARGET_TYPES = {TARGET_TYPE_OPTION, TARGET_TYPE_MODEL, TARGET_TYPE_CONTEXT_CHOICE}
 NEW_ROW_FIT = "cover"
 NEW_ROW_POSITION = "center"
 NEW_ROW_NOTE = "auto-seeded"
@@ -44,6 +47,7 @@ MISSING_IMAGE_ACTIONS = {"flag_missing", "flag_ambiguous", "flag_dead_no_match"}
 
 IMGI_RE = re.compile(r"^imgi_\d+_(.+)$")
 PREFIX_RE = re.compile(r"^([cehrsg])-(.+)$")
+MODEL_BODY_STYLE_RE = re.compile(r"^([cehrsg])(07|67)-([12])$")
 SPLIT_RE = re.compile(r"[-_]")
 RPO_RE = re.compile(r"^[0-9a-z]{3}$")
 
@@ -55,6 +59,20 @@ MODEL_PREFIX = {
     "s": "zr1x",
     "g": "grand_sport_x",
 }
+MODEL_TARGET_STEMS = {
+    "stingray": ("stingray", "stingray"),
+    "grand-sport": ("grand_sport", "grandSport"),
+    "grand_sport": ("grand_sport", "grandSport"),
+    "grandsport": ("grand_sport", "grandSport"),
+    "z06": ("z06", "z06"),
+    "zr1": ("zr1", "zr1"),
+    "zr1x": ("zr1x", "zr1x"),
+    "grand-sport-x": ("grand_sport_x", "grandSportX"),
+    "grand_sport_x": ("grand_sport_x", "grandSportX"),
+    "grandsportx": ("grand_sport_x", "grandSportX"),
+}
+BODY_STYLE_CODE = {"07": "coupe", "67": "convertible"}
+BODY_STYLE_IMAGE_FIELD = {"1": "image_url", "2": "hover_image_url"}
 
 
 @dataclass(frozen=True)
@@ -78,8 +96,8 @@ class WordPressMediaFetchError(RuntimeError):
 @dataclass(frozen=True)
 class SyncPlan:
     report: list[dict[str, str]]
-    url_writes: dict[int, str]
-    inserts: list[dict[str, str]]
+    url_writes: dict[tuple[int, str], str]
+    inserts: list[dict[str, Any]]
     status: dict[int, str]
     used: set[str]
 
@@ -91,6 +109,15 @@ class SyncPlan:
         yield self.inserts
         yield self.status
         yield self.used
+
+
+@dataclass(frozen=True)
+class MediaInventory:
+    option_exact: dict[tuple[str, str], list[str]]
+    option_bare: dict[str, list[str]]
+    model: dict[tuple[str, str], list[str]]
+    bodystyle: dict[tuple[str, str, str], list[str]]
+    unparseable: list[str]
 
 
 def filename_stem(url: str) -> str:
@@ -114,6 +141,24 @@ def parse_media(url: str) -> tuple[str | None, str, bool]:
     return model, rpo, bool(RPO_RE.match(rpo))
 
 
+def parse_model_media(url: str) -> tuple[str | None, str | None]:
+    """Return ``(model_key, target_id)`` for model-card media filenames."""
+
+    return MODEL_TARGET_STEMS.get(filename_stem(url), (None, None))
+
+
+def parse_bodystyle_media(url: str) -> tuple[str | None, str | None, str | None]:
+    """Return ``(model_key, body_style_target_id, image_field)`` for body style media."""
+
+    match = MODEL_BODY_STYLE_RE.match(filename_stem(url))
+    if not match:
+        return None, None, None
+    model_key = MODEL_PREFIX[match.group(1)]
+    body_style = BODY_STYLE_CODE[match.group(2)]
+    image_field = BODY_STYLE_IMAGE_FIELD[match.group(3)]
+    return model_key, f"body_style__{body_style}", image_field
+
+
 def build_media_index(media_urls: Iterable[str]) -> tuple[dict[tuple[str, str], list[str]], dict[str, list[str]], list[str]]:
     exact: dict[tuple[str, str], list[str]] = defaultdict(list)
     bare: dict[str, list[str]] = defaultdict(list)
@@ -127,6 +172,40 @@ def build_media_index(media_urls: Iterable[str]) -> tuple[dict[tuple[str, str], 
         else:
             bare[rpo].append(url)
     return exact, bare, unparseable
+
+
+def build_media_inventory(media_urls: Iterable[str]) -> MediaInventory:
+    option_exact: dict[tuple[str, str], list[str]] = defaultdict(list)
+    option_bare: dict[str, list[str]] = defaultdict(list)
+    model_media: dict[tuple[str, str], list[str]] = defaultdict(list)
+    bodystyle_media: dict[tuple[str, str, str], list[str]] = defaultdict(list)
+    unparseable: list[str] = []
+    for url in media_urls:
+        parsed_any = False
+        model_key, target_id = parse_model_media(url)
+        if model_key and target_id:
+            model_media[(model_key, target_id)].append(url)
+            parsed_any = True
+        body_model, body_target, image_field = parse_bodystyle_media(url)
+        if body_model and body_target and image_field:
+            bodystyle_media[(body_model, body_target, image_field)].append(url)
+            parsed_any = True
+        option_model, rpo, ok = parse_media(url)
+        if ok and not parsed_any:
+            parsed_any = True
+            if option_model:
+                option_exact[(option_model, rpo)].append(url)
+            else:
+                option_bare[rpo].append(url)
+        if not parsed_any:
+            unparseable.append(url)
+    return MediaInventory(
+        option_exact=dict(option_exact),
+        option_bare=dict(option_bare),
+        model=dict(model_media),
+        bodystyle=dict(bodystyle_media),
+        unparseable=unparseable,
+    )
 
 
 def _auth_header_from_env() -> str | None:
@@ -309,6 +388,7 @@ def read_option_sheets(wb, sources: dict[str, str]) -> dict[tuple[str, str], dic
             name = clean(row[index["option_name"]]) if "option_name" in index else ""
             section_id = clean(row[index["section_id"]]).lower() if "section_id" in index else ""
             desired[(model_key, option_id)] = {
+                "target_type": TARGET_TYPE_OPTION,
                 "rpo": rpo,
                 "name": name,
                 "section_id": section_id,
@@ -317,45 +397,126 @@ def read_option_sheets(wb, sources: dict[str, str]) -> dict[tuple[str, str], dic
     return desired
 
 
-def existing_option_asset_rows(ws, header_index: dict[str, int]) -> dict[tuple[str, str], dict[str, Any]]:
+def read_model_targets(wb) -> dict[tuple[str, str], dict[str, str]]:
+    desired: dict[tuple[str, str], dict[str, str]] = {}
+    if "model_registry_promotion" not in wb.sheetnames:
+        return desired
+    for row in rows_from_sheet(wb, "model_registry_promotion"):
+        if not (workbook_truthy(row.get("active")) and workbook_truthy(row.get("promoted_to_runtime"))):
+            continue
+        model_key = clean(row.get("model_key")).lower()
+        target_id = clean(row.get("registry_key")) or model_key
+        if not model_key or not target_id:
+            continue
+        desired[(model_key, target_id)] = {
+            "target_type": TARGET_TYPE_MODEL,
+            "rpo": "",
+            "name": clean(row.get("model_label")) or target_id,
+            "section_id": "",
+            "source_sheet": "model_registry_promotion",
+        }
+    return desired
+
+
+def read_bodystyle_targets(sources: dict[str, str]) -> dict[tuple[str, str], dict[str, str]]:
+    desired: dict[tuple[str, str], dict[str, str]] = {}
+    for model_key in sources:
+        for body_style, display_name in (("coupe", "Coupe"), ("convertible", "Convertible")):
+            target_id = f"body_style__{body_style}"
+            desired[(model_key, target_id)] = {
+                "target_type": TARGET_TYPE_CONTEXT_CHOICE,
+                "rpo": "",
+                "name": display_name,
+                "section_id": "sec_context_body_style",
+                "source_sheet": "generated_body_style_context",
+            }
+    return desired
+
+
+def existing_asset_rows(ws, header_index: dict[str, int]) -> dict[tuple[str, str], dict[str, Any]]:
     rows: dict[tuple[str, str], dict[str, Any]] = {}
     for row_number, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
         target_type = clean(row[header_index["target_type"]]).lower()
-        if target_type != TARGET_TYPE:
+        if target_type not in SUPPORTED_TARGET_TYPES:
             continue
         model_key = clean(row[header_index["model_key"]]).lower()
-        target_id = clean(row[header_index["target_id"]]).lower()
-        if not model_key or not target_id:
+        target_id = clean(row[header_index["target_id"]])
+        target_id_key = target_id.lower() if target_type == TARGET_TYPE_OPTION else target_id
+        if not model_key or not target_id_key:
             continue
-        url = clean(row[header_index["image_url"]])
-        rows[(model_key, target_id)] = {"row": row_number, "url": url}
+        values = {
+            "row": row_number,
+            "target_type": target_type,
+            "url": clean(row[header_index["image_url"]]),
+        }
+        if "hover_image_url" in header_index:
+            values["hover_image_url"] = clean(row[header_index["hover_image_url"]])
+        rows[(model_key, target_id_key)] = values
     return rows
 
 
 def reconcile(
     desired: dict[tuple[str, str], dict[str, str]],
-    exact: dict[tuple[str, str], list[str]],
-    bare: dict[str, list[str]],
-    existing_rows: dict[tuple[str, str], dict[str, Any]],
-    alive: dict[str, bool],
-    incremental: bool,
+    media: MediaInventory | dict[tuple[str, str], list[str]],
+    bare: dict[str, list[str]] | None = None,
+    existing_rows: dict[tuple[str, str], dict[str, Any]] | None = None,
+    alive: dict[str, bool] | None = None,
+    incremental: bool = False,
 ) -> SyncPlan:
-    """Pure reconciliation of desired option assets vs media candidates."""
+    """Pure reconciliation of desired asset targets vs current hosted media inventory."""
 
-    def resolve(model_key: str, rpo: str) -> tuple[str | None, str]:
+    if not isinstance(media, MediaInventory):
+        media = MediaInventory(
+            option_exact=media,
+            option_bare=bare or {},
+            model={},
+            bodystyle={},
+            unparseable=[],
+        )
+    existing_rows = existing_rows or {}
+    alive = alive or {}
+
+    def resolve_option(model_key: str, rpo: str) -> tuple[dict[str, str], str, str]:
         if not rpo:
-            return None, "no-rpo"
-        if (model_key, rpo) in exact:
-            return exact[(model_key, rpo)][0], "prefixed"
-        if rpo in bare:
-            if len(bare[rpo]) == 1:
-                return bare[rpo][0], "bare-shared"
-            return None, "bare-ambiguous"
-        return None, "none"
+            return {}, "no-rpo", "no rpo in option sheet"
+        if (model_key, rpo) in media.option_exact:
+            return {"image_url": media.option_exact[(model_key, rpo)][0]}, "prefixed", ""
+        if rpo in media.option_bare:
+            if len(media.option_bare[rpo]) == 1:
+                return {"image_url": media.option_bare[rpo][0]}, "bare-shared", ""
+            return {}, "bare-ambiguous", f"multiple bare files for '{rpo}'; keep one shared file or add c/e/h/r/s/g prefixes"
+        return {}, "none", ""
+
+    def resolve_fields(model_key: str, target_id: str, info: dict[str, str]) -> tuple[dict[str, str], str, str]:
+        target_type = info.get("target_type", TARGET_TYPE_OPTION)
+        if target_type == TARGET_TYPE_OPTION:
+            return resolve_option(model_key, info.get("rpo", ""))
+        if target_type == TARGET_TYPE_MODEL:
+            candidates = media.model.get((model_key, target_id), [])
+            if len(candidates) == 1:
+                return {"image_url": candidates[0]}, "model-filename", ""
+            if len(candidates) > 1:
+                return {}, "model-ambiguous", f"multiple model files for '{target_id}'"
+            return {}, "none", ""
+        if target_type == TARGET_TYPE_CONTEXT_CHOICE:
+            fields: dict[str, str] = {}
+            ambiguous: list[str] = []
+            for field in ("image_url", "hover_image_url"):
+                candidates = media.bodystyle.get((model_key, target_id, field), [])
+                if len(candidates) == 1:
+                    fields[field] = candidates[0]
+                elif len(candidates) > 1:
+                    ambiguous.append(field)
+            if ambiguous:
+                return {}, "bodystyle-ambiguous", f"multiple body-style files for {', '.join(ambiguous)}"
+            if fields:
+                return fields, "bodystyle-filename", ""
+            return {}, "none", ""
+        return {}, "unsupported-target-type", f"unsupported target_type '{target_type}'"
 
     report: list[dict[str, str]] = []
-    url_writes: dict[int, str] = {}
-    inserts: list[dict[str, str]] = []
+    url_writes: dict[tuple[int, str], str] = {}
+    inserts: list[dict[str, Any]] = []
     status: dict[int, str] = {}
     used: set[str] = set()
 
@@ -378,6 +539,7 @@ def reconcile(
                 "model_key": model_key,
                 "source_sheet": source_sheet,
                 "section_id": desired.get((model_key, target_id), {}).get("section_id", ""),
+                "target_type": desired.get((model_key, target_id), {}).get("target_type", ""),
                 "target_id": target_id,
                 "rpo": rpo,
                 "option_name": desired.get((model_key, target_id), {}).get("name", ""),
@@ -391,54 +553,73 @@ def reconcile(
         )
 
     for (model_key, target_id), info in desired.items():
-        rpo = info["rpo"]
+        rpo = info.get("rpo", "")
         source_sheet = info.get("source_sheet", "")
-        candidate, source = resolve(model_key, rpo)
-        if candidate:
-            used.add(candidate)
-        note = "" if rpo else "no rpo in option sheet"
-        if source == "bare-ambiguous":
-            note = f"multiple bare files for '{rpo}'; keep one shared file or add c/e/h/r/s/g prefixes"
+        fields, source, note = resolve_fields(model_key, target_id, info)
+        for url in fields.values():
+            used.add(url)
 
         existing = existing_rows.get((model_key, target_id))
         if existing:
             row_number = int(existing["row"])
-            existing_url = clean(existing.get("url"))
-            if existing_url:
-                ok = alive.get(existing_url, True)
-                if ok:
+            if fields:
+                changed_fields = []
+                for field, candidate in fields.items():
+                    existing_value = clean(existing.get("url" if field == "image_url" else field))
+                    if existing_value != candidate:
+                        url_writes[(row_number, field)] = candidate
+                        changed_fields.append(field)
+                if changed_fields:
                     status[row_number] = "ok"
-                    add_report("existing", model_key, source_sheet, target_id, rpo, "keep", source, existing_url, existing_url, "ok")
-                elif candidate:
-                    url_writes[row_number] = candidate
-                    status[row_number] = "ok"
-                    add_report("existing", model_key, source_sheet, target_id, rpo, "replace_404", source, existing_url, candidate, "ok")
+                    existing_url = clean(existing.get("url"))
+                    action = "fill" if not existing_url else "replace_canonical"
+                    add_report(
+                        "existing",
+                        model_key,
+                        source_sheet,
+                        target_id,
+                        rpo,
+                        action,
+                        source,
+                        existing_url,
+                        fields.get("image_url", existing_url),
+                        "ok",
+                        f"canonical media inventory differs in: {', '.join(changed_fields)}",
+                    )
                 else:
-                    image_status = "url_dead"
-                    action = "dead_no_match_incremental" if incremental else "flag_dead_no_match"
-                    status[row_number] = image_status
-                    add_report("existing", model_key, source_sheet, target_id, rpo, action, source, existing_url, existing_url, image_status, note)
-            elif candidate:
-                url_writes[row_number] = candidate
-                status[row_number] = "ok"
-                add_report("existing", model_key, source_sheet, target_id, rpo, "fill", source, "", candidate, "ok")
-            elif source == "bare-ambiguous":
+                    status[row_number] = "ok"
+                    existing_url = clean(existing.get("url"))
+                    add_report("existing", model_key, source_sheet, target_id, rpo, "keep", source, existing_url, existing_url, "ok")
+            elif source.endswith("ambiguous"):
                 status[row_number] = "ambiguous"
-                add_report("existing", model_key, source_sheet, target_id, rpo, "flag_ambiguous", source, "", "", "ambiguous", note)
+                add_report("existing", model_key, source_sheet, target_id, rpo, "flag_ambiguous", source, clean(existing.get("url")), "", "ambiguous", note)
             elif incremental:
-                add_report("existing", model_key, source_sheet, target_id, rpo, "skip_no_candidate_incremental", source, "", "", "missing")
+                add_report("existing", model_key, source_sheet, target_id, rpo, "skip_no_candidate_incremental", source, clean(existing.get("url")), "", "missing", note)
+            elif alive.get(clean(existing.get("url")), True) is False:
+                action = "dead_no_match_incremental" if incremental else "flag_dead_no_match"
+                status[row_number] = "url_dead"
+                add_report("existing", model_key, source_sheet, target_id, rpo, action, source, clean(existing.get("url")), "", "url_dead", note)
             else:
                 status[row_number] = "missing"
-                add_report("existing", model_key, source_sheet, target_id, rpo, "flag_missing", source, "", "", "missing", note)
+                add_report("existing", model_key, source_sheet, target_id, rpo, "flag_missing", source, clean(existing.get("url")), "", "missing", note)
             continue
 
-        if candidate:
-            insert = {"model": model_key, "tid": target_id, "rpo": rpo, "name": info["name"], "url": candidate, "status": "ok"}
+        if fields:
+            insert = {
+                "model": model_key,
+                "target_type": info.get("target_type", TARGET_TYPE_OPTION),
+                "tid": target_id,
+                "rpo": rpo,
+                "name": info.get("name", ""),
+                "fields": fields,
+                "url": fields.get("image_url", ""),
+                "status": "ok",
+            }
             if source_sheet:
                 insert["source_sheet"] = source_sheet
             inserts.append(insert)
-            add_report("new", model_key, source_sheet, target_id, rpo, "insert_filled", source, "", candidate, "ok", note)
-        elif source == "bare-ambiguous":
+            add_report("new", model_key, source_sheet, target_id, rpo, "insert_filled", source, "", fields.get("image_url", ""), "ok", note)
+        elif source.endswith("ambiguous"):
             add_report("new", model_key, source_sheet, target_id, rpo, "flag_ambiguous", source, "", "", "ambiguous", note)
         elif incremental:
             add_report("new", model_key, source_sheet, target_id, rpo, "skip_no_candidate_incremental", source, "", "", "missing", note)
@@ -448,19 +629,19 @@ def reconcile(
     for (model_key, target_id), existing in existing_rows.items():
         if (model_key, target_id) not in desired:
             row_number = int(existing["row"])
-            status[row_number] = "stale_option"
+            status[row_number] = "stale_target"
             add_report(
                 "stale",
                 model_key,
                 "",
                 target_id,
                 "",
-                "stale_option",
+                "stale_target",
                 "",
                 clean(existing.get("url")),
                 clean(existing.get("url")),
-                "stale_option",
-                "option no longer active+selectable",
+                "stale_target",
+                "asset target no longer desired by current promoted model inventory",
             )
 
     return SyncPlan(report=report, url_writes=url_writes, inserts=inserts, status=status, used=used)
@@ -488,6 +669,7 @@ def _write_reports(
         "model_key",
         "source_sheet",
         "section_id",
+        "target_type",
         "target_id",
         "rpo",
         "option_name",
@@ -508,6 +690,7 @@ def _write_reports(
         "model_key",
         "source_sheet",
         "section_id",
+        "target_type",
         "target_id",
         "rpo",
         "option_name",
@@ -613,8 +796,10 @@ def build_sync_plan(
 
     sources = discover_promoted_option_sources(wb)
     desired = read_option_sheets(wb, sources)
-    existing_rows = existing_option_asset_rows(ws, header_index)
-    exact, bare, unparseable = build_media_index(media_urls)
+    desired.update(read_model_targets(wb))
+    desired.update(read_bodystyle_targets(sources))
+    existing_rows = existing_asset_rows(ws, header_index)
+    media = build_media_inventory(media_urls)
 
     if verify_existing:
         alive = check_existing([row["url"] for row in existing_rows.values() if row.get("url")], timeout, workers)
@@ -623,14 +808,13 @@ def build_sync_plan(
 
     plan = reconcile(
         desired,
-        exact,
-        bare,
-        existing_rows,
-        alive,
-        incremental,
+        media,
+        existing_rows=existing_rows,
+        alive=alive,
+        incremental=incremental,
     )
-    unmatched = sorted(set(media_urls) - plan.used - set(unparseable))
-    return plan, sources, unmatched, unparseable
+    unmatched = sorted(set(media_urls) - plan.used - set(media.unparseable))
+    return plan, sources, unmatched, media.unparseable
 
 
 def apply_sync_plan(wb, *, asset_sheet: str, plan: SyncPlan) -> None:
@@ -640,21 +824,28 @@ def apply_sync_plan(wb, *, asset_sheet: str, plan: SyncPlan) -> None:
     headers = [clean(cell.value) for cell in ws[1]]
     header_index = _ensure_asset_headers(headers)
 
-    for row_number, url in plan.url_writes.items():
-        ws.cell(row_number, header_index["image_url"] + 1).value = url
+    for (row_number, field), url in plan.url_writes.items():
+        if field in header_index:
+            ws.cell(row_number, header_index[field] + 1).value = url
 
     for insert in plan.inserts:
         row_values: list[Any] = [""] * len(headers)
         row_values[header_index["model_key"]] = insert["model"]
-        row_values[header_index["target_type"]] = TARGET_TYPE
+        row_values[header_index["target_type"]] = insert.get("target_type", TARGET_TYPE_OPTION)
         row_values[header_index["target_id"]] = insert["tid"]
-        row_values[header_index["image_url"]] = insert["url"]
+        for field, value in insert.get("fields", {"image_url": insert.get("url", "")}).items():
+            if field in header_index:
+                row_values[header_index[field]] = value
         if "image_alt" in header_index:
             row_values[header_index["image_alt"]] = insert["name"]
+        if "hover_image_alt" in header_index and insert.get("fields", {}).get("hover_image_url"):
+            row_values[header_index["hover_image_alt"]] = insert["name"]
         if "image_fit" in header_index:
             row_values[header_index["image_fit"]] = NEW_ROW_FIT
         if "image_position" in header_index:
             row_values[header_index["image_position"]] = NEW_ROW_POSITION
+        if "hover_image_position" in header_index and insert.get("fields", {}).get("hover_image_url"):
+            row_values[header_index["hover_image_position"]] = NEW_ROW_POSITION
         if "active" in header_index:
             row_values[header_index["active"]] = True
         if "notes" in header_index:
@@ -669,7 +860,7 @@ def run_sync(
     media_urls: Iterable[str],
     apply: bool = False,
     asset_sheet: str = ASSET_SHEET,
-    verify_existing: bool = True,
+    verify_existing: bool = False,
     timeout: float = 10.0,
     workers: int = 16,
     incremental: bool = False,
@@ -762,7 +953,7 @@ def run_sync(
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Report or safely apply asset_map option image URL sync.")
+    parser = argparse.ArgumentParser(description="Report or safely apply asset_map image URL sync from current hosted media inventory.")
     parser.add_argument("--workbook", required=True, type=Path)
     parser.add_argument("--asset-sheet", default=ASSET_SHEET)
     parser.add_argument("--report-dir", required=True, type=Path)
@@ -770,7 +961,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--apply", action="store_true", help="Write workbook changes through save_workbook_safely()")
     parser.add_argument("--timeout", type=float, default=10.0)
     parser.add_argument("--workers", type=int, default=16)
-    parser.add_argument("--no-verify-existing", action="store_true", help="Skip existing URL liveness checks")
+    parser.add_argument("--verify-existing-network", dest="verify_existing", action="store_true", help="Optionally probe existing workbook URLs for dead-link reporting")
+    parser.add_argument("--no-verify-existing", dest="verify_existing", action="store_false", help="Deprecated no-op; network verification is off by default")
     parser.add_argument("--since", default=None, metavar="DATE", help="Media modified-after date, or 'auto' for saved cursor")
     return parser
 
@@ -805,7 +997,7 @@ def main(argv: list[str] | None = None) -> int:
         media_urls=media_urls,
         apply=args.apply,
         asset_sheet=args.asset_sheet,
-        verify_existing=not args.no_verify_existing,
+        verify_existing=args.verify_existing,
         timeout=args.timeout,
         workers=args.workers,
         incremental=modified_after is not None,

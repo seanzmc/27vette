@@ -7,16 +7,19 @@ from typing import Any, Mapping
 from corvette_form_generator.workbook import clean, rows_from_sheet, workbook_truthy
 
 
-ASSET_IMAGE_FIELDS = ("image_url", "image_alt", "image_fit", "image_position")
+ASSET_IMAGE_FIELDS = (
+    "image_url",
+    "image_alt",
+    "image_fit",
+    "image_position",
+    "hover_image_url",
+    "hover_image_alt",
+    "hover_image_position",
+)
 
 
 def asset_fields(row: dict[str, Any]) -> dict[str, str]:
-    return {
-        "image_url": clean(row.get("image_url")),
-        "image_alt": clean(row.get("image_alt")),
-        "image_fit": clean(row.get("image_fit")),
-        "image_position": clean(row.get("image_position")),
-    }
+    return {field: clean(row.get(field)) for field in ASSET_IMAGE_FIELDS}
 
 
 def load_asset_map(wb, model_key: str) -> dict[tuple[str, str], dict[str, str]]:
@@ -47,6 +50,16 @@ def option_asset_map(wb, model_key: str) -> dict[str, dict[str, str]]:
         target_id: fields
         for (target_type, target_id), fields in load_asset_map(wb, model_key).items()
         if target_type == "option"
+    }
+
+
+def bodystyle_asset_map(wb, model_key: str) -> dict[str, dict[str, str]]:
+    """Body-style context-card assets keyed by body style context choice id."""
+
+    return {
+        target_id: fields
+        for (target_type, target_id), fields in load_asset_map(wb, model_key).items()
+        if target_type == "context_choice"
     }
 
 
@@ -120,17 +133,19 @@ def build_body_context_choices(
     copy_rows: list[dict[str, str]],
     model_key: str,
     body_style_display_order: Mapping[str, int],
+    assets: Mapping[str, dict[str, str]] | None = None,
 ) -> list[dict[str, Any]]:
     body_context_choices: list[dict[str, Any]] = []
+    assets = assets or {}
     body_styles = sorted(
         {row["body_style"] for row in variants},
         key=lambda body_style: body_style_display_order.get(body_style, 99),
     )
     for body_style in body_styles:
         body_variants = [row for row in variants if row["body_style"] == body_style]
-        body_context_choices.append(
-            {
-                "context_choice_id": f"body_style__{body_style}",
+        context_choice_id = f"body_style__{body_style}"
+        choice = {
+                "context_choice_id": context_choice_id,
                 "context_type": "body_style",
                 "value": body_style,
                 "label": body_style.title(),
@@ -150,7 +165,9 @@ def build_body_context_choices(
                 "base_price": "",
                 "display_order": body_style_display_order.get(body_style, 99),
             }
-        )
+        if asset := assets.get(context_choice_id):
+            choice.update(asset)
+        body_context_choices.append(choice)
     return body_context_choices
 
 

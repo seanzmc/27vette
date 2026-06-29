@@ -13,6 +13,7 @@ from openpyxl import load_workbook
 
 from corvette_form_generator.contract import (
     ASSET_IMAGE_FIELDS,
+    bodystyle_asset_map,
     build_body_context_choices,
     build_trim_context_choices,
     context_choice_copy_rows,
@@ -665,6 +666,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     apply_status_lookup(rows, status_lookup_from_sheet(wb, config), config)
     variant_option_overrides = keyed_variant_option_overrides(wb, config)
     context_copy_rows = context_choice_copy_rows(wb, config.model_key)
+    bodystyle_assets = bodystyle_asset_map(wb, config.model_key)
     special_review_rpos = {
         clean(rpo)
         for rpo in (config.special_rule_review_rpos or tuple(SPECIAL_REVIEW_RPOS))
@@ -691,7 +693,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
         )
 
     context_choices = build_body_context_choices(
-        variants, context_copy_rows, config.model_key, config.body_style_display_order
+        variants, context_copy_rows, config.model_key, config.body_style_display_order, bodystyle_assets
     ) + build_trim_context_choices(variants, context_copy_rows, config.model_key)
     variants_by_id = {row["variant_id"]: row for row in variants}
 

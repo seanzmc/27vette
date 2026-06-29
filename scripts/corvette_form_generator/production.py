@@ -15,6 +15,7 @@ from typing import Any
 from openpyxl import load_workbook
 from corvette_form_generator.contract import (
     ASSET_IMAGE_FIELDS,
+    bodystyle_asset_map,
     build_body_context_choices,
     build_trim_context_choices,
     context_choice_copy_rows,
@@ -200,6 +201,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
         for row in variant_option_override_rows
     }
     option_assets = option_asset_map(wb, MODEL_CONFIG.model_key)
+    bodystyle_assets = bodystyle_asset_map(wb, MODEL_CONFIG.model_key)
     grouped_requires = grouped_requirement_pairs(rule_groups)
     grouped_excludes = grouped_exclusion_pairs(rule_groups) | exclusive_group_pairs(exclusive_groups)
 
@@ -278,7 +280,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
         row["section_ids"] = "|".join(sorted(section_ids_by_step.get(row["step_key"], [])))
 
     context_choices = build_body_context_choices(
-        active_variants, context_copy_rows, MODEL_CONFIG.model_key, BODY_STYLE_DISPLAY_ORDER
+        active_variants, context_copy_rows, MODEL_CONFIG.model_key, BODY_STYLE_DISPLAY_ORDER, bodystyle_assets
     ) + build_trim_context_choices(active_variants, context_copy_rows, MODEL_CONFIG.model_key)
 
     def choice_section_metadata(section_id: str) -> dict[str, Any]:

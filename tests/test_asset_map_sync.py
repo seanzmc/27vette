@@ -254,6 +254,20 @@ def test_parse_media_requires_hyphen_for_model_prefix() -> None:
     assert asset_map_sync.parse_media("https://example.test/27vette/paint/c-gba.png") == ("stingray", "gba", True)
 
 
+def test_parse_model_and_bodystyle_media_names() -> None:
+    assert asset_map_sync.parse_model_media("https://example.test/27vette/grandsport.png") == ("grand_sport", "grandSport")
+    assert asset_map_sync.parse_bodystyle_media("https://example.test/27vette/c07-1.png") == (
+        "stingray",
+        "body_style__coupe",
+        "image_url",
+    )
+    assert asset_map_sync.parse_bodystyle_media("https://example.test/27vette/h67-2.png") == (
+        "z06",
+        "body_style__convertible",
+        "hover_image_url",
+    )
+
+
 def test_discovery_uses_promoted_runtime_models_not_inactive_future_sheets() -> None:
     wb = make_discovery_workbook()
 
@@ -302,31 +316,10 @@ def test_reconcile_uses_bare_media_as_shared_fallback_after_model_prefixed_media
     assert urls[("stingray", "opt_gba_001")] == "https://example.test/27vette/paint/gba.png"
     assert urls[("grand_sport", "opt_gba_001")] == "https://example.test/27vette/paint/gba.png"
     assert urls[("z06", "opt_stx_001")] == "https://example.test/27vette/z06/h-stx.png"
-    assert inserts == [
-        {
-            "model": "stingray",
-            "tid": "opt_gba_001",
-            "rpo": "gba",
-            "name": "Black",
-            "url": "https://example.test/27vette/paint/gba.png",
-            "status": "ok",
-        },
-        {
-            "model": "grand_sport",
-            "tid": "opt_gba_001",
-            "rpo": "gba",
-            "name": "Black",
-            "url": "https://example.test/27vette/paint/gba.png",
-            "status": "ok",
-        },
-        {
-            "model": "z06",
-            "tid": "opt_stx_001",
-            "rpo": "stx",
-            "name": "Stripe",
-            "url": "https://example.test/27vette/z06/h-stx.png",
-            "status": "ok",
-        }
+    assert [(row["model"], row["tid"], row["url"], row["target_type"]) for row in inserts] == [
+        ("stingray", "opt_gba_001", "https://example.test/27vette/paint/gba.png", "option"),
+        ("grand_sport", "opt_gba_001", "https://example.test/27vette/paint/gba.png", "option"),
+        ("z06", "opt_stx_001", "https://example.test/27vette/z06/h-stx.png", "option"),
     ]
     assert url_writes == {}
     assert status == {}
@@ -358,6 +351,79 @@ def test_reconcile_flags_duplicate_bare_media_for_same_rpo_as_ambiguous() -> Non
     assert all("multiple bare files" in row["note"] for row in report)
     assert url_writes == {}
     assert inserts == []
+    assert status == {}
+
+
+def test_reconcile_replaces_existing_url_when_canonical_media_inventory_differs() -> None:
+    desired = {
+        ("stingray", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black"},
+    }
+    media = asset_map_sync.build_media_inventory(["https://example.test/27vette/paint/c-gba-new.png"])
+
+    report, url_writes, inserts, status, _used = asset_map_sync.reconcile(
+        desired,
+        media,
+        existing_rows={
+            ("stingray", "opt_gba_001"): {
+                "row": 12,
+                "target_type": "option",
+                "url": "https://example.test/27vette/paint/c-gba-old.png",
+            }
+        },
+        alive={"https://example.test/27vette/paint/c-gba-old.png": True},
+        incremental=False,
+    )
+
+    assert report[0]["action"] == "replace_canonical"
+    assert report[0]["new_url"] == "https://example.test/27vette/paint/c-gba-new.png"
+    assert url_writes == {(12, "image_url"): "https://example.test/27vette/paint/c-gba-new.png"}
+    assert inserts == []
+    assert status == {12: "ok"}
+
+
+def test_reconcile_inserts_context_choice_base_and_hover_media_from_naming_pair() -> None:
+    desired = {
+        ("stingray", "body_style__coupe"): {
+            "target_type": "context_choice",
+            "rpo": "",
+            "name": "Coupe",
+            "source_sheet": "generated_body_style_context",
+        }
+    }
+    media = asset_map_sync.build_media_inventory(
+        [
+            "https://example.test/27vette/body/c07-1.png",
+            "https://example.test/27vette/body/c07-2.png",
+        ]
+    )
+
+    report, url_writes, inserts, status, _used = asset_map_sync.reconcile(
+        desired,
+        media,
+        existing_rows={},
+        alive={},
+        incremental=False,
+    )
+
+    assert report[0]["action"] == "insert_filled"
+    assert report[0]["target_type"] == "context_choice"
+    assert inserts == [
+        {
+            "model": "stingray",
+            "target_type": "context_choice",
+            "tid": "body_style__coupe",
+            "rpo": "",
+            "name": "Coupe",
+            "fields": {
+                "image_url": "https://example.test/27vette/body/c07-1.png",
+                "hover_image_url": "https://example.test/27vette/body/c07-2.png",
+            },
+            "url": "https://example.test/27vette/body/c07-1.png",
+            "status": "ok",
+            "source_sheet": "generated_body_style_context",
+        }
+    ]
+    assert url_writes == {}
     assert status == {}
 
 
@@ -453,7 +519,7 @@ def test_report_manifest_records_source_inventory_and_counts(tmp_path: Path) -> 
     assert manifest["media_source"] == "media-url-list"
     assert manifest["verify_existing"] is False
     assert manifest["included_sources"] == [{"model_key": "stingray", "option_sheet": "stingray_options"}]
-    assert manifest["action_counts"] == {"insert_filled": 1}
+    assert manifest["action_counts"] == {"flag_missing": 3, "insert_filled": 1}
     assert manifest["url_write_count"] == 0
     assert manifest["insert_count"] == 1
     assert manifest["media_url_count"] == len(asset_map_sync.read_media_url_list(fixture))
@@ -486,12 +552,11 @@ def test_missing_images_artifact_written_and_manifested(tmp_path: Path) -> None:
     assert Path(manifest["missing_images_path"]) == missing_path
 
     rows = list(csv.DictReader(missing_path.open(encoding="utf-8")))
-    assert manifest["missing_images_count"] == len(rows) == 1
-    assert {(row["target_id"], row["action"]) for row in rows} == {
-        ("opt_noimg_001", "flag_missing"),
-    }
-    assert rows[0]["section_id"] == "sec_test_001"
-    assert rows[0]["option_name"] == "No Image"
+    assert manifest["missing_images_count"] == len(rows) == 7
+    assert ("opt_noimg_001", "flag_missing") in {(row["target_id"], row["action"]) for row in rows}
+    no_image = next(row for row in rows if row["target_id"] == "opt_noimg_001")
+    assert no_image["section_id"] == "sec_test_001"
+    assert no_image["option_name"] == "No Image"
 
 
 def test_missing_images_artifact_excludes_keep_insert_and_unmatched(tmp_path: Path) -> None:

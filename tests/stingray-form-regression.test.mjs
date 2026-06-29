@@ -989,13 +989,20 @@ test("card media support is optional and data-driven", () => {
   paint.image_alt = "Black \"paint\" preview";
   paint.image_fit = "contain";
   paint.image_position = "50% 40%";
+  paint.hover_image_url = "./assets/cards/black-hover.webp";
+  paint.hover_image_alt = "Black hover preview";
+  paint.hover_image_position = "60% 45%";
 
   runtime.state.activeStep = "paint";
   runtime.render();
   let html = runtime.elements.get("#stepContent").innerHTML;
   assert.match(html, /class="choice-card has-media/);
-  assert.match(html, /<span class="choice-media" data-fit="contain">/);
+  assert.match(html, /<span class="choice-media has-hover-media" data-fit="contain">/);
   assert.match(html, /src="\.\/assets\/cards\/black&amp;trim\.webp"/);
+  assert.match(html, /class="choice-media has-hover-media"/);
+  assert.match(html, /class="choice-media-hover" src="\.\/assets\/cards\/black-hover\.webp"/);
+  assert.match(html, /alt="Black hover preview"/);
+  assert.match(html, /object-position: 60% 45%;/);
   assert.match(html, /alt="Black &quot;paint&quot; preview"/);
   assert.match(html, /object-position: 50% 40%;/);
 
@@ -1003,8 +1010,11 @@ test("card media support is optional and data-driven", () => {
   paint.image_position = "url(javascript:bad)";
   runtime.render();
   html = runtime.elements.get("#stepContent").innerHTML;
-  assert.match(html, /<span class="choice-media" data-fit="cover">/);
+  assert.match(html, /<span class="choice-media has-hover-media" data-fit="cover">/);
   assert.match(html, /object-position: center;/);
+  paint.hover_image_url = "";
+  paint.hover_image_alt = "";
+  paint.hover_image_position = "";
 });
 
 test("choice cards reserve availability slot and move disabled reason into tooltip pill", () => {
