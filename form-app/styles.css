@@ -1015,13 +1015,22 @@ textarea {
 }
 
 .choice-media.has-hover-media img {
-  transition: opacity 160ms ease;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity;
+}
+
+.choice-media.has-hover-media .choice-media-base {
+  position: absolute;
+  inset: 0;
 }
 
 .choice-media-hover {
   position: absolute;
   inset: 0;
   opacity: 0;
+  pointer-events: none;
 }
 
 .choice-card:hover .choice-media.has-hover-media .choice-media-hover,

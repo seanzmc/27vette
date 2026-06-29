@@ -326,13 +326,15 @@ function renderCardMedia(row = {}, fallbackAlt = "", { disabled = false } = {}) 
   const imageFit = cardImageFit(row.image_fit);
   const imagePosition = cardImagePosition(row.image_position);
   const hoverImagePosition = cardImagePosition(row.hover_image_position || row.image_position);
+  const loading = hoverImageUrl ? "eager" : "lazy";
+  const fetchPriority = hoverImageUrl ? "high" : "auto";
   const classes = ["choice-media"];
   if (disabled) classes.push("disabled");
   if (hoverImageUrl) classes.push("has-hover-media");
   return `
     <span class="${classes.join(" ")}" data-fit="${escapeHtml(imageFit)}">
-      <img class="choice-media-base" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}" loading="lazy" style="object-position: ${escapeHtml(imagePosition)};">
-      ${hoverImageUrl ? `<img class="choice-media-hover" src="${escapeHtml(hoverImageUrl)}" alt="${escapeHtml(hoverImageAlt)}" loading="lazy" style="object-position: ${escapeHtml(hoverImagePosition)};">` : ""}
+      <img class="choice-media-base" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(imageAlt)}" loading="${loading}" decoding="async" fetchpriority="${fetchPriority}" draggable="false" style="object-position: ${escapeHtml(imagePosition)};">
+      ${hoverImageUrl ? `<img class="choice-media-hover" src="${escapeHtml(hoverImageUrl)}" alt="${escapeHtml(hoverImageAlt)}" loading="eager" decoding="async" fetchpriority="high" draggable="false" style="object-position: ${escapeHtml(hoverImagePosition)};">` : ""}
     </span>
   `;
 }

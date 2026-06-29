@@ -980,6 +980,8 @@ test("card media support is optional and data-driven", () => {
   assert.match(appSource, /function renderCardMedia/);
   assert.match(appSource, /function cardSupportsHoverMedia/);
   assert.match(stylesSource, /\.choice-media\s*\{[\s\S]*aspect-ratio:\s*16 \/ 9/);
+  assert.match(stylesSource, /transition:\s*opacity 280ms cubic-bezier\(0\.22, 1, 0\.36, 1\)/);
+  assert.match(stylesSource, /will-change:\s*opacity/);
   assert.match(stylesSource, /\.choice-card:hover \.choice-media\.has-hover-media \.choice-media-base,/);
   assert.match(stylesSource, /\.choice-card:focus-visible \.choice-media\.has-hover-media \.choice-media-base\s*\{[\s\S]*?opacity:\s*0/);
   assert.doesNotMatch(stylesSource, /\.choice-card:hover \.choice-media-base\s*\{/);
@@ -1004,6 +1006,7 @@ test("card media support is optional and data-driven", () => {
   assert.match(html, /class="choice-card has-media/);
   assert.match(html, /<span class="choice-media" data-fit="contain">/);
   assert.match(html, /src="\.\/assets\/cards\/black&amp;trim\.webp"/);
+  assert.match(html, /loading="lazy" decoding="async" fetchpriority="auto"/);
   assert.doesNotMatch(html, /class="choice-media has-hover-media"/);
   assert.doesNotMatch(html, /class="choice-media-hover"/);
   assert.match(html, /alt="Black &quot;paint&quot; preview"/);
@@ -1030,7 +1033,9 @@ test("card media support is optional and data-driven", () => {
   bodyChoice.hover_image_position = "55% 50%";
   const bodyHtml = runtime.renderContextCard(bodyChoice, { setup: true, compact: true });
   assert.match(bodyHtml, /class="choice-media has-hover-media"/);
+  assert.match(bodyHtml, /class="choice-media-base"[^>]*loading="eager" decoding="async" fetchpriority="high"/);
   assert.match(bodyHtml, /class="choice-media-hover" src="\.\/assets\/cards\/body-hover\.webp"/);
+  assert.match(bodyHtml, /class="choice-media-hover"[^>]*loading="eager" decoding="async" fetchpriority="high"/);
   assert.match(bodyHtml, /alt="Body style hover preview"/);
   assert.match(bodyHtml, /object-position: 55% 50%;/);
 });
