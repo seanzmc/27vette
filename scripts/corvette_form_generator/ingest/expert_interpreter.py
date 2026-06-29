@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from itertools import combinations
@@ -12,6 +13,12 @@ from typing import Any
 
 from openpyxl import load_workbook
 
+from corvette_form_generator.ingest.model_selection import (
+    assert_selection_matches,
+    build_model_selection,
+    read_model_selection,
+    selection_fingerprint,
+)
 from corvette_form_generator.ingest.source_profiler import rows_from_sheet, validate_output_dir
 from corvette_form_generator.workbook import clean, workbook_truthy
 
@@ -40,6 +47,7 @@ OUTPUT_FILES = [
     "source-sheet-coverage.md",
     "blocked-interpretation.json",
 ]
+WORKBOOK_BUILD_FILES = ["model-selection.json", "workbook-build-summary.json", "workbook-build-review-units.json"]
 AUTO_ALLOWED_DUPLICATE_CLASSES = {"single_source", "redundant_duplicates"}
 VISIBLE_CONFIDENCES = {"mechanical_safe", "review_needed", "blocked"}
 
@@ -52,6 +60,9 @@ def interpret_order_guide_candidates(
     output_dir: Path,
     run_id: str,
     root: Path | None = None,
+    selected_models: list[str] | str | None = None,
+    primary_models: list[str] | str | None = None,
+    comparator_models: list[str] | str | None = None,
 ) -> dict[str, Any]:
     """Aggregate Pass 1 raw candidates into read-only model/RPO review units."""
 
@@ -65,13 +76,26 @@ def interpret_order_guide_candidates(
     evidence = load_artifacts(evidence_dir, EVIDENCE_FILES)
     candidates = load_artifacts(candidates_dir, CANDIDATE_FILES)
     validate_inputs(evidence, candidates)
+    selection_metadata = load_or_validate_selection(
+        evidence_dir=evidence_dir,
+        candidates_dir=candidates_dir,
+        evidence=evidence,
+        run_id=run_id,
+        selected_models=selected_models,
+        primary_models=primary_models,
+        comparator_models=comparator_models,
+    )
     workbook_index = load_workbook_identity_and_status(workbook)
 
     interpreted_options = build_interpreted_options(candidates, workbook_index)
+    if selection_metadata:
+        selected = set(selection_metadata["selected_models"])
+        interpreted_options = [item for item in interpreted_options if item["model_key"] in selected]
     source_sheet_coverage = build_source_sheet_coverage(interpreted_options)
     duplicate_report = build_duplicate_report(interpreted_options)
     review_queue = [item for item in interpreted_options if item["interpretation_confidence"] in VISIBLE_CONFIDENCES]
     blocked_interpretation = build_blocked_interpretation(interpreted_options, candidates["unresolved_review"])
+    workbook_build_units = build_workbook_build_units(interpreted_options, blocked_interpretation, selection_metadata)
     summary = build_summary(
         run_id=run_id,
         evidence_dir=evidence_dir,
@@ -84,10 +108,12 @@ def interpret_order_guide_candidates(
         source_sheet_coverage=source_sheet_coverage,
         candidate_summary=candidates["candidate_summary"],
         unresolved_review=candidates["unresolved_review"],
+        selection_metadata=selection_metadata,
     )
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    write_json(output_dir / "interpretation-summary.json", summary)
+    if selection_metadata:
+        shutil.copyfile(candidates_dir / "model-selection.json", output_dir / "model-selection.json")
     write_json(output_dir / "interpreted-options.json", interpreted_options)
     write_json(output_dir / "review-queue.json", review_queue)
     write_json(output_dir / "duplicate-rpo-report.json", duplicate_report)
@@ -95,6 +121,17 @@ def interpret_order_guide_candidates(
     write_json(output_dir / "source-sheet-coverage.json", source_sheet_coverage)
     (output_dir / "source-sheet-coverage.md").write_text(render_source_sheet_coverage(source_sheet_coverage) + "\n")
     write_json(output_dir / "blocked-interpretation.json", blocked_interpretation)
+    if selection_metadata:
+        write_json(output_dir / "workbook-build-review-units.json", workbook_build_units)
+        workbook_build_summary = build_workbook_build_summary(
+            run_id=run_id,
+            selection_metadata=selection_metadata,
+            workbook_build_units=workbook_build_units,
+            output_dir=output_dir,
+        )
+        write_json(output_dir / "workbook-build-summary.json", workbook_build_summary)
+    summary["artifact_files"] = OUTPUT_FILES + (WORKBOOK_BUILD_FILES if selection_metadata else [])
+    write_json(output_dir / "interpretation-summary.json", summary)
 
     return {
         "status": "passed",
@@ -109,7 +146,7 @@ def interpret_order_guide_candidates(
         "conflicting_duplicate_count": summary["conflicting_duplicate_count"],
         "reduction_status": summary["reduction_status"],
         "reduction_reason_codes": summary["reduction_reason_codes"],
-        "artifact_files": OUTPUT_FILES,
+        "artifact_files": summary["artifact_files"],
     }
 
 
@@ -121,6 +158,34 @@ def load_artifacts(directory: Path, file_map: dict[str, str]) -> dict[str, Any]:
             raise ValueError(f"Missing required ingest artifact: {path}")
         artifacts[key] = json.loads(path.read_text())
     return artifacts
+
+
+def load_or_validate_selection(
+    *,
+    evidence_dir: Path,
+    candidates_dir: Path,
+    evidence: dict[str, Any],
+    run_id: str,
+    selected_models: list[str] | str | None,
+    primary_models: list[str] | str | None,
+    comparator_models: list[str] | str | None,
+) -> dict[str, Any] | None:
+    selection_path = candidates_dir / "model-selection.json"
+    if selected_models or primary_models or comparator_models:
+        selection = read_model_selection(selection_path)
+        expected = build_model_selection(
+            evidence_dir=evidence_dir,
+            variant_matrix=evidence["variant_matrix"],
+            run_id=run_id,
+            selected_models=selected_models or selection["selected_models"],
+            primary_models=primary_models or selection["primary_models"],
+            comparator_models=comparator_models or selection["comparator_models"],
+        )
+        assert_selection_matches(selection, expected, left="candidate model-selection.json", right="interpreter selected-model args")
+        return selection
+    if selection_path.exists():
+        return read_model_selection(selection_path)
+    return None
 
 
 def validate_inputs(evidence: dict[str, Any], candidates: dict[str, Any]) -> None:
@@ -143,16 +208,14 @@ def load_workbook_identity_and_status(workbook: Path) -> dict[str, Any]:
             for row in rows_from_sheet(wb, "model_master")
             if clean(row.get("model_key"))
         }
-        source_rows = [
-            row for row in rows_from_sheet(wb, "model_workbook_sources")
-            if workbook_truthy(row.get("active"))
-        ]
+        source_rows = list(rows_from_sheet(wb, "model_workbook_sources"))
         option_sources = [row for row in source_rows if clean(row.get("source_role")) == "source_option_sheet"]
         status_sources = [row for row in source_rows if clean(row.get("source_role")) == "status_sheet"]
         by_model_rpo: dict[str, dict[str, list[dict[str, str]]]] = defaultdict(lambda: defaultdict(list))
         by_model_option_id: dict[str, dict[str, dict[str, str]]] = defaultdict(dict)
         inactive_by_model_rpo: dict[str, dict[str, list[dict[str, str]]]] = defaultdict(lambda: defaultdict(list))
         for source in option_sources:
+            source_active = workbook_truthy(source.get("active"))
             model_key = clean(source.get("model_key"))
             sheet_name = clean(source.get("sheet_name"))
             if not model_key or sheet_name not in wb.sheetnames:
@@ -166,7 +229,7 @@ def load_workbook_identity_and_status(workbook: Path) -> dict[str, Any]:
                 payload["model_key"] = model_key
                 payload["sheet_name"] = sheet_name
                 by_model_option_id[model_key][option_id] = payload
-                if clean(row.get("active")) == "" or workbook_truthy(row.get("active")):
+                if source_active and (clean(row.get("active")) == "" or workbook_truthy(row.get("active"))):
                     by_model_rpo[model_key][rpo].append(payload)
                 else:
                     inactive_by_model_rpo[model_key][rpo].append(payload)
@@ -339,8 +402,6 @@ def classify_duplicates(source_occurrences: list[dict[str, Any]], availability_m
 
 
 def workbook_identity(model_key: str, rpo: str, workbook_index: dict[str, Any]) -> dict[str, Any]:
-    if not workbook_index["model_active"].get(model_key, False):
-        return {"match_status": "out_of_scope_model", "matches": []}
     active_matches = workbook_index["by_model_rpo"].get(model_key, {}).get(rpo, [])
     if len(active_matches) == 1:
         match = active_matches[0]
@@ -360,7 +421,11 @@ def workbook_identity(model_key: str, rpo: str, workbook_index: dict[str, Any]) 
     inactive_matches = workbook_index["inactive_by_model_rpo"].get(model_key, {}).get(rpo, [])
     if inactive_matches:
         return {"match_status": "inactive_or_scaffold_match", "matches": [match_payload(match) for match in inactive_matches]}
-    return {"match_status": "missing_in_workbook", "matches": []}
+    return {
+        "match_status": "missing_in_workbook",
+        "matches": [],
+        "model_active": workbook_index["model_active"].get(model_key, False),
+    }
 
 
 def match_payload(match: dict[str, str]) -> dict[str, str]:
@@ -668,6 +733,166 @@ def build_blocked_interpretation(interpreted_options: list[dict[str, Any]], unre
     return {"blocked_options": blocked_options, "out_of_scope_unresolved_items": out_of_scope}
 
 
+def build_workbook_build_units(
+    interpreted_options: list[dict[str, Any]],
+    blocked_interpretation: dict[str, Any],
+    selection_metadata: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
+    if not selection_metadata:
+        return []
+    primary = set(selection_metadata.get("primary_models") or [])
+    comparator = set(selection_metadata.get("comparator_models") or [])
+    units: list[dict[str, Any]] = []
+    for item in interpreted_options:
+        model_key = item["model_key"]
+        model_role = "comparator" if model_key in comparator else "primary" if model_key in primary else "selected"
+        presence = workbook_presence_for(item["workbook_identity_match"])
+        base = {
+            "model_key": model_key,
+            "model_role": model_role,
+            "rpo": item.get("rpo"),
+            "source_sheets": sorted({occ.get("source_sheet") for occ in item.get("source_occurrences", []) if occ.get("source_sheet")}),
+            "source_refs": [ref for occ in item.get("source_occurrences", []) for ref in occ.get("source_refs", [])],
+            "raw_source_snapshot": (item.get("primary_source_occurrence") or {}).get("raw_values", {}),
+            "status_matrix_summary": item.get("status_pattern_summary", {}),
+            "relationship_hint_summary": item.get("disclosure_evidence", {}),
+            "workbook_presence": presence,
+            "required_fields_missing": required_fields_missing(item),
+            "comparator_context": {"comparator_only": model_role == "comparator"},
+        }
+        option_sheet = f"{model_key}_options"
+        ovs_sheet = f"{model_key}_ovs"
+        units.append({
+            **base,
+            "review_unit_id": f"wb-option-{slug(model_key)}-{slug(item.get('rpo'))}",
+            "lane": "option_rows",
+            "target_sheet": option_sheet,
+            "target_workbook_surface": option_sheet,
+            "proposed_workbook_action": "create_option_row" if presence == "missing" else "verify_existing_option_row",
+        })
+        if item.get("availability_matrix"):
+            units.append({
+                **base,
+                "review_unit_id": f"wb-ovs-{slug(model_key)}-{slug(item.get('rpo'))}",
+                "lane": "ovs_rows",
+                "target_sheet": ovs_sheet,
+                "target_workbook_surface": ovs_sheet,
+                "proposed_workbook_action": "create_ovs_rows" if presence == "missing" else "verify_status_matrix",
+            })
+        if item.get("disclosure_evidence", {}).get("rule_candidates") or item.get("disclosure_evidence", {}).get("unresolved_items"):
+            units.append({
+                **base,
+                "review_unit_id": f"wb-rel-{slug(model_key)}-{slug(item.get('rpo'))}",
+                "lane": "relationships",
+                "target_sheet": f"{model_key}_rule_mapping",
+                "target_workbook_surface": f"{model_key}_rule_mapping",
+                "proposed_workbook_action": "create_relationship_candidate",
+            })
+        if item.get("duplicate_classification") != "single_source":
+            units.append({
+                **base,
+                "review_unit_id": f"wb-dup-{slug(model_key)}-{slug(item.get('rpo'))}",
+                "lane": "duplicates_and_source_coverage",
+                "target_sheet": "source_sheet_coverage",
+                "target_workbook_surface": "source_sheet_coverage",
+                "proposed_workbook_action": "classify_duplicate_source",
+            })
+    for index, item in enumerate(blocked_interpretation.get("out_of_scope_unresolved_items", []), start=1):
+        category = item.get("category") or "source_shape"
+        action = "defer_price_extractor" if category == "price_out_of_scope" else "defer_color_trim_extractor" if category == "color_trim_out_of_scope" else "blocked_unsupported_source_structure"
+        units.append({
+            "review_unit_id": f"wb-blocked-{index:05d}-{slug(category)}",
+            "lane": "blocked_extractor_gaps",
+            "model_key": "",
+            "model_role": "all_selected",
+            "rpo": "",
+            "target_sheet": "extractor_gap",
+            "target_workbook_surface": category,
+            "proposed_workbook_action": action,
+            "workbook_presence": "not_applicable",
+            "required_fields_missing": [],
+            "source_sheets": sorted({ref.get("source_sheet") for ref in item.get("source_refs", []) if ref.get("source_sheet")}),
+            "source_refs": item.get("source_refs", []),
+            "raw_source_snapshot": item.get("raw_values", {}),
+            "status_matrix_summary": {},
+            "relationship_hint_summary": {},
+            "comparator_context": {},
+        })
+    lane_order = {
+        "option_rows": 0,
+        "ovs_rows": 1,
+        "relationships": 2,
+        "pricing": 3,
+        "duplicates_and_source_coverage": 4,
+        "blocked_extractor_gaps": 5,
+    }
+    return sorted(units, key=lambda row: (lane_order.get(row["lane"], 99), row.get("model_key") or "", row.get("rpo") or "", row["review_unit_id"]))
+
+
+def workbook_presence_for(identity_match: dict[str, Any]) -> str:
+    status = identity_match.get("match_status")
+    if status == "unique_rpo_match":
+        return "existing_active"
+    if status == "inactive_or_scaffold_match":
+        return "existing_inactive_scaffold"
+    if status == "duplicate_workbook_rpo":
+        return "duplicate_existing"
+    if status == "missing_in_workbook":
+        return "missing"
+    return "not_applicable"
+
+
+def required_fields_missing(item: dict[str, Any]) -> list[str]:
+    missing = []
+    primary = item.get("primary_source_occurrence") or {}
+    raw = primary.get("raw_values", {})
+    if not item.get("rpo"):
+        missing.append("rpo")
+    if not clean(raw.get("source_description_raw")):
+        missing.append("source_description_raw")
+    if not item.get("availability_matrix"):
+        missing.append("availability_matrix")
+    return missing
+
+
+def build_workbook_build_summary(
+    *,
+    run_id: str,
+    selection_metadata: dict[str, Any],
+    workbook_build_units: list[dict[str, Any]],
+    output_dir: Path,
+) -> dict[str, Any]:
+    lane_counts = Counter(unit["lane"] for unit in workbook_build_units)
+    model_counts = Counter(unit.get("model_key") or "all_selected" for unit in workbook_build_units)
+    role_counts = Counter(unit.get("model_role") or "selected" for unit in workbook_build_units)
+    artifact_fingerprints = {}
+    units_path = output_dir / "workbook-build-review-units.json"
+    if units_path.exists():
+        artifact_fingerprints["workbook-build-review-units.json"] = sha256_file(units_path)
+    selection_path = output_dir / "model-selection.json"
+    if selection_path.exists():
+        artifact_fingerprints["model-selection.json"] = sha256_file(selection_path)
+    return {
+        "version": 1,
+        "review_mode": "focused_workbook_build",
+        "run_id": run_id,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "selection_metadata": selection_metadata,
+        "selection_fingerprint": selection_fingerprint(selection_metadata),
+        "artifact_fingerprints": artifact_fingerprints,
+        "lane_counts": {lane: lane_counts.get(lane, 0) for lane in ["option_rows", "ovs_rows", "relationships", "pricing", "duplicates_and_source_coverage", "blocked_extractor_gaps"]},
+        "model_counts": dict(sorted(model_counts.items())),
+        "model_role_counts": dict(sorted(role_counts.items())),
+        "cross_check_status": {"ok": True, "errors": []},
+    }
+
+
+def sha256_file(path: Path) -> str:
+    import hashlib
+
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+ 
+ 
 def build_summary(
     *,
     run_id: str,
@@ -681,6 +906,7 @@ def build_summary(
     source_sheet_coverage: dict[str, Any],
     candidate_summary: dict[str, Any],
     unresolved_review: dict[str, Any],
+    selection_metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     candidate_counts = dict(candidate_summary.get("candidate_counts", {}))
     unresolved_count = len(unresolved_review.get("items", []))
@@ -700,7 +926,7 @@ def build_summary(
     target_visible = raw_total * 0.3
     material = (visible_count + blocked_count) <= target_visible if raw_total else True
     reason_codes = [] if material else reduction_reason_codes(interpreted_options, duplicate_report)
-    return {
+    summary = {
         "version": 1,
         "run_id": run_id,
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -729,6 +955,10 @@ def build_summary(
         },
         "artifact_files": OUTPUT_FILES,
     }
+    if selection_metadata:
+        summary["selection_metadata"] = selection_metadata
+        summary["selection_fingerprint"] = selection_fingerprint(selection_metadata)
+    return summary
 
 
 def reduction_reason_codes(interpreted_options: list[dict[str, Any]], duplicate_report: list[dict[str, Any]]) -> list[str]:

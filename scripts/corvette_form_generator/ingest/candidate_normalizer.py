@@ -11,6 +11,7 @@ from typing import Any
 
 from openpyxl import load_workbook
 
+from corvette_form_generator.ingest.model_selection import build_model_selection, filter_rows_for_selection
 from corvette_form_generator.ingest.source_profiler import rows_from_sheet, validate_output_dir
 from corvette_form_generator.workbook import clean, workbook_truthy
 
@@ -38,6 +39,9 @@ def normalize_order_guide_candidates(
     output_dir: Path,
     run_id: str,
     root: Path | None = None,
+    selected_models: list[str] | str | None = None,
+    primary_models: list[str] | str | None = None,
+    comparator_models: list[str] | str | None = None,
 ) -> dict[str, Any]:
     """Normalize Pass 0 evidence into transient review candidate artifacts."""
 
@@ -50,9 +54,22 @@ def normalize_order_guide_candidates(
     evidence = load_evidence(evidence_dir)
     option_index = load_workbook_option_index(workbook)
 
+    selection_metadata = None
+    raw_rows = evidence["raw-rows"]
+    if selected_models:
+        selection_metadata = build_model_selection(
+            evidence_dir=evidence_dir,
+            variant_matrix=evidence["variant-matrix"],
+            run_id=run_id,
+            selected_models=selected_models,
+            primary_models=primary_models,
+            comparator_models=comparator_models,
+        )
+        raw_rows = filter_rows_for_selection(raw_rows, selection_metadata["selected_models"])
+
     unresolved: list[dict[str, Any]] = []
-    candidate_options, option_by_source_row = build_option_candidates(evidence["raw-rows"], option_index, unresolved)
-    candidate_ovs = build_ovs_candidates(evidence["raw-rows"], option_by_source_row, unresolved)
+    candidate_options, option_by_source_row = build_option_candidates(raw_rows, option_index, unresolved)
+    candidate_ovs = build_ovs_candidates(raw_rows, option_by_source_row, unresolved)
     candidate_rules = build_rule_candidates(evidence["disclosure-links"], option_by_source_row, option_index, unresolved)
     candidate_price_rules: list[dict[str, Any]] = []
     add_layout_unresolved(evidence["source-layout"], unresolved)
@@ -73,6 +90,8 @@ def normalize_order_guide_candidates(
         "unresolved-review.json",
         "unresolved-review.md",
     ]
+    if selection_metadata:
+        artifact_files.append("model-selection.json")
     summary = {
         "input_evidence_dir": str(evidence_dir),
         "workbook": str(workbook),
@@ -86,8 +105,12 @@ def normalize_order_guide_candidates(
         "invariant_failures": [],
         "artifact_files": artifact_files,
     }
+    if selection_metadata:
+        summary["selection_metadata"] = selection_metadata
 
     output_dir.mkdir(parents=True, exist_ok=True)
+    if selection_metadata:
+        write_json(output_dir / "model-selection.json", selection_metadata)
     write_json(output_dir / "candidate-options.json", candidate_options)
     write_json(output_dir / "candidate-ovs.json", candidate_ovs)
     write_json(output_dir / "candidate-rules.json", candidate_rules)

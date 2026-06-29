@@ -39,6 +39,11 @@ INTERPRETATION_FILES = [
     "source-sheet-coverage.json",
     "blocked-interpretation.json",
 ]
+WORKBOOK_BUILD_FILES = [
+    "model-selection.json",
+    "workbook-build-summary.json",
+    "workbook-build-review-units.json",
+]
 # Legacy Pass 2/4 review states. Keep accepting them for backward-compatible
 # review exports, but do not treat them as the next ingest direction. Pass 5
 # replaces the primary reviewer vocabulary with concrete workbook-destination
@@ -49,6 +54,13 @@ ALLOWED_DECISION_STATES = {
     "skip",
     "needs_source_review",
     "blocked_out_of_scope",
+}
+ALLOWED_WORKBOOK_BUILD_DECISION_STATES = {
+    "ready_for_apply_plan",
+    "needs_product_decision",
+    "ignore_source",
+    "defer_extractor_gap",
+    "blocked",
 }
 
 
@@ -74,10 +86,12 @@ class IngestReviewStore:
     def summary(self) -> dict[str, Any]:
         loaded = self._load()
         interpretation_enabled = loaded["interpretation_enabled"]
+        workbook_build_enabled = loaded["workbook_build_enabled"]
         return {
             "enabled": True,
-            "mode": "interpretation" if interpretation_enabled else "raw_candidates",
+            "mode": "workbook_build" if workbook_build_enabled else "interpretation" if interpretation_enabled else "raw_candidates",
             "interpretation_enabled": interpretation_enabled,
+            "workbook_build_enabled": workbook_build_enabled,
             "workbook": {
                 "path": str(self.workbook_path),
                 "mtimeNs": self.workbook_mtime_ns,
@@ -88,6 +102,8 @@ class IngestReviewStore:
             "evidence_artifacts": loaded["evidence_artifacts"],
             "candidate_artifacts": loaded["candidate_artifacts"],
             "interpretation_artifacts": loaded.get("interpretation_artifacts", {}),
+            "model_selection": loaded.get("model_selection", {}),
+            "workbook_build_summary": loaded.get("workbook_build_summary", {}),
             "candidate_summary": loaded["candidate_summary"],
             "candidate_counts": loaded["candidate_summary"].get("candidate_counts", {}),
             "unresolved_counts": loaded["unresolved_review"].get("unresolved_counts", {}),
@@ -192,6 +208,62 @@ class IngestReviewStore:
             "blocked": loaded["interpretation"]["blocked-interpretation.json"],
         }
 
+    def model_selection(self) -> dict[str, Any]:
+        loaded = self._require_workbook_build()
+        return loaded["model_selection"]
+
+    def workbook_build_summary(self) -> dict[str, Any]:
+        loaded = self._require_workbook_build()
+        return loaded["workbook_build_summary"]
+
+    def list_workbook_build_units(
+        self,
+        *,
+        lane: str = "",
+        model: str = "",
+        action: str = "",
+        q: str = "",
+        offset: int = 0,
+        limit: int = 200,
+    ) -> dict[str, Any]:
+        loaded = self._require_workbook_build()
+        rows = loaded["workbook_build_units"]
+        filtered = [
+            row for row in rows
+            if (not lane or row.get("lane") == lane)
+            and (not model or row.get("model_key") == model)
+            and (not action or row.get("proposed_workbook_action") == action)
+            and (not q or q.lower() in json.dumps(row, ensure_ascii=False).lower())
+        ]
+        limit = max(1, min(int(limit or 200), 500))
+        offset = max(0, int(offset or 0))
+        return {
+            "mode": "workbook_build",
+            "lane": lane,
+            "model": model,
+            "action": action,
+            "total": len(filtered),
+            "offset": offset,
+            "limit": limit,
+            "items": filtered[offset:offset + limit],
+        }
+
+    def workbook_build_unit(self, review_unit_id: str) -> dict[str, Any]:
+        review_unit_id = unquote(review_unit_id)
+        loaded = self._require_workbook_build()
+        for row in loaded["workbook_build_units"]:
+            if row.get("review_unit_id") == review_unit_id:
+                return row
+        raise KeyError(f"unknown review_unit_id: {review_unit_id}")
+
+    def validate_workbook_build_decisions(self, payload: dict[str, Any]) -> dict[str, Any]:
+        loaded = self._require_workbook_build()
+        return validate_workbook_build_decisions(
+            payload,
+            expected_selection_fingerprint=loaded["workbook_build_summary"].get("selection_fingerprint", ""),
+            known_unit_ids={row.get("review_unit_id") for row in loaded["workbook_build_units"]},
+        )
+
     def source(self, *, sheet: str, row: int) -> dict[str, Any]:
         loaded = self._load()
         sheet = unquote(sheet)
@@ -272,6 +344,12 @@ class IngestReviewStore:
             raise ValueError("No ingest interpretation directory configured.")
         return loaded
 
+    def _require_workbook_build(self) -> dict[str, Any]:
+        loaded = self._require_interpretation()
+        if not loaded["workbook_build_enabled"]:
+            raise ValueError("No focused workbook-build artifacts configured.")
+        return loaded
+
     def _load(self) -> dict[str, Any]:
         if self._loaded is not None:
             return self._loaded
@@ -282,21 +360,44 @@ class IngestReviewStore:
         _validate_unresolved_review(unresolved_review)
         interpretation: dict[str, Any] | None = None
         interpretation_artifacts: dict[str, dict[str, Any]] = {}
+        workbook_build_enabled = False
+        model_selection: dict[str, Any] = {}
+        workbook_build_summary: dict[str, Any] = {}
+        workbook_build_units: list[dict[str, Any]] = []
+        evidence_artifacts = artifact_fingerprints(self.evidence_dir, EVIDENCE_FILES)
         if self.interpretation_dir is not None:
             interpretation = {name: _read_json(self.interpretation_dir / name) for name in INTERPRETATION_FILES}
             _validate_interpretation_artifacts(interpretation)
-            interpretation_artifacts = artifact_fingerprints(self.interpretation_dir, INTERPRETATION_FILES)
+            workbook_build_enabled = all((self.interpretation_dir / name).exists() for name in WORKBOOK_BUILD_FILES)
+            if workbook_build_enabled:
+                for name in WORKBOOK_BUILD_FILES:
+                    interpretation[name] = _read_json(self.interpretation_dir / name)
+                _validate_workbook_build_artifacts(
+                    interpretation,
+                    candidate_summary=candidate_summary,
+                    evidence_artifacts=evidence_artifacts,
+                )
+                model_selection = interpretation["model-selection.json"]
+                workbook_build_summary = interpretation["workbook-build-summary.json"]
+                workbook_build_units = interpretation["workbook-build-review-units.json"]
+            artifact_names = INTERPRETATION_FILES + (WORKBOOK_BUILD_FILES if workbook_build_enabled else [])
+            interpretation_artifacts = artifact_fingerprints(self.interpretation_dir, artifact_names)
+        candidate_artifact_names = CANDIDATE_FILES + (["model-selection.json"] if (self.candidates_dir / "model-selection.json").exists() else [])
         self._loaded = {
             "evidence": evidence,
             "candidates": candidates,
             "candidate_summary": candidate_summary,
             "unresolved_review": unresolved_review,
-            "evidence_artifacts": artifact_fingerprints(self.evidence_dir, EVIDENCE_FILES),
-            "candidate_artifacts": artifact_fingerprints(self.candidates_dir, CANDIDATE_FILES),
+            "evidence_artifacts": evidence_artifacts,
+            "candidate_artifacts": artifact_fingerprints(self.candidates_dir, candidate_artifact_names),
             "interpretation_enabled": interpretation is not None,
+            "workbook_build_enabled": workbook_build_enabled,
             "interpretation": interpretation or {},
             "interpretation_summary": (interpretation or {}).get("interpretation-summary.json", {}),
             "interpretation_artifacts": interpretation_artifacts,
+            "model_selection": model_selection,
+            "workbook_build_summary": workbook_build_summary,
+            "workbook_build_units": workbook_build_units,
         }
         return self._loaded
 
@@ -365,6 +466,83 @@ def validate_review_decisions(payload: dict[str, Any]) -> dict[str, Any]:
         if not decision.get("source_refs"):
             errors.append(f"{ctx}: missing source_refs")
     return {"ok": not errors, "errors": errors, "warnings": []}
+
+
+def validate_workbook_build_decisions(
+    payload: dict[str, Any],
+    *,
+    expected_selection_fingerprint: str,
+    known_unit_ids: set[str | None],
+) -> dict[str, Any]:
+    errors: list[str] = []
+    if payload.get("version") != 3:
+        errors.append("version must be 3")
+    if payload.get("review_mode") != "workbook_build":
+        errors.append("review_mode must be workbook_build")
+    if payload.get("selection_fingerprint") != expected_selection_fingerprint:
+        errors.append("selection_fingerprint does not match focused workbook-build artifacts")
+    decisions = payload.get("workbook_build_decisions")
+    if not isinstance(decisions, list):
+        errors.append("workbook_build_decisions must be a list")
+        decisions = []
+    for index, decision in enumerate(decisions):
+        ctx = f"workbook_build_decisions[{index}]"
+        if decision.get("decision_state") not in ALLOWED_WORKBOOK_BUILD_DECISION_STATES:
+            errors.append(f"{ctx}: invalid decision_state")
+        unit_id = decision.get("review_unit_id")
+        if not unit_id:
+            errors.append(f"{ctx}: missing review_unit_id")
+        elif unit_id not in known_unit_ids:
+            errors.append(f"{ctx}: unknown review_unit_id")
+        for key in ("lane", "model_key", "target_sheet", "proposed_workbook_action", "workbook_presence_snapshot"):
+            if key not in decision:
+                errors.append(f"{ctx}: missing {key}")
+        if not decision.get("source_refs_snapshot"):
+            errors.append(f"{ctx}: missing source_refs_snapshot")
+        if "raw_source_snapshot" not in decision:
+            errors.append(f"{ctx}: missing raw_source_snapshot")
+    return {"ok": not errors, "errors": errors, "warnings": []}
+
+
+def _validate_workbook_build_artifacts(
+    artifacts: dict[str, Any],
+    *,
+    candidate_summary: dict[str, Any],
+    evidence_artifacts: dict[str, dict[str, Any]],
+) -> None:
+    selection = artifacts["model-selection.json"]
+    summary = artifacts["workbook-build-summary.json"]
+    units = artifacts["workbook-build-review-units.json"]
+    if selection.get("version") != 1:
+        raise ValueError("model-selection.json must have version 1")
+    if not selection.get("selected_models"):
+        raise ValueError("model-selection.json missing selected_models")
+    if candidate_summary.get("selection_metadata") and candidate_summary["selection_metadata"] != selection:
+        raise ValueError("candidate-summary.json selection_metadata does not match model-selection.json")
+    for name, expected_sha in (selection.get("evidence_fingerprints") or {}).items():
+        if evidence_artifacts.get(name, {}).get("sha256") != expected_sha:
+            raise ValueError(f"model-selection.json evidence fingerprint mismatch for {name}")
+    if summary.get("version") != 1 or summary.get("review_mode") != "focused_workbook_build":
+        raise ValueError("workbook-build-summary.json must be focused_workbook_build version 1")
+    if summary.get("selection_metadata") != selection:
+        raise ValueError("workbook-build-summary.json selection_metadata does not match model-selection.json")
+    if not isinstance(units, list):
+        raise ValueError("workbook-build-review-units.json must be a list")
+    for index, unit in enumerate(units, start=1):
+        required = {
+            "review_unit_id",
+            "lane",
+            "model_key",
+            "model_role",
+            "target_sheet",
+            "proposed_workbook_action",
+            "workbook_presence",
+            "source_refs",
+            "raw_source_snapshot",
+        }
+        missing = sorted(required - set(unit))
+        if missing:
+            raise ValueError(f"workbook-build-review-units.json item {index} missing keys: {missing}")
 
 
 def _contains_model(row: dict[str, Any], model: str) -> bool:

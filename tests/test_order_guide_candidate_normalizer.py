@@ -119,6 +119,18 @@ def fixture_workbook(path: Path) -> None:
                 "source_role": "source_option_sheet",
                 "sheet_name": "stingray_options",
                 "active": True,
+            },
+            {
+                "model_key": "zr1",
+                "source_role": "source_option_sheet",
+                "sheet_name": "zr1_options",
+                "active": False,
+            },
+            {
+                "model_key": "zr1",
+                "source_role": "status_sheet",
+                "sheet_name": "zr1_ovs",
+                "active": False,
             }
         ],
     )
@@ -158,6 +170,40 @@ def fixture_workbook(path: Path) -> None:
                 "active": True,
             },
         ],
+    )
+    append_sheet(
+        wb,
+        "zr1_options",
+        [
+            "option_id",
+            "rpo",
+            "price",
+            "option_name",
+            "description",
+            "detail_raw",
+            "section_id",
+            "selectable",
+            "display_order",
+            "active",
+            "display_behavior",
+        ],
+        [
+            {
+                "option_id": "opt_tom_zr1_001",
+                "rpo": "TOM",
+                "option_name": "Carbon Fiber Aero Package Scaffold",
+                "section_id": "sec_pkg_001",
+                "selectable": True,
+                "display_order": 1,
+                "active": False,
+            }
+        ],
+    )
+    append_sheet(
+        wb,
+        "zr1_ovs",
+        ["option_id", "variant_id", "status"],
+        [{"option_id": "opt_tom_zr1_001", "variant_id": "1lz_r07", "status": "available"}],
     )
     wb.save(path)
 
@@ -313,6 +359,56 @@ class OrderGuideCandidateNormalizerTests(unittest.TestCase):
             self.assertGreaterEqual(summary["candidate_counts"]["options"], 2)
             self.assertGreaterEqual(summary["unresolved_counts"]["price_schedule_rows_not_extracted"], 1)
             self.assertIn("unresolved-review.json", summary["artifact_files"])
+
+    def test_selected_models_write_required_selection_artifact_and_filter_ovs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            workbook, evidence_dir = build_evidence(tmp)
+            output_dir = tmp / "focused-candidates"
+
+            result = normalize_order_guide_candidates(
+                evidence_dir=evidence_dir,
+                workbook=workbook,
+                output_dir=output_dir,
+                run_id="focused-candidates",
+                root=ROOT,
+                selected_models=["zr1"],
+            )
+
+            self.assertEqual(result["status"], "passed")
+            self.assertIn("model-selection.json", result["artifact_files"])
+            selection = json.loads((output_dir / "model-selection.json").read_text())
+            self.assertEqual(selection["selected_models"], ["zr1"])
+            self.assertEqual(selection["primary_models"], ["zr1"])
+            self.assertEqual(selection["source_variant_columns"]["zr1"], 1)
+            self.assertRegex(selection["evidence_fingerprints"]["variant-matrix.json"], r"^[0-9a-f]{64}$")
+
+            summary = json.loads((output_dir / "candidate-summary.json").read_text())
+            self.assertEqual(summary["selection_metadata"]["selected_models"], ["zr1"])
+            options = json.loads((output_dir / "candidate-options.json").read_text())
+            self.assertEqual({row["normalized_values"]["rpo"] for row in options}, {"TOM"})
+            ovs_models = {
+                row["normalized_values"]["model_key"]
+                for row in json.loads((output_dir / "candidate-ovs.json").read_text())
+            }
+            self.assertEqual(ovs_models, {"zr1"})
+
+    def test_selected_model_missing_from_variant_matrix_fails_before_writing_candidates(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            workbook, evidence_dir = build_evidence(tmp)
+            output_dir = tmp / "focused-candidates"
+
+            with self.assertRaisesRegex(ValueError, "Selected model z06 was not found"):
+                normalize_order_guide_candidates(
+                    evidence_dir=evidence_dir,
+                    workbook=workbook,
+                    output_dir=output_dir,
+                    run_id="focused-candidates",
+                    root=ROOT,
+                    selected_models=["z06"],
+                )
+            self.assertFalse((output_dir / "candidate-summary.json").exists())
 
     def test_rejects_failed_or_incomplete_evidence(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

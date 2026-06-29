@@ -180,6 +180,77 @@ class IngestReviewServerTest(unittest.TestCase):
             finally:
                 srv.EditorHandler.ingest_review = previous_store
 
+    def test_workbook_build_endpoints_are_read_only_and_filterable(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            workbook, evidence_dir = build_evidence(tmp)
+            candidates_dir = tmp / "focused-candidates"
+            normalize_order_guide_candidates(
+                evidence_dir=evidence_dir,
+                workbook=workbook,
+                output_dir=candidates_dir,
+                run_id="focused-server-candidates",
+                root=ROOT,
+                selected_models=["zr1"],
+            )
+            interpretation_dir = tmp / "focused-interpretation"
+            interpret_order_guide_candidates(
+                evidence_dir=evidence_dir,
+                candidates_dir=candidates_dir,
+                workbook=workbook,
+                output_dir=interpretation_dir,
+                run_id="focused-server-interpretation",
+                root=ROOT,
+                selected_models=["zr1"],
+                primary_models=["zr1"],
+            )
+            previous_store = srv.EditorHandler.ingest_review
+            srv.EditorHandler.ingest_review = IngestReviewStore(
+                evidence_dir=evidence_dir,
+                candidates_dir=candidates_dir,
+                interpretation_dir=interpretation_dir,
+                workbook_path=workbook,
+                workbook_mtime_ns=workbook.stat().st_mtime_ns,
+            )
+            mtime_before = workbook.stat().st_mtime_ns
+            try:
+                status, selection = self.request("/api/ingest/workbook-build/selection")
+                self.assertEqual(status, 200)
+                self.assertEqual(selection["selected_models"], ["zr1"])
+
+                status, summary = self.request("/api/ingest/workbook-build/summary")
+                self.assertEqual(status, 200)
+                self.assertEqual(summary["review_mode"], "focused_workbook_build")
+
+                status, units = self.request("/api/ingest/workbook-build/units?lane=option_rows&model=zr1&q=TOM")
+                self.assertEqual(status, 200)
+                self.assertTrue(units["items"])
+                review_unit_id = units["items"][0]["review_unit_id"]
+
+                status, detail = self.request(f"/api/ingest/workbook-build/unit/{review_unit_id}")
+                self.assertEqual(status, 200)
+                self.assertEqual(detail["review_unit_id"], review_unit_id)
+
+                status, validation = self.request(
+                    "/api/ingest/workbook-build/validate",
+                    body={
+                        "version": 3,
+                        "review_mode": "workbook_build",
+                        "selection_fingerprint": summary["selection_fingerprint"],
+                        "workbook_build_decisions": [{
+                            "review_unit_id": review_unit_id,
+                            "decision_state": "accept_for_later_apply",
+                        }],
+                    },
+                    method="POST",
+                )
+                self.assertEqual(status, 200)
+                self.assertFalse(validation["ok"])
+                self.assertIn("invalid decision_state", "\n".join(validation["errors"]))
+                self.assertEqual(workbook.stat().st_mtime_ns, mtime_before)
+            finally:
+                srv.EditorHandler.ingest_review = previous_store
+
 
 if __name__ == "__main__":
     unittest.main()

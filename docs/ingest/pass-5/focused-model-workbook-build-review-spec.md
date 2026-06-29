@@ -138,7 +138,17 @@ Required input shape:
 --models zr1,zr1x,z06
 ```
 
-Implementation may also support a durable selection artifact:
+Implementation must persist selection metadata as a durable artifact. `--models` is allowed as the human input, but the pipeline output must not rely on transient CLI args after Pass 1.
+
+Required artifact:
+
+```text
+<candidate-output-dir>/model-selection.json
+```
+
+The interpreter must consume that artifact by default, copy the same selection metadata into its own output directory, and include the same selection block in `candidate-summary.json`, `interpretation-summary.json`, and `workbook-build-summary.json`.
+
+Required minimum shape:
 
 ```json
 {
@@ -151,9 +161,22 @@ Implementation may also support a durable selection artifact:
     "zr1": 20,
     "zr1x": 20,
     "z06": 30
-  }
+  },
+  "evidence_fingerprints": {
+    "variant-matrix.json": "<sha256>",
+    "source-layout.json": "<sha256>"
+  },
+  "selection_source": "cli_models_arg"
 }
 ```
+
+Server/UI cross-check requirement:
+
+- Evidence, candidate, and interpretation directories must agree on selected models, primary models, comparator models, and evidence fingerprints.
+- If `model-selection.json` is missing from a focused Pass 5 candidate directory, fail closed and report the missing artifact instead of falling back to broad all-model review.
+- If candidate and interpretation selection metadata disagree, fail closed before showing workbook-build queues.
+- If evidence fingerprints do not match the evidence directory currently served, fail closed and report the mismatched artifact names.
+- The UI must display selected/primary/comparator model state from the persisted artifact, not from hardcoded defaults.
 
 ### Validation
 
@@ -195,6 +218,49 @@ Comparator model usage:
 ## Workbook-destination review units
 
 Pass 3/Pass 4 review units should be organized by destination workbook surface, not generic confidence.
+
+Pass 5 must emit a new workbook-build artifact set. These artifacts replace Pass 4 `review-queue.json` as the primary UI/API input when focused-model metadata is present; Pass 4 artifacts may remain available only as drill-down/debug.
+
+Required artifacts in the interpretation output directory:
+
+```text
+model-selection.json
+workbook-build-summary.json
+workbook-build-review-units.json
+```
+
+Artifact contracts:
+
+- `workbook-build-summary.json`
+  - `version: 1`
+  - `review_mode: "focused_workbook_build"`
+  - embedded selection metadata from `model-selection.json`
+  - artifact fingerprints for evidence, candidate, interpretation, and workbook-build unit files
+  - lane counts by `option_rows`, `ovs_rows`, `relationships`, `pricing`, `duplicates_and_source_coverage`, and `blocked_extractor_gaps`
+  - counts by selected model and by primary/comparator role
+  - `cross_check_status` with `ok: true` only when evidence/candidate/interpretation selection metadata agrees
+- `workbook-build-review-units.json`
+  - array of workbook-build review units using the required unit fields below
+  - every row must carry `lane`, `model_key`, `model_role` (`primary` or `comparator`), `target_workbook_surface`, and `proposed_workbook_action`
+  - comparator rows must carry `model_role: "comparator"` and must not produce ZR1/ZR1X target sheets/actions
+
+Required store methods or equivalent server-side functions:
+
+- `selection_metadata()`
+- `workbook_build_summary()`
+- `list_workbook_build_units(lane=None, model=None, q=None, offset=0, limit=50)`
+- `get_workbook_build_unit(review_unit_id)`
+- `validate_workbook_build_decisions(payload)`
+
+Required read-only API endpoints:
+
+- `GET /api/ingest/workbook-build/selection`
+- `GET /api/ingest/workbook-build/summary`
+- `GET /api/ingest/workbook-build/units?lane=&model=&q=&offset=&limit=`
+- `GET /api/ingest/workbook-build/unit/<review_unit_id>`
+- `POST /api/ingest/workbook-build/validate`
+
+These endpoints must not create workbook operations. They only serve focused review state and validate exported decisions.
 
 Required lanes:
 
@@ -272,6 +338,11 @@ Export shape should be versioned separately from Pass 4, for example:
   "selected_models": ["zr1", "zr1x", "z06"],
   "primary_models": ["zr1", "zr1x"],
   "comparator_models": ["z06"],
+  "selection_fingerprint": "<sha256-of-model-selection.json>",
+  "artifact_fingerprints": {
+    "workbook-build-summary.json": "<sha256>",
+    "workbook-build-review-units.json": "<sha256>"
+  },
   "decisions": [
     {
       "review_unit_id": "...",
@@ -304,6 +375,7 @@ The Ingest Review tab should default to focused model workflow when selected-mod
 Required UI behavior:
 
 - Show selected model chips at the top: `ZR1`, `ZR1X`, comparator `Z06`.
+- Show those chips only after server-side selection metadata cross-check passes; otherwise show a blocking configuration error.
 - Show lane counts by workbook destination, not just confidence counts.
 - Default lane should be `option_rows` or an explicit guided order starting with options.
 - The first review question should be understandable without knowing pipeline internals:
@@ -376,6 +448,17 @@ Non-goals:
 - No use of old inactive ZR1/ZR1X workbook scaffolds as expected output.
 
 ## Validation plan
+
+Required negative guards covered by tests:
+
+- Missing selected model fails before Pass 1 candidate normalization and reports available model keys from `variant-matrix.json`.
+- Missing `model-selection.json` fails focused workbook-build server/UI mode instead of falling back to broad all-model review.
+- Candidate/interpreter selection mismatch fails closed before serving `/api/ingest/workbook-build/*` queues.
+- Evidence fingerprint mismatch fails closed before serving workbook-build queues.
+- Non-selected OVS rows are not emitted as primary candidates.
+- Comparator evidence cannot create ZR1/ZR1X workbook-build actions or target sheets.
+- Inactive ZR1/ZR1X scaffold rows are reported only as `existing_inactive_scaffold`, never as canonical expected output.
+- Legacy Pass 2/4 decision labels are not accepted as Pass 5 primary workbook-build actions.
 
 Targeted tests:
 

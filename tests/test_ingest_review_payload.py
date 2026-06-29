@@ -64,6 +64,36 @@ class IngestReviewPayloadTests(unittest.TestCase):
             workbook_mtime_ns=workbook.stat().st_mtime_ns,
         )
 
+    def build_workbook_build_store(self, tmp: Path) -> IngestReviewStore:
+        workbook, evidence_dir = build_evidence(tmp)
+        candidates_dir = tmp / "focused-candidates"
+        normalize_order_guide_candidates(
+            evidence_dir=evidence_dir,
+            workbook=workbook,
+            output_dir=candidates_dir,
+            run_id="focused-candidates",
+            root=ROOT,
+            selected_models=["zr1"],
+        )
+        interpretation_dir = tmp / "focused-interpretation"
+        interpret_order_guide_candidates(
+            evidence_dir=evidence_dir,
+            candidates_dir=candidates_dir,
+            workbook=workbook,
+            output_dir=interpretation_dir,
+            run_id="focused-interpretation",
+            root=ROOT,
+            selected_models=["zr1"],
+            primary_models=["zr1"],
+        )
+        return IngestReviewStore(
+            evidence_dir=evidence_dir,
+            candidates_dir=candidates_dir,
+            interpretation_dir=interpretation_dir,
+            workbook_path=workbook,
+            workbook_mtime_ns=workbook.stat().st_mtime_ns,
+        )
+
     def test_summary_contains_artifact_fingerprints_and_counts(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             store = self.build_store(Path(tmpdir))
@@ -200,6 +230,58 @@ class IngestReviewPayloadTests(unittest.TestCase):
             payload["interpretation_decisions"][0]["source_occurrences_snapshot"] = detail["source_occurrences"]
             payload["interpretation_decisions"][0]["decision_state"] = "apply_now"
             self.assertIn("invalid decision_state", validate_review_decisions(payload)["errors"][0])
+
+    def test_workbook_build_store_lists_units_and_validates_required_selection_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            store = self.build_workbook_build_store(Path(tmpdir))
+
+            summary = store.summary()
+            self.assertEqual(summary["mode"], "workbook_build")
+            self.assertTrue(summary["workbook_build_enabled"])
+            self.assertEqual(summary["model_selection"]["selected_models"], ["zr1"])
+            self.assertIn("workbook-build-summary.json", summary["interpretation_artifacts"])
+
+            option_units = store.list_workbook_build_units(lane="option_rows", model="zr1", limit=10)
+            self.assertEqual(option_units["mode"], "workbook_build")
+            self.assertEqual(option_units["lane"], "option_rows")
+            self.assertTrue(any(row["rpo"] == "TOM" for row in option_units["items"]))
+            detail = store.workbook_build_unit(option_units["items"][0]["review_unit_id"])
+            self.assertEqual(detail["target_sheet"], "zr1_options")
+            self.assertIn(detail["proposed_workbook_action"], {"create_option_row", "verify_existing_option_row"})
+
+            ovs_units = store.list_workbook_build_units(lane="ovs_rows", action="verify_status_matrix", limit=10)
+            self.assertTrue(any(row["rpo"] == "TOM" for row in ovs_units["items"]))
+
+            validation = store.validate_workbook_build_decisions({
+                "version": 3,
+                "review_mode": "workbook_build",
+                "selection_fingerprint": summary["workbook_build_summary"]["selection_fingerprint"],
+                "workbook_build_decisions": [{
+                    "review_unit_id": detail["review_unit_id"],
+                    "lane": detail["lane"],
+                    "model_key": detail["model_key"],
+                    "rpo": detail["rpo"],
+                    "target_sheet": detail["target_sheet"],
+                    "proposed_workbook_action": detail["proposed_workbook_action"],
+                    "decision_state": "ready_for_apply_plan",
+                    "reviewer_notes": "source evidence checked",
+                    "source_refs_snapshot": detail["source_refs"],
+                    "raw_source_snapshot": detail["raw_source_snapshot"],
+                    "workbook_presence_snapshot": detail["workbook_presence"],
+                }],
+            })
+            self.assertEqual(validation["errors"], [])
+            self.assertTrue(validation["ok"])
+
+            bad = store.validate_workbook_build_decisions({
+                "version": 3,
+                "review_mode": "workbook_build",
+                "selection_fingerprint": "wrong",
+                "workbook_build_decisions": [{"review_unit_id": detail["review_unit_id"], "decision_state": "accept_for_later_apply"}],
+            })
+            self.assertFalse(bad["ok"])
+            self.assertTrue(any("selection_fingerprint" in error for error in bad["errors"]))
+            self.assertTrue(any("invalid decision_state" in error for error in bad["errors"]))
 
 
 if __name__ == "__main__":

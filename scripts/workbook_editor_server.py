@@ -331,7 +331,7 @@ class EditorHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):  # noqa: N802 (stdlib API name)
         path = urlsplit(self.path).path
-        if path not in ("/api/validate", "/api/apply", "/api/ingest/review/validate"):
+        if path not in ("/api/validate", "/api/apply", "/api/ingest/review/validate", "/api/ingest/workbook-build/validate"):
             self._send_json({"error": "not found"}, status=404)
             return
         origin = self.headers.get("Origin")
@@ -356,6 +356,9 @@ class EditorHandler(BaseHTTPRequestHandler):
         try:
             if path == "/api/ingest/review/validate":
                 self._send_json(validate_review_decisions(body))
+            elif path == "/api/ingest/workbook-build/validate":
+                store = self._require_ingest_review()
+                self._send_json(store.validate_workbook_build_decisions(body))
             elif path == "/api/validate":
                 batch = body.get("batch") or {}
                 result = apply_batch(self.cache.path, batch, write=False, source="server",
@@ -409,6 +412,26 @@ class EditorHandler(BaseHTTPRequestHandler):
                     offset=int(_query_value(query, "offset", "0") or 0),
                     limit=int(_query_value(query, "limit", "200") or 200),
                 ))
+            elif path == "/api/ingest/workbook-build/selection":
+                store = self._require_ingest_review()
+                self._send_json(store.model_selection())
+            elif path == "/api/ingest/workbook-build/summary":
+                store = self._require_ingest_review()
+                self._send_json(store.workbook_build_summary())
+            elif path == "/api/ingest/workbook-build/units":
+                store = self._require_ingest_review()
+                self._send_json(store.list_workbook_build_units(
+                    lane=_query_value(query, "lane"),
+                    model=_query_value(query, "model"),
+                    action=_query_value(query, "action"),
+                    q=_query_value(query, "q"),
+                    offset=int(_query_value(query, "offset", "0") or 0),
+                    limit=int(_query_value(query, "limit", "200") or 200),
+                ))
+            elif path.startswith("/api/ingest/workbook-build/unit/"):
+                store = self._require_ingest_review()
+                review_unit_id = path[len("/api/ingest/workbook-build/unit/"):]
+                self._send_json(store.workbook_build_unit(review_unit_id))
             elif path == "/api/ingest/interpretation/reports/duplicates":
                 store = self._require_ingest_review()
                 self._send_json({"items": store.interpretation_reports()["duplicates"]})

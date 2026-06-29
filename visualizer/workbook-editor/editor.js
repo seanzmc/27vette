@@ -950,6 +950,7 @@ function JsonBlock({ value }) {
 }
 
 function candidateLabel(row) {
+  if (row.review_unit_id) return `${row.model_key || "selected"} / ${row.rpo || row.lane || row.review_unit_id}`;
   if (row.interpretation_id) return `${row.model_key || "model"} / ${row.rpo || row.interpretation_id}`;
   const normalized = row.normalized_values || {};
   return normalized.rpo || normalized.candidate_option_ref || normalized.candidate_rule_ref
@@ -964,6 +965,8 @@ function IngestReviewTab() {
   const [reason, setReason] = useState("");
   const [confidence, setConfidence] = useState("");
   const [duplicate, setDuplicate] = useState("");
+  const [lane, setLane] = useState("");
+  const [action, setAction] = useState("");
   const [includeAuto, setIncludeAuto] = useState(false);
   const [rows, setRows] = useState(null);
   const [selected, setSelected] = useState(null);
@@ -974,7 +977,8 @@ function IngestReviewTab() {
   useEffect(() => {
     fetchJson("/api/ingest/summary").then((payload) => {
       setSummary(payload);
-      setFamily(payload.interpretation_enabled ? "interpretations" : "options");
+      setFamily(payload.workbook_build_enabled ? "workbook_build" : payload.interpretation_enabled ? "interpretations" : "options");
+      if (payload.workbook_build_enabled) setLane("option_rows");
     }).catch((e) => setError(e.message));
   }, []);
 
@@ -984,9 +988,20 @@ function IngestReviewTab() {
       setFamily("options");
       return;
     }
+    if (family === "workbook_build" && !summary.workbook_build_enabled) {
+      setFamily(summary.interpretation_enabled ? "interpretations" : "options");
+      return;
+    }
     setRows(null); setDetail(null); setSelected(null);
     const params = new URLSearchParams({ limit: "200" });
     if (query.trim()) params.set("q", query.trim());
+    if (family === "workbook_build") {
+      if (lane) params.set("lane", lane);
+      if (action) params.set("action", action);
+      fetchJson(`/api/ingest/workbook-build/units?${params.toString()}`)
+        .then(setRows).catch((e) => setError(e.message));
+      return;
+    }
     if (family === "interpretations") {
       if (confidence) params.set("confidence", confidence);
       if (duplicate) params.set("duplicate", duplicate);
@@ -1000,16 +1015,17 @@ function IngestReviewTab() {
     if (family === "unresolved" && reason) params.set("reason", reason);
     fetchJson(`/api/ingest/candidates?${params.toString()}`)
       .then(setRows).catch((e) => setError(e.message));
-  }, [summary?.enabled, summary?.interpretation_enabled, family, query, reason, confidence, duplicate, includeAuto]);
+  }, [summary?.enabled, summary?.interpretation_enabled, summary?.workbook_build_enabled, family, query, reason, confidence, duplicate, includeAuto, lane, action]);
 
   const decisionKey = (row) => {
+    if (family === "workbook_build") return row.review_unit_id;
     if (family === "interpretations") return row.interpretation_id;
     return family === "unresolved" ? row.unresolved_id : row.candidate_id;
   };
   const loadDetail = (row) => {
     setSelected(row);
     const id = decisionKey(row);
-    const route = family === "interpretations" ? "interpretation" : (family === "unresolved" ? "unresolved" : "candidate");
+    const route = family === "workbook_build" ? "workbook-build/unit" : family === "interpretations" ? "interpretation" : (family === "unresolved" ? "unresolved" : "candidate");
     fetchJson(`/api/ingest/${route}/${encodeURIComponent(id)}`)
       .then(setDetail).catch((e) => setError(e.message));
   };
@@ -1025,6 +1041,19 @@ function IngestReviewTab() {
 
   const buildDecisionExport = () => {
     const picked = Object.values(decisions).filter((d) => d.state);
+    const workbookBuildDecisions = picked.filter((d) => d.family === "workbook_build").map((d) => ({
+      review_unit_id: d.row.review_unit_id,
+      lane: d.row.lane,
+      model_key: d.row.model_key,
+      rpo: d.row.rpo,
+      target_sheet: d.row.target_sheet,
+      proposed_workbook_action: d.row.proposed_workbook_action,
+      decision_state: d.state,
+      reviewer_notes: d.note || "",
+      source_refs_snapshot: d.row.source_refs || [],
+      raw_source_snapshot: d.row.raw_source_snapshot || {},
+      workbook_presence_snapshot: d.row.workbook_presence || "",
+    }));
     const interpretationDecisions = picked.filter((d) => d.family === "interpretations").map((d) => ({
       interpretation_id: d.row.interpretation_id,
       model_key: d.row.model_key,
@@ -1060,10 +1089,12 @@ function IngestReviewTab() {
       normalized_values_snapshot: d.row.normalized_values || {},
       candidate_refs: d.row.candidate_refs || [],
     }));
+    const workbookBuildMode = summary.workbook_build_enabled;
     const interpretationMode = summary.interpretation_enabled;
     return {
-      version: interpretationMode ? 2 : 1,
-      review_mode: interpretationMode ? "interpretation" : "raw_candidates",
+      version: workbookBuildMode ? 3 : interpretationMode ? 2 : 1,
+      review_mode: workbookBuildMode ? "workbook_build" : interpretationMode ? "interpretation" : "raw_candidates",
+      selection_fingerprint: summary.workbook_build_summary?.selection_fingerprint || "",
       created_at: new Date().toISOString(),
       workbook: summary.workbook,
       evidence_dir: summary.evidence_dir,
@@ -1074,12 +1105,17 @@ function IngestReviewTab() {
       interpretation_artifacts: summary.interpretation_artifacts || {},
       candidate_summary: summary.candidate_summary,
       interpretation_summary: summary.interpretation_summary || {},
+      workbook_build_summary: summary.workbook_build_summary || {},
+      model_selection: summary.model_selection || {},
+      workbook_build_decisions: workbookBuildDecisions,
       interpretation_decisions: interpretationDecisions,
       raw_candidate_decisions: candidateDecisions,
       decisions: candidateDecisions,
       unresolved_decisions: unresolvedDecisions,
       unresolved_rollup: summary.unresolved_counts,
-      notes: interpretationMode
+      notes: workbookBuildMode
+        ? "Exported from Pass 5 focused workbook-build review; not a workbook apply manifest."
+        : interpretationMode
         ? "Exported from Pass 4 reduced Ingest Review; not a workbook apply manifest."
         : "Exported from Pass 2 Ingest Review; not a workbook apply manifest.",
     };
@@ -1096,7 +1132,8 @@ function IngestReviewTab() {
   };
 
   const validateDecisions = async () => {
-    const { data } = await postJson("/api/ingest/review/validate", buildDecisionExport());
+    const route = summary.workbook_build_enabled ? "/api/ingest/workbook-build/validate" : "/api/ingest/review/validate";
+    const { data } = await postJson(route, buildDecisionExport());
     setValidation(data);
   };
 
@@ -1106,7 +1143,8 @@ function IngestReviewTab() {
 
   const reasons = Object.keys(summary.unresolved_counts || {}).sort();
   const interpretationSummary = summary.interpretation_summary || {};
-  const modeLabel = family === "interpretations" ? "Reduced review" : "Raw candidates";
+  const workbookBuildSummary = summary.workbook_build_summary || {};
+  const modeLabel = family === "workbook_build" ? "Workbook-build review" : family === "interpretations" ? "Reduced review" : "Raw candidates";
   const selectedDecision = selected ? decisions[decisionKey(selected)] || {} : {};
 
   return html`<div class="space ingest-review">
@@ -1120,6 +1158,13 @@ function IngestReviewTab() {
         <button class="btn primary" onClick=${exportDecisions}>Export decisions JSON</button>
       </div>
       <div class="ingest-summary">
+        ${summary.workbook_build_enabled && html`
+          <div class="metric green"><b>${(summary.model_selection?.primary_models || []).join(", ") || "—"}</b><span>primary models</span></div>
+          <div class="metric"><b>${(summary.model_selection?.comparator_models || []).join(", ") || "none"}</b><span>comparators</span></div>
+          <div class="metric"><b>${workbookBuildSummary.lane_counts?.option_rows || 0}</b><span>option-row units</span></div>
+          <div class="metric"><b>${workbookBuildSummary.lane_counts?.ovs_rows || 0}</b><span>OVS units</span></div>
+          <div class="metric warn"><b>${workbookBuildSummary.lane_counts?.blocked_extractor_gaps || 0}</b><span>extractor gaps</span></div>
+        `}
         ${summary.interpretation_enabled && html`
           <div class="metric"><b>${interpretationSummary.raw_candidate_total || 0}</b><span>raw candidates</span></div>
           <div class="metric"><b>${interpretationSummary.interpreted_option_count || 0}</b><span>model/RPO units</span></div>
@@ -1151,10 +1196,29 @@ function IngestReviewTab() {
     <div class="panel">
       <div class="bar">
         <span class="title">${modeLabel}</span>
-        <select value=${family} onChange=${(e) => { setFamily(e.target.value); setReason(""); setConfidence(""); setDuplicate(""); }}>
+        <select value=${family} onChange=${(e) => { setFamily(e.target.value); setReason(""); setConfidence(""); setDuplicate(""); setLane(""); setAction(""); }}>
+          ${summary.workbook_build_enabled && html`<option value="workbook_build">workbook-build queue</option>`}
           ${summary.interpretation_enabled && html`<option value="interpretations">reduced review</option>`}
           ${summary.families.map((f) => html`<option value=${f} key=${f}>${f}</option>`)}
         </select>
+        ${family === "workbook_build" && html`<select value=${lane} onChange=${(e) => setLane(e.target.value)}>
+          <option value="">all workbook lanes</option>
+          <option value="option_rows">option rows</option>
+          <option value="ovs_rows">OVS rows</option>
+          <option value="relationships">relationships</option>
+          <option value="duplicates_and_source_coverage">duplicates/source coverage</option>
+          <option value="blocked_extractor_gaps">extractor gaps</option>
+        </select>`}
+        ${family === "workbook_build" && html`<select value=${action} onChange=${(e) => setAction(e.target.value)}>
+          <option value="">all workbook actions</option>
+          <option value="create_option_row">create option row</option>
+          <option value="verify_existing_option_row">verify existing option row</option>
+          <option value="create_ovs_rows">create OVS rows</option>
+          <option value="verify_status_matrix">verify status matrix</option>
+          <option value="create_relationship_candidate">create relationship candidate</option>
+          <option value="classify_duplicate_source">classify duplicate source</option>
+          <option value="blocked_unsupported_source_structure">blocked unsupported source</option>
+        </select>`}
         ${family === "interpretations" && html`<select value=${confidence} onChange=${(e) => setConfidence(e.target.value)}>
           <option value="">all visible confidence</option>
           <option value="mechanical_safe">mechanical_safe</option>
@@ -1175,21 +1239,23 @@ function IngestReviewTab() {
           <option value="">all unresolved reasons</option>
           ${reasons.map((r) => html`<option value=${r} key=${r}>${r} (${summary.unresolved_counts[r]})</option>`)}
         </select>`}
+        ${family === "workbook_build" && html`<input type="search" placeholder="Filter workbook-build units…" value=${query}
+          onInput=${(e) => setQuery(e.target.value)} />`}
         ${family === "interpretations" && html`<input type="search" placeholder="Filter model/RPO units…" value=${query}
           onInput=${(e) => setQuery(e.target.value)} />`}
-        ${family !== "interpretations" && html`<input type="search" placeholder="Filter candidates…" value=${query}
+        ${family !== "interpretations" && family !== "workbook_build" && html`<input type="search" placeholder="Filter candidates…" value=${query}
           onInput=${(e) => setQuery(e.target.value)} />
         `}
       </div>
       ${!rows && html`<div class="loading">Loading ${modeLabel.toLowerCase()}…</div>`}
       ${rows && html`<div class="ingest-grid">
         <div class="ingest-list">
-          <div class="meta pad">Showing ${rows.items.length} of ${rows.total} ${family === "interpretations" ? "model/RPO units" : `${rows.family} rows`}.</div>
+          <div class="meta pad">Showing ${rows.items.length} of ${rows.total} ${family === "workbook_build" ? "workbook-build units" : family === "interpretations" ? "model/RPO units" : `${rows.family} rows`}.</div>
           ${rows.items.map((row) => html`<button class=${"ingest-row" + (selected && decisionKey(selected) === decisionKey(row) ? " on" : "")}
             key=${decisionKey(row)} onClick=${() => loadDetail(row)}>
             <span class="mono strong">${candidateLabel(row)}</span>
-            <span class=${"badge " + (row.interpretation_confidence === "auto_confirmed" ? "green" : row.interpretation_confidence === "blocked" ? "sev-error" : row.interpretation_confidence === "review_needed" ? "amber" : "")}>${row.interpretation_confidence || row.reason || row.resolution_status}</span>
-            <span class="small dim">${row.duplicate_classification || row.category || row.candidate_family}</span>
+            <span class=${"badge " + (row.interpretation_confidence === "auto_confirmed" ? "green" : row.interpretation_confidence === "blocked" ? "sev-error" : row.interpretation_confidence === "review_needed" ? "amber" : "")}>${row.proposed_workbook_action || row.interpretation_confidence || row.reason || row.resolution_status}</span>
+            <span class="small dim">${row.target_sheet || row.duplicate_classification || row.category || row.candidate_family}</span>
             ${row.review_reason_codes && html`<span class="small dim">${row.review_reason_codes.join(", ") || "no review reasons"}</span>`}
           </button>`)}
         </div>
@@ -1199,26 +1265,35 @@ function IngestReviewTab() {
             <div class="panel mini">
               <div class="bar"><span class="title">Decision</span></div>
               <div class="pad decision-box">
-                ${html`<!-- Legacy Pass 4 states. Pass 5 replaces this primary control with workbook-destination actions. -->`}
-                <select value=${selectedDecision.state || ""} onChange=${(e) => setDecisionState(selected, e.target.value)}>
+                ${family === "workbook_build" && html`<select value=${selectedDecision.state || ""} onChange=${(e) => setDecisionState(selected, e.target.value)}>
+                  <option value="">undecided</option>
+                  <option value="ready_for_apply_plan">ready for apply plan</option>
+                  <option value="needs_product_decision">needs product decision</option>
+                  <option value="ignore_source">ignore source</option>
+                  <option value="defer_extractor_gap">defer extractor gap</option>
+                  <option value="blocked">blocked</option>
+                </select>`}
+                ${family !== "workbook_build" && html`<select value=${selectedDecision.state || ""} onChange=${(e) => setDecisionState(selected, e.target.value)}>
                   <option value="">undecided</option>
                   <option value="accept_for_later_apply">accept for later apply</option>
                   <option value="edit_before_apply">edit before apply</option>
                   <option value="skip">skip</option>
                   <option value="needs_source_review">needs source review</option>
                   <option value="blocked_out_of_scope">blocked out of scope</option>
-                </select>
+                </select>`}
                 <textarea placeholder="Reviewer notes…" value=${selectedDecision.note || ""}
                   onInput=${(e) => setDecisionNote(selected, e.target.value)} />
               </div>
             </div>
+            ${detail.review_unit_id && html`<div class="panel mini"><div class="bar"><span class="title">Workbook destination</span></div><div class="pad"><p><b>${detail.proposed_workbook_action}</b> → <span class="mono">${detail.target_sheet}</span></p><p class="small dim">lane=${detail.lane}; presence=${detail.workbook_presence}; role=${detail.model_role}</p></div></div>`}
             ${detail.interpretation_id && html`<div class="panel mini"><div class="bar"><span class="title">Expert summary</span></div><div class="pad"><p>${detail.expert_summary}</p><p class="small dim">${(detail.review_reason_codes || []).join(", ") || "no review reasons"}</p></div></div>`}
             <div class="panel mini"><div class="bar"><span class="title">Source evidence</span></div><${JsonBlock} value=${detail.source_occurrences || detail.source_refs || []} /></div>
             ${detail.interpretation_id && html`<div class="panel mini"><div class="bar"><span class="title">Availability matrix</span></div><${JsonBlock} value=${detail.availability_matrix || {}} /></div>`}
+            ${detail.review_unit_id && html`<div class="panel mini"><div class="bar"><span class="title">Status matrix summary</span></div><${JsonBlock} value=${detail.status_matrix_summary || {}} /></div>`}
             ${detail.interpretation_id && html`<div class="panel mini"><div class="bar"><span class="title">Disclosure / rule evidence</span></div><${JsonBlock} value=${detail.disclosure_evidence || {}} /></div>`}
-            <div class="panel mini"><div class="bar"><span class="title">Raw values</span></div><${JsonBlock} value=${detail.raw_values || {}} /></div>
+            <div class="panel mini"><div class="bar"><span class="title">Raw values</span></div><${JsonBlock} value=${detail.raw_source_snapshot || detail.raw_values || {}} /></div>
             <div class="panel mini"><div class="bar"><span class="title">Normalized values</span></div><${JsonBlock} value=${detail.normalized_values || {}} /></div>
-            <div class="panel mini"><div class="bar"><span class="title">Workbook match / context</span></div><${JsonBlock} value=${detail.interpretation_id ? { identity: detail.workbook_identity_match, status: detail.workbook_status_match, duplicate: detail.duplicate_classification } : (detail.workbook_match || detail.candidate_refs || null)} /></div>
+            <div class="panel mini"><div class="bar"><span class="title">Workbook match / context</span></div><${JsonBlock} value=${detail.review_unit_id ? { presence: detail.workbook_presence, missing: detail.required_fields_missing, comparator: detail.comparator_context } : detail.interpretation_id ? { identity: detail.workbook_identity_match, status: detail.workbook_status_match, duplicate: detail.duplicate_classification } : (detail.workbook_match || detail.candidate_refs || null)} /></div>
           </div>`}
         </div>
       </div>`}

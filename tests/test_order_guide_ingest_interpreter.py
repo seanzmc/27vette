@@ -14,12 +14,16 @@ from openpyxl import Workbook
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS_DIR = ROOT / "scripts"
+TESTS_DIR = ROOT / "tests"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
+if str(TESTS_DIR) not in sys.path:
+    sys.path.insert(0, str(TESTS_DIR))
 
 from corvette_form_generator.ingest.candidate_normalizer import normalize_order_guide_candidates  # noqa: E402
 from corvette_form_generator.ingest.expert_interpreter import interpret_order_guide_candidates  # noqa: E402
 from corvette_form_generator.ingest.source_profiler import profile_order_guide  # noqa: E402
+from test_order_guide_candidate_normalizer import build_evidence as build_focused_evidence  # noqa: E402
 
 
 def append_sheet(wb: Workbook, name: str, headers: list[str], rows: list[dict[str, object]]) -> None:
@@ -251,6 +255,68 @@ class OrderGuideIngestInterpreterTests(unittest.TestCase):
                     output_dir=ROOT / "form-output" / "runtime" / "bad-interpretation",
                     run_id="bad-output",
                     root=ROOT,
+                )
+
+    def test_focused_model_interpretation_writes_workbook_build_artifacts(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            workbook, evidence_dir = build_focused_evidence(tmp)
+            candidates_dir = tmp / "focused-candidates"
+            normalize_order_guide_candidates(
+                evidence_dir=evidence_dir,
+                workbook=workbook,
+                output_dir=candidates_dir,
+                run_id="focused-candidates",
+                root=ROOT,
+                selected_models=["zr1"],
+            )
+            output_dir = tmp / "focused-interpretation"
+
+            result = interpret_order_guide_candidates(
+                evidence_dir=evidence_dir,
+                candidates_dir=candidates_dir,
+                workbook=workbook,
+                output_dir=output_dir,
+                run_id="focused-interpretation",
+                root=ROOT,
+                selected_models=["zr1"],
+                primary_models=["zr1"],
+            )
+
+            self.assertEqual(result["status"], "passed")
+            for name in ["model-selection.json", "workbook-build-summary.json", "workbook-build-review-units.json"]:
+                self.assertTrue((output_dir / name).exists(), name)
+                self.assertIn(name, result["artifact_files"])
+            summary = json.loads((output_dir / "workbook-build-summary.json").read_text())
+            self.assertEqual(summary["review_mode"], "focused_workbook_build")
+            self.assertEqual(summary["selection_metadata"]["selected_models"], ["zr1"])
+            self.assertTrue(summary["cross_check_status"]["ok"])
+            self.assertGreaterEqual(summary["lane_counts"]["option_rows"], 1)
+            self.assertGreaterEqual(summary["lane_counts"]["ovs_rows"], 1)
+
+            units = json.loads((output_dir / "workbook-build-review-units.json").read_text())
+            option_unit = next(row for row in units if row["lane"] == "option_rows" and row["rpo"] == "TOM")
+            self.assertEqual(option_unit["target_sheet"], "zr1_options")
+            self.assertEqual(option_unit["workbook_presence"], "existing_inactive_scaffold")
+            self.assertEqual(option_unit["proposed_workbook_action"], "verify_existing_option_row")
+            ovs_unit = next(row for row in units if row["lane"] == "ovs_rows" and row["rpo"] == "TOM")
+            self.assertEqual(ovs_unit["target_sheet"], "zr1_ovs")
+            self.assertEqual(ovs_unit["proposed_workbook_action"], "verify_status_matrix")
+
+    def test_focused_interpretation_requires_candidate_selection_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            workbook, evidence_dir, candidates_dir = build_candidates(tmp)
+
+            with self.assertRaisesRegex(ValueError, "model-selection.json"):
+                interpret_order_guide_candidates(
+                    evidence_dir=evidence_dir,
+                    candidates_dir=candidates_dir,
+                    workbook=workbook,
+                    output_dir=tmp / "focused-interpretation",
+                    run_id="focused-interpretation",
+                    root=ROOT,
+                    selected_models=["stingray"],
                 )
 
     def test_cli_emits_summary_json(self) -> None:

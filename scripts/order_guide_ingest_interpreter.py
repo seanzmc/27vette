@@ -21,6 +21,9 @@ def main() -> int:
     parser.add_argument("--evidence-dir", required=True, help="Directory containing Pass 0 evidence artifacts.")
     parser.add_argument("--candidates-dir", required=True, help="Directory containing Pass 1 candidate artifacts.")
     parser.add_argument("--workbook", default=str(ROOT / "stingray_master.xlsx"), help="Canonical workbook reference, read-only.")
+    parser.add_argument("--models", default="", help="Comma-separated selected model keys for focused workbook-build interpretation.")
+    parser.add_argument("--primary-models", default="", help="Optional comma-separated primary selected model keys.")
+    parser.add_argument("--comparator-models", default="", help="Optional comma-separated comparator selected model keys.")
     parser.add_argument("--run-id", required=True, help="Run identifier used in reports/manifests.")
     parser.add_argument("--output-dir", required=True, help="Directory for transient interpretation artifacts.")
     args = parser.parse_args()
@@ -33,6 +36,9 @@ def main() -> int:
             output_dir=Path(args.output_dir),
             run_id=args.run_id,
             root=ROOT,
+            selected_models=args.models or None,
+            primary_models=args.primary_models or None,
+            comparator_models=args.comparator_models or None,
         )
     except Exception as exc:  # noqa: BLE001 - CLI should print clean failure
         print(f"order-guide ingest interpreter failed: {exc}", file=sys.stderr)
