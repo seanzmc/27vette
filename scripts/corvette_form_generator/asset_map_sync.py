@@ -342,25 +342,15 @@ def reconcile(
 ) -> SyncPlan:
     """Pure reconciliation of desired option assets vs media candidates."""
 
-    models_for_rpo: dict[str, set[str]] = defaultdict(set)
-    for (model_key, _target_id), info in desired.items():
-        if info["rpo"]:
-            models_for_rpo[info["rpo"]].add(model_key)
-    prefixed_models_for_rpo: dict[str, set[str]] = defaultdict(set)
-    for model_key, rpo in exact:
-        prefixed_models_for_rpo[rpo].add(model_key)
-
     def resolve(model_key: str, rpo: str) -> tuple[str | None, str]:
         if not rpo:
             return None, "no-rpo"
         if (model_key, rpo) in exact:
             return exact[(model_key, rpo)][0], "prefixed"
         if rpo in bare:
-            eligible = models_for_rpo.get(rpo, set()) - prefixed_models_for_rpo.get(rpo, set())
-            if eligible == {model_key}:
-                return bare[rpo][0], "bare-unique"
-            if model_key in eligible:
-                return None, "bare-ambiguous"
+            if len(bare[rpo]) == 1:
+                return bare[rpo][0], "bare-shared"
+            return None, "bare-ambiguous"
         return None, "none"
 
     report: list[dict[str, str]] = []
@@ -408,7 +398,7 @@ def reconcile(
             used.add(candidate)
         note = "" if rpo else "no rpo in option sheet"
         if source == "bare-ambiguous":
-            note = f"bare file for '{rpo}' shared across models; add a c/e/h/r/s/g prefix"
+            note = f"multiple bare files for '{rpo}'; keep one shared file or add c/e/h/r/s/g prefixes"
 
         existing = existing_rows.get((model_key, target_id))
         if existing:

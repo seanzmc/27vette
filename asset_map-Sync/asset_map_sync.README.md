@@ -21,6 +21,15 @@ The supported command:
 - defaults to dry-run/report mode;
 - resolves default scope from promoted runtime models in `model_registry_promotion`;
 - resolves each model's option sheet through `model_workbook_sources`;
+- accepts media anywhere under `/wp-content/uploads/pictures/27vette/`, including
+  category subfolders such as `/paint/` or `/int/`;
+- treats model-prefixed filenames as model-specific winners (`c-` Stingray,
+  `e-` Grand Sport, `h-` Z06, `r-` ZR1, `s-` ZR1X, `g-` Grand Sport X);
+- treats a single bare RPO filename as a shared fallback for every promoted
+  active model with a matching active/selectable option row when that model has
+  no model-prefixed candidate for the RPO;
+- flags duplicate bare RPO filenames as ambiguous instead of choosing one by
+  folder or API order;
 - uses stdlib HTTP with an explicit browser-like User-Agent, with optional `WP_USER` / `WP_APP_PASSWORD` only when the public media endpoint requires auth;
 - supports deterministic validation with `--media-url-list tests/fixtures/asset-map-sync-media-urls.txt`;
 - writes review reports plus `asset_map_sync_manifest.json` to `--report-dir`;

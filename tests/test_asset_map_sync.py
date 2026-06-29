@@ -250,6 +250,8 @@ def test_parse_media_requires_hyphen_for_model_prefix() -> None:
     assert asset_map_sync.parse_media("https://example.test/h-stx.png") == ("z06", "stx", True)
     assert asset_map_sync.parse_media("https://example.test/hzp.png") == (None, "hzp", True)
     assert asset_map_sync.parse_media("https://example.test/c-qe6_v1.png") == ("stingray", "qe6", True)
+    assert asset_map_sync.parse_media("https://example.test/27vette/paint/gba.png") == (None, "gba", True)
+    assert asset_map_sync.parse_media("https://example.test/27vette/paint/c-gba.png") == ("stingray", "gba", True)
 
 
 def test_discovery_uses_promoted_runtime_models_not_inactive_future_sheets() -> None:
@@ -263,7 +265,7 @@ def test_discovery_uses_promoted_runtime_models_not_inactive_future_sheets() -> 
     assert ("zr1", "opt_future_001") not in desired
 
 
-def test_reconcile_reports_missing_without_default_blank_insert_and_flags_ambiguous_bare_media() -> None:
+def test_reconcile_uses_bare_media_as_shared_fallback_after_model_prefixed_media() -> None:
     desired = {
         ("stingray", "opt_gba_001"): {"rpo": "gba", "name": "Black"},
         ("grand_sport", "opt_gba_001"): {"rpo": "gba", "name": "Black"},
@@ -271,7 +273,11 @@ def test_reconcile_reports_missing_without_default_blank_insert_and_flags_ambigu
         ("stingray", "opt_noimg_001"): {"rpo": "nix", "name": "No Image"},
     }
     exact, bare, _ = asset_map_sync.build_media_index(
-        ["https://example.test/gba.png", "https://example.test/h-stx.png"]
+        [
+            "https://example.test/27vette/paint/gba.png",
+            "https://example.test/27vette/stripes/stx.png",
+            "https://example.test/27vette/z06/h-stx.png",
+        ]
     )
 
     report, url_writes, inserts, status, _used = asset_map_sync.reconcile(
@@ -284,21 +290,74 @@ def test_reconcile_reports_missing_without_default_blank_insert_and_flags_ambigu
     )
 
     actions = {(row["model_key"], row["target_id"]): row["action"] for row in report}
-    assert actions[("stingray", "opt_gba_001")] == "flag_ambiguous"
-    assert actions[("grand_sport", "opt_gba_001")] == "flag_ambiguous"
+    sources = {(row["model_key"], row["target_id"]): row["candidate_source"] for row in report}
+    urls = {(row["model_key"], row["target_id"]): row["new_url"] for row in report}
+    assert actions[("stingray", "opt_gba_001")] == "insert_filled"
+    assert actions[("grand_sport", "opt_gba_001")] == "insert_filled"
     assert actions[("z06", "opt_stx_001")] == "insert_filled"
     assert actions[("stingray", "opt_noimg_001")] == "flag_missing"
+    assert sources[("stingray", "opt_gba_001")] == "bare-shared"
+    assert sources[("grand_sport", "opt_gba_001")] == "bare-shared"
+    assert sources[("z06", "opt_stx_001")] == "prefixed"
+    assert urls[("stingray", "opt_gba_001")] == "https://example.test/27vette/paint/gba.png"
+    assert urls[("grand_sport", "opt_gba_001")] == "https://example.test/27vette/paint/gba.png"
+    assert urls[("z06", "opt_stx_001")] == "https://example.test/27vette/z06/h-stx.png"
     assert inserts == [
+        {
+            "model": "stingray",
+            "tid": "opt_gba_001",
+            "rpo": "gba",
+            "name": "Black",
+            "url": "https://example.test/27vette/paint/gba.png",
+            "status": "ok",
+        },
+        {
+            "model": "grand_sport",
+            "tid": "opt_gba_001",
+            "rpo": "gba",
+            "name": "Black",
+            "url": "https://example.test/27vette/paint/gba.png",
+            "status": "ok",
+        },
         {
             "model": "z06",
             "tid": "opt_stx_001",
             "rpo": "stx",
             "name": "Stripe",
-            "url": "https://example.test/h-stx.png",
+            "url": "https://example.test/27vette/z06/h-stx.png",
             "status": "ok",
         }
     ]
     assert url_writes == {}
+    assert status == {}
+
+
+def test_reconcile_flags_duplicate_bare_media_for_same_rpo_as_ambiguous() -> None:
+    desired = {
+        ("stingray", "opt_gba_001"): {"rpo": "gba", "name": "Black"},
+        ("grand_sport", "opt_gba_001"): {"rpo": "gba", "name": "Black"},
+    }
+    exact, bare, _ = asset_map_sync.build_media_index(
+        [
+            "https://example.test/27vette/paint/gba.png",
+            "https://example.test/27vette/exterior/gba.png",
+        ]
+    )
+
+    report, url_writes, inserts, status, _used = asset_map_sync.reconcile(
+        desired,
+        exact,
+        bare,
+        existing_rows={},
+        alive={},
+        incremental=False,
+    )
+
+    assert {row["action"] for row in report} == {"flag_ambiguous"}
+    assert {row["candidate_source"] for row in report} == {"bare-ambiguous"}
+    assert all("multiple bare files" in row["note"] for row in report)
+    assert url_writes == {}
+    assert inserts == []
     assert status == {}
 
 
@@ -427,10 +486,9 @@ def test_missing_images_artifact_written_and_manifested(tmp_path: Path) -> None:
     assert Path(manifest["missing_images_path"]) == missing_path
 
     rows = list(csv.DictReader(missing_path.open(encoding="utf-8")))
-    assert manifest["missing_images_count"] == len(rows) == 2
+    assert manifest["missing_images_count"] == len(rows) == 1
     assert {(row["target_id"], row["action"]) for row in rows} == {
         ("opt_noimg_001", "flag_missing"),
-        ("opt_gba_002", "flag_ambiguous"),
     }
     assert rows[0]["section_id"] == "sec_test_001"
     assert rows[0]["option_name"] == "No Image"
@@ -459,7 +517,7 @@ def test_missing_images_artifact_excludes_keep_insert_and_unmatched(tmp_path: Pa
     assert "opt_gba_001" not in {row["target_id"] for row in rows}
     assert "opt_stx_001" not in {row["target_id"] for row in rows}
     unmatched_rows = list(csv.DictReader(result.unmatched_path.open(encoding="utf-8")))
-    assert {row["parsed_rpo"] for row in unmatched_rows} == {"abc", "gba"}
+    assert {row["parsed_rpo"] for row in unmatched_rows} == {"abc"}
     assert "abc" not in {row["rpo"] for row in rows}
 
 
