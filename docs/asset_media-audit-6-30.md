@@ -2,10 +2,11 @@
 
 Audit complete. Current repo worktree is clean (git status --short returned no output). I did not edit repo files or generated artifacts. I did patch the stale local Hermes skill reference for asset_map because it still described the old no-hover/no-context-choice shape.
 
-High-level finding:
+## High-level finding:
+
 The active runtime path is mostly source-of-truth aligned now: workbook metadata discovers the active models, promoted registry rows publish runtime contracts, asset_map feeds generic media fields, and runtime rendering is generic. The main risks are not “missing runtime wiring”; they are structural redundancy and a few remaining code-owned policy decisions that can create drift as more models/assets are added.
 
-Evidence inspected:
+## Evidence inspected:
 
 - Generator entrypoints:
   - scripts/generate_form.py
@@ -31,7 +32,7 @@ Evidence inspected:
   - tests/multi-model-runtime-switching.test.mjs
   - related asset/default metadata assertions in tests/stingray-generator-stability.test.mjs, tests/grand-sport-draft-data.test.mjs, tests/z06-form-data-draft.test.mjs
 
-Current active model/runtime state:
+## Current active model/runtime state:
 
 - Active/generatable workbook models:
   - stingray
@@ -44,7 +45,7 @@ Current active model/runtime state:
 - All three promoted artifacts exist and reported 0 generated validation errors.
 - All three active models have a full active model_workbook_sources role set.
 
-Current asset_map state:
+## Current asset_map state:
 
 - Headers:
   - model_key
@@ -70,7 +71,7 @@ Current asset_map state:
 - Active hover-media rows: 6
 - Active wildcard/shared rows: 0
 
-Generated media counts:
+## Generated media counts:
 
 - Stingray:
   - choices: 1416
@@ -88,10 +89,10 @@ Generated media counts:
   - context choices with image: 2
   - context choices with hover: 2
 
-Report-only sync probe:
+## Report-only sync probe:
 I ran scripts/sync_asset_map.py against a deterministic media URL list built from the current active asset_map URLs only. It did not write anything.
 
-Result:
+### Result:
 
 - keep: 192
 - flag_missing: 268
@@ -101,7 +102,7 @@ Result:
 - unparseable files: 0
 - report dir: /tmp/27vette-asset-audit.To4jiI/report
 
-Missing-image report summary:
+### Missing-image report summary:
 
 - Stingray: 93 missing
 - Grand Sport: 91 missing
@@ -115,7 +116,7 @@ Missing-image report summary:
   - Grand Sport sec_lpoe_001: 16
   - Z06 sec_lpoe_001: 13
 
-Findings:
+## Findings:
 
 1. Good: workbook-owned model discovery and registry promotion are now the primary path.
 
@@ -268,7 +269,7 @@ Smallest safe pass:
 - Separate doc/stale-note cleanup from behavior changes.
 - For behavior/presentation routing, prefer workbook/generated metadata before editing runtime conditions.
 
-Validation run:
+## Validation run:
 
 - .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
   - passed, status valid, 0 issues
@@ -286,7 +287,7 @@ Gates not run:
 - I did not run live WordPress media fetch; deterministic media list was enough for the relationship audit and avoids mutable external results.
 - I did not run browser manual smoke; no runtime behavior was changed.
 
-Recommended next pass:
+## Recommended next pass:
 A. First: fix asset_map_sync identity keys and add duplicate active asset_map validation.
 Reason: small, no workbook data change, closes the highest structural risk before more media/model growth.
 
