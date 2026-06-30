@@ -484,6 +484,59 @@ def validate_model_master_metadata(wb, issues: list[SchemaIssue]) -> bool:
     return True
 
 
+def validate_asset_map_uniqueness(wb, issues: list[SchemaIssue]) -> None:
+    """Validate active asset_map rows are unique per (model_key, target_type, target_id).
+
+    Mirrors validate_model_master_metadata's active-row uniqueness pattern: the runtime read
+    path (contract.py:load_asset_map) keys assets by (target_type, target_id) per model, so a
+    duplicate active row for the same identity is silently last-write-wins at load time with
+    no error. This check makes that failure loud instead of silent.
+    """
+
+    if "asset_map" not in wb.sheetnames:
+        return
+
+    header_cols = nonblank_headers(wb["asset_map"])
+    required = {"model_key", "target_type", "target_id"}
+    if not required.issubset(header_cols):
+        return
+
+    seen_active_keys: dict[tuple[str, str, str], int] = {}
+    for row_number, row in records(wb["asset_map"]):
+        if not truthy(row.get("active"), default=True):
+            continue
+        model_key = clean_text(row.get("model_key")).lower()
+        target_type = clean_text(row.get("target_type")).lower()
+        target_id = clean_text(row.get("target_id"))
+        target_id_key = target_id.lower() if target_type == "option" else target_id
+        if not model_key or not target_type or not target_id_key:
+            continue
+        key = (model_key, target_type, target_id_key)
+        first_row = seen_active_keys.get(key)
+        if first_row is not None:
+            add_issue(
+                issues,
+                "error",
+                "duplicate_active_asset_map_row",
+                sheet="asset_map",
+                row=row_number,
+                column="target_id",
+                value={
+                    "model_key": model_key,
+                    "target_type": target_type,
+                    "target_id": target_id,
+                    "first_row": first_row,
+                    "duplicate_row": row_number,
+                },
+                message=(
+                    f"Duplicate active asset_map row for model_key {model_key!r}, "
+                    f"target_type {target_type!r}, target_id {target_id!r}."
+                ),
+            )
+            continue
+        seen_active_keys[key] = row_number
+
+
 def validate_model_variant_topology(wb, issues: list[SchemaIssue]) -> None:
     """Validate active model membership references active variant fact rows."""
 
@@ -818,6 +871,8 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
         if model_master_valid:
             validate_model_variant_topology(wb, issues)
             validate_registry_promotion_metadata(wb, issues)
+
+        validate_asset_map_uniqueness(wb, issues)
 
         for source_role in HEADER_MATCH_ROLES:
             existing_sheets = [sheet for sheet in source_sheets_by_role.get(source_role, []) if sheet in wb.sheetnames]

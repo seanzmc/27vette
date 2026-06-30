@@ -368,8 +368,8 @@ def _header_index(ws) -> dict[str, int]:
     return {header: index for index, header in enumerate(headers) if header}
 
 
-def read_option_sheets(wb, sources: dict[str, str]) -> dict[tuple[str, str], dict[str, str]]:
-    desired: dict[tuple[str, str], dict[str, str]] = {}
+def read_option_sheets(wb, sources: dict[str, str]) -> dict[tuple[str, str, str], dict[str, str]]:
+    desired: dict[tuple[str, str, str], dict[str, str]] = {}
     for model_key, sheet_name in sources.items():
         ws = wb[sheet_name]
         index = _header_index(ws)
@@ -387,7 +387,7 @@ def read_option_sheets(wb, sources: dict[str, str]) -> dict[tuple[str, str], dic
             rpo = clean(row[index["rpo"]]).lower()
             name = clean(row[index["option_name"]]) if "option_name" in index else ""
             section_id = clean(row[index["section_id"]]).lower() if "section_id" in index else ""
-            desired[(model_key, option_id)] = {
+            desired[(model_key, TARGET_TYPE_OPTION, option_id)] = {
                 "target_type": TARGET_TYPE_OPTION,
                 "rpo": rpo,
                 "name": name,
@@ -397,8 +397,8 @@ def read_option_sheets(wb, sources: dict[str, str]) -> dict[tuple[str, str], dic
     return desired
 
 
-def read_model_targets(wb) -> dict[tuple[str, str], dict[str, str]]:
-    desired: dict[tuple[str, str], dict[str, str]] = {}
+def read_model_targets(wb) -> dict[tuple[str, str, str], dict[str, str]]:
+    desired: dict[tuple[str, str, str], dict[str, str]] = {}
     if "model_registry_promotion" not in wb.sheetnames:
         return desired
     for row in rows_from_sheet(wb, "model_registry_promotion"):
@@ -408,7 +408,7 @@ def read_model_targets(wb) -> dict[tuple[str, str], dict[str, str]]:
         target_id = clean(row.get("registry_key")) or model_key
         if not model_key or not target_id:
             continue
-        desired[(model_key, target_id)] = {
+        desired[(model_key, TARGET_TYPE_MODEL, target_id)] = {
             "target_type": TARGET_TYPE_MODEL,
             "rpo": "",
             "name": clean(row.get("model_label")) or target_id,
@@ -418,12 +418,12 @@ def read_model_targets(wb) -> dict[tuple[str, str], dict[str, str]]:
     return desired
 
 
-def read_bodystyle_targets(sources: dict[str, str]) -> dict[tuple[str, str], dict[str, str]]:
-    desired: dict[tuple[str, str], dict[str, str]] = {}
+def read_bodystyle_targets(sources: dict[str, str]) -> dict[tuple[str, str, str], dict[str, str]]:
+    desired: dict[tuple[str, str, str], dict[str, str]] = {}
     for model_key in sources:
         for body_style, display_name in (("coupe", "Coupe"), ("convertible", "Convertible")):
             target_id = f"body_style__{body_style}"
-            desired[(model_key, target_id)] = {
+            desired[(model_key, TARGET_TYPE_CONTEXT_CHOICE, target_id)] = {
                 "target_type": TARGET_TYPE_CONTEXT_CHOICE,
                 "rpo": "",
                 "name": display_name,
@@ -433,8 +433,8 @@ def read_bodystyle_targets(sources: dict[str, str]) -> dict[tuple[str, str], dic
     return desired
 
 
-def existing_asset_rows(ws, header_index: dict[str, int]) -> dict[tuple[str, str], dict[str, Any]]:
-    rows: dict[tuple[str, str], dict[str, Any]] = {}
+def existing_asset_rows(ws, header_index: dict[str, int]) -> dict[tuple[str, str, str], dict[str, Any]]:
+    rows: dict[tuple[str, str, str], dict[str, Any]] = {}
     for row_number, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
         target_type = clean(row[header_index["target_type"]]).lower()
         if target_type not in SUPPORTED_TARGET_TYPES:
@@ -451,15 +451,15 @@ def existing_asset_rows(ws, header_index: dict[str, int]) -> dict[tuple[str, str
         }
         if "hover_image_url" in header_index:
             values["hover_image_url"] = clean(row[header_index["hover_image_url"]])
-        rows[(model_key, target_id_key)] = values
+        rows[(model_key, target_type, target_id_key)] = values
     return rows
 
 
 def reconcile(
-    desired: dict[tuple[str, str], dict[str, str]],
+    desired: dict[tuple[str, str, str], dict[str, str]],
     media: MediaInventory | dict[tuple[str, str], list[str]],
     bare: dict[str, list[str]] | None = None,
-    existing_rows: dict[tuple[str, str], dict[str, Any]] | None = None,
+    existing_rows: dict[tuple[str, str, str], dict[str, Any]] | None = None,
     alive: dict[str, bool] | None = None,
     incremental: bool = False,
 ) -> SyncPlan:
@@ -524,6 +524,7 @@ def reconcile(
         scope: str,
         model_key: str,
         source_sheet: str,
+        target_type: str,
         target_id: str,
         rpo: str,
         action: str,
@@ -533,16 +534,17 @@ def reconcile(
         image_status: str,
         note: str = "",
     ) -> None:
+        info = desired.get((model_key, target_type, target_id), {})
         report.append(
             {
                 "scope": scope,
                 "model_key": model_key,
                 "source_sheet": source_sheet,
-                "section_id": desired.get((model_key, target_id), {}).get("section_id", ""),
-                "target_type": desired.get((model_key, target_id), {}).get("target_type", ""),
+                "section_id": info.get("section_id", ""),
+                "target_type": target_type or info.get("target_type", ""),
                 "target_id": target_id,
                 "rpo": rpo,
-                "option_name": desired.get((model_key, target_id), {}).get("name", ""),
+                "option_name": info.get("name", ""),
                 "action": action,
                 "candidate_source": source,
                 "existing_url": existing_url,
@@ -552,14 +554,14 @@ def reconcile(
             }
         )
 
-    for (model_key, target_id), info in desired.items():
+    for (model_key, target_type, target_id), info in desired.items():
         rpo = info.get("rpo", "")
         source_sheet = info.get("source_sheet", "")
         fields, source, note = resolve_fields(model_key, target_id, info)
         for url in fields.values():
             used.add(url)
 
-        existing = existing_rows.get((model_key, target_id))
+        existing = existing_rows.get((model_key, target_type, target_id))
         if existing:
             row_number = int(existing["row"])
             if fields:
@@ -577,6 +579,7 @@ def reconcile(
                         "existing",
                         model_key,
                         source_sheet,
+                        target_type,
                         target_id,
                         rpo,
                         action,
@@ -589,19 +592,19 @@ def reconcile(
                 else:
                     status[row_number] = "ok"
                     existing_url = clean(existing.get("url"))
-                    add_report("existing", model_key, source_sheet, target_id, rpo, "keep", source, existing_url, existing_url, "ok")
+                    add_report("existing", model_key, source_sheet, target_type, target_id, rpo, "keep", source, existing_url, existing_url, "ok")
             elif source.endswith("ambiguous"):
                 status[row_number] = "ambiguous"
-                add_report("existing", model_key, source_sheet, target_id, rpo, "flag_ambiguous", source, clean(existing.get("url")), "", "ambiguous", note)
+                add_report("existing", model_key, source_sheet, target_type, target_id, rpo, "flag_ambiguous", source, clean(existing.get("url")), "", "ambiguous", note)
             elif incremental:
-                add_report("existing", model_key, source_sheet, target_id, rpo, "skip_no_candidate_incremental", source, clean(existing.get("url")), "", "missing", note)
+                add_report("existing", model_key, source_sheet, target_type, target_id, rpo, "skip_no_candidate_incremental", source, clean(existing.get("url")), "", "missing", note)
             elif alive.get(clean(existing.get("url")), True) is False:
                 action = "dead_no_match_incremental" if incremental else "flag_dead_no_match"
                 status[row_number] = "url_dead"
-                add_report("existing", model_key, source_sheet, target_id, rpo, action, source, clean(existing.get("url")), "", "url_dead", note)
+                add_report("existing", model_key, source_sheet, target_type, target_id, rpo, action, source, clean(existing.get("url")), "", "url_dead", note)
             else:
                 status[row_number] = "missing"
-                add_report("existing", model_key, source_sheet, target_id, rpo, "flag_missing", source, clean(existing.get("url")), "", "missing", note)
+                add_report("existing", model_key, source_sheet, target_type, target_id, rpo, "flag_missing", source, clean(existing.get("url")), "", "missing", note)
             continue
 
         if fields:
@@ -618,22 +621,23 @@ def reconcile(
             if source_sheet:
                 insert["source_sheet"] = source_sheet
             inserts.append(insert)
-            add_report("new", model_key, source_sheet, target_id, rpo, "insert_filled", source, "", fields.get("image_url", ""), "ok", note)
+            add_report("new", model_key, source_sheet, target_type, target_id, rpo, "insert_filled", source, "", fields.get("image_url", ""), "ok", note)
         elif source.endswith("ambiguous"):
-            add_report("new", model_key, source_sheet, target_id, rpo, "flag_ambiguous", source, "", "", "ambiguous", note)
+            add_report("new", model_key, source_sheet, target_type, target_id, rpo, "flag_ambiguous", source, "", "", "ambiguous", note)
         elif incremental:
-            add_report("new", model_key, source_sheet, target_id, rpo, "skip_no_candidate_incremental", source, "", "", "missing", note)
+            add_report("new", model_key, source_sheet, target_type, target_id, rpo, "skip_no_candidate_incremental", source, "", "", "missing", note)
         else:
-            add_report("new", model_key, source_sheet, target_id, rpo, "flag_missing", source, "", "", "missing", note)
+            add_report("new", model_key, source_sheet, target_type, target_id, rpo, "flag_missing", source, "", "", "missing", note)
 
-    for (model_key, target_id), existing in existing_rows.items():
-        if (model_key, target_id) not in desired:
+    for (model_key, target_type, target_id), existing in existing_rows.items():
+        if (model_key, target_type, target_id) not in desired:
             row_number = int(existing["row"])
             status[row_number] = "stale_target"
             add_report(
                 "stale",
                 model_key,
                 "",
+                target_type,
                 target_id,
                 "",
                 "stale_target",

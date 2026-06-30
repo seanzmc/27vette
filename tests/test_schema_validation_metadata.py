@@ -213,6 +213,42 @@ class SchemaValidationMetadataTests(unittest.TestCase):
 
         self.assertTrue(any(issue.check_id == "duplicate_active_model_master_row" for issue in issues), issues)
 
+    def test_asset_map_rejects_duplicate_active_rows_for_same_identity(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True}],
+            extra_sheets={
+                "asset_map": (
+                    ["model_key", "target_type", "target_id", "image_url", "active"],
+                    [
+                        {"model_key": "stingray", "target_type": "option", "target_id": "opt_gba_001", "image_url": "https://example.test/a.png", "active": True},
+                        {"model_key": "stingray", "target_type": "option", "target_id": "opt_gba_001", "image_url": "https://example.test/b.png", "active": True},
+                    ],
+                )
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(any(issue.check_id == "duplicate_active_asset_map_row" for issue in issues), issues)
+
+    def test_asset_map_allows_same_target_id_under_different_target_types(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True}],
+            extra_sheets={
+                "asset_map": (
+                    ["model_key", "target_type", "target_id", "image_url", "active"],
+                    [
+                        {"model_key": "stingray", "target_type": "option", "target_id": "shared_id", "image_url": "https://example.test/a.png", "active": True},
+                        {"model_key": "stingray", "target_type": "model", "target_id": "shared_id", "image_url": "https://example.test/b.png", "active": True},
+                    ],
+                )
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertFalse(any(issue.check_id == "duplicate_active_asset_map_row" for issue in issues), issues)
+
     def test_model_workbook_sources_sheet_is_required(self) -> None:
         wb = minimal_schema_workbook(extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True}])
         del wb["model_workbook_sources"]

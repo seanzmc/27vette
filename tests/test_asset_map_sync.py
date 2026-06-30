@@ -275,16 +275,19 @@ def test_discovery_uses_promoted_runtime_models_not_inactive_future_sheets() -> 
     desired = asset_map_sync.read_option_sheets(wb, sources)
 
     assert sources == {"stingray": "stingray_options", "grand_sport": "grandSport_options"}
-    assert sorted(desired) == [("grand_sport", "opt_qe6_001"), ("stingray", "opt_gba_001")]
-    assert ("zr1", "opt_future_001") not in desired
+    assert sorted(desired) == [
+        ("grand_sport", "option", "opt_qe6_001"),
+        ("stingray", "option", "opt_gba_001"),
+    ]
+    assert ("zr1", "option", "opt_future_001") not in desired
 
 
 def test_reconcile_uses_bare_media_as_shared_fallback_after_model_prefixed_media() -> None:
     desired = {
-        ("stingray", "opt_gba_001"): {"rpo": "gba", "name": "Black"},
-        ("grand_sport", "opt_gba_001"): {"rpo": "gba", "name": "Black"},
-        ("z06", "opt_stx_001"): {"rpo": "stx", "name": "Stripe"},
-        ("stingray", "opt_noimg_001"): {"rpo": "nix", "name": "No Image"},
+        ("stingray", "option", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black"},
+        ("grand_sport", "option", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black"},
+        ("z06", "option", "opt_stx_001"): {"target_type": "option", "rpo": "stx", "name": "Stripe"},
+        ("stingray", "option", "opt_noimg_001"): {"target_type": "option", "rpo": "nix", "name": "No Image"},
     }
     exact, bare, _ = asset_map_sync.build_media_index(
         [
@@ -327,8 +330,8 @@ def test_reconcile_uses_bare_media_as_shared_fallback_after_model_prefixed_media
 
 def test_reconcile_flags_duplicate_bare_media_for_same_rpo_as_ambiguous() -> None:
     desired = {
-        ("stingray", "opt_gba_001"): {"rpo": "gba", "name": "Black"},
-        ("grand_sport", "opt_gba_001"): {"rpo": "gba", "name": "Black"},
+        ("stingray", "option", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black"},
+        ("grand_sport", "option", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black"},
     }
     exact, bare, _ = asset_map_sync.build_media_index(
         [
@@ -356,7 +359,7 @@ def test_reconcile_flags_duplicate_bare_media_for_same_rpo_as_ambiguous() -> Non
 
 def test_reconcile_replaces_existing_url_when_canonical_media_inventory_differs() -> None:
     desired = {
-        ("stingray", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black"},
+        ("stingray", "option", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black"},
     }
     media = asset_map_sync.build_media_inventory(["https://example.test/27vette/paint/c-gba-new.png"])
 
@@ -364,7 +367,7 @@ def test_reconcile_replaces_existing_url_when_canonical_media_inventory_differs(
         desired,
         media,
         existing_rows={
-            ("stingray", "opt_gba_001"): {
+            ("stingray", "option", "opt_gba_001"): {
                 "row": 12,
                 "target_type": "option",
                 "url": "https://example.test/27vette/paint/c-gba-old.png",
@@ -383,7 +386,7 @@ def test_reconcile_replaces_existing_url_when_canonical_media_inventory_differs(
 
 def test_reconcile_inserts_context_choice_base_and_hover_media_from_naming_pair() -> None:
     desired = {
-        ("stingray", "body_style__coupe"): {
+        ("stingray", "context_choice", "body_style__coupe"): {
             "target_type": "context_choice",
             "rpo": "",
             "name": "Coupe",
@@ -425,6 +428,72 @@ def test_reconcile_inserts_context_choice_base_and_hover_media_from_naming_pair(
     ]
     assert url_writes == {}
     assert status == {}
+
+
+def test_reconcile_keys_by_target_type_so_same_id_string_across_types_does_not_collide() -> None:
+    """A shared model_key + target_id string under two different target_types must stay distinct."""
+    desired = {
+        ("stingray", "option", "shared_id"): {
+            "target_type": "option",
+            "rpo": "gba",
+            "name": "Black Option",
+        },
+        ("stingray", "model", "shared_id"): {
+            "target_type": "model",
+            "rpo": "",
+            "name": "Stingray Model Card",
+        },
+    }
+    media = asset_map_sync.MediaInventory(
+        option_exact={("stingray", "gba"): ["https://example.test/27vette/paint/gba.png"]},
+        option_bare={},
+        model={("stingray", "shared_id"): ["https://example.test/27vette/stingray-shared_id.png"]},
+        bodystyle={},
+        unparseable=[],
+    )
+
+    report, url_writes, inserts, status, _used = asset_map_sync.reconcile(
+        desired,
+        media,
+        existing_rows={},
+        alive={},
+        incremental=False,
+    )
+
+    by_target_type = {row["target_type"]: row for row in report}
+    assert set(by_target_type) == {"option", "model"}
+    assert by_target_type["option"]["action"] == "insert_filled"
+    assert by_target_type["model"]["action"] == "insert_filled"
+    assert by_target_type["option"]["new_url"] == "https://example.test/27vette/paint/gba.png"
+    assert by_target_type["model"]["new_url"] == "https://example.test/27vette/stingray-shared_id.png"
+    assert {(insert["target_type"], insert["tid"], insert["url"]) for insert in inserts} == {
+        ("option", "shared_id", "https://example.test/27vette/paint/gba.png"),
+        ("model", "shared_id", "https://example.test/27vette/stingray-shared_id.png"),
+    }
+    assert url_writes == {}
+    assert status == {}
+
+
+def test_existing_asset_rows_keys_by_target_type_so_same_id_string_across_types_does_not_collide() -> None:
+    wb = Workbook()
+    del wb[wb.sheetnames[0]]
+    add_sheet(
+        wb,
+        "asset_map",
+        ["model_key", "target_type", "target_id", "image_url", "active"],
+        [
+            {"model_key": "stingray", "target_type": "option", "target_id": "shared_id", "image_url": "https://example.test/opt.png", "active": True},
+            {"model_key": "stingray", "target_type": "model", "target_id": "shared_id", "image_url": "https://example.test/model.png", "active": True},
+        ],
+    )
+    ws = wb["asset_map"]
+    header_index = {header: index for index, header in enumerate(["model_key", "target_type", "target_id", "image_url", "active"])}
+
+    rows = asset_map_sync.existing_asset_rows(ws, header_index)
+
+    assert set(rows) == {("stingray", "option", "shared_id"), ("stingray", "model", "shared_id")}
+    assert rows[("stingray", "option", "shared_id")]["url"] == "https://example.test/opt.png"
+    assert rows[("stingray", "model", "shared_id")]["url"] == "https://example.test/model.png"
 
 
 def test_apply_uses_injected_safe_save_and_inserts_confident_candidate(tmp_path: Path) -> None:
