@@ -16,6 +16,7 @@ from corvette_form_generator.registry_promotion import (
     parse_app_data_registry,
     registry_model_key,
 )
+from corvette_form_generator.workbook import workbook_truthy
 
 
 BOOLEAN_COLUMNS: dict[str, tuple[str, ...]] = {
@@ -488,9 +489,10 @@ def validate_asset_map_uniqueness(wb, issues: list[SchemaIssue]) -> None:
     """Validate active asset_map rows are unique per (model_key, target_type, target_id).
 
     Mirrors validate_model_master_metadata's active-row uniqueness pattern: the runtime read
-    path (contract.py:load_asset_map) keys assets by (target_type, target_id) per model, so a
-    duplicate active row for the same identity is silently last-write-wins at load time with
-    no error. This check makes that failure loud instead of silent.
+    path (contract.py:load_asset_map) keys assets by (target_type, target_id) per model and only
+    loads rows where workbook_truthy(active) is true, so a duplicate active row for the same
+    identity is silently last-write-wins at load time with no error. This check makes that
+    failure loud instead of silent while preserving the runtime's inactive/blank-row semantics.
     """
 
     if "asset_map" not in wb.sheetnames:
@@ -503,7 +505,7 @@ def validate_asset_map_uniqueness(wb, issues: list[SchemaIssue]) -> None:
 
     seen_active_keys: dict[tuple[str, str, str], int] = {}
     for row_number, row in records(wb["asset_map"]):
-        if not truthy(row.get("active"), default=True):
+        if not workbook_truthy(row.get("active")):
             continue
         model_key = clean_text(row.get("model_key")).lower()
         target_type = clean_text(row.get("target_type")).lower()

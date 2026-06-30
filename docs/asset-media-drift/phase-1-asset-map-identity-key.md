@@ -1,6 +1,37 @@
 # Spec: Phase 1 — asset_map identity-key correctness (generator/tooling fix)
 
-Status: proposed, awaiting approval per AGENTS.md Section 4. No code changed by this document.
+Status: Completed on 2026-06-30. Phase 1 code/tests/docs are tracked in this repository; no workbook
+writes or generated runtime artifacts were part of this phase.
+
+## Completion update — 2026-06-30
+
+Implementation status:
+
+- `scripts/corvette_form_generator/asset_map_sync.py` now keys desired and existing `asset_map` rows by
+  `(model_key, target_type, target_id)`, aligning the sync/reconciliation path with the runtime loader's
+  identity model.
+- `scripts/corvette_form_generator/schema_validation.py` validates duplicate active `asset_map` rows with
+  the same identity and now uses the same `workbook_truthy(active)` semantics as `contract.py`, so blank
+  or inactive duplicate rows are ignored rather than treated as active.
+- `tests/test_asset_map_sync.py` covers target-id collisions across target types and report/manifest
+  behavior under the identity-key shape.
+- `tests/test_schema_validation_metadata.py` covers duplicate active `asset_map` rows and the blank /
+  inactive duplicate regression case.
+- `contract.py` remained unchanged; it was the source-of-truth runtime reader already using
+  `(target_type, target_id)` and `workbook_truthy(active)`.
+- `form-app/app.js`, `form-app/data.js`, workbook rows, and generated artifacts were not changed.
+
+Validation run with the project `.venv`:
+
+- `.venv/bin/python -m pytest tests/test_asset_map_sync.py -q` → 21 passed.
+- `.venv/bin/python -m pytest tests/test_schema_validation_metadata.py -q` → 29 passed.
+- `.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx` → valid, 0 errors, 0 warnings.
+- `.venv/bin/python scripts/sync_asset_map.py --workbook stingray_master.xlsx --report-dir /tmp/27vette-asset-map-sync-phase1 --media-url-list tests/fixtures/asset-map-sync-media-urls.txt --no-verify-existing` → dry-run only, `apply=false`, action counts `flag_missing=458`, `replace_canonical=2`, `url_write_count=2`, `insert_count=0`, `state_written=false`. The two planned URL changes are fixture-limited dry-run findings, not workbook writes.
+
+Residual scope:
+
+- Phases 2-4 from the parent remediation spec remain unstarted and unapproved by this Phase 1 closure.
+- No live WordPress media sync/apply was run; the report probe used the deterministic checked-in media URL fixture.
 
 Parent: `docs/asset-media-drift-remediation-spec-2026-06-30.md` (Section 2, "Phase 1"). This file is the
 standalone, exact spec for that phase, written for direct implementation. Phases 2-4 from the parent

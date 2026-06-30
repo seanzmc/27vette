@@ -231,6 +231,26 @@ class SchemaValidationMetadataTests(unittest.TestCase):
 
         self.assertTrue(any(issue.check_id == "duplicate_active_asset_map_row" for issue in issues), issues)
 
+    def test_asset_map_ignores_duplicate_blank_or_inactive_rows(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True}],
+            extra_sheets={
+                "asset_map": (
+                    ["model_key", "target_type", "target_id", "image_url", "active"],
+                    [
+                        {"model_key": "stingray", "target_type": "option", "target_id": "blank_duplicate", "image_url": "https://example.test/a.png", "active": ""},
+                        {"model_key": "stingray", "target_type": "option", "target_id": "blank_duplicate", "image_url": "https://example.test/b.png", "active": ""},
+                        {"model_key": "stingray", "target_type": "option", "target_id": "inactive_duplicate", "image_url": "https://example.test/c.png", "active": False},
+                        {"model_key": "stingray", "target_type": "option", "target_id": "inactive_duplicate", "image_url": "https://example.test/d.png", "active": False},
+                    ],
+                )
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertFalse(any(issue.check_id == "duplicate_active_asset_map_row" for issue in issues), issues)
+
     def test_asset_map_allows_same_target_id_under_different_target_types(self) -> None:
         wb = minimal_schema_workbook(
             extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True}],
