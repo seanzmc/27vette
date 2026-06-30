@@ -884,9 +884,9 @@ test("Grand Sport wheel choices keep new aluminum wheels in the existing workboo
     ["SON", 1095, 42, "Gloss Black Forged Aluminum Wheels"],
     ["SOM", 1495, 43, "Bright Polished Forged Aluminum Wheels"],
     ["ROX", 995, 44, "Carbon Flash with Machined Edge Forged Aluminum Wheels"],
-    ["ROY", 11995, 50, "Carbon Flash-Painted Carbon Fiber Wheels"],
-    ["ROZ", 13995, 60, "Visible Carbon Fiber Wheels"],
-    ["STZ", 15500, 70, "Visible Carbon Fiber Red Stripe Wheels"],
+    ["ROY", 10995, 50, "Carbon Flash-Painted Carbon Fiber Wheels"],
+    ["ROZ", 11995, 60, "Visible Carbon Fiber Wheels"],
+    ["STZ", 12495, 70, "Visible Carbon Fiber Red Stripe Wheels"],
   ]);
 });
 
