@@ -51,6 +51,7 @@ from corvette_form_generator.runtime_contract import build_model_runtime_contrac
 from corvette_form_generator.runtime_metadata import (
     derived_default_selected_display_behavior,
     load_context_sections,
+    load_default_selection_display_rules,
     load_default_selection_rules,
     load_model_config_overrides,
     load_order_summary_metadata,
@@ -179,6 +180,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
     rule_groups = load_rule_groups(wb, MODEL_CONFIG)
     exclusive_groups = load_exclusive_groups(wb, MODEL_CONFIG)
     default_selection_rules = load_default_selection_rules(wb, MODEL_CONFIG.model_key)
+    default_selection_display_rules = load_default_selection_display_rules(wb, MODEL_CONFIG.model_key)
     runtime_rule_exceptions = load_runtime_rule_exceptions(wb, MODEL_CONFIG.model_key)
     order_summary_metadata = load_order_summary_metadata(wb, MODEL_CONFIG.model_key)
     runtime_steps = load_runtime_steps(wb, MODEL_CONFIG.model_key, MODEL_CONFIG.step_order, MODEL_CONFIG.step_labels)
@@ -382,7 +384,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
                 "source_detail_raw": option["source_detail_raw"],
             }
             if not display_behavior and derived_default_selected_display_behavior(
-                choice, MODEL_CONFIG.model_key, default_selection_rules, exclusive_groups
+                choice, MODEL_CONFIG.model_key, default_selection_display_rules, exclusive_groups
             ):
                 display_behavior = "default_selected"
             if display_behavior:

@@ -17,13 +17,6 @@ from corvette_form_generator.workbook import clean, intish, rows_from_sheet
 _TRUE_VALUES = {"1", "true", "t", "yes", "y", "on", "active", "enabled"}
 _FALSE_VALUES = {"0", "false", "f", "no", "n", "off", "inactive", "disabled"}
 _GLOBAL_MODEL_KEYS = {"all", "shared", "*"}
-_DEFAULT_SELECTED_DISPLAY_RULE_IDS_BY_MODEL = {
-    # Narrow Pass 17 derivation guard.  The workbook default-selection rules
-    # remain the behavior owner; this allowlist prevents the display-metadata
-    # cleanup from expanding to other defaults such as Stingray NGA or Z06 rows.
-    "stingray": frozenset({"default_bc7"}),
-    "grand_sport": frozenset({"gs_default_bc7_coupe", "gs_default_nga_unless_nwi"}),
-}
 _MODEL_CONFIG_SOURCE_ROLES = {
     "source_option_sheet",
     "status_sheet",
@@ -275,7 +268,21 @@ def load_variant_option_overrides(
 
 
 def load_default_selection_rules(wb: Any, model_key: str) -> list[dict[str, Any]]:
-    return _load_rule_rows(wb, "default_selection_rules", model_key, id_field="rule_id")
+    return _load_rule_rows(
+        wb,
+        "default_selection_rules",
+        model_key,
+        id_field="rule_id",
+        exclude_fields={"display_behavior"},
+    )
+
+
+def load_default_selection_display_rules(wb: Any, model_key: str) -> list[dict[str, Any]]:
+    return [
+        rule
+        for rule in _load_rule_rows(wb, "default_selection_rules", model_key, id_field="rule_id")
+        if clean(rule.get("display_behavior")) == "default_selected"
+    ]
 
 
 def _scope_matches(scope: Any, value: Any) -> bool:
@@ -308,15 +315,10 @@ def derived_default_selected_display_behavior(
     """Return whether a choice should emit default_selected display metadata.
 
     The source of truth is workbook ``default_selection_rules`` plus active
-    single-selection exclusive-group metadata.  The rule-id allowlist is a
-    migration guard for the Pass 17 BC7/NGA cleanup so this derivation cannot
-    silently add display metadata for defaults outside the approved row class.
+    single-selection exclusive-group metadata.  Only rules explicitly marked
+    with ``display_behavior=default_selected`` may add display metadata.
     """
 
-    model = clean(model_key).lower()
-    allowed_rule_ids = _DEFAULT_SELECTED_DISPLAY_RULE_IDS_BY_MODEL.get(model, frozenset())
-    if not allowed_rule_ids:
-        return False
     if clean(choice.get("status")) != "standard":
         return False
     if clean(choice.get("selectable")) != "True" or clean(choice.get("active")) != "True":
@@ -325,7 +327,7 @@ def derived_default_selected_display_behavior(
     if not option_id or option_id not in _active_single_selection_group_option_ids(exclusive_groups):
         return False
     for rule in default_selection_rules:
-        if clean(rule.get("rule_id")) not in allowed_rule_ids:
+        if clean(rule.get("display_behavior")) != "default_selected":
             continue
         if clean(rule.get("target_option_id")) != option_id:
             continue
@@ -345,11 +347,19 @@ def load_runtime_rule_exceptions(wb: Any, model_key: str) -> list[dict[str, Any]
     return _load_rule_rows(wb, "runtime_rule_exceptions", model_key, id_field="exception_id")
 
 
-def _load_rule_rows(wb: Any, sheet_name: str, model_key: str, *, id_field: str) -> list[dict[str, Any]]:
+def _load_rule_rows(
+    wb: Any,
+    sheet_name: str,
+    model_key: str,
+    *,
+    id_field: str,
+    exclude_fields: set[str] | None = None,
+) -> list[dict[str, Any]]:
     rules: list[dict[str, Any]] = []
+    omitted = {"active", "model_key", *(exclude_fields or set())}
     for row in active_rows(wb, sheet_name, model_key):
         record: dict[str, Any] = {
-            key: clean(value) for key, value in row.items() if key not in {"active", "model_key"}
+            key: clean(value) for key, value in row.items() if key not in omitted
         }
         if id_field in record and not record[id_field]:
             continue

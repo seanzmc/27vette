@@ -15,7 +15,10 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 from corvette_form_generator.runtime_metadata import (  # noqa: E402
+    derived_default_selected_display_behavior,
     load_context_sections,
+    load_default_selection_display_rules,
+    load_default_selection_rules,
     load_order_summary_metadata,
     load_runtime_steps,
 )
@@ -50,6 +53,20 @@ CONTEXT_SECTION_HEADERS = [
 ]
 ORDER_SUMMARY_HEADERS = ["model_key", "section_key", "section_label", "display_order", "active", "notes"]
 STEP_SUMMARY_HEADERS = ["model_key", "step_key", "section_key", "active", "notes"]
+DEFAULT_SELECTION_HEADERS = [
+    "model_key",
+    "rule_id",
+    "target_option_id",
+    "condition_type",
+    "condition_id",
+    "body_style_scope",
+    "trim_level_scope",
+    "variant_scope",
+    "priority",
+    "active",
+    "display_behavior",
+    "notes",
+]
 
 
 def append_sheet(wb: Workbook, name: str, headers: list[str], rows: list[dict[str, object]] | None = None) -> None:
@@ -83,6 +100,59 @@ def metadata_workbook(*, promoted: bool, runtime_rows: list[dict[str, object]] |
     append_sheet(wb, "context_section_master", CONTEXT_SECTION_HEADERS, [])
     append_sheet(wb, "order_summary_sections", ORDER_SUMMARY_HEADERS, [])
     append_sheet(wb, "step_order_summary_map", STEP_SUMMARY_HEADERS, [])
+    append_sheet(wb, "default_selection_rules", DEFAULT_SELECTION_HEADERS, [])
+    return wb
+
+
+def default_selection_workbook() -> Workbook:
+    wb = Workbook()
+    del wb[wb.sheetnames[0]]
+    append_sheet(
+        wb,
+        "default_selection_rules",
+        DEFAULT_SELECTION_HEADERS,
+        [
+            {
+                "model_key": "stingray",
+                "rule_id": "default_bc7",
+                "target_option_id": "opt_bc7_001",
+                "condition_type": "always",
+                "body_style_scope": "coupe",
+                "trim_level_scope": "*",
+                "variant_scope": "*",
+                "priority": 40,
+                "active": True,
+                "display_behavior": "default_selected",
+                "notes": "derive display metadata",
+            },
+            {
+                "model_key": "stingray",
+                "rule_id": "default_nga",
+                "target_option_id": "opt_nga_001",
+                "condition_type": "unless_selected_rpo",
+                "body_style_scope": "*",
+                "trim_level_scope": "*",
+                "variant_scope": "*",
+                "priority": 20,
+                "active": True,
+                "display_behavior": "",
+                "notes": "runtime default only",
+            },
+            {
+                "model_key": "z06",
+                "rule_id": "z06_default_bc7",
+                "target_option_id": "opt_bc7_001",
+                "condition_type": "always",
+                "body_style_scope": "coupe",
+                "trim_level_scope": "*",
+                "variant_scope": "*",
+                "priority": 10,
+                "active": True,
+                "display_behavior": "default_selected",
+                "notes": "other model",
+            },
+        ],
+    )
     return wb
 
 
@@ -129,6 +199,77 @@ class RuntimeMetadataGuardTests(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, "requires workbook-owned order_summary_sections and step_order_summary_map rows"):
             load_order_summary_metadata(wb, "z06")
+
+    def test_default_selection_rules_strip_workbook_only_display_behavior(self) -> None:
+        rows = load_default_selection_rules(default_selection_workbook(), "stingray")
+
+        self.assertEqual([row["rule_id"] for row in rows], ["default_nga", "default_bc7"])
+        self.assertTrue(all("display_behavior" not in row for row in rows))
+
+    def test_default_selection_display_rules_load_only_workbook_flagged_rows(self) -> None:
+        rows = load_default_selection_display_rules(default_selection_workbook(), "stingray")
+
+        self.assertEqual([row["rule_id"] for row in rows], ["default_bc7"])
+        self.assertEqual(rows[0]["display_behavior"], "default_selected")
+
+    def test_default_selected_display_derives_from_workbook_flagged_rule(self) -> None:
+        choice = {
+            "option_id": "opt_bc7_001",
+            "status": "standard",
+            "selectable": "True",
+            "active": "True",
+            "body_style": "coupe",
+            "trim_level": "1LT",
+            "variant_id": "1lt_c07",
+        }
+        groups = [
+            {
+                "active": "True",
+                "selection_mode": "single_within_group",
+                "option_ids": ["opt_bc7_001", "opt_bcs_001"],
+            }
+        ]
+
+        self.assertTrue(
+            derived_default_selected_display_behavior(
+                choice,
+                "stingray",
+                load_default_selection_display_rules(default_selection_workbook(), "stingray"),
+                groups,
+            )
+        )
+
+    def test_default_selection_rule_without_display_behavior_does_not_derive(self) -> None:
+        choice = {
+            "option_id": "opt_nga_001",
+            "status": "standard",
+            "selectable": "True",
+            "active": "True",
+            "body_style": "coupe",
+            "trim_level": "1LT",
+            "variant_id": "1lt_c07",
+        }
+        groups = [
+            {
+                "active": "True",
+                "selection_mode": "single_within_group",
+                "option_ids": ["opt_nga_001", "opt_nwi_001"],
+            }
+        ]
+
+        self.assertFalse(
+            derived_default_selected_display_behavior(
+                choice,
+                "stingray",
+                load_default_selection_rules(default_selection_workbook(), "stingray"),
+                groups,
+            )
+        )
+
+    def test_runtime_metadata_has_no_default_selected_rule_id_allowlist(self) -> None:
+        source = (ROOT / "scripts" / "corvette_form_generator" / "runtime_metadata.py").read_text()
+
+        self.assertNotIn("_DEFAULT_SELECTED_DISPLAY_RULE_IDS_BY_MODEL", source)
 
 
 if __name__ == "__main__":

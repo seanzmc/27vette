@@ -33,6 +33,7 @@ from corvette_form_generator.runtime_contract import build_model_runtime_contrac
 from corvette_form_generator.runtime_metadata import (
     derived_default_selected_display_behavior,
     load_context_sections,
+    load_default_selection_display_rules,
     load_default_selection_rules,
     load_order_summary_metadata,
     load_runtime_steps,
@@ -653,6 +654,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     runtime_steps = load_runtime_steps(wb, config.model_key, config.step_order, config.step_labels)
     order_summary_metadata = load_order_summary_metadata(wb, config.model_key)
     default_selection_rules = load_default_selection_rules(wb, config.model_key)
+    default_selection_display_rules = load_default_selection_display_rules(wb, config.model_key)
     exclusive_groups = load_exclusive_groups(wb, config)
     context_sections = [
         {
@@ -830,7 +832,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
                 "display_behavior": choice_row["display_behavior"],
             }
             if not choice["display_behavior"] and derived_default_selected_display_behavior(
-                choice, config.model_key, default_selection_rules, exclusive_groups
+                choice, config.model_key, default_selection_display_rules, exclusive_groups
             ):
                 choice["display_behavior"] = "default_selected"
             choices.append(choice)
