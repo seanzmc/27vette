@@ -1,6 +1,15 @@
 # Spec: Asset/Media Drift Remediation (validates 2026-06-30 audit)
 
-Status: proposed, awaiting approval per AGENTS.md Section 4. No code changed by this document.
+Status: partially implemented. Phases 1, 2, and 3 have landed on `phase-2-shared-assembly-extraction`; Phase 4 remains open. This document is now a route map and status record, not a current approval prompt for the completed phases.
+
+Current implementation status:
+
+- Phase 1 implemented in commit `d8cb649` / `41f5788`: asset_map reconciliation now uses the full `(model_key, target_type, target_id)` identity and duplicate active asset rows are guarded.
+- Phase 2 implemented in commit `67c9dfb`: shared context-choice and asset-field assembly helpers were extracted while preserving generated runtime parity and Stingray compatibility artifacts.
+- Phase 3 implemented in commit `dd800d3`: the hardcoded default-selected display derivation allowlist was removed, `default_selection_rules.display_behavior` became the workbook-owned authoring signal, and generated runtime behavior stayed parity-preserving.
+- Post-Phase-3 hardening implemented: schema validation now rejects invalid `default_selection_rules.display_behavior` values, and a live-workbook guard asserts only the approved three rows are populated. This was a guardrail improvement, not a behavior change.
+- Phase 4 remains open: wildcard/shared asset_map support, media coverage intent/noise reduction, and remaining stale-note/runtime-summary cleanup.
+- Known unrelated red gate after Phase 3: `node --test tests/workbook-schema-standardization.test.mjs` still fails on pre-existing Z06 replace-rule rows 82-86 in `z06_rule_mapping` (`T0F/T0G/Z07/PDD/PDF` replacing `CBF`). Phase 3/hardening did not touch those rows.
 
 ## 0. Validation of the audit
 
@@ -15,7 +24,7 @@ Re-inspected source for every cited finding rather than trusting the audit's lin
 - Findings 5, 6, 9: confirmed by direct read — `contract.py:35` does exact `model_key` equality (no wildcard); `asset_map_sync.py:379-396` treats every active+selectable option row as a desired media target with no separate "should have an image" classification; `model_configs.py:161-165` still says Grand Sport generation "is not activated by the Stingray entrypoint" while the audit's own promoted-models list shows Grand Sport is promoted; `production.py:400-403,643` still gates on legacy `active_for_stingray`; `app.js:1163-1165` hardcodes `sec_incl_001` for summary bucket routing.
 - Reran `tests/test_asset_map_sync.py`: 19 passed, matching the audit. (Ran via system Python + pip-installed pytest/openpyxl in this sandbox, since the repo's `.venv` is a macOS-host venv with a broken interpreter symlink here — not reproducible in this container. Use the project `.venv` on the host for any real validation run.) Did not re-run the Node suite or re-derive workbook row counts (192 active asset_map rows, 268 flag_missing, etc.) — those require opening `stingray_master.xlsx`, which this audit step didn't need to touch and which AGENTS.md says not to write casually. No reason in the codebase to doubt them.
 
-Conclusion: the audit's findings and risk reasoning hold up against the current code. The disagreement in this spec is about **sequencing**, not facts — see below.
+Historical conclusion at spec time: the audit's findings and risk reasoning held up against the then-current code, and this spec changed sequencing rather than the facts. Current status: the highest-priority drift risks from Findings 3/4, 7, and 8 have been implemented through Phases 1-3; the adjacent Phase 3 guardrail hardening is implemented; remaining open work is tracked in Phase 4.
 
 ## 1. Re-ranking by drift risk, not by stated label
 
@@ -27,9 +36,11 @@ The audit labels findings 3, 4, 6, 7, 8 all "medium." For *drift* specifically �
 - **Findings 5 and 6 are maintenance-burden and workflow-noise risks**, not silent-correctness risks. They get worse as models/options grow, but a wrong value isn't produced — workbook authors do more repetitive work, or get a noisier report. Lower priority than 3/4/7/8.
 - **Finding 9 is already-realized drift** (the stale Grand Sport "not activated" note, the legacy `active_for_stingray` gate, the hardcoded `sec_incl_001`), not a future risk. Cheap to fix, low blast radius, but doesn't compound the way 3/4/7/8 do.
 
-This spec proposes four phases in that order. Phases 1-3 are the ones with "highest risk of creating drift"; Phase 4 is the audit's lower-risk remainder, included for completeness but not the focus of this remediation pass.
+This spec proposed four phases in that order. Phases 1-3 were the highest drift-risk items and are now implemented. The targeted Phase 3 hardening pass is also implemented. Phase 4 is the remaining lower-risk cleanup bucket and should be treated as the next planned phase.
 
 ## 2. Phase 1 (highest priority): asset_map identity-key correctness
+
+Status: implemented. See current status summary above.
 
 **Diagnosis**: `asset_map_sync.py` reconciles desired vs. existing asset rows keyed by `(model_key, target_id)`, while the runtime/generator loader (`contract.py:42`) keys by `(target_type, target_id)` per model. There is no uniqueness validation anywhere on active asset_map rows. Risk level: medium-now, but it is the only finding that degrades to silent wrong output with zero test or validation signal, which makes it highest priority to close before more models/target types are added.
 
@@ -54,6 +65,8 @@ This spec proposes four phases in that order. Phases 1-3 are the ones with "high
 
 ## 3. Phase 2: converge duplicated media/metadata assembly logic
 
+Status: implemented. See `docs/asset-media-drift/phase-2-shared-assembly-extraction.md` for closure evidence.
+
 **Diagnosis**: `source_assembly.py:35-56` routes Stingray through `production.build_production_source_data()` and Grand Sport/Z06 through `inspect_model_sources`/`build_contract_preview`/`build_form_data_draft`. Both paths independently merge asset_map media (`production.py:203-204,282-284,390-391` vs. `inspection.py:668-697,976,1016,1063-1064`). Every media/metadata change must be hand-kept consistent across both paths today, with three live models depending on that consistency holding.
 
 **Exact files expected to change**: new shared helper module (exact location TBD during implementation — likely alongside `contract.py` since that's the existing shared-helpers home) extracting the media/context-choice/choice-row assembly logic out of `production.py` and `inspection.py` into one implementation called by both. `production.py` and `inspection.py` are reduced to calling the shared helper. `source_assembly.py` itself does not need to change in this phase — Stingray keeps its compatibility-source path, it just stops duplicating assembly logic.
@@ -74,21 +87,27 @@ This spec proposes four phases in that order. Phases 1-3 are the ones with "high
 
 ## 4. Phase 3: remove the hardcoded default-selected allowlist as a structural drift source
 
-**Diagnosis**: `runtime_metadata.py:20-26` gates which workbook `default_selection_rules` become `display_behavior=default_selected` through a hardcoded `_DEFAULT_SELECTED_DISPLAY_RULE_IDS_BY_MODEL` allowlist, applied at `runtime_metadata.py:302-340`/317-322. The workbook is still the rule owner, but a code allowlist intercepts which rules get display treatment — a second source of truth that must be hand-updated whenever a new model or new default-selection row needs this behavior. Z06 currently has no entry, so it gets none of this display behavior; that's a side effect worth surfacing to a product owner before this phase starts, since the fix could either (a) make Z06 newly eligible or (b) need an explicit decision that Z06 doesn't want this yet.
+Status: implemented. See `docs/asset-media-drift/phase-3-default-selected-display-authoring.md` for closure evidence.
 
-**Exact files expected to change**: `scripts/corvette_form_generator/runtime_metadata.py` (remove or replace the allowlist gate with a workbook-authored signal — e.g., a column/flag on `default_selection_rules` rows themselves). Possibly the workbook schema (`default_selection_rules` sheet) if the audit's recommended fix ("move default-selected presentation intent fully into workbook-authored rows/metadata") is adopted, which would make this a workbook + generator change, not generator-only.
+**Historical diagnosis**: `runtime_metadata.py` gated which workbook `default_selection_rules` became `display_behavior=default_selected` through a hardcoded `_DEFAULT_SELECTED_DISPLAY_RULE_IDS_BY_MODEL` allowlist. That created a second source of truth that had to be hand-updated whenever a new model or default-selection row needed this behavior.
 
-**Source-of-truth decision**: needs a decision before implementation — this is the one phase where the audit's "smallest safe pass" implies a workbook schema change, which is a bigger surface than a pure code fix. Recommend resolving the Z06-gap question with a product owner first, then deciding whether the workbook gets a new authoring surface or whether the allowlist is simply expanded/parameterized without a schema change as an interim step.
+**Implemented outcome**: the allowlist is gone. `default_selection_rules.display_behavior` is now the workbook-owned signal. Only the three parity-preserving rows are populated (`stingray/default_bc7`, `grand_sport/gs_default_bc7_coupe`, `grand_sport/gs_default_nga_unless_nwi`), and Z06 behavior remains unchanged.
 
-**Companion-file impact check**: `model_configs.py` (no expected change, but inspect for related model-specific gates); generated runtime contracts for all three models (display_behavior field); runtime tests asserting `default_selected` behavior; `form-app/app.js` consumers of `display_behavior`.
+**Files changed**: `stingray_master.xlsx`, `scripts/corvette_form_generator/runtime_metadata.py`, `scripts/corvette_form_generator/production.py`, `scripts/corvette_form_generator/inspection.py`, `tests/test_runtime_metadata_guards.py`, and the Phase 3 closure spec.
 
-**Constraints**: keep generated output parity for Stingray and Grand Sport (the two models with existing allowlist entries) unless a product decision explicitly changes Z06 behavior; add a test that fails if new default-selection display behavior requires a Python edit, per the audit's own recommendation.
+**Source-of-truth decision**: resolved. Workbook `default_selection_rules` owns both the default-selection behavior and the authoring signal that a rule-derived default should emit `display_behavior=default_selected`. Python loads and applies that signal generically.
 
-**Risks / non-goals**: touches workbook schema if the full fix is adopted — higher process cost (Excel-closed check, safe-save, schema validation, on-disk verification per AGENTS.md Section 7). Non-goal: this phase does not change which rows in `default_selection_rules` exist today, only how the existing rule set gets translated into display behavior.
+**Companion-file impact check**: generated runtime contracts were regenerated and timestamp-normalized parity passed for Stingray, Grand Sport, and Z06. `form-app/data.js` churn was restored. Runtime JS/CSS/dealer submission were not touched.
 
-**Validation plan**: `validate_workbook_schema.py` if the workbook changes; full generator regeneration with contract diff review for all three models; targeted runtime tests for default-selection display behavior; explicit confirmation with a product owner on the Z06 gap before or alongside this phase.
+**Constraints preserved**: generated output parity for all promoted models, no Z06 behavior expansion, no replacement Python allowlist, no runtime JS/CSS/dealer change.
+
+**Residual risks / non-goals**: Phase 3 intentionally did not decide whether any Z06 default-selection rules should also become display defaults. The follow-up hardening pass added schema-level allowed-value validation for `default_selection_rules.display_behavior` and a live-workbook assertion for the approved populated rows.
+
+**Validation result**: see the Phase 3 closure spec for command-level evidence. Package/schema validation passed; focused Python tests passed; generated runtime parity passed for all three promoted models; the known unrelated workbook-schema-standardization test failure remains on pre-existing Z06 replace-rule rows.
 
 ## 5. Phase 4 (lower priority, included for completeness): the audit's remaining items
+
+Status: open. This is the next broad cleanup bucket after Phases 1-3.
 
 Not the focus of this remediation pass, but tracked so they aren't lost:
 
@@ -106,4 +125,9 @@ Not the focus of this remediation pass, but tracked so they aren't lost:
 
 ## 7. Suggested sequencing
 
-Phase 1 first (smallest, closes the only silent-correctness gap), then Phase 2 (largest test surface, do it next while Phase 1's parity habits are fresh), then Phase 3 (needs a product decision on the Z06 gap, so start that conversation now in parallel even though implementation comes third), then Phase 4 opportunistically.
+Completed sequence: Phase 1, then Phase 2, then Phase 3.
+
+Recommended current sequencing:
+
+1. Continue to Phase 4 for wildcard/shared asset_map support, media coverage intent/noise reduction, and stale-note/runtime-summary cleanup.
+2. Treat the unrelated Z06 replace-rule schema-standardization failure as its own rule-normalization/workbook pass, not part of asset/media Phase 4.

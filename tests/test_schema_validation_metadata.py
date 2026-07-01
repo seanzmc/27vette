@@ -269,6 +269,62 @@ class SchemaValidationMetadataTests(unittest.TestCase):
 
         self.assertFalse(any(issue.check_id == "duplicate_active_asset_map_row" for issue in issues), issues)
 
+    def test_default_selection_display_behavior_rejects_invalid_values(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_sheets={
+                "default_selection_rules": (
+                    [
+                        "model_key",
+                        "rule_id",
+                        "target_option_id",
+                        "condition_type",
+                        "condition_id",
+                        "body_style_scope",
+                        "trim_level_scope",
+                        "variant_scope",
+                        "priority",
+                        "active",
+                        "display_behavior",
+                        "notes",
+                    ],
+                    [
+                        {
+                            "model_key": "stingray",
+                            "rule_id": "default_bc7",
+                            "target_option_id": "opt_bc7_001",
+                            "condition_type": "always",
+                            "active": True,
+                            "display_behavior": "default-selected",
+                        },
+                        {
+                            "model_key": "grand_sport",
+                            "rule_id": "gs_default_bc7_coupe",
+                            "target_option_id": "opt_bc7_001",
+                            "condition_type": "always",
+                            "active": True,
+                            "display_behavior": "default_selected",
+                        },
+                        {
+                            "model_key": "z06",
+                            "rule_id": "z06_default_r8e_tax",
+                            "target_option_id": "opt_r8e_002",
+                            "condition_type": "always",
+                            "active": True,
+                            "display_behavior": "",
+                        },
+                    ],
+                )
+            }
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        invalid_issues = [issue for issue in issues if issue.check_id == "invalid_default_selection_display_behavior"]
+        self.assertEqual(len(invalid_issues), 1, invalid_issues)
+        self.assertEqual(invalid_issues[0].sheet, "default_selection_rules")
+        self.assertEqual(invalid_issues[0].column, "display_behavior")
+        self.assertEqual(invalid_issues[0].value, "default-selected")
+
     def test_model_workbook_sources_sheet_is_required(self) -> None:
         wb = minimal_schema_workbook(extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True}])
         del wb["model_workbook_sources"]

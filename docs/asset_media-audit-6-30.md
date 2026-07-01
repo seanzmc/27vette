@@ -238,20 +238,23 @@ Smallest safe pass:
 - Prove parity for all three runtime contracts.
 - Only then consider routing Stingray through the same source assembly as the other active models.
 
-8. Source-of-truth debt: hardcoded default-selected display derivation allowlist remains in Python.
-   Evidence:
+8. Source-of-truth debt: hardcoded default-selected display derivation allowlist (resolved by Phase 3).
 
-- runtime_metadata.py:20-26 has \_DEFAULT_SELECTED_DISPLAY_RULE_IDS_BY_MODEL with specific model/rule IDs.
-- runtime_metadata.py:302-340 gates derivation through that hardcoded allowlist.
-- Workbook default_selection_rules are still emitted and used, but this allowlist decides which defaults become display_behavior=default_selected.
+   Status update 2026-06-30: resolved by Phase 3. The hardcoded Python allowlist was removed in favor of workbook-authored `default_selection_rules.display_behavior`; current generated runtime behavior was preserved. See `docs/asset-media-drift/phase-3-default-selected-display-authoring.md` and the active route map `docs/asset-media-drift-remediation-spec-2026-06-30.md` for closure evidence and remaining guardrail follow-up.
 
-Risk: medium. This is an explicit model/rule-specific code gate. It was documented as a migration guard, but it is now architecture debt under the “boring scripts” guideline.
+   Historical evidence at audit time:
 
-Smallest safe pass:
+- runtime_metadata.py:20-26 had \_DEFAULT_SELECTED_DISPLAY_RULE_IDS_BY_MODEL with specific model/rule IDs.
+- runtime_metadata.py:302-340 gated derivation through that hardcoded allowlist.
+- Workbook default_selection_rules were still emitted and used, but this allowlist decided which defaults became display_behavior=default_selected.
 
-- Move default-selected presentation intent fully into workbook-authored rows/metadata.
-- Keep generated output parity.
-- Add a test that fails if new default-selection display behavior requires editing a Python allowlist.
+Risk at audit time: medium. This was an explicit model/rule-specific code gate. It was documented as a migration guard, but it became architecture debt under the “boring scripts” guideline.
+
+Completed smallest safe pass:
+
+- Moved default-selected presentation intent fully into workbook-authored rows/metadata.
+- Kept generated output parity.
+- Added tests that fail if the old Python allowlist is reintroduced, if the new workbook column contains an invalid value, or if the live workbook's populated default-selection display rows drift from the approved three.
 
 9. Minor source-of-truth/presentation debt: a few code fallbacks and stale labels remain.
    Evidence:

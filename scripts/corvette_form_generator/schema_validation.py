@@ -129,6 +129,7 @@ MODEL_REGISTRY_PROMOTION_HEADERS: tuple[str, ...] = (
     "notes",
 )
 VALID_REGISTRY_PROMOTION_ARTIFACT_TYPES: set[str] = {"current_generation", "draft_artifact", "runtime_contract"}
+DEFAULT_SELECTION_DISPLAY_BEHAVIORS: frozenset[str] = frozenset(("default_selected",))
 
 
 @dataclass
@@ -539,6 +540,45 @@ def validate_asset_map_uniqueness(wb, issues: list[SchemaIssue]) -> None:
         seen_active_keys[key] = row_number
 
 
+def validate_default_selection_display_behavior(wb, issues: list[SchemaIssue]) -> None:
+    """Validate workbook-authored default-selection display behavior values.
+
+    ``default_selection_rules.display_behavior`` is a workbook-only authoring
+    signal consumed by runtime_metadata.load_default_selection_display_rules().
+    The loader intentionally recognizes only ``default_selected``; reject typos
+    here so a workbook authoring mistake cannot silently suppress display
+    derivation.
+    """
+
+    sheet_name = "default_selection_rules"
+    if sheet_name not in wb.sheetnames:
+        return
+
+    headers = header_index(wb[sheet_name])
+    if "display_behavior" not in headers:
+        return
+
+    for row_number, row in records(wb[sheet_name]):
+        value = clean_text(row.get("display_behavior"))
+        if not value:
+            continue
+        if value in DEFAULT_SELECTION_DISPLAY_BEHAVIORS:
+            continue
+        add_issue(
+            issues,
+            "error",
+            "invalid_default_selection_display_behavior",
+            sheet=sheet_name,
+            row=row_number,
+            column="display_behavior",
+            value=value,
+            message=(
+                "default_selection_rules.display_behavior must be blank or one of "
+                f"{sorted(DEFAULT_SELECTION_DISPLAY_BEHAVIORS)!r}."
+            ),
+        )
+
+
 def validate_model_variant_topology(wb, issues: list[SchemaIssue]) -> None:
     """Validate active model membership references active variant fact rows."""
 
@@ -875,6 +915,7 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
             validate_registry_promotion_metadata(wb, issues)
 
         validate_asset_map_uniqueness(wb, issues)
+        validate_default_selection_display_behavior(wb, issues)
 
         for source_role in HEADER_MATCH_ROLES:
             existing_sheets = [sheet for sheet in source_sheets_by_role.get(source_role, []) if sheet in wb.sheetnames]

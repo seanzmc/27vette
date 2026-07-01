@@ -7,7 +7,7 @@ import sys
 import unittest
 from pathlib import Path
 
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS_DIR = ROOT / "scripts"
@@ -270,6 +270,26 @@ class RuntimeMetadataGuardTests(unittest.TestCase):
         source = (ROOT / "scripts" / "corvette_form_generator" / "runtime_metadata.py").read_text()
 
         self.assertNotIn("_DEFAULT_SELECTED_DISPLAY_RULE_IDS_BY_MODEL", source)
+
+    def test_live_workbook_default_selection_display_behavior_rows_are_explicit(self) -> None:
+        wb = load_workbook(ROOT / "stingray_master.xlsx", read_only=True, data_only=True)
+        try:
+            rows = [
+                (model_key, row["rule_id"], row["display_behavior"])
+                for model_key in ("stingray", "grand_sport", "z06")
+                for row in load_default_selection_display_rules(wb, model_key)
+            ]
+        finally:
+            wb.close()
+
+        self.assertEqual(
+            sorted(rows),
+            [
+                ("grand_sport", "gs_default_bc7_coupe", "default_selected"),
+                ("grand_sport", "gs_default_nga_unless_nwi", "default_selected"),
+                ("stingray", "default_bc7", "default_selected"),
+            ],
+        )
 
 
 if __name__ == "__main__":
