@@ -12,12 +12,11 @@ from typing import Any
 from openpyxl import load_workbook
 
 from corvette_form_generator.contract import (
-    ASSET_IMAGE_FIELDS,
     bodystyle_asset_map,
-    build_body_context_choices,
-    build_trim_context_choices,
+    build_model_context_choices,
     context_choice_copy_rows,
     load_asset_map,
+    merge_option_asset_fields,
 )
 from corvette_form_generator.interiors import build_model_interiors
 from corvette_form_generator.mapping import best_status, normalize_mode, selection_mode_label, status_to_label, step_for_section
@@ -692,9 +691,9 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             }
         )
 
-    context_choices = build_body_context_choices(
+    context_choices = build_model_context_choices(
         variants, context_copy_rows, config.model_key, config.body_style_display_order, bodystyle_assets
-    ) + build_trim_context_choices(variants, context_copy_rows, config.model_key)
+    )
     variants_by_id = {row["variant_id"]: row for row in variants}
 
     choices: list[dict[str, Any]] = []
@@ -1060,8 +1059,7 @@ def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None
                 "source_description": option["source_description"],
                 "text_cleanup_notes": option["text_cleanup_notes"],
             }
-            if option.get("image_url"):
-                draft_choice.update({field: option.get(field, "") for field in ASSET_IMAGE_FIELDS})
+            merge_option_asset_fields(draft_choice, option_rows, only_if_image_present=True)
             draft_choices.append(draft_choice)
 
     standard_equipment = [

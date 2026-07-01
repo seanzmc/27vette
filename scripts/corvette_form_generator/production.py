@@ -16,10 +16,10 @@ from openpyxl import load_workbook
 from corvette_form_generator.contract import (
     ASSET_IMAGE_FIELDS,
     bodystyle_asset_map,
-    build_body_context_choices,
-    build_trim_context_choices,
+    build_model_context_choices,
     context_choice_copy_rows,
     label_for,
+    merge_option_asset_fields,
     option_asset_map,
 )
 from corvette_form_generator.inspection import section_step_resolution_source
@@ -279,9 +279,9 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
     for row in step_rows:
         row["section_ids"] = "|".join(sorted(section_ids_by_step.get(row["step_key"], [])))
 
-    context_choices = build_body_context_choices(
+    context_choices = build_model_context_choices(
         active_variants, context_copy_rows, MODEL_CONFIG.model_key, BODY_STYLE_DISPLAY_ORDER, bodystyle_assets
-    ) + build_trim_context_choices(active_variants, context_copy_rows, MODEL_CONFIG.model_key)
+    )
 
     def choice_section_metadata(section_id: str) -> dict[str, Any]:
         section = sections.get(section_id, {})
@@ -387,8 +387,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
                 display_behavior = "default_selected"
             if display_behavior:
                 choice["display_behavior"] = display_behavior
-            if asset := option_assets.get(option_id):
-                choice.update(asset)
+            merge_option_asset_fields(choice, option_assets, only_if_image_present=False)
             choices.append(choice)
 
     validation_rows: list[dict[str, Any]] = []

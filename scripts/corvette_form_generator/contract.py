@@ -202,6 +202,41 @@ def build_trim_context_choices(
     ]
 
 
+def build_model_context_choices(
+    variants: list[dict[str, Any]],
+    copy_rows: list[dict[str, str]],
+    model_key: str,
+    body_style_display_order: Mapping[str, int],
+    bodystyle_assets: Mapping[str, dict[str, str]] | None = None,
+) -> list[dict[str, Any]]:
+    """Body-style and trim context choices for one model."""
+
+    return build_body_context_choices(
+        variants,
+        copy_rows,
+        model_key,
+        body_style_display_order,
+        bodystyle_assets,
+    ) + build_trim_context_choices(variants, copy_rows, model_key)
+
+
+def merge_option_asset_fields(
+    destination_row: dict[str, Any],
+    source_rows_by_option_id: Mapping[str, Mapping[str, Any]],
+    *,
+    only_if_image_present: bool,
+) -> None:
+    """Copy option asset image fields from the source option row to a destination choice row."""
+
+    option_id = destination_row.get("option_id", "")
+    source_row = source_rows_by_option_id.get(option_id)
+    if not source_row:
+        return
+    if only_if_image_present and not source_row.get("image_url"):
+        return
+    destination_row.update({field: source_row.get(field, "") for field in ASSET_IMAGE_FIELDS})
+
+
 def label_for(
     entity_id: str,
     options: dict[str, dict[str, Any]],
