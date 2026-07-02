@@ -251,6 +251,80 @@ class SchemaValidationMetadataTests(unittest.TestCase):
 
         self.assertFalse(any(issue.check_id == "duplicate_active_asset_map_row" for issue in issues), issues)
 
+    def test_asset_map_rejects_active_wildcard_rows_for_non_option_targets(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True}],
+            extra_sheets={
+                "asset_map": (
+                    ["model_key", "target_type", "target_id", "image_url", "active"],
+                    [
+                        {"model_key": "*", "target_type": "model", "target_id": "stingray", "image_url": "https://example.test/m.png", "active": True},
+                        {"model_key": "*", "target_type": "context_choice", "target_id": "body_style__coupe", "image_url": "https://example.test/c.png", "active": True},
+                    ],
+                )
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        wildcard_issues = [issue for issue in issues if issue.check_id == "invalid_wildcard_asset_map_row"]
+        self.assertEqual(len(wildcard_issues), 2, issues)
+
+    def test_asset_map_allows_active_wildcard_option_rows(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True}],
+            extra_sheets={
+                "asset_map": (
+                    ["model_key", "target_type", "target_id", "image_url", "active"],
+                    [
+                        {"model_key": "*", "target_type": "option", "target_id": "opt_gba_001", "image_url": "https://example.test/shared.png", "active": True},
+                        {"model_key": "stingray", "target_type": "option", "target_id": "opt_gba_001", "image_url": "https://example.test/exact.png", "active": True},
+                    ],
+                )
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertFalse(any(issue.check_id == "invalid_wildcard_asset_map_row" for issue in issues), issues)
+        # wildcard + exact for the same target are distinct identities, not duplicates
+        self.assertFalse(any(issue.check_id == "duplicate_active_asset_map_row" for issue in issues), issues)
+
+    def test_asset_map_duplicate_wildcard_rows_hit_existing_uniqueness_check(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True}],
+            extra_sheets={
+                "asset_map": (
+                    ["model_key", "target_type", "target_id", "image_url", "active"],
+                    [
+                        {"model_key": "*", "target_type": "option", "target_id": "opt_gba_001", "image_url": "https://example.test/a.png", "active": True},
+                        {"model_key": "*", "target_type": "option", "target_id": "opt_gba_001", "image_url": "https://example.test/b.png", "active": True},
+                    ],
+                )
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(any(issue.check_id == "duplicate_active_asset_map_row" for issue in issues), issues)
+
+    def test_asset_map_ignores_inactive_wildcard_non_option_rows(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True}],
+            extra_sheets={
+                "asset_map": (
+                    ["model_key", "target_type", "target_id", "image_url", "active"],
+                    [
+                        {"model_key": "*", "target_type": "model", "target_id": "stingray", "image_url": "https://example.test/m.png", "active": False},
+                    ],
+                )
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertFalse(any(issue.check_id == "invalid_wildcard_asset_map_row" for issue in issues), issues)
+
     def test_asset_map_allows_same_target_id_under_different_target_types(self) -> None:
         wb = minimal_schema_workbook(
             extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True}],

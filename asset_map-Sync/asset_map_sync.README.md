@@ -45,6 +45,26 @@ Report outputs:
 
 Coverage-intent classification is report-only: it never adds or applies workbook rows. The universal-expected policy is product policy encoded as the classifier default; the only workbook-derived classifications are structural presentation facts that self-correct when `section_master` / `section_presentation` change.
 
+Wildcard (shared) asset_map rows:
+
+- `asset_map` supports `model_key="*"` rows for `target_type=option` only. The
+  generator load path (`contract.py:load_asset_map`) loads wildcard rows first
+  and overlays exact-model rows second, so an exact row always wins for the
+  same `(target_type, target_id)`. Blank `model_key` stays invalid; wildcard
+  rows for `model` / `context_choice` targets are rejected by
+  `validate_workbook_schema.py` (`invalid_wildcard_asset_map_row`).
+- Sync treats a wildcard row as coverage for every promoted model desiring the
+  target: such targets report `keep` (never `insert_filled`), and section
+  coverage stats count them as covered. This is the anti-undo contract — a
+  sync run must not re-insert per-model rows for wildcard-covered targets.
+- Sync never writes, edits, or inserts wildcard rows. If the canonical media
+  inventory differs from a wildcard row's URL, the row reports the
+  `wildcard_conflict` review action for manual resolution.
+- A wildcard row is reported `stale_target` only when NO promoted model
+  desires the target.
+- Wildcard authoring (including migrating repeated identical per-model rows to
+  shared rows) is a separate approved workbook-data pass, not sync maintenance.
+
 Blank-row seeding, stale-row deactivation, and workbook schema/status-column
 changes are not routine asset-map maintenance. They need a separate approved
 workbook-data spec before being reintroduced or applied to `stingray_master.xlsx`.

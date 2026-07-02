@@ -540,6 +540,52 @@ def validate_asset_map_uniqueness(wb, issues: list[SchemaIssue]) -> None:
         seen_active_keys[key] = row_number
 
 
+def validate_asset_map_wildcard_rows(wb, issues: list[SchemaIssue]) -> None:
+    """Validate active wildcard asset_map rows are option targets only.
+
+    Mirrors validate_asset_map_uniqueness's active-row walk: the runtime read
+    path (contract.py:load_asset_map) supports model_key="*" wildcard rows for
+    option targets only (wildcard-first, exact-model overlay). Wildcard rows
+    with target_type model or context_choice would be silently ignored by
+    load_model_asset_map or apply model-specific hover media to every model,
+    so reject them loudly here instead.
+    """
+
+    if "asset_map" not in wb.sheetnames:
+        return
+
+    header_cols = nonblank_headers(wb["asset_map"])
+    required = {"model_key", "target_type", "target_id"}
+    if not required.issubset(header_cols):
+        return
+
+    for row_number, row in records(wb["asset_map"]):
+        if not workbook_truthy(row.get("active")):
+            continue
+        if clean_text(row.get("model_key")) != "*":
+            continue
+        target_type = clean_text(row.get("target_type")).lower()
+        if target_type == "option":
+            continue
+        add_issue(
+            issues,
+            "error",
+            "invalid_wildcard_asset_map_row",
+            sheet="asset_map",
+            row=row_number,
+            column="target_type",
+            value={
+                "model_key": "*",
+                "target_type": target_type,
+                "target_id": clean_text(row.get("target_id")),
+            },
+            message=(
+                f"Active wildcard asset_map row (model_key '*') has target_type "
+                f"{target_type!r}; wildcard rows are supported for target_type 'option' only."
+            ),
+        )
+
+
 def validate_default_selection_display_behavior(wb, issues: list[SchemaIssue]) -> None:
     """Validate workbook-authored default-selection display behavior values.
 
@@ -915,6 +961,7 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
             validate_registry_promotion_metadata(wb, issues)
 
         validate_asset_map_uniqueness(wb, issues)
+        validate_asset_map_wildcard_rows(wb, issues)
         validate_default_selection_display_behavior(wb, issues)
 
         for source_role in HEADER_MATCH_ROLES:

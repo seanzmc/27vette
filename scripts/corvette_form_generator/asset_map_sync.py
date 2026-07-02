@@ -26,6 +26,7 @@ from urllib.request import Request, urlopen
 
 from openpyxl import load_workbook
 
+from corvette_form_generator.contract import WILDCARD_MODEL_KEY
 from corvette_form_generator.workbook import clean, rows_from_sheet, save_workbook_safely, workbook_truthy
 
 SITE = "stingraychevroletcorvette.com"
@@ -555,6 +556,14 @@ def reconcile(
         )
     existing_rows = existing_rows or {}
     alive = alive or {}
+    # Wildcard rows (model_key "*", option targets) cover every promoted model.
+    # Sync never writes/edits/inserts wildcard rows; divergence between a
+    # wildcard row and canonical media is a human decision (wildcard_conflict).
+    wildcard_rows = {
+        (target_type, target_id): existing
+        for (model_key, target_type, target_id), existing in existing_rows.items()
+        if model_key == WILDCARD_MODEL_KEY
+    }
 
     def resolve_option(model_key: str, rpo: str) -> tuple[dict[str, str], str, str]:
         if not rpo:
@@ -693,6 +702,42 @@ def reconcile(
                 add_report("existing", model_key, source_sheet, target_type, target_id, rpo, "flag_missing", source, clean(existing.get("url")), "", "missing", note)
             continue
 
+        wildcard = wildcard_rows.get((target_type, target_id)) if target_type == TARGET_TYPE_OPTION else None
+        if wildcard is not None:
+            wildcard_url = clean(wildcard.get("url"))
+            candidate_url = fields.get("image_url", "") if fields else ""
+            if candidate_url and candidate_url != wildcard_url:
+                add_report(
+                    "existing",
+                    model_key,
+                    source_sheet,
+                    target_type,
+                    target_id,
+                    rpo,
+                    "wildcard_conflict",
+                    source,
+                    wildcard_url,
+                    candidate_url,
+                    "ok",
+                    "canonical media differs from shared wildcard row; resolve manually (sync never edits wildcard rows)",
+                )
+            else:
+                add_report(
+                    "existing",
+                    model_key,
+                    source_sheet,
+                    target_type,
+                    target_id,
+                    rpo,
+                    "keep",
+                    source,
+                    wildcard_url,
+                    wildcard_url,
+                    "ok",
+                    "covered by shared wildcard row",
+                )
+            continue
+
         if fields:
             insert = {
                 "model": model_key,
@@ -716,23 +761,31 @@ def reconcile(
             add_report("new", model_key, source_sheet, target_type, target_id, rpo, "flag_missing", source, "", "", "missing", note)
 
     for (model_key, target_type, target_id), existing in existing_rows.items():
-        if (model_key, target_type, target_id) not in desired:
-            row_number = int(existing["row"])
-            status[row_number] = "stale_target"
-            add_report(
-                "stale",
-                model_key,
-                "",
-                target_type,
-                target_id,
-                "",
-                "stale_target",
-                "",
-                clean(existing.get("url")),
-                clean(existing.get("url")),
-                "stale_target",
-                "asset target no longer desired by current promoted model inventory",
-            )
+        if model_key == WILDCARD_MODEL_KEY:
+            # A wildcard row is stale only if NO promoted model desires the target.
+            if any(
+                key[1] == target_type and key[2] == target_id
+                for key in desired
+            ):
+                continue
+        elif (model_key, target_type, target_id) in desired:
+            continue
+        row_number = int(existing["row"])
+        status[row_number] = "stale_target"
+        add_report(
+            "stale",
+            model_key,
+            "",
+            target_type,
+            target_id,
+            "",
+            "stale_target",
+            "",
+            clean(existing.get("url")),
+            clean(existing.get("url")),
+            "stale_target",
+            "asset target no longer desired by current promoted model inventory",
+        )
 
     return SyncPlan(report=report, url_writes=url_writes, inserts=inserts, status=status, used=used)
 
@@ -827,8 +880,9 @@ def build_section_coverage_stats(
     """Per-model/per-section coverage stats over ALL desired option targets.
 
     A target counts as covered when an existing asset_map row carries an
-    image_url. Computed over the full desired set (not the missing subset) so
-    percentages converge to 100 as images land.
+    image_url — either an exact-model row or a shared wildcard row
+    (model_key "*"). Computed over the full desired set (not the missing
+    subset) so percentages converge to 100 as images land.
     """
 
     per_model: dict[str, dict[str, dict[str, int]]] = {}
@@ -840,7 +894,9 @@ def build_section_coverage_stats(
             section_id, {"total_targets": 0, "covered": 0, "missing": 0}
         )
         bucket["total_targets"] += 1
-        existing = existing_rows.get((model_key, target_type, target_id))
+        existing = existing_rows.get((model_key, target_type, target_id)) or existing_rows.get(
+            (WILDCARD_MODEL_KEY, target_type, target_id)
+        )
         if existing and clean(existing.get("url")):
             bucket["covered"] += 1
         else:

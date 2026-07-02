@@ -496,6 +496,170 @@ def test_existing_asset_rows_keys_by_target_type_so_same_id_string_across_types_
     assert rows[("stingray", "model", "shared_id")]["url"] == "https://example.test/model.png"
 
 
+def test_existing_asset_rows_includes_wildcard_rows_under_star_model_key() -> None:
+    wb = Workbook()
+    del wb[wb.sheetnames[0]]
+    add_sheet(
+        wb,
+        "asset_map",
+        ["model_key", "target_type", "target_id", "image_url", "active"],
+        [
+            {"model_key": "*", "target_type": "option", "target_id": "opt_gba_001", "image_url": "https://example.test/shared.png", "active": True},
+        ],
+    )
+    ws = wb["asset_map"]
+    header_index = {header: index for index, header in enumerate(["model_key", "target_type", "target_id", "image_url", "active"])}
+
+    rows = asset_map_sync.existing_asset_rows(ws, header_index)
+
+    assert set(rows) == {("*", "option", "opt_gba_001")}
+    assert rows[("*", "option", "opt_gba_001")]["url"] == "https://example.test/shared.png"
+
+
+def test_reconcile_wildcard_covered_target_is_keep_not_insert() -> None:
+    """The anti-undo contract: a sync run must not re-insert per-model rows for wildcard-covered targets."""
+    desired = {
+        ("stingray", "option", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black"},
+        ("grand_sport", "option", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black"},
+    }
+    media = asset_map_sync.build_media_inventory(["https://example.test/27vette/paint/gba.png"])
+    existing_rows = {
+        ("*", "option", "opt_gba_001"): {"row": 2, "target_type": "option", "url": "https://example.test/27vette/paint/gba.png"},
+    }
+
+    report, url_writes, inserts, status, _used = asset_map_sync.reconcile(
+        desired,
+        media,
+        existing_rows=existing_rows,
+        alive={},
+        incremental=False,
+    )
+
+    per_model = {row["model_key"]: row for row in report if row["target_id"] == "opt_gba_001"}
+    assert set(per_model) == {"stingray", "grand_sport"}
+    for row in per_model.values():
+        assert row["action"] == "keep"
+        assert "wildcard" in row["note"]
+        assert row["existing_url"] == "https://example.test/27vette/paint/gba.png"
+    assert inserts == []
+    assert url_writes == {}
+    assert not any(row["action"] == "stale_target" for row in report)
+
+
+def test_reconcile_wildcard_covered_target_without_media_candidate_is_keep_not_missing() -> None:
+    desired = {
+        ("stingray", "option", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black"},
+    }
+    media = asset_map_sync.build_media_inventory([])
+    existing_rows = {
+        ("*", "option", "opt_gba_001"): {"row": 2, "target_type": "option", "url": "https://example.test/27vette/paint/gba.png"},
+    }
+
+    report, url_writes, inserts, _status, _used = asset_map_sync.reconcile(
+        desired,
+        media,
+        existing_rows=existing_rows,
+        alive={},
+        incremental=False,
+    )
+
+    row = next(r for r in report if r["model_key"] == "stingray" and r["target_id"] == "opt_gba_001")
+    assert row["action"] == "keep"
+    assert inserts == []
+    assert url_writes == {}
+
+
+def test_reconcile_wildcard_url_conflict_is_review_action_with_no_writes() -> None:
+    desired = {
+        ("stingray", "option", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black"},
+    }
+    media = asset_map_sync.build_media_inventory(["https://example.test/27vette/paint/c-gba-new.png"])
+    existing_rows = {
+        ("*", "option", "opt_gba_001"): {"row": 2, "target_type": "option", "url": "https://example.test/27vette/paint/gba-old.png"},
+    }
+
+    report, url_writes, inserts, _status, _used = asset_map_sync.reconcile(
+        desired,
+        media,
+        existing_rows=existing_rows,
+        alive={},
+        incremental=False,
+    )
+
+    row = next(r for r in report if r["model_key"] == "stingray" and r["target_id"] == "opt_gba_001")
+    assert row["action"] == "wildcard_conflict"
+    assert row["existing_url"] == "https://example.test/27vette/paint/gba-old.png"
+    assert row["new_url"] == "https://example.test/27vette/paint/c-gba-new.png"
+    assert "never edits wildcard rows" in row["note"]
+    assert url_writes == {}
+    assert inserts == []
+
+
+def test_reconcile_exact_row_takes_precedence_over_wildcard_row() -> None:
+    desired = {
+        ("z06", "option", "opt_j6d_001"): {"target_type": "option", "rpo": "j6d", "name": "Calipers"},
+    }
+    media = asset_map_sync.build_media_inventory([])
+    existing_rows = {
+        ("*", "option", "opt_j6d_001"): {"row": 2, "target_type": "option", "url": "https://example.test/shared.png"},
+        ("z06", "option", "opt_j6d_001"): {"row": 3, "target_type": "option", "url": "https://example.test/z06-exact.png"},
+    }
+
+    report, url_writes, inserts, _status, _used = asset_map_sync.reconcile(
+        desired,
+        media,
+        existing_rows=existing_rows,
+        alive={},
+        incremental=False,
+    )
+
+    row = next(r for r in report if r["model_key"] == "z06" and r["target_id"] == "opt_j6d_001")
+    assert row["existing_url"] == "https://example.test/z06-exact.png"
+    assert url_writes == {}
+    assert inserts == []
+
+
+def test_reconcile_wildcard_row_is_stale_only_when_no_model_desires_target() -> None:
+    desired = {
+        ("stingray", "option", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black"},
+    }
+    media = asset_map_sync.build_media_inventory([])
+    existing_rows = {
+        ("*", "option", "opt_gba_001"): {"row": 2, "target_type": "option", "url": "https://example.test/shared.png"},
+        ("*", "option", "opt_gone_001"): {"row": 3, "target_type": "option", "url": "https://example.test/gone.png"},
+    }
+
+    report, _url_writes, _inserts, status, _used = asset_map_sync.reconcile(
+        desired,
+        media,
+        existing_rows=existing_rows,
+        alive={},
+        incremental=False,
+    )
+
+    stale = [row for row in report if row["action"] == "stale_target"]
+    assert [(row["model_key"], row["target_id"]) for row in stale] == [("*", "opt_gone_001")]
+    assert status[3] == "stale_target"
+    assert 2 not in status
+
+
+def test_section_coverage_counts_wildcard_row_as_covered() -> None:
+    desired = {
+        ("stingray", "option", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black", "section_id": "sec_pain_001"},
+        ("stingray", "option", "opt_nix_001"): {"target_type": "option", "rpo": "nix", "name": "None", "section_id": "sec_pain_001"},
+    }
+    existing_rows = {
+        ("*", "option", "opt_gba_001"): {"row": 2, "target_type": "option", "url": "https://example.test/shared.png"},
+    }
+
+    stats = asset_map_sync.build_section_coverage_stats(desired, existing_rows)
+
+    section = stats["stingray"]["sections"]["sec_pain_001"]
+    assert section["total_targets"] == 2
+    assert section["covered"] == 1
+    assert section["missing"] == 1
+
+
 def test_apply_uses_injected_safe_save_and_inserts_confident_candidate(tmp_path: Path) -> None:
     workbook_path = tmp_path / "sync.xlsx"
     make_apply_workbook(workbook_path)

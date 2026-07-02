@@ -22,8 +22,18 @@ def asset_fields(row: dict[str, Any]) -> dict[str, str]:
     return {field: clean(row.get(field)) for field in ASSET_IMAGE_FIELDS}
 
 
+WILDCARD_MODEL_KEY = "*"
+WILDCARD_TARGET_TYPES = ("option",)
+
+
 def load_asset_map(wb, model_key: str) -> dict[tuple[str, str], dict[str, str]]:
-    """Active asset_map rows for one model, keyed by (target_type, target_id)."""
+    """Active asset_map rows for one model, keyed by (target_type, target_id).
+
+    Wildcard rows (``model_key == "*"``, option targets only) load first;
+    exact-model rows load second and overwrite wildcard entries for the same
+    (target_type, target_id) key. Blank model_key stays invalid/skipped —
+    shared media must use the explicit ``"*"`` literal.
+    """
 
     if "asset_map" not in wb.sheetnames:
         return {}
@@ -32,14 +42,21 @@ def load_asset_map(wb, model_key: str) -> dict[tuple[str, str], dict[str, str]]:
     for row in rows_from_sheet(wb, "asset_map"):
         if not workbook_truthy(row.get("active")):
             continue
-        if clean(row.get("model_key")) != model_key:
+        row_model = clean(row.get("model_key"))
+        if row_model == WILDCARD_MODEL_KEY:
+            if clean(row.get("target_type")) not in WILDCARD_TARGET_TYPES:
+                continue
+        elif row_model != model_key:
             continue
         target_type = clean(row.get("target_type"))
         target_id = clean(row.get("target_id"))
         fields = asset_fields(row)
         if not target_type or not target_id or not fields["image_url"]:
             continue
-        assets[(target_type, target_id)] = fields
+        if row_model == WILDCARD_MODEL_KEY:
+            assets.setdefault((target_type, target_id), fields)
+        else:
+            assets[(target_type, target_id)] = fields
     return assets
 
 
