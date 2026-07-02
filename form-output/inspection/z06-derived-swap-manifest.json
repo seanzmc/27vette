@@ -1,0 +1,180 @@
+{
+  "model_key": "z06",
+  "candidate_count": 12,
+  "emitted_count": 0,
+  "shadowed_count": 6,
+  "not_emitted_count": 6,
+  "entries": [
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_pdb_001",
+      "target_id": "opt_s47_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_pdb_001",
+          "opt_roy_001"
+        ],
+        "primitive_rule_id": "z06_rule_opt_s47_001_excludes_opt_roy_001",
+        "conflict_id": "opt_roy_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_pdb_001",
+      "target_id": "opt_sfe_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_pdb_001",
+          "opt_roy_001"
+        ],
+        "primitive_rule_id": "z06_rule_opt_sfe_001_excludes_opt_roy_001",
+        "conflict_id": "opt_roy_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "shadowed_by_authored",
+      "source_id": "opt_pdd_001",
+      "target_id": "opt_cbf_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_pdd_001",
+          "opt_cfz_001"
+        ],
+        "primitive_rule_id": "z06_rule_opt_cbf_001_excludes_opt_cfz_001",
+        "conflict_id": "opt_cfz_001"
+      },
+      "allowlisted": true
+    },
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_pdd_001",
+      "target_id": "opt_s47_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_pdd_001",
+          "opt_roy_001"
+        ],
+        "primitive_rule_id": "z06_rule_opt_s47_001_excludes_opt_roy_001",
+        "conflict_id": "opt_roy_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_pdd_001",
+      "target_id": "opt_sfe_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_pdd_001",
+          "opt_roy_001"
+        ],
+        "primitive_rule_id": "z06_rule_opt_sfe_001_excludes_opt_roy_001",
+        "conflict_id": "opt_roy_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "shadowed_by_authored",
+      "source_id": "opt_pdf_001",
+      "target_id": "opt_cbf_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_pdf_001",
+          "opt_cfv_002"
+        ],
+        "primitive_rule_id": "z06_rule_opt_cbf_001_excludes_opt_cfv_002",
+        "conflict_id": "opt_cfv_002"
+      },
+      "allowlisted": true
+    },
+    {
+      "disposition": "shadowed_by_authored",
+      "source_id": "opt_pdf_001",
+      "target_id": "opt_cbf_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_pdf_001",
+          "opt_z07_001",
+          "opt_t0f_001",
+          "opt_cfz_001"
+        ],
+        "primitive_rule_id": "z06_rule_opt_cbf_001_excludes_opt_cfz_001",
+        "conflict_id": "opt_cfz_001"
+      },
+      "allowlisted": true
+    },
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_pdf_001",
+      "target_id": "opt_s47_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_pdf_001",
+          "opt_roy_001"
+        ],
+        "primitive_rule_id": "z06_rule_opt_s47_001_excludes_opt_roy_001",
+        "conflict_id": "opt_roy_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_pdf_001",
+      "target_id": "opt_sfe_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_pdf_001",
+          "opt_roy_001"
+        ],
+        "primitive_rule_id": "z06_rule_opt_sfe_001_excludes_opt_roy_001",
+        "conflict_id": "opt_roy_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "shadowed_by_authored",
+      "source_id": "opt_t0f_001",
+      "target_id": "opt_cbf_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_t0f_001",
+          "opt_cfz_001"
+        ],
+        "primitive_rule_id": "z06_rule_opt_cbf_001_excludes_opt_cfz_001",
+        "conflict_id": "opt_cfz_001"
+      },
+      "allowlisted": true
+    },
+    {
+      "disposition": "shadowed_by_authored",
+      "source_id": "opt_t0g_001",
+      "target_id": "opt_cbf_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_t0g_001",
+          "opt_cfv_002"
+        ],
+        "primitive_rule_id": "z06_rule_opt_cbf_001_excludes_opt_cfv_002",
+        "conflict_id": "opt_cfv_002"
+      },
+      "allowlisted": true
+    },
+    {
+      "disposition": "shadowed_by_authored",
+      "source_id": "opt_z07_001",
+      "target_id": "opt_cbf_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_z07_001",
+          "opt_t0f_001",
+          "opt_cfz_001"
+        ],
+        "primitive_rule_id": "z06_rule_opt_cbf_001_excludes_opt_cfz_001",
+        "conflict_id": "opt_cfz_001"
+      },
+      "allowlisted": true
+    }
+  ]
+}

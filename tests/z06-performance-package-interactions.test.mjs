@@ -11,9 +11,15 @@ function makeElement() {
     dataset: {},
     listeners: {},
     hidden: false,
+    children: [],
     addEventListener(type, listener) {
       this.listeners[type] = listener;
     },
+    setAttribute() {},
+    append(...nodes) {
+      this.children.push(...nodes);
+    },
+    remove() {},
     querySelectorAll() {
       return [];
     },
@@ -487,4 +493,51 @@ test("Z06 carbon fiber wheel and brake packages render in the Wheels & Brake Cal
       `${rpo} package should render in the wheels/calipers step so the bundled performance choice is pre-set`,
     );
   }
+});
+
+function toastMessages(runtime) {
+  const region = runtime.elements.get("#toastRegion");
+  return (region?.children || []).map((toast) => toast.children?.[0]?.textContent || "");
+}
+
+test("Z06 eviction toast fires only for explicitly selected CBF, with verbose reason copy", () => {
+  for (const sourceRpo of ["T0F", "T0G", "Z07", "PDD", "PDF"]) {
+    const runtime = z06Runtime();
+    runtime.handleChoice(choice(runtime, "CBF"));
+    runtime.reconcileSelections();
+    assert.equal(toastMessages(runtime).length, 0, "selecting CBF alone should not toast");
+
+    runtime.handleChoice(choice(runtime, sourceRpo));
+    runtime.reconcileSelections();
+
+    const messages = toastMessages(runtime);
+    assert.equal(messages.length, 1, `${sourceRpo} evicting explicitly selected CBF should raise exactly one toast`);
+    assert.match(messages[0], /CBF|replaces/i, `${sourceRpo} toast should carry the rule's verbose reason copy`);
+    assert.equal(runtime.state.selected.has(choice(runtime, "CBF").option_id), false, "CBF should still be evicted");
+  }
+});
+
+test("Z06 replace evictions of defaults and auto-adds never toast", () => {
+  // Z07 replaces the T0E default rear spoiler (default-selected, not user-selected).
+  const runtime = z06Runtime();
+  assert.equal(runtime.state.selected.has(choice(runtime, "T0E").option_id), true, "T0E should seed as a default");
+  runtime.handleChoice(choice(runtime, "Z07"));
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has(choice(runtime, "T0E").option_id), false, "Z07 should evict the T0E default");
+  assert.equal(toastMessages(runtime).length, 0, "evicting a non-explicit default should stay silent");
+
+  // CFZ auto-adds under Z07 without CBF selected: plain include path, no toast.
+  assert.equal(autoAddedRpos(runtime).includes("CFZ"), true, "Z07 should still auto-add CFZ");
+});
+
+test("Z06 eviction toast leaves the alertRegion data-warning surface untouched", () => {
+  const runtime = z06Runtime();
+  const alertBefore = runtime.elements.get("#alertRegion")?.innerHTML || "";
+  runtime.handleChoice(choice(runtime, "CBF"));
+  runtime.reconcileSelections();
+  runtime.handleChoice(choice(runtime, "Z07"));
+  runtime.reconcileSelections();
+  assert.equal(toastMessages(runtime).length, 1, "explicit CBF eviction should toast");
+  const alertAfter = runtime.elements.get("#alertRegion")?.innerHTML || "";
+  assert.equal(alertAfter, alertBefore, "toast activity must not rewrite #alertRegion");
 });

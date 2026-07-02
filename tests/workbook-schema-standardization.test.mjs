@@ -357,6 +357,10 @@ print(json.dumps(duplicates))
 });
 
 test("Z06 active replace excludes stay limited to true default-replacement rows", () => {
+  // New contract (docs/derived-swap-eviction-spec-2026-07-02.md §2 A6): authored
+  // replace rows must be true default-replacements; hand-stacked includes-closure
+  // rows are forbidden BECAUSE generation-time derivation owns them
+  // (scripts/corvette_form_generator/rule_derivation.py).
   const offenders = pythonJson(`
 import json
 from openpyxl import load_workbook
@@ -397,7 +401,18 @@ for row in rows('z06_exclusive_members'):
         group_by_option.setdefault(option_id, set()).add(group_id)
 
 requires_any_sources = {clean(row.get('source_id')): clean(row.get('group_id')) for row in rows('z06_rule_groups') if active(row) and clean(row.get('group_type')) == 'requires_any'}
+# True default-replacements stay authored in the workbook.
 allowed_pairs = {('opt_j57_001', 'opt_j6a_001')}
+# TEMPORARY exemption — Phase B of the derived-swap pass deletes these five
+# hand-stacked CBF closure rows from z06_rule_mapping and removes this set.
+# Derivation already shadows them (see z06-derived-swap-manifest.json).
+phase_b_pending_deletion = {
+    ('opt_t0f_001', 'opt_cbf_001'),
+    ('opt_t0g_001', 'opt_cbf_001'),
+    ('opt_z07_001', 'opt_cbf_001'),
+    ('opt_pdd_001', 'opt_cbf_001'),
+    ('opt_pdf_001', 'opt_cbf_001'),
+}
 offenders = []
 for row in rows('z06_rule_mapping'):
     if not runtime_authored_rule(row):
@@ -407,6 +422,8 @@ for row in rows('z06_rule_mapping'):
     source_id = clean(row.get('source_id'))
     target_id = clean(row.get('target_id'))
     if (source_id, target_id) in allowed_pairs:
+        continue
+    if (source_id, target_id) in phase_b_pending_deletion:
         continue
     shared_groups = sorted(group_by_option.get(source_id, set()) & group_by_option.get(target_id, set()))
     offenders.append({

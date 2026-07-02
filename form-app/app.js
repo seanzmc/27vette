@@ -73,6 +73,7 @@ const els = {
   summaryDrawer: document.querySelector("#summaryDrawer"),
   requirementsCard: document.querySelector("#requirementsCard"),
   alertRegion: document.querySelector("#alertRegion"),
+  toastRegion: document.querySelector("#toastRegion"),
   resetButton: document.querySelector("#resetButton"),
   downloadBuildButton: document.querySelector("#downloadBuildButton"),
   submitDealerButton: document.querySelector("#submitDealerButton"),
@@ -1027,7 +1028,7 @@ function disableReasonForChoice(choice, { includeSelectedRequirements = true } =
     if (rule.rule_type === "excludes" && selectedIds.has(rule.source_id) && ruleAppliesToCurrentVariant(rule)) {
       if (sameExclusiveGroupPeer(choice.option_id, rule.source_id)) continue;
       if (runtimeExceptionAllowsCandidateOverSelectedTarget(choice.option_id, rule.source_id)) continue;
-      if (rule.runtime_action === "replace") return rule.disabled_reason || `${getEntityLabel(rule.source_id)} removes this default.`;
+      if (rule.runtime_action === "replace") return rule.disabled_reason || `${getEntityLabel(rule.source_id)} removes ${getEntityLabel(rule.target_id)}.`;
       return rule.disabled_reason || `Blocked by ${getEntityLabel(rule.source_id)}.`;
     }
   }
@@ -1538,9 +1539,41 @@ function removeReplaceRuleTargets(sourceId) {
   const rules = ruleTargetsBySource.get(sourceId) || [];
   for (const rule of rules) {
     if (rule.runtime_action === "replace" && ruleAppliesToCurrentVariant(rule)) {
+      // Toast only for explicit customer selections: state.userSelected holds
+      // only user picks (defaults/auto-adds live in state.selected alone), and
+      // the check must run before deleteSelectedOption clears the flag.
+      const wasExplicitlySelected = state.userSelected.has(rule.target_id);
       deleteSelectedOption(rule.target_id);
+      if (wasExplicitlySelected) {
+        showEvictionToast(rule.disabled_reason || `${getEntityLabel(rule.source_id)} removes ${getEntityLabel(rule.target_id)}.`);
+      }
     }
   }
+}
+
+const TOAST_TIMEOUT_MS = 8000;
+
+function showEvictionToast(message) {
+  if (!els.toastRegion || !message) return;
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.setAttribute?.("role", "status");
+  const text = document.createElement("span");
+  text.className = "toast-message";
+  text.textContent = message;
+  const dismiss = document.createElement("button");
+  dismiss.className = "toast-dismiss";
+  dismiss.type = "button";
+  dismiss.setAttribute?.("aria-label", "Dismiss notification");
+  dismiss.textContent = "\u00d7";
+  const remove = () => {
+    window.clearTimeout?.(timer);
+    toast.remove?.();
+  };
+  const timer = window.setTimeout?.(remove, TOAST_TIMEOUT_MS);
+  dismiss.addEventListener?.("click", remove);
+  toast.append?.(text, dismiss);
+  els.toastRegion.append?.(toast);
 }
 
 function selectedOrAutoInSection(sectionId, autoAdded = computeAutoAdded()) {

@@ -38,6 +38,7 @@ from corvette_form_generator.rules import (
     entity_section,
     entity_type,
     exclusive_group_pairs,
+    extend_with_derived_swap_rules,
     grouped_exclusion_pairs,
     grouped_requirement_pairs,
     load_exclusive_groups,
@@ -465,7 +466,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
         if rule.get("disabled_reason", ""):
             disabled_reason = rule.get("disabled_reason", "")
         elif replaces_t0a:
-            disabled_reason = f"{source_label} removes this default."
+            disabled_reason = f"{source_label} removes {target_label}."
         elif rule_type == "excludes":
             disabled_reason = f"Blocked by {source_label}."
         elif rule_type == "requires":
@@ -493,6 +494,8 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
                 "source_note": truncate_reason(rule.get("original_detail_raw", ""), 500),
             }
         )
+
+    extend_with_derived_swap_rules(MODEL_CONFIG, raw_rules, options_by_id, interiors_by_id, sections)
 
     price_rules = [
         {

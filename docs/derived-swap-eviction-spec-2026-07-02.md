@@ -1,6 +1,6 @@
 # Spec: Derived swap exclusions + eviction toast notification
 
-Status: DRAFT — awaiting approval (Section 10). Authored 2026-07-02.
+Status: DRAFT v2 — awaiting approval (Section 10). Authored 2026-07-02; revised same day after pre-approval review (findings 1–6 resolved: allowlist-gated emission, `production.py` route coverage, precise `userSelected` toast guard, dedicated toast container, manifest-only provenance, Phase-A-green test lane).
 
 Parent threads: remediation spec `docs/asset-media-drift-remediation-spec-2026-06-30.md` §7 follow-up 1 (the Z06 replace-rule red gate) and the 2026-07-02 design discussion confirming the intended CBF behavior is a swap, not a block. This pass supersedes the earlier "re-shelve the five rows as excludes_any" framing: the confirmed product intent is that packages evict CBF (swap mechanic with user notification), so plain-blocking re-authoring would be a behavior regression, not a fix.
 
@@ -11,11 +11,14 @@ Recommended reasoning level for implementation: high. This is a behavior-changin
 - `z06_rule_mapping` rows 82–86: five `rule_type="excludes"` / `runtime_action="replace"` rows, sources T0F/T0G/Z07/PDD/PDF, all targeting `opt_cbf_001` (CBF, "Body-color painted Rockers and splitter", `sec_exte_001`, selectable, NOT a default — no `default_selection_rules` row).
 - The primitive incompatibilities already exist as authored rows: `cbf excludes cfz` (Carbon Flash ground effects), `cbf excludes cfv_002`, `cbf excludes efy`.
 - The includes graph already implies the five stacked rows: T0F→CFZ; T0G→CFV; Z07→{T0F, J57, FE7, XFS}; PDD→{Z07, T0F, CFZ, ROY}; PDF→{Z07, T0G, CFV, ROY}. Every one of the five stacked rows is the transitive closure of a primitive exclusion through this graph, computed by hand.
-- Runtime `replace` semantics (`form-app/app.js`): `removeReplaceRuleTargets` (:1538) silently `deleteSelectedOption`s the target when the source is selected; `disableReasonForChoice` (:1030) shows "X removes this default" while the source stays selected; `:1050` exempts replace rules from ordinary exclusion handling. There is NO user notification of the eviction (no toast/notification machinery exists in app.js or styles.css).
+- Runtime `replace` semantics (`form-app/app.js`): `removeReplaceRuleTargets` (:1538) silently `deleteSelectedOption`s the target when the source is selected; `disableReasonForChoice` (:1030) shows "X removes this default" while the source stays selected; `:1050` exempts replace rules from ordinary exclusion handling. There is NO user notification of the eviction. Existing notification-adjacent machinery (review correction 2026-07-02): `index.html:46` already has `#alertRegion` with `aria-live="polite"`, styled at `styles.css:222`; render OVERWRITES its `innerHTML` for data warnings at `app.js:2701` — it is a render-owned warning surface, not a toast queue, and cannot host evictions without clobbering (see §2 A4).
+- Runtime selection state distinguishes explicit customer picks from programmatic ones: `state.userSelected` (`app.js:30`) holds only explicit choices; `state.selected` also holds defaults and auto-added/programmatic selections. The toast guard MUST key on `state.userSelected` (§2 A4).
+- Rule assembly is split by generation route (review correction 2026-07-02): Stingray assembles rules through `production.py` (:425 `raw_rules` loop), while Grand Sport/Z06 use `rules.py:134` via `source_assembly.py:35`. A derivation hook in `rules.py` alone does not cover Stingray.
 - Generator `replace` handling (`scripts/corvette_form_generator/rules.py:160-200`): `runtime_action=="replace"` marks `replaces_default`, exempts the rule from redundant-same-section omission, and emits reason text "X removes this default." — text that is factually wrong for CBF (not a default).
 - Red gate: `tests/workbook-schema-standardization.test.mjs:359` ("Z06 active replace excludes stay limited to true default-replacement rows") allowlists only `(opt_j57_001, opt_j6a_001)`; the five CBF rows fail it on every run (documented pre-existing red).
 - Authored `replace` rows across models: stingray `rule_mapping` 4 (5ZW→T0A, ZF1→T0A, Z51→FE1, Z51→FE2), grand_sport 5 (J57→J6A, FEY→T0E, FEB→JX6, FEY→JX6, FEY→J56), z06 6 (J57→J6A + the five CBF rows). Whether the non-CBF rows are true default-replacements or more hand-stacked closure has NOT been classified — that audit is part of this pass (§2 A5), migration of them is not.
 - Excludes enforcement is directional: `disableReasonForChoice(X)` consults only rules whose target is X with a selected source (`selectedContextIds()` does include auto-added options). Deleting the five stacked rows today with no replacement mechanism would leave Z07 selectable alongside CBF while suppressing the CFZ auto-add — a silently incomplete configuration. The stacked rows are load-bearing until derivation exists.
+- Dry closure scan (review finding 2026-07-02, current workbook): generic includes-closure derivation over primitive excludes finds unshadowed candidates BEYOND the five approved CBF equivalents — 6 on Stingray, 1 on Grand Sport, 6 on Z06. Unconstrained emission would therefore trip the anti-surprise gate immediately. This spec resolves that by making emission allowlist-gated (§2 A1/A3): only allowlisted pairs are emitted as rules; all other closure candidates are report-only manifest entries for separate approval.
 
 ## 1. Diagnosis
 
@@ -32,44 +35,48 @@ Approved product decisions (2026-07-02):
 
 ### Phase A — derivation mechanism + eviction toast (code + tests, no workbook write)
 
-1. `rules.py` (or a sibling helper in `corvette_form_generator/`): derive swap rules at generation time. For each selectable option S, compute its includes-closure I(S) (recursive walk of active `includes` rules, cycle-guarded, deterministic ordering). For each active primitive excludes rule (A excludes B) with B ∈ I(S) and S ≠ A: emit a derived rule S-evicts-A with `runtime_action="replace"`, provenance fields (suggested: `derived="True"`, `derived_via` = the includes path + primitive rule_id), and generated verbose reason text built from option labels, e.g. "Body-color painted Rockers and splitter (CBF) was removed: Z07 Performance Package includes Carbon Flash Carbon Fiber Ground Effects (CFZ), which replaces it." No model-specific knowledge in Python — pure graph mechanics over workbook rows.
+1. Derivation helper — new `scripts/corvette_form_generator/rule_derivation.py`, wired into BOTH rule-assembly routes: `rules.py:134` (Grand Sport/Z06 via `source_assembly.py:35`) AND `production.py:425` (`raw_rules` loop — Stingray's route; a `rules.py`-only hook does not cover all three regenerated models). For each selectable option S, compute its includes-closure I(S) (recursive walk of active `includes` rules, cycle-guarded, deterministic ordering). For each active primitive excludes rule (A excludes B) with B ∈ I(S) and S ≠ A: that (S, A) pair is a derivation CANDIDATE. Every candidate is recorded in the derivation manifest with provenance (`derived_via` = includes path + primitive rule_id). Emission is allowlist-gated: only candidates on the approved emission allowlist (this pass: exactly the five Z06 CBF pairs — T0F/T0G/Z07/PDD/PDF → opt_cbf_001) become emitted rules with `runtime_action="replace"` and generated verbose reason text built from option labels, e.g. "Body-color painted Rockers and splitter (CBF) was removed: Z07 Performance Package includes Carbon Flash Carbon Fiber Ground Effects (CFZ), which replaces it." Non-allowlisted candidates (the ~13 known from §0's dry scan: 6 Stingray, 1 GS, 6 Z06) appear ONLY in the manifest as `candidate_not_emitted` — never as rules. The allowlist is data (module-level constant of (model, source_id, target_id) tuples), not model logic; graph mechanics stay generic. Emitted derived rules carry NO extra runtime-contract fields (see A1b).
+   1b. Provenance is manifest-only, NOT runtime-contract data. `registry_promotion.py:146` (`find_draft_only_fields` / promotion validation) passes unknown runtime fields through, so `derived`/`derived_via` on emitted rules would silently enter `form-app/data.js` and become de-facto contract surface. Decision: emitted derived rules are shaped identically to authored replace rules in the runtime contract (same fields; only reason copy differs); `derived`/`derived_via`/includes-path provenance live exclusively in the derivation manifest artifact. Contract tests assert NO `derived*` fields appear in runtime contracts or `data.js`; Phase B's bounded-diff expectation is restated accordingly (§2 B2).
 2. De-duplication and precedence: if an authored rule for the same (source, target) pair exists, the authored row wins and no derived rule is emitted (authored rows keep workbook authority; this also makes Phase A parity-safe for Z06 where the five authored rows still exist).
-3. Anti-surprise gate (hard requirement): generation emits a derivation manifest per model (derived rules with provenance, plus authored replace rows shadowing would-be derivations). In this pass, the ONLY approved net-new derived rules after Phase B deletes the five Z06 rows are the five CBF equivalents. Any other derived rule on any model is a hard stop → report for separate approval, never silently shipped. Implementation lane: either an allowlist asserted in tests or a generation-time check — implementer picks, tests pin it.
-4. Runtime toast (`form-app/app.js` + `form-app/styles.css` + `form-app/index.html` if a container element is needed): when `removeReplaceRuleTargets` evicts a target that is in `state.selected` (explicit customer selection), enqueue a toast using the rule's verbose reason text. Auto-added evictions stay silent. Vanilla JS/CSS, no dependencies; dismissable + auto-timeout; `aria-live="polite"`; stacks safely if multiple evictions fire in one action; mobile-first layout per AGENTS §7.
+3. Anti-surprise gate (hard requirement): the derivation manifest per model records every closure candidate (emitted, `shadowed_by_authored`, or `candidate_not_emitted`) with provenance. Because emission is allowlist-gated (A1), the gate cannot be tripped by latent closures — the ~13 known non-CBF candidates land in the manifest as `candidate_not_emitted` and are delivered in the checkpoint report for separate approval, never shipped. The gate's enforced invariants, pinned by tests: (a) emitted derived rules == allowlist ∩ candidates, exactly; (b) an allowlisted pair that is NOT a closure candidate is a hard generation error (stale allowlist); (c) manifests are deterministic across runs.
+4. Runtime toast (`form-app/app.js` + `form-app/styles.css` + `form-app/index.html`): when `removeReplaceRuleTargets` (:1538) evicts a target, toast if and only if `state.userSelected.has(rule.target_id)` — checked BEFORE `deleteSelectedOption` (:1387) runs, since deletion clears the flag (`app.js:1389` deletes from `userSelected`). `state.selected` is NOT a sufficient guard: it also holds defaults and programmatic selections, and keying on it would toast for non-explicit evictions in violation of §1's scope rule. Container: a NEW dedicated element (e.g. `#toastRegion`, `aria-live="polite"`) added to `index.html` — NOT `#alertRegion`, whose `innerHTML` is overwritten by render for data warnings at `app.js:2701`; existing data-warning rendering is preserved untouched. Vanilla JS/CSS, no dependencies; dismissable + auto-timeout; stacks safely if multiple evictions fire in one action; mobile-first layout per AGENTS §7.
 5. Reason-text correction: derived rules and any authored replace rows whose target is NOT a workbook default must not say "removes this default"; generic copy is "X removes Y" with the includes-path detail. True default-replacements (e.g. J57→J6A) keep their default-flavored copy.
 6. Tests (Phase A):
-   - Python: derivation unit tests (closure walk incl. multi-hop PDD→Z07→T0F→CFZ, cycle guard, authored-shadowing, determinism, verbose-copy assembly, anti-surprise manifest).
-   - Node: `workbook-schema-standardization.test.mjs` replace-allowlist test REWRITTEN to the new contract: authored replace rows must be true default-replacements (allowlist), and stacked-closure rows are forbidden BECAUSE derivation owns them — with the five CBF rows exempted until Phase B deletes them (or the test lands red-until-Phase-B; implementer picks, checkpoint documents it). New/extended runtime tests: eviction fires from derived rule; toast renders for explicitly-selected eviction; NO toast for auto-added eviction or plain blocks; evicted option shows disabled reason while source selected.
+   - Python: derivation unit tests (closure walk incl. multi-hop PDD→Z07→T0F→CFZ, cycle guard, authored-shadowing, determinism, verbose-copy assembly, allowlist gating: non-allowlisted candidates never emitted, stale-allowlist hard error, manifest completeness incl. `candidate_not_emitted` entries, no `derived*` fields on emitted rule dicts).
+   - Node: `workbook-schema-standardization.test.mjs` replace-allowlist test REWRITTEN to the new contract: authored replace rows must be true default-replacements (allowlist), and stacked-closure rows are forbidden BECAUSE derivation owns them — with the five CBF rows carried on a TEMPORARY explicit exemption list (clearly labeled "Phase B removes") so Phase A closes GREEN; Phase B removes the exemption in the same pass that deletes the rows. No red-until-Phase-B lane: Phase A's checkpoint requires all Phase A tests green (a standing red between phases would pollute gate signal, and the previous "implementer picks" wording contradicted the green requirement). New/extended runtime tests: eviction fires from derived rule; toast renders for explicitly-selected eviction (guard = `state.userSelected`); NO toast for auto-added eviction, default eviction, or plain blocks; evicted option shows disabled reason while source selected; `#alertRegion` data-warning rendering unaffected by toast activity.
 
-Checkpoint (stop, report before Phase B): mechanism tests green; regeneration of all three models produces contracts where the ONLY rule-surface diffs are the approved provenance/copy fields (authored rows still shadow derivations, so no net-new behavior yet); derivation manifest reviewed; replace-row classification report for stingray/grand_sport (§2 A5 audit: true default-replacement vs hand-stacked closure) delivered with a recommendation but no migration.
+Checkpoint (stop, report before Phase B): ALL Phase A tests green (Python + Node, incl. the temporarily-exempted schema test); regeneration of all three models produces contracts where the ONLY rule-surface diffs are the approved reason-copy corrections (authored rows still shadow derivations and provenance is manifest-only, so no net-new rules and no new contract fields); derivation manifests reviewed — including the `candidate_not_emitted` inventory (expected ~13: 6 Stingray, 1 GS, 6 Z06; exact list delivered for separate approval); replace-row classification report for stingray/grand_sport (§2 A5 audit: true default-replacement vs hand-stacked closure) delivered with a recommendation but no migration.
 
 ### Phase B — workbook deletion + regeneration (data pass, AGENTS §5)
 
 1. Delete the five Z06 CBF stacked rows (`z06_rule_mapping` rows re-resolved at apply time by rule_id, not row number) via a one-shot temp script through `save_workbook_safely()`; manifest printed before apply; backup + on-disk read-back.
-2. Regenerate all three models + registry. Expected diff (NOT parity): the five authored Z06 rules disappear and exactly five derived equivalents appear (same source/target pairs, `derived="True"`, new verbose copy); stingray/grand_sport contracts unchanged except approved copy/provenance fields from Phase A; CSV reviewed for the same bounded diff. Anything beyond the bounded expectation is a hard stop.
-3. Full gates per §8, including browser smoke — REQUIRED this pass (runtime behavior + new UI component; parity proof is not available as a substitute).
+2. Regenerate all three models + registry. Expected diff (NOT parity): the five authored Z06 rules disappear and exactly five derived equivalents appear (same source/target pairs, same contract shape as authored replace rules — no `derived*` fields per §2 A1b — new verbose copy); stingray/grand_sport contracts unchanged except approved copy corrections from Phase A; CSV reviewed for the same bounded diff. Anything beyond the bounded expectation is a hard stop.
+3. Remove the five CBF pairs from the temporary schema-test exemption list (§2 A6) — the rewritten `workbook-schema-standardization` test must pass green with no exemptions.
+4. Full gates per §8, including browser smoke — REQUIRED this pass (runtime behavior + new UI component; parity proof is not available as a substitute).
 
 ## 3. Exact files expected to change
 
 Phase A:
-1. `scripts/corvette_form_generator/rules.py` (+ possibly a new `rule_derivation.py` helper) — derivation, shadowing, manifest, copy assembly.
-2. `form-app/app.js`, `form-app/styles.css` (+ `form-app/index.html` if a toast container is added) — eviction toast, explicit-selection guard.
-3. `tests/workbook-schema-standardization.test.mjs` — new replace-rule contract.
-4. `tests/z06-performance-package-interactions.test.mjs`, `tests/multi-model-runtime-switching.test.mjs` — eviction/toast runtime assertions (whichever layer fabricates selections; extend, don't fork).
-5. New/extended Python test module for derivation (co-locate with existing rules tests; if none exist, `tests/test_rule_derivation.py`).
-6. `README.md` test-to-surface table if a new test module lands.
+1. New `scripts/corvette_form_generator/rule_derivation.py` — closure walk, candidates, allowlist gating, manifest, copy assembly.
+2. `scripts/corvette_form_generator/rules.py` (GS/Z06 route, :134) AND `scripts/corvette_form_generator/production.py` (Stingray route, :425 `raw_rules` loop) — wire derivation into both rule-assembly routes; reason-copy correction per §2 A5.
+3. `form-app/app.js`, `form-app/styles.css`, `form-app/index.html` (new dedicated toast container per §2 A4) — eviction toast, `userSelected` guard.
+4. `tests/workbook-schema-standardization.test.mjs` — new replace-rule contract with temporary CBF exemption list.
+5. `tests/z06-performance-package-interactions.test.mjs`, `tests/multi-model-runtime-switching.test.mjs` — eviction/toast runtime assertions (whichever layer fabricates selections; extend, don't fork).
+6. New/extended Python test module for derivation (co-locate with existing rules tests; if none exist, `tests/test_rule_derivation.py`).
+7. `README.md` test-to-surface table if a new test module lands.
 
 Phase B:
-7. `stingray_master.xlsx` — delete 5 `z06_rule_mapping` rows (§5 safety).
-8. `form-output/runtime/*-runtime-contract.json`, `form-output/stingray-form-data.{json,csv}`, `form-app/data.js` — regenerated; bounded-diff proven.
-9. `docs/asset-media-drift-remediation-spec-2026-06-30.md` — follow-up 1 status flip.
-10. This spec — close per AGENTS §11.
+8. `stingray_master.xlsx` — delete 5 `z06_rule_mapping` rows (§5 safety).
+9. `form-output/runtime/*-runtime-contract.json`, `form-output/stingray-form-data.{json,csv}`, `form-app/data.js` — regenerated; bounded-diff proven.
+10. `tests/workbook-schema-standardization.test.mjs` — remove the temporary CBF exemption list (§2 B3).
+11. `docs/asset-media-drift-remediation-spec-2026-06-30.md` — follow-up 1 status flip.
+12. This spec — close per AGENTS §11.
 
 Explicitly NOT changing: dealer submission surfaces (untouched/preserved, AGENTS §6); `default_selection_rules` (CBF stays a non-default selectable option); stingray/grand_sport authored replace rows (audited and classified in the checkpoint report, migrated only under a separate approval); excludes_any group machinery (the jake-graphics-style clusters are a candidate future derivation lane, out of scope); workbook schema/columns (no new columns — notification scoping is runtime-generic).
 
 ## 4. Source-of-truth decision
 
-Workbook authors only primitive facts: real incompatibilities (CBF excludes CFZ/CFV/EFY), the includes graph, and true default-replacements. The generator owns transitive derivation — generic graph mechanics, no RPO knowledge — and stamps provenance so every derived rule is auditable back to its primitives. Runtime stays a consumer: it executes the same `replace` action it already knows, plus a generic notify-on-explicit-eviction rule. No product knowledge moves into JS.
+Workbook authors only primitive facts: real incompatibilities (CBF excludes CFZ/CFV/EFY), the includes graph, and true default-replacements. The generator owns transitive derivation — generic graph mechanics, no RPO knowledge, allowlist-gated emission — and records provenance in the derivation manifest so every derived rule is auditable back to its primitives (provenance never enters the runtime contract; §2 A1b). Runtime stays a consumer: it executes the same `replace` action it already knows, plus a generic notify-on-explicit-eviction rule keyed on `state.userSelected`. No product knowledge moves into JS.
 
 ## 5. Companion-file impact check
 
@@ -87,47 +94,49 @@ Standing constraints from AGENTS.md apply (§3, §4, §5 for Phase B, §6, §7).
 
 - Derivation is includes-closure only (auto-add lineage); requires/excludes_any relationships do not derive swaps in this pass.
 - Authored rows always shadow derived rows for the same (source, target) pair.
-- Anti-surprise gate: net-new derived rules beyond the five approved CBF equivalents are a hard stop, per model, enforced by test/manifest — no "looks reasonable" judgment inside the pass.
-- Toast fires only for explicit-selection evictions; no per-rule workbook flag; no new dependencies; vanilla implementation.
+- Anti-surprise gate: emission is allowlist-gated (§2 A1/A3); the only pairs on the emission allowlist this pass are the five Z06 CBF equivalents. All other closure candidates are manifest-only (`candidate_not_emitted`) pending separate approval — no "looks reasonable" judgment inside the pass.
+- Derivation provenance is manifest-only; emitted rules add NO new runtime-contract fields (§2 A1b).
+- Toast fires only for explicit-selection evictions, guarded by `state.userSelected` (§2 A4); no per-rule workbook flag; no new dependencies; vanilla implementation. Existing `#alertRegion` data-warning behavior preserved.
 - Sync/asset surfaces untouched; no interaction with the 4D wildcard lanes.
 
 ## 7. Risks and non-goals
 
 Risks:
 
-- Derivation minting unexpected rules on stingray/grand_sport (latent closures never hand-authored) — mitigated by the anti-surprise gate; surfaced in the checkpoint manifest for human decision.
+- Derivation minting unexpected rules on stingray/grand_sport — RESOLVED by design, not just mitigated: the dry scan (§0) already found ~13 unshadowed non-CBF candidates, so emission is allowlist-gated and those candidates land in the checkpoint manifest as `candidate_not_emitted` for human decision. Residual risk shifts to allowlist staleness, which invariant (b) in §2 A3 hard-errors on.
 - Reason-copy churn breaking pinned test expectations — mitigated by §5 inspection lane; every expectation change reviewed against product copy intent.
 - Toast noise if a package evicts multiple explicit selections at once — mitigated by stacking design (§2 A4) and the explicit-selection guard; verified in runtime tests.
 - Eviction + dealer payload interaction — mitigated by §5 dealer verification lane.
+- Two rule-assembly routes (`production.py` for Stingray, `rules.py` for GS/Z06) must both call the shared derivation helper with equivalent inputs — divergence would make the manifest lie for one route. Mitigated by putting all logic in `rule_derivation.py` and testing both integration points; route unification itself stays out of scope (separately queued production.py legacy-path retirement).
 - The pre-existing `test_source_assembly_characterization` red (flagged in 4D §12) touches rule/choice surfaces; triage it BEFORE this pass lands so its signal is clean, or explicitly re-reproduce it unchanged pre/post.
 
-Non-goals: migrating stingray/grand_sport replace rows (classification report only); deriving from excludes_any clusters; two-directional eviction; per-rule notification flags; toast for auto-added changes (a broader "what changed" summary UX is a separate idea); the editor-lints and Z06-CBF-unrelated documented reds beyond the schema-standardization test this pass rewrites.
+Non-goals: migrating stingray/grand_sport replace rows (classification report only); emitting the ~13 non-CBF closure candidates (manifest-reported, approved separately); deriving from excludes_any clusters; two-directional eviction; per-rule notification flags; toast for auto-added changes (a broader "what changed" summary UX is a separate idea); unifying the production.py/rules.py assembly routes; the editor-lints and Z06-CBF-unrelated documented reds beyond the schema-standardization test this pass rewrites.
 
 ## 8. Validation plan
 
 Phase A (run in order, report exact output):
 
-1. Python: derivation unit suite + existing rules/contract suites (`.venv/bin/python -m pytest -q` targeted modules).
-2. Regenerate all three models + registry: assert bounded diff (authored shadowing ⇒ provenance/copy-only changes); derivation manifests reviewed and attached to checkpoint.
-3. Node: rewritten `workbook-schema-standardization` + extended runtime suites green (or documented red-until-Phase-B lane per §2 A6).
+1. Python: derivation unit suite + existing rules/contract suites (`.venv/bin/python -m pytest -q` targeted modules) — must cover BOTH assembly routes (rules.py and production.py integration).
+2. Regenerate all three models + registry: assert bounded diff (authored shadowing + manifest-only provenance ⇒ reason-copy-only changes, no new contract fields); derivation manifests reviewed and attached to checkpoint, incl. the `candidate_not_emitted` inventory.
+3. Node: rewritten `workbook-schema-standardization` (green, with the labeled temporary CBF exemption) + extended runtime suites green. No red lanes at Phase A close.
 4. `git diff --check`; workbook and generated artifacts unchanged on disk at Phase A close except regeneration churn restored.
 
 Checkpoint report (mechanism proof + stingray/GS replace-row classification + derivation manifests), then Phase B:
 
 5. §5 evidence: lock check, `save_workbook_safely()` backup, on-disk read-back (5 rows absent by rule_id, all others untouched), deletion manifest.
 6. `validate_workbook_package.py` + `validate_workbook_schema.py` — valid/0 issues.
-7. Regenerate all three models + registry; bounded-diff proof (five authored → five derived equivalents; nothing else).
-8. Full Node suite per README table; full pytest; the remaining documented pre-existing reds byte-identical to pre-pass reproductions.
+7. Regenerate all three models + registry; bounded-diff proof (five authored → five derived equivalents, no `derived*` contract fields; nothing else).
+8. Full Node suite per README table (schema-standardization now green with NO exemptions); full pytest; the remaining documented pre-existing reds byte-identical to pre-pass reproductions.
 9. Browser smoke — REQUIRED: Z06 flow — select CBF, select Z07 → CBF evicted + toast with verbose copy; CBF disabled with honest reason while Z07 selected; deselect Z07 → CBF selectable again; PDD/PDF/T0F/T0G variants spot-checked; no toast when CFZ auto-adds without CBF selected; summary/totals/download/dealer modal reflect post-eviction state; mobile viewport check.
 
 ## 9. Handoff requirements
 
-AGENTS.md §11, plus: derivation manifests per model; the stingray/GS replace-row classification report with recommendation; bounded-diff proof for both phases; toast UX evidence (screenshots or DOM assertions); disposition of deferred lanes (other-model migrations, excludes_any derivation).
+AGENTS.md §11, plus: derivation manifests per model incl. the `candidate_not_emitted` inventory (~13 pairs) as its own approval queue; the stingray/GS replace-row classification report with recommendation; bounded-diff proof for both phases; toast UX evidence (screenshots or DOM assertions); disposition of deferred lanes (other-model migrations, non-CBF candidate emission, excludes_any derivation).
 
 ## 10. Approval question
 
-Approve this pass as spec'd?
+Approve this pass as spec'd (DRAFT v2 — review findings 1–6 resolved)?
 
 a. Approve both phases, checkpoint report between them (recommended).
 b. Approve Phase A (mechanism + toast + tests) only; Phase B deletion approved separately after the checkpoint.
-c. Changes to scope first.
+c. Further changes to scope first.
