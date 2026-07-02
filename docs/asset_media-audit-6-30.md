@@ -256,14 +256,17 @@ Completed smallest safe pass:
 - Kept generated output parity.
 - Added tests that fail if the old Python allowlist is reintroduced, if the new workbook column contains an invalid value, or if the live workbook's populated default-selection display rows drift from the approved three.
 
-9. Minor source-of-truth/presentation debt: a few code fallbacks and stale labels remain.
-   Evidence:
+9. Minor source-of-truth/presentation debt: a few code fallbacks and stale labels remain (partially resolved by Phase 4C).
 
-- model_configs.py:150-159 has Grand Sport section label overrides in code.
-- model_configs.py:161-169 has stale Grand Sport notes saying read-only inspection/not activated, while Grand Sport is promoted.
-- production.py:161-169 remains explicitly Stingray-only.
-- production.py:397-403 still validates active_for_stingray in the legacy path.
-- app.js:1163-1169 hardcodes sec_incl_001 for auto-added summary bucket routing.
+   Status update 2026-07-02: Phase 4C resolved three of the five items. The app.js sec_incl_001 hardcode was replaced with a workbook-derived generated choice field (`auto_added_summary_required`, sourced from new `section_presentation.auto_added_bucket` rows, behavior-preserving); the Grand Sport section-label code dict was retired in favor of the existing workbook `section_presentation.display_label` rows; and the stale Grand Sport `_MODEL_NOTES` text was corrected. See `docs/asset-media-drift/phase-4c-stale-note-runtime-summary-cleanup.md` for closure evidence. Remaining unresolved: the production.py Stingray-only legacy path items below (deferred to a separate legacy-path retirement pass).
+
+   Historical evidence at audit time:
+
+- model_configs.py:150-159 had Grand Sport section label overrides in code (resolved 2026-07-02).
+- model_configs.py:161-169 had stale Grand Sport notes saying read-only inspection/not activated, while Grand Sport is promoted (resolved 2026-07-02).
+- production.py:161-169 remains explicitly Stingray-only (still open).
+- production.py:397-403 still validates active_for_stingray in the legacy path (still open).
+- app.js:1163-1169 hardcoded sec_incl_001 for auto-added summary bucket routing (resolved 2026-07-02).
 
 Risk: low-to-medium. These are not breaking current runtime behavior, but they are the kind of code-owned model/presentation policy that will accumulate.
 

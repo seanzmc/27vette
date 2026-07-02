@@ -1161,7 +1161,7 @@ function sectionKeyForStep(stepKey) {
 }
 
 function autoAddedOptionUsesRequiredSummaryBucket(option) {
-  return option?.section_id === "sec_incl_001";
+  return option?.auto_added_summary_required === true;
 }
 
 function sectionKeyForOption(option, type = "") {

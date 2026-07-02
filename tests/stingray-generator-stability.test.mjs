@@ -145,6 +145,7 @@ const sectionPresentationHeaders = [
   "section_display_order",
   "standard_equipment_bucket",
   "standard_equipment_group_type",
+  "auto_added_bucket",
   "active",
   "notes",
 ];
@@ -388,6 +389,21 @@ test("Stingray generated contract keeps the closed-out shape", () => {
   assert.equal(jsonData.priceRules.length, 49);
   assert.equal(jsonData.interiors.length, 130);
   assert.equal(jsonData.validation.filter((row) => row.severity === "error").length, 0);
+});
+
+test("auto-added summary bucket routing is workbook-derived on generated choices", () => {
+  for (const choice of jsonData.choices) {
+    assert.equal(
+      typeof choice.auto_added_summary_required,
+      "boolean",
+      `${choice.choice_id} should carry boolean auto_added_summary_required`
+    );
+    assert.equal(
+      choice.auto_added_summary_required,
+      choice.section_id === "sec_incl_001",
+      `${choice.choice_id} auto_added_summary_required must mirror the workbook auto_added_bucket seed (sec_incl_001 only)`
+    );
+  }
 });
 
 test("model option source sheets use the same normalized contract", () => {
@@ -683,6 +699,15 @@ test("Phase 6 step and presentation metadata are workbook-owned", () => {
       standardRows.filter((row) => row.standard_equipment_group_type === "trim_equipment").map((row) => row.section_id).sort(),
       ["sec_1lte_001", "sec_2lte_001", "sec_3lte_001"],
       `${modelKey} trim-equipment grouping should be workbook-owned`
+    );
+
+    const autoAddedBucketRows = workbookRows("section_presentation").filter(
+      (row) => row.model_key === modelKey && row.active === "True" && row.auto_added_bucket === "True"
+    );
+    assert.deepEqual(
+      autoAddedBucketRows.map((row) => row.section_id),
+      ["sec_incl_001"],
+      `${modelKey} auto-added summary bucket should be workbook-owned and limited to sec_incl_001`
     );
   }
 

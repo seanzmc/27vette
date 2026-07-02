@@ -1242,6 +1242,16 @@ test("current order option lines are complete, separated, and omit standard equi
   assert.equal(autoByRpo.get("FE3")?.section_key, "performance_mechanical", "non-included auto-added FE3 should recap in its normal section");
   assert.equal(autoByRpo.get("T0A")?.section_key, "performance_mechanical", "non-included auto-added T0A should recap in its normal section");
   assert.equal(autoByRpo.get("G0K")?.section_key, "auto_added_required", "sec_incl auto-added package rows should stay in Auto-Added / Required");
+  assert.match(
+    appSource,
+    /option\?\.auto_added_summary_required === true/,
+    "auto-added summary routing should read the generated workbook-derived field"
+  );
+  assert.doesNotMatch(
+    appSource,
+    /section_id === "sec_incl_001"/,
+    "app.js must not hardcode sec_incl_001 for summary routing"
+  );
   assert.equal(order.selected_options.some((item) => item.step_key === "standard_equipment"), false);
   assert.equal(order.standard_equipment_summary.count > 0, true);
   assert.equal(Array.isArray(order.standard_equipment_summary.items), false, "summary should not dump standard equipment rows");

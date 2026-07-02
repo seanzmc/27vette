@@ -213,6 +213,7 @@ def load_section_presentation(wb: Any, model_key: str) -> list[dict[str, Any]]:
                 "section_display_order": clean(row.get("section_display_order")),
                 "standard_equipment_bucket": clean(row.get("standard_equipment_bucket")),
                 "standard_equipment_group_type": clean(row.get("standard_equipment_group_type")),
+                "auto_added_bucket": clean(row.get("auto_added_bucket")),
             }
         )
     return sorted(presentations, key=lambda row: (intish(row["section_display_order"], 0), row["section_id"]))

@@ -30,7 +30,6 @@ class ModelConfig:
     section_step_overrides: Mapping[str, str]
     interior_source_sheet: str = "lt_interiors"
     blank_section_overrides: Mapping[str, str] = field(default_factory=dict)
-    section_label_overrides: Mapping[str, str] = field(default_factory=dict)
     preview_artifact_prefix: str = ""
     draft_artifact_prefix: str = ""
     rule_mapping_sheet: str = "rule_mapping"

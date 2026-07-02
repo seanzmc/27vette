@@ -147,20 +147,9 @@ DEFAULT_TEXT_CLEANUP = {
     "remove_adjacent_duplicate_phrases": True,
 }
 
-GRAND_SPORT_SECTION_LABEL_OVERRIDES = {
-    "sec_gsce_001": "Grand Sport Center Stripes",
-    "sec_gsha_001": "Grand Sport Heritage Hash Marks",
-    "sec_spec_001": "Special Edition",
-    "sec_colo_001": "Color Combination Override",
-}
-
-_SECTION_LABEL_OVERRIDES_BY_MODEL = {
-    "grand_sport": GRAND_SPORT_SECTION_LABEL_OVERRIDES,
-}
-
 _MODEL_NOTES = {
     "grand_sport": (
-        "Read-only inspection only: Grand Sport generation is not activated by the Stingray entrypoint.",
+        "Grand Sport is a promoted runtime model generated through the shared source-assembly path.",
         "Grand Sport option rows are read from the normalized grandSport_options sheet.",
     ),
     "z06": (
@@ -216,7 +205,6 @@ def base_model_config(model_key: str) -> ModelConfig:
         selection_mode_labels=SELECTION_MODE_LABELS,
         standard_sections=STANDARD_SECTIONS,
         section_step_overrides=SECTION_STEP_OVERRIDES,
-        section_label_overrides=_SECTION_LABEL_OVERRIDES_BY_MODEL.get(model_key, {}),
         preview_artifact_prefix=f"{slug}-contract-preview",
         draft_artifact_prefix=f"{slug}-form-data-draft",
         text_cleanup=dict(DEFAULT_TEXT_CLEANUP),

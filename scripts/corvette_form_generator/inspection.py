@@ -192,11 +192,10 @@ def section_display_label(
     section_presentation: dict[str, dict[str, Any]] | None = None,
     config: ModelConfig | None = None,
 ) -> str:
+    _ = config
     presentation = (section_presentation or {}).get(section_id, {})
     if clean(presentation.get("display_label")):
         return clean(presentation.get("display_label"))
-    if config and section_id in config.section_label_overrides:
-        return config.section_label_overrides[section_id]
     return sections.get(section_id, {}).get("section_name", "")
 
 
@@ -821,6 +820,9 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
                 "resolved_section_id": choice_section_id,
                 "section_name": choice_section_name,
                 "standard_equipment_group_type": clean(section_presentation.get(choice_section_id, {}).get("standard_equipment_group_type")),
+                "auto_added_summary_required": presentation_bool(
+                    section_presentation.get(choice_section_id, {}), "auto_added_bucket", default=False
+                ),
                 "step_key": choice_step_key,
                 "variant_id": variant_id,
                 "body_style": variant["body_style"],
@@ -1005,6 +1007,7 @@ def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None
                     "section_id",
                     "section_name",
                     "resolved_section_id",
+                    "auto_added_summary_required",
                     "step_key",
                     "selectable",
                     "active",
@@ -1042,6 +1045,7 @@ def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None
                 "section_id": choice_source["section_id"],
                 "section_name": choice_source["section_name"],
                 "standard_equipment_group_type": choice_source.get("standard_equipment_group_type", ""),
+                "auto_added_summary_required": bool(choice_source.get("auto_added_summary_required", False)),
                 "step_key": choice_source["step_key"],
                 "variant_id": variant_id,
                 "body_style": variant["body_style"],

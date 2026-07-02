@@ -1,6 +1,6 @@
 # Spec: Phase 4C — stale-note and runtime-summary hardcode cleanup
 
-Status: Spec only. Do not implement until approved.
+Status: Implemented 2026-07-02. Closure evidence in Section 11.
 
 Parent: `docs/asset-media-drift-remediation-spec-2026-06-30.md` Section 5 / audit Finding 9 (`docs/asset_media-audit-6-30.md`). Predecessors: 4A, 4B (both Implemented 2026-07-01). Successor queued: 4D wildcard/shared `asset_map`.
 
@@ -116,11 +116,60 @@ Follow AGENTS.md §11. Spec-specific additions:
 - Whether `section_label_overrides` was fully removed or retained (and why).
 - Confirmation Finding 9's remaining unresolved items (production.py legacy path) are documented as the leftover, and whether 4D or the legacy-path retirement should go next.
 
-## 10. Approval prompt
+## 10. Historical Approval Prompt (approved and implemented 2026-07-02)
 
-Approve Phase 4C:
+Approved Phase 4C scope:
 
 - Replace the app.js `sec_incl_001` hardcode with a workbook-derived generated choice field (`auto_added_summary_required`), behavior-preserving, with regeneration + full runtime gates + browser smoke.
 - Fix the stale Grand Sport `_MODEL_NOTES` text.
 - Retire the redundant GS section-label dict in favor of workbook `section_presentation.display_label` (precondition-checked).
 - Workbook write only if the metadata derivation or label precondition requires it (§5 safety); production.py legacy path deferred.
+
+## 11. Closure (Implemented 2026-07-02)
+
+### §2.1 branch decision: (b) explicit workbook column
+
+Checkpoint evidence: branch (a)'s candidate predicate (`standard_equipment_bucket=True` with no `standard_equipment_group_type`) matched FIVE sections per model on the live workbook — sec_incl_001, sec_safe_001, sec_stan_001, sec_stan_002, sec_tech_001 — identically for stingray, grand_sport, and z06. Not exact, so per the spec's stop condition (b) was taken: a new `section_presentation.auto_added_bucket` column (inserted after `standard_equipment_group_type`), seeded `True` only for the sec_incl_001 row of each promoted model.
+
+Secondary checkpoint: `colorOverrides.adds_rpo` targets (the only other `computeAutoAdded` source besides includes-rules) resolve to opt_d30_001 / sec_colo_001 on all three contracts — routed to the normal bucket before and after, so the field derivation covers all auto-add paths behavior-preservingly.
+
+### Changed surfaces
+
+- `stingray_master.xlsx` — `section_presentation.auto_added_bucket` column + 3 seeded rows. §5 safety: Excel lock absent, one-pass writer through `save_workbook_safely()` (backup `backups/stingray_master-20260702-004548.xlsx`), on-disk row verification, standalone `validate_workbook_package.py` valid/0 issues after save. Writer script was a temp file, already deleted.
+- `scripts/corvette_form_generator/production.py` — `choice_section_metadata()` derives `auto_added_summary_required` from the workbook column; emitted on every generated choice row.
+- `scripts/corvette_form_generator/inspection.py` — same derivation on preview choice rows, field carried through the draft `option_rows` copy tuple and draft choice rows; `section_display_label()` code-dict fallback removed.
+- `scripts/corvette_form_generator/runtime_metadata.py` — `load_section_presentation()` reads `auto_added_bucket`.
+- `scripts/corvette_form_generator/model_configs.py` — `GRAND_SPORT_SECTION_LABEL_OVERRIDES` / `_SECTION_LABEL_OVERRIDES_BY_MODEL` deleted (§2.3 precondition verified: all four labels exist as active workbook `display_label` rows); stale grand_sport `_MODEL_NOTES` rewritten (§2.2).
+- `scripts/corvette_form_generator/model_config.py` — dead `section_label_overrides` field removed entirely (no remaining consumers; only archived docs mention it).
+- `form-app/app.js` — `autoAddedOptionUsesRequiredSummaryBucket(option)` reads `option?.auto_added_summary_required === true`; no section-id literal.
+- Regenerated: all three `form-output/runtime/*-runtime-contract.json`, `form-app/data.js`, `form-output/stingray-form-data.json` (CSV byte-identical to baseline).
+- Tests: `stingray-generator-stability.test.mjs` — header pin updated for the new column; new test pinning `auto_added_summary_required === (section_id === "sec_incl_001")` on every generated choice; new workbook assertion that active `auto_added_bucket=True` rows are exactly sec_incl_001 per promoted model. `stingray-form-regression.test.mjs` — source guards that app.js reads the generated field and no longer hardcodes sec_incl_001; existing FE3/T0A/G0K bucket assertions retained as the behavior-parity guard.
+- `docs/asset_media-audit-6-30.md` — Finding 9 status updated (3 of 5 items resolved; production.py legacy path still open).
+
+### Gates run
+
+- Workbook: `validate_workbook_package.py` valid/0 issues (after save and again post-regeneration); `validate_workbook_schema.py` valid/0 issues.
+- Contract parity probe (timestamp-normalized): for all three models, after-contract minus the new field == before-contract; field `True` only on sec_incl_001 choices; 0 choices missing the field. Same parity result for `form-app/data.js` registry payloads and `stingray-form-data.json`; CSV byte-identical.
+- Python: 58 passed (`test_model_config_metadata`, `test_registry_promotion_metadata`, `test_schema_validation_metadata`, `test_runtime_contract_builder`).
+- Node full current suite, sequential: 12 of 13 files fully green (stingray pair, GS pair, visual-copy, Z06 five, multi-model-runtime-switching — 261 passing tests across them). Two reds, both proven PRE-EXISTING by identical probe output against the pre-pass backup workbook (`backups/stingray_master-20260630-231507.xlsx`):
+  - `tests/test_editor_lints.py::test_d1_rwj_wks_collision` (pytest full run) — expects a z06_options display-order collision that no longer exists in source data; rows identical before/after this pass.
+  - `tests/workbook-schema-standardization.test.mjs` "Z06 active replace excludes stay limited to true default-replacement rows" — 5 T0F/T0G/Z07/PDD/PDF→CBF replace rows with no shared exclusive group, byte-identical in the pre-pass backup. Both need their own triage pass; out of 4C scope.
+- Browser smoke (served form-app, 0 console errors, all three models):
+  - Stingray coupe/1LT + Z51: FE3/T0A route to performance_mechanical; G0K/G96/J55/M1N/QTU/V08 to Auto-Added / Required (6 items in the order sections recap); totals $73,495 + $5,395 = $78,890.
+  - Grand Sport and Z06: R8C → CFX auto-add routes to auto_added_required; a generic per-line routing cross-check (bucket iff the choice row's generated flag) reported zero violations on every probe.
+  - Dealer button present and correctly disabled pre-completion; dealer payload/submission code untouched (AGENTS §6 preserved).
+
+### Companion impact
+
+- Generated contracts / data.js / compatibility JSON: regenerated, additive-field-only churn proven. CSV: byte-identical (field not in the CSV fieldnames — intentional, runtime contract only).
+- `contract.py`, `registry_promotion.py` trim/draft-only field lists: inspected, no change needed (additive field not trimmed or draft-only).
+- Workbook editor server: inspected-no-change (reads section_presentation generically).
+- `workbook-schema-standardization.test.mjs`: inspected — no header pin for section_presentation there; the stability test owns that pin and was updated.
+- Dealer submission: untouched/preserved.
+
+### Residual risks / follow-up
+
+- production.py Stingray-only legacy path (audit Finding 9 leftover) — separate legacy-path retirement spec; not part of 4D.
+- Two pre-existing red gates documented above need their own triage (stale lint expectation vs. real Z06 replace-rule modeling question).
+- Next pass in the sequence: 4D wildcard/shared `asset_map` (38 repeated payload groups).
+- Working tree left uncommitted for review; baseline artifacts for diff review remain at `/tmp/phase4c-baseline/`.
