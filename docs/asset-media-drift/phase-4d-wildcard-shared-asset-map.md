@@ -1,6 +1,6 @@
 # Spec: Phase 4D — wildcard/shared asset_map rows
 
-Status: Phase A Implemented 2026-07-02 (approval option b). Phase B (workbook migration) awaits separate approval; checkpoint report in Section 11.
+Status: CLOSED — Phase A Implemented 2026-07-02 (approval option b); Phase B (workbook migration) approved and Implemented 2026-07-02. Checkpoint report in Section 11; Phase B closure in Section 12. No open approval prompts.
 
 Parent: `docs/asset-media-drift-remediation-spec-2026-06-30.md` Section 5 / audit Finding 5 (`docs/asset_media-audit-6-30.md`). Predecessors: 4A, 4B (2026-07-01), 4C (2026-07-02) — all Implemented. This is the last open Phase 4 item.
 
@@ -138,7 +138,7 @@ Follow AGENTS.md §11. Spec-specific additions:
 Approve Phase 4D as spec'd?
 
 a. Approve both phases, checkpoint report between them (recommended).
-b. Approve Phase A (mechanism + tests) only; Phase B migration approved separately after the checkpoint. [APPROVED 2026-07-02]
+b. Approve Phase A (mechanism + tests) only; Phase B migration approved separately after the checkpoint. [APPROVED 2026-07-02; Phase B separately APPROVED and implemented 2026-07-02 — see Section 12]
 c. Changes to scope first.
 
 ## 11. Phase A closure + checkpoint report (Implemented 2026-07-02)
@@ -182,3 +182,33 @@ opt_379_001[3,37,65] opt_3a9_001[4,38,66] opt_3f9_001[5,39,67] opt_3m9_001[6,40,
 - Deferred lanes unchanged: 10 two-model groups, 16 divergent target_ids, wildcard for model/context_choice.
 - Fixture probe note: broad flag_missing is 458 on the current workbook/fixture (spec-era audit said 268 against a different, URL-derived media list) — baseline-identical, not a regression.
 - Working tree left uncommitted for review.
+
+## 12. Phase B closure (Implemented 2026-07-02)
+
+### Changed files
+
+- `stingray_master.xlsx` — asset_map migration per §2 Phase B: 84 exact option rows deleted, 28 `model_key="*"` option rows inserted (appended; loader is order-independent), active rows 192→136 (138 total incl. 2 preserved inactive). Payloads copied byte-for-byte from the stingray row of each group; `active` stored as bool (bool-hygiene gate clean); wildcard `notes` document the collapse. Migration ran as a one-shot temp script (not committed) through `save_workbook_safely()` with lock check, mtime guard, and backup (`backups/stingray_master-20260702-094148.xlsx`); dry-run manifest matched the §11 checkpoint manifest exactly (same 28 target_ids, same 84 pre-migration sheet rows, payload hashes verified) before apply; rows re-resolved at apply time.
+- `form-output/runtime/*-runtime-contract.json`, `form-output/stingray-form-data.json`, `form-app/data.js` — regenerated (timestamp-only drift, proven); `form-output/stingray-form-data.csv` byte-identical.
+- `docs/asset_media-audit-6-30.md` — Finding 5 marked RESOLVED.
+- `docs/asset-media-drift-remediation-spec-2026-06-30.md` — 4D flipped to landed; Finding 5 RESOLVED; sequencing updated.
+- This spec — closed.
+
+NOT changed: all generator/sync/runtime code (Phase A landed previously in `9fb4a7c`), `form-app/app.js`/CSS/HTML, dealer submission surfaces (preserved/untouched), `load_model_asset_map`/registry model-card assets, non-migrated asset_map rows (verified untouched on disk).
+
+### Gates run (§8 items 6-12)
+
+6. §5 evidence: no Excel lock file; `save_workbook_safely()` backup at `backups/stingray_master-20260702-094148.xlsx`; on-disk read-back confirmed 28 active wildcard option rows present, 0 leftover exact rows for migrated targets, 136 active / 2 inactive / 138 total; migration manifest printed pre-apply (matches §11).
+7. `validate_workbook_package.py` — valid, 0 issues. `validate_workbook_schema.py` — valid, 0 errors / 0 warnings (wildcard guard clean on live workbook).
+8. Regenerated all 3 models + registry (0 validation errors each). `compare-generated-contracts.mjs` vs pre-migration baselines: contracts match for stingray/grand-sport/z06 runtime contracts and stingray-form-data.json; data.js timestamp-normalized diff empty; CSV byte-identical. `git diff` confirms timestamp-only lines in generated artifacts.
+9. Post-migration sync fixture probe (`--media-url-list tests/fixtures/asset-map-sync-media-urls.txt --no-verify-existing`): 0 new-row plans, `apply=false`, `state_written=false`; 84 wildcard-covered (model,target) pairs report keep (83) or `wildcard_conflict` (1: opt_gba_001 — fixture URL differs from wildcard row; no write planned, correct anti-undo/no-wildcard-write behavior); the 1 remaining `replace_canonical` (z06 opt_stx_001) is a non-migrated target, present pre-migration too; coverage percentages unchanged vs pre-migration baseline probe (stingray 35.4%, grand_sport 40.1%, z06 45.8%; section-level identical); report CSVs byte-identical across two runs (deterministic).
+10. Node suite per README table: Stingray pair 102/102; GS pair 25/25; Z06 five 67/67; `z06-runtime-promotion` + `multi-model-runtime-switching` 51/51; `workbook-visual-copy-standardization` 8/8; `workbook-schema-standardization` 8/9 — the 1 red is the documented pre-existing Z06 CBF replace-excludes failure, reproduced byte-identically (excluding durations) against the pre-migration workbook.
+11. Python full pytest: all modules green except (a) `test_editor_lints.py` 3 failures (rwj_wks_collision, c2_cj2_stingray_name_deviator, r3_drz_pending_review) — pre-existing, identical against the pre-migration workbook; (b) `test_source_assembly_characterization.py::test_shared_assembler_preserves_stingray_runtime_drift_surfaces` — red identically pre- and post-migration (display_behavior assertion on opt_uqt_002), NOT caused by this pass; flagged for separate triage since it is outside the two documented reds.
+12. Browser smoke: skipped per §8 item 12 — parity gates 8-9 clean without interpretation (runtime payloads unchanged by proof), per AGENTS §9.
+
+Environment note: gates were executed in a sandboxed Linux workspace (repo's Mac `.venv` unusable there). Python gates ran on system Python 3.10 + openpyxl 3.1.5 (matches requirements.txt). Two sandbox-only accommodations, neither touching repo files: (1) a load-mode shim forcing `read_only=False` openpyxl loads for the schema validator and workbook-reading node tests (read-only random-access `ws.cell()` is O(sheet) per call and exceeded the sandbox per-command time cap; values identical); (2) node/pytest runs used a shadow directory of symlinks/copies with a working `.venv/bin/python` shim. Three ingest output-dir-guard pytest failures occurred only in the shadow directory and pass in the real repo. One intermittent node failure was traced to sandbox mount I/O (data.js read returned empty under concurrent load) and disappeared with local file copies — not a product issue. Re-running gates natively on macOS should reproduce green (plus the documented reds) without shims.
+
+### Residual risks / follow-up
+
+- Deferred lanes unchanged: 10 two-model groups, 16 divergent target_ids, wildcard for model/context_choice targets (optional follow-ups, per-group parity proofs required).
+- `test_source_assembly_characterization` pre-existing red (see gate 11) — separate triage, alongside the two documented reds (editor-lints, Z06 CBF replace-excludes).
+- Working tree left uncommitted for review (workbook + timestamp-only generated churn + doc closures).

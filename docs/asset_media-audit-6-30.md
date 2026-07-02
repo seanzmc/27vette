@@ -179,7 +179,10 @@ Smallest safe pass:
 - Do not change current workbook rows.
 
 5. Redundancy: 38 active option asset payload groups are repeated across models.
-   Evidence:
+
+Status: RESOLVED 2026-07-02 by Phase 4D (`docs/asset-media-drift/phase-4d-wildcard-shared-asset-map.md`) — wildcard `model_key="*"` option rows with exact overlay landed (Phase A), and the 28 groups identical across all three promoted models were collapsed (84 exact rows → 28 wildcard rows, active 192→136) with timestamp-only generated drift (Phase B). The 10 two-model groups and 16 divergent target_ids remain per-model by design (optional follow-up lanes).
+
+Evidence (as of 2026-06-30 audit):
 
 - Active wildcard/shared rows: 0.
 - Repeated identical option media payload groups: 38.

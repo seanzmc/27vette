@@ -1,6 +1,6 @@
 # Spec: Asset/Media Drift Remediation (validates 2026-06-30 audit)
 
-Status: partially implemented. Phases 1, 2, and 3 have landed on `phase-2-shared-assembly-extraction`; Phase 4 sub-passes 4A/4B (2026-07-01) and 4C (2026-07-02) have landed; 4D remains open. This document is now a route map and status record, not a current approval prompt for the completed phases.
+Status: implemented. Phases 1, 2, and 3 have landed on `phase-2-shared-assembly-extraction`; Phase 4 sub-passes 4A/4B (2026-07-01), 4C (2026-07-02), and 4D (Phase A mechanism + Phase B workbook migration, 2026-07-02) have all landed. This document is now a route map and status record, not a current approval prompt for the completed phases.
 
 Current implementation status:
 
@@ -8,7 +8,7 @@ Current implementation status:
 - Phase 2 implemented in commit `67c9dfb`: shared context-choice and asset-field assembly helpers were extracted while preserving generated runtime parity and Stingray compatibility artifacts.
 - Phase 3 implemented in commit `dd800d3`: the hardcoded default-selected display derivation allowlist was removed, `default_selection_rules.display_behavior` became the workbook-owned authoring signal, and generated runtime behavior stayed parity-preserving.
 - Post-Phase-3 hardening implemented: schema validation now rejects invalid `default_selection_rules.display_behavior` values, and a live-workbook guard asserts only the approved three rows are populated. This was a guardrail improvement, not a behavior change.
-- Phase 4: 4A media coverage intent classification and 4B universal-expected coverage policy landed 2026-07-01; 4C stale-note/runtime-summary hardcode cleanup landed 2026-07-02; 4D wildcard/shared asset_map remains open.
+- Phase 4: 4A media coverage intent classification and 4B universal-expected coverage policy landed 2026-07-01; 4C stale-note/runtime-summary hardcode cleanup landed 2026-07-02; 4D wildcard/shared asset_map landed 2026-07-02 (Phase A mechanism + Phase B migration: 28 wildcard rows in, 84 exact rows out, active 192→136, generated parity proven).
 - Known unrelated red gate after Phase 3: `node --test tests/workbook-schema-standardization.test.mjs` still fails on pre-existing Z06 replace-rule rows 82-86 in `z06_rule_mapping` (`T0F/T0G/Z07/PDD/PDF` replacing `CBF`). Phase 3/hardening did not touch those rows.
 
 ## 0. Validation of the audit
@@ -107,9 +107,9 @@ Status: implemented. See `docs/asset-media-drift/phase-3-default-selected-displa
 
 ## 5. Phase 4 (lower priority, included for completeness): the audit's remaining items
 
-Status: partially implemented. Sub-passes 4A (media coverage intent classification, ruleset `phase4a-v1`) and 4B (universal-expected coverage report policy, ruleset `phase4b-v1`) landed 2026-07-01; 4C (stale-note and runtime-summary hardcode cleanup) landed 2026-07-02. Remaining open: 4D wildcard/shared asset_map.
+Status: implemented. Sub-passes 4A (media coverage intent classification, ruleset `phase4a-v1`) and 4B (universal-expected coverage report policy, ruleset `phase4b-v1`) landed 2026-07-01; 4C (stale-note and runtime-summary hardcode cleanup) landed 2026-07-02; 4D (wildcard/shared asset_map, Phases A+B) landed 2026-07-02.
 
-- **Finding 5** (wildcard/shared asset_map rows): OPEN — queued as Phase 4D. Reduces workbook maintenance burden as models grow, not a correctness-drift risk.
+- **Finding 5** (wildcard/shared asset_map rows): RESOLVED by 4D — `load_asset_map` supports `model_key="*"` option rows with exact-row overlay, sync treats wildcard coverage as coverage and never authors wildcard rows (`wildcard_conflict` review action for divergence), and the 28 all-3-model identical option payload groups were collapsed (84 exact rows → 28 wildcard rows, active 192→136) with timestamp-only generated drift. Deferred lanes: 10 two-model groups, 16 divergent target_ids, wildcard for model/context_choice targets. See `docs/asset-media-drift/phase-4d-wildcard-shared-asset-map.md`.
 - **Finding 6** (media coverage policy too broad): RESOLVED by 4A + 4B. Coverage intent is classified report-side with the universal-expected policy (every active+selectable option card is `expected`; `not_expected` derives only from structural presentation metadata). See `docs/asset-media-drift/phase-4a-media-coverage-intent-classification.md` and `phase-4b-universal-expected-coverage-report.md`.
 - **Finding 9** (stale labels/notes, legacy `active_for_stingray` gate, hardcoded `sec_incl_001`): MOSTLY RESOLVED by 4C — app.js summary-bucket routing is now workbook-derived (`section_presentation.auto_added_bucket` → generated `auto_added_summary_required`), the GS section-label code dict is retired, and the stale GS note is fixed. Still open: the production.py Stingray-only legacy path / `active_for_stingray` validation, deferred to a separate legacy-path retirement spec. See `docs/asset-media-drift/phase-4c-stale-note-runtime-summary-cleanup.md`.
 
@@ -125,8 +125,10 @@ Status: partially implemented. Sub-passes 4A (media coverage intent classificati
 
 Completed sequence: Phase 1, then Phase 2, then Phase 3.
 
-Recommended current sequencing:
+Completed 2026-07-02: Phase 4D (wildcard/shared asset_map support + all-3-model migration) — the last open Phase 4 item.
 
-1. Continue to Phase 4D: wildcard/shared asset_map support (Finding 5, the last open Phase 4 item).
-2. Treat the unrelated Z06 replace-rule schema-standardization failure as its own rule-normalization/workbook pass, not part of asset/media Phase 4.
-3. Separate spec for the production.py Stingray-only legacy path retirement (Finding 9 leftover).
+Remaining follow-ups (each its own pass):
+
+1. Treat the unrelated Z06 replace-rule schema-standardization failure as its own rule-normalization/workbook pass, not part of asset/media Phase 4.
+2. Separate spec for the production.py Stingray-only legacy path retirement (Finding 9 leftover).
+3. Optional 4D follow-up lanes if the maintenance win justifies them: two-model wildcard groups and wildcard+overlay for divergent target_ids (per-group parity proofs required).
