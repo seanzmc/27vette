@@ -38,10 +38,12 @@ The supported command:
 
 Report outputs:
 
-- `asset_map_sync_report.csv`: full reconciliation report.
-- `asset_map_missing_images.csv`: review-only list of active/selectable options whose image coverage is missing, ambiguous, or dead with no candidate. This file is for triage; it does not imply blank-row seeding or automatic workbook edits.
+- `asset_map_sync_report.csv`: full reconciliation report. Every row carries `coverage_intent` (`expected` / `review` / `not_expected`) and `coverage_intent_reason` (the metadata rule that fired, e.g. `section-display-only:sec_stan_001`, `sibling-model-asset-row`), derived read-only from `section_master`, `section_presentation`, and existing `asset_map` coverage.
+- `asset_map_missing_images.csv`: the actionable review queue — missing/ambiguous/dead-no-candidate targets classified `expected` or `review` only. Missing rows classified `not_expected` are excluded here but remain visible in the broad report CSV with their intent columns populated. This file is for triage; it does not imply blank-row seeding or automatic workbook edits.
 - `asset_map_unmatched_media.csv`: uploaded media that did not map to a desired active option target, plus unparseable filenames.
-- `asset_map_sync_manifest.json`: run contract with workbook path/sheet, included promoted model option sheets, media source mode, `--since` state handling, existing URL verification mode, action counts, planned URL writes/inserts, missing-image count/path, unmatched media count/path, unparseable filename count, and report paths.
+- `asset_map_sync_manifest.json`: run contract with workbook path/sheet, included promoted model option sheets, media source mode, `--since` state handling, existing URL verification mode, action counts, planned URL writes/inserts, actionable missing-image count/path plus `broad_missing_images_count`, a `coverage` block (classifier ruleset version + rules, intent counts, actionable count, and per-model/per-section intent breakdown), unmatched media count/path, unparseable filename count, and report paths.
+
+Coverage-intent classification is report-only (Phase 4A): it never adds or applies workbook rows, and the classification is a provisional metadata-derived review signal, not workbook-authored media policy. Durable intent authoring requires a separate approved workbook-data spec.
 
 Blank-row seeding, stale-row deactivation, and workbook schema/status-column
 changes are not routine asset-map maintenance. They need a separate approved

@@ -787,3 +787,219 @@ def test_legacy_entrypoint_no_longer_contains_direct_workbook_save() -> None:
 
     assert "wb.save(args.workbook)" not in legacy
     assert "scripts/sync_asset_map.py" in legacy or "asset_map_sync" not in legacy
+
+
+def make_coverage_workbook(path: Path) -> None:
+    """Workbook exercising every coverage-intent classifier rule."""
+
+    wb = Workbook()
+    del wb[wb.sheetnames[0]]
+    add_sheet(
+        wb,
+        "model_registry_promotion",
+        ["model_key", "promoted_to_runtime", "active", "display_order", "registry_key", "model_label"],
+        [
+            {"model_key": "stingray", "promoted_to_runtime": True, "active": True, "display_order": 1, "registry_key": "stingray", "model_label": "Stingray"},
+            {"model_key": "grand_sport", "promoted_to_runtime": True, "active": True, "display_order": 2, "registry_key": "grandSport", "model_label": "Grand Sport"},
+        ],
+    )
+    add_sheet(
+        wb,
+        "model_workbook_sources",
+        ["model_key", "source_role", "sheet_name", "active"],
+        [
+            {"model_key": "stingray", "source_role": "source_option_sheet", "sheet_name": "stingray_options", "active": True},
+            {"model_key": "grand_sport", "source_role": "source_option_sheet", "sheet_name": "grandSport_options", "active": True},
+        ],
+    )
+    option_headers = ["option_id", "rpo", "option_name", "section_id", "active", "selectable"]
+    add_sheet(
+        wb,
+        "stingray_options",
+        option_headers,
+        [
+            {"option_id": "opt_disp_001", "rpo": "DSP", "option_name": "Display Only", "section_id": "sec_disp_001", "active": True, "selectable": True},
+            {"option_id": "opt_seb_001", "rpo": "SEB", "option_name": "Std Equip", "section_id": "sec_bucket_001", "active": True, "selectable": True},
+            {"option_id": "opt_exist_001", "rpo": "EXI", "option_name": "Existing Row", "section_id": "sec_opt_001", "active": True, "selectable": True},
+            {"option_id": "opt_req_001", "rpo": "REQ", "option_name": "Required Section", "section_id": "sec_req_001", "active": True, "selectable": True},
+            {"option_id": "opt_repl_001", "rpo": "RPL", "option_name": "Replaceable Default", "section_id": "sec_repl_001", "active": True, "selectable": True},
+            {"option_id": "opt_unma_001", "rpo": "UNM", "option_name": "Unmatched Section", "section_id": "sec_ghost_001", "active": True, "selectable": True},
+            {"option_id": "opt_prec_001", "rpo": "PRC", "option_name": "Precedent Section", "section_id": "sec_opt_001", "active": True, "selectable": True},
+            {"option_id": "opt_nopr_001", "rpo": "NPR", "option_name": "No Precedent", "section_id": "sec_nopr_001", "active": True, "selectable": True},
+        ],
+    )
+    add_sheet(
+        wb,
+        "grandSport_options",
+        option_headers,
+        [
+            {"option_id": "opt_exist_001", "rpo": "EXI", "option_name": "Existing Row GS", "section_id": "sec_opt_001", "active": True, "selectable": True},
+        ],
+    )
+    add_sheet(
+        wb,
+        "section_master",
+        ["section_id", "section_name", "selection_mode", "is_required", "display_order", "standard_behavior", "step_key"],
+        [
+            {"section_id": "sec_disp_001", "section_name": "Display", "selection_mode": "display_only", "is_required": False, "standard_behavior": "locked_included"},
+            {"section_id": "sec_bucket_001", "section_name": "Bucketed", "selection_mode": "multi_select_opt", "is_required": False, "standard_behavior": "locked_included"},
+            {"section_id": "sec_opt_001", "section_name": "Optional Covered", "selection_mode": "multi_select_opt", "is_required": False, "standard_behavior": "locked_included"},
+            {"section_id": "sec_req_001", "section_name": "Required", "selection_mode": "single_select_req", "is_required": True, "standard_behavior": "locked_included"},
+            {"section_id": "sec_repl_001", "section_name": "Replaceable", "selection_mode": "single_select_opt", "is_required": False, "standard_behavior": "replaceable_default"},
+            {"section_id": "sec_nopr_001", "section_name": "No Precedent", "selection_mode": "multi_select_opt", "is_required": False, "standard_behavior": "locked_included"},
+        ],
+    )
+    add_sheet(
+        wb,
+        "section_presentation",
+        ["model_key", "section_id", "standard_equipment_bucket", "active"],
+        [
+            {"model_key": "stingray", "section_id": "sec_bucket_001", "standard_equipment_bucket": True, "active": True},
+        ],
+    )
+    add_sheet(
+        wb,
+        "asset_map",
+        ["model_key", "target_type", "target_id", "image_url", "image_alt", "image_fit", "image_position", "active", "notes"],
+        [
+            {
+                "model_key": "stingray",
+                "target_type": "option",
+                "target_id": "opt_exist_001",
+                "image_url": "https://example.test/exi.png",
+                "image_alt": "Existing Row",
+                "image_fit": "cover",
+                "image_position": "center",
+                "active": True,
+                "notes": "existing",
+            },
+        ],
+    )
+    wb.save(path)
+    wb.close()
+
+
+def _coverage_inputs(workbook_path: Path):
+    wb = load_workbook(workbook_path, read_only=True, data_only=True)
+    sources = asset_map_sync.discover_promoted_option_sources(wb)
+    desired = asset_map_sync.read_option_sheets(wb, sources)
+    desired.update(asset_map_sync.read_model_targets(wb))
+    desired.update(asset_map_sync.read_bodystyle_targets(sources))
+    section_metadata = asset_map_sync.read_section_coverage_metadata(wb)
+    ws = wb["asset_map"]
+    header_index = {
+        header: index
+        for index, header in enumerate(
+            [str(cell.value).strip() if cell.value is not None else "" for cell in ws[1]]
+        )
+        if header
+    }
+    existing = asset_map_sync.existing_asset_rows(ws, header_index)
+    return desired, section_metadata, existing
+
+
+def test_coverage_classifier_rules_and_reasons(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "coverage.xlsx"
+    make_coverage_workbook(workbook_path)
+    desired, section_metadata, existing = _coverage_inputs(workbook_path)
+    classify = asset_map_sync.build_coverage_classifier(desired, section_metadata, existing)
+
+    cases = {
+        ("stingray", "model", "stingray"): ("expected", "target_type:model"),
+        ("stingray", "context_choice", "body_style__coupe"): ("expected", "target_type:context_choice"),
+        ("stingray", "option", "opt_disp_001"): ("not_expected", "section-display-only:sec_disp_001"),
+        ("stingray", "option", "opt_seb_001"): ("not_expected", "standard-equipment-bucket:sec_bucket_001"),
+        ("stingray", "option", "opt_exist_001"): ("expected", "existing-asset-row"),
+        ("grand_sport", "option", "opt_exist_001"): ("expected", "sibling-model-asset-row"),
+        ("stingray", "option", "opt_req_001"): ("expected", "section-required:sec_req_001"),
+        ("stingray", "option", "opt_repl_001"): ("expected", "section-replaceable-default:sec_repl_001"),
+        ("stingray", "option", "opt_unma_001"): ("review", "unmatched-section"),
+        ("stingray", "option", "opt_prec_001"): ("review", "section-media-precedent-uncovered:sec_opt_001"),
+        ("stingray", "option", "opt_nopr_001"): ("not_expected", "section-no-media-precedent:sec_nopr_001"),
+    }
+    for key, wanted in cases.items():
+        assert classify(*key) == wanted, key
+    for key in cases:
+        intent, reason = classify(*key)
+        assert intent in asset_map_sync.COVERAGE_INTENTS
+        assert reason
+
+
+def test_coverage_classifier_deterministic_under_input_order(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "coverage-order.xlsx"
+    make_coverage_workbook(workbook_path)
+    desired, section_metadata, existing = _coverage_inputs(workbook_path)
+
+    keys = sorted(desired)
+    shuffled_desired = {key: desired[key] for key in reversed(keys)}
+    classify_a = asset_map_sync.build_coverage_classifier(desired, section_metadata, existing)
+    classify_b = asset_map_sync.build_coverage_classifier(shuffled_desired, section_metadata, existing)
+    for key in keys:
+        assert classify_a(*key) == classify_b(*key), key
+
+
+def test_missing_images_csv_is_actionable_queue_and_broad_report_keeps_all(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "coverage-report.xlsx"
+    make_coverage_workbook(workbook_path)
+    report_dir = tmp_path / "reports"
+
+    result = asset_map_sync.run_sync(
+        workbook_path=workbook_path,
+        report_dir=report_dir,
+        media_urls=[],
+        apply=False,
+        verify_existing=False,
+        media_source="media-url-list",
+    )
+
+    report_rows = list(csv.DictReader(result.report_path.open(encoding="utf-8")))
+    missing_rows = list(csv.DictReader(result.missing_path.open(encoding="utf-8")))
+    for rows in (report_rows, missing_rows):
+        assert rows
+        assert "coverage_intent" in rows[0]
+        assert "coverage_intent_reason" in rows[0]
+
+    assert {row["coverage_intent"] for row in missing_rows} <= {"expected", "review"}
+    broad_missing = [
+        row for row in report_rows if row["action"] in asset_map_sync.MISSING_IMAGE_ACTIONS
+    ]
+    excluded = [row for row in broad_missing if row["coverage_intent"] == "not_expected"]
+    assert excluded, "coverage fixture must produce not_expected missing rows"
+    missing_ids = {(row["model_key"], row["target_type"], row["target_id"]) for row in missing_rows}
+    for row in excluded:
+        key = (row["model_key"], row["target_type"], row["target_id"])
+        assert key not in missing_ids
+        assert row["coverage_intent_reason"]
+    review_rows = [row for row in missing_rows if row["coverage_intent"] == "review"]
+    assert review_rows, "review rows must not be silently dropped"
+    assert len(missing_rows) == len(broad_missing) - len(excluded)
+
+
+def test_manifest_reports_coverage_breakdown_and_ruleset(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "coverage-manifest.xlsx"
+    make_coverage_workbook(workbook_path)
+    report_dir = tmp_path / "reports"
+
+    result = asset_map_sync.run_sync(
+        workbook_path=workbook_path,
+        report_dir=report_dir,
+        media_urls=[],
+        apply=False,
+        verify_existing=False,
+        media_source="media-url-list",
+    )
+
+    manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
+    coverage = manifest["coverage"]
+    assert coverage["ruleset_version"] == asset_map_sync.COVERAGE_RULESET_VERSION
+    assert coverage["ruleset"] == list(asset_map_sync.COVERAGE_RULESET)
+    assert coverage["broad_missing_count"] == manifest["broad_missing_images_count"]
+    assert manifest["missing_images_count"] == coverage["actionable_missing_count"]
+    assert coverage["intent_counts"].get("not_expected")
+    sections = coverage["missing_by_model_section_intent"]
+    assert "stingray" in sections
+    assert any(
+        intent_counts.get("not_expected")
+        for section_counts in sections.values()
+        for intent_counts in section_counts.values()
+    )

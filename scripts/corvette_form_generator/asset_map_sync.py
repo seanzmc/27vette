@@ -45,6 +45,25 @@ NEW_ROW_POSITION = "center"
 NEW_ROW_NOTE = "auto-seeded"
 MISSING_IMAGE_ACTIONS = {"flag_missing", "flag_ambiguous", "flag_dead_no_match"}
 
+COVERAGE_EXPECTED = "expected"
+COVERAGE_REVIEW = "review"
+COVERAGE_NOT_EXPECTED = "not_expected"
+COVERAGE_INTENTS = (COVERAGE_EXPECTED, COVERAGE_REVIEW, COVERAGE_NOT_EXPECTED)
+ACTIONABLE_COVERAGE_INTENTS = {COVERAGE_EXPECTED, COVERAGE_REVIEW, ""}
+COVERAGE_RULESET_VERSION = "phase4a-v1"
+COVERAGE_RULESET = (
+    "target_type:model|context_choice -> expected",
+    "section selection_mode=display_only -> not_expected",
+    "section_presentation standard_equipment_bucket -> not_expected",
+    "existing asset_map row for target -> expected",
+    "sibling promoted model has asset_map row for option_id -> expected",
+    "section is_required -> expected",
+    "section standard_behavior=replaceable_default -> expected",
+    "section missing/unmatched in section_master -> review",
+    "section has authored option media precedent -> review",
+    "section has no authored option media precedent -> not_expected",
+)
+
 IMGI_RE = re.compile(r"^imgi_\d+_(.+)$")
 PREFIX_RE = re.compile(r"^([cehrsg])-(.+)$")
 MODEL_BODY_STYLE_RE = re.compile(r"^([cehrsg])(07|67)-([12])$")
@@ -433,6 +452,93 @@ def read_bodystyle_targets(sources: dict[str, str]) -> dict[tuple[str, str, str]
     return desired
 
 
+@dataclass(frozen=True)
+class SectionCoverageMetadata:
+    """Workbook-derived section metadata used by the coverage-intent classifier."""
+
+    selection_mode: dict[str, str]
+    is_required: dict[str, bool]
+    standard_behavior: dict[str, str]
+    standard_equipment_buckets: set[tuple[str, str]]
+
+
+def read_section_coverage_metadata(wb) -> SectionCoverageMetadata:
+    """Read section metadata for coverage classification; tolerates missing sheets."""
+
+    selection_mode: dict[str, str] = {}
+    is_required: dict[str, bool] = {}
+    standard_behavior: dict[str, str] = {}
+    buckets: set[tuple[str, str]] = set()
+    if "section_master" in wb.sheetnames:
+        for row in rows_from_sheet(wb, "section_master"):
+            section_id = clean(row.get("section_id")).lower()
+            if not section_id:
+                continue
+            selection_mode[section_id] = clean(row.get("selection_mode")).lower()
+            is_required[section_id] = workbook_truthy(row.get("is_required"))
+            standard_behavior[section_id] = clean(row.get("standard_behavior")).lower()
+    if "section_presentation" in wb.sheetnames:
+        for row in rows_from_sheet(wb, "section_presentation"):
+            if not (workbook_truthy(row.get("active")) and workbook_truthy(row.get("standard_equipment_bucket"))):
+                continue
+            model_key = clean(row.get("model_key")).lower()
+            section_id = clean(row.get("section_id")).lower()
+            if model_key and section_id:
+                buckets.add((model_key, section_id))
+    return SectionCoverageMetadata(
+        selection_mode=selection_mode,
+        is_required=is_required,
+        standard_behavior=standard_behavior,
+        standard_equipment_buckets=buckets,
+    )
+
+
+def build_coverage_classifier(
+    desired: dict[tuple[str, str, str], dict[str, str]],
+    section_metadata: SectionCoverageMetadata,
+    existing_rows: dict[tuple[str, str, str], dict[str, Any]],
+) -> Callable[[str, str, str], tuple[str, str]]:
+    """Return a pure ``(model_key, target_type, target_id) -> (intent, reason)`` classifier.
+
+    Conservative, metadata-derived only. Precomputed inputs make repeated calls
+    deterministic regardless of desired-target iteration order.
+    """
+
+    covered_option_ids = {
+        target_id for (_, target_type, target_id) in existing_rows if target_type == TARGET_TYPE_OPTION
+    }
+    sections_with_media_precedent = {
+        info["section_id"]
+        for (_, target_type, target_id), info in desired.items()
+        if target_type == TARGET_TYPE_OPTION and target_id in covered_option_ids and info.get("section_id")
+    }
+
+    def classify(model_key: str, target_type: str, target_id: str) -> tuple[str, str]:
+        if target_type in (TARGET_TYPE_MODEL, TARGET_TYPE_CONTEXT_CHOICE):
+            return COVERAGE_EXPECTED, f"target_type:{target_type}"
+        info = desired.get((model_key, target_type, target_id), {})
+        section_id = info.get("section_id", "")
+        if section_id and section_metadata.selection_mode.get(section_id) == "display_only":
+            return COVERAGE_NOT_EXPECTED, f"section-display-only:{section_id}"
+        if section_id and (model_key, section_id) in section_metadata.standard_equipment_buckets:
+            return COVERAGE_NOT_EXPECTED, f"standard-equipment-bucket:{section_id}"
+        if (model_key, target_type, target_id) in existing_rows:
+            return COVERAGE_EXPECTED, "existing-asset-row"
+        if target_id in covered_option_ids:
+            return COVERAGE_EXPECTED, "sibling-model-asset-row"
+        if section_id and section_metadata.is_required.get(section_id):
+            return COVERAGE_EXPECTED, f"section-required:{section_id}"
+        if section_id and section_metadata.standard_behavior.get(section_id) == "replaceable_default":
+            return COVERAGE_EXPECTED, f"section-replaceable-default:{section_id}"
+        if not section_id or section_id not in section_metadata.selection_mode:
+            return COVERAGE_REVIEW, "unmatched-section"
+        if section_id in sections_with_media_precedent:
+            return COVERAGE_REVIEW, f"section-media-precedent-uncovered:{section_id}"
+        return COVERAGE_NOT_EXPECTED, f"section-no-media-precedent:{section_id}"
+
+    return classify
+
+
 def existing_asset_rows(ws, header_index: dict[str, int]) -> dict[tuple[str, str, str], dict[str, Any]]:
     rows: dict[tuple[str, str, str], dict[str, Any]] = {}
     for row_number, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
@@ -462,6 +568,7 @@ def reconcile(
     existing_rows: dict[tuple[str, str, str], dict[str, Any]] | None = None,
     alive: dict[str, bool] | None = None,
     incremental: bool = False,
+    classify_coverage: Callable[[str, str, str], tuple[str, str]] | None = None,
 ) -> SyncPlan:
     """Pure reconciliation of desired asset targets vs current hosted media inventory."""
 
@@ -535,6 +642,10 @@ def reconcile(
         note: str = "",
     ) -> None:
         info = desired.get((model_key, target_type, target_id), {})
+        if classify_coverage is None:
+            coverage_intent, coverage_reason = "", ""
+        else:
+            coverage_intent, coverage_reason = classify_coverage(model_key, target_type, target_id)
         report.append(
             {
                 "scope": scope,
@@ -550,6 +661,8 @@ def reconcile(
                 "existing_url": existing_url,
                 "new_url": new_url,
                 "image_status": image_status,
+                "coverage_intent": coverage_intent,
+                "coverage_intent_reason": coverage_reason,
                 "note": note,
             }
         )
@@ -665,7 +778,7 @@ def _write_reports(
     unmatched: list[str],
     unparseable: list[str],
     incremental: bool,
-) -> tuple[Path, Path, Path, int]:
+) -> tuple[Path, Path, Path, int, int]:
     report_dir.mkdir(parents=True, exist_ok=True)
     report_path = report_dir / "asset_map_sync_report.csv"
     report_fieldnames = [
@@ -682,6 +795,8 @@ def _write_reports(
         "existing_url",
         "new_url",
         "image_status",
+        "coverage_intent",
+        "coverage_intent_reason",
         "note",
     ]
     with report_path.open("w", newline="", encoding="utf-8") as handle:
@@ -701,9 +816,16 @@ def _write_reports(
         "action",
         "candidate_source",
         "image_status",
+        "coverage_intent",
+        "coverage_intent_reason",
         "note",
     ]
-    missing_rows = [row for row in report if row["action"] in MISSING_IMAGE_ACTIONS]
+    broad_missing_rows = [row for row in report if row["action"] in MISSING_IMAGE_ACTIONS]
+    # Actionable review queue: expected + review only. not_expected missing rows
+    # stay visible in the broad report CSV with intent columns populated.
+    missing_rows = [
+        row for row in broad_missing_rows if row.get("coverage_intent", "") in ACTIONABLE_COVERAGE_INTENTS
+    ]
     with missing_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=missing_fieldnames)
         writer.writeheader()
@@ -720,7 +842,31 @@ def _write_reports(
             writer.writerow([url, model_key or "", rpo, reason])
         for url in unparseable:
             writer.writerow([url, "", "", "filename did not yield a 3-char RPO"])
-    return report_path, missing_path, unmatched_path, len(missing_rows)
+    return report_path, missing_path, unmatched_path, len(missing_rows), len(broad_missing_rows)
+
+
+def build_coverage_summary(report: list[dict[str, str]]) -> dict[str, Any]:
+    """Coverage-intent metrics over broad missing rows for the manifest."""
+
+    broad_missing = [row for row in report if row["action"] in MISSING_IMAGE_ACTIONS]
+    intent_counts = Counter(row.get("coverage_intent", "") or "unclassified" for row in broad_missing)
+    section_counts: dict[str, dict[str, dict[str, int]]] = {}
+    for row in broad_missing:
+        model_key = row.get("model_key", "")
+        section_id = row.get("section_id", "") or "(none)"
+        intent = row.get("coverage_intent", "") or "unclassified"
+        section_counts.setdefault(model_key, {}).setdefault(section_id, {}).setdefault(intent, 0)
+        section_counts[model_key][section_id][intent] += 1
+    return {
+        "ruleset_version": COVERAGE_RULESET_VERSION,
+        "ruleset": list(COVERAGE_RULESET),
+        "broad_missing_count": len(broad_missing),
+        "intent_counts": dict(intent_counts),
+        "actionable_missing_count": sum(
+            count for intent, count in intent_counts.items() if intent != COVERAGE_NOT_EXPECTED
+        ),
+        "missing_by_model_section_intent": section_counts,
+    }
 
 
 def _write_manifest(
@@ -746,6 +892,8 @@ def _write_manifest(
     report_path: Path,
     missing_path: Path,
     missing_count: int,
+    broad_missing_count: int,
+    coverage_summary: dict[str, Any],
     unmatched_path: Path,
 ) -> Path:
     manifest_path = report_dir / "asset_map_sync_manifest.json"
@@ -776,6 +924,8 @@ def _write_manifest(
         "report_path": str(report_path),
         "missing_images_path": str(missing_path),
         "missing_images_count": missing_count,
+        "broad_missing_images_count": broad_missing_count,
+        "coverage": coverage_summary,
         "unmatched_path": str(unmatched_path),
     }
     manifest_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -804,6 +954,7 @@ def build_sync_plan(
     desired.update(read_bodystyle_targets(sources))
     existing_rows = existing_asset_rows(ws, header_index)
     media = build_media_inventory(media_urls)
+    classify_coverage = build_coverage_classifier(desired, read_section_coverage_metadata(wb), existing_rows)
 
     if verify_existing:
         alive = check_existing([row["url"] for row in existing_rows.values() if row.get("url")], timeout, workers)
@@ -816,6 +967,7 @@ def build_sync_plan(
         existing_rows=existing_rows,
         alive=alive,
         incremental=incremental,
+        classify_coverage=classify_coverage,
     )
     unmatched = sorted(set(media_urls) - plan.used - set(media.unparseable))
     return plan, sources, unmatched, media.unparseable
@@ -895,7 +1047,7 @@ def run_sync(
     finally:
         plan_wb.close()
 
-    report_path, missing_path, unmatched_path, missing_count = _write_reports(
+    report_path, missing_path, unmatched_path, missing_count, broad_missing_count = _write_reports(
         report_dir,
         plan.report,
         unmatched,
@@ -903,6 +1055,7 @@ def run_sync(
         incremental,
     )
     action_counts = dict(Counter(row["action"] for row in plan.report))
+    coverage_summary = build_coverage_summary(plan.report)
 
     if apply:
         apply_wb = load_workbook(workbook_path)
@@ -939,6 +1092,8 @@ def run_sync(
         report_path=report_path,
         missing_path=missing_path,
         missing_count=missing_count,
+        broad_missing_count=broad_missing_count,
+        coverage_summary=coverage_summary,
         unmatched_path=unmatched_path,
     )
 
