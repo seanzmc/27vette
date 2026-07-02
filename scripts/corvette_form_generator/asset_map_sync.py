@@ -12,7 +12,7 @@ import base64
 import csv
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta, timezone
 import json
 import os
@@ -46,22 +46,15 @@ NEW_ROW_NOTE = "auto-seeded"
 MISSING_IMAGE_ACTIONS = {"flag_missing", "flag_ambiguous", "flag_dead_no_match"}
 
 COVERAGE_EXPECTED = "expected"
-COVERAGE_REVIEW = "review"
 COVERAGE_NOT_EXPECTED = "not_expected"
-COVERAGE_INTENTS = (COVERAGE_EXPECTED, COVERAGE_REVIEW, COVERAGE_NOT_EXPECTED)
-ACTIONABLE_COVERAGE_INTENTS = {COVERAGE_EXPECTED, COVERAGE_REVIEW, ""}
-COVERAGE_RULESET_VERSION = "phase4a-v1"
+COVERAGE_INTENTS = (COVERAGE_EXPECTED, COVERAGE_NOT_EXPECTED)
+ACTIONABLE_COVERAGE_INTENTS = {COVERAGE_EXPECTED, ""}
+COVERAGE_RULESET_VERSION = "phase4b-v1"
 COVERAGE_RULESET = (
     "target_type:model|context_choice -> expected",
     "section selection_mode=display_only -> not_expected",
     "section_presentation standard_equipment_bucket -> not_expected",
-    "existing asset_map row for target -> expected",
-    "sibling promoted model has asset_map row for option_id -> expected",
-    "section is_required -> expected",
-    "section standard_behavior=replaceable_default -> expected",
-    "section missing/unmatched in section_master -> review",
-    "section has authored option media precedent -> review",
-    "section has no authored option media precedent -> not_expected",
+    "all other active+selectable option targets -> expected (universal policy)",
 )
 
 IMGI_RE = re.compile(r"^imgi_\d+_(.+)$")
@@ -119,6 +112,7 @@ class SyncPlan:
     inserts: list[dict[str, Any]]
     status: dict[int, str]
     used: set[str]
+    section_coverage: dict[str, Any] = field(default_factory=dict)
 
     def __iter__(self):
         """Preserve the older tuple-unpack test/helper contract."""
@@ -457,8 +451,6 @@ class SectionCoverageMetadata:
     """Workbook-derived section metadata used by the coverage-intent classifier."""
 
     selection_mode: dict[str, str]
-    is_required: dict[str, bool]
-    standard_behavior: dict[str, str]
     standard_equipment_buckets: set[tuple[str, str]]
 
 
@@ -466,8 +458,6 @@ def read_section_coverage_metadata(wb) -> SectionCoverageMetadata:
     """Read section metadata for coverage classification; tolerates missing sheets."""
 
     selection_mode: dict[str, str] = {}
-    is_required: dict[str, bool] = {}
-    standard_behavior: dict[str, str] = {}
     buckets: set[tuple[str, str]] = set()
     if "section_master" in wb.sheetnames:
         for row in rows_from_sheet(wb, "section_master"):
@@ -475,8 +465,6 @@ def read_section_coverage_metadata(wb) -> SectionCoverageMetadata:
             if not section_id:
                 continue
             selection_mode[section_id] = clean(row.get("selection_mode")).lower()
-            is_required[section_id] = workbook_truthy(row.get("is_required"))
-            standard_behavior[section_id] = clean(row.get("standard_behavior")).lower()
     if "section_presentation" in wb.sheetnames:
         for row in rows_from_sheet(wb, "section_presentation"):
             if not (workbook_truthy(row.get("active")) and workbook_truthy(row.get("standard_equipment_bucket"))):
@@ -487,8 +475,6 @@ def read_section_coverage_metadata(wb) -> SectionCoverageMetadata:
                 buckets.add((model_key, section_id))
     return SectionCoverageMetadata(
         selection_mode=selection_mode,
-        is_required=is_required,
-        standard_behavior=standard_behavior,
         standard_equipment_buckets=buckets,
     )
 
@@ -500,18 +486,15 @@ def build_coverage_classifier(
 ) -> Callable[[str, str, str], tuple[str, str]]:
     """Return a pure ``(model_key, target_type, target_id) -> (intent, reason)`` classifier.
 
-    Conservative, metadata-derived only. Precomputed inputs make repeated calls
-    deterministic regardless of desired-target iteration order.
+    Universal-expected policy (phase4b-v1): every active+selectable option card
+    is expected to carry a visual element. ``not_expected`` derives only from
+    structural presentation metadata (display-only sections, standard-equipment
+    buckets) — never from media inventory or asset_map coverage state, so
+    classifications self-correct when workbook presentation metadata changes.
+    ``existing_rows`` is accepted for signature stability but unused by policy.
     """
 
-    covered_option_ids = {
-        target_id for (_, target_type, target_id) in existing_rows if target_type == TARGET_TYPE_OPTION
-    }
-    sections_with_media_precedent = {
-        info["section_id"]
-        for (_, target_type, target_id), info in desired.items()
-        if target_type == TARGET_TYPE_OPTION and target_id in covered_option_ids and info.get("section_id")
-    }
+    del existing_rows  # policy must not depend on coverage state (no circularity)
 
     def classify(model_key: str, target_type: str, target_id: str) -> tuple[str, str]:
         if target_type in (TARGET_TYPE_MODEL, TARGET_TYPE_CONTEXT_CHOICE):
@@ -522,19 +505,9 @@ def build_coverage_classifier(
             return COVERAGE_NOT_EXPECTED, f"section-display-only:{section_id}"
         if section_id and (model_key, section_id) in section_metadata.standard_equipment_buckets:
             return COVERAGE_NOT_EXPECTED, f"standard-equipment-bucket:{section_id}"
-        if (model_key, target_type, target_id) in existing_rows:
-            return COVERAGE_EXPECTED, "existing-asset-row"
-        if target_id in covered_option_ids:
-            return COVERAGE_EXPECTED, "sibling-model-asset-row"
-        if section_id and section_metadata.is_required.get(section_id):
-            return COVERAGE_EXPECTED, f"section-required:{section_id}"
-        if section_id and section_metadata.standard_behavior.get(section_id) == "replaceable_default":
-            return COVERAGE_EXPECTED, f"section-replaceable-default:{section_id}"
         if not section_id or section_id not in section_metadata.selection_mode:
-            return COVERAGE_REVIEW, "unmatched-section"
-        if section_id in sections_with_media_precedent:
-            return COVERAGE_REVIEW, f"section-media-precedent-uncovered:{section_id}"
-        return COVERAGE_NOT_EXPECTED, f"section-no-media-precedent:{section_id}"
+            return COVERAGE_EXPECTED, "unmatched-section"
+        return COVERAGE_EXPECTED, "universal-expected"
 
     return classify
 
@@ -821,11 +794,13 @@ def _write_reports(
         "note",
     ]
     broad_missing_rows = [row for row in report if row["action"] in MISSING_IMAGE_ACTIONS]
-    # Actionable review queue: expected + review only. not_expected missing rows
-    # stay visible in the broad report CSV with intent columns populated.
-    missing_rows = [
-        row for row in broad_missing_rows if row.get("coverage_intent", "") in ACTIONABLE_COVERAGE_INTENTS
-    ]
+    # Actionable review queue: expected only (universal policy). Structural
+    # not_expected missing rows stay visible in the broad report CSV with
+    # intent columns populated. Sorted model -> section -> target for triage.
+    missing_rows = sorted(
+        (row for row in broad_missing_rows if row.get("coverage_intent", "") in ACTIONABLE_COVERAGE_INTENTS),
+        key=lambda row: (row.get("model_key", ""), row.get("section_id", ""), row.get("target_id", "")),
+    )
     with missing_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=missing_fieldnames)
         writer.writeheader()
@@ -843,6 +818,54 @@ def _write_reports(
         for url in unparseable:
             writer.writerow([url, "", "", "filename did not yield a 3-char RPO"])
     return report_path, missing_path, unmatched_path, len(missing_rows), len(broad_missing_rows)
+
+
+def build_section_coverage_stats(
+    desired: dict[tuple[str, str, str], dict[str, str]],
+    existing_rows: dict[tuple[str, str, str], dict[str, Any]],
+) -> dict[str, Any]:
+    """Per-model/per-section coverage stats over ALL desired option targets.
+
+    A target counts as covered when an existing asset_map row carries an
+    image_url. Computed over the full desired set (not the missing subset) so
+    percentages converge to 100 as images land.
+    """
+
+    per_model: dict[str, dict[str, dict[str, int]]] = {}
+    for (model_key, target_type, target_id), info in desired.items():
+        if target_type != TARGET_TYPE_OPTION:
+            continue
+        section_id = info.get("section_id", "") or "(none)"
+        bucket = per_model.setdefault(model_key, {}).setdefault(
+            section_id, {"total_targets": 0, "covered": 0, "missing": 0}
+        )
+        bucket["total_targets"] += 1
+        existing = existing_rows.get((model_key, target_type, target_id))
+        if existing and clean(existing.get("url")):
+            bucket["covered"] += 1
+        else:
+            bucket["missing"] += 1
+
+    stats: dict[str, Any] = {}
+    for model_key in sorted(per_model):
+        sections: dict[str, Any] = {}
+        model_total = model_covered = 0
+        for section_id in sorted(per_model[model_key]):
+            bucket = per_model[model_key][section_id]
+            model_total += bucket["total_targets"]
+            model_covered += bucket["covered"]
+            sections[section_id] = {
+                **bucket,
+                "coverage_pct": round(100.0 * bucket["covered"] / bucket["total_targets"], 1),
+            }
+        stats[model_key] = {
+            "sections": sections,
+            "total_targets": model_total,
+            "covered": model_covered,
+            "missing": model_total - model_covered,
+            "coverage_pct": round(100.0 * model_covered / model_total, 1) if model_total else 0.0,
+        }
+    return stats
 
 
 def build_coverage_summary(report: list[dict[str, str]]) -> dict[str, Any]:
@@ -969,6 +992,7 @@ def build_sync_plan(
         incremental=incremental,
         classify_coverage=classify_coverage,
     )
+    plan = replace(plan, section_coverage=build_section_coverage_stats(desired, existing_rows))
     unmatched = sorted(set(media_urls) - plan.used - set(media.unparseable))
     return plan, sources, unmatched, media.unparseable
 
@@ -1056,6 +1080,7 @@ def run_sync(
     )
     action_counts = dict(Counter(row["action"] for row in plan.report))
     coverage_summary = build_coverage_summary(plan.report)
+    coverage_summary["section_coverage"] = plan.section_coverage
 
     if apply:
         apply_wb = load_workbook(workbook_path)

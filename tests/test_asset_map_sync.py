@@ -909,13 +909,15 @@ def test_coverage_classifier_rules_and_reasons(tmp_path: Path) -> None:
         ("stingray", "context_choice", "body_style__coupe"): ("expected", "target_type:context_choice"),
         ("stingray", "option", "opt_disp_001"): ("not_expected", "section-display-only:sec_disp_001"),
         ("stingray", "option", "opt_seb_001"): ("not_expected", "standard-equipment-bucket:sec_bucket_001"),
-        ("stingray", "option", "opt_exist_001"): ("expected", "existing-asset-row"),
-        ("grand_sport", "option", "opt_exist_001"): ("expected", "sibling-model-asset-row"),
-        ("stingray", "option", "opt_req_001"): ("expected", "section-required:sec_req_001"),
-        ("stingray", "option", "opt_repl_001"): ("expected", "section-replaceable-default:sec_repl_001"),
-        ("stingray", "option", "opt_unma_001"): ("review", "unmatched-section"),
-        ("stingray", "option", "opt_prec_001"): ("review", "section-media-precedent-uncovered:sec_opt_001"),
-        ("stingray", "option", "opt_nopr_001"): ("not_expected", "section-no-media-precedent:sec_nopr_001"),
+        # Universal-expected policy: coverage state, sibling coverage, section
+        # requiredness, and media precedent no longer influence intent.
+        ("stingray", "option", "opt_exist_001"): ("expected", "universal-expected"),
+        ("grand_sport", "option", "opt_exist_001"): ("expected", "universal-expected"),
+        ("stingray", "option", "opt_req_001"): ("expected", "universal-expected"),
+        ("stingray", "option", "opt_repl_001"): ("expected", "universal-expected"),
+        ("stingray", "option", "opt_unma_001"): ("expected", "unmatched-section"),
+        ("stingray", "option", "opt_prec_001"): ("expected", "universal-expected"),
+        ("stingray", "option", "opt_nopr_001"): ("expected", "universal-expected"),
     }
     for key, wanted in cases.items():
         assert classify(*key) == wanted, key
@@ -923,6 +925,19 @@ def test_coverage_classifier_rules_and_reasons(tmp_path: Path) -> None:
         intent, reason = classify(*key)
         assert intent in asset_map_sync.COVERAGE_INTENTS
         assert reason
+
+
+def test_coverage_classifier_ignores_asset_coverage_state(tmp_path: Path) -> None:
+    """Structural not_expected must never depend on media/asset coverage (no circularity)."""
+
+    workbook_path = tmp_path / "coverage-state.xlsx"
+    make_coverage_workbook(workbook_path)
+    desired, section_metadata, existing = _coverage_inputs(workbook_path)
+
+    classify_with = asset_map_sync.build_coverage_classifier(desired, section_metadata, existing)
+    classify_without = asset_map_sync.build_coverage_classifier(desired, section_metadata, {})
+    for key in sorted(desired):
+        assert classify_with(*key) == classify_without(*key), key
 
 
 def test_coverage_classifier_deterministic_under_input_order(tmp_path: Path) -> None:
@@ -959,7 +974,7 @@ def test_missing_images_csv_is_actionable_queue_and_broad_report_keeps_all(tmp_p
         assert "coverage_intent" in rows[0]
         assert "coverage_intent_reason" in rows[0]
 
-    assert {row["coverage_intent"] for row in missing_rows} <= {"expected", "review"}
+    assert {row["coverage_intent"] for row in missing_rows} == {"expected"}
     broad_missing = [
         row for row in report_rows if row["action"] in asset_map_sync.MISSING_IMAGE_ACTIONS
     ]
@@ -969,10 +984,10 @@ def test_missing_images_csv_is_actionable_queue_and_broad_report_keeps_all(tmp_p
     for row in excluded:
         key = (row["model_key"], row["target_type"], row["target_id"])
         assert key not in missing_ids
-        assert row["coverage_intent_reason"]
-    review_rows = [row for row in missing_rows if row["coverage_intent"] == "review"]
-    assert review_rows, "review rows must not be silently dropped"
+        assert row["coverage_intent_reason"].startswith(("section-display-only", "standard-equipment-bucket"))
     assert len(missing_rows) == len(broad_missing) - len(excluded)
+    sort_keys = [(row["model_key"], row["section_id"], row["target_id"]) for row in missing_rows]
+    assert sort_keys == sorted(sort_keys), "queue must be sorted model -> section -> target"
 
 
 def test_manifest_reports_coverage_breakdown_and_ruleset(tmp_path: Path) -> None:
@@ -995,6 +1010,7 @@ def test_manifest_reports_coverage_breakdown_and_ruleset(tmp_path: Path) -> None
     assert coverage["ruleset"] == list(asset_map_sync.COVERAGE_RULESET)
     assert coverage["broad_missing_count"] == manifest["broad_missing_images_count"]
     assert manifest["missing_images_count"] == coverage["actionable_missing_count"]
+    assert set(coverage["intent_counts"]) <= set(asset_map_sync.COVERAGE_INTENTS)
     assert coverage["intent_counts"].get("not_expected")
     sections = coverage["missing_by_model_section_intent"]
     assert "stingray" in sections
@@ -1003,3 +1019,50 @@ def test_manifest_reports_coverage_breakdown_and_ruleset(tmp_path: Path) -> None
         for section_counts in sections.values()
         for intent_counts in section_counts.values()
     )
+
+
+def test_manifest_section_coverage_stats(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "coverage-stats.xlsx"
+    make_coverage_workbook(workbook_path)
+    report_dir = tmp_path / "reports"
+
+    result = asset_map_sync.run_sync(
+        workbook_path=workbook_path,
+        report_dir=report_dir,
+        media_urls=[],
+        apply=False,
+        verify_existing=False,
+        media_source="media-url-list",
+    )
+
+    manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
+    stats = manifest["coverage"]["section_coverage"]
+
+    # Fully covered section: opt_exist_001 is stingray's only sec_opt_001 row
+    # besides opt_prec_001 -> partial; grand_sport's sec_opt_001 is uncovered.
+    stingray = stats["stingray"]
+    sec_opt = stingray["sections"]["sec_opt_001"]
+    assert sec_opt["total_targets"] == 2
+    assert sec_opt["covered"] == 1
+    assert sec_opt["missing"] == 1
+    assert sec_opt["coverage_pct"] == 50.0
+
+    grand_sport = stats["grand_sport"]
+    gs_sec_opt = grand_sport["sections"]["sec_opt_001"]
+    assert gs_sec_opt == {"total_targets": 1, "covered": 0, "missing": 1, "coverage_pct": 0.0}
+
+    # Stats cover ALL desired option targets, including structurally
+    # not_expected sections (display-only still has a row counted).
+    assert "sec_disp_001" in stingray["sections"]
+
+    # Model rollups are consistent with section sums.
+    for model_stats in stats.values():
+        section_totals = sum(s["total_targets"] for s in model_stats["sections"].values())
+        section_covered = sum(s["covered"] for s in model_stats["sections"].values())
+        assert model_stats["total_targets"] == section_totals
+        assert model_stats["covered"] == section_covered
+        assert model_stats["missing"] == section_totals - section_covered
+
+    # Pure helper agrees with the manifest.
+    desired, _, existing = _coverage_inputs(workbook_path)
+    assert asset_map_sync.build_section_coverage_stats(desired, existing) == stats
