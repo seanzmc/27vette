@@ -300,12 +300,15 @@ test("Z06 CBF drafts with availability, direct blockers, and package/aero replac
     assert.equal(rule.runtime_action, "active");
   }
 
+  // The five package/aero swap rules are generation-derived (rule_derivation.py,
+  // allowlist-gated) since the Phase B deletion of the hand-stacked workbook rows
+  // (docs/derived-swap-eviction-spec-2026-07-02.md). Copy is generated verbose text.
   for (const [ruleId, sourceId, reasonPattern] of [
-    ["z06_rule_opt_t0f_001_replaces_opt_cbf_001", "opt_t0f_001", /T0F.*CFZ.*replaces CBF/i],
-    ["z06_rule_opt_t0g_001_replaces_opt_cbf_001", "opt_t0g_001", /T0G.*CFV.*replaces CBF/i],
-    ["z06_rule_opt_z07_001_replaces_opt_cbf_001", "opt_z07_001", /Z07.*ground-effects aero path.*replaces CBF/i],
-    ["z06_rule_opt_pdd_001_replaces_opt_cbf_001", "opt_pdd_001", /PDD.*CFZ.*replaces CBF/i],
-    ["z06_rule_opt_pdf_001_replaces_opt_cbf_001", "opt_pdf_001", /PDF.*CFV.*replaces CBF/i],
+    ["derived_opt_t0f_001_replaces_opt_cbf_001", "opt_t0f_001", /CBF.*removed.*T0F.*includes.*CFZ.*replaces it/i],
+    ["derived_opt_t0g_001_replaces_opt_cbf_001", "opt_t0g_001", /CBF.*removed.*T0G.*includes.*CFV.*replaces it/i],
+    ["derived_opt_z07_001_replaces_opt_cbf_001", "opt_z07_001", /CBF.*removed.*Z07.*includes.*CFZ.*replaces it/i],
+    ["derived_opt_pdd_001_replaces_opt_cbf_001", "opt_pdd_001", /CBF.*removed.*PDD.*includes.*CFZ.*replaces it/i],
+    ["derived_opt_pdf_001_replaces_opt_cbf_001", "opt_pdf_001", /CBF.*removed.*PDF.*includes.*CFV.*replaces it/i],
   ]) {
     const rule = ruleById.get(ruleId);
     assert.ok(rule, `${ruleId} should emit`);

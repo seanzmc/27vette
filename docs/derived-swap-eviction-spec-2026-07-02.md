@@ -1,6 +1,6 @@
 # Spec: Derived swap exclusions + eviction toast notification
 
-Status: DRAFT v2 — awaiting approval (Section 10). Authored 2026-07-02; revised same day after pre-approval review (findings 1–6 resolved: allowlist-gated emission, `production.py` route coverage, precise `userSelected` toast guard, dedicated toast container, manifest-only provenance, Phase-A-green test lane).
+Status: IMPLEMENTED — both phases landed 2026-07-02 (Phase A commit `c3fcef5`; Phase B same day: workbook deletion + regeneration + gates). Closure details in §11-closure at the end of this spec. Originally authored 2026-07-02; revised same day after pre-approval review (findings 1–6 resolved: allowlist-gated emission, `production.py` route coverage, precise `userSelected` toast guard, dedicated toast container, manifest-only provenance, Phase-A-green test lane).
 
 Parent threads: remediation spec `docs/asset-media-drift-remediation-spec-2026-06-30.md` §7 follow-up 1 (the Z06 replace-rule red gate) and the 2026-07-02 design discussion confirming the intended CBF behavior is a swap, not a block. This pass supersedes the earlier "re-shelve the five rows as excludes_any" framing: the confirmed product intent is that packages evict CBF (swap mechanic with user notification), so plain-blocking re-authoring would be a behavior regression, not a fix.
 
@@ -133,10 +133,30 @@ Checkpoint report (mechanism proof + stingray/GS replace-row classification + de
 
 AGENTS.md §11, plus: derivation manifests per model incl. the `candidate_not_emitted` inventory (~13 pairs) as its own approval queue; the stingray/GS replace-row classification report with recommendation; bounded-diff proof for both phases; toast UX evidence (screenshots or DOM assertions); disposition of deferred lanes (other-model migrations, non-CBF candidate emission, excludes_any derivation).
 
-## 10. Approval question
+## 10. Approval question (historical — approved 2026-07-02)
 
-Approve this pass as spec'd (DRAFT v2 — review findings 1–6 resolved)?
+Sean approved option (a): both phases, checkpoint report between them. Checkpoint delivered after Phase A; Phase B approved and executed the same day. The 12 `candidate_not_emitted` pairs were reviewed and explicitly deferred (Z06 lug-nut/wheel-lock cluster already block-enforced both directions via requires_any + directional excludes; Stingray 5VM/5W8 cluster dormant — both options active=False).
 
-a. Approve both phases, checkpoint report between them (recommended).
-b. Approve Phase A (mechanism + toast + tests) only; Phase B deletion approved separately after the checkpoint.
-c. Further changes to scope first.
+## 11. Closure (AGENTS §11) — completed 2026-07-02
+
+Changed:
+- Workbook: 5 `z06_rule_mapping` rows deleted by rule_id (rows 82–86: T0F/T0G/Z07/PDD/PDF → opt_cbf_001) via one-shot temp script through `save_workbook_safely()`; deletion manifest printed pre-apply; backup `backups/stingray_master-20260702-162826.xlsx`; on-disk read-back verified (80 populated rows, was 85; zero deleted ids present).
+- Generator: new `rule_derivation.py` (allowlist-gated includes-closure derivation, manifest-only provenance, stale-allowlist hard error) wired into BOTH routes — `rules.py` `build_draft_rules` (GS/Z06) and `production.py` (Stingray) via shared `extend_with_derived_swap_rules`; generic replace fallback copy corrected to "X removes Y."
+- Runtime: `app.js` eviction toast gated on `state.userSelected.has(rule.target_id)` checked before `deleteSelectedOption`; new `#toastRegion` (`index.html`) + `.toast*` styles (`styles.css`); `#alertRegion` data-warning rendering untouched.
+- Generated: z06 runtime contract + `form-app/data.js` — five authored rules replaced by five `derived_*` equivalents (same source/target pairs, `runtime_action="replace"`, verbose generated copy, NO `derived*` contract fields); rule count 85→85. Stingray/GS contracts and stingray CSV byte-identical modulo timestamps (timestamp-only churn restored).
+- Tests: `test_rule_derivation.py` (15 tests); `workbook-schema-standardization` replace test rewritten to the derivation-owns-closure contract, temporary CBF exemption added in Phase A and REMOVED in Phase B; `z06-performance-package-interactions` +3 toast tests; `z06-form-data-draft` CBF replace expectations re-pinned to derived rule ids/copy (reviewed per §5, not blind).
+- Docs: README pytest gate line includes `test_rule_derivation.py`; `asset-media-drift-remediation-spec-2026-06-30.md` follow-up-1 red-gate note flipped to RESOLVED; this spec closed.
+
+Preserved: dealer submission surfaces (eviction path calls the same `deleteSelectedOption` as before; dealer/download state verified post-eviction in browser smoke); `default_selection_rules` (CBF remains non-default selectable); stingray/GS authored replace rows (classified, kept); excludes_any machinery; workbook schema (no new columns).
+
+Gates (Phase B):
+- `validate_workbook_package.py` + `validate_workbook_schema.py`: valid / 0 issues.
+- Bounded-diff proof: z06 rules 85→85, exactly 5 removed / 5 derived added, zero changed existing rules, zero `derived*` fields in contract or `data.js`, no other top-level diffs; stingray/GS/CSV parity.
+- Full Node table: stingray-form-regression 87/87, stingray-generator-stability 15/15, grand-sport-contract-preview 6/6, grand-sport-draft-data 19/19, z06-contract-preview 3/3, z06-form-data-draft 24/24, z06-interior-accessory-cleanup 7/7, z06-performance-package-interactions 21/21, z06-runtime-rule-corrections 15/15, z06-runtime-promotion 5/5, multi-model-runtime-switching 46/46, workbook-schema-standardization 9/9 (NO exemptions), workbook-visual-copy-standardization 8/8.
+- Full pytest: 258 passed; 4 pre-existing fails reproduced BYTE-IDENTICAL against the pre-deletion backup workbook (editor-lints RWJ/WKS collision + C2/CJ2 + R3/DRZ compare keys; source-assembly display_behavior characterization) — all documented pre-pass, none touched by this pass.
+- Browser smoke (localhost:8742, real DOM): CBF select → no toast; Z07 select → CBF evicted + exactly one toast with verbose derived copy (screenshot-verified rendering, dismiss button, no UI occlusion); CBF disabled with honest derived reason while source selected; deselect → selectable again; T0G/PDD/PDF spot-checked (one toast each, verbose copy); T0F auto-adding CFZ without CBF selected → zero toasts; `#alertRegion` empty/untouched; summary shows PDD/Z07/T0F/CFZ/ROY/J57 and no CBF post-eviction; toast region fixed-position, z-index 60, fits viewport (`min(480px, 100vw - 24px)` — mobile-safe by construction).
+
+Residual risks / follow-ups:
+- 12 `candidate_not_emitted` pairs remain manifest-reported every generation (6 Stingray dormant-5VM/5W8, 6 Z06 lug-nuts/wheel-locks) — deliberate deferrals, each needs its own approval to emit. Latent note: dormant 5VM requires-5ZW vs excludes-ZF1 vs 5ZW-includes-ZF1 contradiction should be resolved if 5VM/5W8 reactivate.
+- Pre-existing reds (editor-lints ×3, source-assembly characterization ×1) still open — separately queued triage lanes, unchanged by this pass.
+- Stingray/GS authored replace rows kept authored per classification report (true defaults: Z51→FE1, FEY→T0E; the rest are non-derivable de-facto-standard replacements) — migration only under separate approval.

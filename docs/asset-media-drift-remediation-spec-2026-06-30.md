@@ -9,7 +9,7 @@ Current implementation status:
 - Phase 3 implemented in commit `dd800d3`: the hardcoded default-selected display derivation allowlist was removed, `default_selection_rules.display_behavior` became the workbook-owned authoring signal, and generated runtime behavior stayed parity-preserving.
 - Post-Phase-3 hardening implemented: schema validation now rejects invalid `default_selection_rules.display_behavior` values, and a live-workbook guard asserts only the approved three rows are populated. This was a guardrail improvement, not a behavior change.
 - Phase 4: 4A media coverage intent classification and 4B universal-expected coverage policy landed 2026-07-01; 4C stale-note/runtime-summary hardcode cleanup landed 2026-07-02; 4D wildcard/shared asset_map landed 2026-07-02 (Phase A mechanism + Phase B migration: 28 wildcard rows in, 84 exact rows out, active 192→136, generated parity proven).
-- Known unrelated red gate after Phase 3: `node --test tests/workbook-schema-standardization.test.mjs` still fails on pre-existing Z06 replace-rule rows 82-86 in `z06_rule_mapping` (`T0F/T0G/Z07/PDD/PDF` replacing `CBF`). Phase 3/hardening did not touch those rows.
+- Known unrelated red gate after Phase 3: RESOLVED 2026-07-02 by the derived-swap pass (`docs/derived-swap-eviction-spec-2026-07-02.md`): the five Z06 CBF stacked replace rows (`z06_rule_mapping` T0F/T0G/Z07/PDD/PDF → CBF) were deleted from the workbook and are now generation-derived via `scripts/corvette_form_generator/rule_derivation.py` (allowlist-gated includes-closure); `workbook-schema-standardization.test.mjs` is green with no exemptions.
 
 ## 0. Validation of the audit
 
