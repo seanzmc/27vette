@@ -1048,7 +1048,7 @@ function IngestReviewTab() {
       rpo: d.row.rpo,
       target_sheet: d.row.target_sheet,
       proposed_workbook_action: d.row.proposed_workbook_action,
-      decision_state: d.state,
+      reviewer_resolution: d.state,
       reviewer_notes: d.note || "",
       source_refs_snapshot: d.row.source_refs || [],
       raw_source_snapshot: d.row.raw_source_snapshot || {},
@@ -1093,7 +1093,10 @@ function IngestReviewTab() {
     const interpretationMode = summary.interpretation_enabled;
     return {
       version: workbookBuildMode ? 3 : interpretationMode ? 2 : 1,
-      review_mode: workbookBuildMode ? "workbook_build" : interpretationMode ? "interpretation" : "raw_candidates",
+      review_mode: workbookBuildMode ? "focused_workbook_build" : interpretationMode ? "interpretation" : "raw_candidates",
+      selected_models: summary.model_selection?.selected_models || [],
+      primary_models: summary.model_selection?.primary_models || [],
+      comparator_models: summary.model_selection?.comparator_models || [],
       selection_fingerprint: summary.workbook_build_summary?.selection_fingerprint || "",
       created_at: new Date().toISOString(),
       workbook: summary.workbook,
@@ -1157,12 +1160,21 @@ function IngestReviewTab() {
         <button class="btn" onClick=${validateDecisions}>Validate decisions</button>
         <button class="btn primary" onClick=${exportDecisions}>Export decisions JSON</button>
       </div>
+      ${summary.workbook_build_enabled && html`<div class="model-chips">
+        ${(summary.model_selection?.selected_models || []).map((m) => {
+          const comparator = (summary.model_selection?.comparator_models || []).includes(m);
+          return html`<span class=${"model-chip" + (comparator ? " comparator" : " primary")} key=${m}>
+            ${m.toUpperCase()}<em>${comparator ? "comparator" : "primary"}</em></span>`;
+        })}
+        <span class="meta">selected models from model-selection.json — comparator evidence never becomes primary-model data</span>
+      </div>`}
       <div class="ingest-summary">
         ${summary.workbook_build_enabled && html`
-          <div class="metric green"><b>${(summary.model_selection?.primary_models || []).join(", ") || "—"}</b><span>primary models</span></div>
-          <div class="metric"><b>${(summary.model_selection?.comparator_models || []).join(", ") || "none"}</b><span>comparators</span></div>
-          <div class="metric"><b>${workbookBuildSummary.lane_counts?.option_rows || 0}</b><span>option-row units</span></div>
-          <div class="metric"><b>${workbookBuildSummary.lane_counts?.ovs_rows || 0}</b><span>OVS units</span></div>
+          <div class="metric"><b>${workbookBuildSummary.lane_counts?.option_rows || 0}</b><span>option rows</span></div>
+          <div class="metric"><b>${workbookBuildSummary.lane_counts?.ovs_rows || 0}</b><span>OVS rows</span></div>
+          <div class="metric"><b>${workbookBuildSummary.lane_counts?.relationships || 0}</b><span>relationships</span></div>
+          <div class="metric"><b>${workbookBuildSummary.lane_counts?.pricing || 0}</b><span>pricing</span></div>
+          <div class="metric"><b>${workbookBuildSummary.lane_counts?.duplicates_and_source_coverage || 0}</b><span>duplicates/coverage</span></div>
           <div class="metric warn"><b>${workbookBuildSummary.lane_counts?.blocked_extractor_gaps || 0}</b><span>extractor gaps</span></div>
         `}
         ${summary.interpretation_enabled && html`
@@ -1198,14 +1210,15 @@ function IngestReviewTab() {
         <span class="title">${modeLabel}</span>
         <select value=${family} onChange=${(e) => { setFamily(e.target.value); setReason(""); setConfidence(""); setDuplicate(""); setLane(""); setAction(""); }}>
           ${summary.workbook_build_enabled && html`<option value="workbook_build">workbook-build queue</option>`}
-          ${summary.interpretation_enabled && html`<option value="interpretations">reduced review</option>`}
-          ${summary.families.map((f) => html`<option value=${f} key=${f}>${f}</option>`)}
+          ${summary.interpretation_enabled && html`<option value="interpretations">${summary.workbook_build_enabled ? "reduced review (debug)" : "reduced review"}</option>`}
+          ${summary.families.map((f) => html`<option value=${f} key=${f}>${summary.workbook_build_enabled ? `${f} (debug)` : f}</option>`)}
         </select>
         ${family === "workbook_build" && html`<select value=${lane} onChange=${(e) => setLane(e.target.value)}>
           <option value="">all workbook lanes</option>
           <option value="option_rows">option rows</option>
           <option value="ovs_rows">OVS rows</option>
           <option value="relationships">relationships</option>
+          <option value="pricing">pricing</option>
           <option value="duplicates_and_source_coverage">duplicates/source coverage</option>
           <option value="blocked_extractor_gaps">extractor gaps</option>
         </select>`}
@@ -1247,6 +1260,14 @@ function IngestReviewTab() {
           onInput=${(e) => setQuery(e.target.value)} />
         `}
       </div>
+      ${family === "workbook_build" && html`<p class="note pad lane-question">${{
+        option_rows: "Create or verify option rows for the selected models?",
+        ovs_rows: "Create or verify OVS/status matrix rows?",
+        relationships: "Which relationship hints need canonical workbook rules?",
+        pricing: "Which price rows or price gaps need workbook decisions?",
+        duplicates_and_source_coverage: "Which source sheet should own each duplicated row?",
+        blocked_extractor_gaps: "Which blocked source structures need a later extractor or manual decision?",
+      }[lane] || "Pick a workbook lane — each unit names the workbook sheet it builds or verifies."}</p>`}
       ${!rows && html`<div class="loading">Loading ${modeLabel.toLowerCase()}…</div>`}
       ${rows && html`<div class="ingest-grid">
         <div class="ingest-list">
@@ -1267,11 +1288,9 @@ function IngestReviewTab() {
               <div class="pad decision-box">
                 ${family === "workbook_build" && html`<select value=${selectedDecision.state || ""} onChange=${(e) => setDecisionState(selected, e.target.value)}>
                   <option value="">undecided</option>
-                  <option value="ready_for_apply_plan">ready for apply plan</option>
-                  <option value="needs_product_decision">needs product decision</option>
-                  <option value="ignore_source">ignore source</option>
-                  <option value="defer_extractor_gap">defer extractor gap</option>
-                  <option value="blocked">blocked</option>
+                  <option value="approved_for_plan">approved for later dry-run plan</option>
+                  <option value="hold_for_question">hold — needs a question answered</option>
+                  <option value="not_needed">not needed</option>
                 </select>`}
                 ${family !== "workbook_build" && html`<select value=${selectedDecision.state || ""} onChange=${(e) => setDecisionState(selected, e.target.value)}>
                   <option value="">undecided</option>

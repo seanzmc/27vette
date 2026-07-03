@@ -104,9 +104,19 @@ def build_model_selection(
     available = sorted(set(variant_counts) | set(unmatched_counts))
     for model in selected:
         if model not in variant_counts:
+            counts_report = "; ".join(
+                f"{key}: matched={variant_counts.get(key, 0)}, unmatched={unmatched_counts.get(key, 0)}"
+                for key in available
+            ) or "none"
+            sheets_report = "; ".join(
+                f"{key}: {', '.join(sorted(sheet_counts.get(key, {}))) or 'none'}"
+                for key in available
+            ) or "none"
             raise ValueError(
                 f"Selected model {model} was not found with matched variant columns in variant-matrix.json; "
-                f"available models: {', '.join(available) or 'none'}"
+                f"available models: {', '.join(available) or 'none'}; "
+                f"variant counts: {counts_report}; "
+                f"source sheets: {sheets_report}"
             )
         if variant_counts[model] <= 0:
             raise ValueError(f"Selected model {model} has no matched variant columns in variant-matrix.json")
@@ -149,6 +159,18 @@ def validate_selection_shape(selection: dict[str, Any], *, source: str = "model-
         raise ValueError(f"{source} primary_models and comparator_models must be lists")
     if sorted(set(primary) | set(comparator)) != sorted(selected):
         raise ValueError(f"{source} primary/comparator models must partition selected_models")
+
+
+def assert_evidence_fingerprints(selection: dict[str, Any], evidence_dir: Path, *, source: str = "model-selection.json") -> None:
+    """Fail closed when the persisted selection no longer matches the served evidence."""
+
+    current = evidence_fingerprints(Path(evidence_dir))
+    recorded = selection.get("evidence_fingerprints") or {}
+    mismatched = sorted(name for name in FINGERPRINT_FILES if recorded.get(name) != current.get(name))
+    if mismatched:
+        raise ValueError(
+            f"{source} evidence fingerprint mismatch against {evidence_dir} for: {', '.join(mismatched)}"
+        )
 
 
 def assert_selection_matches(a: dict[str, Any], b: dict[str, Any], *, left: str, right: str) -> None:

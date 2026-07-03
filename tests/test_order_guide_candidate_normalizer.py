@@ -399,7 +399,7 @@ class OrderGuideCandidateNormalizerTests(unittest.TestCase):
             workbook, evidence_dir = build_evidence(tmp)
             output_dir = tmp / "focused-candidates"
 
-            with self.assertRaisesRegex(ValueError, "Selected model z06 was not found"):
+            with self.assertRaisesRegex(ValueError, "Selected model z06 was not found") as ctx:
                 normalize_order_guide_candidates(
                     evidence_dir=evidence_dir,
                     workbook=workbook,
@@ -408,6 +408,11 @@ class OrderGuideCandidateNormalizerTests(unittest.TestCase):
                     root=ROOT,
                     selected_models=["z06"],
                 )
+            message = str(ctx.exception)
+            self.assertIn("available models:", message)
+            self.assertIn("variant counts:", message)
+            self.assertIn("source sheets:", message)
+            self.assertIn("zr1: Exterior 4", message)
             self.assertFalse((output_dir / "candidate-summary.json").exists())
 
     def test_rejects_failed_or_incomplete_evidence(self) -> None:

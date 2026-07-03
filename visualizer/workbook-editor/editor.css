@@ -273,6 +273,19 @@ td.lintmsg { max-width: 460px; white-space: normal; font-size: 12px; }
 .errlist.stale { color: var(--sky-text); }
 
 /* ── Pass 2: Ingest Review tab ── */
+/* Pass 5: selected-model chips rendered from persisted model-selection.json */
+.model-chips {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 16px 0;
+}
+.model-chip {
+  display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 10px;
+  border-radius: 999px; border: 1px solid var(--border); background: #0b1222;
+  font-weight: 600; font-size: 13px; letter-spacing: 0.02em;
+}
+.model-chip em { font-style: normal; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.model-chip.primary { border-color: #166534; color: #a7f3d0; }
+.model-chip.comparator { border-color: var(--amber); color: #fcd34d; }
+.lane-question { font-size: 13px; color: var(--sky-text); }
 .ingest-summary {
   display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 16px;
 }

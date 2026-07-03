@@ -235,18 +235,43 @@ class IngestReviewServerTest(unittest.TestCase):
                     "/api/ingest/workbook-build/validate",
                     body={
                         "version": 3,
-                        "review_mode": "workbook_build",
+                        "review_mode": "focused_workbook_build",
                         "selection_fingerprint": summary["selection_fingerprint"],
                         "workbook_build_decisions": [{
                             "review_unit_id": review_unit_id,
-                            "decision_state": "accept_for_later_apply",
+                            "lane": detail["lane"],
+                            "model_key": detail["model_key"],
+                            "target_sheet": detail["target_sheet"],
+                            "proposed_workbook_action": detail["proposed_workbook_action"],
+                            "reviewer_resolution": "approved_for_plan",
+                            "source_refs_snapshot": detail["source_refs"],
+                            "raw_source_snapshot": detail["raw_source_snapshot"],
+                            "workbook_presence_snapshot": detail["workbook_presence"],
                         }],
                     },
                     method="POST",
                 )
                 self.assertEqual(status, 200)
-                self.assertFalse(validation["ok"])
-                self.assertIn("invalid decision_state", "\n".join(validation["errors"]))
+                self.assertTrue(validation["ok"], validation["errors"])
+
+                status, legacy = self.request(
+                    "/api/ingest/workbook-build/validate",
+                    body={
+                        "version": 3,
+                        "review_mode": "focused_workbook_build",
+                        "selection_fingerprint": summary["selection_fingerprint"],
+                        "workbook_build_decisions": [{
+                            "review_unit_id": review_unit_id,
+                            "proposed_workbook_action": "accept_for_later_apply",
+                            "reviewer_resolution": "accept_for_later_apply",
+                        }],
+                    },
+                    method="POST",
+                )
+                self.assertEqual(status, 200)
+                self.assertFalse(legacy["ok"])
+                self.assertIn("invalid reviewer_resolution", "\n".join(legacy["errors"]))
+                self.assertIn("invalid proposed_workbook_action", "\n".join(legacy["errors"]))
                 self.assertEqual(workbook.stat().st_mtime_ns, mtime_before)
             finally:
                 srv.EditorHandler.ingest_review = previous_store

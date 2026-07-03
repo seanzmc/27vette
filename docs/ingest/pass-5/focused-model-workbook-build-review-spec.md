@@ -2,7 +2,7 @@
 
 Date: 2026-06-28
 Branch: `ingest-wizard`
-Status: Spec only. Do not implement until approved.
+Status: Implemented and closed 2026-07-02. See "Implementation closure" at the end of this file.
 Recommended reasoning level for implementation agent: high.
 
 ## Purpose
@@ -538,8 +538,58 @@ rg -n "accept_for_later_apply|edit_before_apply|needs_source_review|blocked_out_
 
 Any remaining hits must be either legacy compatibility/debug code or historical notes that explicitly point to Pass 5 as the current direction.
 
-## Approval question
+## Approval question (resolved)
 
-Approve Pass 5 implementation as scoped above: a read-only focused-model ingest pass that selects ZR1/ZR1X plus one comparator immediately after Pass 0 header/model profiling, filters later ingest stages to that scope, replaces abstract review decisions with workbook-destination actions, and keeps workbook/generated/runtime/dealer surfaces untouched?
+Historical: this pass was approved and implemented as scoped. No approval is pending.
 
-Recommended approval: yes. This is the smallest safe correction before any apply planning, and it addresses the actual usability failure found during Pass 4 review.
+## Implementation closure
+
+Closed: 2026-07-02.
+
+### Changed files
+
+Ingest tooling:
+
+- `scripts/corvette_form_generator/ingest/model_selection.py` — new shared helper: `--models` parsing, ZR1/ZR1X + Z06 primary/comparator inference, selection validation against Pass 0 `variant-matrix.json` (failure reports available models, per-model matched/unmatched variant counts, and source sheets), `model-selection.json` shape validation, selection fingerprints, evidence-fingerprint assertion, and selected-model row filtering that preserves unfiltered `all_status_cells` context.
+- `scripts/corvette_form_generator/ingest/candidate_normalizer.py` — accepts selected/primary/comparator models, persists `model-selection.json`, embeds `selection_metadata` in `candidate-summary.json`, and emits OVS/status candidates only for selected-model variants.
+- `scripts/corvette_form_generator/ingest/expert_interpreter.py` — consumes the persisted selection by default (fails closed on missing selection or evidence-fingerprint mismatch), copies it into the interpretation output, filters interpretation to selected models, and emits `workbook-build-summary.json` (selection metadata, selection fingerprint, evidence/candidate/interpretation/unit artifact fingerprints, six-lane counts, model/role counts, cross-check status) plus `workbook-build-review-units.json` keyed by workbook-destination lanes.
+- `scripts/order_guide_candidate_normalizer.py`, `scripts/order_guide_ingest_interpreter.py` — `--models`, `--primary-models`, `--comparator-models` CLI arguments.
+- `scripts/corvette_form_generator/ingest/review_payload.py` — focused workbook-build store: `model_selection()`, `workbook_build_summary()`, `list_workbook_build_units()`, `workbook_build_unit()`, `validate_workbook_build_decisions()`. Fails closed when a focused run is missing `model-selection.json` or any workbook-build artifact, when candidate/interpretation selection metadata disagree, on evidence-fingerprint mismatch, and on units that leak non-selected models, mislabel comparator/primary roles, or let comparator rows target primary-model sheets. Export validation requires `version: 3`, `review_mode: focused_workbook_build`, the concrete workbook-build action vocabulary, and reviewer resolutions (`approved_for_plan`, `hold_for_question`, `not_needed`); legacy Pass 2/4 labels are rejected as Pass 5 actions and remain accepted only in the legacy raw/interpretation validators.
+
+Server/UI:
+
+- `scripts/workbook_editor_server.py` — read-only `GET /api/ingest/workbook-build/{selection,summary,units,unit/<id>}` and `POST /api/ingest/workbook-build/validate`; no workbook operations are created from ingest review.
+- `visualizer/workbook-editor/editor.js` — Ingest Review defaults to the focused workbook-build queue with lane `option_rows` when focused artifacts are configured; selected-model chips (primary/comparator) render from the persisted selection after the server-side cross-check passes; all six lane counts and lane/action filters; guided lane questions; reviewer resolutions replace abstract decision states in the primary UI; legacy reduced-review/raw families remain available but labelled "(debug)"; export uses `version: 3` and `review_mode: focused_workbook_build`.
+- `visualizer/workbook-editor/editor.css` — model-chip and lane-question styling.
+
+Tests:
+
+- `tests/test_order_guide_candidate_normalizer.py` — selection artifact/filtering tests plus detailed missing-model failure reporting.
+- `tests/test_order_guide_ingest_interpreter.py` — focused workbook-build artifact tests, comparator role/leakage guarantees, inactive-scaffold presence (`existing_inactive_scaffold`), missing-candidate-selection and evidence-fingerprint fail-closed tests.
+- `tests/test_ingest_review_payload.py` — workbook-build store/queue/validation tests, fail-closed tests for missing focused artifacts and fingerprint mismatch, comparator/non-selected leakage rejection, legacy-label rejection.
+- `tests/test_editor_server_ingest_review.py` — focused endpoints default/read-only tests and export-vocabulary validation via the live server.
+
+Docs:
+
+- `docs/ingest/README.md`, `docs/ingest/pass-5/focused-model-workbook-build-review-spec.md` (this closure). `Order-Guide_IngestPrompt.md`, `docs/ingest/pass-2/interactive-review-wizard-spec.md`, `docs/ingest/pass-3/expert-interpretation-review-reduction-spec.md`, and `docs/ingest/pass-4/reduced-review-ui-spec.md` were inspected and already state that Pass 5 precedes dry-run apply planning — no change needed.
+
+### Gates run (2026-07-02, all passed)
+
+- `.venv/bin/python -m pytest tests/test_order_guide_candidate_normalizer.py tests/test_order_guide_ingest_interpreter.py tests/test_ingest_review_payload.py tests/test_editor_server_ingest_review.py -q` — 25 passed.
+- `node --check visualizer/workbook-editor/editor.js` — clean.
+- `.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx` — 0 errors / 0 warnings.
+- `git diff --exit-code -- stingray_master.xlsx form-app/data.js` and `git diff --exit-code -- $(git ls-files form-output)` — clean; `git status --short -- form-output` — empty. No workbook, registry, or generated-runtime writes.
+- Real raw-export smoke (`2027 Chevrolet Car Corvette Export_RAW.xlsx`, `--models zr1,zr1x,z06`, `--primary-models zr1,zr1x`, `--comparator-models z06`) into `/tmp/27vette-pass5-{evidence,candidates,interpretation}`: selection persisted with zr1=20/zr1x=20/z06=30 matched variant columns; `workbook-build-summary.json` reports `focused_workbook_build`, cross-check ok, lanes option_rows=609, ovs_rows=609, relationships=221, pricing=0, duplicates_and_source_coverage=589, blocked_extractor_gaps=3; 2031 units with zero comparator/non-selected leakage; ZR1/ZR1X scaffold matches reported as `existing_inactive_scaffold` only.
+- Manual browser smoke against `workbook_editor_server.py --port 8127` with the /tmp artifacts: ZR1/ZR1X primary and Z06 comparator chips, focused queue default with lane `option_rows`, six lane counts, guided lane question, reviewer-resolution decision select, raw candidate drill-down intact, decision validation round-trip ok with `version: 3` / `review_mode: focused_workbook_build`.
+- Stale-direction scan (`rg` per the validation plan): remaining hits are legacy compatibility/debug code with Pass 5 notes, tests locking the legacy vocabulary for legacy families only, or historical spec notes that explicitly point to Pass 5.
+
+### Residual risks
+
+- The pricing lane is always 0 today because no price extractor exists; price evidence surfaces only as `blocked_extractor_gaps` (`defer_price_extractor`). A later extractor pass must populate the lane before pricing review is meaningful.
+- Real-export review volume is still large (609 option-row units for three models). If reviewer sessions find the six-lane queue too big, add per-lane triage ordering before apply planning rather than reverting to abstract confidence labels.
+- Comparator-leakage validation blocks comparator units targeting primary sheets by sheet-name prefix; if a future model key prefixes another (none today), tighten the check.
+- Workbook-build unit files are trusted after selection/evidence fingerprints pass; unit-file tampering between generation and serving is only caught by the leakage/shape validators, not a units-file fingerprint check.
+
+### Next step
+
+Use the focused ZR1/ZR1X + Z06 queue in a real review session. Only after that review shape proves usable, write a separate dry-run apply-planning spec (per `Order-Guide_IngestPrompt.md`, canonical workbook writes remain a later approved pass with full AGENTS.md §5 safety). None of that is started here.

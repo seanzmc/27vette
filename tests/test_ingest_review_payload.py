@@ -94,6 +94,39 @@ class IngestReviewPayloadTests(unittest.TestCase):
             workbook_mtime_ns=workbook.stat().st_mtime_ns,
         )
 
+    def build_comparator_workbook_build_store(self, tmp: Path) -> IngestReviewStore:
+        workbook, evidence_dir = build_evidence(tmp)
+        candidates_dir = tmp / "focused-candidates"
+        normalize_order_guide_candidates(
+            evidence_dir=evidence_dir,
+            workbook=workbook,
+            output_dir=candidates_dir,
+            run_id="focused-comparator-candidates",
+            root=ROOT,
+            selected_models=["zr1", "stingray"],
+            primary_models=["zr1"],
+            comparator_models=["stingray"],
+        )
+        interpretation_dir = tmp / "focused-interpretation"
+        interpret_order_guide_candidates(
+            evidence_dir=evidence_dir,
+            candidates_dir=candidates_dir,
+            workbook=workbook,
+            output_dir=interpretation_dir,
+            run_id="focused-comparator-interpretation",
+            root=ROOT,
+            selected_models=["zr1", "stingray"],
+            primary_models=["zr1"],
+            comparator_models=["stingray"],
+        )
+        return IngestReviewStore(
+            evidence_dir=evidence_dir,
+            candidates_dir=candidates_dir,
+            interpretation_dir=interpretation_dir,
+            workbook_path=workbook,
+            workbook_mtime_ns=workbook.stat().st_mtime_ns,
+        )
+
     def test_summary_contains_artifact_fingerprints_and_counts(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             store = self.build_store(Path(tmpdir))
@@ -254,7 +287,7 @@ class IngestReviewPayloadTests(unittest.TestCase):
 
             validation = store.validate_workbook_build_decisions({
                 "version": 3,
-                "review_mode": "workbook_build",
+                "review_mode": "focused_workbook_build",
                 "selection_fingerprint": summary["workbook_build_summary"]["selection_fingerprint"],
                 "workbook_build_decisions": [{
                     "review_unit_id": detail["review_unit_id"],
@@ -263,7 +296,7 @@ class IngestReviewPayloadTests(unittest.TestCase):
                     "rpo": detail["rpo"],
                     "target_sheet": detail["target_sheet"],
                     "proposed_workbook_action": detail["proposed_workbook_action"],
-                    "decision_state": "ready_for_apply_plan",
+                    "reviewer_resolution": "approved_for_plan",
                     "reviewer_notes": "source evidence checked",
                     "source_refs_snapshot": detail["source_refs"],
                     "raw_source_snapshot": detail["raw_source_snapshot"],
@@ -277,11 +310,105 @@ class IngestReviewPayloadTests(unittest.TestCase):
                 "version": 3,
                 "review_mode": "workbook_build",
                 "selection_fingerprint": "wrong",
-                "workbook_build_decisions": [{"review_unit_id": detail["review_unit_id"], "decision_state": "accept_for_later_apply"}],
+                "workbook_build_decisions": [{
+                    "review_unit_id": detail["review_unit_id"],
+                    "proposed_workbook_action": "accept_for_later_apply",
+                    "reviewer_resolution": "edit_before_apply",
+                }],
             })
             self.assertFalse(bad["ok"])
+            self.assertTrue(any("review_mode must be focused_workbook_build" in error for error in bad["errors"]))
             self.assertTrue(any("selection_fingerprint" in error for error in bad["errors"]))
-            self.assertTrue(any("invalid decision_state" in error for error in bad["errors"]))
+            self.assertTrue(any("invalid reviewer_resolution" in error for error in bad["errors"]))
+            self.assertTrue(any("invalid proposed_workbook_action" in error for error in bad["errors"]))
+
+    def test_workbook_build_store_fails_closed_on_missing_focused_artifacts(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            store = self.build_workbook_build_store(tmp)
+            store.summary()
+
+            units_path = tmp / "focused-interpretation" / "workbook-build-review-units.json"
+            units_backup = units_path.read_text()
+            units_path.unlink()
+            broken = IngestReviewStore(
+                evidence_dir=store.evidence_dir,
+                candidates_dir=store.candidates_dir,
+                interpretation_dir=store.interpretation_dir,
+                workbook_path=store.workbook_path,
+                workbook_mtime_ns=store.workbook_mtime_ns,
+            )
+            with self.assertRaisesRegex(ValueError, "workbook-build-review-units.json"):
+                broken.summary()
+            units_path.write_text(units_backup)
+
+            selection_path = tmp / "focused-candidates" / "model-selection.json"
+            selection_backup = selection_path.read_text()
+            selection_path.unlink()
+            broken = IngestReviewStore(
+                evidence_dir=store.evidence_dir,
+                candidates_dir=store.candidates_dir,
+                interpretation_dir=store.interpretation_dir,
+                workbook_path=store.workbook_path,
+                workbook_mtime_ns=store.workbook_mtime_ns,
+            )
+            with self.assertRaisesRegex(ValueError, "model-selection.json"):
+                broken.summary()
+            selection_path.write_text(selection_backup)
+
+    def test_workbook_build_store_fails_closed_on_evidence_fingerprint_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            store = self.build_workbook_build_store(tmp)
+            matrix_path = tmp / "evidence" / "variant-matrix.json"
+            matrix_path.write_text(matrix_path.read_text() + "\n")
+            broken = IngestReviewStore(
+                evidence_dir=store.evidence_dir,
+                candidates_dir=store.candidates_dir,
+                interpretation_dir=store.interpretation_dir,
+                workbook_path=store.workbook_path,
+                workbook_mtime_ns=store.workbook_mtime_ns,
+            )
+            with self.assertRaisesRegex(ValueError, "evidence fingerprint mismatch"):
+                broken.summary()
+
+    def test_workbook_build_store_rejects_model_leakage_in_units(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            store = self.build_comparator_workbook_build_store(tmp)
+            summary = store.summary()
+            self.assertEqual(summary["model_selection"]["comparator_models"], ["stingray"])
+
+            units_path = tmp / "focused-interpretation" / "workbook-build-review-units.json"
+            units = json.loads(units_path.read_text())
+            comparator_unit = next(unit for unit in units if unit["model_role"] == "comparator")
+            tampered = json.loads(units_path.read_text())
+            for unit in tampered:
+                if unit["review_unit_id"] == comparator_unit["review_unit_id"]:
+                    unit["target_sheet"] = "zr1_options"
+            units_path.write_text(json.dumps(tampered, indent=2) + "\n")
+            broken = IngestReviewStore(
+                evidence_dir=store.evidence_dir,
+                candidates_dir=store.candidates_dir,
+                interpretation_dir=store.interpretation_dir,
+                workbook_path=store.workbook_path,
+                workbook_mtime_ns=store.workbook_mtime_ns,
+            )
+            with self.assertRaisesRegex(ValueError, "comparator.*target primary sheet"):
+                broken.summary()
+
+            tampered = json.loads(json.dumps(units))
+            tampered[0]["model_key"] = "z06"
+            units_path.write_text(json.dumps(tampered, indent=2) + "\n")
+            broken = IngestReviewStore(
+                evidence_dir=store.evidence_dir,
+                candidates_dir=store.candidates_dir,
+                interpretation_dir=store.interpretation_dir,
+                workbook_path=store.workbook_path,
+                workbook_mtime_ns=store.workbook_mtime_ns,
+            )
+            with self.assertRaisesRegex(ValueError, "leaks non-selected model"):
+                broken.summary()
 
 
 if __name__ == "__main__":

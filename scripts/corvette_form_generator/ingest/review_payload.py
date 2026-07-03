@@ -55,12 +55,35 @@ ALLOWED_DECISION_STATES = {
     "needs_source_review",
     "blocked_out_of_scope",
 }
-ALLOWED_WORKBOOK_BUILD_DECISION_STATES = {
-    "ready_for_apply_plan",
+# Pass 5 focused workbook-build vocabulary. The proposed action names the
+# workbook destination/work implied by the unit; the reviewer resolution only
+# says whether the reviewer accepts that unit for a later dry-run plan.
+ALLOWED_WORKBOOK_BUILD_ACTIONS = {
+    "create_option_row",
+    "verify_existing_option_row",
+    "create_ovs_rows",
+    "verify_status_matrix",
+    "create_relationship_candidate",
+    "classify_duplicate_source",
+    "defer_price_extractor",
+    "defer_color_trim_extractor",
     "needs_product_decision",
-    "ignore_source",
-    "defer_extractor_gap",
-    "blocked",
+    "needs_source_mapping_decision",
+    "ignore_for_selected_models",
+    "blocked_unsupported_source_structure",
+}
+ALLOWED_WORKBOOK_BUILD_RESOLUTIONS = {
+    "approved_for_plan",
+    "hold_for_question",
+    "not_needed",
+}
+WORKBOOK_BUILD_LANES = {
+    "option_rows",
+    "ovs_rows",
+    "relationships",
+    "pricing",
+    "duplicates_and_source_coverage",
+    "blocked_extractor_gaps",
 }
 
 
@@ -365,18 +388,34 @@ class IngestReviewStore:
         workbook_build_summary: dict[str, Any] = {}
         workbook_build_units: list[dict[str, Any]] = []
         evidence_artifacts = artifact_fingerprints(self.evidence_dir, EVIDENCE_FILES)
+        candidates_selection_path = self.candidates_dir / "model-selection.json"
         if self.interpretation_dir is not None:
             interpretation = {name: _read_json(self.interpretation_dir / name) for name in INTERPRETATION_FILES}
             _validate_interpretation_artifacts(interpretation)
-            workbook_build_enabled = all((self.interpretation_dir / name).exists() for name in WORKBOOK_BUILD_FILES)
-            if workbook_build_enabled:
+            present = [name for name in WORKBOOK_BUILD_FILES if (self.interpretation_dir / name).exists()]
+            focused = bool(present) or candidates_selection_path.exists() or bool(candidate_summary.get("selection_metadata"))
+            if focused:
+                # Fail closed: a focused Pass 5 run must never fall back to the
+                # broad all-model review because an artifact is missing.
+                missing = [name for name in WORKBOOK_BUILD_FILES if name not in present]
+                if missing:
+                    raise ValueError(
+                        "Focused Pass 5 candidates require workbook-build artifacts; "
+                        f"missing from {self.interpretation_dir}: {', '.join(missing)}"
+                    )
+                if not candidates_selection_path.exists():
+                    raise ValueError(
+                        f"Missing required focused model-selection.json artifact: {candidates_selection_path}"
+                    )
                 for name in WORKBOOK_BUILD_FILES:
                     interpretation[name] = _read_json(self.interpretation_dir / name)
                 _validate_workbook_build_artifacts(
                     interpretation,
+                    candidates_selection=_read_json(candidates_selection_path),
                     candidate_summary=candidate_summary,
                     evidence_artifacts=evidence_artifacts,
                 )
+                workbook_build_enabled = True
                 model_selection = interpretation["model-selection.json"]
                 workbook_build_summary = interpretation["workbook-build-summary.json"]
                 workbook_build_units = interpretation["workbook-build-review-units.json"]
@@ -477,8 +516,8 @@ def validate_workbook_build_decisions(
     errors: list[str] = []
     if payload.get("version") != 3:
         errors.append("version must be 3")
-    if payload.get("review_mode") != "workbook_build":
-        errors.append("review_mode must be workbook_build")
+    if payload.get("review_mode") != "focused_workbook_build":
+        errors.append("review_mode must be focused_workbook_build")
     if payload.get("selection_fingerprint") != expected_selection_fingerprint:
         errors.append("selection_fingerprint does not match focused workbook-build artifacts")
     decisions = payload.get("workbook_build_decisions")
@@ -487,14 +526,16 @@ def validate_workbook_build_decisions(
         decisions = []
     for index, decision in enumerate(decisions):
         ctx = f"workbook_build_decisions[{index}]"
-        if decision.get("decision_state") not in ALLOWED_WORKBOOK_BUILD_DECISION_STATES:
-            errors.append(f"{ctx}: invalid decision_state")
+        if decision.get("reviewer_resolution") not in ALLOWED_WORKBOOK_BUILD_RESOLUTIONS:
+            errors.append(f"{ctx}: invalid reviewer_resolution")
+        if decision.get("proposed_workbook_action") not in ALLOWED_WORKBOOK_BUILD_ACTIONS:
+            errors.append(f"{ctx}: invalid proposed_workbook_action")
         unit_id = decision.get("review_unit_id")
         if not unit_id:
             errors.append(f"{ctx}: missing review_unit_id")
         elif unit_id not in known_unit_ids:
             errors.append(f"{ctx}: unknown review_unit_id")
-        for key in ("lane", "model_key", "target_sheet", "proposed_workbook_action", "workbook_presence_snapshot"):
+        for key in ("lane", "model_key", "target_sheet", "workbook_presence_snapshot"):
             if key not in decision:
                 errors.append(f"{ctx}: missing {key}")
         if not decision.get("source_refs_snapshot"):
@@ -507,6 +548,7 @@ def validate_workbook_build_decisions(
 def _validate_workbook_build_artifacts(
     artifacts: dict[str, Any],
     *,
+    candidates_selection: dict[str, Any],
     candidate_summary: dict[str, Any],
     evidence_artifacts: dict[str, dict[str, Any]],
 ) -> None:
@@ -517,7 +559,11 @@ def _validate_workbook_build_artifacts(
         raise ValueError("model-selection.json must have version 1")
     if not selection.get("selected_models"):
         raise ValueError("model-selection.json missing selected_models")
-    if candidate_summary.get("selection_metadata") and candidate_summary["selection_metadata"] != selection:
+    if candidates_selection != selection:
+        raise ValueError("candidate model-selection.json does not match interpretation model-selection.json")
+    if not candidate_summary.get("selection_metadata"):
+        raise ValueError("candidate-summary.json is missing selection_metadata for a focused Pass 5 run")
+    if candidate_summary["selection_metadata"] != selection:
         raise ValueError("candidate-summary.json selection_metadata does not match model-selection.json")
     for name, expected_sha in (selection.get("evidence_fingerprints") or {}).items():
         if evidence_artifacts.get(name, {}).get("sha256") != expected_sha:
@@ -528,6 +574,9 @@ def _validate_workbook_build_artifacts(
         raise ValueError("workbook-build-summary.json selection_metadata does not match model-selection.json")
     if not isinstance(units, list):
         raise ValueError("workbook-build-review-units.json must be a list")
+    selected = set(selection.get("selected_models") or [])
+    primary = set(selection.get("primary_models") or [])
+    comparator = set(selection.get("comparator_models") or [])
     for index, unit in enumerate(units, start=1):
         required = {
             "review_unit_id",
@@ -543,6 +592,37 @@ def _validate_workbook_build_artifacts(
         missing = sorted(required - set(unit))
         if missing:
             raise ValueError(f"workbook-build-review-units.json item {index} missing keys: {missing}")
+        if unit.get("lane") not in WORKBOOK_BUILD_LANES:
+            raise ValueError(f"workbook-build-review-units.json item {index} has unknown lane {unit.get('lane')!r}")
+        if unit.get("proposed_workbook_action") not in ALLOWED_WORKBOOK_BUILD_ACTIONS:
+            raise ValueError(
+                f"workbook-build-review-units.json item {index} has unsupported proposed_workbook_action "
+                f"{unit.get('proposed_workbook_action')!r}"
+            )
+        model_key = unit.get("model_key") or ""
+        if unit.get("lane") == "blocked_extractor_gaps" and not model_key:
+            continue
+        if model_key not in selected:
+            raise ValueError(
+                f"workbook-build-review-units.json item {index} leaks non-selected model {model_key!r}"
+            )
+        role = unit.get("model_role")
+        if model_key in comparator and role != "comparator":
+            raise ValueError(
+                f"workbook-build-review-units.json item {index} must mark comparator model {model_key!r} as comparator"
+            )
+        if model_key in primary and role != "primary":
+            raise ValueError(
+                f"workbook-build-review-units.json item {index} must mark primary model {model_key!r} as primary"
+            )
+        if role == "comparator":
+            target = str(unit.get("target_sheet") or "")
+            leaked = next((m for m in primary if target == m or target.startswith(f"{m}_")), None)
+            if leaked:
+                raise ValueError(
+                    f"workbook-build-review-units.json item {index} lets comparator {model_key!r} "
+                    f"target primary sheet {target!r} for model {leaked!r}"
+                )
 
 
 def _contains_model(row: dict[str, Any], model: str) -> bool:

@@ -303,6 +303,80 @@ class OrderGuideIngestInterpreterTests(unittest.TestCase):
             self.assertEqual(ovs_unit["target_sheet"], "zr1_ovs")
             self.assertEqual(ovs_unit["proposed_workbook_action"], "verify_status_matrix")
 
+    def test_focused_interpretation_marks_comparator_units_and_never_targets_primary_sheets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            workbook, evidence_dir = build_focused_evidence(tmp)
+            candidates_dir = tmp / "focused-candidates"
+            normalize_order_guide_candidates(
+                evidence_dir=evidence_dir,
+                workbook=workbook,
+                output_dir=candidates_dir,
+                run_id="focused-comparator-candidates",
+                root=ROOT,
+                selected_models=["zr1", "stingray"],
+                primary_models=["zr1"],
+                comparator_models=["stingray"],
+            )
+            output_dir = tmp / "focused-interpretation"
+            interpret_order_guide_candidates(
+                evidence_dir=evidence_dir,
+                candidates_dir=candidates_dir,
+                workbook=workbook,
+                output_dir=output_dir,
+                run_id="focused-comparator-interpretation",
+                root=ROOT,
+                selected_models=["zr1", "stingray"],
+                primary_models=["zr1"],
+                comparator_models=["stingray"],
+            )
+
+            units = json.loads((output_dir / "workbook-build-review-units.json").read_text())
+            comparator_units = [unit for unit in units if unit["model_key"] == "stingray"]
+            primary_units = [unit for unit in units if unit["model_key"] == "zr1"]
+            self.assertTrue(comparator_units)
+            self.assertTrue(primary_units)
+            for unit in comparator_units:
+                self.assertEqual(unit["model_role"], "comparator")
+                self.assertTrue(unit["comparator_context"]["comparator_only"])
+                self.assertFalse(unit["target_sheet"].startswith("zr1"), unit["target_sheet"])
+            for unit in primary_units:
+                self.assertEqual(unit["model_role"], "primary")
+
+            summary = json.loads((output_dir / "workbook-build-summary.json").read_text())
+            self.assertGreaterEqual(summary["model_role_counts"]["comparator"], 1)
+            self.assertGreaterEqual(summary["model_role_counts"]["primary"], 1)
+            self.assertIn("evidence", summary["artifact_fingerprints"])
+            self.assertIn("candidates", summary["artifact_fingerprints"])
+            self.assertIn("interpretation", summary["artifact_fingerprints"])
+            self.assertIn("model-selection.json", summary["artifact_fingerprints"]["candidates"])
+
+    def test_focused_interpretation_fails_closed_on_evidence_fingerprint_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            workbook, evidence_dir = build_focused_evidence(tmp)
+            candidates_dir = tmp / "focused-candidates"
+            normalize_order_guide_candidates(
+                evidence_dir=evidence_dir,
+                workbook=workbook,
+                output_dir=candidates_dir,
+                run_id="focused-candidates",
+                root=ROOT,
+                selected_models=["zr1"],
+            )
+            matrix_path = evidence_dir / "variant-matrix.json"
+            matrix_path.write_text(matrix_path.read_text() + "\n")
+
+            with self.assertRaisesRegex(ValueError, "evidence fingerprint mismatch"):
+                interpret_order_guide_candidates(
+                    evidence_dir=evidence_dir,
+                    candidates_dir=candidates_dir,
+                    workbook=workbook,
+                    output_dir=tmp / "focused-interpretation",
+                    run_id="focused-interpretation",
+                    root=ROOT,
+                )
+
     def test_focused_interpretation_requires_candidate_selection_metadata(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)

@@ -14,6 +14,7 @@ from typing import Any
 from openpyxl import load_workbook
 
 from corvette_form_generator.ingest.model_selection import (
+    assert_evidence_fingerprints,
     assert_selection_matches,
     build_model_selection,
     read_model_selection,
@@ -128,6 +129,7 @@ def interpret_order_guide_candidates(
             selection_metadata=selection_metadata,
             workbook_build_units=workbook_build_units,
             output_dir=output_dir,
+            candidates_dir=candidates_dir,
         )
         write_json(output_dir / "workbook-build-summary.json", workbook_build_summary)
     summary["artifact_files"] = OUTPUT_FILES + (WORKBOOK_BUILD_FILES if selection_metadata else [])
@@ -184,7 +186,9 @@ def load_or_validate_selection(
         assert_selection_matches(selection, expected, left="candidate model-selection.json", right="interpreter selected-model args")
         return selection
     if selection_path.exists():
-        return read_model_selection(selection_path)
+        selection = read_model_selection(selection_path)
+        assert_evidence_fingerprints(selection, evidence_dir, source=str(selection_path))
+        return selection
     return None
 
 
@@ -861,11 +865,24 @@ def build_workbook_build_summary(
     selection_metadata: dict[str, Any],
     workbook_build_units: list[dict[str, Any]],
     output_dir: Path,
+    candidates_dir: Path,
 ) -> dict[str, Any]:
     lane_counts = Counter(unit["lane"] for unit in workbook_build_units)
     model_counts = Counter(unit.get("model_key") or "all_selected" for unit in workbook_build_units)
     role_counts = Counter(unit.get("model_role") or "selected" for unit in workbook_build_units)
-    artifact_fingerprints = {}
+    artifact_fingerprints: dict[str, Any] = {
+        "evidence": dict(selection_metadata.get("evidence_fingerprints") or {}),
+        "candidates": {
+            name: sha256_file(candidates_dir / name)
+            for name in list(CANDIDATE_FILES) + ["model-selection.json"]
+            if (candidates_dir / name).exists()
+        },
+        "interpretation": {
+            name: sha256_file(output_dir / name)
+            for name in OUTPUT_FILES
+            if (output_dir / name).exists()
+        },
+    }
     units_path = output_dir / "workbook-build-review-units.json"
     if units_path.exists():
         artifact_fingerprints["workbook-build-review-units.json"] = sha256_file(units_path)
