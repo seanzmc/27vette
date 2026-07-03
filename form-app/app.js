@@ -202,6 +202,61 @@ function formatMoney(value) {
   }).format(Number(value || 0));
 }
 
+function renderPriceSpan(value, className = "price") {
+  const amount = Number(value || 0);
+  if (amount === 0) return `<span class="${className} included">Included</span>`;
+  return `<span class="${className}">${formatMoney(amount)}</span>`;
+}
+
+/* ---- 1a "Full Carbon": dynamic accent follows the selected exterior paint (SPEC §2) ---- */
+const ACCENT_FOLLOWS_PAINT = true;
+const DEFAULT_PAINT_ACCENT = { accent: "#d0425a", accentDark: "#b22234", onAccent: "#ffffff", accentGlow: "rgba(208,66,90,.40)" };
+const PAINT_ACCENTS = {
+  GKZ: DEFAULT_PAINT_ACCENT,
+  G4Z: { accent: "#4fae6e", accentDark: "#2e7d4f", onAccent: "#06210f", accentGlow: "rgba(79,174,110,.36)" },
+  GTR: { accent: "#3f73ff", accentDark: "#1d4ed8", onAccent: "#ffffff", accentGlow: "rgba(63,115,255,.40)" },
+  GBK: { accent: "#ffc81f", accentDark: "#e0a400", onAccent: "#1c1606", accentGlow: "rgba(255,200,31,.36)" },
+  G26: { accent: "#ff6a1a", accentDark: "#d8480a", onAccent: "#1c0d04", accentGlow: "rgba(255,106,26,.38)" },
+  GPH: { accent: "#cf3e5e", accentDark: "#8a1a2c", onAccent: "#ffffff", accentGlow: "rgba(207,62,94,.38)" },
+};
+
+function formAssetBase() {
+  return typeof window !== "undefined" && window.SC_FORM_ASSET_BASE ? window.SC_FORM_ASSET_BASE : "./assets/";
+}
+
+function selectedPaintChoice() {
+  const candidateIds = new Set([...state.selected, ...computeAutoAdded().keys()]);
+  for (const optionId of candidateIds) {
+    const option = optionsById.get(optionId);
+    if (option?.step_key === "paint") return option;
+  }
+  return null;
+}
+
+function applyAccentForPaint() {
+  if (!ACCENT_FOLLOWS_PAINT || typeof document === "undefined") return;
+  const paint = selectedPaintChoice();
+  const theme = (paint && PAINT_ACCENTS[String(paint.rpo || "").toUpperCase()]) || DEFAULT_PAINT_ACCENT;
+  const rootStyle = document.documentElement.style;
+  rootStyle.setProperty("--accent", theme.accent);
+  rootStyle.setProperty("--accent-dark", theme.accentDark);
+  rootStyle.setProperty("--on-accent", theme.onAccent);
+  rootStyle.setProperty("--accent-glow", theme.accentGlow);
+}
+
+function renderVehicleStage() {
+  const paint = selectedPaintChoice();
+  const rpo = String(paint?.rpo || "GKZ").toUpperCase();
+  const name = paint?.label || "Torch Red";
+  return `
+    <div class="vehicle-stage">
+      <div class="vehicle-stage-glow"></div>
+      <img src="${formAssetBase()}vehicle/${rpo.toLowerCase()}.png" alt="${escapeHtml(name)}">
+      <div class="vehicle-stage-pill"><span class="rpo">${escapeHtml(rpo)}</span><span>${escapeHtml(name)}</span></div>
+    </div>
+  `;
+}
+
 function escapeHtml(value) {
   return String(value || "")
     .replace(/&/g, "&amp;")
@@ -1878,15 +1933,18 @@ function renderMobileProgress() {
 }
 
 function renderStepRail() {
-  els.stepRail.innerHTML = visibleRuntimeSteps()
-    .map(
-      (step, index) => `
-        <button class="step-link ${normalizeStepKey(state.activeStep) === step.step_key ? "active" : ""}" data-step="${step.step_key}" type="button">
-          <span class="step-index">${index + 1}</span>
+  const steps = visibleRuntimeSteps();
+  const activeIndex = steps.findIndex((step) => normalizeStepKey(state.activeStep) === step.step_key);
+  els.stepRail.innerHTML = steps
+    .map((step, index) => {
+      const isComplete = activeIndex >= 0 && index < activeIndex;
+      return `
+        <button class="step-link ${index === activeIndex ? "active" : ""}${isComplete ? " complete" : ""}" data-step="${step.step_key}" type="button">
+          <span class="step-index">${isComplete ? "✓" : index + 1}</span>
           <span>${step.step_label}</span>
         </button>
-      `
-    )
+      `;
+    })
     .join("");
   els.stepRail.querySelectorAll(".step-link").forEach((button) => {
     button.addEventListener("click", () => {
@@ -1908,7 +1966,7 @@ function renderChoiceCard(choice, autoAdded) {
   if (disabledReason) classes.push("disabled");
   if (autoReason) classes.push("auto");
   const displayPrice = choiceDisplayPrice(choice);
-  const priceMarkup = displayPrice === null ? "" : `<span class=\"price\">${formatMoney(displayPrice)}</span>`;
+  const priceMarkup = displayPrice === null ? "" : renderPriceSpan(displayPrice);
   return `
     <button class="${classes.join(" ")}" type="button" data-option="${choice.option_id}" ${disabled ? "aria-disabled=\"true\"" : ""}>
       ${renderCardMedia(choice, choice.label, { disabled: mediaDisabled })}
@@ -1959,7 +2017,7 @@ function renderInteriorCard(interior) {
   return `
     <button class="${classes.join(" ")}" type="button" data-interior="${interior.interior_id}" ${disabledReason ? "aria-disabled=\"true\"" : ""}>
       ${renderCardMedia(interior, label, { disabled: Boolean(disabledReason) })}
-      <span class="topline"><span class="rpo">${interior.interior_code}</span><span class="price">${formatMoney(adjustedInteriorDisplayPrice(interior))}</span></span>
+      <span class="topline"><span class="rpo">${interior.interior_code}</span>${renderPriceSpan(adjustedInteriorDisplayPrice(interior))}</span>
       <span class="choice-name"><span>${escapeHtml(label)}</span>${renderInfoTooltip(detail || interior.interior_id, "Interior details", { focusable: false })}</span>
       ${renderChoiceAvailability(disabledReason ? renderStatePill("Unavailable", "disabled-reason", disabledReason) : "")}
     </button>
@@ -2579,6 +2637,7 @@ function renderStepContent({ resetScroll = false } = {}) {
       })
       .join("");
     if (!body) body = "<p class=\"empty\">No choices are mapped to this step for the active body and trim.</p>";
+    if (state.activeStep === "paint") body = renderVehicleStage() + body;
   }
 
   const next = nextStep();
@@ -2648,7 +2707,7 @@ function renderSummaryRpoRow(item, { includeReason = false } = {}) {
     <li class="summary-rpo-row">
       <span class="summary-rpo-code">${escapeHtml(item.rpo || item.id)}</span>
       <span class="summary-rpo-label">${escapeHtml(item.label)}</span>
-      <span class="summary-rpo-price">${formatMoney(item.price)}</span>
+      ${renderPriceSpan(item.price, "summary-rpo-price")}
       ${includeReason && item.reason ? renderInfoTooltip(item.reason, "Auto-added reason") : ""}
     </li>
   `;
@@ -3214,6 +3273,7 @@ function activateModel(modelKey, { preserveCustomer = true, shouldRender = true,
 
 function render({ resetScroll = false, preserveScroll = false } = {}) {
   const scrollPosition = preserveScroll ? captureScrollPosition() : null;
+  applyAccentForPaint();
   renderModelChrome();
   renderStepRail();
   renderStepContent({ resetScroll });

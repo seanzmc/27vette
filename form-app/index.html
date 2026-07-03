@@ -10,13 +10,19 @@
   </head>
   <body>
     <main class="app-shell">
+      <div class="accent-stripe" aria-hidden="true"></div>
       <header class="topbar">
         <button id="openStepDrawerButton" class="mobile-drawer-button mobile-drawer-button-left" type="button" aria-controls="stepRailDrawer" aria-expanded="false" aria-label="Open steps">
           <span aria-hidden="true">☰</span>
         </button>
-        <div>
-          <p class="eyebrow">2027 Corvette</p>
-          <h1 id="appTitle">Stingray Order Form</h1>
+        <div class="brand-block">
+          <img class="brand-crossflags" src="./assets/logo/crossflags-white.png" alt="Corvette crossed flags">
+          <img class="brand-wordmark" src="./assets/logo/stingray-wordmark-white.png" alt="Stingray Corvette">
+          <div class="brand-divider" aria-hidden="true"></div>
+          <div>
+            <p class="eyebrow">2027 Corvette</p>
+            <h1 id="appTitle">Stingray Order Form</h1>
+          </div>
         </div>
         <div class="toolbar" aria-label="Build actions">
           <div class="toolbar-action-group toolbar-utility-group">
@@ -86,7 +92,7 @@
             <dl class="total-list">
               <div><dt>Base</dt><dd id="summaryBase">$0</dd></div>
               <div><dt>Options</dt><dd id="summaryOptions">$0</dd></div>
-              <div><dt>Total MSRP</dt><dd id="summaryTotal">$0</dd></div>
+              <div class="grand"><dt>Total MSRP</dt><dd id="summaryTotal">$0</dd></div>
             </dl>
           </div>
           <div id="selectedRposCard" class="summary-card">
